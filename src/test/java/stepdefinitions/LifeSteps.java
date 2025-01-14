@@ -5,20 +5,20 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import pages.LoginPage;
+import pages.Navigation;
 
 public class LifeSteps {
 
-    LoginPage loginPage = new LoginPage(DriverFactory.getPage());
+    Navigation navigation = new Navigation(DriverFactory.getPage());
 
     @Given("Life application is logged in as {string}")
     public void life_application_is_looged_in_as(String string) {
-        loginPage.navigateToUrl();
-        loginPage.enterUsername(string);
-        loginPage.enterPassword();
-        loginPage.clickLogin();
-        Assert.assertEquals("", "Admin Dashboard", loginPage.verifyProfilePage());
-        System.out.println(loginPage.verifyProfilePage());
+        navigation.navigateToUrl();
+        navigation.enterUsername(string);
+        navigation.enterPassword();
+        navigation.clickLogin();
+        Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
+        System.out.println(navigation.verifyProfilePage());
     }
 
     @Given("I click create campaign")

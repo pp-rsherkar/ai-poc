@@ -4,13 +4,13 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import utils.WebActions;
 
-public class LoginPage {
+public class Navigation {
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
     private final Page page;
 
-    public LoginPage(Page page) {
+    public Navigation(Page page) {
         this.page = page;
         this.USERNAME = page.locator("#UserName");
         this.PASSWORD = page.locator("#Password");
