@@ -4,6 +4,7 @@ import com.microsoft.playwright.*;
 import utils.WebActions;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 public class DriverFactory {
@@ -51,12 +52,15 @@ public class DriverFactory {
         }
         if (browserType == null) throw new IllegalArgumentException("Could not Launch Browser for type" + browserType);
         //context = browser.newContext();
-        BrowserContext context = browserType.launchPersistentContext(userDataDir, new BrowserType.LaunchPersistentContextOptions().setHeadless(headless).setViewportSize(1280,720));
+        BrowserContext context = browserType.launchPersistentContext(userDataDir, new BrowserType.LaunchPersistentContextOptions().setHeadless(headless).setViewportSize(1366,607));
         //Below line is used to start the trace file
         //context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
         page = context.newPage();
-        //int width = page.viewportSize().width;
-       // int height = page.viewportSize().height;
+//        int width = (int) page.evaluate("window.innerWidth");
+//        int height = (int) page.evaluate("window.innerHeight");
+//        System.out.println("Dynamic Viewport Size: " + width + " x " + height);
+//        page.setViewportSize(width,height);
+
         //BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(width,height));
 
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
