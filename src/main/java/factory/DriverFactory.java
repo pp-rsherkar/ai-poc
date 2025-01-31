@@ -2,6 +2,9 @@ package factory;
 
 import com.microsoft.playwright.*;
 import utils.WebActions;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class DriverFactory {
     public static BrowserContext context;
@@ -28,6 +31,7 @@ public class DriverFactory {
 
     //Launches Browser as set by user in config file
     public Page initDriver(String browserName) {
+        Path userDataDir = Paths.get("C:\\Users\\nparab\\AppData\\Local\\ms-playwright\\chromium-1134\\chrome-win\\").toAbsolutePath();
         BrowserType browserType = null;
         boolean headless = Boolean.parseBoolean(WebActions.getProperty("headless"));
         switch (browserName) {
@@ -38,6 +42,7 @@ public class DriverFactory {
             case "chrome":
                 browserType = Playwright.create().chromium();
                 browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless));
+                //browser = browserType.launchPersistentContext(userDataDir,new BrowserType.LaunchPersistentContextOptions().setHeadless(headless));
                 break;
             case "webkit":
                 browserType = Playwright.create().webkit();
@@ -45,12 +50,24 @@ public class DriverFactory {
                 break;
         }
         if (browserType == null) throw new IllegalArgumentException("Could not Launch Browser for type" + browserType);
-        context = browser.newContext();
+        //context = browser.newContext();
+        BrowserContext context = browserType.launchPersistentContext(userDataDir, new BrowserType.LaunchPersistentContextOptions().setHeadless(headless).setViewportSize(1280,720));
         //Below line is used to start the trace file
-        context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
+        //context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
         page = context.newPage();
+        //int width = page.viewportSize().width;
+       // int height = page.viewportSize().height;
+        //BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(width,height));
+
+        context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
+
+        // Print the viewport size
+       // System.out.println("Viewport Size: " + width + "x" + height);
+        //page = context.pages().get(0);
+
         threadLocalDriver.set(page);
         threadLocalContext.set(context);
         return page;
+
     }
 }
