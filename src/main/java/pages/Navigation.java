@@ -17,16 +17,16 @@ public class Navigation {
         this.LOGIN_BUTTON = page.locator(".loginLabel");
     }
 
-    public void navigateToUrl() {
-        this.page.navigate(WebActions.getProperty("url"));
+    public void navigateToUrl(String url) {
+        this.page.navigate(url);
     }
 
-    public void enterUsername(String userName) {
-        USERNAME.fill(WebActions.getProperty("user"));
+    public void enterUsername(String userName, String username) {
+        USERNAME.fill(username);
     }
 
-    public void enterPassword() {
-        PASSWORD.fill(WebActions.getProperty("password"));
+    public void enterPassword(String password) {
+        PASSWORD.fill(password);
     }
 
     public void clickLogin() {

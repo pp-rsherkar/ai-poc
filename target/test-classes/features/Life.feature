@@ -3,7 +3,7 @@ Feature: LIFE Regression - Create a campaign, Add tactics, generate a report
   Background: Setup test environment for feature execution
     Given This feature will be executed in the "Demo" environment
 
-  @regression
+  @purvesh
   Scenario Outline: Create a Campaign
     Given Life application is logged in as "<USER>"
     And User navigates to the Campaign Dashboard
