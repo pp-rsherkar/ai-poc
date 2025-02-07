@@ -1,0 +1,80 @@
+<changelist name="Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]" date="1738930949287" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2/7/2025 5:51 PM [Changes]" />
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/testrunner/TestRunner.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/TestRunner.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/stepdefinitions/ApiSteps.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/ApiSteps.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/EnableStudioforAccount.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/EnableStudioforAccount.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/stepdefinitions/HCPNewSteps.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/HCPNewSteps.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/Navigation.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/Navigation.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/factory/DriverFactory.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/DriverFactory.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/NavigateStudio.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/NavigateStudio.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/utils/ConfigReader.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/ConfigReader.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/utils/ApiActions.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/ApiActions.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/stepdefinitions/EnableStudioforAccountSteps.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/EnableStudioforAccountSteps.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/_E_n_a_b_l_e_ _S_t_u_d_i_o_ _f_o_r_ _a_n_ _A_c_c_o_u_n_t_.zip" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/_E_n_a_b_l_e_ _S_t_u_d_i_o_ _f_o_r_ _a_n_ _A_c_c_o_u_n_t_.zip" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/Workspaces.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/Workspaces.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/hooks/Hooks.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/Hooks.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/DisableStudioPermissions.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/DisableStudioPermissions.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/ExplorerWorkspace.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/ExplorerWorkspace.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/pages/ExpansionWorkspace.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/ExpansionWorkspace.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/testrunner/TestReRunner.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/TestReRunner.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/test-classes/stepdefinitions/LifeSteps.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/LifeSteps.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/utils/WebActions.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2_7_2025_5_51_PM_[Changes]/WebActions.class" />
+  </binary>
+</changelist>

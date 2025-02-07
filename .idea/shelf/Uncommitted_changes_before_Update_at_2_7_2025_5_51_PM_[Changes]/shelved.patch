@@ -1,0 +1,756 @@
+Index: src/test/resources/config/config.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>browser=chrome\r\nheadless=false\r\nurl=https://platform-demo.pulsepoint.com/AccountMgmt/LifeLogin.aspx\r\ntimeout=60\r\nuser=admin11\r\npassword=ppadmin1
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/src/test/resources/config/config.properties b/src/test/resources/config/config.properties
+--- a/src/test/resources/config/config.properties	(revision 6016628d606410249241cd59e43f23a387b5a614)
++++ b/src/test/resources/config/config.properties	(date 1738930676019)
+@@ -1,6 +1,6 @@
+ browser=chrome
+ headless=false
+-url=https://platform-demo.pulsepoint.com/AccountMgmt/LifeLogin.aspx
++url=https://platform-prerelease.pulsepoint.com/AccountMgmt/LifeLogin.aspx
+ timeout=60
+-user=admin11
+-password=ppadmin1
+\ No newline at end of file
++user=nparab
++password=November@2024
+\ No newline at end of file
+Index: src/test/resources/features/Life.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Feature: LIFE Regression - Create a campaign, Add tactics, generate a report\r\n\r\n  @sanity\r\n  Scenario Outline: Create a campaign\r\n    Given Life application is logged in as \"<USER>\"\r\n    And I click create campaign\r\n    When I fill \"<ADVERTISER>\" \"<TYPE>\" \"<CLIENT>\"campaign details\r\n    And I click on save\r\n    Then Verify campaign is created successfully\r\n    Examples:\r\n      | USER       | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | Type     |\r\n      | Admin      |            | Regular    |        | XYZ            | Positive |\r\n      | SuperAdmin |            | Sequential |        | ABC            | Negative |\r\n\r\n  @regression\r\n  Scenario Outline: API Sample Test\r\n    Given I call \"<apiName>\" with parameters \"<param1>\" & \"<param2>\"\r\n    Then Verify response have \"<statusCode>\" & \"<expected1>\" & \"<expected2>\"\r\n    Examples:\r\n      | apiName | param1 | param2 | statusCode | expected1 | expected2 |\r\n      | GET     | 1      | 2      | 404        | 1         | 2         |\r\n      | POST    | 1      | 2      | 404        | 1         | 2         |\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/resources/features/Life.feature b/src/test/resources/features/Life.feature
+--- a/src/test/resources/features/Life.feature	(revision 6016628d606410249241cd59e43f23a387b5a614)
++++ b/src/test/resources/features/Life.feature	(date 1738930676023)
+@@ -2,7 +2,7 @@
+ 
+   @sanity
+   Scenario Outline: Create a campaign
+-    Given Life application is logged in as "<USER>"
++      Given Life application is logged in as "<USER>"
+     And I click create campaign
+     When I fill "<ADVERTISER>" "<TYPE>" "<CLIENT>"campaign details
+     And I click on save
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+--- /dev/null	(date 1738930675999)
++++ b/.idea/.gitignore	(date 1738930675999)
+@@ -0,0 +1,3 @@
++# Default ignored files
++/shelf/
++/workspace.xml
+Index: target/test-classes/features/Life.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/test-classes/features/Life.feature b/target/test-classes/features/Life.feature
+new file mode 100644
+--- /dev/null	(date 1738930676150)
++++ b/target/test-classes/features/Life.feature	(date 1738930676150)
+@@ -0,0 +1,22 @@
++Feature: LIFE Regression - Create a campaign, Add tactics, generate a report
++
++  @sanity
++  Scenario Outline: Create a campaign
++      Given Life application is logged in as "<USER>"
++    And I click create campaign
++    When I fill "<ADVERTISER>" "<TYPE>" "<CLIENT>"campaign details
++    And I click on save
++    Then Verify campaign is created successfully
++    Examples:
++      | USER       | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | Type     |
++      | Admin      |            | Regular    |        | XYZ            | Positive |
++      | SuperAdmin |            | Sequential |        | ABC            | Negative |
++
++  @regression
++  Scenario Outline: API Sample Test
++    Given I call "<apiName>" with parameters "<param1>" & "<param2>"
++    Then Verify response have "<statusCode>" & "<expected1>" & "<expected2>"
++    Examples:
++      | apiName | param1 | param2 | statusCode | expected1 | expected2 |
++      | GET     | 1      | 2      | 404        | 1         | 2         |
++      | POST    | 1      | 2      | 404        | 1         | 2         |
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n    <modelVersion>4.0.0</modelVersion>\r\n\r\n    <groupId>org</groupId>\r\n    <artifactId>Pulsepoint</artifactId>\r\n    <version>1.0-SNAPSHOT</version>\r\n\r\n    <properties>\r\n        <maven.compiler.source>23</maven.compiler.source>\r\n        <maven.compiler.target>23</maven.compiler.target>\r\n        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\r\n    </properties>\r\n\r\n    <dependencies>\r\n        <dependency>\r\n            <groupId>com.microsoft.playwright</groupId>\r\n            <artifactId>playwright</artifactId>\r\n            <version>1.47.0</version>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>io.cucumber</groupId>\r\n            <artifactId>cucumber-java</artifactId>\r\n            <version>7.20.1</version>\r\n            <scope>test</scope>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>io.cucumber</groupId>\r\n            <artifactId>cucumber-junit</artifactId>\r\n            <version>7.20.1</version>\r\n            <scope>test</scope>\r\n        </dependency>\r\n<!--        <dependency>-->\r\n<!--            <groupId>junit</groupId>-->\r\n<!--            <artifactId>junit</artifactId>-->\r\n<!--            <version>4.13.2</version>-->\r\n<!--            <scope>test</scope>-->\r\n<!--        </dependency>-->\r\n        <!--        <dependency>-->\r\n        <!--            <groupId>org.projectlombok</groupId>-->\r\n        <!--            <artifactId>lombok</artifactId>-->\r\n        <!--            <version>1.18.22</version>-->\r\n        <!--        </dependency>-->\r\n    </dependencies>\r\n\r\n    <build>\r\n        <plugins>\r\n            <plugin>\r\n                <groupId>org.apache.maven.plugins</groupId>\r\n                <artifactId>maven-compiler-plugin</artifactId>\r\n                <version>3.10.1</version>\r\n                <!-- References to interface static methods are allowed only at source level 1.8 or above -->\r\n                <configuration>\r\n                    <source>1.8</source>\r\n                    <target>1.8</target>\r\n                </configuration>\r\n            </plugin>\r\n        </plugins>\r\n    </build>\r\n\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision 6016628d606410249241cd59e43f23a387b5a614)
++++ b/pom.xml	(date 1738930676009)
+@@ -32,7 +32,7 @@
+             <version>7.20.1</version>
+             <scope>test</scope>
+         </dependency>
+-<!--        <dependency>-->
++        <!--        <dependency>-->
+ <!--            <groupId>junit</groupId>-->
+ <!--            <artifactId>junit</artifactId>-->
+ <!--            <version>4.13.2</version>-->
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1738930676007)
++++ b/.idea/vcs.xml	(date 1738930676007)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: target/test-classes/config/config.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/target/test-classes/config/config.properties b/target/test-classes/config/config.properties
+new file mode 100644
+--- /dev/null	(date 1738930676147)
++++ b/target/test-classes/config/config.properties	(date 1738930676147)
+@@ -0,0 +1,6 @@
++browser=chrome
++headless=false
++url=https://platform-prerelease.pulsepoint.com/AccountMgmt/LifeLogin.aspx
++timeout=60
++user=nparab
++password=November@2024
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+new file mode 100644
+--- /dev/null	(date 1738930676006)
++++ b/.idea/misc.xml	(date 1738930676006)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ExternalStorageConfigurationManager" enabled="true" />
++  <component name="MavenProjectsManager">
++    <option name="originalFiles">
++      <list>
++        <option value="$PROJECT_DIR$/pom.xml" />
++      </list>
++    </option>
++  </component>
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK" />
++</project>
+\ No newline at end of file
+Index: .idea/encodings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/encodings.xml b/.idea/encodings.xml
+new file mode 100644
+--- /dev/null	(date 1738930676005)
++++ b/.idea/encodings.xml	(date 1738930676005)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="Encoding">
++    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
++    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+new file mode 100644
+--- /dev/null	(date 1738930676004)
++++ b/.idea/compiler.xml	(date 1738930676004)
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="CompilerConfiguration">
++    <annotationProcessing>
++      <profile name="Maven default annotation processors profile" enabled="true">
++        <sourceOutputDir name="target/generated-sources/annotations" />
++        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
++        <outputRelativeToContentRoot value="true" />
++        <module name="Pulsepoint" />
++      </profile>
++    </annotationProcessing>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/test/resources/features/Studio/CreateWorkspaces_HCPAudiences.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/resources/features/Studio/CreateWorkspaces_HCPAudiences.feature b/src/test/resources/features/Studio/CreateWorkspaces_HCPAudiences.feature
+new file mode 100644
+--- /dev/null	(date 1738930676024)
++++ b/src/test/resources/features/Studio/CreateWorkspaces_HCPAudiences.feature	(date 1738930676024)
+@@ -0,0 +1,25 @@
++Feature: HCP Audience Workspace in Studio Application
++  
++  Background:
++    Given the user is on the portal login page
++    And the user logs in with valid credentials
++    And the user clicks on the Studio menu
++    And the user is navigated to the Studio application
++
++  Scenario: Create and save an HCP audience workspace with specific filters
++    When the user clicks on "Create New Workspace"
++    And the user sees the types of workspaces they have permissions for
++    Then the user clicks on "HCP Audiences" workspace
++    And the user selects the advertiser "<advertiser>"
++    And the user applies the following filters:
++      | Filter     | Value   |
++      | NPI Gender | <gender>|
++      | NPI Age    | <age>   |
++    And the user clicks "OK"
++    Then the filters should be applied to the workspace
++    And the user renames the workspace to "<workspace_name>"
++    And the user saves the workspace
++
++    Examples:
++      | advertiser | gender | age           | workspace_name       |
++      | Advertiser1| Male   | 25-35, 45-65  | Stud_automation_HCP  |
+Index: .idea/jarRepositories.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/jarRepositories.xml b/.idea/jarRepositories.xml
+new file mode 100644
+--- /dev/null	(date 1738930676006)
++++ b/.idea/jarRepositories.xml	(date 1738930676006)
+@@ -0,0 +1,20 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="RemoteRepositoriesConfiguration">
++    <remote-repository>
++      <option name="id" value="central" />
++      <option name="name" value="Central Repository" />
++      <option name="url" value="https://repo.maven.apache.org/maven2" />
++    </remote-repository>
++    <remote-repository>
++      <option name="id" value="central" />
++      <option name="name" value="Maven Central repository" />
++      <option name="url" value="https://repo1.maven.org/maven2" />
++    </remote-repository>
++    <remote-repository>
++      <option name="id" value="jboss.community" />
++      <option name="name" value="JBoss Community repository" />
++      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
++    </remote-repository>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/test/resources/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/resources/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature b/src/test/resources/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature
+new file mode 100644
+--- /dev/null	(date 1738930676024)
++++ b/src/test/resources/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature	(date 1738930676024)
+@@ -0,0 +1,28 @@
++Feature: HCP Audience Workspace in Studio Application
++  
++  Background:
++    Given the user is on the portal login page
++    And the user logs in with valid credentials
++    And the user clicks on the Studio menu
++    And the user is navigated to the Studio application
++
++  Scenario Outline: Create and save an HCP Audience Expansion workspace with specific filters
++    When the user clicks on "Create New Workspace"
++    And the user sees the types of workspaces they have permissions for
++    Then the user clicks on "HCP Audience Expansion" workspace
++    And the user selects the advertiser "<advertiser>"
++    Then the user selects Source Audience
++    Then the user selects Expand With Care Team or Expand With Affiliation Graph
++    And selects the value
++    And the user applies the following filters:
++      | Filter     | Value    |
++      | NPI Gender | <gender> |
++
++    And the user clicks "OK"
++    Then the filters should be applied to the workspace
++    And the user renames the workspace to "<workspace_name>"
++    And the user saves the workspace
++
++    Examples:
++      | advertiser  | gender | age          | workspace_name            |
++      | Advertiser1 | Male   | 25-35, 45-65 | Stud_automation_Expansion |
+Index: src/main/java/pages/Workspaces.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package pages;\r\n\r\nimport com.microsoft.playwright.Locator;\r\nimport com.microsoft.playwright.Page;\r\nimport utils.WebActions;\r\n\r\npublic class Workspaces {\r\n    private final Page page;\r\n\r\n    public Workspaces(Page page) {\r\n        this.page = page;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/pages/Workspaces.java b/src/main/java/pages/Workspaces.java
+--- a/src/main/java/pages/Workspaces.java	(revision 6016628d606410249241cd59e43f23a387b5a614)
++++ b/src/main/java/pages/Workspaces.java	(date 1738930676017)
+@@ -1,13 +1,56 @@
+ package pages;
+-
++import com.microsoft.playwright.*;
++import com.microsoft.playwright.FrameLocator;
+ import com.microsoft.playwright.Locator;
+ import com.microsoft.playwright.Page;
+-import utils.WebActions;
++import com.microsoft.playwright.options.AriaRole;
++import com.microsoft.playwright.options.LoadState;
++import com.microsoft.playwright.options.WaitForSelectorState;
+ 
+ public class Workspaces {
+     private final Page page;
++    private final Locator STUDIO;
++    private final Locator SUB_MENU;
++    private final Locator CREATE_WORKSPACE ;
++    private final Locator LIFE ;
++
+ 
+     public Workspaces(Page page) {
+         this.page = page;
++        this.SUB_MENU =page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("menu"));
++        this.STUDIO =page.getByText("Studio");
++        this.CREATE_WORKSPACE =page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Create New Workspace"));
++        this.LIFE =page.getByText("Life");
++    }
++
++    public void CREATE_WS() {
++       // page.reload();
++//       //page.wait(30000);
++ //       Locator button = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByLabel("HCP Audience Expansion");
++//        button.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
++//        page.reload();
++       page.waitForLoadState();
++      // page.waitFor(new Locator.WaitForOptions().setTimeout(60000));
++       page.waitForTimeout(3000);
++        CREATE_WORKSPACE.click();
++
++//        CREATE_WORKSPACE.click();
++//        page.waitForLoadState(LoadState.LOAD);
++    }
++    public void CLICK_SUBMENU() {
++
++        page.waitForLoadState();
++        SUB_MENU.click();
++    }
++    public void CLICK_STUDIO() {
++
++        page.waitForLoadState();
++        STUDIO.click();
++    }
++
++    public void LIFE() {
++
++        page.waitForLoadState();
++        LIFE.click();
+     }
+ }
+\ No newline at end of file
+Index: src/test/resources/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/resources/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature b/src/test/resources/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature
+new file mode 100644
+--- /dev/null	(date 1738930676027)
++++ b/src/test/resources/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature	(date 1738930676027)
+@@ -0,0 +1,30 @@
++Feature: HCP Audience Workspace in Studio Application
++  
++#  Background:
++#    Given the user is on the portal login page
++#    And the user logs in with valid credentials
++#    And the user clicks on the Studio menu
++#    And the user is navigated to the Studio application
++
++  Scenario: Create and save an HCP Audience Expansion workspace with specific filters
++    Given Life application is logged in as "<USER>"
++    And the User navigate to studio
++    When the user clicks on "Create New Workspace"
++    And the user sees the types of workspaces they have permissions for
++    Then the user clicks on "HCP Audience Expansion" workspace
++    And the user selects the advertiser "Test"
++    Then the user selects Source Audience "<Source_audience>"
++    And the user selects Expand With Care Team or Expand With Affiliation Graph and selects the value
++#    And the user applies the following filters:
++#      | Filter     | Value    |
++#      | NPI Gender | <gender> |
++
++#    And the user clicks "OK"
++   Then the filters should be applied to the workspace
++    And the user renames the workspace to
++#  "<workspace_name>"
++    And the user saves the workspace
++
++#    Examples:
++#      | advertiser  | gender | age          | workspace_name            |
++#      | Advertiser1 | Male   | 25-35, 45-65 | Stud_automation_Expansion |
+Index: src/test/java/stepdefinitions/HCPNewSteps.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/stepdefinitions/HCPNewSteps.java b/src/test/java/stepdefinitions/HCPNewSteps.java
+new file mode 100644
+--- /dev/null	(date 1738930676019)
++++ b/src/test/java/stepdefinitions/HCPNewSteps.java	(date 1738930676019)
+@@ -0,0 +1,107 @@
++package stepdefinitions;
++
++import factory.DriverFactory;
++import io.cucumber.java.en.And;
++import io.cucumber.java.en.Then;
++import io.cucumber.java.en.When;
++import org.junit.Assert;
++import pages.ExpansionWorkspace;
++import pages.Navigation;
++import pages.Workspaces;
++
++import static factory.DriverFactory.page;
++
++
++public class HCPNewSteps {
++    Workspaces workspaces = new Workspaces(DriverFactory.getPage());
++    ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
++    @When("the user clicks on {string}")
++    public void the_user_clicks_on(String string) {
++        workspaces.CREATE_WS();
++
++    }
++
++
++    @And("the User navigate to studio")
++    public void theUserNavigateToStudio() {
++        workspaces.LIFE();
++        workspaces.CLICK_SUBMENU();
++        workspaces.CLICK_STUDIO();
++    }
++
++
++    @When("the user sees the types of workspaces they have permissions for")
++    public void the_user_sees_the_types_of_workspaces_they_have_permissions_for() {
++       // Assert.assertEquals("", "HCP Audience Expansion", expworkspaces.VERIFY_WRSP());
++
++      //  throw new io.cucumber.java.PendingException();
++    }
++    @Then("the user clicks on {string} workspace")
++    public void the_user_clicks_on_workspace(String string) {
++        expworkspaces.HCP_AUDIENCE_EXP();
++       // throw new io.cucumber.java.PendingException();
++    }
++    @Then("the user selects the advertiser {string}")
++    public void the_user_selects_the_advertiser(String string) {
++
++        expworkspaces.ADVT_DRPDWN();
++        page.waitForLoadState();
++//        expworkspaces.ADVT_SELECT();
++//        throw new io.cucumber.java.PendingException();
++    }
++    @Then("the user selects Source Audience {string}")
++    public void the_user_selects_source_audience(String string) {
++        expworkspaces.SRCAUDI_SELECT();
++//        expworkspaces.SRCAUDIVAL_SELECT();
++        //throw new io.cucumber.java.PendingException();
++    }
++
++    @Then("the user selects Expand With Care Team or Expand With Affiliation Graph and selects the value")
++    public void the_user_selects_expand_with_care_team_or_expand_with_affiliation_graph_and_selects_the_value() {
++        expworkspaces.EXPAND_CARETEAM();
++        expworkspaces.EXPAND_AFFGRAPH();
++//        throw new io.cucumber.java.PendingException();
++    }
++
++    @Then("the filters should be applied to the workspace")
++    public void the_user_applies_the_following_filters() {
++
++        expworkspaces.ADD_FILTER();
++
++        // Write code here that turns the phrase above into concrete actions
++        // For automatic transformation, change DataTable to one of
++        // E, List<E>, List<List<E>>, List<Map<K,V>>, Map<K,V> or
++        // Map<K, List<V>>. E,K,V must be a String, Integer, Float,
++        // Double, Byte, Short, Long, BigInteger or BigDecimal.
++        //
++        // For other transformations you can register a DataTableType.
++      //  throw new io.cucumber.java.PendingException();
++    }
++//    @Then("the user clicks {string}")
++//    public void the_user_clicks(String string) {
++//        // Write code here that turns the phrase above into concrete actions
++//        throw new io.cucumber.java.PendingException();
++//    }
++//    @Then("the filters should be applied to the workspace")
++//    public void the_filters_should_be_applied_to_the_workspace() {
++//
++//
++//        // Write code here that turns the phrase above into concrete actions
++//        throw new io.cucumber.java.PendingException();
++//    }
++    @Then("the user renames the workspace to")
++    public void the_user_renames_the_workspace_to() {
++
++        expworkspaces.RENAME_EXP();
++        // Write code here that turns the phrase above into concrete actions
++    //    throw new io.cucumber.java.PendingException();
++    }
++    @Then("the user saves the workspace")
++    public void the_user_saves_the_workspace() {
++        expworkspaces.SAVE_EXP();
++      //  throw new io.cucumber.java.PendingException();
++    }
++
++
++
++}
+Index: target/test-classes/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/test-classes/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature b/target/test-classes/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature
+new file mode 100644
+--- /dev/null	(date 1738930676153)
++++ b/target/test-classes/features/Studio/HCP_Audience_Expansion_CreateWorkspaces.feature	(date 1738930676153)
+@@ -0,0 +1,30 @@
++Feature: HCP Audience Workspace in Studio Application
++  
++#  Background:
++#    Given the user is on the portal login page
++#    And the user logs in with valid credentials
++#    And the user clicks on the Studio menu
++#    And the user is navigated to the Studio application
++
++  Scenario: Create and save an HCP Audience Expansion workspace with specific filters
++    Given Life application is logged in as "<USER>"
++    And the User navigate to studio
++    When the user clicks on "Create New Workspace"
++    And the user sees the types of workspaces they have permissions for
++    Then the user clicks on "HCP Audience Expansion" workspace
++    And the user selects the advertiser "Test"
++    Then the user selects Source Audience "<Source_audience>"
++    And the user selects Expand With Care Team or Expand With Affiliation Graph and selects the value
++#    And the user applies the following filters:
++#      | Filter     | Value    |
++#      | NPI Gender | <gender> |
++
++#    And the user clicks "OK"
++   Then the filters should be applied to the workspace
++    And the user renames the workspace to
++#  "<workspace_name>"
++    And the user saves the workspace
++
++#    Examples:
++#      | advertiser  | gender | age          | workspace_name            |
++#      | Advertiser1 | Male   | 25-35, 45-65 | Stud_automation_Expansion |
+Index: target/test-classes/features/Studio/Enable_Studio_for_account.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/test-classes/features/Studio/Enable_Studio_for_account.feature b/target/test-classes/features/Studio/Enable_Studio_for_account.feature
+new file mode 100644
+--- /dev/null	(date 1738930676152)
++++ b/target/test-classes/features/Studio/Enable_Studio_for_account.feature	(date 1738930676152)
+@@ -0,0 +1,12 @@
++  Feature: Enable Studio for an account
++
++  Scenario: Enable Studio for an Account for internal users
++    Given user logged in as "<Internal User>"
++    When user enable the studio for an account
++    Then user should navigate to workspace permission
++    Then user selects the workspace types and saves the setting
++    Then the studio should be enabled for that account
++    Then user should be able to see the enabled workspaces for that account under Studio
++    Then user disables the studio permission for an account
++    And user should not be able to see the studio permission for that account
++
+Index: target/test-classes/features/Studio/CreateWorkspaces_HCPAudiences.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/test-classes/features/Studio/CreateWorkspaces_HCPAudiences.feature b/target/test-classes/features/Studio/CreateWorkspaces_HCPAudiences.feature
+new file mode 100644
+--- /dev/null	(date 1738930676151)
++++ b/target/test-classes/features/Studio/CreateWorkspaces_HCPAudiences.feature	(date 1738930676151)
+@@ -0,0 +1,25 @@
++Feature: HCP Audience Workspace in Studio Application
++  
++  Background:
++    Given the user is on the portal login page
++    And the user logs in with valid credentials
++    And the user clicks on the Studio menu
++    And the user is navigated to the Studio application
++
++  Scenario: Create and save an HCP audience workspace with specific filters
++    When the user clicks on "Create New Workspace"
++    And the user sees the types of workspaces they have permissions for
++    Then the user clicks on "HCP Audiences" workspace
++    And the user selects the advertiser "<advertiser>"
++    And the user applies the following filters:
++      | Filter     | Value   |
++      | NPI Gender | <gender>|
++      | NPI Age    | <age>   |
++    And the user clicks "OK"
++    Then the filters should be applied to the workspace
++    And the user renames the workspace to "<workspace_name>"
++    And the user saves the workspace
++
++    Examples:
++      | advertiser | gender | age           | workspace_name       |
++      | Advertiser1| Male   | 25-35, 45-65  | Stud_automation_HCP  |
+Index: target/test-classes/features/Hcp365.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/test-classes/features/Hcp365.feature b/target/test-classes/features/Hcp365.feature
+new file mode 100644
+--- /dev/null	(date 1738930676149)
++++ b/target/test-classes/features/Hcp365.feature	(date 1738930676149)
+@@ -0,0 +1,74 @@
++Feature: HCP365 Regression - Dashboard data Validation and Permission
++
++  @sanity
++  Scenario Outline: Verify Overview Tabs and its Sub Tabs availability on Dashboard on HCP 365
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User land on Overview tab on HCP Dashboard
++    Then Verify Tabs and Subtabs of Overview tab on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify Site Tabs and its Sub Tabs availability on Dashboard on HCP 365
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User clicks on Site tab on HCP Dashboard
++    Then Verify Tabs and Subtabs of Site tab on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify Search Tabs and its Sub Tabs availability on Dashboard on HCP 365
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User clicks on Search tab on HCP Dashboard
++    Then Verify Tabs and Subtabs of Search tab on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify Media Tabs and its Sub Tabs availability on Dashboard on HCP 365
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User clicks on Media tab on HCP Dashboard
++    Then Verify Tabs and Subtabs of Media tab on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify Email Tabs and its Sub Tabs availability on Dashboard on HCP 365
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User clicks on Email tab on HCP Dashboard
++    Then Verify Tabs and Subtabs of Email tab on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify Social Tabs and its Sub Tabs availability on Dashboard on HCP 365
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User clicks on Social tab on HCP Dashboard
++    Then Verify Tabs and Subtabs of Social tab on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify user access modification of Dashboard on HCP 365 in all tab.
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User change settings of HCP Dashboard Display modules
++    Then Verify Tabs and Subtabs of shall change on HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
++
++  Scenario Outline: Verify data after modification of filters in Dashboard on HCP 365 in all tab.
++    Given Life application is logged in as "<USER>"
++    And User clicks on HCP 365 module from main menu
++    When User change filters of HCP Dashboard Overview tabs
++    Then Verify data after change in filter of HCP Dashboard
++    Examples:
++      | USER      | ADVERTISER | TYPE       | CLIENT | ExpectedOutput | User Type|
++      | admin11   |            | Regular    |        | XYZ            | Internal |
+Index: target/test-classes/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/test-classes/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature b/target/test-classes/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature
+new file mode 100644
+--- /dev/null	(date 1738930676151)
++++ b/target/test-classes/features/Studio/CreateWorkspaces_HCP_Audience_Expansion.feature	(date 1738930676151)
+@@ -0,0 +1,28 @@
++Feature: HCP Audience Workspace in Studio Application
++  
++  Background:
++    Given the user is on the portal login page
++    And the user logs in with valid credentials
++    And the user clicks on the Studio menu
++    And the user is navigated to the Studio application
++
++  Scenario Outline: Create and save an HCP Audience Expansion workspace with specific filters
++    When the user clicks on "Create New Workspace"
++    And the user sees the types of workspaces they have permissions for
++    Then the user clicks on "HCP Audience Expansion" workspace
++    And the user selects the advertiser "<advertiser>"
++    Then the user selects Source Audience
++    Then the user selects Expand With Care Team or Expand With Affiliation Graph
++    And selects the value
++    And the user applies the following filters:
++      | Filter     | Value    |
++      | NPI Gender | <gender> |
++
++    And the user clicks "OK"
++    Then the filters should be applied to the workspace
++    And the user renames the workspace to "<workspace_name>"
++    And the user saves the workspace
++
++    Examples:
++      | advertiser  | gender | age          | workspace_name            |
++      | Advertiser1 | Male   | 25-35, 45-65 | Stud_automation_Expansion |
+diff --git a/target/classes/Request.json b/target/classes/Request.json
+new file mode 100644
