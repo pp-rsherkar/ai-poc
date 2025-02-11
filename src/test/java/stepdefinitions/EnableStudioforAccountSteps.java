@@ -13,7 +13,6 @@ public class EnableStudioforAccountSteps
     Navigation navigation = new Navigation(DriverFactory.getPage());
     EnableStudioforAccount esa= new EnableStudioforAccount(DriverFactory.getPage());
     NavigateStudio ns= new NavigateStudio(DriverFactory.getPage());
-    DisableStudioPermissions ds= new DisableStudioPermissions(DriverFactory.getPage());
 
     @Given("user logged in as {string}")
     public void userLoggedInAsAn(String string) {
@@ -66,12 +65,12 @@ public class EnableStudioforAccountSteps
     @And("user disables the studio permission for an account")
     public void userDisablesTheStudioPermissionForAnAccount()
     {
-       ds.disableStudioForAccount();
+       esa.disableStudioForAccount();
     }
     @Then("user should not be able to see the studio permission for that account")
     public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount()
     {
-        ds.verifyStudioMenu();
+        esa.verifyStudioMenu();
     }
 
 

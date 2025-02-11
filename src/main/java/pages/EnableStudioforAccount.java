@@ -15,12 +15,15 @@ public class EnableStudioforAccount {
     private final Locator explorerworkspace;
     private final Locator expansionworkspace;
     private final Locator savestudiosetting;
+    private final Locator disableStudioSetting;
+    private final Locator PPmenuIcon;
+    private final Locator studioMenu;
     private final Page page;
 
     public EnableStudioforAccount(Page page) {
         this.page = page;
-        this.menu = page.locator(".megaMenuWrapper");
-        this.administration = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Administration")).nth(4);
+        this.menu = page.locator("span").first();
+        this.administration = page.getByText("Administration", new Page.GetByTextOptions().setExact(true));
         this.accountmenu = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Accounts"));
         this.search = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.searchIcon=page.locator(".ui > .iconSprite");
@@ -29,7 +32,9 @@ public class EnableStudioforAccount {
         this.explorerworkspace = page.locator("app-rightside label").first();
         this.expansionworkspace = page.locator(("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label"));
         this.savestudiosetting=page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
-
+        this.studioMenu=page.getByText("Studio").nth(4);
+        this.disableStudioSetting=page.locator("sui-dimmer div").filter(new Locator.FilterOptions().setHasText("Ok")).nth(4);
+        this.PPmenuIcon=page.locator(".ui > div:nth-child(6)").first();
     }
 
     public void clickMenu() {
@@ -62,4 +67,23 @@ public class EnableStudioforAccount {
 
     }
 
+    public void disableStudioForAccount()
+    {
+        menu.click();
+        administration.click();
+        accountmenu.click();
+        searchaccount.click();
+        studiosettingbtn.click();
+        disableStudioSetting.click();
+    }
+    public void verifyStudioMenu()
+    {
+        PPmenuIcon.click();
+        menu.click();
+        boolean isVisible = studioMenu.isVisible();
+        if(!isVisible)
+        {
+            System.out.println("Studio Menu is not visible");
+        }
+    }
 }
