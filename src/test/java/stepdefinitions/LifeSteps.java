@@ -7,7 +7,8 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import utils.WebActions;
-import java.util.*;
+
+import java.util.UUID;
 
 public class LifeSteps {
 
@@ -40,12 +41,13 @@ public class LifeSteps {
     }
 
     @Given("Life application is logged in as {string}")
-    public void life_application_is_logged_in_as(String string) {
-        navigation.navigateToUrl(url);
-        navigation.enterUsername(string, username);
-        navigation.enterPassword(password);
+    public void life_application_is_looged_in_as(String string) {
+        navigation.navigateToUrl();
+        navigation.enterUsername(string);
+        navigation.enterPassword();
         navigation.clickLogin();
         Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
+        System.out.println(navigation.verifyProfilePage());
     }
 
     @Given("User navigates to the Campaign Dashboard")
@@ -139,6 +141,7 @@ public class LifeSteps {
         Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign());
         Assert.assertEquals(createdLineItem, campaignListing.verifyCreatedLineItem());
 //        campaignListing.expandCreatedLineItem();
-//        Assert.assertEquals(createdTactic, campaignListing.verifyCreatedTactic()); -- failing intermittent, debugging this issue
+//        Below assertion is failing intermittently, debugging this issue
+//        Assert.assertEquals(createdTactic, campaignListing.verifyCreatedTactic());
     }
 }

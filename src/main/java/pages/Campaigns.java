@@ -53,7 +53,7 @@ public class Campaigns {
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.fill(advertiser);
-        SELECT_ADVERTISER.locator("text="+advertiser).click();
+        SELECT_ADVERTISER.locator("text=" + advertiser).click();
     }
 
     public void enterCampaignName(String campaignNameRandom) {

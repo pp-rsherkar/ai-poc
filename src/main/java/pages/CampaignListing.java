@@ -46,5 +46,3 @@ public class CampaignListing {
         return VERIFY_CREATED_TACTIC.innerText();
     }
 }
-
-

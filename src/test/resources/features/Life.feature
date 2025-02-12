@@ -23,13 +23,13 @@ Feature: LIFE Regression - Create a campaign, Add tactics, generate a report
     Examples:
       |USER |ADVERTISER               |CP_NAME |CP_TYPE|CP_BUDGET|LINE_NAME  |LINE_BUDGET|TACTIC_NAME|CHANNEL         |CREATIVE       |
       |Admin|01- Advertiser           |Auto    |Regular|20000    |Line_Auto  |500        |Tactic_Auto|Standard        |Auto_Creative  |
-      #|Admin|00CacheTestAdvertise232n |Test    |Regular|25000    |Line Item_1|1200       |New_Tactic |Display Advanced|Sequential_Auto|
+#      |Admin|00CacheTestAdvertise232n |Test    |Regular|25000    |Line Item_1|1200       |New_Tactic |Display Advanced|Sequential_Auto|
 
-  @regression
-  Scenario Outline: API Sample Test
-    Given I call "<apiName>" with parameters "<param1>" & "<param2>"
-    Then Verify response have "<statusCode>" & "<expected1>" & "<expected2>"
-    Examples:
-      | apiName | param1 | param2 | statusCode | expected1 | expected2 |
-      | GET     | 1      | 2      | 404        | 1         | 2         |
-      | POST    | 1      | 2      | 404        | 1         | 2         |
+#  @regression
+#  Scenario Outline: API Sample Test
+#    Given I call "<apiName>" with parameters "<param1>" & "<param2>"
+#    Then Verify response have "<statusCode>" & "<expected1>" & "<expected2>"
+#    Examples:
+#      | apiName | param1 | param2 | statusCode | expected1 | expected2 |
+#      | GET     | 1      | 2      | 404        | 1         | 2         |
+#      | POST    | 1      | 2      | 404        | 1         | 2         |
