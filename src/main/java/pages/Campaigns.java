@@ -84,5 +84,6 @@ public class Campaigns {
 
     public void navigateToCampaignListing() {
         NAVIGATE_TO_CAMPAIGN_LISTING.click();
+        page.waitForLoadState();
     }
 }

@@ -18,12 +18,12 @@ Feature: LIFE Regression - Create a campaign, Add tactics, generate a report
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify creative details are saved and the campaign is in running state
-    Then Verify the newly created campaign details in the campaign list: Campaign name "<LINE_NAME>" "<TACTIC_NAME>"
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
 
     Examples:
       |USER |ADVERTISER               |CP_NAME |CP_TYPE|CP_BUDGET|LINE_NAME  |LINE_BUDGET|TACTIC_NAME|CHANNEL         |CREATIVE       |
-      |Admin|01- Advertiser           |Auto    |Regular|20000    |Line_Auto  |500        |Tactic_Auto|Standard        |Auto_Creative  |
-#      |Admin|00CacheTestAdvertise232n |Test    |Regular|25000    |Line Item_1|1200       |New_Tactic |Display Advanced|Sequential_Auto|
+      |Admin|01- Advertiser           |Auto    |Regular|20000    |Line       |500        |Tactic     |Standard        |Auto_Creative  |
+      #|Admin|00CacheTestAdvertise232n |Test    |Regular|25000    |Line Item_1|1200       |New_Tactic |Display Advanced|Sequential_Auto|
 
 #  @regression
 #  Scenario Outline: API Sample Test
@@ -33,3 +33,21 @@ Feature: LIFE Regression - Create a campaign, Add tactics, generate a report
 #      | apiName | param1 | param2 | statusCode | expected1 | expected2 |
 #      | GET     | 1      | 2      | 404        | 1         | 2         |
 #      | POST    | 1      | 2      | 404        | 1         | 2         |
+
+#  @regression
+#  Scenario Outline: Create a Report Template
+#    Given Life application is logged in as "<USER>"
+#    And User navigates to the Campaign Dashboard
+#    And User navigates to Report Templates page
+#    Then Verify the tabs displayed on the Report Templates page
+#    When User clicks on New Template
+#    Then Verify the tabs displayed on the Create New Template panel
+#    When User enters the template details as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>" -- metrics -- impressions and clicks
+#    Then Verify the selected dimensions and metrics under the Template Structure section
+#    When User saves the new template
+#    Then Verify new template is saved and displayed in the template list -- make sure only 1 row is available and name should be exact match
+#    Then Verify new template details -
+
+#    Examples:
+#      |USER  |TEMPLATE NAME |DIMENSIONS |METRICS |
+#      |Admin |Auto_Template |           |        |

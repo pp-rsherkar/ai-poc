@@ -2,7 +2,6 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import utils.WebActions;
 
 public class Navigation {
     public final Locator USERNAME;
