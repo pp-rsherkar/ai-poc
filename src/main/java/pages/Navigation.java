@@ -8,6 +8,7 @@ public class Navigation {
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
+    private final Locator LIFE_MENU;
     private final Page page;
 
     public Navigation(Page page) {
@@ -15,6 +16,7 @@ public class Navigation {
         this.USERNAME = page.locator("#UserName");
         this.PASSWORD = page.locator("#Password");
         this.LOGIN_BUTTON = page.locator(".loginLabel");
+        this.LIFE_MENU=page.getByText("Life");
     }
 
     public void navigateToUrl() {
@@ -40,5 +42,10 @@ public class Navigation {
     public String verifyProfilePage() {
         page.waitForLoadState();
         return this.page.title();
+    }
+
+    public void clickLifeMenu()
+    {
+        LIFE_MENU.click();
     }
 }
