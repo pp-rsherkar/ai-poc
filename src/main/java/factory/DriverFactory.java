@@ -30,21 +30,22 @@ public class DriverFactory {
     public Page initDriver(String browserName) {
         BrowserType browserType = null;
         boolean headless = Boolean.parseBoolean(WebActions.getProperty("headless"));
+        int delay = Integer.parseInt(WebActions.getProperty("delay"));
         switch (browserName) {
             case "firefox":
                 browserType = Playwright.create().firefox();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless));
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
                 break;
             case "chrome":
                 browserType = Playwright.create().chromium();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless));
+                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless).setSlowMo(delay));
                 break;
             case "webkit":
                 browserType = Playwright.create().webkit();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless));
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
                 break;
         }
-        if (browserType == null) throw new IllegalArgumentException("Could not Launch Browser for type" + browserType);
+        if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserType);
         context = browser.newContext();
         //Below line is used to start the trace file
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));

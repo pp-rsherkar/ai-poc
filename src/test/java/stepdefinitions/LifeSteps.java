@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import factory.DriverFactory;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -12,6 +13,13 @@ import java.util.UUID;
 
 public class LifeSteps {
 
+    static String campaignNameRandom;
+    static String lineItemNameRandom;
+    static String tacticNameRandom;
+    static String environment;
+    static String url;
+    static String username;
+    static String password;
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -19,14 +27,9 @@ public class LifeSteps {
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
     TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
     CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
-    static String campaignNameRandom;
-    static String environment;
-    static String url;
-    static String username;
-    static String password;
 
-    @Given("This feature will be executed in the {string} environment")
-    public void set_environment(String env) {
+    @Given("This scenario will be executed in the {string} environment as a {string}")
+    public void set_environment(String env, String user) {
         environment = env;
 
         if (environment.equals("Demo")) {
@@ -40,11 +43,11 @@ public class LifeSteps {
         }
     }
 
-    @Given("Life application is logged in as {string}")
-    public void life_application_is_looged_in_as(String string) {
-        navigation.navigateToUrl();
-        navigation.enterUsername(string);
-        navigation.enterPassword();
+    @And("Life application is logged in successfully")
+    public void life_application_is_loged_in_as() {
+        navigation.navigateToUrl(url);
+        navigation.enterUsername(username);
+        navigation.enterPassword(password);
         navigation.clickLogin();
         Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
         System.out.println(navigation.verifyProfilePage());
@@ -58,6 +61,8 @@ public class LifeSteps {
 
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
+        campaignListing.setGroupByFilter();
+        navigation.clickOnIcon(" Group By Campaign ");
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
@@ -80,7 +85,8 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemDetails.enterLineItemName(lineItemName);
+        lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
+        lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
@@ -95,7 +101,8 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticDetails.enterTacticName(tacticName);
+        tacticNameRandom = tacticName + '_' + UUID.randomUUID().toString().substring(0, 10);
+        tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
 
@@ -134,14 +141,13 @@ public class LifeSteps {
         Assert.assertEquals("Running", tacticCreatives.verifyCampaignRunning());
     }
 
-    @Then("Verify the newly created campaign details in the campaign list: Campaign name {string} {string}")
-    public void verify_the_newly_created_campaign_details_in_the_campaign_list(String createdLineItem, String createdTactic) {
+    @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
+    public void verify_the_newly_created_campaign_details_in_the_campaign_list() {
         campaigns.navigateToCampaignListing();
         campaignListing.searchCreatedCampaign(campaignNameRandom);
-        Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign());
-        Assert.assertEquals(createdLineItem, campaignListing.verifyCreatedLineItem());
-//        campaignListing.expandCreatedLineItem();
-//        Below assertion is failing intermittently, debugging this issue
-//        Assert.assertEquals(createdTactic, campaignListing.verifyCreatedTactic());
+        Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
+        Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
+        campaignListing.expandCreatedLineItem();
+        Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
     }
 }
