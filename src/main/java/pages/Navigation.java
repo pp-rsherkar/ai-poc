@@ -20,8 +20,8 @@ public class Navigation {
         this.page.navigate(url);
     }
 
-    public void enterUsername(String userName, String username) {
-        USERNAME.fill(username);
+    public void enterUsername(String userName) {
+        USERNAME.fill(userName);
     }
 
     public void enterPassword(String password) {

@@ -1,23 +1,18 @@
 package stepdefinitions;
 
 import factory.DriverFactory;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import utils.WebActions;
-import java.util.*;
+
+import java.util.UUID;
 
 public class LifeSteps {
 
-    Navigation navigation = new Navigation(DriverFactory.getPage());
-    Campaigns campaigns = new Campaigns(DriverFactory.getPage());
-    LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
-    TacticDetails tacticDetails = new TacticDetails(DriverFactory.getPage());
-    TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
-    TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
@@ -25,9 +20,16 @@ public class LifeSteps {
     static String url;
     static String username;
     static String password;
+    Navigation navigation = new Navigation(DriverFactory.getPage());
+    Campaigns campaigns = new Campaigns(DriverFactory.getPage());
+    LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
+    TacticDetails tacticDetails = new TacticDetails(DriverFactory.getPage());
+    TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
+    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
 
-    @Given("This feature will be executed in the {string} environment")
-    public void set_environment(String env) {
+    @Given("This scenario will be executed in the {string} environment as a {string}")
+    public void set_environment(String env, String user) {
         environment = env;
 
         if (environment.equals("Demo")) {
@@ -41,13 +43,14 @@ public class LifeSteps {
         }
     }
 
-    @Given("Life application is logged in as {string}")
-    public void life_application_is_logged_in_as(String string) {
+    @And("Life application is logged in successfully")
+    public void life_application_is_loged_in_as() {
         navigation.navigateToUrl(url);
-        navigation.enterUsername(string, username);
+        navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
         Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
+        System.out.println(navigation.verifyProfilePage());
     }
 
     @Given("User navigates to the Campaign Dashboard")
@@ -143,7 +146,6 @@ public class LifeSteps {
         campaigns.navigateToCampaignListing();
         campaignListing.searchCreatedCampaign(campaignNameRandom);
         Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
-        //campaignListing.expandCreatedCampaign();
         Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
