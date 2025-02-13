@@ -1,11 +1,11 @@
-package pages;
+package pages.studio;
 
 import com.microsoft.playwright.Page;
 
-public class LineItemMediaInsights {
+public class ExpansionWorkspace {
     private final Page page;
 
-    public LineItemMediaInsights(Page page) {
+    public ExpansionWorkspace(Page page) {
         this.page = page;
     }
 }

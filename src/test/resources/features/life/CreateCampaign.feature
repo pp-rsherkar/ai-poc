@@ -1,4 +1,4 @@
-Feature: LIFE Regression - Happy Flow - Create a Campaign
+Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item

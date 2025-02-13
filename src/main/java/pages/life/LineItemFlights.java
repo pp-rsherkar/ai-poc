@@ -1,11 +1,11 @@
-package pages;
+package pages.life;
 
 import com.microsoft.playwright.Page;
 
-public class ExplorerWorkspace {
+public class LineItemFlights {
     private final Page page;
 
-    public ExplorerWorkspace(Page page) {
+    public LineItemFlights(Page page) {
         this.page = page;
     }
 }

@@ -1,4 +1,4 @@
-package pages;
+package pages.life;
 
 import com.microsoft.playwright.Page;
 

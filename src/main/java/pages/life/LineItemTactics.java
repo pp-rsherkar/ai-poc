@@ -1,11 +1,11 @@
-package pages;
+package pages.life;
 
 import com.microsoft.playwright.Page;
 
-public class ExpansionWorkspace {
+public class LineItemTactics {
     private final Page page;
 
-    public ExpansionWorkspace(Page page) {
+    public LineItemTactics(Page page) {
         this.page = page;
     }
 }

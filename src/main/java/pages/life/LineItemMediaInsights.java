@@ -1,11 +1,11 @@
-package pages;
+package pages.life;
 
 import com.microsoft.playwright.Page;
 
-public class CampaignDashboard {
+public class LineItemMediaInsights {
     private final Page page;
 
-    public CampaignDashboard(Page page) {
+    public LineItemMediaInsights(Page page) {
         this.page = page;
     }
 }
