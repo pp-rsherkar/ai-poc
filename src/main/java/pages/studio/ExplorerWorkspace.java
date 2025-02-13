@@ -1,11 +1,11 @@
-package pages;
+package pages.studio;
 
 import com.microsoft.playwright.Page;
 
-public class CampaignRealtimeData {
+public class ExplorerWorkspace {
     private final Page page;
 
-    public CampaignRealtimeData(Page page) {
+    public ExplorerWorkspace(Page page) {
         this.page = page;
     }
 }
