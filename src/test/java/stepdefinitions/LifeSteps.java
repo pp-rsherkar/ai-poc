@@ -17,7 +17,6 @@ public class LifeSteps {
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
-    static String environment;
     static String url;
     static String username;
     static String password;
@@ -30,9 +29,7 @@ public class LifeSteps {
     CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
-    public void set_environment(String env, String user) {
-        environment = env;
-
+    public void set_environment(String environment, String user) {
         if (environment.equals("Demo")) {
             url = WebActions.getProperty("demoURL");
             username = WebActions.getProperty("demoUser");
@@ -44,12 +41,13 @@ public class LifeSteps {
         }
     }
 
-    @And("Life application is logged in successfully")
-    public void life_application_is_loged_in_as() {
+    @And("{string} application is logged in successfully")
+    public void life_application_is_loged_in_as(String application) {
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
+//        Add logic to conditional redirection to respective applications
         Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
         System.out.println(navigation.verifyProfilePage());
     }
