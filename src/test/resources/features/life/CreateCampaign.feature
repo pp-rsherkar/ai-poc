@@ -3,7 +3,7 @@ Feature: LIFE Regression - Create a Campaign
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And Life application is logged in successfully
+    And "Life" application is logged in successfully
     And User navigates to the Campaign Dashboard
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
