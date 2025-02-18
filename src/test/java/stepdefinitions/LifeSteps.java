@@ -47,19 +47,25 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-//        Add logic to conditional redirection to respective applications
         Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
-        System.out.println(navigation.verifyProfilePage());
-    }
 
-    @Given("User navigates to the Campaign Dashboard")
-    public void user_navigates_to_the_campaign_dashboard() {
-        campaigns.navigateToLife();
-        Assert.assertEquals("", "Life", campaigns.campaignDashboard());
+        switch (application) {
+            case "Life":
+                navigation.navigateToLife();
+                break;
+            case "HCP":
+                navigation.navigateToHCP();
+                break;
+            case "Studio":
+                navigation.navigateToLife();
+                navigation.navigateToStudio();
+                break;
+        }
     }
 
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
+        Assert.assertEquals("", "Life", campaigns.campaignDashboard());
         campaignListing.setGroupByFilter();
         navigation.clickOnIcon(" Group By Campaign ");
         campaigns.createCampaign();
