@@ -5,7 +5,6 @@ import com.microsoft.playwright.Page;
 
 public class Campaigns {
     private final Page page;
-    private final Locator LIFE;
     private final Locator CREATE_CAMPAIGN;
     private final Locator VERIFY_CAMPAIGN_PAGE;
     private final Locator SEARCH_ADVERTISER;
@@ -20,7 +19,6 @@ public class Campaigns {
 
     public Campaigns(Page page) {
         this.page = page;
-        this.LIFE = page.getByText("Life");
         this.CREATE_CAMPAIGN = page.locator("//button[text()='Create a Campaign']");
         this.VERIFY_CAMPAIGN_PAGE = page.locator("//div[text()='Create New Campaign']");
         this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
@@ -32,10 +30,6 @@ public class Campaigns {
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
         this.CAMPAIGN_SUCCESS = page.locator("//*[text()='Success!']");
         this.NAVIGATE_TO_CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
-    }
-
-    public void navigateToLife() {
-        LIFE.click();
     }
 
     public void createCampaign() {
