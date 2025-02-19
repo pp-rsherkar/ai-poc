@@ -1,11 +1,11 @@
-package pages;
+package pages.life;
 
 import com.microsoft.playwright.Page;
 
-public class LineItemMediaInsights {
+public class LineItemTactics {
     private final Page page;
 
-    public LineItemMediaInsights(Page page) {
+    public LineItemTactics(Page page) {
         this.page = page;
     }
 }
