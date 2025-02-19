@@ -3,7 +3,6 @@ package stepdefinitions;
 import factory.DriverFactory;
 import io.cucumber.java.en.*;
 import org.junit.Assert;
-import pages.DisableStudioPermissions;
 import pages.EnableStudioforAccount;
 import pages.NavigateStudio;
 import pages.Navigation;
