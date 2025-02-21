@@ -4,7 +4,6 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.util.regex.Pattern;
 
@@ -45,13 +44,14 @@ public class ExplorerWorkspace {
     }
 
     public void enterWorkspaceName(String workspaceName) {
+        WORKSPACE_NAME.clear();
         WORKSPACE_NAME.fill(workspaceName);
     }
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.fill(advertiser);
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
-        //DASHBOARD_CONTENT.waitFor();
+        DASHBOARD_CONTENT.waitFor();
     }
 
     public void selectFilter(String filter, String option) {

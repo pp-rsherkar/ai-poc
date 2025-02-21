@@ -13,8 +13,14 @@ import pages.studio.Workspaces;
 import java.util.UUID;
 
 public class StudioSteps {
+    static String workspaceNameRandom;
+    static String filterName;
+    static String filterOption;
+    static Boolean clickFlag = true;
     Accounts accounts = new Accounts(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
+    Workspaces workspaces = new Workspaces(DriverFactory.getPage());
+    ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
 
     @And("User enables the studio for an account")
     public void user_enables_the_studio_for_an_account()
@@ -42,16 +48,34 @@ public class StudioSteps {
     {
         accounts.saveStudioSettings();
     }
-    static String workspaceNameRandom;
-    static String filterName;
-    static String filterOption;
-    Workspaces workspaces = new Workspaces(DriverFactory.getPage());
-    ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
+
+    @And("User should be able to see the enabled workspaces for that account under Studio")
+    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio()
+    {
+        accounts.switchAccount();
+        navigation.navigateToStudio();
+        workspaces.createWorkspace();
+        Assert.assertEquals("HCP Audience Expansion",accounts.verifyWorkspacePermission());
+
+    }
+    @And("User disables the studio permission for an account")
+    public void userDisablesTheStudioPermissionForAnAccount()
+    {
+        navigation.clickSubMenu();
+        accounts.disableStudioForAccount();
+    }
+
+    @Then("User should not be able to see the studio permission for that account")
+    public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount()
+    {
+        accounts.verifyStudioMenu();
+    }
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
-        workspaces.createWorkspace();
+        //workspaces.createWorkspace();
+        workspaces.createWorkspace(clickFlag);
     }
 
     @Then("User sees the types of workspaces they have permissions for")
@@ -103,26 +127,5 @@ public class StudioSteps {
     public void verify_the_hcp_explorer_workspace_is_saved() {
         assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
         System.out.println(explorerWorkspace.workspaceSuccess());
-    }
-    @And("User should be able to see the enabled workspaces for that account under Studio")
-    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio()
-    {
-        accounts.switchAccount();
-        navigation.navigateToStudio();
-        accounts.createWorkspace();
-        Assert.assertEquals("HCP Audience Expansion",accounts.verifyWorkspacePermission());
-
-    }
-    @And("User disables the studio permission for an account")
-    public void userDisablesTheStudioPermissionForAnAccount()
-    {
-        navigation.clickSubMenu();
-        accounts.disableStudioForAccount();
-    }
-
-    @Then("User should not be able to see the studio permission for that account")
-    public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount()
-    {
-        accounts.verifyStudioMenu();
     }
 }

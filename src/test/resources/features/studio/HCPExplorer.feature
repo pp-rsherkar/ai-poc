@@ -15,5 +15,5 @@ Feature: HCP Explorer Workspace in Studio Application
     Then Verify the HCP Explorer Workspace is saved
 
     Examples:
-      | ADVERTISER | FILTER     | OPTION | WORKSPACE_NAME |
-      | Abbvie     | NPI Gender | Male   | Explorer       |
+      | ADVERTISER | FILTER     | OPTION | WORKSPACE_NAME  |
+      | Abbvie     | NPI Gender | Male   | Explorer        |
