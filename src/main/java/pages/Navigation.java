@@ -63,5 +63,10 @@ public class Navigation {
         SUB_MENU.click();
         page.waitForLoadState();
         STUDIO.click();
+        page.waitForLoadState();
+    }
+
+    public void clickSubMenu() {
+        SUB_MENU.click();
     }
 }

@@ -3,6 +3,8 @@ package factory;
 import com.microsoft.playwright.*;
 import utils.WebActions;
 
+import java.util.List;
+
 public class DriverFactory {
     public static BrowserContext context;
     public static Page page;
@@ -38,7 +40,7 @@ public class DriverFactory {
                 break;
             case "chrome":
                 browserType = Playwright.create().chromium();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless).setSlowMo(delay));
+                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
                 break;
             case "webkit":
                 browserType = Playwright.create().webkit();
@@ -46,7 +48,7 @@ public class DriverFactory {
                 break;
         }
         if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserType);
-        context = browser.newContext();
+        context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
         //Below line is used to start the trace file
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
         page = context.newPage();
