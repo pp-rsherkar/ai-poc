@@ -1,6 +1,5 @@
 package pages.admin;
 
-import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -25,9 +24,6 @@ public class Accounts {
     private final Locator SWITCH_CLICK_ACCOUNT;
     private final Locator STUDIO;
     private final Locator WORKSPACE_NAME;
-    private final Locator CREATE_WORKSPACE;
-    private final Locator BACK_TO_WORKSPACE_DASHBOARD;
-    static int counter = 0;
 
     public Accounts(Page page) {
         this.page = page;
@@ -49,8 +45,6 @@ public class Accounts {
         this.SWITCH_CLICK_ACCOUNT =page.locator("#accountSwitcher").getByText("100Plus");
         this.STUDIO=page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
         this.WORKSPACE_NAME=page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
-        this.CREATE_WORKSPACE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Create New Workspace"));
-        this.BACK_TO_WORKSPACE_DASHBOARD = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON);
     }
 
     public void clickAdministration() {
@@ -118,36 +112,6 @@ public class Accounts {
         if(!isVisible)
         {
             System.out.println("Studio Menu is not visible");
-        }
-    }
-
-    public void createWorkspace() {
-        while (counter < 3) {
-            retryCreateWorkspace(false);
-        }
-    }
-
-    public void createWorkspace(Boolean clickFlag) {
-        while (counter < 3) {
-            retryCreateWorkspace(clickFlag);
-        }
-    }
-
-    public void retryCreateWorkspace(boolean clickFlag) {
-         {
-            CREATE_WORKSPACE.click();
-            page.waitForLoadState();
-            if (WORKSPACE_NAME.isVisible()) {
-                page.waitForLoadState();
-                counter = 4;
-                if (clickFlag) {
-                    WORKSPACE_NAME.click();
-                }
-            } else {
-                counter++;
-                BACK_TO_WORKSPACE_DASHBOARD.click();
-                page.waitForLoadState();
-            }
         }
     }
 }
