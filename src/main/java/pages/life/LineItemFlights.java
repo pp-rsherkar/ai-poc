@@ -1,11 +1,11 @@
-package pages;
+package pages.life;
 
 import com.microsoft.playwright.Page;
 
-public class LineItemConversions {
+public class LineItemFlights {
     private final Page page;
 
-    public LineItemConversions(Page page) {
+    public LineItemFlights(Page page) {
         this.page = page;
     }
 }
