@@ -8,13 +8,13 @@ Feature: LIFE Regression - Create Static NPI List
     When User clicks on Add List
     Then Verify creation of NPI List screen is displayed
     And User selects Static List
-    And User enters the NPI list details as "<LIST NAME>" "<ADVERTISER>" "<NPI NUMBER>"
-    When User makes list available in LIFE and HCP365 and saves the list
+    And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>" "<NPI_NUMBER>"
+    When User makes list available in LIFE and saves the list
     Then Verify list gets saved successfully.
 
     Examples:
       | USER  | ADVERTISER     | NPI_NUMBER | LIST_NAME   |
-      | Admin | 01- Advertiser | 1478523698 | STATIC_NPI  |
+      | Admin | 01- Advertiser | 1478523698 | STATIC_NPI|
 
 
 
