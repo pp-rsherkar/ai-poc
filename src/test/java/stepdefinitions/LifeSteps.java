@@ -10,6 +10,8 @@ import pages.*;
 import pages.life.*;
 import utils.WebActions;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class LifeSteps {
@@ -20,6 +22,8 @@ public class LifeSteps {
     static String url;
     static String username;
     static String password;
+    static String timestamp;
+    static String npiStaticName;
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -27,6 +31,8 @@ public class LifeSteps {
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
     TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
     CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
+    NPILists npiLists = new NPILists(DriverFactory.getPage());
+    NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -155,4 +161,45 @@ public class LifeSteps {
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
     }
+    @Given("User navigates to NPI Lists page")
+    public void user_navigates_to_npi_lists_page() {
+        navigation.clickSubMenu();
+        npiLists.clickNPILists();
+    }
+
+    @When("User clicks on Add List")
+    public void user_clicks_on_add_list() {
+        npiLists.clickAddList();
+    }
+
+    @Then("Verify creation of NPI List screen is displayed")
+    public void verify_creation_of_npi_list_screen_is_displayed() {
+        Assert.assertEquals("Create New NPI List", npiLists.verifyNPIListText());
+    }
+
+    @Then("User selects Static List")
+    public void user_selects_static_list() {
+        npiLists.clickStaticList();
+    }
+
+    @Then("User enters the NPI list details as {string} {string} {string}")
+    public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiStaticName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiStaticName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiStaticList.enterNPINumber(npiNumber);
+    }
+    @When("User makes list available in LIFE and saves the list")
+    public void user_makes_list_available_in_life_and_saves_the_list() {
+        npiStaticList.selectProduct();
+    }
+
+    @Then("Verify list gets saved successfully.")
+    public void verify_list_gets_saved_successfully() {
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
+    }
+
 }
+
