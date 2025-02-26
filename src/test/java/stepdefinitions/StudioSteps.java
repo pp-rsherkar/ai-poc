@@ -8,6 +8,7 @@ import org.junit.Assert;
 import pages.*;
 import pages.admin.Accounts;
 import pages.studio.ExplorerWorkspace;
+import pages.studio.WorkspaceDownloadNPI;
 import pages.studio.Workspaces;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class StudioSteps {
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Workspaces workspaces = new Workspaces(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
+    WorkspaceDownloadNPI workspacedownloadnpi=new WorkspaceDownloadNPI(DriverFactory.getPage());
 
     @And("User enables the studio for an account")
     public void user_enables_the_studio_for_an_account()
@@ -122,5 +124,25 @@ public class StudioSteps {
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
         assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
+    }
+
+    @When("search for workspace")
+    public void search_for_workspace() {
+        workspacedownloadnpi.searchWorkspace();
+    }
+    @Then("user clicks on the searched workspace")
+    public void user_clicks_on_the_searched_workspace() {
+        workspacedownloadnpi.clickWorkspace();
+        workspacedownloadnpi.clickDownloadButton();
+        workspacedownloadnpi.clickNPIDownload();
+        workspacedownloadnpi.clickCSVFile();
+        workspacedownloadnpi.clickDownloadNPIButton();
+        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
+
+        workspacedownloadnpi.clickDownloadButton();
+        workspacedownloadnpi.clickNPIDownload();
+        workspacedownloadnpi.clickXSLXFile();
+        workspacedownloadnpi.clickDownloadNPIButton();
+        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
     }
 }
