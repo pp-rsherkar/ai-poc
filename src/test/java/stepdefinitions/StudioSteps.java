@@ -22,7 +22,7 @@ public class StudioSteps {
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Workspaces workspaces = new Workspaces(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
-    WorkspaceDownloadNPI stud=new WorkspaceDownloadNPI(DriverFactory.getPage());
+    WorkspaceDownloadNPI workspacedownloadnpi=new WorkspaceDownloadNPI(DriverFactory.getPage());
 
     @And("User enables the studio for an account")
     public void user_enables_the_studio_for_an_account()
@@ -128,21 +128,21 @@ public class StudioSteps {
 
     @When("search for workspace")
     public void search_for_workspace() {
-        stud.searchWorkspace();
+        workspacedownloadnpi.searchWorkspace();
     }
     @Then("user clicks on the searched workspace")
     public void user_clicks_on_the_searched_workspace() {
-        stud.clickWorkspace();
-        stud.clickDownloadButton();
-        stud.clickNPIDownload();
-        stud.clickCSVFile();
-        stud.clickDownloadNPIButton();
-        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",stud.verifyToast());
+        workspacedownloadnpi.clickWorkspace();
+        workspacedownloadnpi.clickDownloadButton();
+        workspacedownloadnpi.clickNPIDownload();
+        workspacedownloadnpi.clickCSVFile();
+        workspacedownloadnpi.clickDownloadNPIButton();
+        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
 
-        stud.clickDownloadButton();
-        stud.clickNPIDownload();
-        stud.clickXSLXFile();
-        stud.clickDownloadNPIButton();
-        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",stud.verifyToast());
+        workspacedownloadnpi.clickDownloadButton();
+        workspacedownloadnpi.clickNPIDownload();
+        workspacedownloadnpi.clickXSLXFile();
+        workspacedownloadnpi.clickDownloadNPIButton();
+        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
     }
 }
