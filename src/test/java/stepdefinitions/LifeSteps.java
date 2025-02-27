@@ -24,6 +24,9 @@ public class LifeSteps {
     static String password;
     static String timestamp;
     static String npiStaticName;
+    static String templateNameRandom;
+    static String dimensionName;
+    static String metricName;
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -33,6 +36,7 @@ public class LifeSteps {
     CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
+    ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -201,5 +205,58 @@ public class LifeSteps {
         assert npiStaticList.saveListSuccess().contains("NPI list created");
     }
 
-}
+    @Given("User navigates to Report Templates page")
+    public void user_navigates_to_report_templates_page() {
+        navigation.clickSubMenu();
+        reportTemplates.clickReportTemplatesLink();
+    }
 
+    @Then("Verify the tabs displayed on the Report Templates page")
+    public void verify_the_tabs_displayed_on_the_report_templates_page() {
+        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab());
+        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab());
+        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
+    }
+
+    @When("User clicks on New Template")
+    public void user_clicks_on_new_template() {
+        reportTemplates.createNewTemplate();
+    }
+
+    @Then("Verify the tabs displayed on the Create New Template panel")
+    public void verify_the_tabs_displayed_on_the_create_new_template_panel() {
+        Assert.assertEquals("DIMENSIONS", reportTemplates.verifyDimensionsTab());
+        Assert.assertEquals("METRICS", reportTemplates.verifyMetricsTab());
+    }
+
+    @When("User enters the template details as {string} {string} {string}")
+    public void user_enters_the_template_details_as(String templateName, String dimension, String metric) {
+        dimensionName = dimension;
+        metricName = metric;
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        templateNameRandom = templateName + '_' + timestamp;
+        reportTemplates.enterTemplateName(templateNameRandom);
+        reportTemplates.selectDimension(dimension);
+        reportTemplates.clickMetricsTab();
+        reportTemplates.selectMetric(metric);
+    }
+
+    @Then("Verify the selected dimensions and metrics under the Template Structure section")
+    public void verify_the_selected_dimensions_and_metrics_under_the_template_structure_section() {
+        Assert.assertEquals(dimensionName, reportTemplates.verifySelectedDimensions());
+        Assert.assertEquals(metricName, reportTemplates.verifySelectedMetrics());
+    }
+
+    @When("User saves the new template")
+    public void user_saves_the_new_template() {
+        reportTemplates.saveReportTemplate();
+    }
+
+    @Then("Verify new template is saved and displayed in the template list")
+    public void verify_new_template_is_saved_and_displayed_in_the_template_list() {
+        assert reportTemplates.reportTemplateSuccess().contains("Template created successfully");
+        reportTemplates.searchCreatedReportTemplate(templateNameRandom);
+        Assert.assertEquals(templateNameRandom, reportTemplates.verifyCreatedReportTemplate(templateNameRandom));
+        Assert.assertEquals(1, reportTemplates.searchResultRowCount());
+    }
+}
