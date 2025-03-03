@@ -1,5 +1,4 @@
 package pages.studio;
-
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -62,6 +61,30 @@ public class Workspaces {
                 counter = 4;
                 if (clickFlag) {
                     HCP_EXPLORER.click();
+                }
+            } else {
+                counter++;
+                BACK_TO_WORKSPACE_DASHBOARD.click();
+                page.waitForLoadState();
+            }
+        }
+    }
+
+    public void createWorkspaceExpansion(Boolean expansionFlag) {
+        while (counter < 3) {
+            retryCreateWorkspaceExpansion(expansionFlag);
+        }
+    }
+
+    public void retryCreateWorkspaceExpansion(boolean expansionFlag) {
+        {
+            CREATE_WORKSPACE.click();
+            page.waitForLoadState();
+            if (HCP_EXPANSION.isVisible()) {
+                page.waitForLoadState();
+                counter = 4;
+                if (expansionFlag) {
+                    HCP_EXPANSION.click();
                 }
             } else {
                 counter++;
