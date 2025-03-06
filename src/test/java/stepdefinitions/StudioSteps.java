@@ -7,22 +7,98 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import pages.admin.Accounts;
+import pages.studio.ExpansionWorkspace;
 import pages.studio.ExplorerWorkspace;
 import pages.studio.WorkspaceDownloadNPI;
 import pages.studio.Workspaces;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import static factory.DriverFactory.page;
 
 import java.util.UUID;
 
 public class StudioSteps {
+    static String workspaceName;
     static String workspaceNameRandom;
     static String filterName;
     static String filterOption;
     static Boolean clickFlag = true;
+    static Boolean expansionFlag = true;
     Accounts accounts = new Accounts(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Workspaces workspaces = new Workspaces(DriverFactory.getPage());
+    ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     WorkspaceDownloadNPI workspacedownloadnpi=new WorkspaceDownloadNPI(DriverFactory.getPage());
+
+
+    @When("the user clicks on Create New Workspace")
+    public void the_user_clicks_on_create_new_workspace() {
+        // workspaces.CREATE_WS();
+        Boolean clickFlag = true;
+        workspaces.createWorkspace(clickFlag);
+
+    }
+    @And("the User navigate to studio")
+    public void theUserNavigateToStudio() {
+        navigation.navigateToLife();
+        navigation.navigateToStudio();
+    }
+
+
+    @When("the user sees the types of workspaces they have permissions for")
+    public void the_user_sees_the_types_of_workspaces_they_have_permissions_for() {
+        Assert.assertEquals("HCP Explorer", workspaces.verifyHCPExplorer());
+        Assert.assertEquals("HCP Audience Expansion", workspaces.verifyHCPAudienceExpansion());
+
+    }
+
+    @Then("the user selects the advertiser {string}")
+    public void the_user_selects_the_advertiser(String advertiser) {
+        page.waitForLoadState();
+        expworkspaces.clickAdvertiserDropdown(advertiser);
+        page.waitForLoadState();
+
+    }
+    @Then("the user selects Source Audience {string}")
+    public void the_user_selects_source_audience(String string) {
+        expworkspaces.selectSourceAudience(string);
+
+    }
+
+    @Then("the user selects Expand With Care Team or Expand With Affiliation Graph and selects the value")
+    public void the_user_selects_expand_with_care_team_or_expand_with_affiliation_graph_and_selects_the_value() {
+        expworkspaces.selectExpandCareTeam();
+        expworkspaces.selectExpandAffGraph();
+    }
+
+    @Then("the filters should be applied to the workspace")
+    public void the_user_applies_the_following_filters() {
+
+        expworkspaces.addFilter();
+
+
+    }
+
+    @Then("the user renames the workspace to {string}")
+    public void the_user_renames_the_workspace_to_(String string) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("_ddMMyy_HHmmss_SSS");
+        String dateAndTimeStamp = LocalDateTime.now().format(formatter);
+        workspaceName= string+dateAndTimeStamp;
+        expworkspaces.renameExpansion(workspaceName);
+
+
+        // Write code here that turns the phrase above into concrete actions
+        //    throw new io.cucumber.java.PendingException();
+    }
+    @Then("the user saves the workspace and check the workspace is Saved")
+    public void the_user_saves_the_workspace_and_check_the_workspace_is_Saved() {
+        expworkspaces.saveExpansion();
+        assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
+
+    }
 
     @And("User enables the studio for an account")
     public void user_enables_the_studio_for_an_account()
@@ -78,6 +154,12 @@ public class StudioSteps {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
         //workspaces.createWorkspace();
         workspaces.createWorkspace(clickFlag);
+    }
+    @When("User clicks on Create New Workspace For Expansion")
+    public void user_clicks_on_create_new_workspace_for_expansion() {
+        Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
+        //workspaces.createWorkspace();
+        workspaces.createWorkspaceExpansion(expansionFlag);
     }
 
     @Then("User sees the types of workspaces they have permissions for")
