@@ -12,6 +12,8 @@ import utils.WebActions;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class LifeSteps {
@@ -27,6 +29,8 @@ public class LifeSteps {
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
+    List<String> rules;
+    List<String> rulesCompare = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -84,7 +88,8 @@ public class LifeSteps {
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
     public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget) {
-        campaignNameRandom = campaign_name + '_' + UUID.randomUUID().toString().substring(0, 10);
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        campaignNameRandom = campaign_name + '_' + timestamp;
         campaigns.selectAdvertiser(advertiser);
         campaigns.enterCampaignName(campaignNameRandom);
         campaigns.setCampaignType(campaign_type);
@@ -258,5 +263,44 @@ public class LifeSteps {
         reportTemplates.searchCreatedReportTemplate(templateNameRandom);
         Assert.assertEquals(templateNameRandom, reportTemplates.verifyCreatedReportTemplate(templateNameRandom));
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
+    }
+
+    @Given("User selects the {string} channel, configures targeting rules:")
+    public void user_selects_the_channel_configures_targeting_rules(String channel, io.cucumber.datatable.DataTable ruleTypes) {
+        rules = ruleTypes.asList(String.class);
+
+        tacticSettings.selectChannel(channel);
+        navigation.clickOnIcon("Add Targeting Rule");
+
+        for (String rule : rules) {
+            tacticSettings.selectMultipleRuleTypes(rule);
+        }
+
+        tacticSettings.closeRuleTypePanel();
+    }
+
+    @Then("Verify the configured targeting rules")
+    public void verify_the_configured_targeting_rules() {
+        rulesCompare.add(tacticSettings.verifyAudienceAttributeRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyHealthJourneyRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyDemographicsRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyContextualRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyGeographyRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyMediaSupplyRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyLegalTargetingsRule().replaceAll("\\(\\d+\\)", "").trim());
+        assert rules.equals(rulesCompare);
+
+        tacticSettings.verifyAudienceAttributeOption();
+        tacticSettings.verifyHealthJourneyOption();
+        tacticSettings.verifyDemographicsOption();
+        tacticSettings.verifyContextualOption();
+        tacticSettings.verifyGeographyOption();
+        tacticSettings.verifyMediaSupplyOption();
+        tacticSettings.verifyLegalTargetingsOption();
+    }
+
+    @When("User saves the settings")
+    public void user_saves_the_settings() {
+        tacticSettings.saveTacticSettings();
     }
 }

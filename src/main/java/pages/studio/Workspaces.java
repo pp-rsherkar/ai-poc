@@ -11,7 +11,7 @@ public class Workspaces {
     private final Locator HCP_EXPLORER;
     private final Locator HCP_EXPANSION;
     private final Locator BACK_TO_WORKSPACE_DASHBOARD;
-    static int counter = 0;
+    int counter = 0;
 
     public Workspaces(Page page) {
         this.page = page;
