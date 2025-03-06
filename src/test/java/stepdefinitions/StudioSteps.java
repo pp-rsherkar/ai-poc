@@ -10,6 +10,7 @@ import pages.admin.Accounts;
 import pages.studio.ExpansionWorkspace;
 import pages.studio.ExplorerWorkspace;
 import pages.studio.WorkspaceDownloadNPI;
+import pages.studio.WorkspacePublishNPI;
 import pages.studio.Workspaces;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +33,7 @@ public class StudioSteps {
     ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     WorkspaceDownloadNPI workspacedownloadnpi=new WorkspaceDownloadNPI(DriverFactory.getPage());
+    WorkspacePublishNPI workspacePublishNPI =new WorkspacePublishNPI(DriverFactory.getPage());
 
 
     @When("the user clicks on Create New Workspace")
@@ -226,5 +228,47 @@ public class StudioSteps {
         workspacedownloadnpi.clickXSLXFile();
         workspacedownloadnpi.clickDownloadNPIButton();
         Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
+    }
+    @When("Studio platform is available")
+    public void studio_platform_is_available()
+    {
+        workspacePublishNPI.studio();
+    }
+
+    @And("User searches the {string} and selects it")
+    public void userSearchesTheAndSelectsIt(String WORKSPACE)
+    {
+        workspacePublishNPI.searchWorkspace(WORKSPACE);
+    }
+
+    @When("Download button is enabled to the user")
+    public void download_button_is_enabled_to_the_user()
+    {
+        workspacePublishNPI.clickDownbutton();
+    }
+    @When("User clicks on Publish NPI List")
+    public void user_clicks_on_publish_npi_list()
+    {
+        workspacePublishNPI.clickPublishNpi();
+    }
+    @And("User selects publish {string}")
+    public void userSelectsPublish(String listType)
+    {
+        workspacePublishNPI.publish(listType);
+        System.out.println("list type is: "+listType);
+    }
+
+    @When("User select the system to publish the list")
+    public void user_select_the_system_to_publish_the_list() {
+        workspacePublishNPI.hcp();
+        workspacePublishNPI.life();
+
+    }
+    @Then("Verify list is published")
+    public void verify_list_is_published() {
+        workspacePublishNPI.clickPublish();
+        Assert.assertEquals("Workspace saved and ready to use!", workspacePublishNPI.verifyToast());
+
+
     }
 }
