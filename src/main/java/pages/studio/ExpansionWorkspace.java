@@ -25,6 +25,8 @@ public class ExpansionWorkspace {
     private final Locator WORKSPACE_NAME;
     private final Locator ENTER_MY_PLAYGROUNG;
     private final Locator POPUP_CLOSE;
+    private final Locator DROPDOWN_CARETEAM;
+    private final Locator DROPDOWN_CARETEAM_VALUE;
 
     public ExpansionWorkspace(Page page) {
 
@@ -45,6 +47,8 @@ public class ExpansionWorkspace {
         this.SAVE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator(".styles__StyledResetUpdate-sc-njp72g-0 > button:nth-child(2)");
         this.POPUP_CLOSE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
         this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX).nth(3);
+        this.DROPDOWN_CARETEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.COMPLEMENTARY).getByRole(AriaRole.COMBOBOX, new Locator.GetByRoleOptions().setName("undefined combobox")).getByRole(AriaRole.TEXTBOX);
+        this.DROPDOWN_CARETEAM_VALUE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Basic"));
 
     }
 
@@ -80,6 +84,9 @@ public class ExpansionWorkspace {
 
         page.waitForLoadState();
         EXPAND_CARE_TEAM.click();
+        DROPDOWN_CARETEAM.click();
+        DROPDOWN_CARETEAM_VALUE.click();
+
 
     }
 
