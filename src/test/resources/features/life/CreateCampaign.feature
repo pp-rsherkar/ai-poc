@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Campaign
 
-  @regression
+  @regression @jenkins
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
