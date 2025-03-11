@@ -7,7 +7,10 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         // Rerun failed tests from rerun.txt file
-        features = {"@target/rerun.txt"}, glue = {"stepdefinitions", "hooks"}, plugin = {"pretty", "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:", "rerun:target/rerun.txt"})
+        features = {"@target/rerun.txt"}
+        , glue = {"stepdefinitions", "hooks"}
+        , plugin = {"pretty", "html:target/cucumber-reports/report.html", "json:target/cucumber-reports/cucumber.json", "rerun:target/rerun.txt"    // Save Failed test scenarios in rerun.txt file
+})
 
 
 public class TestReRunner {
