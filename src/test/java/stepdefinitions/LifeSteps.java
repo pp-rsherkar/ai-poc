@@ -6,7 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import pages.*;
+import pages.Navigation;
 import pages.life.*;
 import utils.WebActions;
 
@@ -170,6 +170,7 @@ public class LifeSteps {
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
     }
+
     @Given("User navigates to NPI Lists page")
     public void user_navigates_to_npi_lists_page() {
         navigation.clickSubMenu();
@@ -199,6 +200,7 @@ public class LifeSteps {
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
     }
+
     @When("User makes list available in LIFE and saves the list")
     public void user_makes_list_available_in_life_and_saves_the_list() {
         npiStaticList.selectProduct();
