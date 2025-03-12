@@ -305,4 +305,40 @@ public class LifeSteps {
     public void user_saves_the_settings() {
         tacticSettings.saveTacticSettings();
     }
+
+    @Then("User selects Smart List")
+    public void user_selects_smart_list() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("User enters the NPI list details as {string} {string}")
+    public void user_enters_the_npi_list_details_as(String string, String string2) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @When("User clicks on Prescribed Drug and enters the drug details")
+    public void user_clicks_on_prescribed_drug_and_enters_the_drug_details() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("Verify drug details are added")
+    public void verify_drug_details_are_added() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @When("User makes list available in LIFE, HCP365 and saves the list")
+    public void user_makes_list_available_in_life_hcp365_and_saves_the_list() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("Verify list gets saved successfully")
+    public void verify_list_gets_saved_successfully() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
 }
