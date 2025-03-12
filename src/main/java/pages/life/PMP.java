@@ -19,23 +19,25 @@ public class PMP {
     private final Locator PREMIUM_DEALS_TAB;
     private final Locator ASSIGN_PREMIUM_DEALS;
     private final Locator EXIT_PMP_MODAL_OK_BUTTON;
+    private final Locator EXIT_TARGETING_PANEL;
     private final Locator TACTIC_SETTINGS_SUCCESS;
 
     public PMP(Page page) {
         this.page = page;
         this.GLOBAL_LIFE_SEARCH_MODAL = page.locator("//div[@class='iconSprite search-overlay-lens']");
-        this.GLOBAL_SEARCH_TACTICS_TAB=page.locator("//*[text()='Tactics'] and contains(@class, 'item tabBorder'");
-        this.SEARCH_TACTIC_NAME=page.locator("//div[@id='global_search_input']");
-        this.TACTIC_ROW=page.locator("//div[@class='description truncate']");
+        this.GLOBAL_SEARCH_TACTICS_TAB=page.locator("//a[normalize-space()='Tactics']");
+        this.SEARCH_TACTIC_NAME=page.locator("//input[@id='global_search_input']");
+        this.TACTIC_ROW=page.locator("//mark[normalize-space()='UNIQUE TACTIC FOR PMP 1203 SSS 1']");
         this.VERIFY_TACTIC_SETTINGS_PAGE = page.locator("//div[text()='Bid Strategy']");
-        this.ADD_TARGETING_RULE = page.locator("//span[text()='New Targeting Rule']");
-        this.SEARCH_TARGETING = page.locator("//div[@class='searchBox ng-pristine ng-valid ng-touched']");
-        this.DEALS_TARGETING = page.locator("//div[@class='item targetType pointer firstItem']");
-        this.PRIVATE_DEALS_TAB = page.locator("//*[text()='PRIVATE DEALS']");
-        this.ASSIGN_PRIVATE_DEALS = page.locator("//span[@class='addDeal ng-star-inserted']");
-        this.PREMIUM_DEALS_TAB = page.locator("//*[text()='PREMIUM DEALS']");
-        this.ASSIGN_PREMIUM_DEALS = page.locator("//span[@class='addDeal ng-star-inserted']");
-        this.EXIT_PMP_MODAL_OK_BUTTON = page.locator("//div[@class='ui primary button okButton']");
+        this.ADD_TARGETING_RULE = page.locator("//div[@class='NewTargetingLink']//img[contains(@class,'icon')]");
+        this.SEARCH_TARGETING = page.locator("//input[@name='search']");
+        this.DEALS_TARGETING = page.locator("//a[@class='item targetType pointer firstItem']");
+        this.PRIVATE_DEALS_TAB = page.locator("//a[normalize-space()='PRIVATE DEALS']");
+        this.ASSIGN_PRIVATE_DEALS = page.locator("//div[@class='pmpDealsList']//div[2]//div[1]//div[5]//span[2]");
+        this.PREMIUM_DEALS_TAB = page.locator("//a[normalize-space()='PREMIUM DEALS']");
+        this.ASSIGN_PREMIUM_DEALS = page.locator("//div[@class='pmpDealsList']//div[2]//div[1]//div[5]//span[2]");
+        this.EXIT_PMP_MODAL_OK_BUTTON = page.locator("//button[normalize-space()='Ok']");
+        this.EXIT_TARGETING_PANEL=page.locator("//div[@class='right iconSprite icons_20-close pointer close_icon']");
         this.SAVE_TACTIC_SETTINGS = page.locator("//span[text()='Save']");
         this.TACTIC_SETTINGS_SUCCESS = page.locator("//*[text()='Success!']");
     }
@@ -58,7 +60,8 @@ public class PMP {
 
     public void SEARCH_TARGETING_RULE() {
         SEARCH_TARGETING.fill("Deals");
-        page.waitForLoadState();
+        SEARCH_TARGETING.press("Enter");
+
 
     }
 
@@ -78,6 +81,7 @@ public class PMP {
 
     public void EXIT_PMP_MODAL_OK_BUTTON_PRESS() {
         EXIT_PMP_MODAL_OK_BUTTON.click();
+        EXIT_TARGETING_PANEL.click();
     }
 
     public void saveTacticSettings() {
