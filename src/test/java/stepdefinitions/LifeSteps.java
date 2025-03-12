@@ -336,9 +336,5 @@ public class LifeSteps {
         throw new io.cucumber.java.PendingException();
     }
 
-    @Then("Verify list gets saved successfully")
-    public void verify_list_gets_saved_successfully() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
+
 }
