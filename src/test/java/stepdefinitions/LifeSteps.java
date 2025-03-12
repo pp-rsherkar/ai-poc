@@ -21,6 +21,7 @@ public class LifeSteps {
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
+    static String tacticPMP;
     static String url;
     static String username;
     static String password;
@@ -41,6 +42,7 @@ public class LifeSteps {
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
+    PMP pmp = new PMP(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -170,6 +172,7 @@ public class LifeSteps {
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
     }
+
     @Given("User navigates to NPI Lists page")
     public void user_navigates_to_npi_lists_page() {
         navigation.clickSubMenu();
@@ -199,6 +202,7 @@ public class LifeSteps {
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
     }
+
     @When("User makes list available in LIFE and saves the list")
     public void user_makes_list_available_in_life_and_saves_the_list() {
         npiStaticList.selectProduct();
@@ -303,4 +307,46 @@ public class LifeSteps {
     public void user_saves_the_settings() {
         tacticSettings.saveTacticSettings();
     }
+
+    @And("User has navigated to mentioned tactic {string}")
+    public void user_navigates_to_the_tactic(String tacticPMP) {
+        pmp.navigateToTactic(tacticPMP);
+    }
+
+    @When("Targeting panel is opened on Tactic Settings tab")
+    public void user_navigates_to_targeting_panel() {
+        pmp.verifyTacticSettingsText();
+        pmp.setADD_TARGETING_RULE();
+    }
+
+    @And("User clicks on Deals Targeting")
+    public void deals_targeting_navigation() {
+        pmp.SEARCH_TARGETING_RULE();
+        pmp.SET_DEALS_TARGETING();
+    }
+
+    @And("User assigns premium deals")
+    public void user_assigns_premium_deals() {
+        pmp.PREMIUM_DEALS_ASSIGNMENT();
+    }
+
+    @And("User clicks on OK button of PMP Modal")
+    public void user_clicks_on_OK_PMP_Modal() {
+        pmp.EXIT_PMP_MODAL_OK_BUTTON_PRESS();
+    }
+
+    @And("User assigns private deals")
+    public void user_assigns_private_deals() {
+        pmp.PRIVATE_DEALS_ASSIGNMENT();
+    }
+
+    @And("User saves the changes")
+    public void users_saves_deal_changes(){
+        pmp.saveTacticSettings();
+    }
+    @Then("Deals should be assigned")
+    public void deals_are_assigned(){
+        pmp.tacticSettingsSuccess();
+    }
+
 }
