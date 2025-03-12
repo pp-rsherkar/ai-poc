@@ -84,8 +84,8 @@ public class PMP {
         SAVE_TACTIC_SETTINGS.click();
     }
 
-    public String tacticSettingsSuccess() {
-        return TACTIC_SETTINGS_SUCCESS.innerText();
+    public void tacticSettingsSuccess() {
+        TACTIC_SETTINGS_SUCCESS.innerText();
     }
 }
 
