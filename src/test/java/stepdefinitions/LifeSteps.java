@@ -340,13 +340,28 @@ public class LifeSteps {
         pmp.PRIVATE_DEALS_ASSIGNMENT();
     }
 
+    @And("User turns the Only Target Applied deals OFF")
+    public void user_turns_toggle_off() {
+    pmp.TOGGLE_OFF();
+    }
+
     @And("User saves the changes")
-    public void users_saves_deal_changes(){
+    public void users_saves_deal_changes() {
         pmp.saveTacticSettings();
     }
-    @Then("Deals should be assigned")
-    public void deals_are_assigned(){
+
+    @Then("Deals should be assigned to both targeting and PMP deals section")
+    public void deals_are_assigned() {
         pmp.tacticSettingsSuccess();
+        pmp.DEALS_PRESENT_IN_TARGETING();
+        pmp.DEALS_PRESENT_IN_PMP_DEALS_SECTION();
+    }
+
+    @Then("Deals should be assigned to only PMP deals section")
+    public void deals_are_assigned_to_only_PMP_section()
+    {
+        pmp.DEALS_ABSENT_IN_TARGETING();
+        pmp.DEALS_PRESENT_IN_PMP_DEALS_SECTION();
     }
 
 }
