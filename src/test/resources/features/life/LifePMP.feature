@@ -41,7 +41,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User saves the changes
     Then Deals should be assigned to only PMP deals section
     Examples:
-      | USER  | tacticPMP                        |
+      | USER  | tacticPMP    |
       | Admin | PMPTOGGLEOFF |
 
   Scenario Outline: Verify private deal can be assigned to a tactic with Toggle "Only Target Applied Deals" OFF
@@ -56,5 +56,5 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User saves the changes
     Then Deals should be assigned to only PMP deals section
     Examples:
-      | USER  | tacticPMP                        |
+      | USER  | tacticPMP   |
       | Admin | PMPTOGGLEOFF|
