@@ -1,6 +1,6 @@
 Feature: End to End Workflow of NPI Lists
 
-  @Raj_Run
+  @regression
   Scenario Outline: End to End Workflow of LIFE NPI lists Integration with HCP365
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
@@ -9,13 +9,22 @@ Feature: End to End Workflow of NPI Lists
     Then Verify creation of NPI List screen is displayed
     And User selects Smart List
     And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>"
-    When User clicks on Prescribed Drug and enters the drug details
+    When User clicks on Prescribed Drug and enters the drug details "<DRUG_NAME>"
     Then Verify drug details are added
     When User makes list available in LIFE, HCP365 and saves the list
     Then Verify list gets saved successfully
-    #When User navigates to Tactic targeting and add NPI targeting by selecting the created smart list
-    #And User clicks on OK and Save
-    #Then Verify smart list is targeted in the tactic successfully
+    And  User navigates to Campaign Dashboard
+    And User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    #When User selects the "<CHANNEL>" channel, configures the targeting rule with created smart NPI list, and saves the settings
+    When User selects the "<CHANNEL>" channel, configure NPI targeting rule
+    Then Verify smart list is targeted in the tactic successfully
+    And User saves the targeting
     #And User navigates to Smart actions from the main menu
     #When User clicks on Add Smart Action
     #Then Verify smart action creation page is displayed
@@ -34,5 +43,5 @@ Feature: End to End Workflow of NPI Lists
 
 
     Examples:
-      | USER  | ADVERTISER     | LIST_NAME   |
-      | Admin | 01- Advertiser | Smart List  |
+      | USER  | ADVERTISER     | LIST_NAME   | DRUG_NAME | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME| CHANNEL          |
+      | Admin | 01- Advertiser | Smart List  | Glynase   | Auto    | Regular | 2000      |  Line     | 500         | TACTIC     | Display Advanced |

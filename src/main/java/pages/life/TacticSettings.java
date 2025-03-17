@@ -2,6 +2,8 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
+import com.microsoft.playwright.options.AriaRole;
 
 public class TacticSettings {
     private final Page page;
@@ -48,6 +50,12 @@ public class TacticSettings {
     private final Locator DEVICES_OPTION2;
     private final Locator LEGAL_POPULATIONS_OPTION1;
     private final Locator TEXT_AUDIENCE_ATTRIBUTE;
+    private final Locator NPI_RULE;
+    private final Locator NPI_PANEL_SEARCH;
+    private final Locator TARGET_OPTION;
+    private final Locator VERIFY_NPI;
+
+
     String optionTextAudienceAttribute1;
     String optionTextDemographics1;
     String optionTextDemographics2;
@@ -107,6 +115,12 @@ public class TacticSettings {
         this.DEVICES_OPTION2 = page.locator("(//span[@class='target-ellipse'])[12]");
         this.LEGAL_POPULATIONS_OPTION1 = page.locator("(//span[@class='target-ellipse'])[13]");
         this.TEXT_AUDIENCE_ATTRIBUTE = page.locator("(//span[contains(@class,'d-block fs-13 lh-20')])[1]");
+        this.NPI_RULE = page.locator("a").filter(new Locator.FilterOptions().setHasText("NPIHCP Direct Match"));
+        this.NPI_PANEL_SEARCH =page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search..."));
+        this.TARGET_OPTION = page.getByTitle("Target");
+        this.VERIFY_NPI = page.locator("//label[normalize-space(text())='NPI']");
+
+
     }
 
     public String verifyTacticSettingsText() {
@@ -117,6 +131,7 @@ public class TacticSettings {
         SELECT_CHANNEL.click();
         SELECT_CHANNEL.locator("text=" + channel).click();
     }
+
 
     public void selectRuleType() {
         SEARCH_RULE_TYPE.fill("Behavioral Segment");
@@ -187,6 +202,9 @@ public class TacticSettings {
                 RULE_LEGAL_POPULATIONS_OPTION_SELECT.click();
                 RULE_TYPE_OK_BUTTON.click();
                 break;
+
+
+
         }
     }
 
@@ -268,4 +286,35 @@ public class TacticSettings {
         String displayedTextLegalTargetings1 = LEGAL_POPULATIONS_OPTION1.innerText();
         assert healthPopulations1.equals(displayedTextLegalTargetings1);
     }
+
+    public void selectNPIRule(String listname) {
+        NPI_RULE.click();
+        NPI_PANEL_SEARCH.click();
+        NPI_PANEL_SEARCH.fill(listname);
+        NPI_PANEL_SEARCH.press("Enter");
+
+    }
+
+    public void clickTarget() {
+        TARGET_OPTION.click();
+    }
+
+    public void clickOk() {
+        RULE_TYPE_OK_BUTTON.click();
+    }
+
+    public void clickClose() {
+        RULE_TYPE_CLOSE.click();
+
+    }
+
+    public String verifyNPIRule() {
+    return VERIFY_NPI.innerText();
+
+
+    }
+
+
+
+
 }
