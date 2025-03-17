@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Campaign
 
-  @regression
+  @jenkins
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
@@ -21,7 +21,7 @@ Feature: LIFE Regression - Create a Campaign
       | USER  | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      |
       | Admin | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Auto_Creative |
 
-  @regression
+  @jenkins
   Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
