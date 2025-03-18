@@ -32,7 +32,7 @@ public class LifeSteps {
     static String dimensionName;
     static String metricName;
 
-    static String npiListName="00testa";
+    //static String npiListName="00testa";
     List<String> rules;
     List<String> rulesCompare = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
@@ -47,7 +47,7 @@ public class LifeSteps {
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
     NPIListE2E npiListE2E = new NPIListE2E(DriverFactory.getPage());
 
-    SmartActions smartActions = new SmartActions(DriverFactory.getPage(),npiListName);
+    SmartActions smartActions = new SmartActions(DriverFactory.getPage(),npiName);
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -282,8 +282,8 @@ public class LifeSteps {
     public void user_clicks_on_add_smart_action() {
         smartActions.clickAddSmartAction();
     }
-    @Then("Verify smart action creation page should be displayed")
-    public void verify_smart_action_creation_page_should_be_displayed() {
+    @Then("Verify smart action creation page is displayed")
+    public void verify_smart_action_creation_page_is_displayed() {
         Assert.assertEquals("Smart Action Properties", smartActions.verifySmartAction());
     }
     @Then("User enters smart action details as {string} {string}")
@@ -310,7 +310,7 @@ public class LifeSteps {
     }
     @Then("Verify NPI list created in LIFE is present")
     public void verify_npi_list_created_in_life_is_present() {
-        Assert.assertEquals(npiListName,smartActions.searchNPIList(npiListName));
+        Assert.assertEquals(npiName,smartActions.searchNPIList(npiName));
     }
     @Then("User adds NPI list to the smart action")
     public void user_adds_npi_list_to_the_smart_action() {

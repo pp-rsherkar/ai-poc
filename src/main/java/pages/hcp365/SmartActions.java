@@ -22,7 +22,7 @@ public class SmartActions {
     private final Locator NPILIST_SEARCH;
     private final Locator OK_BUTTON;
     private final Locator ACTION_TAB;
-       private final Locator ACTION_VISITSBRANDPAGE_OPTION;
+    private final Locator ACTION_VISITSBRANDPAGE_OPTION;
     private final Locator COLLECTION_COMBOBOX;
     private final Locator RESPONSE_TAB;
     private final Locator RESPONSE_ADDNPITOSMARTLIST_OPTION;
@@ -35,8 +35,7 @@ public class SmartActions {
     private final Locator COLLECTION_OPTION;
 
 
-
-    public SmartActions (Page page, String npiListName) {
+    public SmartActions(Page page, String npiListName) {
         this.page = page;
         this.CLICK_SMARTACTIONS = page.locator("#megamenu").getByText("Smart Actions");
         this.CLICK_ADDSMARTACTION = page.getByText("Add Smart Action");
@@ -49,22 +48,21 @@ public class SmartActions {
         this.AUDIENCE_TAB = page.locator("//div[@class='col-sm nav-tab selected']");
         this.AUDIENCE_NPILISTS_OPTION = page.getByText("NPI Lists");
         this.NPILIST_SEARCH = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
-        this.NPILIST_TARGET = page.locator("//div[@title='"+npiListName+"']/preceding-sibling::div[@class='float-left targetIcons ng-star-inserted']/div[@title='Target']");
-        this.VERIFY_NPILISTNAME = page.locator("//div[@title='"+npiListName+"']");
+        this.NPILIST_TARGET = page.locator("//div[@title='" + npiListName + "']/preceding-sibling::div[@class='float-left targetIcons ng-star-inserted']/div[@title='Target']");
+        this.VERIFY_NPILISTNAME = page.locator("//div[@title='" + npiListName + "']");
         this.OK_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ok"));
         this.SAVEDSUCCESSMSG = page.getByText("Data saved successfully");
         this.ACTION_TAB = page.locator("//div[@class='col-sm nav-tab']").first();
-       // this.ACTION_TAB_SELECTED = page.locator("//div[@class='col-sm nav-tab selected'][text()='Action']");
         this.ACTION_VISITSBRANDPAGE_OPTION = page.getByText("Visits Brand Page");
         this.COLLECTION_COMBOBOX = page.locator("//div[text()='Collections']/parent::div/following-sibling::ng-select//input[@role='combobox']");
-        this.COLLECTION_OPTION=page.locator("//div[@role='option']").first();
+        this.COLLECTION_OPTION = page.locator("//div[@role='option']").first();
         this.RESPONSE_TAB = page.locator("//div[@class='col-sm nav-tab']").nth(1);
-        this.RESPONSE_ADDNPITOSMARTLIST_OPTION =page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Add NPI to the Smart List"));
+        this.RESPONSE_ADDNPITOSMARTLIST_OPTION = page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Add NPI to the Smart List"));
         this.SMARTLISTNAME = page.locator("//input[@formcontrolname='smartListName']");
         this.DAYS = page.locator("//input[@formcontrolname='noOfDays']");
     }
 
-    public void responseTabDataEntryAndSave(String smartListName, String days){
+    public void responseTabDataEntryAndSave(String smartListName, String days) {
         RESPONSE_TAB.click();
         RESPONSE_ADDNPITOSMARTLIST_OPTION.click();
         SMARTLISTNAME.click();
@@ -73,9 +71,8 @@ public class SmartActions {
         SAVE_BUTTON.click();
     }
 
-    public void actionTabDataEntryAndSave(){
+    public void actionTabDataEntryAndSave() {
         ACTION_TAB.click();
-      //  ACTION_TAB_SELECTED.click();
         ACTION_VISITSBRANDPAGE_OPTION.click();
         COLLECTION_COMBOBOX.click();
         COLLECTION_OPTION.click();
@@ -86,34 +83,42 @@ public class SmartActions {
     public void enterSmartActionName(String SmartActionName) {
         SMARTACTION_NAME.fill(SmartActionName);
     }
+
     public void enterAdvertiser(String advertiser) {
-      //  this.advertiser=advertiser;
         ADVERTISER.click();
-      SELECTADVERTISER.click();
+        SELECTADVERTISER.click();
 
     }
+
     public void saveSmartAction() {
         SAVE_BUTTON.click();
     }
 
-    public String verifySmartActionSuccessMsg() {return SMARTACTION_SUCCESS.innerText(); }
+    public String verifySmartActionSuccessMsg() {
+        return SMARTACTION_SUCCESS.innerText();
+    }
+
     public void clickSmartActions() {
         CLICK_SMARTACTIONS.click();
     }
+
     public void clickAddSmartAction() {
         CLICK_ADDSMARTACTION.click();
     }
-    public String verifySmartAction() {return VERIFY_SMARTACTION.innerText(); }
 
-    public String verifyAudienceTab(){
+    public String verifySmartAction() {
+        return VERIFY_SMARTACTION.innerText();
+    }
+
+    public String verifyAudienceTab() {
         return AUDIENCE_TAB.innerText();
     }
 
-    public void clickNPIListsOption(){
+    public void clickNPIListsOption() {
         AUDIENCE_NPILISTS_OPTION.click();
     }
 
-    public String searchNPIList(String npiListName){
+    public String searchNPIList(String npiListName) {
         NPILIST_SEARCH.click();
         NPILIST_SEARCH.fill(npiListName);
         NPILIST_SEARCH.press("Enter");
@@ -121,15 +126,16 @@ public class SmartActions {
 
     }
 
-    public void targetNPIList(){
+    public void targetNPIList() {
         NPILIST_TARGET.click();
     }
 
-    public void saveNPILists(){
+    public void saveNPILists() {
         OK_BUTTON.click();
         SAVE_BUTTON.click();
     }
-    public String SavedMsg(){
+
+    public String SavedMsg() {
         return SAVEDSUCCESSMSG.innerText();
     }
 
