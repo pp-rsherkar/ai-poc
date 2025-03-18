@@ -118,8 +118,8 @@ public class TacticSettings {
         SELECT_CHANNEL.locator("text=" + channel).click();
     }
 
-    public void selectRuleType() {
-        SEARCH_RULE_TYPE.fill("Behavioral Segment");
+    public void selectRuleType(String ruleType) {
+        SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
         SELECT_OPTION.click();
