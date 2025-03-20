@@ -61,7 +61,7 @@ public class ReportTemplates {
         return VERIFY_GENERATED_REPORTS_TAB.innerText();
     }
 
-    public String verifySchedulingTab () {
+    public String verifySchedulingTab() {
         return VERIFY_SCHEDULING_TAB.innerText();
     }
 

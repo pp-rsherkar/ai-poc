@@ -24,9 +24,9 @@ public class PMP {
     public PMP(Page page) {
         this.page = page;
         this.GLOBAL_LIFE_SEARCH_MODAL = page.locator("//div[@class='iconSprite search-overlay-lens']");
-        this.GLOBAL_SEARCH_TACTICS_TAB=page.locator("//*[text()='Tactics'] and contains(@class, 'item tabBorder'");
-        this.SEARCH_TACTIC_NAME=page.locator("//div[@id='global_search_input']");
-        this.TACTIC_ROW=page.locator("//div[@class='description truncate']");
+        this.GLOBAL_SEARCH_TACTICS_TAB = page.locator("//*[text()='Tactics'] and contains(@class, 'item tabBorder'");
+        this.SEARCH_TACTIC_NAME = page.locator("//div[@id='global_search_input']");
+        this.TACTIC_ROW = page.locator("//div[@class='description truncate']");
         this.VERIFY_TACTIC_SETTINGS_PAGE = page.locator("//div[text()='Bid Strategy']");
         this.ADD_TARGETING_RULE = page.locator("//span[text()='New Targeting Rule']");
         this.SEARCH_TARGETING = page.locator("//div[@class='searchBox ng-pristine ng-valid ng-touched']");
@@ -59,7 +59,6 @@ public class PMP {
     public void SEARCH_TARGETING_RULE() {
         SEARCH_TARGETING.fill("Deals");
         page.waitForLoadState();
-
     }
 
     public void SET_DEALS_TARGETING() {
