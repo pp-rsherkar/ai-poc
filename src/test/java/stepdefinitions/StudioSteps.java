@@ -5,15 +5,26 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import pages.Navigation;
+import pages.*;
 import pages.admin.Accounts;
-import pages.studio.*;
+import pages.studio.ExpansionWorkspace;
+import pages.studio.ExplorerWorkspace;
+import pages.studio.WorkspaceDownloadNPI;
+import pages.studio.WorkspacePublishNPI;
+import pages.studio.Workspaces;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import utils.*;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static factory.DriverFactory.page;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class StudioSteps {
     static String workspaceName;
@@ -22,21 +33,26 @@ public class StudioSteps {
     static String filterOption;
     static Boolean clickFlag = true;
     static Boolean expansionFlag = true;
+    List<String[]> fileContent;
+    List<String[]> actualValue;
+    List<String> fileContentData;
+    List<String> actualValueData;
     Accounts accounts = new Accounts(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Workspaces workspaces = new Workspaces(DriverFactory.getPage());
-    ExpansionWorkspace expansionWorkspace = new ExpansionWorkspace(DriverFactory.getPage());
+    ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
-    WorkspaceDownloadNPI workspaceDownloadNPI = new WorkspaceDownloadNPI(DriverFactory.getPage());
-    WorkspacePublishNPI workspacePublishNPI = new WorkspacePublishNPI(DriverFactory.getPage());
-
+    WorkspaceDownloadNPI workspacedownloadnpi=new WorkspaceDownloadNPI(DriverFactory.getPage());
+    WorkspacePublishNPI workspacePublishNPI =new WorkspacePublishNPI(DriverFactory.getPage());
+    CSVActions csvActions =new CSVActions();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
+        // workspaces.CREATE_WS();
         Boolean clickFlag = true;
         workspaces.createWorkspace(clickFlag);
-    }
 
+    }
     @And("the User navigate to studio")
     public void theUserNavigateToStudio() {
         navigation.navigateToLife();
@@ -48,47 +64,57 @@ public class StudioSteps {
     public void the_user_sees_the_types_of_workspaces_they_have_permissions_for() {
         Assert.assertEquals("HCP Explorer", workspaces.verifyHCPExplorer());
         Assert.assertEquals("HCP Audience Expansion", workspaces.verifyHCPAudienceExpansion());
+
     }
 
     @Then("the user selects the advertiser {string}")
     public void the_user_selects_the_advertiser(String advertiser) {
         page.waitForLoadState();
-        expansionWorkspace.clickAdvertiserDropdown(advertiser);
+        expworkspaces.clickAdvertiserDropdown(advertiser);
         page.waitForLoadState();
-    }
 
+    }
     @Then("the user selects Source Audience {string}")
     public void the_user_selects_source_audience(String string) {
-        expansionWorkspace.selectSourceAudience(string);
+        expworkspaces.selectSourceAudience(string);
+
     }
 
     @Then("the user selects Expand With Care Team or Expand With Affiliation Graph and selects the value")
     public void the_user_selects_expand_with_care_team_or_expand_with_affiliation_graph_and_selects_the_value() {
-        expansionWorkspace.selectExpandCareTeam();
-        expansionWorkspace.selectExpandAffGraph();
+        expworkspaces.selectExpandCareTeam();
+        expworkspaces.selectExpandAffGraph();
     }
 
     @Then("the filters should be applied to the workspace")
     public void the_user_applies_the_following_filters() {
-        expansionWorkspace.addFilter();
+
+        expworkspaces.addFilter();
+
+
     }
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("_ddMMyy_HHmmss_SSS");
         String dateAndTimeStamp = LocalDateTime.now().format(formatter);
-        workspaceName = string + dateAndTimeStamp;
-        expansionWorkspace.renameExpansion(workspaceName);
-    }
+        workspaceName= string+dateAndTimeStamp;
+        expworkspaces.renameExpansion(workspaceName);
 
+
+        // Write code here that turns the phrase above into concrete actions
+        //    throw new io.cucumber.java.PendingException();
+    }
     @Then("the user saves the workspace and check the workspace is Saved")
     public void the_user_saves_the_workspace_and_check_the_workspace_is_Saved() {
-        expansionWorkspace.saveExpansion();
+        expworkspaces.saveExpansion();
         assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
+
     }
 
     @And("User enables the studio for an account")
-    public void user_enables_the_studio_for_an_account() {
+    public void user_enables_the_studio_for_an_account()
+    {
         navigation.clickSubMenu();
         accounts.clickAdministration();
         accounts.selectAccountsTab();
@@ -96,48 +122,55 @@ public class StudioSteps {
     }
 
     @And("User navigates to workspace permissions")
-    public void User_navigates_to_workspace_permissions() {
+    public void User_navigates_to_workspace_permissions()
+    {
         accounts.enableStudio();
     }
 
     @When("User selects the workspace types and saves the settings")
-    public void user_selects_the_workspace_types_and_saves_the_settings() {
+    public void user_selects_the_workspace_types_and_saves_the_settings()
+    {
         accounts.workSpaceSettings();
     }
 
     @Then("Studio should be enabled for that account")
-    public void Studio_should_be_enabled_for_that_account() {
+    public void Studio_should_be_enabled_for_that_account()
+    {
         accounts.saveStudioSettings();
     }
 
     @And("User should be able to see the enabled workspaces for that account under Studio")
-    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio() {
+    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio()
+    {
         accounts.switchAccount();
         navigation.navigateToStudio();
         workspaces.createWorkspace();
-        Assert.assertEquals("HCP Audience Expansion", accounts.verifyWorkspacePermission());
-    }
+        Assert.assertEquals("HCP Audience Expansion",accounts.verifyWorkspacePermission());
 
+    }
     @And("User disables the studio permission for an account")
-    public void userDisablesTheStudioPermissionForAnAccount() {
+    public void userDisablesTheStudioPermissionForAnAccount()
+    {
         navigation.clickSubMenu();
         accounts.disableStudioForAccount();
     }
 
     @Then("User should not be able to see the studio permission for that account")
-    public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount() {
+    public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount()
+    {
         accounts.verifyStudioMenu();
     }
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
+        //workspaces.createWorkspace();
         workspaces.createWorkspace(clickFlag);
     }
-
     @When("User clicks on Create New Workspace For Expansion")
     public void user_clicks_on_create_new_workspace_for_expansion() {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
+        //workspaces.createWorkspace();
         workspaces.createWorkspaceExpansion(expansionFlag);
     }
 
@@ -189,59 +222,92 @@ public class StudioSteps {
 
     @When("search for workspace")
     public void search_for_workspace() {
-        workspaceDownloadNPI.searchWorkspace();
+        workspacedownloadnpi.searchWorkspace();
     }
-
     @Then("user clicks on the searched workspace")
     public void user_clicks_on_the_searched_workspace() {
-        workspaceDownloadNPI.clickWorkspace();
-        workspaceDownloadNPI.clickDownloadButton();
-        workspaceDownloadNPI.clickNPIDownload();
-        workspaceDownloadNPI.clickCSVFile();
-        workspaceDownloadNPI.clickDownloadNPIButton();
-        Assert.assertEquals("NPI List file download failed", "NPI List file is ready for download", workspaceDownloadNPI.verifyToast());
+        workspacedownloadnpi.clickWorkspace();
+        workspacedownloadnpi.clickDownloadButton();
+        workspacedownloadnpi.clickNPIDownload();
+        workspacedownloadnpi.clickCSVFile();
+        workspacedownloadnpi.clickDownloadNPIButton();
+        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
 
-        workspaceDownloadNPI.clickDownloadButton();
-        workspaceDownloadNPI.clickNPIDownload();
-        workspaceDownloadNPI.clickXSLXFile();
-        workspaceDownloadNPI.clickDownloadNPIButton();
-        Assert.assertEquals("NPI List file download failed", "NPI List file is ready for download", workspaceDownloadNPI.verifyToast());
+        workspacedownloadnpi.clickDownloadButton();
+        workspacedownloadnpi.clickNPIDownload();
+        workspacedownloadnpi.clickXSLXFile();
+        workspacedownloadnpi.clickDownloadNPIButton();
+        Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
     }
+    @Then("verify the file content")
+    public void verify_the_file_content() {
+         fileContent = csvActions.readAllDataAtOnce(WebActions.getProperty("csvFilePath"));
+        fileContentData = new ArrayList<>();
+        //To display the data from csv- Separate logic
+        /*for (int i = 1; i < fileContent.size(); i++) {
+           // System.out.println("Row " + i + ": " + String.join(", ", fileContent.get(i)));
+            String data= Arrays.toString(fileContent.get(i));
+            fileContentData.add(data);
+        }*/
+        for (String[] row : fileContent) {
+            fileContentData.add(String.join(", ", row));
+        }
+        System.out.println("Data from csv :" + fileContentData);
 
+    }
+    //DB result will be raised in next PR
+    /*@Then("verify db result")
+    public void verify_db_result() throws SQLException {
+       // String query = "select GRPNAME from adadmin.CMPGroup where GRPNAME = 'Auto_Feb_9'";
+        String expectedValue = "Auto_Feb_9";
+        actualValueData=new ArrayList<>();
+         actualValue = DatabaseActions.getData("select * from contextad.adadmin.CMPGroup where GRPNAME = ?", expectedValue);
+        for (String[] row : actualValue) {
+            //System.out.println("Row: " + String.join(", ", row));
+            actualValueData.add(String.join(", ", row));
+        }
+        System.out.println("Data from query :" + actualValueData);
+    }*/
     @When("Studio platform is available")
-    public void studio_platform_is_available() {
+    public void studio_platform_is_available()
+    {
         workspacePublishNPI.studio();
     }
 
     @And("User searches the {string} and selects it")
-    public void userSearchesTheAndSelectsIt(String WORKSPACE) {
+    public void userSearchesTheAndSelectsIt(String WORKSPACE)
+    {
         workspacePublishNPI.searchWorkspace(WORKSPACE);
     }
 
     @When("Download button is enabled to the user")
-    public void download_button_is_enabled_to_the_user() {
+    public void download_button_is_enabled_to_the_user()
+    {
         workspacePublishNPI.clickDownbutton();
     }
-
     @When("User clicks on Publish NPI List")
-    public void user_clicks_on_publish_npi_list() {
+    public void user_clicks_on_publish_npi_list()
+    {
         workspacePublishNPI.clickPublishNpi();
     }
-
     @And("User selects publish {string}")
-    public void userSelectsPublish(String listType) {
+    public void userSelectsPublish(String listType)
+    {
         workspacePublishNPI.publish(listType);
+        System.out.println("list type is: "+listType);
     }
 
     @When("User select the system to publish the list")
     public void user_select_the_system_to_publish_the_list() {
         workspacePublishNPI.hcp();
         workspacePublishNPI.life();
-    }
 
+    }
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspacePublishNPI.clickPublish();
         Assert.assertEquals("Workspace saved and ready to use!", workspacePublishNPI.verifyToast());
+
+
     }
 }

@@ -170,7 +170,7 @@ public class TacticSettings {
                 RULE_TYPE_OK_BUTTON.click();
                 break;
             case "Postal Codes":
-                RULE_POSTAL_CODES_TEXTBOX.fill(postalCodes1+"\n"+postalCodes2+"\n"+postalCodes3);
+                RULE_POSTAL_CODES_TEXTBOX.fill(postalCodes1 + "\n" + postalCodes2 + "\n" + postalCodes3);
                 RULE_TYPE_OK_BUTTON.click();
                 break;
             case "Device":

@@ -22,6 +22,7 @@ public class LifeSteps {
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
+    static String tacticPMP;
     static String url;
     static String username;
     static String password;
@@ -43,6 +44,7 @@ public class LifeSteps {
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
     Constants constants = new Constants();
+    PMP pmp = new PMP(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -316,4 +318,46 @@ public class LifeSteps {
         }
         Assert.assertEquals(campaignNameRandom, actualValue);
     }
+
+    @And("User has navigated to mentioned tactic {string}")
+    public void user_navigates_to_the_tactic(String tacticPMP) {
+        pmp.navigateToTactic(tacticPMP);
+    }
+
+    @When("Targeting panel is opened on Tactic Settings tab")
+    public void user_navigates_to_targeting_panel() {
+        pmp.verifyTacticSettingsText();
+        pmp.setADD_TARGETING_RULE();
+    }
+
+    @And("User clicks on Deals Targeting")
+    public void deals_targeting_navigation() {
+        pmp.SEARCH_TARGETING_RULE();
+        pmp.SET_DEALS_TARGETING();
+    }
+
+    @And("User assigns premium deals")
+    public void user_assigns_premium_deals() {
+        pmp.PREMIUM_DEALS_ASSIGNMENT();
+    }
+
+    @And("User clicks on OK button of PMP Modal")
+    public void user_clicks_on_OK_PMP_Modal() {
+        pmp.EXIT_PMP_MODAL_OK_BUTTON_PRESS();
+    }
+
+    @And("User assigns private deals")
+    public void user_assigns_private_deals() {
+        pmp.PRIVATE_DEALS_ASSIGNMENT();
+    }
+
+    @And("User saves the changes")
+    public void users_saves_deal_changes(){
+        pmp.saveTacticSettings();
+    }
+    @Then("Deals should be assigned")
+    public void deals_are_assigned(){
+        pmp.tacticSettingsSuccess();
+    }
+
 }

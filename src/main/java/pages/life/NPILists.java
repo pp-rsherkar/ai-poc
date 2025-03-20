@@ -5,32 +5,33 @@ import com.microsoft.playwright.Page;
 
 public class NPILists {
     private final Page page;
-    private final Locator CLICK_NPILISTS;
-    private final Locator CLICK_ADDLIST;
-    private final Locator VERIFY_NPILIST;
-    private final Locator CLICK_STATIC_LIST;
+    private final Locator NPI_LISTS;
+    private final Locator ADD_LIST;
+    private final Locator CREATE_NPI_LIST;
+    private final Locator STATIC_LIST;
 
-
-    public NPILists (Page page) {
+    public NPILists(Page page) {
         this.page = page;
-        this.CLICK_NPILISTS = page.locator("#megamenu").getByText("NPI Lists");
-        this.CLICK_ADDLIST = page.getByText("Add List");
-        this.VERIFY_NPILIST = page.getByText("Create New NPI List");
-        this.CLICK_STATIC_LIST = page.getByText("Plain static list of NPI");
+        this.NPI_LISTS = page.locator("#megamenu").getByText("NPI Lists");
+        this.ADD_LIST = page.getByText("Add List");
+        this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
+        this.STATIC_LIST = page.getByText("Plain static list of NPI");
     }
 
     public void clickNPILists() {
-        CLICK_NPILISTS.click();
-    }
-    public void clickAddList() {
-        CLICK_ADDLIST.click();
-    }
-    public String verifyNPIListText() {
-        return VERIFY_NPILIST.innerText();
-    }
-    public void clickStaticList() {
-        CLICK_STATIC_LIST.click();
+        NPI_LISTS.click();
     }
 
+    public void clickAddList() {
+        ADD_LIST.click();
+    }
+
+    public String verifyNPIListText() {
+        return CREATE_NPI_LIST.innerText();
+    }
+
+    public void clickStaticList() {
+        STATIC_LIST.click();
+    }
 }
 
