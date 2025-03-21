@@ -11,15 +11,16 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User selects the "<CHANNEL>" channel, configures the targeting rules, and saves the settings
+    And User selects the "<CHANNEL>" as channel, selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify creative details are saved and the campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Then Verify the newly created campaign in the database
 
     Examples:
-      | USER  | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      |
-      | Admin | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Auto_Creative |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
 
   @jenkins
   Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic

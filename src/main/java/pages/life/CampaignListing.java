@@ -33,7 +33,7 @@ public class CampaignListing {
 
     public void searchCreatedCampaign(String createdCampaign) {
         page.waitForLoadState();
-        page.waitForSelector("//i[@class='star display-inline']", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        page.waitForSelector("//i[contains(@class,'star display-inline')]", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CAMPAIGN.fill(createdCampaign);
         CLICK_CAMPAIGN_SEARCH.click();
     }

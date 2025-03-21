@@ -1,9 +1,6 @@
 Feature: PMP Marketplace Regression - Sanity and Regression
 
   @regression
-  Background:Common for all the scenarios under sanity
-
-
   Scenario Outline: Verify premium deal can be assigned to a tactic with Toggle "Only Target Applied Deals" ON
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
