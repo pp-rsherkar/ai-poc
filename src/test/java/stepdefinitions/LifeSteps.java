@@ -29,7 +29,7 @@ public class LifeSteps {
     static String username;
     static String password;
     static String timestamp;
-    static String npiStaticName;
+    static String npiName;
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
@@ -47,6 +47,7 @@ public class LifeSteps {
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
     Constants constants = new Constants();
     PMP pmp = new PMP(DriverFactory.getPage());
+    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -201,8 +202,8 @@ public class LifeSteps {
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
         timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        npiStaticName = npiListName + '_' + timestamp;
-        npiStaticList.enterListName(npiStaticName);
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
     }
@@ -212,7 +213,7 @@ public class LifeSteps {
         npiStaticList.selectProduct();
     }
 
-    @Then("Verify list gets saved successfully.")
+    @Then("Verify list gets saved successfully")
     public void verify_list_gets_saved_successfully() {
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
@@ -362,6 +363,65 @@ public class LifeSteps {
     @Then("Deals should be assigned")
     public void deals_are_assigned() {
         pmp.tacticSettingsSuccess();
+    }
+
+    @Then("User selects Smart List")
+    public void user_selects_smart_list() {
+        npiSmartList.clickSmartList();
+
+    }
+
+    @Then("User enters the NPI list details as {string} {string}")
+    public void user_enters_the_npi_list_details_as(String listName, String advertiser) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = listName + '_' + timestamp;
+        npiSmartList.enterListName(npiName);
+        npiSmartList.selectAdvertiser(advertiser);
+    }
+
+    @When("User clicks on Prescribed Drug and enters the drug details {string}")
+    public void user_clicks_on_prescribed_drug_and_enters_the_drug_details(String drugName) {
+        npiSmartList.selectPrescribedDrug();
+        npiSmartList.selectDrug(drugName);
+
+    }
+
+    @Then("Verify drug details are added")
+    public void verify_drug_details_are_added() {
+        Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
+
+    }
+
+    @When("User makes list available in LIFE, HCP365 and saves the list")
+    public void user_makes_list_available_in_life_hcp365_and_saves_the_list() {
+        npiSmartList.selectProduct();
+    }
+
+    @Then("User navigates to Campaign Dashboard")
+    public void user_navigates_to_campaign_dashboard() {
+        npiSmartList.clickPulsepointICon();
+    }
+
+    @Then("Verify smart list is targeted in the tactic successfully")
+    public void verify_smart_list_is_targeted_in_the_tactic_successfully() {
+        tacticSettings.verifyNPIRule();
+        Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
+
+    }
+
+    @Then("User saves the targeting")
+    public void u_ser_saves_the_targeting() {
+        tacticSettings.saveTacticSettings();
+    }
+
+    @When("User selects the {string} channel, configure NPI targeting rule")
+    public void user_selects_the_channel_configure_npi_targeting_rule(String channel) {
+        tacticSettings.selectChannel(channel);
+        navigation.clickOnIcon("Add Targeting Rule");
+        tacticSettings.selectNPIRule(npiName);
+        tacticSettings.clickTarget();
+        tacticSettings.clickOk();
+        tacticSettings.clickClose();
     }
 
 }

@@ -10,11 +10,11 @@ Feature: LIFE Regression - Create Static NPI List
     And User selects Static List
     And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>" "<NPI_NUMBER>"
     When User makes list available in LIFE and saves the list
-    Then Verify list gets saved successfully.
+    Then Verify list gets saved successfully
 
     Examples:
-      | USER  | ADVERTISER     | NPI_NUMBER | LIST_NAME   |
-      | Admin | 01- Advertiser | 1478523698 | STATIC_NPI|
+      | ADVERTISER     | NPI_NUMBER | LIST_NAME  |
+      | 01- Advertiser | 1478523698 | STATIC_NPI |
 
 
 
