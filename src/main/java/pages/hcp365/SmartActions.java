@@ -4,8 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 
-import java.util.List;
-
 public class SmartActions {
 
     private final Page page;
@@ -34,22 +32,21 @@ public class SmartActions {
     private final Locator SAVEDSUCCESSMSG;
     private final Locator COLLECTION_OPTION;
 
-
-    public SmartActions(Page page, String npiListName) {
+    public SmartActions(Page page) {
         this.page = page;
         this.CLICK_SMARTACTIONS = page.locator("#megamenu").getByText("Smart Actions");
         this.CLICK_ADDSMARTACTION = page.getByText("Add Smart Action");
         this.VERIFY_SMARTACTION = page.getByText("Smart Action Properties");
         this.SMARTACTION_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Smart Action Name"));
         this.ADVERTISER = page.locator("//*[@id='triggerControlsContainer']/form/div[2]/div/ng-select");
-        this.SELECTADVERTISER = page.getByText("01- Advertiser");
+        this.SELECTADVERTISER = page.getByText("Z_Automation");
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.SMARTACTION_SUCCESS = page.getByText("new Smart Action created successfully");
         this.AUDIENCE_TAB = page.locator("//div[@class='col-sm nav-tab selected']");
         this.AUDIENCE_NPILISTS_OPTION = page.getByText("NPI Lists");
         this.NPILIST_SEARCH = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
-        this.NPILIST_TARGET = page.locator("//div[@title='" + npiListName + "']/preceding-sibling::div[@class='float-left targetIcons ng-star-inserted']/div[@title='Target']");
-        this.VERIFY_NPILISTNAME = page.locator("//div[@title='" + npiListName + "']");
+        this.NPILIST_TARGET = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@title='Target']");
+        this.VERIFY_NPILISTNAME = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@customclass='primary-tooltip']");
         this.OK_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ok"));
         this.SAVEDSUCCESSMSG = page.getByText("Data saved successfully");
         this.ACTION_TAB = page.locator("//div[@class='col-sm nav-tab']").first();
