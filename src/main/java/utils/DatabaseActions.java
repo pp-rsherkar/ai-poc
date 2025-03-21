@@ -1,24 +1,18 @@
 package utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class DatabaseActions {
-    private static final String DB_URL = WebActions.getProperty("dbURL");
-    private static final String DB_USER = WebActions.getProperty("dbUsername");
-    private static final String DB_PASSWORD = WebActions.getProperty("dbPassword");
-
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            return DriverManager.getConnection(ConfigLoader.getDbURL(), ConfigLoader.getDbUsername(), ConfigLoader.getDbPassword());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new SQLException("Database Driver not found", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -36,17 +30,47 @@ public class DatabaseActions {
         return actualValue;
     }
 
-//    public static List<String[]> getCSVData(String query, String expectedValue) throws SQLException {
-//        List<String[]> actualValue =  new ArrayList<>();;
-//        try (Connection connection = getConnection();
-//             PreparedStatement statement = connection.prepareStatement(query)) {
-//            statement.setString(1, expectedValue);
-//            try (ResultSet resultSet = statement.executeQuery()) {
-//                while (resultSet.next()) {
-//                    actualValue.add(new String[]{resultSet.getString(1)});
-//                }
-//            }
-//        }
-//        return actualValue;
-//    }  -- working on this function along with CSVActions utility class
+    public static List<Map<String, String>> getDataAsMap(String query, String expectedValue) throws SQLException {
+        List<Map<String, String>> actualValue = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, expectedValue);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                while (resultSet.next()) {
+                    Map<String, String> row = new HashMap<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        row.put(metaData.getColumnName(i), resultSet.getString(i));
+                    }
+                    actualValue.add(row);
+                }
+            }
+        }
+        return actualValue;
+    }
+
+    public static List<Object> getDataAsList(String query, String expectedValue) {
+        List<Object> resultList = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, expectedValue);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                for (int i = 1; i <= columnCount; i++) {
+                    resultList.add(metaData.getColumnName(i));
+                }
+                while (resultSet.next()) {
+                    for (int i = 1; i <= columnCount; i++) {
+                        resultList.add(resultSet.getObject(i));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resultList;
+    }
 }

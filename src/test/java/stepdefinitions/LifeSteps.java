@@ -8,7 +8,9 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.Navigation;
 import pages.life.*;
-import utils.*;
+import utils.Constants;
+import utils.DatabaseActions;
+import utils.WebActions;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -136,7 +138,7 @@ public class LifeSteps {
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
-    @Then("User selects the {string} channel, selects {string} and configures the targeting rules, and saves the settings")
+    @Then("User selects the {string} as channel, selects {string} as rule type and configures the targeting rules, and saves the settings")
     public void user_selects_the_channel_configures_the_targeting_rules_and_saves_the_settings(String channel, String ruleType) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
@@ -313,10 +315,11 @@ public class LifeSteps {
     @Then("Verify the newly created campaign in the database")
     public void verify_campaign_in_database() throws SQLException {
         String actualValue = DatabaseActions.getData(constants.CAMPAIGN_NAME, campaignNameRandom);
-        if (actualValue == null) {
-            throw new AssertionError("Campaign not found in the database with the expected name: " + campaignNameRandom);
+        if (actualValue != null) {
+            Assert.assertEquals(campaignNameRandom, actualValue);
+        } else {
+            throw new SQLException("Campaign not found in the database with the expected name: " + campaignNameRandom);
         }
-        Assert.assertEquals(campaignNameRandom, actualValue);
     }
 
     @And("User has navigated to mentioned tactic {string}")
@@ -352,11 +355,12 @@ public class LifeSteps {
     }
 
     @And("User saves the changes")
-    public void users_saves_deal_changes(){
+    public void users_saves_deal_changes() {
         pmp.saveTacticSettings();
     }
+
     @Then("Deals should be assigned")
-    public void deals_are_assigned(){
+    public void deals_are_assigned() {
         pmp.tacticSettingsSuccess();
     }
 
