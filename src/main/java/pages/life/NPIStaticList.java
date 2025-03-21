@@ -4,8 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 
-//import javax.management.StringValueExp;
-
 public class NPIStaticList {
     private final Page page;
     private final Locator LIST_NAME;
@@ -16,7 +14,7 @@ public class NPIStaticList {
     private final Locator SAVE_BUTTON;
     private final Locator LIST_SUCCESS;
 
-    public NPIStaticList (Page page) {
+    public NPIStaticList(Page page) {
         this.page = page;
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("//div[text()= 'Select Advertiser']");
@@ -24,7 +22,7 @@ public class NPIStaticList {
         this.NPI_NUMBER = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
         this.AVAILABLE_IN = page.locator(".mat-checkbox-inner-container").first();
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
-        this.LIST_SUCCESS =page.getByText("× NPI list created");
+        this.LIST_SUCCESS = page.getByText("× NPI list created");
     }
 
     public void enterListName(String npiListName) {
@@ -34,7 +32,7 @@ public class NPIStaticList {
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
-   }
+    }
 
     public void enterNPINumber(String npiNumber) {
         NPI_NUMBER.fill(npiNumber);
@@ -51,7 +49,5 @@ public class NPIStaticList {
     public String saveListSuccess() {
         return LIST_SUCCESS.innerText();
     }
-
-
 }
 

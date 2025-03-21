@@ -6,12 +6,13 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import pages.*;
-import pages.hcp365.SmartActions;
 import pages.Navigation;
 import pages.life.*;
+import utils.Constants;
+import utils.DatabaseActions;
 import utils.WebActions;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -23,16 +24,15 @@ public class LifeSteps {
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
+    static String tacticPMP;
     static String url;
     static String username;
     static String password;
     static String timestamp;
-    static String npiName;
+    static String npiStaticName;
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
-
-    //static String npiListName="00testa";
     List<String> rules;
     List<String> rulesCompare = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
@@ -45,9 +45,8 @@ public class LifeSteps {
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
-    NPIListE2E npiListE2E = new NPIListE2E(DriverFactory.getPage());
-
-    SmartActions smartActions = new SmartActions(DriverFactory.getPage(),npiName);
+    Constants constants = new Constants();
+    PMP pmp = new PMP(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -139,11 +138,11 @@ public class LifeSteps {
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
-    @Then("User selects the {string} channel, configures the targeting rules, and saves the settings")
-    public void user_selects_the_channel_configures_the_targeting_rules_and_saves_the_settings(String channel) {
+    @Then("User selects the {string} as channel, selects {string} as rule type and configures the targeting rules, and saves the settings")
+    public void user_selects_the_channel_configures_the_targeting_rules_and_saves_the_settings(String channel, String ruleType) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
-        tacticSettings.selectRuleType();
+        tacticSettings.selectRuleType(ruleType);
         tacticSettings.saveTacticSettings();
     }
 
@@ -177,6 +176,7 @@ public class LifeSteps {
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
     }
+
     @Given("User navigates to NPI Lists page")
     public void user_navigates_to_npi_lists_page() {
         navigation.clickSubMenu();
@@ -201,17 +201,18 @@ public class LifeSteps {
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
         timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        npiName = npiListName + '_' + timestamp;
-        npiStaticList.enterListName(npiName);
+        npiStaticName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiStaticName);
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
     }
+
     @When("User makes list available in LIFE and saves the list")
     public void user_makes_list_available_in_life_and_saves_the_list() {
         npiStaticList.selectProduct();
     }
 
-    @Then("Verify list gets saved successfully")
+    @Then("Verify list gets saved successfully.")
     public void verify_list_gets_saved_successfully() {
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
@@ -272,139 +273,95 @@ public class LifeSteps {
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
-    @Given("User navigates to Smart actions from the main menu")
-    public void user_navigates_to_smart_actions_from_the_main_menu() {
-        navigation.clickSubMenu();
-        smartActions.clickSmartActions();
+    @Given("User selects the {string} channel, configures targeting rules:")
+    public void user_selects_the_channel_configures_targeting_rules(String channel, io.cucumber.datatable.DataTable ruleTypes) {
+        rules = ruleTypes.asList(String.class);
 
-    }
-    @When("User clicks on Add Smart Action")
-    public void user_clicks_on_add_smart_action() {
-        smartActions.clickAddSmartAction();
-    }
-    @Then("Verify smart action creation page is displayed")
-    public void verify_smart_action_creation_page_is_displayed() {
-        Assert.assertEquals("Smart Action Properties", smartActions.verifySmartAction());
-    }
-    @Then("User enters smart action details as {string} {string}")
-    public void user_enters_smart_action_details_as(String smartActionName, String advertiser) {
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        smartActionName = smartActionName + '_' + timestamp;
-        smartActions.enterSmartActionName(smartActionName);
-        smartActions.enterAdvertiser(advertiser);
-
-    }
-    @When("User saves the smart action")
-    public void user_saves_the_smart_action() {
-        smartActions.saveSmartAction();
-    }
-    @Then("Verify smart action is saved successfully and navigates to Audience tab")
-    public void verify_smart_action_is_saved_successfully_and_navigates_to_audience_tab() {
-        Assert.assertEquals("New Smart Action created successfully.", smartActions.verifySmartActionSuccessMsg());
-        Assert.assertEquals("Audience", smartActions.verifyAudienceTab());
-
-    }
-    @When("User clicks on NPI Lists")
-    public void user_clicks_on_npi_lists() {
-        smartActions.clickNPIListsOption();
-    }
-    @Then("Verify NPI list created in LIFE is present")
-    public void verify_npi_list_created_in_life_is_present() {
-        Assert.assertEquals(npiName,smartActions.searchNPIList(npiName));
-    }
-    @Then("User adds NPI list to the smart action")
-    public void user_adds_npi_list_to_the_smart_action() {
-        smartActions.targetNPIList();
-    }
-    @When("User clicks on Ok and Save")
-    public void user_clicks_on_ok_and_save() {
-        smartActions.saveNPILists();
-    }
-    @Then("Verify data is saved successfully")
-    public void verify_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully",smartActions.SavedMsg());
-
-    }
-    @When("User clicks on Action and enters the details and saves")
-    public void user_clicks_on_action_and_enters_the_details_and_saves() {
-        smartActions.actionTabDataEntryAndSave();
-    }
-    @Then("Verify Action data is saved successfully")
-    public void verify_action_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully",smartActions.SavedMsg());
-    }
-    @When("User clicks on Response and enter the details and creates smart list {string} {string} and saves")
-    public void user_clicks_on_response_and_enter_the_details_and_creates_smart_list_and_saves(String smartListName, String days) {
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        smartListName = smartListName + '_' + timestamp;
-        smartActions.responseTabDataEntryAndSave(smartListName, days);
-    }
-    @Then("Verify Response data is saved successfully")
-    public void verify_response_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully",smartActions.SavedMsg());
-    }
-
-    @Then("User selects Smart List")
-    public void user_selects_smart_list() {
-        npiListE2E.clickSmartList();
-
-    }
-
-    @Then("User enters the NPI list details as {string} {string}")
-    public void user_enters_the_npi_list_details_as(String listName, String advertiser) {
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        npiName = listName + '_' + timestamp;
-        npiListE2E.enterListName(npiName);
-        npiListE2E.selectAdvertiser(advertiser);
-    }
-
-    @When("User clicks on Prescribed Drug and enters the drug details {string}")
-    public void user_clicks_on_prescribed_drug_and_enters_the_drug_details(String drugName) {
-        npiListE2E.selectPrescribedDrug();
-        npiListE2E.clickAddDrug();
-        npiListE2E.selectDrug(drugName);
-
-    }
-
-    @Then("Verify drug details are added")
-    public void verify_drug_details_are_added() {
-        Assert.assertEquals("Glynase", npiListE2E.verifyDrug());
-
-    }
-
-    @When("User makes list available in LIFE, HCP365 and saves the list")
-    public void user_makes_list_available_in_life_hcp365_and_saves_the_list() {
-     npiListE2E.selectProduct();
-    }
-
-    @Then("User navigates to Campaign Dashboard")
-    public void user_navigates_to_campaign_dashboard() {
-    npiListE2E.clickPulsepointICon();
-    }
-
-    @When("User selects the {string} channel, configure NPI targeting rule")
-    public void user_selects_the_channel_configure_npi_targeting_rule(String channel) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
-        tacticSettings.selectNPIRule(npiName);
-        tacticSettings.clickTarget();
-        tacticSettings.clickOk();
-        tacticSettings.clickClose();
+
+        for (String rule : rules) {
+            tacticSettings.selectMultipleRuleTypes(rule);
+        }
+
+        tacticSettings.closeRuleTypePanel();
     }
 
+    @Then("Verify the configured targeting rules")
+    public void verify_the_configured_targeting_rules() {
+        rulesCompare.add(tacticSettings.verifyAudienceAttributeRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyHealthJourneyRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyDemographicsRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyContextualRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyGeographyRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyMediaSupplyRule().replaceAll("\\(\\d+\\)", "").trim());
+        rulesCompare.add(tacticSettings.verifyLegalTargetingsRule().replaceAll("\\(\\d+\\)", "").trim());
+        assert rules.equals(rulesCompare);
 
-    @Then("Verify smart list is targeted in the tactic successfully")
-    public void verify_smart_list_is_targeted_in_the_tactic_successfully() {
-        tacticSettings.verifyNPIRule();
-        Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
-
+        tacticSettings.verifyAudienceAttributeOption();
+        tacticSettings.verifyHealthJourneyOption();
+        tacticSettings.verifyDemographicsOption();
+        tacticSettings.verifyContextualOption();
+        tacticSettings.verifyGeographyOption();
+        tacticSettings.verifyMediaSupplyOption();
+        tacticSettings.verifyLegalTargetingsOption();
     }
 
-    @Then("User saves the targeting")
-    public void u_ser_saves_the_targeting() {
+    @When("User saves the settings")
+    public void user_saves_the_settings() {
         tacticSettings.saveTacticSettings();
     }
 
+    @Then("Verify the newly created campaign in the database")
+    public void verify_campaign_in_database() throws SQLException {
+        String actualValue = DatabaseActions.getData(constants.CAMPAIGN_NAME, campaignNameRandom);
+        if (actualValue != null) {
+            Assert.assertEquals(campaignNameRandom, actualValue);
+        } else {
+            throw new SQLException("Campaign not found in the database with the expected name: " + campaignNameRandom);
+        }
+    }
 
+    @And("User has navigated to mentioned tactic {string}")
+    public void user_navigates_to_the_tactic(String tacticPMP) {
+        pmp.navigateToTactic(tacticPMP);
+    }
+
+    @When("Targeting panel is opened on Tactic Settings tab")
+    public void user_navigates_to_targeting_panel() {
+        pmp.verifyTacticSettingsText();
+        pmp.setADD_TARGETING_RULE();
+    }
+
+    @And("User clicks on Deals Targeting")
+    public void deals_targeting_navigation() {
+        pmp.SEARCH_TARGETING_RULE();
+        pmp.SET_DEALS_TARGETING();
+    }
+
+    @And("User assigns premium deals")
+    public void user_assigns_premium_deals() {
+        pmp.PREMIUM_DEALS_ASSIGNMENT();
+    }
+
+    @And("User clicks on OK button of PMP Modal")
+    public void user_clicks_on_OK_PMP_Modal() {
+        pmp.EXIT_PMP_MODAL_OK_BUTTON_PRESS();
+    }
+
+    @And("User assigns private deals")
+    public void user_assigns_private_deals() {
+        pmp.PRIVATE_DEALS_ASSIGNMENT();
+    }
+
+    @And("User saves the changes")
+    public void users_saves_deal_changes() {
+        pmp.saveTacticSettings();
+    }
+
+    @Then("Deals should be assigned")
+    public void deals_are_assigned() {
+        pmp.tacticSettingsSuccess();
+    }
 
 }

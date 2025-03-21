@@ -6,4 +6,7 @@ Feature: Studio Download NPI List
     And "Studio" application is logged in successfully
     And search for workspace
     Then user clicks on the searched workspace
+    Then verify the file content
+    #Then verify db result
 
+  
