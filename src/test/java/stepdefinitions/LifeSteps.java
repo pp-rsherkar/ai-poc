@@ -423,5 +423,25 @@ public class LifeSteps {
         tacticSettings.clickOk();
         tacticSettings.clickClose();
     }
+    //Verify published Studio List is displayed in the Life application
+    @And("User searches the {string} in LIFE and selects it")
+    public void userSearchesTheInLIFEAndSelectsIt(String Studio_list)
+    {
+        npiLists.searchNPILists(Studio_list);
+    }
+
+    @And("User clicks on the published {string}")
+    public void userClicksOnThePublished(String Studio_list)
+    {
+        npiLists.selectPublishedList(Studio_list);
+    }
+
+    @Then("User Verify the list is displayed in the Life")
+    public void userVerifyTheListIsDisplayedInTheLife()
+    {
+        Assert.assertTrue(npiLists.availablePlatforms());
+
+
+    }
 
 }
