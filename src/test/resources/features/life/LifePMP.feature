@@ -13,7 +13,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     Then Deals should be assigned to both targeting and PMP deals section
     Examples:
       | USER  | tacticPMP         |
-      | Admin | PMPTACTIC12032025 |
+      | Admin | PMP24032025 |
 
   Scenario Outline: Verify private deal can be assigned to a tactic with Toggle "Only Target Applied Deals" ON
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -27,7 +27,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     Then Deals should be assigned to both targeting and PMP deals section
     Examples:
       | USER  | tacticPMP         |
-      | Admin | PMPTACTIC12032025 |
+      | Admin | PMP24032025|
 
   Scenario Outline: Verify premium deal can be assigned to a tactic with Toggle "Only Target Applied Deals" OFF
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -42,7 +42,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     Then Deals should be assigned to only PMP deals section
     Examples:
       | USER  | tacticPMP    |
-      | Admin | PMPTOGGLEOFF |
+      | Admin | TOGGLE24032025 |
 
   Scenario Outline: Verify private deal can be assigned to a tactic with Toggle "Only Target Applied Deals" OFF
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -57,4 +57,4 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     Then Deals should be assigned to only PMP deals section
     Examples:
       | USER  | tacticPMP   |
-      | Admin | PMPTOGGLEOFF|
+      | Admin | TOGGLE24032025|
