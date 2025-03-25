@@ -33,7 +33,7 @@ public class HcpSteps {
 
     @Then("Verify smart action creation page is displayed")
     public void verify_smart_action_creation_page_is_displayed() {
-        Assert.assertEquals("Smart Action Properties", smartActions.verifySmartAction());
+        Assert.assertEquals("Smart Action Properties", smartActions.getSmartAction());
     }
 
     @Then("User enters smart action details as {string} {string}")
@@ -52,8 +52,8 @@ public class HcpSteps {
 
     @Then("Verify smart action is saved successfully and navigates to Audience tab")
     public void verify_smart_action_is_saved_successfully_and_navigates_to_audience_tab() {
-        Assert.assertEquals("New Smart Action created successfully.", smartActions.verifySmartActionSuccessMsg());
-        Assert.assertEquals("Audience", smartActions.verifyAudienceTab());
+        Assert.assertEquals("New Smart Action created successfully.", smartActions.getSmartActionSuccessMessage());
+        Assert.assertEquals("Audience", smartActions.getAudienceTab());
 
     }
 
@@ -79,7 +79,7 @@ public class HcpSteps {
 
     @Then("Verify data is saved successfully")
     public void verify_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully", smartActions.SavedMsg());
+        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage());
 
     }
 
@@ -90,7 +90,7 @@ public class HcpSteps {
 
     @Then("Verify Action data is saved successfully")
     public void verify_action_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully", smartActions.SavedMsg());
+        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage());
     }
 
     @When("User clicks on Response and enter the details and creates smart list {string} {string} and saves")
@@ -102,7 +102,7 @@ public class HcpSteps {
 
     @Then("Verify Response data is saved successfully")
     public void verify_response_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully", smartActions.SavedMsg());
+        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage());
     }
 
 
