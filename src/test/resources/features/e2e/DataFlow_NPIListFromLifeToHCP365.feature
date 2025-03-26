@@ -1,7 +1,7 @@
 Feature: End to End Workflow of NPI Lists. It covers below
-  1. Creation of Smart List from LIFE and to be available in LIFE & HCP365.
-  2. Campaign creation in LIFE with smart list targeting.
-  3. Creation of Smart action from HCP365
+  1. Create a Smart List from LIFE and to be available in LIFE & HCP365.
+  2. Create Campaign in LIFE with smart list targeting.
+  3. Create a Smart action from HCP365
   4. Navigate to Audience tab.
   5. Verify NPI list created in LIFE is available.
   6. Add Smart list created in LIFE as the Audience.
