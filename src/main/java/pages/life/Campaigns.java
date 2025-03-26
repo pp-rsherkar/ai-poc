@@ -21,8 +21,10 @@ public class Campaigns {
         this.page = page;
         this.CREATE_CAMPAIGN = page.locator("//button[text()='Create a Campaign']");
         this.VERIFY_CAMPAIGN_PAGE = page.locator("//div[text()='Create New Campaign']");
-        this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
-        this.SELECT_ADVERTISER = page.locator("//sui-select-option");
+       // this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
+        this.SEARCH_ADVERTISER = page.locator("(//input[@placeholder='Select Advertiser'])[1]");
+      //  this.SELECT_ADVERTISER = page.getByText("- Advertiser");
+        this.SELECT_ADVERTISER = page.getByText("- Advertiser");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
         this.CAMPAIGN_TYPE_REGULAR = page.locator("//button[text()='Regular']");
         this.CAMPAIGN_TYPE_SEQUENTIAL = page.locator("//button[text()='Sequential']");

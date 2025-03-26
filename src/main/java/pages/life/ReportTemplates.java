@@ -1,8 +1,19 @@
 package pages.life;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 public class ReportTemplates {
     private final Page page;
@@ -25,6 +36,21 @@ public class ReportTemplates {
     private final Locator SEARCH_TEMPLATE;
     private final Locator CLICK_TEMPLATE_SEARCH;
     private final Locator VERIFY_CREATED_TEMPLATE;
+    private final Locator SELECT_TEMPLATE;
+    private final Locator SELECT_TACTIC;
+    private final Locator SELECT_LIFETIME;
+    private final Locator SELECT_VALUE;
+    private final Locator SELECT_TEMPLATE_VALUE;
+    private final Locator RUN_REPORT;
+    private final Locator REPORT_DOWNLOAD_OPTION;
+    private final Locator REPORT_DOWNLOAD_BUTTON;
+    private final Locator TEMPLATE_COLUMNS;
+    private final Locator SEARCH_ICON;
+    private String reportname;
+    private Locator REPORT_IMAGE;
+    private Locator REPORT_PANEL;
+    private Locator SELECT_DIMENSION_E2E;
+
 
     public ReportTemplates(Page page) {
         this.page = page;
@@ -38,6 +64,8 @@ public class ReportTemplates {
         this.TEMPLATE_NAME = page.locator("//input[contains(@class,'template-name')]");
         this.SEARCH_DIMENSION = page.locator("//input[contains(@class,'search group_list') and @placeholder='Search']");
         this.SELECT_DIMENSION = page.locator("//label[text()='Advertiser Name']");
+        this.SELECT_DIMENSION_E2E = page.locator("sui-checkbox[class='form-control ui checkbox ng-untouched ng-pristine ng-valid checked'] label");
+
         this.SEARCH_METRIC = page.locator("//input[contains(@class,'search group_list') and @placeholder='Search']");
         this.SELECT_METRIC = page.locator("//label[text()='Impressions']");
         this.VERIFY_DIMENSION = page.locator("//sortable-item[contains(@class,'diemension')]");
@@ -47,6 +75,21 @@ public class ReportTemplates {
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
         this.CLICK_TEMPLATE_SEARCH = page.locator("//div[contains(@class,'search-icon')]");
         this.VERIFY_CREATED_TEMPLATE = page.locator("//div[contains(@class,'favortile-label ellipsediv ng-star-inserted')]");
+        this.SELECT_TEMPLATE = page.locator("//input[@placeholder='Select Template']");
+        this.SELECT_TACTIC = page.locator("//input[@placeholder='All Tactics']");
+        this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
+        this.TEMPLATE_COLUMNS = page.locator("//tr[@class='highlighted loadedall']//td[1]");
+        this.SEARCH_ICON = page.locator(".search-field > .ui");
+        //input[@class='form-control gaTableSearch w-218 ng-valid ng-dirty ng-touched']
+
+//       this.SELECT_VALUE =page.locator("//*[@id='tacticLookup']/div/div");
+        this.SELECT_VALUE =page.locator("//*[@id=\"tacticLookup\"]/div/div[1]");
+        this.SELECT_TEMPLATE_VALUE =page.getByTitle("");
+        this.RUN_REPORT =page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Run").setExact(true));
+        this.REPORT_DOWNLOAD_OPTION = page.locator(".inlineDiv > .ui > .pointer").first();
+        this.REPORT_DOWNLOAD_BUTTON=page.locator("(//span[contains(text(),'Download')])[1]");
+        this.REPORT_IMAGE= (page.locator(".content-section > div > div > .icon").first());
+        this.REPORT_PANEL=page.locator(".reports-body > div").first();
     }
 
     public void clickReportTemplatesLink() {
@@ -93,11 +136,29 @@ public class ReportTemplates {
         SEARCH_DIMENSION.fill(dimension);
         SELECT_DIMENSION.click();
         SEARCH_DIMENSION.clear();
+
+    }
+    public void selectDimensione2e(String dimension) {
+        SEARCH_DIMENSION.fill(dimension);
+        String xpath = String.format("//label[text()='%s']", dimension);
+        Locator labelElement = page.locator(xpath);
+        labelElement.click();
+        SEARCH_DIMENSION.clear();
+
+
+
     }
 
     public void selectMetric(String metric) {
         SEARCH_METRIC.fill(metric);
         SELECT_METRIC.click();
+        SEARCH_METRIC.clear();
+    }
+    public void selectMetrice2e(String metric) {
+        SEARCH_METRIC.fill(metric);
+        String xpath = String.format("//label[text()='%s']", metric);
+        Locator labelElement = page.locator(xpath);
+        labelElement.click();
         SEARCH_METRIC.clear();
     }
 
@@ -132,4 +193,102 @@ public class ReportTemplates {
         String searchResultXpath = "//tbody[@popuptrigger='manual']//tr[contains(@class,'fixedrow')]";
         return page.locator(searchResultXpath).count();
     }
-}
+
+    //////////////////////////////
+    public void enterDetailsToRunReport(String reportTemplateName,String tactic) {
+        SELECT_TEMPLATE.fill(reportTemplateName);
+       Locator optionLocator = page.getByTitle(reportTemplateName).first();
+        optionLocator.click();
+       // SELECT_TEMPLATE_VALUE.click();
+        SELECT_TACTIC.fill(tactic);
+        SELECT_VALUE.click();
+        REPORT_PANEL.click();
+        SELECT_LIFETIME.click();
+    }
+
+
+
+    /// ///////////////
+
+        public String verifyAutopopulatedCampaign(String createdCampaign) {
+            String campaignNameXpath = String.format("//a[contains(normalize-space(), '%s')]", createdCampaign);
+             return page.locator(campaignNameXpath).innerText();
+
+
+    }
+    /// ///////////////
+
+    public String verifyAutopopulatedLineitem(String createdLineitem) {
+        String lineitemNameXpath = String.format("//a[contains(normalize-space(), '%s')]", createdLineitem);
+        //      page.waitForSelector(campaignNameXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        return page.locator(lineitemNameXpath).innerText();
+
+
+    }
+
+
+    /// ///////////////
+    public void runReport() {
+
+        RUN_REPORT.click();
+    }
+
+    /// ///////////////
+    public void downloadGeneratedReport() throws IOException {
+        page.waitForTimeout(13000);
+        page.reload();
+        REPORT_DOWNLOAD_OPTION.click();
+
+        Download download = page.waitForDownload(() -> {
+            page.locator("(//span[contains(text(),'Download')])[1]").click();
+        });
+        reportname = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String downloadPath = "C:/Users/pranav.jadhav/Downloads/report_" + reportname + ".csv";
+                download.saveAs(Path.of(downloadPath));
+
+        }
+
+    //////////////////////////////////////////
+    public void verifyColumnsOfReport(String templateNameRandom) throws IOException {
+
+        SEARCH_TEMPLATE.fill(templateNameRandom);
+        SEARCH_ICON.click();
+
+        String data = TEMPLATE_COLUMNS.innerText();
+
+        String[] expectedHeaders = data.split(",");
+        for (int i = 0; i < expectedHeaders.length; i++) {
+            expectedHeaders[i] = expectedHeaders[i].trim();
+            expectedHeaders[i] = expectedHeaders[i].toLowerCase();
+            }
+
+        String file = "C:/Users/pranav.jadhav/Downloads/report_" + reportname+".csv";
+        BufferedReader reader = null;
+        String line = "";
+        reader = new BufferedReader(new FileReader(file));
+        while ((line = reader.readLine()) != null) {
+            String[] row = line.split(",");
+            page.waitForTimeout(1500);
+            for (int j = 0; j < row.length; j++) {
+                row[j] = row[j].trim();
+                row[j] = row[j].toLowerCase();
+            }
+
+            assert Arrays.equals(expectedHeaders,row) :
+                    "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) +
+                            "\nArray 2: " + Arrays.toString(row);
+
+
+
+            System.out.println(Arrays.toString(row));
+            System.out.println(Arrays.toString(expectedHeaders));
+            System.out.println(reportname);
+
+
+        }
+
+
+    }}
+
+
+

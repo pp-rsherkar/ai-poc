@@ -13,6 +13,12 @@ public class Navigation {
     private final Locator SIGNAL;
     private final Locator STUDIO;
     private final Locator SUB_MENU;
+    private final Locator RUN_REPORT;
+    private final Locator GENERATED_REPORT;
+    private final Locator SCHEDULED_REPORT;
+    private final Locator REPORT_TEMPLATE;
+
+
 
     public Navigation(Page page) {
         this.page = page;
@@ -22,7 +28,13 @@ public class Navigation {
         this.LIFE = page.getByText("Life");
         this.SIGNAL = page.getByText("Signal");
         this.STUDIO = page.getByText("Studio");
+        this.RUN_REPORT = page.getByText("Run a Report");
+        this.GENERATED_REPORT = page.locator("#megamenu").getByText("Generated Reports");
+        this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
+        this.REPORT_TEMPLATE = page.locator("#megamenu").getByText("Report Templates");
         this.SUB_MENU = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("menu"));
+
+
     }
 
     public void navigateToUrl(String url) {
@@ -68,5 +80,23 @@ public class Navigation {
 
     public void clickSubMenu() {
         SUB_MENU.click();
+    }
+    public void clickRunReport() {
+        RUN_REPORT.click();
+    }
+
+
+    public void clickGeneratedReport() {
+        page.waitForTimeout(5000);
+        GENERATED_REPORT.click();
+    }
+
+    public void clickScheduledReport() {
+        SCHEDULED_REPORT.click();
+
+    }
+        public void clickReportTemplate()
+    {
+            REPORT_TEMPLATE.click();
     }
 }
