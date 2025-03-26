@@ -24,7 +24,7 @@ public class Campaigns {
        // this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
         this.SEARCH_ADVERTISER = page.locator("(//input[@placeholder='Select Advertiser'])[1]");
       //  this.SELECT_ADVERTISER = page.getByText("- Advertiser");
-        this.SELECT_ADVERTISER = page.getByText("- Advertiser");
+        this.SELECT_ADVERTISER = page.getByText("");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
         this.CAMPAIGN_TYPE_REGULAR = page.locator("//button[text()='Regular']");
         this.CAMPAIGN_TYPE_SEQUENTIAL = page.locator("//button[text()='Sequential']");
