@@ -13,11 +13,9 @@ import utils.DatabaseActions;
 import utils.WebActions;
 
 import java.sql.SQLException;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -257,31 +255,6 @@ public class LifeSteps {
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
         reportTemplates.selectMetric(metric);
-
-    }
-    @When("User enters the template details for end to end as {string} {string} {string}")
-    public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
-
-
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        templateNameRandom = templateName + '_' + timestamp;
-        reportTemplates.enterTemplateName(templateNameRandom);
-        List<String> dimensionList = Arrays.asList(dimension.split(","));
-
-        for (String dimensionValue : dimensionList) {
-            dimensionValue = dimensionValue.trim();
-            reportTemplates.selectDimensione2e(dimensionValue);
-        }
-
-        reportTemplates.clickMetricsTab();
-        List<String> metricsList = Arrays.asList(metric.split(","));
-
-        for (String metricValue : metricsList) {
-            metricValue = metricValue.trim();
-            reportTemplates.selectDimensione2e(metricValue);
-        }
-
-
     }
 
     @Then("Verify the selected dimensions and metrics under the Template Structure section")
@@ -473,58 +446,5 @@ public class LifeSteps {
 
 
     }
-
-
-    /// ///////////////////////
-    @And("User navigates to run report from mega menu of the life application")
-    public void user_navigate_to_run_report() {
-        navigation.clickSubMenu();
-        navigation.clickRunReport();
-
-
-    }
-
-    /// /////////////
-    @Then("User selects the report template created tactic and other fields for running the report")
-    public void user_enter_input_for_running_report() {
-        reportTemplates.enterDetailsToRunReport(templateNameRandom,tacticNameRandom);
-
-    }
-    /// ///////////////
-    @Then("User verifies the selected campaign,lineitem, tactic and runs report by clicking on Run button")
-    public void user_verifies_the_selected_details() {
-//       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-//        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-
-        reportTemplates.runReport();
-
-   }
-
-    /// ///////////////
-
-    @Then("User navigates to generate report field and verifies the report name by campaign name")
-    public void user_navigate_to_generate_report_page() {
-
-        navigation.clickSubMenu();
-        navigation.clickScheduledReport();
-        navigation.clickSubMenu();
-        navigation.clickGeneratedReport();
-
-
-
-    }
-
-    /// ///////////////
-    @Then("User downloads the report and verify the data in downloaded report")
-    public void user_download_the_report_from_generated_report_page_and_verify_the_data() throws IOException {
-        reportTemplates.downloadGeneratedReport();
-        navigation.clickSubMenu();
-        navigation.clickReportTemplate();
-        reportTemplates.verifyColumnsOfReport(templateNameRandom);
-
-
-
-    }
-
 
 }

@@ -2,7 +2,10 @@ package pages.studio;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 
-public class WorkspacePublishNPI {
+import java.util.UUID;
+
+public class WorkspacePublishNPI
+{
 
     private final Page page;
     private final Locator studioClick;
@@ -37,6 +40,7 @@ public class WorkspacePublishNPI {
         Response reload = page.reload();
     }
     public void searchWorkspace(String WORKSPACE){
+       // WORKSPACE = WORKSPACE + '_' + UUID.randomUUID().toString().substring(0, 10);
         searchWorkspace.fill(WORKSPACE);
         Locator clickWorkspace=page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText(WORKSPACE);
         clickWorkspace.click();

@@ -44,6 +44,7 @@ public class ExplorerWorkspace {
     }
 
     public void enterWorkspaceName(String workspaceName) {
+       // WORKSPACE_NAME.click();
         WORKSPACE_NAME.clear();
         WORKSPACE_NAME.fill(workspaceName);
     }
@@ -79,6 +80,7 @@ public class ExplorerWorkspace {
         page.waitForLoadState();
         SAVE_EXPLORER_WORKSPACE.waitFor();
         SAVE_EXPLORER_WORKSPACE.click();
+        page.waitForTimeout(5000);
     }
 
     public String workspaceSuccess() {

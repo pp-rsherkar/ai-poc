@@ -95,6 +95,7 @@ public class Accounts {
     }
 
     public void verifyStudioMenu() {
+        page.reload();
         PULSEPOINT_ICON.click();
         SUB_MENU.click();
         boolean isVisible = STUDIO_MENU.isVisible();

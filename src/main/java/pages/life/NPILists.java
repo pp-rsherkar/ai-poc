@@ -17,7 +17,7 @@ public class NPILists {
 
     public NPILists(Page page) {
         this.page = page;
-        this.NPI_LISTS = page.locator("#megamenu").getByText("NPI Lists");
+        this.NPI_LISTS = page.getByText("NPI Lists");
         this.ADD_LIST = page.getByText("Add List");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
