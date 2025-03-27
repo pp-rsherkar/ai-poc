@@ -35,6 +35,7 @@ public class LifeSteps {
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
+    public static String workspaceNameRandom;
     List<String> rules;
     List<String> rulesCompare = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
@@ -50,6 +51,7 @@ public class LifeSteps {
     Constants constants = new Constants();
     PMP pmp = new PMP(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
+    StudioSteps studioSteps = new StudioSteps();
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -454,7 +456,8 @@ public class LifeSteps {
     @And("User searches the {string} in LIFE and selects it")
     public void userSearchesTheInLIFEAndSelectsIt(String Studio_list)
     {
-        npiLists.searchNPILists(Studio_list);
+        npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
+
     }
 
     @And("User clicks on the published {string}")
