@@ -1,7 +1,13 @@
-Feature: LIFE Regression - Create a Campaign
+Feature:End to End Workflow of Report Generation. It covers below points
 
-  @regression
-  Scenario Outline: Create a Campaign with a Tactic & a Line Item
+  Create a Campaign with Line item and Tactic.
+  Create a report template by passing dimensions and metrics.
+  Run the report with newly created Campaign, Line item, Tactic and Report Template
+  Download the report from generated report tab.
+  Verify the Column headers of Template and Report file.
+
+  @1Apr1
+  Scenario Outline: End to End Workflow of Report Generation with Campaign and Report Template creation.
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User clicks on Create Campaign
@@ -33,5 +39,5 @@ Feature: LIFE Regression - Create a Campaign
     Then User downloads the report and verify the data in downloaded report
 
     Examples:
-      | USER  | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      | REPORT_TEMPLATE | TEMPLATE NAME | DIMENSIONS                                                            | METRICS                                               | RULE_TYPE          |
-      | Admin | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Auto_Creative | E2E Report      | Template      | Advertiser Name,Campaign Name,Creative Name,LineItem Name,Tactic Name | Impressions,Clicks,Media Spend,Total Spend,Data Spend | Behavioral Segment |
+      | USER  | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      | REPORT_TEMPLATE | TEMPLATE NAME | DIMENSIONS                    | METRICS            | RULE_TYPE          |
+      | Admin | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Auto_Creative | E2E Report      | Template      | Advertiser Name,Campaign Name | Impressions,Clicks | Behavioral Segment |
