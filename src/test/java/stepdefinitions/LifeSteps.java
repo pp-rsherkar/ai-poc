@@ -470,8 +470,8 @@ public class LifeSteps {
     /// ///////////////
     @Then("User verifies the selected campaign,lineitem, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-//       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-//        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
+       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
+        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
 
         reportTemplates.runReport();
 
