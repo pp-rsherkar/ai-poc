@@ -185,7 +185,32 @@ public class LifeSteps {
         navigation.clickSubMenu();
         npiLists.clickNPILists();
     }
+    @And("User navigates to NPI Lists page in LIFE")
+    public void userNavigatesToNPIListsPageInLIFE()
+    {
+        navigation.clickSubMenu();
+        npiLists.clickNPIListsStg();
+    }
+    @And("User searches the {string} in LIFE and selects it")
+    public void userSearchesTheInLIFEAndSelectsIt(String Studio_list)
+    {
+        npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
 
+    }
+
+    @And("User clicks on the published {string}")
+    public void userClicksOnThePublished(String Studio_list)
+    {
+        npiLists.selectPublishedList(Studio_list);
+    }
+
+    @Then("User Verify the list is displayed in the Life")
+    public void userVerifyTheListIsDisplayedInTheLife()
+    {
+        //Assert.assertTrue(npiLists.availablePlatforms());
+
+
+    }
     @When("User clicks on Add List")
     public void user_clicks_on_add_list() {
         npiLists.clickAddList();
@@ -502,6 +527,7 @@ public class LifeSteps {
 
 
     }
+
 
 
 }
