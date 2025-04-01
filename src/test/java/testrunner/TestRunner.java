@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
         // Rerun failed tests from rerun.txt file
         features = {"src/test/resources/features/"}
         , glue = {"stepdefinitions", "hooks"}
-        , tags = "@jenkins"
+        , tags = "@regression1"
         , plugin = {"pretty", "html:target/cucumber-reports/report.html", "json:target/cucumber-reports/cucumber.json", "rerun:target/rerun.txt"  // Save Failed test scenarios in rerun.txt file
 })
 

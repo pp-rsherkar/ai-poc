@@ -54,14 +54,15 @@ public class Workspaces {
 
     public void retryCreateWorkspace(boolean clickFlag) {
         {
+            page.waitForTimeout(5000);
             CREATE_WORKSPACE.click();
             page.waitForLoadState();
             if (HCP_EXPANSION.isVisible()) {
                 page.waitForLoadState();
                 counter = 4;
-                if (clickFlag) {
-                    HCP_EXPLORER.click();
-                }
+//                if (clickFlag) {
+//                    HCP_EXPLORER.click();
+//                }
             } else {
                 counter++;
                 BACK_TO_WORKSPACE_DASHBOARD.click();
@@ -81,10 +82,43 @@ public class Workspaces {
             CREATE_WORKSPACE.click();
             page.waitForLoadState();
             if (HCP_EXPANSION.isVisible()) {
+
                 page.waitForLoadState();
                 counter = 4;
                 if (expansionFlag) {
                     HCP_EXPANSION.click();
+                }
+            } else {
+                counter++;
+                //page.waitForTimeout(3000);
+                BACK_TO_WORKSPACE_DASHBOARD.click();
+                page.waitForLoadState();
+            }
+        }
+    }
+    public void createWorkspace_downloadnpi() {
+        while (counter < 3) {
+            retryCreateWorkspace_downloadnpi(false);
+        }
+    }
+    public void retryCreateWorkspace_downloadnpi(boolean clickFlag) {
+        {
+            if(CREATE_WORKSPACE.isVisible())
+            {
+            CREATE_WORKSPACE.click();
+            }
+            else
+            {
+                page.waitForTimeout(10000);
+                CREATE_WORKSPACE.click();
+            }
+            page.waitForLoadState();
+            if (HCP_EXPANSION.isVisible()) {
+                page.waitForLoadState();
+                BACK_TO_WORKSPACE_DASHBOARD.click();
+                counter = 4;
+                if (clickFlag) {
+                    HCP_EXPLORER.click();
                 }
             } else {
                 counter++;

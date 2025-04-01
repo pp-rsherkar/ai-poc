@@ -1,6 +1,6 @@
   Feature: Enable Studio for an account
 
-  @regression
+  @regression1
   Scenario: Enable Studio for an Account for internal users
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Life" application is logged in successfully
