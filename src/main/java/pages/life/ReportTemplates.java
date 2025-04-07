@@ -239,7 +239,7 @@ public class ReportTemplates {
     public void downloadGeneratedReport() throws IOException {
         page.waitForTimeout(13000);
         page.reload();
-        page.waitForTimeout(15000);
+        page.waitForTimeout(10000);
         page.reload();
         REPORT_DOWNLOAD_OPTION.click();
 
@@ -258,6 +258,7 @@ public class ReportTemplates {
 
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click();
+        page.waitForTimeout(1500);
 
         String data = TEMPLATE_COLUMNS.innerText();
 
@@ -267,6 +268,7 @@ public class ReportTemplates {
             expectedHeaders[i] = expectedHeaders[i].toLowerCase();
             expectedHeaders[i] = expectedHeaders[i].replace("campaign name","campaign");
             expectedHeaders[i] = expectedHeaders[i].replace("advertiser name","advertisername");
+            System.out.print(expectedHeaders[i]);
 
             }
 
@@ -280,18 +282,19 @@ public class ReportTemplates {
             String[] newArray = Arrays.copyOfRange(row, 1, row.length);
            for (int j = 0; j < newArray.length; j++) {
                newArray[j] = newArray[j].trim();
+               if (newArray[j].startsWith("\"") && newArray[j].endsWith("\"")) {
+                   newArray[j] = newArray[j].substring(1, newArray[j].length() - 1);
+               }
                newArray[j] = newArray[j].toLowerCase();
+               System.out.print(newArray[j]);
            }
 
-//            assert Arrays.equals(expectedHeaders,newArray) :
-//                    "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) +
-//                            "\nArray 2: " + Arrays.toString(newArray);
-//
+            assert Arrays.equals(expectedHeaders,newArray) :
+                    "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) +
+                            "\nArray 2: " + Arrays.toString(newArray);
 
 
-            System.out.println(Arrays.toString(row));
-            System.out.println(Arrays.toString(expectedHeaders));
-            System.out.println(reportname);
+
 
 
         }
