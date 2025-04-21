@@ -21,9 +21,7 @@ public class Campaigns {
         this.page = page;
         this.CREATE_CAMPAIGN = page.locator("//button[text()='Create a Campaign']");
         this.VERIFY_CAMPAIGN_PAGE = page.locator("//div[text()='Create New Campaign']");
-       // this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
         this.SEARCH_ADVERTISER = page.locator("(//input[@placeholder='Select Advertiser'])[1]");
-      //  this.SELECT_ADVERTISER = page.getByText("- Advertiser");
         this.SELECT_ADVERTISER = page.getByText("");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
         this.CAMPAIGN_TYPE_REGULAR = page.locator("//button[text()='Regular']");
@@ -61,8 +59,6 @@ public class Campaigns {
             CAMPAIGN_TYPE_REGULAR.click();
         } else if ("Sequential".equals(campaignType)) {
             CAMPAIGN_TYPE_SEQUENTIAL.click();
-        } else {
-            System.out.println("Invalid campaign type");
         }
     }
 

@@ -3,6 +3,8 @@ package pages.admin;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
+import org.opentest4j.AssertionFailedError;
 
 public class Accounts {
     private final Page page;
@@ -13,7 +15,6 @@ public class Accounts {
     private final Locator SEARCH_ICON;
     private final Locator SELECT_ACCOUNT;
     private final Locator STUDIO_SETTINGS_BUTTON;
-    private final Locator EXPLORER_TOGGLE;
     private final Locator EXPANSION_TOGGLE;
     private final Locator STUDIO_SETTINGS_SAVE;
     private final Locator STUDIO_MENU;
@@ -22,8 +23,8 @@ public class Accounts {
     private final Locator SWITCH_ACCOUNT;
     private final Locator SWITCH_SEARCH_ACCOUNT;
     private final Locator SWITCH_CLICK_ACCOUNT;
-    private final Locator STUDIO;
     private final Locator WORKSPACE_NAME;
+    private final Locator ACCOUNTS_TAB_TEXT;
 
     public Accounts(Page page) {
         this.page = page;
@@ -34,7 +35,6 @@ public class Accounts {
         this.SEARCH_ICON = page.locator(".ui > .iconSprite");
         this.SELECT_ACCOUNT = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("100Plus"));
         this.STUDIO_SETTINGS_BUTTON = page.locator("div:nth-child(6) > .btn > .acc-toggle-wrapper > .icons-32-checkmark");
-        this.EXPLORER_TOGGLE = page.locator("app-rightside label").first();
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
@@ -43,8 +43,8 @@ public class Accounts {
         this.SWITCH_ACCOUNT = page.locator(".left > div:nth-child(2)").first();
         this.SWITCH_SEARCH_ACCOUNT = page.getByPlaceholder("Search");
         this.SWITCH_CLICK_ACCOUNT = page.locator("#accountSwitcher").getByText("100Plus");
-        this.STUDIO = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
         this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
+        this.ACCOUNTS_TAB_TEXT = page.locator("//span[text()='Account Management']");
     }
 
     public void clickAdministration() {
@@ -56,8 +56,11 @@ public class Accounts {
         ACCOUNTS_TAB.click();
     }
 
-    public void searchAccount() {
+    public void searchAccount(String accountName) {
         page.waitForLoadState();
+        ACCOUNTS_TAB_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SEARCH_ACCOUNT.fill(accountName);
+        SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
     }
 
@@ -73,19 +76,20 @@ public class Accounts {
         STUDIO_SETTINGS_SAVE.click();
     }
 
-    public void disableStudioForAccount() {
+    public void disableStudioForAccount(String accountName) {
         ADMINISTRATION.click();
         ACCOUNTS_TAB.click();
-        SEARCH_ACCOUNT.fill("100Plus");
+        ACCOUNTS_TAB_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
         STUDIO_SETTINGS_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
     }
 
-    public void switchAccount() {
+    public void switchAccount(String accountName) {
         SWITCH_ACCOUNT.click();
-        SWITCH_SEARCH_ACCOUNT.fill("100Plus");
+        SWITCH_SEARCH_ACCOUNT.fill(accountName);
         SWITCH_CLICK_ACCOUNT.click();
     }
 
@@ -95,11 +99,12 @@ public class Accounts {
     }
 
     public void verifyStudioMenu() {
+        page.reload();
         PULSEPOINT_ICON.click();
         SUB_MENU.click();
         boolean isVisible = STUDIO_MENU.isVisible();
-        if (!isVisible) {
-            System.out.println("Studio Menu is not visible");
+        if (isVisible) {
+            throw new AssertionFailedError("Expected Studio Menu to be not visible, but it was visible.");
         }
     }
 }

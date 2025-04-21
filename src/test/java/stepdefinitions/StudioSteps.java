@@ -7,24 +7,16 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import pages.admin.Accounts;
-import pages.studio.ExpansionWorkspace;
-import pages.studio.ExplorerWorkspace;
-import pages.studio.WorkspaceDownloadNPI;
-import pages.studio.WorkspacePublishNPI;
-import pages.studio.Workspaces;
-
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import pages.studio.*;
 import utils.*;
 
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static factory.DriverFactory.page;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static factory.DriverFactory.page;
 
 public class StudioSteps {
     static String workspaceName;
@@ -42,29 +34,27 @@ public class StudioSteps {
     Workspaces workspaces = new Workspaces(DriverFactory.getPage());
     ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
-    WorkspaceDownloadNPI workspacedownloadnpi=new WorkspaceDownloadNPI(DriverFactory.getPage());
-    WorkspacePublishNPI workspacePublishNPI =new WorkspacePublishNPI(DriverFactory.getPage());
-    CSVActions csvActions =new CSVActions();
+    WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
+    WorkspacePublishNPI workspacePublishNPI = new WorkspacePublishNPI(DriverFactory.getPage());
+    CSVActions csvActions = new CSVActions();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
         // workspaces.CREATE_WS();
         Boolean clickFlag = true;
         workspaces.createWorkspace(clickFlag);
-
     }
+
     @And("the User navigate to studio")
     public void theUserNavigateToStudio() {
         navigation.navigateToLife();
         navigation.navigateToStudio();
     }
 
-
     @When("the user sees the types of workspaces they have permissions for")
     public void the_user_sees_the_types_of_workspaces_they_have_permissions_for() {
         Assert.assertEquals("HCP Explorer", workspaces.verifyHCPExplorer());
         Assert.assertEquals("HCP Audience Expansion", workspaces.verifyHCPAudienceExpansion());
-
     }
 
     @Then("the user selects the advertiser {string}")
@@ -72,8 +62,8 @@ public class StudioSteps {
         page.waitForLoadState();
         expworkspaces.clickAdvertiserDropdown(advertiser);
         page.waitForLoadState();
-
     }
+
     @Then("the user selects Source Audience {string}")
     public void the_user_selects_source_audience(String string) {
         expworkspaces.selectSourceAudience(string);
@@ -88,89 +78,74 @@ public class StudioSteps {
 
     @Then("the filters should be applied to the workspace")
     public void the_user_applies_the_following_filters() {
-
         expworkspaces.addFilter();
-
-
     }
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("_ddMMyy_HHmmss_SSS");
         String dateAndTimeStamp = LocalDateTime.now().format(formatter);
-        workspaceName= string+dateAndTimeStamp;
+        workspaceName = string + dateAndTimeStamp;
         expworkspaces.renameExpansion(workspaceName);
-
-
-        // Write code here that turns the phrase above into concrete actions
-        //    throw new io.cucumber.java.PendingException();
     }
+
     @Then("the user saves the workspace and check the workspace is Saved")
     public void the_user_saves_the_workspace_and_check_the_workspace_is_Saved() {
         expworkspaces.saveExpansion();
         assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
-
     }
 
-    @And("User enables the studio for an account")
-    public void user_enables_the_studio_for_an_account()
-    {
+    @And("User enables the studio for {string} account")
+    public void user_enables_the_studio_for_an_account(String accountName) {
         navigation.clickSubMenu();
         accounts.clickAdministration();
         accounts.selectAccountsTab();
-        accounts.searchAccount();
+        accounts.searchAccount(accountName);
     }
 
     @And("User navigates to workspace permissions")
-    public void User_navigates_to_workspace_permissions()
-    {
+    public void User_navigates_to_workspace_permissions() {
         accounts.enableStudio();
     }
 
     @When("User selects the workspace types and saves the settings")
-    public void user_selects_the_workspace_types_and_saves_the_settings()
-    {
+    public void user_selects_the_workspace_types_and_saves_the_settings() {
         accounts.workSpaceSettings();
     }
 
     @Then("Studio should be enabled for that account")
-    public void Studio_should_be_enabled_for_that_account()
-    {
+    public void Studio_should_be_enabled_for_that_account() {
         accounts.saveStudioSettings();
     }
 
-    @And("User should be able to see the enabled workspaces for that account under Studio")
-    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio()
-    {
-        accounts.switchAccount();
+    @And("User should be able to see the enabled workspaces for {string} account under Studio")
+    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
+        accounts.switchAccount(accountName);
         navigation.navigateToStudio();
         workspaces.createWorkspace();
-        Assert.assertEquals("HCP Audience Expansion",accounts.verifyWorkspacePermission());
-
+        Assert.assertEquals("HCP Audience Expansion", accounts.verifyWorkspacePermission());
     }
-    @And("User disables the studio permission for an account")
-    public void userDisablesTheStudioPermissionForAnAccount()
-    {
+
+    @And("User disables the studio permission for {string} account")
+    public void userDisablesTheStudioPermissionForAnAccount(String accountName) {
         navigation.clickSubMenu();
-        accounts.disableStudioForAccount();
+        accounts.disableStudioForAccount(accountName);
     }
 
     @Then("User should not be able to see the studio permission for that account")
-    public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount()
-    {
+    public void userShouldNotBeAbleToSeeTheStudioPermissionForThatAccount() {
         accounts.verifyStudioMenu();
     }
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
-        //workspaces.createWorkspace();
         workspaces.createWorkspace(clickFlag);
     }
+
     @When("User clicks on Create New Workspace For Expansion")
     public void user_clicks_on_create_new_workspace_for_expansion() {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
-        //workspaces.createWorkspace();
         workspaces.createWorkspaceExpansion(expansionFlag);
     }
 
@@ -224,6 +199,7 @@ public class StudioSteps {
     public void search_for_workspace() {
         workspacedownloadnpi.searchWorkspace();
     }
+
     @Then("user clicks on the searched workspace")
     public void user_clicks_on_the_searched_workspace() {
         workspacedownloadnpi.clickWorkspace();
@@ -231,7 +207,7 @@ public class StudioSteps {
         workspacedownloadnpi.clickNPIDownload();
         workspacedownloadnpi.clickCSVFile();
         workspacedownloadnpi.clickDownloadNPIButton();
-       // Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
+        // Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
 
         workspacedownloadnpi.clickDownloadButton();
         workspacedownloadnpi.clickNPIDownload();
@@ -239,9 +215,10 @@ public class StudioSteps {
         workspacedownloadnpi.clickDownloadNPIButton();
         //Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
     }
+
     @Then("verify the file content")
     public void verify_the_file_content() {
-         fileContent = csvActions.readAllDataAtOnce(WebActions.getProperty("csvFilePath"));
+        fileContent = CSVActions.readAllDataAtOnce(WebActions.getProperty("csvFilePath"));
         fileContentData = new ArrayList<>();
         //To display the data from csv- Separate logic
         /*for (int i = 1; i < fileContent.size(); i++) {
@@ -255,6 +232,7 @@ public class StudioSteps {
         System.out.println("Data from csv :" + fileContentData);
 
     }
+
     //DB result will be raised in next PR
     /*@Then("verify db result")
     public void verify_db_result() throws SQLException {
@@ -268,46 +246,42 @@ public class StudioSteps {
         }
         System.out.println("Data from query :" + actualValueData);
     }*/
+
     @When("Studio platform is available")
-    public void studio_platform_is_available()
-    {
+    public void studio_platform_is_available() {
         workspacePublishNPI.studio();
     }
 
     @And("User searches the {string} and selects it")
-    public void userSearchesTheAndSelectsIt(String WORKSPACE)
-    {
+    public void userSearchesTheAndSelectsIt(String WORKSPACE) {
         workspacePublishNPI.searchWorkspace(WORKSPACE);
     }
 
     @When("Download button is enabled to the user")
-    public void download_button_is_enabled_to_the_user()
-    {
+    public void download_button_is_enabled_to_the_user() {
         workspacePublishNPI.clickDownbutton();
     }
+
     @When("User clicks on Publish NPI List")
-    public void user_clicks_on_publish_npi_list()
-    {
+    public void user_clicks_on_publish_npi_list() {
         workspacePublishNPI.clickPublishNpi();
     }
+
     @And("User selects publish {string}")
-    public void userSelectsPublish(String listType)
-    {
+    public void userSelectsPublish(String listType) {
         workspacePublishNPI.publish(listType);
-        System.out.println("list type is: "+listType);
+        System.out.println("list type is: " + listType);
     }
 
     @When("User select the system to publish the list")
     public void user_select_the_system_to_publish_the_list() {
         workspacePublishNPI.hcp();
         workspacePublishNPI.life();
-
     }
+
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspacePublishNPI.clickPublish();
         //Assert.assertEquals("Workspace saved and ready to use!", workspacePublishNPI.verifyToast());
-
-
     }
 }
