@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import org.opentest4j.AssertionFailedError;
 
 public class Accounts {
     private final Page page;
@@ -85,6 +84,7 @@ public class Accounts {
         SELECT_ACCOUNT.click();
         STUDIO_SETTINGS_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
+        page.reload();
     }
 
     public void switchAccount(String accountName) {
@@ -99,12 +99,8 @@ public class Accounts {
     }
 
     public void verifyStudioMenu() {
-        page.reload();
         PULSEPOINT_ICON.click();
         SUB_MENU.click();
-        boolean isVisible = STUDIO_MENU.isVisible();
-        if (isVisible) {
-            throw new AssertionFailedError("Expected Studio Menu to be not visible, but it was visible.");
-        }
+        assert STUDIO_MENU.isHidden();
     }
 }

@@ -42,8 +42,8 @@ public class ReportTemplates {
     private final Locator REPORT_DOWNLOAD_OPTION;
     private final Locator TEMPLATE_COLUMNS;
     private final Locator SEARCH_ICON;
-    private String reportname;
     private final Locator REPORT_PANEL;
+    private String reportName;
 
     public ReportTemplates(Page page) {
         this.page = page;
@@ -70,7 +70,7 @@ public class ReportTemplates {
         this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
         this.TEMPLATE_COLUMNS = page.locator("//tr[@class='highlighted loadedall']//td[1]");
         this.SEARCH_ICON = page.locator(".search-field > .ui");
-        this.SELECT_VALUE = page.locator("//*[@id=\"tacticLookup\"]/div/div[1]");
+        this.SELECT_VALUE = getTacticName("tacticLookup", 1);
         this.RUN_REPORT = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Run").setExact(true));
         this.REPORT_DOWNLOAD_OPTION = page.locator(".inlineDiv > .ui > .pointer").first();
         this.REPORT_PANEL = page.locator(".reports-body > div").first();
@@ -199,9 +199,9 @@ public class ReportTemplates {
         Download download = page.waitForDownload(() -> {
             page.locator("(//span[contains(text(),'Download')])[1]").click();
         });
-        reportname = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        reportName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String downloadPath = Paths.get(System.getProperty("user.home"), "Downloads").toString();
-        String filePath = Paths.get(downloadPath, "report_" + reportname + ".csv").toString();
+        String filePath = Paths.get(downloadPath, "report_" + reportName + ".csv").toString();
         download.saveAs(Paths.get(filePath));
     }
 
@@ -220,7 +220,7 @@ public class ReportTemplates {
         }
 
         String downloadPath = Paths.get(System.getProperty("user.home"), "Downloads").toString();
-        String filePath = Paths.get(downloadPath, "report_" + reportname + ".csv").toString();
+        String filePath = Paths.get(downloadPath, "report_" + reportName + ".csv").toString();
         BufferedReader reader = null;
         String line = "";
         reader = new BufferedReader(new FileReader(filePath));
@@ -228,13 +228,12 @@ public class ReportTemplates {
             String[] row = line.split(",");
             String[] newArray = Arrays.copyOfRange(row, 1, row.length);
             for (int j = 0; j < newArray.length; j++) {
-                newArray[j] = newArray[j].trim();
-                newArray[j] = newArray[j].toLowerCase();
+                newArray[j] = newArray[j].trim().toLowerCase();
             }
-
-            System.out.println(Arrays.toString(row));
-            System.out.println(Arrays.toString(expectedHeaders));
-            System.out.println(reportname);
         }
+    }
+
+    public Locator getTacticName(String id, int index) {
+        return page.locator(String.format("//*[@id='%s']/div/div[%d]", id, index));
     }
 }
