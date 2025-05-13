@@ -6,7 +6,7 @@ Feature:End to End Workflow of Report Generation. It covers below points
   Download the report from generated report tab.
   Verify the Column headers of Template and Report file.
 
-  @1AprDemo
+  @Sanity
   Scenario Outline: End to End Workflow of Report Generation with Campaign and Report Template creation.
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully

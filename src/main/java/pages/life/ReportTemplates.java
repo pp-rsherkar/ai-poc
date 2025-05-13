@@ -268,7 +268,6 @@ public class ReportTemplates {
             expectedHeaders[i] = expectedHeaders[i].toLowerCase();
             expectedHeaders[i] = expectedHeaders[i].replace("campaign name","campaign");
             expectedHeaders[i] = expectedHeaders[i].replace("advertiser name","advertisername");
-            System.out.print(expectedHeaders[i]);
 
             }
 
@@ -286,7 +285,6 @@ public class ReportTemplates {
                    newArray[j] = newArray[j].substring(1, newArray[j].length() - 1);
                }
                newArray[j] = newArray[j].toLowerCase();
-               System.out.print(newArray[j]);
            }
 
             assert Arrays.equals(expectedHeaders,newArray) :
