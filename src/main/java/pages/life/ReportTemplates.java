@@ -192,7 +192,7 @@ public class ReportTemplates {
     public void downloadGeneratedReport() throws IOException {
         page.waitForTimeout(13000);
         page.reload();
-        page.waitForTimeout(15000);
+        page.waitForTimeout(10000);
         page.reload();
         REPORT_DOWNLOAD_OPTION.click();
 
@@ -208,6 +208,7 @@ public class ReportTemplates {
     public void verifyColumnsOfReport(String templateNameRandom) throws IOException {
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click();
+        page.waitForTimeout(1500);
 
         String data = TEMPLATE_COLUMNS.innerText();
 
@@ -232,8 +233,30 @@ public class ReportTemplates {
             }
         }
     }
+           for (int j = 0; j < newArray.length; j++) {
+               newArray[j] = newArray[j].trim();
+               if (newArray[j].startsWith("\"") && newArray[j].endsWith("\"")) {
+                   newArray[j] = newArray[j].substring(1, newArray[j].length() - 1);
+               }
+               newArray[j] = newArray[j].toLowerCase();
+           }
+
+            assert Arrays.equals(expectedHeaders,newArray) :
+                    "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) +
+                            "\nArray 2: " + Arrays.toString(newArray);
 
     public Locator getTacticName(String id, int index) {
         return page.locator(String.format("//*[@id='%s']/div/div[%d]", id, index));
     }
 }
+
+
+
+
+        }
+
+
+    }}
+
+
+
