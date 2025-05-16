@@ -229,34 +229,20 @@ public class ReportTemplates {
             String[] row = line.split(",");
             String[] newArray = Arrays.copyOfRange(row, 1, row.length);
             for (int j = 0; j < newArray.length; j++) {
-                newArray[j] = newArray[j].trim().toLowerCase();
+                newArray[j] = newArray[j].trim();
+                if (newArray[j].startsWith("\"") && newArray[j].endsWith("\"")) {
+                    newArray[j] = newArray[j].substring(1, newArray[j].length() - 1);
+                }
+                newArray[j] = newArray[j].toLowerCase();
             }
-        }
-    }
-           for (int j = 0; j < newArray.length; j++) {
-               newArray[j] = newArray[j].trim();
-               if (newArray[j].startsWith("\"") && newArray[j].endsWith("\"")) {
-                   newArray[j] = newArray[j].substring(1, newArray[j].length() - 1);
-               }
-               newArray[j] = newArray[j].toLowerCase();
-           }
 
-            assert Arrays.equals(expectedHeaders,newArray) :
+            assert Arrays.equals(expectedHeaders, newArray) :
                     "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) +
                             "\nArray 2: " + Arrays.toString(newArray);
+        }
+    }
 
     public Locator getTacticName(String id, int index) {
         return page.locator(String.format("//*[@id='%s']/div/div[%d]", id, index));
     }
 }
-
-
-
-
-        }
-
-
-    }}
-
-
-
