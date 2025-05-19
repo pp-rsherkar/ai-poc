@@ -1,13 +1,13 @@
-Feature:End to End Workflow of Report Generation. It covers below points
+Feature: End to End Workflow of Report Generation. It covers below points
+  1. Create a Campaign with Line item and Tactic.
+  2. Create a report template by passing dimensions and metrics.
+  3. Run the report with newly created Campaign, Line item, Tactic and Report Template
+  4. Download the report from generated report tab.
+  5. Verify the Column headers of Template and Report file.
 
-  Create a Campaign with Line item and Tactic.
-  Create a report template by passing dimensions and metrics.
-  Run the report with newly created Campaign, Line item, Tactic and Report Template
-  Download the report from generated report tab.
-  Verify the Column headers of Template and Report file.
-
-  @Sanity
+  @e2e
   Scenario Outline: End to End Workflow of Report Generation with Campaign and Report Template creation.
+    # 1
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User clicks on Create Campaign
@@ -22,7 +22,7 @@ Feature:End to End Workflow of Report Generation. It covers below points
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify creative details are saved and the campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
-
+    # 2
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
     When User clicks on New Template
@@ -30,12 +30,12 @@ Feature:End to End Workflow of Report Generation. It covers below points
     When User enters the template details for end to end as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
     When User saves the new template
     Then Verify new template is saved and displayed in the template list
-
-
+    # 3
     And User navigates to run report from mega menu of the life application
     Then User selects the report template created tactic and other fields for running the report
-    Then User verifies the selected campaign,lineitem, tactic and runs report by clicking on Run button
+    Then User verifies the selected campaign,line item, tactic and runs report by clicking on Run button
     Then User navigates to generate report field and verifies the report name by campaign name
+    # 4 & 5
     Then User downloads the report and verify the data in downloaded report
 
     Examples:
