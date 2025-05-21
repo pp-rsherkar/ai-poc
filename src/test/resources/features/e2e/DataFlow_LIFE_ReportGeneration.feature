@@ -1,4 +1,5 @@
-Feature: End to End Workflow of Report Generation. It covers below points
+Feature: End to End Workflow of Report Generation.
+  It covers below points
   1. Create a Campaign with Line item and Tactic.
   2. Create a report template by passing dimensions and metrics.
   3. Run the report with newly created Campaign, Line item, Tactic and Report Template
