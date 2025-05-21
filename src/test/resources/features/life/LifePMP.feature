@@ -102,7 +102,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User fills Curated markets mandatory fields and clicks on Save
     Then Curated Market should be created successfully
 
-  Scenario Outline: Verify Deals can be imported for the newly created curated markets
+  Scenario: Verify Deals can be imported for the newly created curated markets
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User has navigated to the curated markets administration portal
@@ -114,13 +114,13 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User clicks OK button of Import Deals if there are no errors
     Then Deals should be imported
 
-  Scenario Outline: Verify Deals(Standalone) Page has three tabs
+  Scenario: Verify Deals(Standalone) Page has three tabs
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User navigates to Deals page
     Then User should see three tabs - All Deals, Private Deals and Life Marketplace Deals
 
-  Scenario Outline: Verify User can create Private deals through Deals(Standalone) page
+  Scenario: Verify User can create Private deals through Deals(Standalone) page
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User navigates to Deals page
