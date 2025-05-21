@@ -94,7 +94,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
       | USER  | tacticPMP       |
       | Admin | Tactic_0512_SSS |
 
-  Scenario Outline: Verify Curated markets can be created
+  Scenario: Verify Curated markets can be created
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User has navigated to the curated markets administration portal
