@@ -42,7 +42,7 @@ Feature: End to End Workflow of NPI Lists.
     And User enters smart action details as "<SMART_ACTION_NAME>" "<ADVERTISER>"
     When User saves the smart action
     Then Verify smart action is saved successfully and navigates to Audience tab
-    # 4 & # 5
+    # 4 & 5
     When User clicks on NPI Lists
     Then Verify NPI list created in LIFE is present
     And User adds NPI list to the smart action
@@ -51,7 +51,7 @@ Feature: End to End Workflow of NPI Lists.
     # 6
     When User clicks on Action and enters the details and saves
     Then Verify data is saved successfully
-    # 7 & # 8
+    # 7 & 8
     When User clicks on Response and enter the details and creates smart list "<SMART_LIST_NAME>" "<DAYS>" and saves
     Then Verify data is saved successfully
 
