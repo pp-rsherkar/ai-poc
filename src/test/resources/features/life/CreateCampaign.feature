@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Campaign
 
-  @jenkins
+  @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
@@ -22,7 +22,7 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
 
-  @jenkins
+  @regression
   Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
@@ -34,13 +34,13 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" channel, configures targeting rules:
-      | Behavioral Segment  |
-      | In Condition        |
-      | Age                 |
-      | Health Pages        |
-      | Postal Codes        |
-      | Device              |
-      | Legal Populations   |
+      | Behavioral Segment |
+      | In Condition       |
+      | Age                |
+      | Health Pages       |
+      | Postal Codes       |
+      | Device             |
+      | Legal Populations  |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
@@ -49,8 +49,8 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
 
     Examples:
-      | ADVERTISER               | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL         | CREATIVE           |
-      | 00CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      |Display Advanced | Please_Dont_Delete |
+      | ADVERTISER               | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
+      | 00CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
 
 #  @regression
 #  Scenario Outline: API Sample Test

@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Report Template
 
-  @jenkins
+  @regression
   Scenario Outline: Create a Report Template
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
