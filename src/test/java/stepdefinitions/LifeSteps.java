@@ -12,8 +12,8 @@ import utils.Constants;
 import utils.DatabaseActions;
 import utils.WebActions;
 
-import java.sql.SQLException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ public class LifeSteps {
     static String password;
     static String timestamp;
     static String npiName;
+    static String npiNameEdited;
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
@@ -185,32 +186,31 @@ public class LifeSteps {
         navigation.clickSubMenu();
         npiLists.clickNPILists();
     }
+
     @And("User navigates to NPI Lists page in LIFE")
-    public void userNavigatesToNPIListsPageInLIFE()
-    {
+    public void userNavigatesToNPIListsPageInLIFE() {
         navigation.clickSubMenu();
         npiLists.clickNPIListsStg();
     }
+
     @And("User searches the {string} in LIFE and selects it")
-    public void userSearchesTheInLIFEAndSelectsIt(String Studio_list)
-    {
+    public void userSearchesTheInLIFEAndSelectsIt(String Studio_list) {
         npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
 
     }
 
     @And("User clicks on the published {string}")
-    public void userClicksOnThePublished(String Studio_list)
-    {
+    public void userClicksOnThePublished(String Studio_list) {
         npiLists.selectPublishedList(Studio_list);
     }
 
     @Then("User Verify the list is displayed in the Life")
-    public void userVerifyTheListIsDisplayedInTheLife()
-    {
+    public void userVerifyTheListIsDisplayedInTheLife() {
         //Assert.assertTrue(npiLists.availablePlatforms());
 
 
     }
+
     @When("User clicks on Add List")
     public void user_clicks_on_add_list() {
         npiLists.clickAddList();
@@ -282,6 +282,7 @@ public class LifeSteps {
         reportTemplates.selectMetric(metric);
 
     }
+
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
 
@@ -289,7 +290,7 @@ public class LifeSteps {
         timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         templateNameRandom = templateName + '_' + timestamp;
         reportTemplates.enterTemplateName(templateNameRandom);
-        List<String> dimensionList = Arrays.asList(dimension.split(","));
+        String[] dimensionList = dimension.split(",");
 
         for (String dimensionValue : dimensionList) {
             dimensionValue = dimensionValue.trim();
@@ -297,7 +298,7 @@ public class LifeSteps {
         }
 
         reportTemplates.clickMetricsTab();
-        List<String> metricsList = Arrays.asList(metric.split(","));
+        String[] metricsList = metric.split(",");
 
         for (String metricValue : metricsList) {
             metricValue = metricValue.trim();
@@ -476,58 +477,93 @@ public class LifeSteps {
         tacticSettings.clickClose();
     }
 
-
-    /// ///////////////////////
     @And("User navigates to run report from mega menu of the life application")
     public void user_navigate_to_run_report() {
         navigation.clickSubMenu();
         navigation.clickRunReport();
-
-
     }
 
-    /// /////////////
     @Then("User selects the report template created tactic and other fields for running the report")
     public void user_enter_input_for_running_report() {
-        reportTemplates.enterDetailsToRunReport(templateNameRandom,tacticNameRandom);
-
+        reportTemplates.enterDetailsToRunReport(templateNameRandom, tacticNameRandom);
     }
-    /// ///////////////
+
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
+        Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
         Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-
         reportTemplates.runReport();
-
-   }
-
-    /// ///////////////
+    }
 
     @Then("User navigates to generate report field and verifies the report name by campaign name")
     public void user_navigate_to_generate_report_page() {
-
         navigation.clickSubMenu();
         navigation.clickScheduledReport();
         navigation.clickSubMenu();
         navigation.clickGeneratedReport();
-
-
-
     }
 
-    /// ///////////////
     @Then("User downloads the report and verify the data in downloaded report")
     public void user_download_the_report_from_generated_report_page_and_verify_the_data() throws IOException {
         reportTemplates.downloadGeneratedReport();
         navigation.clickSubMenu();
         navigation.clickReportTemplate();
         reportTemplates.verifyColumnsOfReport(templateNameRandom);
-
-
-
     }
 
+    @When("User tries to save the list without entering any details, an error message should be displayed")
+    public void user_tries_to_save_the_list_without_entering_any_details() {
+        npiStaticList.saveList();
+        assert npiStaticList.listNameError().contains("List Name is required");
+        String npiNameTemp = "Temporary List Name";
+        npiStaticList.enterListName(npiNameTemp);
+        npiStaticList.saveList();
+        assert npiStaticList.advertiserError().contains("Advertiser is required");
+    }
 
+    @And("User enters the NPI Static list details as {string} {string}")
+    public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+    }
 
+    @And("User uploads the file {string}")
+    public void user_uploads_the_file(String fileName) {
+        npiStaticList.uploadStaticListFile(fileName);
+    }
+
+    @When("User edits the created list")
+    public void user_edits_the_created_list() {
+        //npiStaticList.clickBackToNPILists();
+        //npiLists.searchList(npiName);
+        navigation.clickSubMenu();
+        npiLists.clickNPILists();
+        npiLists.searchList(npiName);
+        npiLists.openSearchedList(npiName);
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiNameEdited = "Edited" + '_' + timestamp;
+        npiStaticList.enterListName(npiNameEdited);
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
+    }
+
+    @Then("Verify list gets updated successfully")
+    public void verify_list_gets_updated_successfully() {
+        npiStaticList.clickBackToNPILists();
+        npiLists.searchList(npiNameEdited);
+        npiLists.openSearchedList(npiNameEdited);
+        Assert.assertEquals(npiNameEdited, npiStaticList.updatedListName());
+    }
+
+    @When("User deletes the created list")
+    public void user_deletes_the_created_list() {
+        npiStaticList.deleteList();
+    }
+
+    @Then("Verify list gets deleted successfully")
+    public void verify_list_gets_deleted_successfully() {
+        assert npiStaticList.deleteSuccess().contains("NPI list Deleted");
+    }
 }
