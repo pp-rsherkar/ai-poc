@@ -29,4 +29,11 @@ public class ConfigLoader {
         String encryptedDbPassword = properties.getProperty("dbPassword");
         return EncryptionDecryption.decrypt(encryptedDbPassword);
     }
+    public static String getPassword() throws Exception {
+        String encryptedPassword = properties.getProperty("preReleasePassword");
+
+        return EncryptionDecryption.decrypt(encryptedPassword);
+
+
+    }
 }

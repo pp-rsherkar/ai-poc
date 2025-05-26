@@ -1,5 +1,6 @@
 package stepdefinitions;
 
+import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -8,6 +9,7 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.Navigation;
 import pages.life.*;
+import utils.ConfigLoader;
 import utils.Constants;
 import utils.DatabaseActions;
 import utils.WebActions;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static factory.DriverFactory.page;
 
 public class LifeSteps {
 
@@ -52,7 +56,7 @@ public class LifeSteps {
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
-    public void set_environment(String environment, String user) {
+    public void set_environment(String environment, String user) throws Exception {
         if (environment.equals("Demo")) {
             url = WebActions.getProperty("demoURL");
             username = WebActions.getProperty("demoUser");
@@ -60,7 +64,10 @@ public class LifeSteps {
         } else if (environment.equals("Pre-release")) {
             url = WebActions.getProperty("preReleaseURL");
             username = WebActions.getProperty("preReleaseUser");
-            password = WebActions.getProperty("preReleasePassword");
+//            password = WebActions.getProperty(ConfigLoader.getPassword());
+            password = ConfigLoader.getPassword();
+            System.out.println("Encrypted Password: " + ConfigLoader.getPassword());
+
         }
     }
 
@@ -70,6 +77,7 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
         Assert.assertEquals("", "Admin Dashboard", navigation.verifyProfilePage());
 
         switch (application) {
@@ -226,6 +234,13 @@ public class LifeSteps {
         npiLists.clickStaticList();
     }
 
+    @Then("User selects Smart List to create NPI list")
+    public void user_selects_smart_list_to_create_npi_list() {
+
+        npiLists.clickSmartList();
+    }
+
+
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
         timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -233,6 +248,236 @@ public class LifeSteps {
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
+    }
+    @Then("User enters the Smart NPI list details as {string} {string} {string} for Smart Pixel")
+    public void user_enters_the_smart_npi_list_details_as_for_Smart_Pixel(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickSmartPixel();
+        npiSmartList.clickSmartPixelDropDown();
+        npiSmartList.clickSmartPixelDropDownValue();
+        npiSmartList.clickLifeCheckbox();
+
+    }
+    @Then("User enters the Smart NPI list details as {string} {string} {string} for NPI List")
+    public void user_enters_the_smart_npi_list_details_as_for_NPI_List(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickNPIList();
+        npiSmartList.clickNPIGroup();
+        npiSmartList.clickNPIGroupValue();
+        npiSmartList.clickLifeCheckbox();
+
+    }
+    @Then("User enters the Smart NPI list with Expand based on practice and hospital affiliation details as {string} {string} {string} for NPI List")
+    public void user_enters_the_smart_npi_list_with_expand_based_details_as_for_NPI_List(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickNPIList();
+        npiSmartList.clickNPIGroup();
+        npiSmartList.clickNPIGroupValue();
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickExpandPractice();
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Specialty")
+    public void user_enters_the_smart_npi_list_details_as_for_Specialty(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickSpecialty();
+        npiSmartList.clickSpecialtyDropdown();
+        npiSmartList.selectSpecialtyValue();
+
+
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Profession")
+    public void user_enters_the_smart_npi_list_details_as_for_Profession(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickProfession();
+        npiSmartList.clickProfessionDropdown();
+        npiSmartList.selectProfessionValue();
+
+
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Prescribed Drug")
+    public void user_enters_the_smart_npi_list_details_as_for_PrescribedDrug(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickPrescribedDrug();
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Diagnosis")
+    public void user_enters_the_smart_npi_list_details_as_for_Diagnosis(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickDiagnosis();
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Medical Procedure")
+    public void user_enters_the_smart_npi_list_details_as_for_Medical_Procedure(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickMedicalProcedure();
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Endemic Research")
+    public void user_enters_the_smart_npi_list_details_as_for_Endemic_Research(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickEndemicResearch();
+        npiSmartList.SelectEndemicDetails();
+
+
+    }
+    @Then("User enters the details as {string} {string} {string} for Prescription Behavior Change")
+    public void user_enters_the_smart_npi_list_details_as_for_Prescription_Behavior_Change(String npiListName, String advertiser, String npiNumber) {
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+
+        npiSmartList.clickPrescriptionBehaviorChange();
+        npiSmartList.SelectPrescriptionBehaviorDetails();
+
+    }
+    @Then("User enters the Smart NPI list details as {string} {string} for {string}")
+    public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type) {
+        switch (type) {
+            case "Smart Pixel":
+                {
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickSmartPixel();
+                npiSmartList.clickSmartPixelDropDown();
+                npiSmartList.clickSmartPixelDropDownValue();
+                npiSmartList.clickLifeCheckbox();
+                    break;
+            }
+                case "NPI List":
+                    timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                    npiName = npiListName + '_' + timestamp;
+                    npiStaticList.enterListName(npiName);
+                    npiStaticList.selectAdvertiser(advertiser);
+                    npiSmartList.clickNPIList();
+                    npiSmartList.clickNPIGroup();
+                    npiSmartList.clickNPIGroupValue();
+                    npiSmartList.clickLifeCheckbox();
+
+                    break;
+            case "Specialty":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickSpecialty();
+                npiSmartList.clickSpecialtyDropdown();
+                npiSmartList.selectSpecialtyValue();
+
+                break;
+            case "Profession":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickProfession();
+                npiSmartList.clickProfessionDropdown();
+                npiSmartList.selectProfessionValue();
+
+                break;
+            case "Prescribed Drug":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickPrescribedDrug();
+
+                break;
+            case "Prescription Behaviour Change":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+
+                npiSmartList.clickPrescriptionBehaviorChange();
+                npiSmartList.SelectPrescriptionBehaviorDetails();
+                break;
+            case "Diagnosis":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickDiagnosis();
+                break;
+            case "Medical Procedure":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickMedicalProcedure();
+                break;
+            case "Endemic Research":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickEndemicResearch();
+                npiSmartList.SelectEndemicDetails();
+
+                break;
+            case "Expand":
+
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickNPIList();
+                npiSmartList.clickNPIGroup();
+                npiSmartList.clickNPIGroupValue();
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickExpandPractice();
+
+                break;
+
+            default : System.out.println("Invalid Type");
+
+        }
     }
 
     @When("User makes list available in LIFE and saves the list")
@@ -242,6 +487,11 @@ public class LifeSteps {
 
     @Then("Verify list gets saved successfully")
     public void verify_list_gets_saved_successfully() {
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
+    }
+    @Then("Save and Verify the list gets saved successfully")
+    public void verify_smart_list_gets_saved_successfully() {
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
     }

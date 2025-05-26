@@ -14,6 +14,7 @@ public class NPILists {
     private static Locator SEARCH_NPILISTS;
     private final Locator LIFE_CHECKBOX;
     private final Locator HCP_CHECKBOX;
+    private final Locator SMART_LIST;
 
     public NPILists(Page page) {
         this.page = page;
@@ -22,6 +23,7 @@ public class NPILists {
         this.ADD_LIST = page.getByText("Add List");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
+        this.SMART_LIST = page.getByText("Dynamic list of NPI");
         SEARCH_NPILISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.LIFE_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-4']/label/div");
         this.HCP_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-5']/label/div");
@@ -45,6 +47,10 @@ public class NPILists {
 
     public void clickStaticList() {
         STATIC_LIST.click();
+    }
+    public void clickSmartList() {
+
+        SMART_LIST.click();
     }
 
     public void searchNPILists(String Studio_list) {
