@@ -7,7 +7,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User has navigated to mentioned tactic "<tacticPMP>"
     When Targeting panel is opened on Tactic Settings tab
     And User clicks on Deals Targeting
-    And User assigns Life Marketplace(Premium) deals
+    And User assigns premium deals
     And User clicks on OK button of PMP Modal
     And User saves the changes
     Then Deals should be assigned to both targeting and PMP deals section
@@ -35,7 +35,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User has navigated to mentioned tactic "<tacticPMP>"
     When Targeting panel is opened on Tactic Settings tab
     And   User clicks on Deals Targeting
-    And  User assigns Life Marketplace(Premium) deals
+    And  User assigns premium deals
     And User turns the Only Target Applied deals OFF
     And User clicks on OK button of PMP Modal
     And User saves the changes
@@ -88,7 +88,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And User has navigated to mentioned tactic "<tacticPMP>"
     When Targeting panel is opened on Tactic Settings tab
     And  User clicks on Deals Targeting
-    And User navigates to Life Marketplace deals tab
+    And User assigns premium deals
     Then Filters Exchange,Deal Type,Channel, Device Type, Ad Size,Floor Price Range, Estd. Avails and Compatible with this tactic checkbox should be present
     Examples:
       | USER  | tacticPMP       |
