@@ -236,9 +236,7 @@ public class ReportTemplates {
                 newArray[j] = newArray[j].toLowerCase();
             }
 
-            assert Arrays.equals(expectedHeaders, newArray) :
-                    "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) +
-                            "\nArray 2: " + Arrays.toString(newArray);
+            assert Arrays.equals(expectedHeaders, newArray) : "❌ Arrays do not match!\nArray 1: " + Arrays.toString(expectedHeaders) + "\nArray 2: " + Arrays.toString(newArray);
         }
     }
 

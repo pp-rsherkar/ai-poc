@@ -15,7 +15,7 @@ public class Campaigns {
     private final Locator BUDGET;
     private final Locator SAVE_CAMPAIGN;
     private final Locator CAMPAIGN_SUCCESS;
-    private final Locator NAVIGATE_TO_CAMPAIGN_LISTING;
+    private final Locator CAMPAIGN_LISTING;
 
     public Campaigns(Page page) {
         this.page = page;
@@ -29,7 +29,7 @@ public class Campaigns {
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
         this.CAMPAIGN_SUCCESS = page.locator("//*[text()='Success!']");
-        this.NAVIGATE_TO_CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
+        this.CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
     }
 
     public void createCampaign() {
@@ -75,7 +75,7 @@ public class Campaigns {
     }
 
     public void navigateToCampaignListing() {
-        NAVIGATE_TO_CAMPAIGN_LISTING.click();
+        CAMPAIGN_LISTING.click();
         page.waitForLoadState();
     }
 }

@@ -54,7 +54,6 @@ public class TacticSettings {
     private final Locator TARGET_OPTION;
     private final Locator VERIFY_NPI;
 
-
     String optionTextAudienceAttribute1;
     String optionTextDemographics1;
     String optionTextDemographics2;
@@ -118,8 +117,6 @@ public class TacticSettings {
         this.NPI_PANEL_SEARCH = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search..."));
         this.TARGET_OPTION = page.getByTitle("Target");
         this.VERIFY_NPI = page.locator("//label[normalize-space(text())='NPI']");
-
-
     }
 
     public String verifyTacticSettingsText() {
@@ -200,8 +197,6 @@ public class TacticSettings {
                 RULE_LEGAL_POPULATIONS_OPTION_SELECT.click();
                 RULE_TYPE_OK_BUTTON.click();
                 break;
-
-
         }
     }
 
@@ -289,7 +284,6 @@ public class TacticSettings {
         NPI_PANEL_SEARCH.click();
         NPI_PANEL_SEARCH.fill(listname);
         NPI_PANEL_SEARCH.press("Enter");
-
     }
 
     public void clickTarget() {
@@ -302,13 +296,9 @@ public class TacticSettings {
 
     public void clickClose() {
         RULE_TYPE_CLOSE.click();
-
     }
 
     public String verifyNPIRule() {
         return VERIFY_NPI.innerText();
-
     }
-
-
 }

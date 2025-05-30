@@ -1,8 +1,8 @@
 package pages.studio;
 
-import com.microsoft.playwright.Page;
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 
 import java.util.regex.Pattern;
@@ -29,7 +29,6 @@ public class ExpansionWorkspace {
     private final Locator DROPDOWN_CARETEAM_VALUE;
 
     public ExpansionWorkspace(Page page) {
-
         this.page = page;
         this.HCP_AUDIENCEEXP = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.IMG).nth(2);
         this.ADVERTISER_DROPDOWN = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX);
@@ -49,45 +48,30 @@ public class ExpansionWorkspace {
         this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX).nth(3);
         this.DROPDOWN_CARETEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.COMPLEMENTARY).getByRole(AriaRole.COMBOBOX, new Locator.GetByRoleOptions().setName("undefined combobox")).getByRole(AriaRole.TEXTBOX);
         this.DROPDOWN_CARETEAM_VALUE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Basic"));
-
     }
 
     public void clickAdvertiserDropdown(String advertiser) {
-
         ADVERTISER_DROPDOWN.click();
         ADVERTISER_DROPDOWN.fill(advertiser);
         SELECT_ADVERTISER.click();
-
     }
 
     public void selectSourceAudience(String string) {
-
         page.waitForLoadState();
-
         if (string.equals("Studio Workspace")) {
             SOURCE_AUDIENCE.click();
-
-
             ENTER_MY_PLAYGROUNG.fill("My playground");
-
-
             SELECT_SOURCE_AUDIENCE.click();
         } else {
             System.out.println("ok");
-
         }
-
-
     }
 
     public void selectExpandCareTeam() {
-
         page.waitForLoadState();
         EXPAND_CARE_TEAM.click();
         DROPDOWN_CARETEAM.click();
         DROPDOWN_CARETEAM_VALUE.click();
-
-
     }
 
     public void selectExpandAffGraph() {
@@ -101,15 +85,12 @@ public class ExpansionWorkspace {
         BELOW_25.click();
         OK_FILTER.click();
         POPUP_CLOSE.click();
-
     }
-
 
     public void saveExpansion() {
         page.waitForLoadState();
         SAVE.click();
         page.waitForLoadState();
-
     }
 
     public void renameExpansion(String workspaceName) {
@@ -117,14 +98,4 @@ public class ExpansionWorkspace {
         WORKSPACE_NAME.click();
         WORKSPACE_NAME.fill(workspaceName);
     }
-
 }
-
-
-
-
-
-
-
-
-
