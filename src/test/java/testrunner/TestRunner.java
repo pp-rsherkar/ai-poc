@@ -1,6 +1,5 @@
 package testrunner;
 
-
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
@@ -11,7 +10,7 @@ import org.junit.runner.RunWith;
         features = {"src/test/resources/features/"}
         , glue = {"stepdefinitions", "hooks"}
         , tags = "@e2e"
-        , plugin = {"pretty", "html:target/cucumber-reports/report.html", "json:target/cucumber-reports/cucumber.json", "rerun:target/rerun.txt"  // Save Failed test scenarios in rerun.txt file
+        , plugin = {"pretty", "html:target/cucumber-reports/report.html", "json:target/cucumber-reports/cucumber.json", "junit:target/cucumber-reports/Cucumber.xml"
 })
 
 public class TestRunner {
