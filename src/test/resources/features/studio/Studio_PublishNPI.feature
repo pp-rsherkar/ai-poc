@@ -1,4 +1,5 @@
 Feature: Studio Publish NPI List
+
   @regression
   Scenario Outline: Publish NPI List as Static List or Live List
     Given This scenario will be executed in the "Pre-release" environment as a "User"

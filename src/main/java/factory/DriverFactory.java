@@ -24,10 +24,6 @@ public class DriverFactory {
         return threadLocalDriver.get(); // Will return Initialized Thread Local Driver
     }
 
-    public static synchronized BrowserContext getContext() {
-        return threadLocalContext.get(); // Will return Initialized Thread Local Context
-    }
-
     //Launches Browser as set by user in config file
     public Page initDriver(String browserName) {
         BrowserType browserType = null;
@@ -47,7 +43,7 @@ public class DriverFactory {
                 browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
                 break;
         }
-        if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserType);
+        if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);
         context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
         //Below line is used to start the trace file
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));

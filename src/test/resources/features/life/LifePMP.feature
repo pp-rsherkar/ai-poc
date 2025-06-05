@@ -15,6 +15,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
       | USER  | tacticPMP                        |
       | Admin | UNIQUE TACTIC FOR PMP 1203 SSS 1 |
 
+  @regression
   Scenario Outline: Verify private deal can be assigned to a tactic with Toggle "Only Target Applied Deals" ON
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully

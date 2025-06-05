@@ -1,4 +1,5 @@
 package pages.studio;
+
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -96,19 +97,18 @@ public class Workspaces {
             }
         }
     }
+
     public void createWorkspace_downloadnpi() {
         while (counter < 3) {
             retryCreateWorkspace_downloadnpi(false);
         }
     }
+
     public void retryCreateWorkspace_downloadnpi(boolean clickFlag) {
         {
-            if(CREATE_WORKSPACE.isVisible())
-            {
-            CREATE_WORKSPACE.click();
-            }
-            else
-            {
+            if (CREATE_WORKSPACE.isVisible()) {
+                CREATE_WORKSPACE.click();
+            } else {
                 page.waitForTimeout(10000);
                 CREATE_WORKSPACE.click();
             }
