@@ -21,9 +21,6 @@ import static factory.DriverFactory.page;
 public class StudioSteps {
     static String workspaceName;
     static String workspaceNameRandom;
-    static String filterName;
-    static String filterOption;
-    static Boolean clickFlag = true;
     static Boolean expansionFlag = true;
     List<String[]> fileContent;
     List<String[]> actualValue;
@@ -37,12 +34,12 @@ public class StudioSteps {
     WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
     WorkspacePublishNPI workspacePublishNPI = new WorkspacePublishNPI(DriverFactory.getPage());
     CSVActions csvActions = new CSVActions();
+    List<Object> appliedFilters = new ArrayList<>();
+    List<Object> appliedOptions = new ArrayList<>();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
-        // workspaces.CREATE_WS();
-        Boolean clickFlag = true;
-        workspaces.createWorkspace(clickFlag);
+        workspaces.createStudioWorkspace();
     }
 
     @And("the User navigate to studio")
@@ -140,7 +137,8 @@ public class StudioSteps {
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
         Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
-        workspaces.createWorkspace(clickFlag);
+        workspaces.verifyStudioWorkspaceFrame();
+        workspaces.createStudioWorkspace();
     }
 
     @When("User clicks on Create New Workspace For Expansion")
@@ -158,20 +156,33 @@ public class StudioSteps {
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
         workspaces.clickHCPExplorerWorkspace();
+        Assert.assertEquals("Workspace created successfully", workspaces.verifyWorkspaceCreation());
     }
 
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String workspaceName, String advertiser) {
+        workspacePublishNPI.waitTillWorkspaceAlertHide();
         workspaceNameRandom = workspaceName + '_' + UUID.randomUUID().toString().substring(0, 10);
         explorerWorkspace.enterWorkspaceName(workspaceNameRandom);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
 
     @Then("User applies the {string} filter and selects {string} option")
-    public void user_applies_the_filters_as_gender_and_age(String filter, String option) {
-        filterName = filter;
-        filterOption = option;
-        explorerWorkspace.selectFilter(filterName, filterOption);
+    public void user_applies_the_filters_as_gender_and_age(String filters, String options) {
+        String[] filterArray = filters.split(",");
+        String[] optionArray = options.split(",");
+
+        if (filterArray.length != optionArray.length) {
+            throw new IllegalArgumentException("Number of filters and options do not match.");
+        }
+
+        for (int i = 0; i < filterArray.length; i++) {
+            String filterName = filterArray[i].trim();
+            String filterOption = optionArray[i].trim();
+            appliedFilters.add(filterName);
+            appliedOptions.add(filterOption);
+            explorerWorkspace.selectFilter(filterName, filterOption);
+        }
     }
 
     @Then("User clicks on Ok and closes the filter popup")
@@ -181,8 +192,10 @@ public class StudioSteps {
 
     @Then("Verify that the applied filters are displayed correctly")
     public void verify_that_the_applied_filters_are_displayed_correctly() {
-        Assert.assertEquals(filterName, explorerWorkspace.verifySelectedFilter());
-        Assert.assertEquals(filterOption, explorerWorkspace.verifySelectedOption());
+        List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
+        List<String> displayedOptions = explorerWorkspace.verifyAllSelectedOptions();
+        Assert.assertEquals(appliedFilters, displayedFilters);
+        Assert.assertEquals(appliedOptions, displayedOptions);
     }
 
     @Then("User saves the workspace")
@@ -192,7 +205,8 @@ public class StudioSteps {
 
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
-        //assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
+        Assert.assertEquals("Workspace saved successfully", workspaces.verifyWorkspaceCreation());
+        workspacePublishNPI.waitTillWorkspaceAlertHide();
     }
 
     @When("search for workspace")
@@ -218,7 +232,7 @@ public class StudioSteps {
 
     @Then("verify the file content")
     public void verify_the_file_content() {
-        fileContent = CSVActions.readAllDataAtOnce(WebActions.getProperty("csvFilePath"));
+        fileContent = CSVActions.readAllDataAtOnce(ConfigReader.getProperty("csvFilePath"));
         fileContentData = new ArrayList<>();
         //To display the data from csv- Separate logic
         /*for (int i = 1; i < fileContent.size(); i++) {
@@ -270,7 +284,6 @@ public class StudioSteps {
     @And("User selects publish {string}")
     public void userSelectsPublish(String listType) {
         workspacePublishNPI.publish(listType);
-        System.out.println("list type is: " + listType);
     }
 
     @When("User select the system to publish the list")
@@ -282,6 +295,10 @@ public class StudioSteps {
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspacePublishNPI.clickPublish();
-        //Assert.assertEquals("Workspace saved and ready to use!", workspacePublishNPI.verifyToast());
+        Assert.assertEquals("Workspace saved successfully", workspaces.verifyWorkspaceCreation());
+        workspacePublishNPI.waitTillWorkspaceAlertHide();
+        workspacePublishNPI.clickDownbutton();
+        Assert.assertEquals("Published NPI List", workspacePublishNPI.verifyPublishedNpi());
+
     }
 }

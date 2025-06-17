@@ -24,13 +24,13 @@ public class PMP {
     public PMP(Page page) {
         this.page = page;
         this.GLOBAL_LIFE_SEARCH_MODAL = page.locator("//div[@class='iconSprite search-overlay-lens']");
-        this.GLOBAL_SEARCH_TACTICS_TAB = page.locator("//*[text()='Tactics'] and contains(@class, 'item tabBorder'");
-        this.SEARCH_TACTIC_NAME = page.locator("//div[@id='global_search_input']");
+        this.GLOBAL_SEARCH_TACTICS_TAB = page.locator("//*[text()='Tactics' and contains(@class, 'item tabBorder')]");
+        this.SEARCH_TACTIC_NAME = page.locator("//input[@id='global_search_input']");
         this.TACTIC_ROW = page.locator("//div[@class='description truncate']");
         this.VERIFY_TACTIC_SETTINGS_PAGE = page.locator("//div[text()='Bid Strategy']");
-        this.ADD_TARGETING_RULE = page.locator("//span[text()='New Targeting Rule']");
-        this.SEARCH_TARGETING = page.locator("//div[@class='searchBox ng-pristine ng-valid ng-touched']");
-        this.DEALS_TARGETING = page.locator("//div[@class='item targetType pointer firstItem']");
+        this.ADD_TARGETING_RULE = page.locator("//span[text()='Add Targeting Rule']");
+        this.SEARCH_TARGETING = page.locator("//input[@name='search']");
+        this.DEALS_TARGETING = page.locator("(//a[@classname='target-tooltip'])[1]");
         this.PRIVATE_DEALS_TAB = page.locator("//*[text()='PRIVATE DEALS']");
         this.ASSIGN_PRIVATE_DEALS = page.locator("//span[@class='addDeal ng-star-inserted']");
         this.PREMIUM_DEALS_TAB = page.locator("//*[text()='PREMIUM DEALS']");
@@ -56,8 +56,8 @@ public class PMP {
         ADD_TARGETING_RULE.click();
     }
 
-    public void SEARCH_TARGETING_RULE() {
-        SEARCH_TARGETING.fill("Deals");
+    public void SEARCH_TARGETING_RULE(String Deals) {
+        SEARCH_TARGETING.type(Deals);
         page.waitForLoadState();
     }
 
