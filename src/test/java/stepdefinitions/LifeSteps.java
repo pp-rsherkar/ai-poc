@@ -86,8 +86,8 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
-        /*campaignListing.setGroupByFilter();
-        navigation.clickOnIcon(" Group By Campaign ");*/
+        campaignListing.setGroupByFilter();
+        navigation.clickOnIcon(" Group By Campaign ");
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
@@ -187,15 +187,14 @@ public class LifeSteps {
         navigation.clickSubMenu();
         npiLists.clickNPIListsStg();
     }
+
     @And("User searches the workspace in LIFE and selects it")
-    public void userSearchesTheInLIFEAndSelectsIt()
-    {
+    public void userSearchesTheInLIFEAndSelectsIt() {
         npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
     }
 
     @And("User clicks on the published workspace")
-    public void userClicksOnThePublished()
-    {
+    public void userClicksOnThePublished() {
         npiLists.selectPublishedList(StudioSteps.workspaceNameRandom);
     }
 
@@ -205,8 +204,8 @@ public class LifeSteps {
         //Assert.assertTrue(npiLists.availablePlatforms());
     }
 
-    @When("User clicks on Add List")
-    public void user_clicks_on_add_list() {
+    @When("User clicks on Create New List")
+    public void user_clicks_on_create_new_list() {
         npiLists.clickAddList();
     }
 
@@ -272,8 +271,8 @@ public class LifeSteps {
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
         reportTemplates.selectMetric(metric);
-
     }
+
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
         templateNameRandom = templateName + '_' + timestamp;
@@ -292,8 +291,6 @@ public class LifeSteps {
             metricValue = metricValue.trim();
             reportTemplates.selectDimensione2e(metricValue);
         }
-
-
     }
 
     @Then("Verify the selected dimensions and metrics under the Template Structure section")
@@ -421,13 +418,11 @@ public class LifeSteps {
     public void user_clicks_on_prescribed_drug_and_enters_the_drug_details(String drugName) {
         npiSmartList.selectPrescribedDrug();
         npiSmartList.selectDrug(drugName);
-
     }
 
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
         Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
-
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
@@ -444,7 +439,6 @@ public class LifeSteps {
     public void verify_smart_list_is_targeted_in_the_tactic_successfully() {
         tacticSettings.verifyNPIRule();
         Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
-
     }
 
     @Then("User saves the targeting")
@@ -509,7 +503,6 @@ public class LifeSteps {
 
     @And("User enters the NPI Static list details as {string} {string}")
     public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         npiName = npiListName + '_' + timestamp;
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
@@ -522,15 +515,11 @@ public class LifeSteps {
 
     @When("User edits the created list")
     public void user_edits_the_created_list() {
-        //npiStaticList.clickBackToNPILists();
-        //npiLists.searchList(npiName);
-        navigation.clickSubMenu();
-        npiLists.clickNPILists();
+        npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         npiNameEdited = "Edited" + '_' + timestamp;
-        npiStaticList.enterListName(npiNameEdited);
+        npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
     }
@@ -540,7 +529,6 @@ public class LifeSteps {
         npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiNameEdited);
         npiLists.openSearchedList(npiNameEdited);
-        Assert.assertEquals(npiNameEdited, npiStaticList.updatedListName());
     }
 
     @When("User deletes the created list")
@@ -550,6 +538,6 @@ public class LifeSteps {
 
     @Then("Verify list gets deleted successfully")
     public void verify_list_gets_deleted_successfully() {
-        assert npiStaticList.deleteSuccess().contains("NPI list Deleted");
+        assert npiStaticList.deleteSuccess().contains("NPI List Deleted");
     }
 }

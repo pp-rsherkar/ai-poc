@@ -5,7 +5,7 @@ Feature: LIFE Regression - Create Static NPI List
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User navigates to NPI Lists page
-    When User clicks on Add List
+    When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
     And User selects Static List
     And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>" "<NPI_NUMBER>"
@@ -21,7 +21,7 @@ Feature: LIFE Regression - Create Static NPI List
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully
     And User navigates to NPI Lists page
-    When User clicks on Add List
+    When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
     And User selects Static List
     When User tries to save the list without entering any details, an error message should be displayed

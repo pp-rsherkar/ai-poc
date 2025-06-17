@@ -3,6 +3,7 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.ExcelActions;
 
 public class NPIStaticList {
@@ -29,10 +30,10 @@ public class NPIStaticList {
         this.NPI_NUMBER = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
         this.AVAILABLE_IN = page.locator(".mat-checkbox-inner-container").first();
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
-        this.LIST_SUCCESS = page.getByText("× NPI list created");
+        this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(text(),'List Name is required')]");
         this.ADVERTISER_NAME_ERROR = page.locator("//div[contains(text(),'Advertiser is required')]");
-        this.BACK_TO_NPI_LISTS = page.locator("//img[@src='assets/images/12-back.svg']");
+        this.BACK_TO_NPI_LISTS = page.locator("//app-icon-lable-link[@icon='12-back.svg']");
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
@@ -77,14 +78,18 @@ public class NPIStaticList {
     }
 
     public void clickBackToNPILists() {
+        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
         BACK_TO_NPI_LISTS.click();
+        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public String updatedListName() {
-        return LIST_NAME.inputValue();
+    public void editListName(String newListName) {
+        BACK_TO_NPI_LISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        LIST_NAME.fill(newListName);
     }
 
     public void deleteList() {
+        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
         DELETE_LIST_ICON.click();
         DELETE_LIST_BUTTON.click();
     }
