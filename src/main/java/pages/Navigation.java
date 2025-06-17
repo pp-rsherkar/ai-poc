@@ -19,7 +19,6 @@ public class Navigation {
     private final Locator REPORT_TEMPLATE;
 
 
-
     public Navigation(Page page) {
         this.page = page;
         this.USERNAME = page.locator("#UserName");
@@ -33,8 +32,6 @@ public class Navigation {
         this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
         this.REPORT_TEMPLATE = page.locator("#megamenu").getByText("Report Templates");
         this.SUB_MENU = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("menu"));
-
-
     }
 
     public void navigateToUrl(String url) {
@@ -54,7 +51,7 @@ public class Navigation {
     }
 
     public void clickOnIcon(String iconName) {
-        this.page.getByText(iconName, new Page.GetByTextOptions().setExact(true)).click();  // Clicks on the Exact text
+        this.page.getByText(iconName.trim()).click();
     }
 
     public String verifyProfilePage() {

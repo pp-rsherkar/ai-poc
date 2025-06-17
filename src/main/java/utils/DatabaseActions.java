@@ -7,7 +7,7 @@ public class DatabaseActions {
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            return DriverManager.getConnection(ConfigLoader.getDbURL(), ConfigLoader.getDbUsername(), ConfigLoader.getDbPassword());
+            return DriverManager.getConnection(ConfigReader.getDbURL(), ConfigReader.getDbUsername(), ConfigReader.getDbPassword());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new SQLException("Database Driver not found", e);

@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class CampaignListing {
@@ -45,7 +46,7 @@ public class CampaignListing {
     }
 
     public void expandCreatedLineItem() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.LOAD); //DOMCONTENTLOADED
         EXPAND_CREATED_LINE_ITEM.click();
         page.waitForLoadState();
     }

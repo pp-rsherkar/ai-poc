@@ -19,7 +19,7 @@ public class LineItemDetails {
         this.LINE_ITEM_BUDGET = page.locator("//input[@id='budget0']");
         this.ENABLE_LINE_ITEM = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_LINE_ITEM = page.locator("//span[text()='Save']");
-        this.LINE_ITEM_SUCCESS = page.locator("//*[text()='Success!']");
+        this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
     }
 
     public String verifyLineItemText() {

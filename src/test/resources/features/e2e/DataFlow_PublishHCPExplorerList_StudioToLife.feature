@@ -22,9 +22,9 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User select the system to publish the list
     Then Verify list is published
     And User navigates to NPI Lists page in LIFE
-    And User searches the "<WORKSPACE_NAME>" in LIFE and selects it
-    And User clicks on the published "<WORKSPACE_NAME>"
+    And User searches the workspace in LIFE and selects it
+    And User clicks on the published workspace
     Then User Verify the list is displayed in the Life
     Examples:
-      | ADVERTISER | FILTER     | OPTION | WORKSPACE_NAME | LIST_TYPE |
-      | Abbvie     | NPI Gender | Male   | Explorer       | Static    |
+      | ADVERTISER | FILTER              | OPTION           | WORKSPACE_NAME | LIST_TYPE |
+      | Abbvie     | NPI Gender, NPI Age | Male, 25 to 35   | Explorer       | Static    |

@@ -6,7 +6,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And "Life" application is logged in successfully
     And User has navigated to mentioned tactic "<tacticPMP>"
     When Targeting panel is opened on Tactic Settings tab
-    And User clicks on Deals Targeting
+    And User clicks on "Deals" Targeting
     And User assigns premium deals
     And User clicks on OK button of PMP Modal
     And User saves the changes
@@ -21,7 +21,7 @@ Feature: PMP Marketplace Regression - Sanity and Regression
     And "Life" application is logged in successfully
     And User has navigated to mentioned tactic "<tacticPMP>"
     When Targeting panel is opened on Tactic Settings tab
-    And   User clicks on Deals Targeting
+    And   User clicks on "Deals" Targeting
     And  User assigns private deals
     And User clicks on OK button of PMP Modal
     And User saves the changes

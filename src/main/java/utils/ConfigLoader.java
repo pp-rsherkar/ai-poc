@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigLoader {
-    private static Properties properties = new Properties();
+    /*private static Properties properties = new Properties();
 
     static {
         try (FileInputStream fileInputStream = new FileInputStream("./src/test/resources/config/config.properties")) {
@@ -28,5 +28,5 @@ public class ConfigLoader {
     public static String getDbPassword() throws Exception {
         String encryptedDbPassword = properties.getProperty("dbPassword");
         return EncryptionDecryption.decrypt(encryptedDbPassword);
-    }
+    }*/
 }
