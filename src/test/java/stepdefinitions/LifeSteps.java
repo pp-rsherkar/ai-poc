@@ -45,7 +45,7 @@ public class LifeSteps {
     PMP pmp = new PMP(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     Constants constants = new Constants();
-    static String timestamp = CommonUtils.timeStampCalculation();
+    String timestamp = CommonUtils.timeStampCalculation();
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
