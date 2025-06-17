@@ -5,81 +5,89 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class WorkspacePublishNPI {
 
     private final Page page;
-    private final Locator studioClick;
-    private final Locator searchWorkspace;
-    //    private Locator clickWorkspace;
-    private final Locator clickDownloadbutton;
-    private final Locator clickPublishNpi;
-    private final Locator staticList;
-    private final Locator liveList;
-    private final Locator selectHCP;
-    private final Locator selectLIFE;
-    private final Locator clickPublishbutton;
-    //private String WORKSPACE;
-    private final Locator verifyPopupMessage;
+    private final Locator STUDIO_CLICK;
+    private final Locator SEARCH_WORKSPACE;
+    private final Locator DOWNLOAD_BUTTON;
+    private final Locator PUBLISH_NPI;
+    private final Locator PUBLISHED_NPI;
+    private final Locator STATIC_LIST;
+    private final Locator LIVE_LIST;
+    private final Locator SELECT_HCP;
+    private final Locator SELECT_LIFE;
+    private final Locator PUBLISH_BUTTON;
+    private final FrameLocator WORKSPACE_FRAME;
+    private final Locator WORK_SPACECREATED_ALERT;
 
     public WorkspacePublishNPI(Page page) {
         this.page = page;
-        this.studioClick = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
-        this.searchWorkspace = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.clickDownloadbutton = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator(".styles__StyledScheduleStatus-sc-u6f0o3-5 > svg").first();
-        this.clickPublishNpi = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish NPI List"));
-        this.staticList = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Static List"));
-        this.liveList = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Live List"));
-        this.selectHCP = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP365"));
-        this.selectLIFE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
-        this.clickPublishbutton = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
-        this.verifyPopupMessage = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("Workspace saved and ready to");
+        this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
+        this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
+        this.SEARCH_WORKSPACE = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
+        this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator(".styles__StyledScheduleStatus-sc-u6f0o3-5 > svg").first();
+        this.PUBLISH_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish NPI List"));
+        this.PUBLISHED_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Published NPI List"));
+        this.STATIC_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Static List"));
+        this.LIVE_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Live List"));
+        this.SELECT_HCP = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP365"));
+        this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
+        this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
+        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//span[contains(@class,'TextBase-sc')]");
+
     }
 
     public void studio() {
-        studioClick.click();
-        Response reload = page.reload();
+        STUDIO_CLICK.click();
+        page.reload();
     }
 
-    public void searchWorkspace(String WORKSPACE) {
+    public void searchWorkspace(String workspace) {
         // WORKSPACE = WORKSPACE + '_' + UUID.randomUUID().toString().substring(0, 10);
-        searchWorkspace.fill(WORKSPACE);
-        Locator clickWorkspace = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText(WORKSPACE);
+        SEARCH_WORKSPACE.fill(workspace);
+        Locator clickWorkspace = WORKSPACE_FRAME.getByText(workspace);
         clickWorkspace.click();
     }
 
     public void clickDownbutton() {
-        clickDownloadbutton.click();
+        DOWNLOAD_BUTTON.click();
     }
 
     public void clickPublishNpi() {
-        clickPublishNpi.click();
+        PUBLISH_NPI.click();
     }
 
     public void publish(String listType) {
         if (listType.equals("Static")) {
-            staticList.click();
+            STATIC_LIST.click();
         } else {
-            liveList.click();
+            LIVE_LIST.click();
         }
     }
 
     public void hcp() {
-        selectHCP.click();
+        SELECT_HCP.click();
     }
 
     public void life() {
-        selectLIFE.click();
+        SELECT_LIFE.click();
     }
 
     public void clickPublish() {
-        clickPublishbutton.click();
-        page.waitForTimeout(5000);
+        PUBLISH_BUTTON.click();
+        WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+
     }
 
-    public String verifyToast() {
-        String msg = verifyPopupMessage.textContent();
-        System.out.println("Toast msg is : " + msg);
-        return msg;
+    public String verifyPublishedNpi() {
+        return PUBLISHED_NPI.innerText();
     }
+
+    public void waitTillWorkspaceAlertHide(){
+        WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));;
+    }
+
 }

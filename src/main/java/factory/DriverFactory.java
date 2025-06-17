@@ -1,6 +1,7 @@
 package factory;
 
 import com.microsoft.playwright.*;
+import utils.ConfigReader;
 import utils.WebActions;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class DriverFactory {
     public static ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>(); //For Parallel execution
     public static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
     private static Playwright playwright;
-    public Browser browser;
+    public static Browser browser;
 
     public static Playwright createPlaywright() {
         if (playwright == null) {
@@ -27,8 +28,8 @@ public class DriverFactory {
     //Launches Browser as set by user in config file
     public Page initDriver(String browserName) {
         BrowserType browserType = null;
-        boolean headless = Boolean.parseBoolean(WebActions.getProperty("headless"));
-        int delay = Integer.parseInt(WebActions.getProperty("delay"));
+        boolean headless = Boolean.parseBoolean(ConfigReader.getProperty("headless"));
+        int delay = Integer.parseInt(ConfigReader.getProperty("delay"));
         switch (browserName) {
             case "firefox":
                 browserType = Playwright.create().firefox();

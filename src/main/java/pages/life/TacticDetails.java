@@ -15,7 +15,7 @@ public class TacticDetails {
         this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
         this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
-        this.TACTIC_DETAILS_SUCCESS = page.locator("//*[text()='Success!']");
+        this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']");
     }
 
     public String verifyTacticDetailsText() {
