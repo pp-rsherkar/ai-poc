@@ -21,7 +21,6 @@ public class NPISmartList {
     private final Locator HCP365_AVAILABLE_IN;
     private final Locator PULSEPOINT_ICON;
 
-
     public NPISmartList(Page page) {
         this.page = page;
         this.CLICK_SMART_LIST = page.getByText("Smart List", new Page.GetByTextOptions().setExact(true));
@@ -36,9 +35,7 @@ public class NPISmartList {
         this.LIFE_AVAILABLE_IN = page.locator("//span[contains(text(),'Life')]");
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
-
     }
-
 
     public void clickSmartList() {
         CLICK_SMART_LIST.click();
@@ -64,7 +61,6 @@ public class NPISmartList {
     }
 
     public String verifyDrug() {
-
         return VERIFY_DRUG.innerText();
     }
 
@@ -76,6 +72,5 @@ public class NPISmartList {
     public void clickPulsepointICon() {
         PULSEPOINT_ICON.click();
     }
-
 }
 

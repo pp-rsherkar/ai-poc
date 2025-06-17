@@ -25,7 +25,7 @@ public class TacticCreatives {
         this.ASSIGN_CREATIVE_OK_BUTTON = page.locator("//button[@class='ui primary button okButton' and normalize-space(text())='Ok']");
         this.ENABLE_CREATIVE = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_TACTIC_CREATIVES = page.locator("//span[text()='Save']");
-        this.TACTIC_CREATIVE_SUCCESS = page.locator("//*[text()='Success!']");
+        this.TACTIC_CREATIVE_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.NAVIGATE_TO_CAMPAIGN_DASHBOARD = page.locator("//div[contains(@class,'campaign-tile')]");
         this.VERIFY_CAMPAIGN_RUNNING = page.locator("//span[@class='status-label running']");
     }

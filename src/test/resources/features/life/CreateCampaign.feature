@@ -34,13 +34,13 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" channel, configures targeting rules:
-      | Behavioral Segment |
-      | In Condition       |
-      | Age                |
-      | Health Pages       |
-      | Postal Codes       |
-      | Device             |
-      | Legal Populations  |
+      | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
+      | In Condition       | Digestive System Diseases, Liver Diseases                          |
+      | Age                | 25-29, 35-39                                                       |
+      | Health Pages       | Animal Diseases                                                    |
+      | Postal Codes       | 123456, 10001, 987654                                              |
+      | Device             | Connected Device, OOH Device                                       |
+      | Legal Populations  | Adoption                                                           |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab

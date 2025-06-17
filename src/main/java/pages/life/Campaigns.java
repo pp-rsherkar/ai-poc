@@ -2,6 +2,8 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class Campaigns {
     private final Page page;
@@ -14,8 +16,8 @@ public class Campaigns {
     private final Locator CAMPAIGN_TYPE_SEQUENTIAL;
     private final Locator BUDGET;
     private final Locator SAVE_CAMPAIGN;
+    private final Locator CAMPAIGN_LISTING;
     private final Locator CAMPAIGN_SUCCESS;
-    private final Locator NAVIGATE_TO_CAMPAIGN_LISTING;
 
     public Campaigns(Page page) {
         this.page = page;
@@ -28,8 +30,8 @@ public class Campaigns {
         this.CAMPAIGN_TYPE_SEQUENTIAL = page.locator("//button[text()='Sequential']");
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
-        this.CAMPAIGN_SUCCESS = page.locator("//*[text()='Success!']");
-        this.NAVIGATE_TO_CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
+        this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
     }
 
     public void createCampaign() {
@@ -75,7 +77,7 @@ public class Campaigns {
     }
 
     public void navigateToCampaignListing() {
-        NAVIGATE_TO_CAMPAIGN_LISTING.click();
+        CAMPAIGN_LISTING.click();
         page.waitForLoadState();
     }
 }

@@ -15,6 +15,8 @@ public class NPILists {
     private final Locator STATIC_LIST;
     private final Locator LIFE_CHECKBOX;
     private final Locator HCP_CHECKBOX;
+    private final Locator SEARCH_NPILISTS;
+    private final Locator PARENT_LIST_LABEL;
     private final Locator SEARCH_BOX;
     private final Locator NPI_LISTS_TITLE;
 
@@ -25,9 +27,10 @@ public class NPILists {
         this.ADD_LIST = page.getByText("Add List");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
-        SEARCH_NPILISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
+        this.SEARCH_NPILISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.LIFE_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-4']/label/div");
         this.HCP_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-5']/label/div");
+        this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.NPI_LISTS_TITLE = page.locator("//span[@class='header-title' and text()='NPI Lists']");
     }
@@ -52,23 +55,15 @@ public class NPILists {
         STATIC_LIST.click();
     }
 
-    public void searchNPILists(String Studio_list) {
-
-        SEARCH_NPILISTS.fill(Studio_list);
+    public void searchNPILists(String workspaceName) {
+        SEARCH_NPILISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SEARCH_NPILISTS.fill(workspaceName);
         SEARCH_NPILISTS.press("Enter");
     }
 
-    public void selectPublishedList(String Studio_list) {
-
-        Locator STUDIO_LIST = page.getByText(Studio_list);
-        STUDIO_LIST.click();
-        SEARCH_NPILISTS.click();
-        //added code because of an issue with displaying list after search (maybe env issue)
-//        SEARCH_NPILISTS.fill("NP_test_Stud382");
-//        SEARCH_NPILISTS.press("Enter");
-//        page.getByText("NP_test_Stud382").click();
-//        searchNPILists(Studio_list);
-        //needs to remove once the issue is fixed
+    public void selectPublishedList(String listname) {
+        page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
+        PARENT_LIST_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public boolean availablePlatforms() {

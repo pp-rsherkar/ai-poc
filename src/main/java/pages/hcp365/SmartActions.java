@@ -13,7 +13,6 @@ public class SmartActions {
     private final Locator SMART_ACTION_NAME;
     private final Locator ADVERTISER;
     private final Locator SAVE_BUTTON;
-
     private final Locator SMART_ACTION_SUCCESS;
     private final Locator AUDIENCE_TAB;
     private final Locator AUDIENCE_NPI_LISTS_OPTION;
@@ -76,7 +75,6 @@ public class SmartActions {
         SAVE_BUTTON.click();
     }
 
-
     public void enterSmartActionName(String SmartActionName) {
         SMART_ACTION_NAME.fill(SmartActionName);
     }
@@ -84,7 +82,6 @@ public class SmartActions {
     public void enterAdvertiser(String advertiser) {
         ADVERTISER.click();
         SELECT_ADVERTISER.click();
-
     }
 
     public void saveSmartAction() {
@@ -120,7 +117,6 @@ public class SmartActions {
         NPI_LIST_SEARCH.fill(npiListName);
         NPI_LIST_SEARCH.press("Enter");
         return VERIFY_NPI_LIST_NAME.innerText();
-
     }
 
     public void targetNPIList() {
@@ -135,5 +131,4 @@ public class SmartActions {
     public String getSavedMessage() {
         return SAVED_SUCCESS_MESSAGE.innerText();
     }
-
 }

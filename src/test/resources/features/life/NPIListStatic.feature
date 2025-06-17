@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create Static NPI List
 
-  @jenkins
+  @regression
   Scenario Outline: Create Static NPI List by specifying NPI Numbers.
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully

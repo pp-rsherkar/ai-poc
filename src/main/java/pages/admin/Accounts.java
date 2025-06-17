@@ -1,12 +1,16 @@
 package pages.admin;
 
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Locator.WaitForOptions;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class Accounts {
     private final Page page;
+    private final WaitForOptions WaitForOptions = new Locator.WaitForOptions();
     private final Locator SUB_MENU;
     private final Locator ADMINISTRATION;
     private final Locator ACCOUNTS_TAB;
@@ -57,7 +61,7 @@ public class Accounts {
 
     public void searchAccount(String accountName) {
         page.waitForLoadState();
-        ACCOUNTS_TAB_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        ACCOUNTS_TAB_TEXT.waitFor(WaitForOptions.setState(WaitForSelectorState.VISIBLE));
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
@@ -78,7 +82,7 @@ public class Accounts {
     public void disableStudioForAccount(String accountName) {
         ADMINISTRATION.click();
         ACCOUNTS_TAB.click();
-        ACCOUNTS_TAB_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        ACCOUNTS_TAB_TEXT.waitFor(WaitForOptions.setState(WaitForSelectorState.VISIBLE));
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
@@ -101,6 +105,6 @@ public class Accounts {
     public void verifyStudioMenu() {
         PULSEPOINT_ICON.click();
         SUB_MENU.click();
-        assert STUDIO_MENU.isHidden();
+        assertThat(STUDIO_MENU).isHidden();
     }
 }
