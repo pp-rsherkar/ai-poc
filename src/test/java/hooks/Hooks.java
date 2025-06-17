@@ -1,6 +1,5 @@
 package hooks;
 
-import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Tracing;
 import factory.DriverFactory;
@@ -8,13 +7,8 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import utils.ConfigReader;
-import utils.WebActions;
 
-import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 
 public class Hooks {
     public DriverFactory driverFactory;

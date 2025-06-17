@@ -2,7 +2,6 @@ package factory;
 
 import com.microsoft.playwright.*;
 import utils.ConfigReader;
-import utils.WebActions;
 
 import java.util.List;
 
