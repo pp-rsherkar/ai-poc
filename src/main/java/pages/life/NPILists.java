@@ -9,25 +9,25 @@ public class NPILists {
     private final Page page;
     private final Locator NPI_LISTS;
     private final Locator NPI_LISTS_STG;
-    private final Locator ADD_LIST;
     private final Locator CREATE_NPI_LIST;
     private final Locator STATIC_LIST;
     private final Locator LIFE_CHECKBOX;
     private final Locator HCP_CHECKBOX;
     private final Locator SEARCH_NPILISTS;
     private final Locator PARENT_LIST_LABEL;
+    private final Locator CREATE_NEW_LIST;
 
     public NPILists(Page page) {
         this.page = page;
         this.NPI_LISTS = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("NPI Lists")).nth(3);
         this.NPI_LISTS_STG = page.getByText("NPI Lists");
-        this.ADD_LIST = page.getByText("Add List");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
         this.SEARCH_NPILISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.LIFE_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-4']/label/div");
         this.HCP_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-5']/label/div");
         this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
+        this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
     }
 
     public void clickNPILists() {
@@ -39,7 +39,7 @@ public class NPILists {
     }
 
     public void clickAddList() {
-        ADD_LIST.click();
+        CREATE_NEW_LIST.click();
     }
 
     public String verifyNPIListText() {
