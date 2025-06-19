@@ -43,7 +43,7 @@ public class SmartActions {
         this.SMART_ACTION_SUCCESS = page.getByText("new Smart Action created successfully");
         this.AUDIENCE_TAB = page.locator("//div[@class='col-sm nav-tab selected']");
         this.AUDIENCE_NPI_LISTS_OPTION = page.getByText("NPI Lists");
-        this.NPI_LIST_SEARCH = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
+        this.NPI_LIST_SEARCH = page.locator("//input[@id='search-input']");
         this.NPI_LIST_TARGET = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@title='Target']");
         this.VERIFY_NPI_LIST_NAME = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@customclass='primary-tooltip']");
         this.OK_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ok"));
@@ -116,6 +116,7 @@ public class SmartActions {
         NPI_LIST_SEARCH.click();
         NPI_LIST_SEARCH.fill(npiListName);
         NPI_LIST_SEARCH.press("Enter");
+        page.waitForTimeout(3000);
         return VERIFY_NPI_LIST_NAME.innerText();
     }
 

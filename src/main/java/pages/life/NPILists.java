@@ -13,9 +13,9 @@ public class NPILists {
     private final Locator STATIC_LIST;
     private final Locator LIFE_CHECKBOX;
     private final Locator HCP_CHECKBOX;
-    private final Locator CREATE_NEW_LIST;
     private final Locator SEARCH_NPILISTS;
     private final Locator PARENT_LIST_LABEL;
+    private final Locator CREATE_NEW_LIST;
     private final Locator SEARCH_BOX;
 
     public NPILists(Page page) {
