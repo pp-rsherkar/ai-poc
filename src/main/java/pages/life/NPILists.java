@@ -40,7 +40,7 @@ public class NPILists {
         NPI_LISTS_STG.click();
     }
 
-    public void clickAddList() {
+    public void clickCreateNewList() {
         CREATE_NEW_LIST.click();
     }
 

@@ -206,7 +206,7 @@ public class LifeSteps {
 
     @When("User clicks on Create New List")
     public void user_clicks_on_create_new_list() {
-        npiLists.clickAddList();
+        npiLists.clickCreateNewList();
     }
 
     @Then("Verify creation of NPI List screen is displayed")
