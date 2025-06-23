@@ -153,9 +153,8 @@ public class TacticSettings {
 
     public void isElementVisible(String xpath){
         Locator locator = page.locator(xpath);
-        // Try waiting and checking visibility manually
         boolean visible = false;
-        for (int i = 0; i < 5; i++) {  // wait up to ~5 seconds total
+        for (int i = 0; i < 5; i++) {
             if (locator.isVisible()) {
                 visible = true;
                 break;

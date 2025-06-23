@@ -13,7 +13,6 @@ import utils.*;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static utils.CommonUtils.normalize;
 
@@ -30,8 +29,8 @@ public class LifeSteps {
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
-    List<Object> ruleTypes = new ArrayList<>();
-    List<Object> ruleOptions = new ArrayList<>();
+    List<Object> keyType = new ArrayList<>();
+    List<Object> keyValues = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -44,8 +43,10 @@ public class LifeSteps {
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
     PMP pmp = new PMP(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
+    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
+    boolean flag = false;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -318,28 +319,22 @@ public class LifeSteps {
     public void user_selects_the_channel_configures_targeting_rules(String channel, DataTable ruleTypeAndOptions) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
-        Map<String, String> rulesMap = ruleTypeAndOptions.asMap(String.class, String.class);
-
-        for (Map.Entry<String, String> entry : rulesMap.entrySet()) {
-            String ruleType = entry.getKey().trim();
-            ruleTypes.add(ruleType);
-            String ruleValue = entry.getValue().trim();
-            ruleOptions.add(ruleValue);
-            List<String> values = Arrays.stream(ruleValue.split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
-
-            tacticSettings.selectMultipleRuleTypes(ruleType, values);
+        Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
+        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
+        for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
+            keyType.add( entry.getKey());
+            keyValues.addAll( entry.getValue());
+            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
         tacticSettings.closeRuleTypePanel();
     }
 
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
-        List<String> expectedNormalizedRuleTypes = normalize(Collections.singletonList(ruleTypes.toString()));
+        List<String> expectedNormalizedRuleTypes = normalize(Collections.singletonList(keyType.toString()));
         List<String> actualNormalizedRuleTypes = normalize(Collections.singletonList(tacticSettings.fetchRulesTypes().toString()));
 
-        List<String> expectedNormalizedRuleOptions = normalize(Collections.singletonList(ruleOptions.toString()));
+        List<String> expectedNormalizedRuleOptions = normalize(Collections.singletonList(keyValues.toString()));
         List<String> actualNormalizedRuleOptions = normalize(Collections.singletonList(tacticSettings.fetchRuleOptions().toString()));
 
         Assert.assertEquals("Rule types mismatch", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
@@ -461,47 +456,32 @@ public class LifeSteps {
         tacticSettings.clickClose();
     }
 
-
-    /// ///////////////////////
     @And("User navigates to run report from mega menu of the life application")
     public void user_navigate_to_run_report() {
         navigation.clickSubMenu();
         navigation.clickRunReport();
-
-
     }
 
-    /// /////////////
     @Then("User selects the report template created tactic and other fields for running the report")
     public void user_enter_input_for_running_report() {
         reportTemplates.enterDetailsToRunReport(templateNameRandom,tacticNameRandom);
-
     }
-    /// ///////////////
+
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
        Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
         Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-
         reportTemplates.runReport();
-
    }
-
-    /// ///////////////
 
     @Then("User navigates to generate report field and verifies the report name by campaign name")
     public void user_navigate_to_generate_report_page() {
-
         navigation.clickSubMenu();
         navigation.clickScheduledReport();
         navigation.clickSubMenu();
         navigation.clickGeneratedReport();
-
-
-
     }
 
-    /// ///////////////
     @Then("User downloads the report and verify the data in downloaded report")
     public void user_download_the_report_from_generated_report_page_and_verify_the_data() throws Exception {
         String filePath = reportTemplates.downloadGeneratedReport(templateNameRandom);
@@ -509,5 +489,171 @@ public class LifeSteps {
         navigation.clickReportTemplate();
         boolean matchOutput = reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath);
         Assert.assertTrue("Report headers match expected values!", matchOutput);
+    }
+
+    /*Roshani Sherkar - 18-06-2025
+     * Campaign Dashbaord Features Start*/
+    @And("Verify Campaign Dashboard is displayed with title {string}")
+    public void verifyCampaignDashboardIsDisplayedWithTitle(String title) {
+        Assert.assertEquals(title, campaignDashboard.verifyCampaignDashbaord(title));
+    }
+
+    @When("User enters {string} and click Search button")
+    public void userEntersAndClickSearchButton(String campaignID) {
+        campaignListing.searchCreatedCampaign(campaignID);
+        campaignListing.expandCreatedLineItem();
+    }
+
+    @Then("Verify Campaigns, line items, tactics names matching the {string} should display on Dashboard table")
+    public void verifyCampaignsLineItemsTacticsNamesMatchingTheShouldDisplayOnDashboardTable(String campaignID) {
+        Assert.assertEquals(campaignID, campaignDashboard.verifyCampaignDetails(campaignID));
+    }
+
+    @When("User add comments to Campaign, Line Items and Tactics")
+    public void userAddCommentsToCampaignLineItemsAndTactics(DataTable comments) {
+        Map<String, String> rawMap = comments.asMap(String.class, String.class);
+        Map<String, List<String>> commentMap = CommonUtils.processDataTable(rawMap);
+        keyValues.clear();
+        for (Map.Entry<String, List<String>> entry : commentMap.entrySet()) {
+            keyValues.addAll(entry.getValue());
+            String successAlertText = campaignDashboard.addCommentsToCampaign(entry.getKey(), entry.getValue());
+            Assert.assertEquals("Success!", successAlertText);
+        }
+    }
+
+    @Then("Verify comments are saved successfully, icon should display in bluish-green color {string} and comments should available on individual panel")
+    public void verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(String colour) {
+        List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
+        Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
+        List<String> expectedComments = normalize(Collections.singletonList(keyValues.toString()));
+        List<String> actualComments = normalize(Collections.singletonList(String.valueOf(campaignDashboard.verifyCommentIconText())));
+        Assert.assertEquals(expectedComments, actualComments);
+    }
+
+    @When("User toggles Enabled button for Line Items and Tactic from dashboard")
+    public void userTogglesEnabledButtonForLineItemsAndTacticFromDashboard() {
+        campaignDashboard.clickLineAndTacticToggleButton();
+    }
+
+    @Then("Verify Line Items and Tactics are enabled, disabled accordingly")
+    public void verifyLineItemsAndTacticsAreEnabledDisabledAccordingly() {
+        boolean flag = campaignDashboard.verifyLineTacticToggleStatus();
+        Assert.assertTrue("Buttons are clickable and functional", flag);
+    }
+
+    @When("User clicks Campaign {string}, Line Item and Tactic one by one")
+    public void userClicksCampaignLineItemAndTacticOneByOne(String campaignID) {
+        campaignDashboard.navigateToCampaignLIAndTactic(campaignID);
+    }
+
+    @Then("verify user should navigate to respective panel")
+    public void verifyUserShouldNavigateToRespectivePanel() {
+        boolean flag = campaignDashboard.verifyPanelTitleText();
+        Assert.assertTrue("Navigated to each panel successfully", flag);
+    }
+
+    @When("User clicks Menu option and selects column names")
+    public void userClicksMenuOptionAndSelectsColumnNames(DataTable columnNames) {
+        List<String> columns = columnNames.asList(String.class);
+        keyValues.clear();
+        keyValues.addAll(columns);
+        campaignDashboard.clickMenuTransitionIcon(columns);
+    }
+
+    @Then("Verify dashboard is customized and only selected columns are displayed")
+    public void verifyDashboardIsCustomizedAndOnlySelectedColumnsAreDisplayed() {
+        List<String> columnName = campaignDashboard.fecthDashboardColumns();
+        Assert.assertEquals(new HashSet<>(keyValues), new HashSet<>(columnName));
+    }
+
+    @When("User clicks HideAll and ShowAll options from Menu")
+    public void userClicksHideAllAndShowAllOptionsFromMenu() {
+        campaignDashboard.clickHideAndShowAllOption();
+    }
+
+    @Then("Dashboard columns should be hidden and shown accordingly")
+    public void dashboardColumnsShouldBeHiddenAndShownAccordingly() {
+        boolean flag = campaignDashboard.verifyColumnsCount();
+        Assert.assertTrue("Columns are hidden and shown successfully", flag);
+    }
+
+    @When("Navigate to any Dashboard column, select the filter and apply")
+    public void navigateToAnyDashboardColumnSelectTheFilterAndApply(DataTable filterNames) {
+        Map<String, String> rawMap = filterNames.asMap(String.class, String.class);
+        Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
+        keyValues.clear();
+        for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
+            keyValues.add(entry.getKey());
+            campaignDashboard.applyFilterOnSelectedColumns(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Then("Verify the data should filter as per the selected filter values")
+    public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
+        List<String> selectedFilter = campaignDashboard.verifySelectedFilter();
+        Assert.assertEquals(keyValues, selectedFilter);
+    }
+
+    @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
+    public void filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(String iconColor) {
+       String filterIconColor = campaignDashboard.verifyFilterIcon();
+       Assert.assertEquals(iconColor, filterIconColor);
+    }
+
+    @When("User clicks Favorite star icon on few campaigns and checks Favorite Only checkbox")
+    public void userClicksFavoriteStarIconOnFewCampaignsAndChecksFavoriteOnlyCheckbox() {
+        campaignDashboard.clickFavoriteOnlyCheckbox();
+    }
+
+    @Then("Verify the dashboard results should show only campaigns which are marked as favorite")
+    public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
+        boolean flag = campaignDashboard.verifyCampaignMarkedFavorite();
+        Assert.assertTrue("Favorite Campaigns displayed",flag);
+    }
+
+    @When("User clicks Hide Finished checkbox")
+    public void userClicksHideFinishedCheckbox() {
+        campaignDashboard.clickHideFinishedCheckbox();
+    }
+    
+    @Then("Verify the dashboard data should not reflect campaigns with Finished status")
+    public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
+        boolean flag = campaignDashboard.verifyHideFinishedCampaignList();
+        Assert.assertTrue("Campaigns with Finished Status are hidden",flag);
+    }
+
+    @When("User clicks Active Flights, Today and Yesterday filter option type")
+    public void userClicksActiveFlightsTodayAndYesterdayFilterOptionType() {
+        flag = campaignDashboard.clickAndVerifyFilterOptionTypeButton();
+    }
+
+    @Then("Verify only Active Flights should render on the Dashboard")
+    public void verifyOnlyActiveFlightsShouldRenderOnTheDashboard() {
+        Assert.assertTrue("Only Active flights are visible", flag);
+    }
+
+    @When("User clicks Custom filter option type and selects date")
+    public void userClicksCustomFilterOptionTypeAndSelectsDate() {
+        campaignDashboard.clickAndVerifyCustomFilterOption();
+    }
+
+    @When("User clicks the Settings icon and selects the following group by options")
+    public void userClicksTheSettingsIconAndSelectsTheFollowingGroupByOptions() {
+        flag = campaignDashboard.clickGroupByOptionsAndFilterDashboardData();
+    }
+
+    @Then("Verify the Dashboard data is grouped by the selected options")
+    public void verifyTheDashboardDataIsGroupedByTheSelectedOptions() {
+        Assert.assertTrue("Dashboard data is grouped by the selected options", flag);
+    }
+
+    @When("User hover on the image icon for creative in red color")
+    public void userHoverOnTheImageIconForCreativeInRedColor() {
+        flag = campaignDashboard.fetchCreativeToolTipText();
+    }
+
+    @Then("Tool tip whether creative is assigned to the campaign or not should be reflected")
+    public void toolTipWhetherCreativeIsAssignedToTheCampaignOrNotShouldBeReflected() {
+        Assert.assertTrue("Tool Tip text is available", flag);
     }
 }

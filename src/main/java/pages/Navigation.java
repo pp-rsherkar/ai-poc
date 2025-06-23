@@ -3,6 +3,8 @@ package pages;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
+import utils.CommonUtils;
 
 public class Navigation {
     public final Locator USERNAME;
@@ -55,7 +57,7 @@ public class Navigation {
     }
 
     public String verifyProfilePage() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.LOAD);
         return this.page.title();
     }
 
