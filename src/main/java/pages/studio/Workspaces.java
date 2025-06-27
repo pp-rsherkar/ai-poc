@@ -34,7 +34,7 @@ public class Workspaces {
     }
 
     public String studioDashboard() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
