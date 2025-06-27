@@ -63,7 +63,7 @@ public class TacticSettings {
 
     public void selectChannel(String channel) {
         SELECT_CHANNEL.click();
-        SELECT_CHANNEL.locator("text=" + channel).click();
+        SELECT_CHANNEL.locator("text=" + channel).first().click();
     }
 
     public void selectRuleType(String ruleType) {

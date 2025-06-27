@@ -20,9 +20,11 @@ public class Hooks {
     @Before
     public void launchBrowser(Scenario scenario) {
         try {
+            double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
             String browserName = ConfigReader.getProperty("browser");  //Fetching browser value from config file
             driverFactory = new DriverFactory();
             page = driverFactory.initDriver(browserName); // Passing browser name to launch the browser
+            page.setDefaultTimeout(timeout);
         }catch(Exception e) {
             handleError("Error during browser launch", e, scenario);
             throw e; // Failing scenario explicitly

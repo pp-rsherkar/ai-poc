@@ -3,7 +3,7 @@ Feature: LIFE Regression - Check various features available on Campaign Dashboar
   @regression
   Scenario Outline: Verify Campaign Dashboard's features
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully
+    And "Life" application is logged in successfully with Account "UAT_account"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
     When User enters "<Campaign ID>" and click Search button
     Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
@@ -46,5 +46,5 @@ Feature: LIFE Regression - Check various features available on Campaign Dashboar
 
     Examples:
       | Campaign ID           | COLOUR                    | RED BULLET                             |
-      | Auto_20250617_123204  | 24-note-table-provided.svg| 20-filter-applied.1e22619f2d75d737.svg |
+      | Auto_20250625_123023  | 24-note-table-provided.svg| 20-filter-applied.1e22619f2d75d737.svg |
 

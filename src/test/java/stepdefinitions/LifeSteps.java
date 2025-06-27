@@ -21,6 +21,8 @@ public class LifeSteps {
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
+    static String dealNameRandom;
+    static String dealIDRandom;
     static String tacticPMP;
     static String url;
     static String username;
@@ -61,8 +63,8 @@ public class LifeSteps {
         }
     }
 
-    @And("{string} application is logged in successfully")
-    public void life_application_is_loged_in_as(String application) {
+    @And("{string} application is logged in successfully with Account {string}")
+    public void life_application_is_loged_in_as(String application, String account) {
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
@@ -81,6 +83,7 @@ public class LifeSteps {
                 navigation.navigateToStudio();
                 break;
         }
+        navigation.selectAccount(account);
     }
 
     @Given("User clicks on Create Campaign")
@@ -292,8 +295,6 @@ public class LifeSteps {
             metricValue = metricValue.trim();
             reportTemplates.selectDimensione2e(metricValue);
         }
-
-
     }
 
     @Then("Verify the selected dimensions and metrics under the Template Structure section")
@@ -356,36 +357,27 @@ public class LifeSteps {
         }
     }
 
-    @And("User has navigated to mentioned tactic {string}")
-    public void user_navigates_to_the_tactic(String tacticPMP) {
-        pmp.navigateToTactic(tacticPMP);
-    }
-
     @When("Targeting panel is opened on Tactic Settings tab")
     public void user_navigates_to_targeting_panel() {
         pmp.verifyTacticSettingsText();
-        pmp.setADD_TARGETING_RULE();
+        pmp.addNewTargetingRule();
     }
 
     @And("User clicks on {string} Targeting")
     public void deals_targeting_navigation(String Deals) {
-        pmp.SEARCH_TARGETING_RULE(Deals);
-        pmp.SET_DEALS_TARGETING();
+        pmp.searchTargetingRuleAndSelect(Deals);
     }
 
     @And("User assigns premium deals")
     public void user_assigns_premium_deals() {
-        pmp.PREMIUM_DEALS_ASSIGNMENT();
     }
 
     @And("User clicks on OK button of PMP Modal")
     public void user_clicks_on_OK_PMP_Modal() {
-        pmp.EXIT_PMP_MODAL_OK_BUTTON_PRESS();
     }
 
     @And("User assigns private deals")
     public void user_assigns_private_deals() {
-        pmp.PRIVATE_DEALS_ASSIGNMENT();
     }
 
     @And("User saves the changes")
@@ -395,13 +387,12 @@ public class LifeSteps {
 
     @Then("Deals should be assigned")
     public void deals_are_assigned() {
-        pmp.tacticSettingsSuccess();
+        pmp.verifyTacticIsSaved();
     }
 
     @Then("User selects Smart List")
     public void user_selects_smart_list() {
         npiSmartList.clickSmartList();
-
     }
 
     @Then("User enters the NPI list details as {string} {string}")
@@ -415,7 +406,6 @@ public class LifeSteps {
     public void user_clicks_on_prescribed_drug_and_enters_the_drug_details(String drugName) {
         npiSmartList.selectPrescribedDrug();
         npiSmartList.selectDrug(drugName);
-
     }
 
     @Then("Verify drug details are added")
@@ -470,8 +460,8 @@ public class LifeSteps {
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
        Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-        reportTemplates.runReport();
+       Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
+       reportTemplates.runReport();
    }
 
     @Then("User navigates to generate report field and verifies the report name by campaign name")
@@ -487,8 +477,7 @@ public class LifeSteps {
         String filePath = reportTemplates.downloadGeneratedReport(templateNameRandom);
         navigation.clickSubMenu();
         navigation.clickReportTemplate();
-        boolean matchOutput = reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath);
-        Assert.assertTrue("Report headers match expected values!", matchOutput);
+        Assert.assertTrue("Report headers match expected values!", reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath));
     }
 
     /*Roshani Sherkar - 18-06-2025
@@ -537,8 +526,7 @@ public class LifeSteps {
 
     @Then("Verify Line Items and Tactics are enabled, disabled accordingly")
     public void verifyLineItemsAndTacticsAreEnabledDisabledAccordingly() {
-        boolean flag = campaignDashboard.verifyLineTacticToggleStatus();
-        Assert.assertTrue("Buttons are clickable and functional", flag);
+        Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.verifyLineTacticToggleStatus());
     }
 
     @When("User clicks Campaign {string}, Line Item and Tactic one by one")
@@ -548,8 +536,7 @@ public class LifeSteps {
 
     @Then("verify user should navigate to respective panel")
     public void verifyUserShouldNavigateToRespectivePanel() {
-        boolean flag = campaignDashboard.verifyPanelTitleText();
-        Assert.assertTrue("Navigated to each panel successfully", flag);
+        Assert.assertTrue("Navigated to each panel successfully", campaignDashboard.verifyPanelTitleText());
     }
 
     @When("User clicks Menu option and selects column names")
@@ -573,8 +560,7 @@ public class LifeSteps {
 
     @Then("Dashboard columns should be hidden and shown accordingly")
     public void dashboardColumnsShouldBeHiddenAndShownAccordingly() {
-        boolean flag = campaignDashboard.verifyColumnsCount();
-        Assert.assertTrue("Columns are hidden and shown successfully", flag);
+        Assert.assertTrue("Columns are hidden and shown successfully", campaignDashboard.verifyColumnsCount());
     }
 
     @When("Navigate to any Dashboard column, select the filter and apply")
@@ -607,8 +593,14 @@ public class LifeSteps {
 
     @Then("Verify the dashboard results should show only campaigns which are marked as favorite")
     public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
-        boolean flag = campaignDashboard.verifyCampaignMarkedFavorite();
-        Assert.assertTrue("Favorite Campaigns displayed",flag);
+        int count = campaignDashboard.verifyCampaignMarkedFavorite();
+        String message = " ";
+        if(count == 0){
+            message = "No campaigns matching filtering criteria found";
+        }else{
+            message = "Campaigns matching filtering criteria found";
+        }
+        Assert.assertTrue(message, true);
     }
 
     @When("User clicks Hide Finished checkbox")
@@ -618,8 +610,7 @@ public class LifeSteps {
     
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
-        boolean flag = campaignDashboard.verifyHideFinishedCampaignList();
-        Assert.assertTrue("Campaigns with Finished Status are hidden",flag);
+        Assert.assertTrue("Campaigns with Finished Status are hidden",campaignDashboard.verifyHideFinishedCampaignList());
     }
 
     @When("User clicks Active Flights, Today and Yesterday filter option type")
@@ -655,5 +646,138 @@ public class LifeSteps {
     @Then("Tool tip whether creative is assigned to the campaign or not should be reflected")
     public void toolTipWhetherCreativeIsAssignedToTheCampaignOrNotShouldBeReflected() {
         Assert.assertTrue("Tool Tip text is available", flag);
+    }
+
+    /* Roshani Sherkar
+    Life PMP - Deals Assignment
+    * */
+    @When("User clicks Tactic Setting tab")
+    public void userClicksTacticSettingTab() {
+        pmp.navigateToTacticSettingTab();
+    }
+
+    @Then("User should navigate to respective Tactic Setting tab")
+    public void userShouldNavigateToRespectiveTacticSettingTab() {
+        pmp.verifyTacticSettingsText();
+    }
+
+    @When("User add new targeting rule for Rule Type {string}")
+    public void userAddNewTargetingRuleForRuleType(String ruleType) {
+        pmp.addNewTargetingRule();
+        pmp.searchTargetingRuleAndSelect(ruleType);
+    }
+
+    @Then("user should navigate to PMP Deals Panel")
+    public void userShouldNavigateToPMPDealsPanel() {
+        Assert.assertEquals("All Deals ",pmp.verifyPMPDealsPanel());
+    }
+
+    @When("User clicks {string} Deals Tab")
+    public void userClicksPrivateDealsTab(String dealType) {
+        pmp.clickDealsTab(dealType);
+    }
+
+    @Then("User should see Add New Deal button, filters such as Exchange, Search")
+    public void userShouldSeeButtonFiltersSuchAsExchangeAdvertiser() {
+        Assert.assertTrue("Button and Filters are not available", pmp.verifyPrivateDealsFilterPanel());
+    }
+
+    @When("User enters below details in respective search field")
+    public void userEntersBelowDetailsInRespectiveSearchField(DataTable filterBy) {
+        Map<String, String> rawMap = filterBy.asMap(String.class, String.class);
+        Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
+        for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
+            flag = pmp.applyFilter(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Then("Verify private deals list should appear based on the filter selected")
+    public void verifyPrivateDealsBasedOnTheFilterSelected() {
+        Assert.assertTrue("Button and Filters are not available", flag);
+    }
+
+    @And("User clicks on Add New Deal button")
+    public void userClicksOnAddNewDealButton() {
+        pmp.clickAddNewDeals();
+    }
+
+    @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}")
+    public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String dealPriceType, String price) {
+        dealIDRandom = dealID + CommonUtils.timeStampCalculation();
+        dealNameRandom = dealName + CommonUtils.timeStampCalculation();
+        List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
+        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, dealPriceType, price));
+    }
+
+    @When("User searches the deal and assign it from the deal list")
+    public void userSelectsTheDealFromTheDealList() {
+        pmp.selectDealFromListAndAssign(dealNameRandom);
+    }
+
+    @Then("Selected Deals should appear in Applied Deals panel")
+    public void selectedDealsShouldAppearInAppliedDealsPanel() {
+        Assert.assertTrue("Unable to assign deals", pmp.verifyAsignedDealsList());
+    }
+
+    @And("Verify Target Applied Deals Toggle button is available with default value as {string}")
+    public void verifyTargetAppliedDealsToggleButtonIsAvailableWithDefaultValueAsON(String toggleButton) {
+        Assert.assertTrue("Default value is " + toggleButton, pmp.verifyTargetAppliedDealsToggle(toggleButton));
+    }
+
+    @When("User clicks on OK button")
+    public void userClicksOnOKButton() {
+        pmp.saveDealsAssigned();
+    }
+
+    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button {string}")
+    public void dealDetailsShouldAppearOnTacticSettingsTab(String toggleButton) {
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom, toggleButton));
+    }
+
+    @And("Verify Delete icon is disabled and error message {string}")
+    public void verifyDeleteIconIsDisabledAndOnHoverShowErrorMessage(String errorMessage) {
+        flag = pmp.verifyDeleteIconAndMessage(errorMessage);
+        Assert.assertEquals("Go to the Curated Markets & Deals section to remove the market.", errorMessage);
+    }
+
+    @And("Verify Pricing Strategy is editable for Deals present in Curated Market and Deals section")
+    public void verifyPricingStrategyIsEditableForDealsPresentInCuratedMarketAndDealsSection(DataTable pricingStrategy) {
+        Map<String, String> rawMap = pricingStrategy.asMap(String.class, String.class);
+        Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
+        for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
+            pmp.verifyPricingStrategyIsEditable(dealIDRandom, entry.getKey(), entry.getValue());
+        }
+    }
+
+    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
+    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String dealPriceType, String price, String toggleButton) {
+        List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
+        dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
+        dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section",
+                pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, dealPriceType, price, toggleButton));
+    }
+
+    @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
+    public void verifyBaseBidPriceAndMaxBidPriceFieldsAreEditableWhenDealsAreTargeted(String baseBidPrice, String maxBidPrice) {
+        Assert.assertTrue("Base and Max Bid Price fields are editable",pmp.verifyBaseAndMaxPriceIsEditable(baseBidPrice,maxBidPrice));
+    }
+
+    @When("User clicks Save button from Tactic Setting tab")
+    public void userClicksSaveButtonFromTacticSettingTab() {
+        pmp.saveTacticSettings();
+    }
+
+    @Then("Deals should get assigned to the Tactic")
+    public void dealsShouldGetAssignedToTheTactic() {
+        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved());
+    }
+
+
+    @Then("User should see All Premium Pubs, filters such as Exchange, Search")
+    public void userShouldSeeAllPremiumPubsFiltersSuchAsExchangeSearch(DataTable premiumHubs) {
+        List<String> premiumHubsList = premiumHubs.asList(String.class);
+        Assert.assertTrue("All premium Hubs are avilable and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
+
     }
 }

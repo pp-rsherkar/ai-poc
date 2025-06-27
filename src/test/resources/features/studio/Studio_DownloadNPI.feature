@@ -3,7 +3,7 @@ Feature: Studio Download NPI List
   @regression
   Scenario: Verify "Download NPI" functionality on studio platform
     Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Studio" application is logged in successfully
+    And "Studio" application is logged in successfully with Account "UAT_account"
     And search for workspace
     Then user clicks on the searched workspace
     Then verify the file content

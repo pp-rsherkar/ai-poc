@@ -4,7 +4,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
-import utils.CommonUtils;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class Navigation {
     public final Locator USERNAME;
@@ -19,6 +19,10 @@ public class Navigation {
     private final Locator GENERATED_REPORT;
     private final Locator SCHEDULED_REPORT;
     private final Locator REPORT_TEMPLATE;
+    private final Locator ACCOUNTNAME;
+    private final Locator ACCOUNT_SEARCH;
+    private final Locator ACCOUNT_ITEM;
+    private final Locator PRE_LOADER;
 
 
     public Navigation(Page page) {
@@ -34,6 +38,11 @@ public class Navigation {
         this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
         this.REPORT_TEMPLATE = page.locator("#megamenu").getByText("Report Templates");
         this.SUB_MENU = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("menu"));
+        this.ACCOUNTNAME = page.locator("//div[@class='accountname']");
+        this.ACCOUNT_SEARCH = page.locator("//div[@id='accountSwitcher']/input[@placeholder='Search']");
+        this.ACCOUNT_ITEM = page.locator("//div[@id='accountSwitcher']//div[@class='item']");
+        this.PRE_LOADER = page.locator("//div[@class='preloader']");
+
     }
 
     public void navigateToUrl(String url) {
@@ -75,6 +84,16 @@ public class Navigation {
         page.waitForLoadState();
         STUDIO.click();
         page.waitForLoadState();
+    }
+
+    public void selectAccount(String account){
+        if(ACCOUNTNAME.innerText().contains("buyer2")){
+            ACCOUNTNAME.click();
+            ACCOUNT_SEARCH.fill(account);
+            page.waitForLoadState(LoadState.LOAD);
+            ACCOUNT_ITEM.click();
+        }
+        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void clickSubMenu() {

@@ -114,6 +114,7 @@ public class CampaignDashboard {
     }
 
     public String verifyCampaignDashbaord(String text){
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         page.waitForCondition(() -> CAMPAIGNPAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
         return CAMPAIGNPAGE_TEXT.innerText();
@@ -155,7 +156,7 @@ public class CampaignDashboard {
         COMMENTBOX_OKBUTTON.click();
         COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         String successAlertText = COMMENT_SUCCESS_ALERT.innerText();
-        COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return successAlertText;
     }
 
@@ -297,8 +298,14 @@ public class CampaignDashboard {
         PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
     }
 
-    public boolean verifyCampaignMarkedFavorite() {
-        return FAVORITE_CAMPAIGN_LIST.count() > 0;
+    public int verifyCampaignMarkedFavorite() {
+        int flag = 0;
+        if(!FAVORITE_CAMPAIGN_LIST.first().isVisible()){
+            return flag;
+        }else if(FAVORITE_CAMPAIGN_LIST.count() > 0){
+            flag = FAVORITE_CAMPAIGN_LIST.count();
+        }
+        return flag;
     }
 
     public void clickHideFinishedCheckbox() {
