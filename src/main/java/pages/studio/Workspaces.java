@@ -7,8 +7,6 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
-import java.time.Duration;
-
 public class Workspaces {
     private final Page page;
     private final Locator CREATE_WORKSPACE;
