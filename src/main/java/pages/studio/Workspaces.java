@@ -62,11 +62,11 @@ public class Workspaces {
     }
 
     public void createStudioWorkspace() {
-       while(!CREATE_WORKSPACE.isEnabled()){
+       while(!CREATE_WORKSPACE.first().isEnabled()){
                 MENU_ICON.click();
                 page.keyboard().press("Escape");
        }
-       CREATE_WORKSPACE.click();
+       CREATE_WORKSPACE.first().click();
        page.waitForCondition(() -> WORKSPACE_TYPE.filter(new Locator.FilterOptions().setHasText("Workspace Type")).count() == 1);
     }
 

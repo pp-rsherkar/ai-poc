@@ -198,7 +198,9 @@ public class PMP {
 
     public void selectDealFromListAndAssign(String dealName) {
         DEAL_SEARCHFILTER.fill(dealName);
-        page.waitForLoadState(LoadState.LOAD);
+        page.waitForSelector(
+                String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName),
+                new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         EXPAND_DEALNAME.first().click();
         if(ASSIGNED_DEALS_BUTTON.first().isVisible())
             ASSIGNED_DEALS_BUTTON.first().click();

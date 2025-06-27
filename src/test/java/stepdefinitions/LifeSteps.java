@@ -250,9 +250,9 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Report Templates page")
     public void verify_the_tabs_displayed_on_the_report_templates_page() {
-        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab());
-        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab());
-        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
+        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab().toUpperCase());
+        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab().toUpperCase());
+        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
     }
 
     @When("User clicks on New Template")
@@ -262,8 +262,8 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Create New Template panel")
     public void verify_the_tabs_displayed_on_the_create_new_template_panel() {
-        Assert.assertEquals("DIMENSIONS", reportTemplates.verifyDimensionsTab());
-        Assert.assertEquals("METRICS", reportTemplates.verifyMetricsTab());
+        Assert.assertEquals("DIMENSIONS", reportTemplates.verifyDimensionsTab().toUpperCase());
+        Assert.assertEquals("METRICS", reportTemplates.verifyMetricsTab().toUpperCase());
     }
 
     @When("User enters the template details as {string} {string} {string}")

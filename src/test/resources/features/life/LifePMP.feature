@@ -1,4 +1,4 @@
-Feature: PMP Marketplace Regression - Sanity and Regression
+Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation and Assignment
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"

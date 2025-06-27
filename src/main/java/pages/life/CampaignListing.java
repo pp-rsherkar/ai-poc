@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class CampaignListing {
@@ -68,8 +69,10 @@ public class CampaignListing {
 
     public String verifyCreatedCampaign(String createdCampaign) {
         String campaignNameXpath = String.format("//span[contains(text(),'%s')]", createdCampaign);
-        page.waitForSelector(campaignNameXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
-        return page.locator(campaignNameXpath).innerText();
+        page.locator(campaignNameXpath).first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        //page.waitForSelector(campaignNameXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        return page.locator(campaignNameXpath).first().innerText();
+
     }
 
     public String verifyCreatedLineItem(String lineItemNameRandom) {
