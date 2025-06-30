@@ -3,6 +3,7 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class Campaigns {
@@ -39,7 +40,7 @@ public class Campaigns {
     }
 
     public String campaignDashboard() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
