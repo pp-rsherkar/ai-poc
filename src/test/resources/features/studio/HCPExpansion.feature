@@ -4,7 +4,7 @@ Feature: HCP Audience Workspace in Studio Application
   @regression
   Scenario Outline: Create and save an HCP Audience Expansion workspace with specific filters
     Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Studio" application is logged in successfully
+    And "Studio" application is logged in successfully with Account "UAT_account"
     When User clicks on Create New Workspace For Expansion
     And the user selects the advertiser "<ADVERTISER>"
     Then the user selects Source Audience "<SOURCE_AUDIENCE>"

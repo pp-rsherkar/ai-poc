@@ -3,7 +3,7 @@ Feature: LIFE Regression - Create Static NPI List
   @jenkins2005
   Scenario Outline: Create Static NPI List by specifying NPI Numbers.
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully
+    And "Life" application is logged in successfully with Account "UAT_account"
     And User navigates to NPI Lists page
     When User clicks on Add List
     Then Verify creation of NPI List screen is displayed

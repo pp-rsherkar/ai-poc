@@ -10,7 +10,7 @@ Feature: End to End Workflow of Report Generation.
   Scenario Outline: End to End Workflow of Report Generation with Campaign and Report Template creation.
     # 1
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully
+    And "Life" application is logged in successfully with Account "UAT_account"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
