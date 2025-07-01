@@ -63,14 +63,10 @@ public class NPISmartList {
         this.CLICK_ENDEMIC_RESEARCH = page.getByText("Endemic Research", new Page.GetByTextOptions().setExact(true));
         this.CLICK_ENDEMIC_DROPDOWN = page.getByText("Select MESH Conditions");
         this.CLICK_ENDEMIC_DROPDOWN_VALUE = page.locator(".pull-left > .iconSprite").first();
-
         this.CLICK_SPECIALTY_DROPDOWN =  page.getByText("Select Specialities");
         this.SELECT_SPECIALTY_VALUE= page.locator(".pull-left > .iconSprite").first();
-
         this.CLICK_PRESCRIPTION_DROPDOWN =  page.locator("#prescriptionBehaviorWrapper").getByRole(AriaRole.COMBOBOX);
         this.CLICK_PRESCRIPTION_DROPDOWN_VALUE=  page.getByText("Parastat44911-0034, 44911-");
-
-
         this.CLICK_PROFESSION_DROPDOWN =  page.getByText("Select Profession");
         this.SELECT_PROFESSION_VALUE= page.getByText("Nurse Practitioner");
         this.CLICK_EXPAND_PRACTICE=page.getByText("Expand based on Practice and Hospital affiliation", new Page.GetByTextOptions().setExact(true));
@@ -78,11 +74,7 @@ public class NPISmartList {
         this.CLICK_SMART_PIXEL_DROPDOWN_VALUE =  page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("01- Advertiser Smart Pixel 1").setExact(true)).locator("div");
         this.CLICK_NPI_GROUP = page.getByText("Select NPI Groups");
         this.CLICK_NPI_GROUP_VALUE = page.getByText("0_Test_PB_02");
-
-
-
         this.CLICK_LIFE_CHECKBOX = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
-
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
