@@ -6,7 +6,7 @@ Feature: End to End Workflow of Report Generation.
   4. Download the report from generated report tab.
   5. Verify the Column headers of Template and Report file.
 
-  @e2e2 @regression
+  @e2e @regression
   Scenario Outline: End to End Workflow of Report Generation with Campaign and Report Template creation.
     # 1
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -18,7 +18,8 @@ Feature: End to End Workflow of Report Generation.
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User selects the "<CHANNEL>" as channel, selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    And User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify creative details are saved and the campaign is in running state

@@ -140,10 +140,14 @@ public class LifeSteps {
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
-    @Then("User selects the {string} as channel, selects {string} as rule type and configures the targeting rules, and saves the settings")
-    public void user_selects_the_channel_configures_the_targeting_rules_and_saves_the_settings(String channel, String ruleType) {
+    @Then("User selects the {string} as channel")
+    public void user_selects_the_channel(String channel) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
+    }
+
+    @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
+    public void user_configures_the_targeting_rules_and_saves_the_settings(String ruleType) {
         tacticSettings.selectRuleType(ruleType);
         tacticSettings.saveTacticSettings();
     }
@@ -316,10 +320,8 @@ public class LifeSteps {
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
-    @Given("User selects the {string} channel, configures targeting rules:")
-    public void user_selects_the_channel_configures_targeting_rules(String channel, DataTable ruleTypeAndOptions) {
-        tacticSettings.selectChannel(channel);
-        navigation.clickOnIcon("Add Targeting Rule");
+    @Given("User configures targeting rules as below")
+    public void user_selects_the_channel_configures_targeting_rules(DataTable ruleTypeAndOptions) {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
@@ -411,7 +413,6 @@ public class LifeSteps {
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
         Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
-
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")

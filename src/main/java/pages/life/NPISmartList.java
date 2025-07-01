@@ -21,46 +21,54 @@ public class NPISmartList {
     private final Locator LIFE_AVAILABLE_IN;
     private final Locator HCP365_AVAILABLE_IN;
     private final Locator PULSEPOINT_ICON;
+    private final Locator SPINNER;
+    private final Locator ADD_DRUG_BTN;
 
     public NPISmartList(Page page) {
         this.page = page;
         this.CLICK_SMART_LIST = page.getByText("Smart List", new Page.GetByTextOptions().setExact(true));
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
-        this.SELECT_ADVERTISER = page.getByText("Z_Automation");
+        this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.PRESCRIBED_DRUG = page.locator("//label[contains(@class, 'mat-checkbox-layout') and .//span[contains(text(), 'Prescribed Drug')]]");
-        this.SEARCH_DRUG = page.getByRole(AriaRole.LISTBOX).filter(new Locator.FilterOptions().setHasText(Pattern.compile("^$"))).getByRole(AriaRole.COMBOBOX);
-        this.SEARCH_DRUG_FILL = page.getByRole(AriaRole.LISTBOX).filter(new Locator.FilterOptions().setHasText(Pattern.compile("Type to search"))).getByRole(AriaRole.COMBOBOX);
+        this.SEARCH_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown ')]");
+        this.SEARCH_DRUG_FILL = page.locator("//ng-select[contains(@class, 'drugDropdown ')]//input");
         this.SELECT_DRUG = page.locator("//div[contains(@class,'dropdown-items')]");
-        this.VERIFY_DRUG = page.locator("//span[@class='ng-value-label ng-star-inserted'][contains(text(),'Glynase')]");
+        this.VERIFY_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown ')]//span[contains(@class,'ng-value-label')]");
         this.LIFE_AVAILABLE_IN = page.locator("//span[contains(text(),'Life')]");
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
+        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
+        this.ADD_DRUG_BTN = page.locator("//span[contains(text(), 'Add Drug')]");
+
     }
 
     public void clickSmartList() {
         CLICK_SMART_LIST.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void enterListName(String listName) {
-        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         LIST_NAME.fill(listName);
     }
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
-        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
-        page.waitForTimeout(3000);
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void selectPrescribedDrug() {
+        PRESCRIBED_DRUG.scrollIntoViewIfNeeded();
         PRESCRIBED_DRUG.check();
+        ADD_DRUG_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void selectDrug(String Drug) {
+    public void selectDrug(String drug) {
+        ADD_DRUG_BTN.click();
         SEARCH_DRUG.click();
-        SEARCH_DRUG_FILL.fill(Drug);
+        SEARCH_DRUG_FILL.fill(drug);
         SELECT_DRUG.click();
     }
 
