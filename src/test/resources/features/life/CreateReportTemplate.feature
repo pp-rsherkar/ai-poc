@@ -3,7 +3,7 @@ Feature: LIFE Regression - Create a Report Template
   @regression
   Scenario Outline: Create a Report Template
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "UAT_account"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
     When User clicks on New Template

@@ -2,7 +2,7 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "UAT_account"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page

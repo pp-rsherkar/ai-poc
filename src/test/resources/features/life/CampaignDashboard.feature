@@ -3,7 +3,7 @@ Feature: LIFE Regression - Check various features available on Campaign Dashboar
   @regression
   Scenario Outline: Verify Campaign Dashboard's features
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "UAT_account"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
     When User enters "<Campaign ID>" and click Search button
     Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
