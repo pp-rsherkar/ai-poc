@@ -2,6 +2,8 @@ package utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class EncryptionDecryption {
@@ -22,6 +24,21 @@ public class EncryptionDecryption {
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] decodedValue = Base64.getDecoder().decode(encryptedValue);
         byte[] decryptedValue = cipher.doFinal(decodedValue);
-        return new String(decryptedValue);
+        byte[] unpadded = stripPKCS7Padding(decryptedValue);
+
+        return new String(unpadded, StandardCharsets.UTF_8);
+//        return new String(decryptedValue);
+    }
+    private static byte[] stripPKCS7Padding(byte[] decrypted) throws Exception {
+        int pad = decrypted[decrypted.length - 1] & 0xFF;
+        if (pad < 1 || pad > 16) {
+            throw new IllegalArgumentException("Invalid padding value: " + pad);
+        }
+        for (int i = decrypted.length - pad; i < decrypted.length; i++) {
+            if (decrypted[i] != (byte) pad) {
+                throw new IllegalArgumentException("Invalid padding byte at position " + i);
+            }
+        }
+        return Arrays.copyOfRange(decrypted, 0, decrypted.length - pad);
     }
 }
