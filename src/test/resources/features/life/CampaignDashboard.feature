@@ -1,4 +1,8 @@
-Feature: LIFE Regression - Check various features available on Campaign Dashboard
+Feature: LIFE Regression - Check below features available on Campaign Dashboard
+  1. Add comments to Campaign, Line Items and Tactics
+  2. Navigation to Campaign, Line Item and Tactic from dashboard
+  3. Modify Dashboard column basis filter
+  4. Verify Active, Today, Yesterday, Favorite and Hide Finished filters
 
   @regression
   Scenario Outline: Verify Campaign Dashboard's features
@@ -7,15 +11,15 @@ Feature: LIFE Regression - Check various features available on Campaign Dashboar
     And Verify Campaign Dashboard is displayed with title "Campaigns"
     When User enters "<Campaign ID>" and click Search button
     Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
-    When User add comments to Campaign, Line Items and Tactics
+    When User add and save comments to Campaign, Line Items and Tactics
       | Campaign Name  | This is Campaign Name comment box  |
       | Line Item Name | This is Line Item Name comment box |
       | Tactic Name    | This is Tactic Name comment box    |
-    Then Verify comments are saved successfully, icon should display in bluish-green color "<COLOUR>" and comments should available on individual panel
-    When User toggles Enabled button for Line Items and Tactic from dashboard
-    Then Verify Line Items and Tactics are enabled, disabled accordingly
-    When User clicks Campaign "<Campaign ID>", Line Item and Tactic one by one
-    Then verify user should navigate to respective panel
+    Then Verify comments, icon should display in bluish-green color "<COLOUR>" and comments should available on individual panel
+    When User toggles the Enabled button for Line Items and Tactics
+    Then Verify that Line Items and Tactics reflect the correct enabled or disabled state
+    When User clicks Campaign "<Campaign ID>", Line Item and Tactic
+    Then Verify user should navigate to Campaign, Line Item and Tactic
     When User clicks Menu option and selects column names
       | ADVERTISER    |
       | STATUS        |
