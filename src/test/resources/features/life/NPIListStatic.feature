@@ -15,12 +15,3 @@ Feature: LIFE Regression - Create Static NPI List
     Examples:
       | ADVERTISER     | NPI_NUMBER | LIST_NAME  |
       | 01- Advertiser | 1478523698 | STATIC_NPI |
-
-
-
-
-
-
-
-
-

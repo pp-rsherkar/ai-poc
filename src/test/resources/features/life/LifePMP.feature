@@ -44,8 +44,8 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
       | medscape        |
       | webmd           |
     When User enters below details in respective search field
-      | SearchByName     | dealmarketnew  |
-      | SearchByExchange | Pubmatic       |
+      | SearchByName     | dealmarketnew |
+      | SearchByExchange | Pubmatic      |
     Then Verify private deals list should appear based on the filter selected
 
   @regression
@@ -64,8 +64,8 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
     Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button "ON"
     And Verify Delete icon is disabled and error message "Go to the Curated Markets & Deals section to remove the market."
     And Verify Pricing Strategy is editable for Deals present in Curated Market and Deals section
-    | Flat          | 35 |
-    | % above floor | 60 |
+      | Flat          | 35 |
+      | % above floor | 60 |
     And Verify user can add new "Private" deals by clicking Add Deal button present in Curated Market and Deals section using details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<DEALPRICE_TYPE>", "<PRICE>" with toggle "ON"
     And Verify Base Bid Price "<BASE_BIDPRICE>" and Max Bid Price "<MAX_BIDPRICE>" fields are editable when deals are targeted
     When User clicks Save button from Tactic Setting tab

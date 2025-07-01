@@ -1,6 +1,5 @@
 Feature: HCP Audience Workspace in Studio Application
 
-
   @regression
   Scenario Outline: Create and save an HCP Audience Expansion workspace with specific filters
     Given This scenario will be executed in the "Pre-release" environment as a "User"

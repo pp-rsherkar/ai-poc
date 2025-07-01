@@ -1,4 +1,4 @@
-  Feature: Enable Studio for an account
+Feature: Enable Studio for an account
 
   @regression
   Scenario Outline: Enable Studio for an Account for internal users

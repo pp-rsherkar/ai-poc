@@ -8,5 +8,3 @@ Feature: Studio Download NPI List
     Then user clicks on the searched workspace
     Then verify the file content
     #Then verify db result
-
-  
