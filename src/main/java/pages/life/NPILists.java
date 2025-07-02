@@ -16,6 +16,7 @@ public class NPILists {
     private final Locator SEARCH_NPILISTS;
     private final Locator PARENT_LIST_LABEL;
     private final Locator CREATE_NEW_LIST;
+    private final Locator SMART_LIST;
 
     public NPILists(Page page) {
         this.page = page;
@@ -28,6 +29,7 @@ public class NPILists {
         this.HCP_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-5']/label/div");
         this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
+        this.SMART_LIST = page.getByText("Dynamic list of NPI");
     }
 
     public void clickNPILists() {
@@ -50,19 +52,23 @@ public class NPILists {
         STATIC_LIST.click();
     }
 
-    public void searchNPILists(String workspaceName) {
-        SEARCH_NPILISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        SEARCH_NPILISTS.fill(workspaceName);
-        SEARCH_NPILISTS.press("Enter");
-    }
+    public void clickSmartList() {
+        SMART_LIST.click();
 
-    public void selectPublishedList(String listname) {
-        page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
-        PARENT_LIST_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
+        public void searchNPILists (String workspaceName){
+            SEARCH_NPILISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+            SEARCH_NPILISTS.fill(workspaceName);
+            SEARCH_NPILISTS.press("Enter");
+        }
 
-    public boolean availablePlatforms() {
-        return LIFE_CHECKBOX.isChecked() && HCP_CHECKBOX.isChecked();
+        public void selectPublishedList (String listname){
+            page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
+            PARENT_LIST_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        }
+
+        public boolean availablePlatforms () {
+            return LIFE_CHECKBOX.isChecked() && HCP_CHECKBOX.isChecked();
+        }
     }
-}
 

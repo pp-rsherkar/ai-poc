@@ -15,3 +15,24 @@ Feature: LIFE Regression - Create Static NPI List
     Examples:
       | ADVERTISER     | NPI_NUMBER | LIST_NAME  |
       | 01- Advertiser | 1478523698 | STATIC_NPI |
+
+
+  @jenkinsSwitch
+  Scenario Outline: Create Smart NPI List by specifying Type.
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User navigates to NPI Lists page
+    When User clicks on Add List
+    And User selects Smart List to create NPI list
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for "<Type>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER      | LIST_NAME       |Type|
+      | 01- Advertiser  | SMART_Pixel_NPI |Smart Pixel|
+
+
+
+
+
+

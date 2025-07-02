@@ -1,6 +1,6 @@
 Feature: HCP Explorer Workspace in Studio Application
 
-  @regression
+  @e2eregression
   Scenario Outline: Create and save HCP Explorer workspace with specific filters
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "UAT_account"

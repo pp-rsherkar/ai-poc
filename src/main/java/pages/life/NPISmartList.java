@@ -13,6 +13,10 @@ public class NPISmartList {
     private final Locator CLICK_NPI_LIST;
     private final Locator CLICK_SMART_PIXEL_DROPDOWN;
     private final Locator CLICK_SMART_PIXEL_DROPDOWN_VALUE;
+    private final Locator  CLICK_ADD_VISITED_URL;
+    private final Locator  CLICK_ADD_IGNORED_URL;
+    private final Locator  INSERT_VISITED_URL;
+    private final Locator  INSERT_IGNORED_URL;
     private final Locator CLICK_NPI_GROUP;
     private final Locator CLICK_SPECIALTY;
     private final Locator CLICK_PROFESSION;
@@ -22,6 +26,7 @@ public class NPISmartList {
     private final Locator CLICK_ENDEMIC_RESEARCH;
     private final Locator CLICK_ENDEMIC_DROPDOWN;
     private final Locator CLICK_ENDEMIC_DROPDOWN_VALUE;
+    private final Locator CLICK_ENDEMIC_SAVE;
     private final Locator CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE;
     private final Locator CLICK_PRESCRIPTION_DROPDOWN;
     private final Locator CLICK_PRESCRIPTION_DROPDOWN_VALUE;
@@ -60,7 +65,7 @@ public class NPISmartList {
         this.CLICK_ENDEMIC_RESEARCH = page.getByText("Endemic Research", new Page.GetByTextOptions().setExact(true));
         this.CLICK_ENDEMIC_DROPDOWN = page.getByText("Select MESH Conditions");
         this.CLICK_ENDEMIC_DROPDOWN_VALUE = page.locator(".pull-left > .iconSprite").first();
-
+        this.CLICK_ENDEMIC_SAVE=page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ok"));
         this.CLICK_SPECIALTY_DROPDOWN =  page.getByText("Select Specialities");
         this.SELECT_SPECIALTY_VALUE= page.locator(".pull-left > .iconSprite").first();
 
@@ -72,9 +77,13 @@ public class NPISmartList {
         this.SELECT_PROFESSION_VALUE= page.getByText("Nurse Practitioner");
         this.CLICK_EXPAND_PRACTICE=page.getByText("Expand based on Practice and Hospital affiliation", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SMART_PIXEL_DROPDOWN = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Smart Pixel$"))).nth(1);
-        this.CLICK_SMART_PIXEL_DROPDOWN_VALUE =  page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("01- Advertiser Smart Pixel 1").setExact(true)).locator("div");
+        this.CLICK_SMART_PIXEL_DROPDOWN_VALUE =  page.getByText("AutoCollection889379612");
+        this.CLICK_ADD_VISITED_URL=page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("altText?altText:''")).nth(2);
+        this.CLICK_ADD_IGNORED_URL=page.getByText("Add URL").nth(1);
+        this.INSERT_IGNORED_URL= page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
+        this.INSERT_VISITED_URL=page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.CLICK_NPI_GROUP = page.getByText("Select NPI Groups");
-        this.CLICK_NPI_GROUP_VALUE = page.getByText("0_Test_PB_02");
+        this.CLICK_NPI_GROUP_VALUE = page.getByText("AutoAdminNPIFileUpload187526255");
 
 
 
@@ -109,6 +118,34 @@ public class NPISmartList {
     }
     public void clickSmartPixelDropDownValue() {
         CLICK_SMART_PIXEL_DROPDOWN_VALUE.click();
+    }
+    public void insertVisitedURL() {
+
+        CLICK_ADD_VISITED_URL.click();
+
+        INSERT_VISITED_URL.fill("www.google.com");
+
+        CLICK_ADD_VISITED_URL.click();
+
+        INSERT_VISITED_URL.fill("www.facebook.com");
+
+    }
+    public void checkDisabledNPI() {
+
+
+
+    }
+
+    public void insertIgnoredURL() {
+
+        CLICK_ADD_IGNORED_URL.click();
+
+        INSERT_IGNORED_URL.fill("www.google.com");
+
+        CLICK_ADD_IGNORED_URL.click();
+
+        INSERT_IGNORED_URL.fill("www.facebook.com");
+
     }
     public void clickNPIGroup() {
         CLICK_NPI_GROUP.click();
@@ -151,6 +188,7 @@ public class NPISmartList {
     public void SelectEndemicDetails() {
         CLICK_ENDEMIC_DROPDOWN.click();
         CLICK_ENDEMIC_DROPDOWN_VALUE.click();
+        CLICK_ENDEMIC_SAVE.click();
     }
 
     public void clickSpecialtyDropdown() {

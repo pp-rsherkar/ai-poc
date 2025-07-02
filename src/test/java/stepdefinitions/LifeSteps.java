@@ -12,7 +12,10 @@ import pages.life.*;
 import utils.*;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static utils.CommonUtils.normalize;
 
@@ -212,6 +215,16 @@ public class LifeSteps {
     public void user_clicks_on_add_list() {
         npiLists.clickAddList();
     }
+    @Then("User selects Smart List to create NPI list")
+    public void user_selects_smart_list_to_create_npi_list() {
+
+        npiLists.clickSmartList();
+    }
+    @Then("Save and Verify the list gets saved successfully")
+    public void verify_smart_list_gets_saved_successfully() {
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
+    }
 
     @Then("Verify creation of NPI List screen is displayed")
     public void verify_creation_of_npi_list_screen_is_displayed() {
@@ -250,9 +263,120 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Report Templates page")
     public void verify_the_tabs_displayed_on_the_report_templates_page() {
-        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab().toUpperCase());
-        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab().toUpperCase());
-        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
+        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab());
+        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab());
+        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
+    }
+    @Then("User enters the Smart NPI list details as {string} {string} for {string}")
+    public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type) {
+        switch (type) {
+            case "Smart Pixel":
+            {
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickSmartPixel();
+                npiSmartList.clickSmartPixelDropDown();
+                npiSmartList.clickSmartPixelDropDownValue();
+                npiSmartList.clickLifeCheckbox();
+                break;
+            }
+            case "NPI List":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickNPIList();
+                npiSmartList.clickNPIGroup();
+                npiSmartList.clickNPIGroupValue();
+                npiSmartList.clickLifeCheckbox();
+
+                break;
+            case "Specialty":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickSpecialty();
+                npiSmartList.clickSpecialtyDropdown();
+                npiSmartList.selectSpecialtyValue();
+
+                break;
+            case "Profession":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickProfession();
+                npiSmartList.clickProfessionDropdown();
+                npiSmartList.selectProfessionValue();
+
+                break;
+            case "Prescribed Drug":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickPrescribedDrug();
+
+                break;
+            case "Prescription Behaviour Change":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+
+                npiSmartList.clickPrescriptionBehaviorChange();
+                npiSmartList.SelectPrescriptionBehaviorDetails();
+                break;
+            case "Diagnosis":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickDiagnosis();
+                break;
+            case "Medical Procedure":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickMedicalProcedure();
+                break;
+            case "Endemic Research":
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickEndemicResearch();
+                npiSmartList.SelectEndemicDetails();
+
+                break;
+            case "Expand":
+
+                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                npiName = npiListName + '_' + timestamp;
+                npiStaticList.enterListName(npiName);
+                npiStaticList.selectAdvertiser(advertiser);
+                npiSmartList.clickNPIList();
+                npiSmartList.clickNPIGroup();
+                npiSmartList.clickNPIGroupValue();
+                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickExpandPractice();
+
+                break;
+
+            default : System.out.println("Invalid Type");
+
+        }
     }
 
     @When("User clicks on New Template")
@@ -459,10 +583,10 @@ public class LifeSteps {
 
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-       Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-       reportTemplates.runReport();
-   }
+        Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
+        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
+        reportTemplates.runReport();
+    }
 
     @Then("User navigates to generate report field and verifies the report name by campaign name")
     public void user_navigate_to_generate_report_page() {
@@ -582,8 +706,8 @@ public class LifeSteps {
 
     @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
     public void filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(String iconColor) {
-       String filterIconColor = campaignDashboard.verifyFilterIcon();
-       Assert.assertEquals(iconColor, filterIconColor);
+        String filterIconColor = campaignDashboard.verifyFilterIcon();
+        Assert.assertEquals(iconColor, filterIconColor);
     }
 
     @When("User clicks Favorite star icon on few campaigns and checks Favorite Only checkbox")
@@ -607,7 +731,7 @@ public class LifeSteps {
     public void userClicksHideFinishedCheckbox() {
         campaignDashboard.clickHideFinishedCheckbox();
     }
-    
+
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
         Assert.assertTrue("Campaigns with Finished Status are hidden",campaignDashboard.verifyHideFinishedCampaignList());

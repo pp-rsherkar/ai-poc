@@ -27,9 +27,15 @@ public class NPIStaticList {
         this.LIST_SUCCESS = page.getByText("× NPI list created");
     }
 
+
+
     public void enterListName(String npiListName) {
         LIST_NAME.fill(npiListName);
     }
+
+
+
+
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
