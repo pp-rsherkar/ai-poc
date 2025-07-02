@@ -3,11 +3,12 @@ package pages.studio;
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Response;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
-public class WorkspacePublishNPI {
+import java.util.List;
+
+public class Workspace {
 
     private final Page page;
     private final Locator STUDIO_CLICK;
@@ -22,8 +23,17 @@ public class WorkspacePublishNPI {
     private final Locator PUBLISH_BUTTON;
     private final FrameLocator WORKSPACE_FRAME;
     private final Locator WORK_SPACECREATED_ALERT;
+    private final Locator WEBHOOK_ICON;
+    private final Locator WEBHOOK_TOGGLE_BUTTON;
+    private final Locator WEBHOOK_PANEL_TITLE;
+    private final Locator WEBHOOK_CANCEL_BUTTON;
+    private final Locator GET_REQUEST;
+    private final Locator POST_REQUEST;
+    private final Locator URL_TEXTAREA;
+    private final Locator MACROS;
+    private final Locator PARAM;
 
-    public WorkspacePublishNPI(Page page) {
+    public Workspace(Page page) {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
@@ -37,7 +47,15 @@ public class WorkspacePublishNPI {
         this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//span[contains(@class,'TextBase-sc')]");
-
+        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//div[contains(@class,'styles__StyledScheduleStatus')])[3]"); //no unique identifier is available hence index needs to be provided
+        this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
+        this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
+        this.WEBHOOK_CANCEL_BUTTON = WORKSPACE_FRAME.locator("//button[@type='button']/div[contains(text(),'Cancel')]");
+        this.GET_REQUEST = WORKSPACE_FRAME.locator("//button[@value='GET']");
+        this.POST_REQUEST = WORKSPACE_FRAME.locator("//button[@value='POST']");
+        this.URL_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@name='url']");
+        this.MACROS = WORKSPACE_FRAME.locator("//span[contains(@class,'styles__StyledBIChip')]/span/div");
+        this.PARAM = WORKSPACE_FRAME.locator("//p[contains(@cursor,'pointer')]");
     }
 
     public void studio() {
@@ -79,7 +97,6 @@ public class WorkspacePublishNPI {
     public void clickPublish() {
         PUBLISH_BUTTON.click();
         WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-
     }
 
     public String verifyPublishedNpi() {
@@ -90,4 +107,46 @@ public class WorkspacePublishNPI {
         WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));;
     }
 
+    public void clickWebhookIcon(){
+        WEBHOOK_ICON.click();
+    }
+
+    public String verifyWebhookToggleButton() {
+        WEBHOOK_PANEL_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if(WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-disabled")){
+            return "Disabled";
+        }else {
+            WEBHOOK_TOGGLE_BUTTON.click();
+            if(WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-checked"))
+                return "Enabled";
+        }
+        return " ";
+    }
+
+    public void closeWebhookPanel(){
+        WEBHOOK_CANCEL_BUTTON.click();
+    }
+
+    public void clickRequestMethod(String requestType) {
+        if(requestType.contains("GET"))
+            GET_REQUEST.click();
+        POST_REQUEST.click();
+    }
+
+    public void addURLAndMacros(String url, String param, List<String> macrosList) {
+        URL_TEXTAREA.fill(url);
+        for(int i=0; i<MACROS.count(); i++){
+            MACROS.nth(i).locator("text="+macrosList.get(i)).click();
+            if(PARAM.isVisible())
+                PARAM.locator("text="+param).click();
+        }
+    }
+
+    public String verifyMacrosAppendedToURL() {
+        return URL_TEXTAREA.innerText();
+    }
+
+    public void selectAndClickContentType(String contentType) {
+        page.locator(String.format("//button[contains(@value,'%s')]",contentType)).click();
+    }
 }
