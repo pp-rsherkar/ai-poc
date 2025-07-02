@@ -140,10 +140,14 @@ public class LifeSteps {
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
-    @Then("User selects the {string} as channel, selects {string} as rule type and configures the targeting rules, and saves the settings")
-    public void user_selects_the_channel_configures_the_targeting_rules_and_saves_the_settings(String channel, String ruleType) {
+    @When("User selects the {string} as channel")
+    public void user_selects_the_channel(String channel) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
+    }
+
+    @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
+    public void user_configures_the_targeting_rules_and_saves_the_settings(String ruleType) {
         tacticSettings.selectRuleType(ruleType);
         tacticSettings.saveTacticSettings();
     }
@@ -316,10 +320,8 @@ public class LifeSteps {
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
-    @Given("User selects the {string} channel, configures targeting rules:")
-    public void user_selects_the_channel_configures_targeting_rules(String channel, DataTable ruleTypeAndOptions) {
-        tacticSettings.selectChannel(channel);
-        navigation.clickOnIcon("Add Targeting Rule");
+    @Given("User configures targeting rules as below")
+    public void user_selects_the_channel_configures_targeting_rules(DataTable ruleTypeAndOptions) {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
@@ -411,7 +413,6 @@ public class LifeSteps {
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
         Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
-
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
@@ -498,7 +499,7 @@ public class LifeSteps {
         Assert.assertEquals(campaignID, campaignDashboard.verifyCampaignDetails(campaignID));
     }
 
-    @When("User add comments to Campaign, Line Items and Tactics")
+    @When("User add and save comments to Campaign, Line Items and Tactics")
     public void userAddCommentsToCampaignLineItemsAndTactics(DataTable comments) {
         Map<String, String> rawMap = comments.asMap(String.class, String.class);
         Map<String, List<String>> commentMap = CommonUtils.processDataTable(rawMap);
@@ -510,7 +511,7 @@ public class LifeSteps {
         }
     }
 
-    @Then("Verify comments are saved successfully, icon should display in bluish-green color {string} and comments should available on individual panel")
+    @Then("Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(String colour) {
         List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
         Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
@@ -519,22 +520,22 @@ public class LifeSteps {
         Assert.assertEquals(expectedComments, actualComments);
     }
 
-    @When("User toggles Enabled button for Line Items and Tactic from dashboard")
+    @When("User toggles the Enabled button for Line Items and Tactics")
     public void userTogglesEnabledButtonForLineItemsAndTacticFromDashboard() {
         campaignDashboard.clickLineAndTacticToggleButton();
     }
 
-    @Then("Verify Line Items and Tactics are enabled, disabled accordingly")
+    @Then("Verify that Line Items and Tactics reflect the correct enabled or disabled state")
     public void verifyLineItemsAndTacticsAreEnabledDisabledAccordingly() {
         Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.verifyLineTacticToggleStatus());
     }
 
-    @When("User clicks Campaign {string}, Line Item and Tactic one by one")
+    @When("User clicks Campaign {string}, Line Item and Tactic")
     public void userClicksCampaignLineItemAndTacticOneByOne(String campaignID) {
         campaignDashboard.navigateToCampaignLIAndTactic(campaignID);
     }
 
-    @Then("verify user should navigate to respective panel")
+    @Then("Verify user should navigate to Campaign, Line Item and Tactic")
     public void verifyUserShouldNavigateToRespectivePanel() {
         Assert.assertTrue("Navigated to each panel successfully", campaignDashboard.verifyPanelTitleText());
     }
@@ -777,7 +778,29 @@ public class LifeSteps {
     @Then("User should see All Premium Pubs, filters such as Exchange, Search")
     public void userShouldSeeAllPremiumPubsFiltersSuchAsExchangeSearch(DataTable premiumHubs) {
         List<String> premiumHubsList = premiumHubs.asList(String.class);
-        Assert.assertTrue("All premium Hubs are avilable and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
-
+        Assert.assertTrue("All premium Hubs are available and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
     }
+
+    /*Roshani Sherkar
+     * 01-07-2025*/
+    @Then("Verify targeting panel with all targeting under below categories")
+    public void verifyTargetingPanelWithAllTargetingUnderBelowCategories(DataTable targetCategory) {
+        List<String> targetCategoryList = targetCategory.asList(String.class);
+        Assert.assertTrue("Category names are not matched", tacticSettings.fetchAndVerifyTargetCategoryName(targetCategoryList));
+    }
+
+    @And("Verify target type with respect to category")
+    public void verifyTargetTypeWithRespectToCategory(DataTable categoryNameAndType) {
+        Map<String, String> rawMap = categoryNameAndType.asMap(String.class, String.class);
+        Map<String, List<String>> categoryNameAndTypeMap = CommonUtils.processDataTable(rawMap);
+        for (Map.Entry<String, List<String>> entry : categoryNameAndTypeMap.entrySet()) {
+            String key = entry.getKey();
+            List<String> expectedValues = entry.getValue();
+            List<String> actualValues = tacticSettings.getTargetTypesForCategory(key);
+            for (String expected : expectedValues) {
+                Assert.assertTrue("Expected value '" + expected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(expected));
+            }
+        }
+    }
+
 }

@@ -16,6 +16,7 @@ public class NPILists {
     private final Locator SEARCH_NPILISTS;
     private final Locator PARENT_LIST_LABEL;
     private final Locator CREATE_NEW_LIST;
+    private final Locator SPINNER;
 
     public NPILists(Page page) {
         this.page = page;
@@ -28,10 +29,12 @@ public class NPILists {
         this.HCP_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-5']/label/div");
         this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
+        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
     }
 
     public void clickNPILists() {
         NPI_LISTS.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void clickNPIListsStg() {
@@ -40,6 +43,7 @@ public class NPILists {
 
     public void clickAddList() {
         CREATE_NEW_LIST.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public String verifyNPIListText() {
