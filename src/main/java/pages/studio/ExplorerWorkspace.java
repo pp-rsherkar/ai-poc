@@ -37,7 +37,7 @@ public class ExplorerWorkspace {
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
         this.ADD_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Add Filters"));
         this.SEARCH_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer')]");
+        this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
         this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitle-sc-')]");
@@ -58,19 +58,25 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.press("Enter");
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
+    public void clickAddFilter(){
         ADD_FILTER.click();
     }
 
     public void selectFilter(String filter, String option) {
         SEARCH_FILTER.fill(filter);
         SELECT_FILTER.click();
-        WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option)).click();
+        if(filter.contains("Site") || filter.contains("Search")){
+            WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option)).click();
+        }else{
+            WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option)).click();
+        }
         FILTER_OK_BUTTON.click();
         SEARCH_FILTER.clear();
     }
 
     public void applyFilter() {
-        //FILTER_OK_BUTTON.click();
         FILTER_CLOSE_BUTTON.click();
     }
 

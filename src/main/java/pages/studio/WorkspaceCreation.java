@@ -7,7 +7,7 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
-public class Workspaces {
+public class WorkspaceCreation {
     private final Page page;
     private final Locator CREATE_WORKSPACE;
     private final Locator HCP_EXPLORER;
@@ -19,7 +19,7 @@ public class Workspaces {
     private final Locator WORKSPACE_TYPE;
     int counter = 0;
 
-    public Workspaces(Page page) {
+    public WorkspaceCreation(Page page) {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace']");
@@ -146,4 +146,5 @@ public class Workspaces {
             }
         }
     }
+
 }

@@ -7,13 +7,14 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.Navigation;
 import pages.hcp365.SmartActions;
+import utils.CommonUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class HcpSteps {
 
-    static String timestamp;
+    String timestamp = CommonUtils.timeStampCalculation();
 
     SmartActions smartActions = new SmartActions(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
@@ -38,7 +39,6 @@ public class HcpSteps {
 
     @Then("User enters smart action details as {string} {string}")
     public void user_enters_smart_action_details_as(String smartActionName, String advertiser) {
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         smartActionName = smartActionName + '_' + timestamp;
         smartActions.enterSmartActionName(smartActionName);
         smartActions.enterAdvertiser(advertiser);
@@ -52,9 +52,8 @@ public class HcpSteps {
 
     @Then("Verify smart action is saved successfully and navigates to Audience tab")
     public void verify_smart_action_is_saved_successfully_and_navigates_to_audience_tab() {
-        Assert.assertEquals("New Smart Action created successfully.", smartActions.getSmartActionSuccessMessage());
+        Assert.assertEquals("New Smart Action created successfully.", smartActions.getSmartActionSuccessMessage().trim());
         Assert.assertEquals("Audience", smartActions.getAudienceTab());
-
     }
 
     @When("User clicks on NPI Lists")
@@ -79,7 +78,7 @@ public class HcpSteps {
 
     @Then("Verify data is saved successfully")
     public void verify_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage());
+        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage().trim());
 
     }
 
@@ -90,19 +89,18 @@ public class HcpSteps {
 
     @Then("Verify Action data is saved successfully")
     public void verify_action_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage());
+        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage().trim());
     }
 
     @When("User clicks on Response and enter the details and creates smart list {string} {string} and saves")
     public void user_clicks_on_response_and_enter_the_details_and_creates_smart_list_and_saves(String smartListName, String days) {
-        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         smartListName = smartListName + '_' + timestamp;
         smartActions.responseTabDataEntryAndSave(smartListName, days);
     }
 
     @Then("Verify Response data is saved successfully")
     public void verify_response_data_is_saved_successfully() {
-        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage());
+        Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage().trim());
     }
 
 

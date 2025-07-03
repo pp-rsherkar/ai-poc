@@ -3,7 +3,7 @@ Feature: HCP Explorer Workspace in Studio Application
   @e2eregression
   Scenario Outline: Create and save HCP Explorer workspace with specific filters
     Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Studio" application is logged in successfully with Account "UAT_account"
+    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace

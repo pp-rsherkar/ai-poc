@@ -2,7 +2,7 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "UAT_account"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -10,7 +10,8 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "Tactic" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User selects the "Display Advanced" as channel, selects "Behavioral Segment" as rule type and configures the targeting rules, and saves the settings
+    And User selects the "Display Advanced" as channel
+    And User selects "Behavioral Segment" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
 
   @regression

@@ -31,6 +31,7 @@ public class LifeSteps {
     static String username;
     static String password;
     static String npiName;
+    static String npiNameEdited;
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
@@ -143,10 +144,14 @@ public class LifeSteps {
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
-    @Then("User selects the {string} as channel, selects {string} as rule type and configures the targeting rules, and saves the settings")
-    public void user_selects_the_channel_configures_the_targeting_rules_and_saves_the_settings(String channel, String ruleType) {
+    @When("User selects the {string} as channel")
+    public void user_selects_the_channel(String channel) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
+    }
+
+    @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
+    public void user_configures_the_targeting_rules_and_saves_the_settings(String ruleType) {
         tacticSettings.selectRuleType(ruleType);
         tacticSettings.saveTacticSettings();
     }
@@ -187,21 +192,20 @@ public class LifeSteps {
         navigation.clickSubMenu();
         npiLists.clickNPILists();
     }
+
     @And("User navigates to NPI Lists page in LIFE")
-    public void userNavigatesToNPIListsPageInLIFE()
-    {
+    public void userNavigatesToNPIListsPageInLIFE() {
         navigation.clickSubMenu();
         npiLists.clickNPIListsStg();
     }
+
     @And("User searches the workspace in LIFE and selects it")
-    public void userSearchesTheInLIFEAndSelectsIt()
-    {
+    public void userSearchesTheInLIFEAndSelectsIt() {
         npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
     }
 
     @And("User clicks on the published workspace")
-    public void userClicksOnThePublished()
-    {
+    public void userClicksOnThePublished() {
         npiLists.selectPublishedList(StudioSteps.workspaceNameRandom);
     }
 
@@ -211,9 +215,9 @@ public class LifeSteps {
         //Assert.assertTrue(npiLists.availablePlatforms());
     }
 
-    @When("User clicks on Add List")
-    public void user_clicks_on_add_list() {
-        npiLists.clickAddList();
+    @When("User clicks on Create New List")
+    public void user_clicks_on_create_new_list() {
+        npiLists.clickCreateNewList();
     }
     @Then("User selects Smart List to create NPI list")
     public void user_selects_smart_list_to_create_npi_list() {
@@ -399,8 +403,8 @@ public class LifeSteps {
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
         reportTemplates.selectMetric(metric);
-
     }
+
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
         templateNameRandom = templateName + '_' + timestamp;
@@ -440,10 +444,8 @@ public class LifeSteps {
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
-    @Given("User selects the {string} channel, configures targeting rules:")
-    public void user_selects_the_channel_configures_targeting_rules(String channel, DataTable ruleTypeAndOptions) {
-        tacticSettings.selectChannel(channel);
-        navigation.clickOnIcon("Add Targeting Rule");
+    @Given("User configures targeting rules as below")
+    public void user_selects_the_channel_configures_targeting_rules(DataTable ruleTypeAndOptions) {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
@@ -535,7 +537,6 @@ public class LifeSteps {
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
         Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
-
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
@@ -552,7 +553,6 @@ public class LifeSteps {
     public void verify_smart_list_is_targeted_in_the_tactic_successfully() {
         tacticSettings.verifyNPIRule();
         Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
-
     }
 
     @Then("User saves the targeting")
@@ -622,7 +622,7 @@ public class LifeSteps {
         Assert.assertEquals(campaignID, campaignDashboard.verifyCampaignDetails(campaignID));
     }
 
-    @When("User add comments to Campaign, Line Items and Tactics")
+    @When("User add and save comments to Campaign, Line Items and Tactics")
     public void userAddCommentsToCampaignLineItemsAndTactics(DataTable comments) {
         Map<String, String> rawMap = comments.asMap(String.class, String.class);
         Map<String, List<String>> commentMap = CommonUtils.processDataTable(rawMap);
@@ -634,7 +634,7 @@ public class LifeSteps {
         }
     }
 
-    @Then("Verify comments are saved successfully, icon should display in bluish-green color {string} and comments should available on individual panel")
+    @Then("Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(String colour) {
         List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
         Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
@@ -643,22 +643,22 @@ public class LifeSteps {
         Assert.assertEquals(expectedComments, actualComments);
     }
 
-    @When("User toggles Enabled button for Line Items and Tactic from dashboard")
+    @When("User toggles the Enabled button for Line Items and Tactics")
     public void userTogglesEnabledButtonForLineItemsAndTacticFromDashboard() {
         campaignDashboard.clickLineAndTacticToggleButton();
     }
 
-    @Then("Verify Line Items and Tactics are enabled, disabled accordingly")
+    @Then("Verify that Line Items and Tactics reflect the correct enabled or disabled state")
     public void verifyLineItemsAndTacticsAreEnabledDisabledAccordingly() {
         Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.verifyLineTacticToggleStatus());
     }
 
-    @When("User clicks Campaign {string}, Line Item and Tactic one by one")
+    @When("User clicks Campaign {string}, Line Item and Tactic")
     public void userClicksCampaignLineItemAndTacticOneByOne(String campaignID) {
         campaignDashboard.navigateToCampaignLIAndTactic(campaignID);
     }
 
-    @Then("verify user should navigate to respective panel")
+    @Then("Verify user should navigate to Campaign, Line Item and Tactic")
     public void verifyUserShouldNavigateToRespectivePanel() {
         Assert.assertTrue("Navigated to each panel successfully", campaignDashboard.verifyPanelTitleText());
     }
@@ -806,6 +806,56 @@ public class LifeSteps {
         Assert.assertTrue("Button and Filters are not available", pmp.verifyPrivateDealsFilterPanel());
     }
 
+    @When("User tries to save the list without entering any details, an error message should be displayed")
+    public void user_tries_to_save_the_list_without_entering_any_details() {
+        npiStaticList.saveList();
+        assert npiStaticList.listNameError().contains("List Name is required");
+        String npiNameTemp = "Temporary List Name";
+        npiStaticList.enterListName(npiNameTemp);
+        npiStaticList.saveList();
+        assert npiStaticList.advertiserError().contains("Advertiser is required");
+    }
+
+    @And("User enters the NPI Static list details as {string} {string}")
+    public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+    }
+
+    @And("User uploads the file {string}")
+    public void user_uploads_the_file(String fileName) {
+        npiStaticList.uploadStaticListFile(fileName);
+    }
+
+    @When("User edits the created list")
+    public void user_edits_the_created_list() {
+        npiStaticList.clickBackToNPILists();
+        npiLists.searchList(npiName);
+        npiLists.openSearchedList(npiName);
+        npiNameEdited = "Edited" + '_' + timestamp;
+        npiStaticList.editListName(npiNameEdited);
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
+    }
+
+    @Then("Verify list gets updated successfully")
+    public void verify_list_gets_updated_successfully() {
+        npiStaticList.clickBackToNPILists();
+        npiLists.searchList(npiNameEdited);
+        npiLists.openSearchedList(npiNameEdited);
+    }
+
+    @When("User deletes the created list")
+    public void user_deletes_the_created_list() {
+        npiStaticList.deleteList();
+    }
+
+    @Then("Verify list gets deleted successfully")
+    public void verify_list_gets_deleted_successfully() {
+        assert npiStaticList.deleteSuccess().contains("NPI List Deleted");
+    }
+
     @When("User enters below details in respective search field")
     public void userEntersBelowDetailsInRespectiveSearchField(DataTable filterBy) {
         Map<String, String> rawMap = filterBy.asMap(String.class, String.class);
@@ -901,7 +951,29 @@ public class LifeSteps {
     @Then("User should see All Premium Pubs, filters such as Exchange, Search")
     public void userShouldSeeAllPremiumPubsFiltersSuchAsExchangeSearch(DataTable premiumHubs) {
         List<String> premiumHubsList = premiumHubs.asList(String.class);
-        Assert.assertTrue("All premium Hubs are avilable and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
-
+        Assert.assertTrue("All premium Hubs are available and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
     }
+
+    /*Roshani Sherkar
+     * 01-07-2025*/
+    @Then("Verify targeting panel with all targeting under below categories")
+    public void verifyTargetingPanelWithAllTargetingUnderBelowCategories(DataTable targetCategory) {
+        List<String> targetCategoryList = targetCategory.asList(String.class);
+        Assert.assertTrue("Category names are not matched", tacticSettings.fetchAndVerifyTargetCategoryName(targetCategoryList));
+    }
+
+    @And("Verify target type with respect to category")
+    public void verifyTargetTypeWithRespectToCategory(DataTable categoryNameAndType) {
+        Map<String, String> rawMap = categoryNameAndType.asMap(String.class, String.class);
+        Map<String, List<String>> categoryNameAndTypeMap = CommonUtils.processDataTable(rawMap);
+        for (Map.Entry<String, List<String>> entry : categoryNameAndTypeMap.entrySet()) {
+            String key = entry.getKey();
+            List<String> expectedValues = entry.getValue();
+            List<String> actualValues = tacticSettings.getTargetTypesForCategory(key);
+            for (String expected : expectedValues) {
+                Assert.assertTrue("Expected value '" + expected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(expected));
+            }
+        }
+    }
+
 }

@@ -4,9 +4,10 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class TacticSettings {
@@ -30,6 +31,7 @@ public class TacticSettings {
     private final Locator VERIFY_NPI;
     private final Locator FETCH_TARGET_RULETYPES;
     private final Locator FETCH_TARGET_RULEOPTIONS;
+    private final Locator TARGET_CATEGORY_NAME;
 
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -55,6 +57,7 @@ public class TacticSettings {
         this.VERIFY_NPI = page.locator("//label[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULETYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULEOPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
+        this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -219,5 +222,34 @@ public class TacticSettings {
         return VERIFY_NPI.innerText();
     }
 
+    /*Roshani Sherkar
+    * 01-07-2025*/
+    public boolean fetchAndVerifyTargetCategoryName(List<String> targetCategoryList){
+        List<String> actualCategories = new ArrayList<>();
+        int count = TARGET_CATEGORY_NAME.count();
+        for (int i = 0; i < count; i++) {
+            String text = TARGET_CATEGORY_NAME.nth(i).innerText().trim();
+            actualCategories.add(text);
+        }
+        return new HashSet<>(targetCategoryList).containsAll(actualCategories);
+    }
 
+    public List<String> getTargetTypesForCategory(String key) {
+        int categoryCount = TARGET_CATEGORY_NAME.count();
+        for (int i = 0; i < categoryCount; i++) {
+            String categoryText = TARGET_CATEGORY_NAME.nth(i).innerText().trim();
+
+            if (categoryText.contains(key)) {
+                String xpathString = String.format("//div[contains(@class,'targetCategoryName') and contains(text(),'%s')]/following-sibling::div//span[1]", key);
+                Locator categoryItems = page.locator(xpathString);
+                List<String> actualValues = new ArrayList<>();
+                for (int j = 0; j < categoryItems.count(); j++) {
+                    categoryItems.nth(j).scrollIntoViewIfNeeded();
+                    actualValues.add(categoryItems.nth(j).innerText().trim());
+                }
+                return actualValues;
+            }
+        }
+        return Collections.emptyList();
+    }
 }

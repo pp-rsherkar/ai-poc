@@ -10,7 +10,7 @@ Feature: End to End Workflow of Report Generation.
   Scenario Outline: End to End Workflow of Report Generation with Campaign and Report Template creation.
     # 1
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "UAT_account"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -18,7 +18,8 @@ Feature: End to End Workflow of Report Generation.
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User selects the "<CHANNEL>" as channel, selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    And User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify creative details are saved and the campaign is in running state
@@ -40,5 +41,5 @@ Feature: End to End Workflow of Report Generation.
     Then User downloads the report and verify the data in downloaded report
 
     Examples:
-      | USER  | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      | REPORT_TEMPLATE | TEMPLATE NAME | DIMENSIONS                    | METRICS            | RULE_TYPE          |
-      | Admin | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Auto_Creative | E2E Report      | Template      | Advertiser Name,Campaign Name | Impressions,Clicks | Behavioral Segment |
+      | USER  | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE            | REPORT_TEMPLATE | TEMPLATE NAME | DIMENSIONS                    | METRICS            | RULE_TYPE          |
+      | Admin | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Automation_Creative | E2E Report      | Template      | Advertiser Name,Campaign Name | Impressions,Clicks | Behavioral Segment |

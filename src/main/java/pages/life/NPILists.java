@@ -16,6 +16,8 @@ public class NPILists {
     private final Locator SEARCH_NPILISTS;
     private final Locator PARENT_LIST_LABEL;
     private final Locator CREATE_NEW_LIST;
+    private final Locator SEARCH_BOX;
+    private final Locator SPINNER;
     private final Locator SMART_LIST;
 
     public NPILists(Page page) {
@@ -29,19 +31,23 @@ public class NPILists {
         this.HCP_CHECKBOX = page.locator("xpath=//*[@id='mat-checkbox-5']/label/div");
         this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
+        this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
+        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.SMART_LIST = page.getByText("Dynamic list of NPI");
     }
 
     public void clickNPILists() {
         NPI_LISTS.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void clickNPIListsStg() {
         NPI_LISTS_STG.click();
     }
 
-    public void clickAddList() {
+    public void clickCreateNewList() {
         CREATE_NEW_LIST.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public String verifyNPIListText() {
@@ -67,8 +73,20 @@ public class NPILists {
             PARENT_LIST_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         }
 
-        public boolean availablePlatforms () {
-            return LIFE_CHECKBOX.isChecked() && HCP_CHECKBOX.isChecked();
-        }
+    public boolean availablePlatforms() {
+        return LIFE_CHECKBOX.isChecked() && HCP_CHECKBOX.isChecked();
     }
 
+    public void searchList(String listName) {
+        CREATE_NEW_LIST.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SEARCH_BOX.first().fill(listName);
+        SEARCH_BOX.first().press("Enter");
+    }
+
+    public void openSearchedList(String listName) {
+        String listNameXpath = String.format("//div[contains(text(),'%s')]", listName);
+        page.waitForSelector(listNameXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        page.locator(listNameXpath).first().click();
+        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+}
