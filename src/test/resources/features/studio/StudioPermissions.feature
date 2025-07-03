@@ -1,9 +1,9 @@
-  Feature: Enable Studio for an account
+Feature: Enable Studio for an account
 
   @regression
   Scenario Outline: Enable Studio for an Account for internal users
     Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Life" application is logged in successfully
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User enables the studio for "<ACCOUNT_NAME>" account
     And User navigates to workspace permissions
     When User selects the workspace types and saves the settings

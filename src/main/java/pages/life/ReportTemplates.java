@@ -4,19 +4,15 @@ import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.ExcelActions;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ReportTemplates {
     private final Page page;
@@ -57,9 +53,9 @@ public class ReportTemplates {
     public ReportTemplates(Page page) {
         this.page = page;
         this.REPORT_TEMPLATE_LINK = page.locator("//div[normalize-space(text())='Report Templates']");
-        this.VERIFY_TEMPLATES_TAB = page.locator("//a[normalize-space(text())='TEMPLATES']");
-        this.VERIFY_GENERATED_REPORTS_TAB = page.locator("//a[normalize-space(text())='GENERATED REPORTS']");
-        this.VERIFY_SCHEDULING_TAB = page.locator("//a[normalize-space(text())='SCHEDULING']");
+        this.VERIFY_TEMPLATES_TAB = page.locator("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'templates')]");
+        this.VERIFY_GENERATED_REPORTS_TAB = page.locator("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'generated reports')]");
+        this.VERIFY_SCHEDULING_TAB = page.locator("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'scheduling')]");
         this.NEW_TEMPLATE = page.locator("//button[normalize-space(text())='New Template']");
         this.REPORT_DIMENSIONS = page.locator("//div[normalize-space(text())='Dimensions']");
         this.REPORT_METRICS = page.locator("//div[normalize-space(text())='Metrics']");
@@ -71,7 +67,7 @@ public class ReportTemplates {
         this.VERIFY_DIMENSION = page.locator("//sortable-item[contains(@class,'diemension')]");
         this.VERIFY_METRIC = page.locator("//sortable-item[contains(@class,'metric')]");
         this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Ok']");
-        this.TEMPLATE_SUCCESS = page.locator("//div[@aria-label='Template created successfully']");
+        this.TEMPLATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
         this.CLICK_TEMPLATE_SEARCH = page.locator("div.iconSprite.search.search-icon");
         this.SELECT_TEMPLATE = page.locator("//input[@placeholder='Select Template']");

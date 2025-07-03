@@ -4,9 +4,10 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
-public class Workspaces {
+public class WorkspaceCreation {
     private final Page page;
     private final Locator CREATE_WORKSPACE;
     private final Locator HCP_EXPLORER;
@@ -15,26 +16,28 @@ public class Workspaces {
     private final Locator WORK_SPACECREATED_ALERT;
     private final Locator MENU_ICON;
     private final FrameLocator WORKSPACE_FRAME;
+    private final Locator WORKSPACE_TYPE;
     int counter = 0;
 
-    public Workspaces(Page page) {
+    public WorkspaceCreation(Page page) {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
-        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("text=Create New Workspace");
+        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace']");
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//span[contains(@class,'TextBase-sc')]");
         this.MENU_ICON = page.locator("//img[contains(@class,'menu-icon')]");
+        this.WORKSPACE_TYPE = WORKSPACE_FRAME.locator("//label[text()='Workspace Type']");
     }
 
     public String studioDashboard() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
     public String verifyHCPExplorer() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return HCP_EXPLORER.innerText();
     }
 
@@ -57,25 +60,16 @@ public class Workspaces {
     }
 
     public void createStudioWorkspace() {
-        /*while (counter < 3) {
-            retryCreateWorkspace(clickFlag);
-        }*/
-        for (int i = 0; i < 1000; i++) {
-            if (CREATE_WORKSPACE.isEnabled()) {
-                CREATE_WORKSPACE.click();
-                break;
-            }else{
+       while(!CREATE_WORKSPACE.first().isEnabled()){
                 MENU_ICON.click();
                 page.keyboard().press("Escape");
-            }
-        }
+       }
+       CREATE_WORKSPACE.first().click();
+       page.waitForCondition(() -> WORKSPACE_TYPE.filter(new Locator.FilterOptions().setHasText("Workspace Type")).count() == 1);
     }
 
     public void verifyStudioWorkspaceFrame(){
-        page.frameLocator("iframe#iframe0")
-                .frameLocator("iframe")
-                .locator("text=Create New Workspace")
-                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        CREATE_WORKSPACE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public void retryCreateWorkspace(boolean clickFlag) {
@@ -152,4 +146,5 @@ public class Workspaces {
             }
         }
     }
+
 }

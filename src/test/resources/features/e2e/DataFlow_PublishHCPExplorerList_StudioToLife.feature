@@ -6,7 +6,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
   @e2e @regression
   Scenario Outline: Create and save HCP Explorer workspace with specific filters
     Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Studio" application is logged in successfully
+    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
@@ -26,5 +26,5 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User clicks on the published workspace
     Then User Verify the list is displayed in the Life
     Examples:
-      | ADVERTISER | FILTER              | OPTION           | WORKSPACE_NAME | LIST_TYPE |
-      | Abbvie     | NPI Gender, NPI Age | Male, 25 to 35   | Explorer       | Static    |
+      | ADVERTISER | FILTER              | OPTION         | WORKSPACE_NAME | LIST_TYPE |
+      | Abbvie     | NPI Gender, NPI Age | Male, 25 to 35 | Explorer       | Static    |

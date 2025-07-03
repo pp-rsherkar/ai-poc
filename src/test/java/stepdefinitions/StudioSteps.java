@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import factory.DriverFactory;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -28,18 +29,18 @@ public class StudioSteps {
     List<String> actualValueData;
     Accounts accounts = new Accounts(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
-    Workspaces workspaces = new Workspaces(DriverFactory.getPage());
+    WorkspaceCreation workspaceCreation = new WorkspaceCreation(DriverFactory.getPage());
     ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
-    WorkspacePublishNPI workspacePublishNPI = new WorkspacePublishNPI(DriverFactory.getPage());
+    Workspace workspace = new Workspace(DriverFactory.getPage());
     CSVActions csvActions = new CSVActions();
     List<Object> appliedFilters = new ArrayList<>();
     List<Object> appliedOptions = new ArrayList<>();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
-        workspaces.createStudioWorkspace();
+        workspaceCreation.createStudioWorkspace();
     }
 
     @And("the User navigate to studio")
@@ -50,8 +51,8 @@ public class StudioSteps {
 
     @When("the user sees the types of workspaces they have permissions for")
     public void the_user_sees_the_types_of_workspaces_they_have_permissions_for() {
-        Assert.assertEquals("HCP Explorer", workspaces.verifyHCPExplorer());
-        Assert.assertEquals("HCP Audience Expansion", workspaces.verifyHCPAudienceExpansion());
+        Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
+        Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
     }
 
     @Then("the user selects the advertiser {string}")
@@ -119,7 +120,7 @@ public class StudioSteps {
     public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
         accounts.switchAccount(accountName);
         navigation.navigateToStudio();
-        workspaces.createWorkspace();
+        workspaceCreation.createWorkspace();
         Assert.assertEquals("HCP Audience Expansion", accounts.verifyWorkspacePermission());
     }
 
@@ -136,39 +137,40 @@ public class StudioSteps {
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
-        Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
-        workspaces.verifyStudioWorkspaceFrame();
-        workspaces.createStudioWorkspace();
+        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
+        workspaceCreation.verifyStudioWorkspaceFrame();
+        workspaceCreation.createStudioWorkspace();
     }
 
     @When("User clicks on Create New Workspace For Expansion")
     public void user_clicks_on_create_new_workspace_for_expansion() {
-        Assert.assertEquals("", "Genome Studio", workspaces.studioDashboard());
-        workspaces.createWorkspaceExpansion(expansionFlag);
+        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
+        workspaceCreation.createWorkspaceExpansion(expansionFlag);
     }
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
-        Assert.assertEquals("HCP Explorer", workspaces.verifyHCPExplorer());
-        Assert.assertEquals("HCP Audience Expansion", workspaces.verifyHCPAudienceExpansion());
+        Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
+        Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
     }
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
-        workspaces.clickHCPExplorerWorkspace();
-        Assert.assertEquals("Workspace created successfully", workspaces.verifyWorkspaceCreation());
+        workspaceCreation.clickHCPExplorerWorkspace();
+        Assert.assertEquals("Workspace created successfully", workspaceCreation.verifyWorkspaceCreation());
     }
 
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String workspaceName, String advertiser) {
-        workspacePublishNPI.waitTillWorkspaceAlertHide();
+        workspace.waitTillWorkspaceAlertHide();
         workspaceNameRandom = workspaceName + '_' + UUID.randomUUID().toString().substring(0, 10);
         explorerWorkspace.enterWorkspaceName(workspaceNameRandom);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
 
-    @Then("User applies the {string} filter and selects {string} option")
+    @When("User applies the {string} filter and selects {string} option")
     public void user_applies_the_filters_as_gender_and_age(String filters, String options) {
+        explorerWorkspace.clickAddFilter();
         String[] filterArray = filters.split(",");
         String[] optionArray = options.split(",");
 
@@ -205,8 +207,8 @@ public class StudioSteps {
 
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
-        Assert.assertEquals("Workspace saved successfully", workspaces.verifyWorkspaceCreation());
-        workspacePublishNPI.waitTillWorkspaceAlertHide();
+        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+        workspace.waitTillWorkspaceAlertHide();
     }
 
     @When("search for workspace")
@@ -263,42 +265,85 @@ public class StudioSteps {
 
     @When("Studio platform is available")
     public void studio_platform_is_available() {
-        workspacePublishNPI.studio();
+        workspace.studio();
     }
 
     @And("User searches the {string} and selects it")
     public void userSearchesTheAndSelectsIt(String WORKSPACE) {
-        workspacePublishNPI.searchWorkspace(WORKSPACE);
+        workspace.searchWorkspace(WORKSPACE);
     }
 
     @When("Download button is enabled to the user")
     public void download_button_is_enabled_to_the_user() {
-        workspacePublishNPI.clickDownbutton();
+        workspace.clickDownbutton();
     }
 
     @When("User clicks on Publish NPI List")
     public void user_clicks_on_publish_npi_list() {
-        workspacePublishNPI.clickPublishNpi();
+        workspace.clickPublishNpi();
     }
 
     @And("User selects publish {string}")
     public void userSelectsPublish(String listType) {
-        workspacePublishNPI.publish(listType);
+        workspace.publish(listType);
     }
 
     @When("User select the system to publish the list")
     public void user_select_the_system_to_publish_the_list() {
-        workspacePublishNPI.hcp();
-        workspacePublishNPI.life();
+        workspace.hcp();
+        workspace.life();
     }
 
     @Then("Verify list is published")
     public void verify_list_is_published() {
-        workspacePublishNPI.clickPublish();
-        Assert.assertEquals("Workspace saved successfully", workspaces.verifyWorkspaceCreation());
-        workspacePublishNPI.waitTillWorkspaceAlertHide();
-        workspacePublishNPI.clickDownbutton();
-        Assert.assertEquals("Published NPI List", workspacePublishNPI.verifyPublishedNpi());
+        workspace.clickPublish();
+        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+        workspace.waitTillWorkspaceAlertHide();
+        workspace.clickDownbutton();
+        Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
 
+    }
+
+    @And("Verify Webhook panel is disabled before applying filters")
+    public void verifyWebhookPanelIsDisabledBeforeApplyingFilters() {
+        workspace.clickWebhookIcon();
+        Assert.assertEquals("Disabled",workspace.verifyWebhookToggleButton());
+        workspace.closeWebhookPanel();
+    }
+
+    @Then("Verify Webhook panel is enabled after applying filters")
+    public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
+        workspace.clickWebhookIcon();
+        Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
+    }
+
+    @When("User clicks {string} request method")
+    public void userClicksRequestMethod(String requestType) {
+        workspace.clickRequestMethod(requestType);
+    }
+
+    @And("User adds URL {string} and append Macros with {string} to the URL as follow")
+    public void userAddsURLAndMacrosWithToTheURLAsFollow(String url, String param, DataTable macros) {
+        List<String> macrosList = macros.asList(String.class);
+        workspace.addURLAndMacros(url, param, macrosList);
+    }
+
+    @Then("Verify if Macros Appended to the URL {string}")
+    public void verifyIfMacrosAppendedToTheURL(String url) {
+        String text =workspace.verifyMacrosAppendedToURL();
+        Assert.assertTrue("Macros are not correctly appended to the URL", text.contains(url+"%%NPI%%%%URL%%%%Channel%%%%PARAM.*"));
+    }
+
+    @And("User adds URL {string} and Macros with {string} to the URL as follow")
+    public void userAddsURLAndMacrosWithToTheURLAsFollow(String arg0, String arg1) {
+    }
+
+    @And("User selects content type {string}")
+    public void userSelectsContentType(String contentType) {
+        workspace.selectAndClickContentType(contentType);
+    }
+
+    @And("User adds body {string} and append Macros to the body as follow")
+    public void userAddsBodyAndAppendMacrosToTheBodyAsFollow(String body) {
     }
 }

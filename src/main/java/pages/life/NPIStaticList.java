@@ -29,6 +29,8 @@ public class NPIStaticList {
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.NPI_NUMBER = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
         this.AVAILABLE_IN = page.locator(".mat-checkbox-inner-container").first();
+   //     this.AVAILABLE_IN = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
+
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(text(),'List Name is required')]");
@@ -53,7 +55,7 @@ public class NPIStaticList {
     }
 
     public void selectProduct() {
-        AVAILABLE_IN.check();
+        AVAILABLE_IN.click();
     }
 
     public void saveList() {
