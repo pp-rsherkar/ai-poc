@@ -90,8 +90,8 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
-        campaignListing.setGroupByFilter();
-        navigation.clickOnIcon(" Group By Campaign ");
+        /*campaignListing.setGroupByFilter();
+        navigation.clickOnIcon(" Group By Campaign ");*/
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }

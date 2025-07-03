@@ -19,7 +19,7 @@ Feature: LIFE Regression - Create Static NPI List
   @regression
   Scenario Outline: Create Static NPI List by uploading file with NPI Numbers
     Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
