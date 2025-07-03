@@ -45,7 +45,7 @@ Feature: LIFE Regression - Create Static NPI List
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to NPI Lists page
-    When User clicks on Add List
+    When User clicks on Create New List
     And User selects Smart List to create NPI list
     And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for "<Type>"
     Then Save and Verify the list gets saved successfully

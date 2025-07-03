@@ -219,6 +219,7 @@ public class LifeSteps {
     public void user_clicks_on_create_new_list() {
         npiLists.clickCreateNewList();
     }
+
     @Then("User selects Smart List to create NPI list")
     public void user_selects_smart_list_to_create_npi_list() {
 
