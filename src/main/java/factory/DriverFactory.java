@@ -36,7 +36,7 @@ public class DriverFactory {
                 break;
             case "chrome":
                 browserType = Playwright.create().chromium();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
+                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chromium").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
                 break;
             case "webkit":
                 browserType = Playwright.create().webkit();
