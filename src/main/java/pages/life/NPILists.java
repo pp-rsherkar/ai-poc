@@ -62,16 +62,17 @@ public class NPILists {
         SMART_LIST.click();
 
     }
-        public void searchNPILists (String workspaceName){
-            SEARCH_NPILISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-            SEARCH_NPILISTS.fill(workspaceName);
-            SEARCH_NPILISTS.press("Enter");
-        }
 
-        public void selectPublishedList (String listname){
-            page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
-            PARENT_LIST_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        }
+    public void searchNPILists(String workspaceName) {
+        SEARCH_NPILISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SEARCH_NPILISTS.fill(workspaceName);
+        SEARCH_NPILISTS.press("Enter");
+    }
+
+    public void selectPublishedList(String listname) {
+        page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
+        PARENT_LIST_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
 
     public boolean availablePlatforms() {
         return LIFE_CHECKBOX.isChecked() && HCP_CHECKBOX.isChecked();

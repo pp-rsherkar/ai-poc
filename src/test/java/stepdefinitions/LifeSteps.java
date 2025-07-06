@@ -199,6 +199,7 @@ public class LifeSteps {
         npiLists.clickNPIListsStg();
     }
 
+
     @And("User searches the workspace in LIFE and selects it")
     public void userSearchesTheInLIFEAndSelectsIt() {
         npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
@@ -210,8 +211,7 @@ public class LifeSteps {
     }
 
     @Then("User Verify the list is displayed in the Life")
-    public void userVerifyTheListIsDisplayedInTheLife()
-    {
+    public void userVerifyTheListIsDisplayedInTheLife() {
         //Assert.assertTrue(npiLists.availablePlatforms());
     }
 
@@ -225,6 +225,7 @@ public class LifeSteps {
 
         npiLists.clickSmartList();
     }
+
     @Then("Save and Verify the list gets saved successfully")
     public void verify_smart_list_gets_saved_successfully() {
         npiStaticList.saveList();
@@ -272,11 +273,11 @@ public class LifeSteps {
         Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab());
         Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
     }
+
     @Then("User enters the Smart NPI list details as {string} {string} for {string}")
     public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type) {
         switch (type) {
-            case "Smart Pixel":
-            {
+            case "Smart Pixel": {
                 timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
                 npiName = npiListName + '_' + timestamp;
                 npiStaticList.enterListName(npiName);
@@ -379,7 +380,8 @@ public class LifeSteps {
 
                 break;
 
-            default : System.out.println("Invalid Type");
+            default:
+                System.out.println("Invalid Type");
 
         }
     }
@@ -450,8 +452,8 @@ public class LifeSteps {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            keyType.add( entry.getKey());
-            keyValues.addAll( entry.getValue());
+            keyType.add(entry.getKey());
+            keyValues.addAll(entry.getValue());
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
         tacticSettings.closeRuleTypePanel();
@@ -466,7 +468,7 @@ public class LifeSteps {
         List<String> actualNormalizedRuleOptions = normalize(Collections.singletonList(tacticSettings.fetchRuleOptions().toString()));
 
         Assert.assertEquals("Rule types mismatch", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
-        Assert.assertEquals("Rule options mismatch",  expectedNormalizedRuleOptions, actualNormalizedRuleOptions);
+        Assert.assertEquals("Rule options mismatch", expectedNormalizedRuleOptions, actualNormalizedRuleOptions);
     }
 
     @When("User saves the settings")
@@ -579,7 +581,7 @@ public class LifeSteps {
 
     @Then("User selects the report template created tactic and other fields for running the report")
     public void user_enter_input_for_running_report() {
-        reportTemplates.enterDetailsToRunReport(templateNameRandom,tacticNameRandom);
+        reportTemplates.enterDetailsToRunReport(templateNameRandom, tacticNameRandom);
     }
 
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
@@ -720,9 +722,9 @@ public class LifeSteps {
     public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
         int count = campaignDashboard.verifyCampaignMarkedFavorite();
         String message = " ";
-        if(count == 0){
+        if (count == 0) {
             message = "No campaigns matching filtering criteria found";
-        }else{
+        } else {
             message = "Campaigns matching filtering criteria found";
         }
         Assert.assertTrue(message, true);
@@ -735,7 +737,7 @@ public class LifeSteps {
 
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
-        Assert.assertTrue("Campaigns with Finished Status are hidden",campaignDashboard.verifyHideFinishedCampaignList());
+        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.verifyHideFinishedCampaignList());
     }
 
     @When("User clicks Active Flights, Today and Yesterday filter option type")
@@ -794,7 +796,7 @@ public class LifeSteps {
 
     @Then("user should navigate to PMP Deals Panel")
     public void userShouldNavigateToPMPDealsPanel() {
-        Assert.assertEquals("All Deals ",pmp.verifyPMPDealsPanel());
+        Assert.assertEquals("All Deals ", pmp.verifyPMPDealsPanel());
     }
 
     @When("User clicks {string} Deals Tab")
@@ -935,7 +937,7 @@ public class LifeSteps {
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
     public void verifyBaseBidPriceAndMaxBidPriceFieldsAreEditableWhenDealsAreTargeted(String baseBidPrice, String maxBidPrice) {
-        Assert.assertTrue("Base and Max Bid Price fields are editable",pmp.verifyBaseAndMaxPriceIsEditable(baseBidPrice,maxBidPrice));
+        Assert.assertTrue("Base and Max Bid Price fields are editable", pmp.verifyBaseAndMaxPriceIsEditable(baseBidPrice, maxBidPrice));
     }
 
     @When("User clicks Save button from Tactic Setting tab")

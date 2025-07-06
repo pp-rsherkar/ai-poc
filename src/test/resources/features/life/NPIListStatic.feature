@@ -40,6 +40,7 @@ Feature: LIFE Regression - Create Static NPI List
 
 
 
+
   @jenkinsSwitch
   Scenario Outline: Create Smart NPI List by specifying Type.
     Given This scenario will be executed in the "Demo" environment as a "User"
