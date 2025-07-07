@@ -32,6 +32,8 @@ public class LifeSteps {
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
+    static String lineItemTypeList;
+    static int i=0;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
@@ -114,12 +116,21 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
-        lineItemDetails.enterLineItemName(lineItemNameRandom);
-        navigation.clickOnIcon("Add Flight");
-        lineItemDetails.enterLineItemBudget(lineBudget);
-        lineItemDetails.enableLineItem();
-        lineItemDetails.saveLineItem();
+        List<String> lineItemTypeList = List.of("Display", "Video", "Audio", "Native Display", "Native Video", "Search Extension", "DOOH");
+        for (String type : lineItemTypeList) {
+            i += 1;
+            lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
+            lineItemDetails.enterLineItemName(lineItemNameRandom);
+            lineItemDetails.selectLineItemType(type);
+            navigation.clickOnIcon("Add Flight");
+            lineItemDetails.enterLineItemBudget(lineBudget);
+            lineItemDetails.enableLineItem();
+            lineItemDetails.saveLineItem();
+            if (i < 7){
+                lineItemDetails.cancelTactic();
+                lineItemDetails.selectNewLineItem();
+            }
+        }
     }
 
     @Then("Verify line item details are saved and user is navigated to the tactic page")

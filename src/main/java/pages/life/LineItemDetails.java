@@ -11,6 +11,9 @@ public class LineItemDetails {
     private final Locator ENABLE_LINE_ITEM;
     private final Locator SAVE_LINE_ITEM;
     private final Locator LINE_ITEM_SUCCESS;
+    private final Locator LINE_ITEM_TYPE;
+    private final Locator CANCEL_TACTIC;
+    private final Locator NEW_LINE_ITEM;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -20,6 +23,9 @@ public class LineItemDetails {
         this.ENABLE_LINE_ITEM = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_LINE_ITEM = page.locator("//span[text()='Save']");
         this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.LINE_ITEM_TYPE = page.locator("//div[contains(@class,'ui dropdown selection form-control lineItemType')]");
+        this.CANCEL_TACTIC =  page.locator("#lidcBody").getByText("Cancel");
+        this.NEW_LINE_ITEM = page.getByText("New Line Item");
     }
 
     public String verifyLineItemText() {
@@ -44,5 +50,18 @@ public class LineItemDetails {
 
     public String lineItemSuccess() {
         return LINE_ITEM_SUCCESS.innerText();
+    }
+
+    public void selectLineItemType(String lineItemType) {
+        LINE_ITEM_TYPE.click();
+        LINE_ITEM_TYPE.locator("text=" + lineItemType).first().click();
+    };
+
+    public void cancelTactic() {
+        CANCEL_TACTIC.click();
+    }
+
+    public void selectNewLineItem() {
+        NEW_LINE_ITEM.click();
     }
 }
