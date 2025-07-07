@@ -2,6 +2,9 @@ package utils;
 
 import com.microsoft.playwright.Locator;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -11,6 +14,10 @@ public class CommonUtils {
 
     public static String timeStampCalculation(){
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    }
+
+    public static String randomNumberGeneration(){
+        return UUID.randomUUID().toString().substring(0, 10);
     }
 
     public static List<String> normalize(List<String> list) {
@@ -43,6 +50,14 @@ public class CommonUtils {
                 }
             }
         }
+    }
+
+    public static String readJsonTestDataFile(String jsonFileName) throws IOException {
+        InputStream is = CommonUtils.class.getClassLoader().getResourceAsStream(jsonFileName);
+        if (is == null) {
+            throw new IllegalArgumentException("File not found in resources folder: " + jsonFileName);
+        }
+        return new String(is.readAllBytes(), StandardCharsets.UTF_8);
     }
 
 

@@ -11,17 +11,17 @@ import pages.admin.Accounts;
 import pages.studio.*;
 import utils.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static factory.DriverFactory.page;
 
 public class StudioSteps {
     static String workspaceName;
-    static String workspaceNameRandom;
+    static String newWorkspaceName;
     static Boolean expansionFlag = true;
     List<String[]> fileContent;
     List<String[]> actualValue;
@@ -37,6 +37,7 @@ public class StudioSteps {
     CSVActions csvActions = new CSVActions();
     List<Object> appliedFilters = new ArrayList<>();
     List<Object> appliedOptions = new ArrayList<>();
+    String randomNumber = CommonUtils.randomNumberGeneration();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -163,8 +164,8 @@ public class StudioSteps {
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String workspaceName, String advertiser) {
         workspace.waitTillWorkspaceAlertHide();
-        workspaceNameRandom = workspaceName + '_' + UUID.randomUUID().toString().substring(0, 10);
-        explorerWorkspace.enterWorkspaceName(workspaceNameRandom);
+        newWorkspaceName = workspaceName + '_' + randomNumber;
+        explorerWorkspace.enterWorkspaceName(newWorkspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
 
@@ -319,31 +320,95 @@ public class StudioSteps {
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
-        workspace.clickRequestMethod(requestType);
+        if(requestType.contains("POST"))
+            workspace.clickWebhookIcon();
+        workspace.clickRequestOrContentButton(requestType);
     }
 
-    @And("User adds URL {string} and append Macros with {string} to the URL as follow")
-    public void userAddsURLAndMacrosWithToTheURLAsFollow(String url, String param, DataTable macros) {
+    @And("User adds valid URL {string} and append Macros with {string} to the {string} as follow")
+    public void userAddsURLAndMacrosWithToTheURLAsFollow(String url, String param, String textType, DataTable macros) {
         List<String> macrosList = macros.asList(String.class);
-        workspace.addURLAndMacros(url, param, macrosList);
+        workspace.addURL(url);
+        workspace.addMacros(textType, param, macrosList);
     }
 
     @Then("Verify if Macros Appended to the URL {string}")
     public void verifyIfMacrosAppendedToTheURL(String url) {
-        String text =workspace.verifyMacrosAppendedToURL();
-        Assert.assertTrue("Macros are not correctly appended to the URL", text.contains(url+"%%NPI%%%%URL%%%%Channel%%%%PARAM.*"));
-    }
-
-    @And("User adds URL {string} and Macros with {string} to the URL as follow")
-    public void userAddsURLAndMacrosWithToTheURLAsFollow(String arg0, String arg1) {
+        String text = workspace.verifyMacrosAppendedToURL();
+        Assert.assertTrue(
+                "Macros are not correctly appended to the URL",
+                text.matches(Pattern.quote(url) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%")
+        );
     }
 
     @And("User selects content type {string}")
     public void userSelectsContentType(String contentType) {
-        workspace.selectAndClickContentType(contentType);
+        workspace.clickRequestOrContentButton(contentType);
     }
 
-    @And("User adds body {string} and append Macros to the body as follow")
-    public void userAddsBodyAndAppendMacrosToTheBodyAsFollow(String body) {
+    @And("User adds valid body {string} and append Macros with {string} to the {string} as follow")
+    public void userAddsBodyAndAppendMacrosToTheBodyAsFollow(String jsonFile, String param, String textType, DataTable macros) throws IOException {
+        List<String> macrosList = macros.asList(String.class);
+        workspace.addBody(jsonFile);
+        workspace.addMacros(textType, param, macrosList);
+    }
+
+    @Then("Verify if Macros Appended to the Body {string}")
+    public void verifyIfMacrosAppendedToTheBody(String body) throws IOException {
+        String text = workspace.verifyMacrosAppendedToBody();
+        String[] parts = text.split("%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%");
+        Assert.assertTrue("Macro suffix not found in text", parts.length == 1 || parts.length == 2);
+
+        String actualJson = parts[0].replaceAll("\\s+", "");
+        String expectedJsonNormalized = CommonUtils.readJsonTestDataFile(body).replaceAll("\\s+", "");
+        Assert.assertEquals("JSON part does not match", expectedJsonNormalized, actualJson);
+        workspace.addBody(body);
+    }
+
+    @When("User saves the webhook setup")
+    public void userSavesTheWebhookSetup() {
+        workspace.saveWebhookSetup();
+    }
+
+    @Then("Check that the success message appears once the webhook is successfully created")
+    public void checkThatTheSuccessMessageAppearsOnceTheWebhookIsSuccessfullyCreated() {
+        Assert.assertEquals("Webhook setup successfully", workspace.verifyWebhookCreationIsSuccess());
+    }
+
+    @Then("Verify inline error message for the invalid webhook entries {string}")
+    public void verifyInlineErrorMessageForTheInvalidWebhookEntries(String invalidData) {
+        String inlineError = String.valueOf(workspace.verifyInlineErrorMessage(invalidData));
+        Assert.assertTrue("Inline error message is not displayed", (inlineError.contains("URL is invalidBody is invalid") || inlineError.contains("URL is invalid")));
+    }
+
+    @And("Verify error message when webhook setup is failed using {string}")
+    public void verifyErrorMessageWhenWebhookSetupIsFailed(String errorData) throws IOException {
+        List<String> mediaTypeList = Arrays.stream(errorData.split(",")).toList();
+        String errorMessage = workspace.verifyErrorMsgWhenAPIFailed(mediaTypeList);
+        Assert.assertTrue("Error message is not displayed", errorMessage.contains("Error occurred while saving workspace or editing webhook"));
+    }
+
+    @Then("Check the webhook icon is highlighted in green color")
+    public void checkTheWebhookIconIsHighlightedInGreenColor() {
+        Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
+    }
+
+    @When("User deletes the webhook from the workspace list")
+    public void userDeletesTheWebhookFromTheWorkspaceList() {
+        workspace.goToWorkspaceList();
+        workspaceCreation.searchWorkspaceAndDelete(newWorkspaceName);
+    }
+
+    @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
+    public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
+        String text = workspaceCreation.verifyDeletePopUp();
+        Assert.assertTrue("Message is not displayed",
+                text.contains("You are trying to delete the workspace " + newWorkspaceName +".\n" +
+                        "\n" +
+                        "Webhooks are enabled for this workspace.\n" +
+                        "\n" +
+                        "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
+                        "Do you want to proceed?"));
+        Assert.assertEquals("Workspace archived successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 }
