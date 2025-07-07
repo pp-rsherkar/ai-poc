@@ -28,6 +28,7 @@ public class LifeSteps {
     static String username;
     static String password;
     static String npiName;
+    static String npiNameEdited;
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
@@ -188,22 +189,21 @@ public class LifeSteps {
         navigation.clickSubMenu();
         npiLists.clickNPILists();
     }
+
     @And("User navigates to NPI Lists page in LIFE")
-    public void userNavigatesToNPIListsPageInLIFE()
-    {
+    public void userNavigatesToNPIListsPageInLIFE() {
         navigation.clickSubMenu();
         npiLists.clickNPIListsStg();
     }
+
     @And("User searches the workspace in LIFE and selects it")
-    public void userSearchesTheInLIFEAndSelectsIt()
-    {
-        npiLists.searchNPILists(StudioSteps.newWorkspaceName);
+    public void userSearchesTheInLIFEAndSelectsIt() {
+        npiLists.searchNPILists(StudioSteps.workspaceNameRandom);
     }
 
     @And("User clicks on the published workspace")
-    public void userClicksOnThePublished()
-    {
-        npiLists.selectPublishedList(StudioSteps.newWorkspaceName);
+    public void userClicksOnThePublished() {
+        npiLists.selectPublishedList(StudioSteps.workspaceNameRandom);
     }
 
     @Then("User Verify the list is displayed in the Life")
@@ -212,9 +212,9 @@ public class LifeSteps {
         //Assert.assertTrue(npiLists.availablePlatforms());
     }
 
-    @When("User clicks on Add List")
-    public void user_clicks_on_add_list() {
-        npiLists.clickAddList();
+    @When("User clicks on Create New List")
+    public void user_clicks_on_create_new_list() {
+        npiLists.clickCreateNewList();
     }
 
     @Then("Verify creation of NPI List screen is displayed")
@@ -279,8 +279,8 @@ public class LifeSteps {
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
         reportTemplates.selectMetric(metric);
-
     }
+
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
         templateNameRandom = templateName + '_' + timestamp;
@@ -429,7 +429,6 @@ public class LifeSteps {
     public void verify_smart_list_is_targeted_in_the_tactic_successfully() {
         tacticSettings.verifyNPIRule();
         Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
-
     }
 
     @Then("User saves the targeting")
@@ -608,7 +607,7 @@ public class LifeSteps {
     public void userClicksHideFinishedCheckbox() {
         campaignDashboard.clickHideFinishedCheckbox();
     }
-    
+
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
         Assert.assertTrue("Campaigns with Finished Status are hidden",campaignDashboard.verifyHideFinishedCampaignList());
@@ -681,6 +680,56 @@ public class LifeSteps {
     @Then("User should see Add New Deal button, filters such as Exchange, Search")
     public void userShouldSeeButtonFiltersSuchAsExchangeAdvertiser() {
         Assert.assertTrue("Button and Filters are not available", pmp.verifyPrivateDealsFilterPanel());
+    }
+
+    @When("User tries to save the list without entering any details, an error message should be displayed")
+    public void user_tries_to_save_the_list_without_entering_any_details() {
+        npiStaticList.saveList();
+        assert npiStaticList.listNameError().contains("List Name is required");
+        String npiNameTemp = "Temporary List Name";
+        npiStaticList.enterListName(npiNameTemp);
+        npiStaticList.saveList();
+        assert npiStaticList.advertiserError().contains("Advertiser is required");
+    }
+
+    @And("User enters the NPI Static list details as {string} {string}")
+    public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+    }
+
+    @And("User uploads the file {string}")
+    public void user_uploads_the_file(String fileName) {
+        npiStaticList.uploadStaticListFile(fileName);
+    }
+
+    @When("User edits the created list")
+    public void user_edits_the_created_list() {
+        npiStaticList.clickBackToNPILists();
+        npiLists.searchList(npiName);
+        npiLists.openSearchedList(npiName);
+        npiNameEdited = "Edited" + '_' + timestamp;
+        npiStaticList.editListName(npiNameEdited);
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
+    }
+
+    @Then("Verify list gets updated successfully")
+    public void verify_list_gets_updated_successfully() {
+        npiStaticList.clickBackToNPILists();
+        npiLists.searchList(npiNameEdited);
+        npiLists.openSearchedList(npiNameEdited);
+    }
+
+    @When("User deletes the created list")
+    public void user_deletes_the_created_list() {
+        npiStaticList.deleteList();
+    }
+
+    @Then("Verify list gets deleted successfully")
+    public void verify_list_gets_deleted_successfully() {
+        assert npiStaticList.deleteSuccess().contains("NPI List Deleted");
     }
 
     @When("User enters below details in respective search field")

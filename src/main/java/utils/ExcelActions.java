@@ -14,6 +14,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.microsoft.playwright.Locator;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class ExcelActions {
 
     //Read CSV file and return column values starting from index 1
@@ -38,4 +42,9 @@ public class ExcelActions {
         return actualHeaders;
     }
 
+
+    public static void uploadFile(Locator fileInput, String fileName) {
+        Path filePath = Paths.get("src/test/resources/uploadfiles/" + fileName).toAbsolutePath();
+        fileInput.setInputFiles(filePath);
+    }
 }
