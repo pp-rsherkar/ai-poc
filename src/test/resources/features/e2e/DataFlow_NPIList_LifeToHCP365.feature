@@ -60,7 +60,7 @@ Feature: End to End Workflow of NPI Lists.
       | Z_Automation | Smart List | Glynase   | Auto    | Regular | 2000      | Line      | 500         | TACTIC      | Display Advanced | SMART_ACTION      | SMART_LIST      | 5    |
 
 
-  @e2e2 @regression
+  @e2e @regression
   Scenario Outline: End to End Workflow of LIFE Static NPI lists Integration with HCP365
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
