@@ -312,7 +312,7 @@ public class StudioSteps {
         workspace.closeWebhookPanel();
     }
 
-    @Then("Verify Webhook panel is enabled after applying filters")
+    @Then("Verify Webhook panel is enabled after applying engagement filters")
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         workspace.clickWebhookIcon();
         Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
@@ -393,7 +393,7 @@ public class StudioSteps {
         Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
     }
 
-    @When("User deletes the webhook from the workspace list")
+    @When("When User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
         workspaceCreation.searchWorkspaceAndDelete(newWorkspaceName);

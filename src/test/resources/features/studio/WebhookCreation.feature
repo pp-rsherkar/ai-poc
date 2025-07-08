@@ -15,7 +15,7 @@ Feature: Webhook Creation Regression - Verify below features
     And Verify Webhook panel is disabled before applying filters
     When User applies the "<FILTER>" filter and selects "<OPTION>" option
     And User clicks on Ok and closes the filter popup
-    Then Verify Webhook panel is enabled after applying filters
+    Then Verify Webhook panel is enabled after applying engagement filters
     When User clicks "GET" request method
     Then Verify inline error message for the invalid webhook entries "<INVALID_WEBHOOK_DATA>"
     And Verify error message when webhook setup is failed using "<ERROR_DATA>"
@@ -48,7 +48,7 @@ Feature: Webhook Creation Regression - Verify below features
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
     Then Check the webhook icon is highlighted in green color
-    When User deletes the webhook from the workspace list
+    When When User tries to delete the workspace associated with active webhook from the workspace list
     Then Verify user receives a warning when attempting to delete a workspace with an active webhook
 
     Examples:
