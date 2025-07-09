@@ -212,7 +212,7 @@ public class LifeSteps {
 
     @Then("User Verify the list is displayed in the Life")
     public void userVerifyTheListIsDisplayedInTheLife() {
-        //Assert.assertTrue(npiLists.availablePlatforms());
+        Assert.assertTrue(npiLists.availablePlatforms());
     }
 
     @When("User clicks on Create New List")

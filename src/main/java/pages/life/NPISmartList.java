@@ -147,9 +147,6 @@ public class NPISmartList {
 
         INSERT_IGNORED_URL.fill("www.google.com");
 
-        CLICK_ADD_IGNORED_URL.click();
-
-        INSERT_IGNORED_URL.fill("www.facebook.com");
 
     }
 
