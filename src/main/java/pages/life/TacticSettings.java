@@ -94,67 +94,77 @@ public class TacticSettings {
     public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues) {
         SEARCH_RULE_TYPE.clear();
         SEARCH_RULE_TYPE.type(ruleType);
-        SELECT_RULE_TYPE.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        if(SELECT_RULE_TYPE.isVisible()){
+            SELECT_RULE_TYPE.click();
+            SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
 
-        switch (ruleType) {
-            case "Behavioral Segment":
-                for (String val : ruleValues) {
-                    SEARCH_RULE_OPTION.fill(val);
-                    String xpath = String.format("(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'segmentname')]/preceding-sibling::div[contains(@class, 'iconsWrapper')]//div[contains(@class, 'include-default')])[1]", val);
-                    isElementVisible(xpath);
-                }
-                clickRuleTypeOkButton();
-                break;
-            case "In Condition":
-                for (String val : ruleValues) {
-                    SEARCH_RULE_OPTION.fill(val);
-                    String xpath = String.format("//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[contains(@class, 'include-default')]", val);
-                    isElementVisible(xpath);
-                }
-                clickRuleTypeOkButton();
-                break;
-            case "Age":
-                for (String val : ruleValues) {
-                    String xpath = String.format("//label[contains(text(),'%s')]", val);
-                    isElementVisible(xpath);
-                }
-                clickRuleTypeOkButton();
-                break;
-            case "Health Pages":
-                for (String val : ruleValues) {
-                    SEARCH_RULE_OPTION.fill(val);
-                    String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target']", val);
-                    isElementVisible(xpath);
-                }
-                clickRuleTypeOkButton();
-                break;
-            case "Postal Codes":
-                RULE_POSTAL_CODES_TEXTBOX.click();
-                for (String val : ruleValues) {
-                    RULE_POSTAL_CODES_TEXTBOX.type(val.trim());
-                    RULE_POSTAL_CODES_TEXTBOX.press("Enter");
-                    page.waitForLoadState(LoadState.LOAD);
-                }
-                clickRuleTypeOkButton();
-                break;
-            case "Device":
-                RULE_DEVICE_BLOCK.click();
-                for (String val : ruleValues) {
-                    String xpath = String.format("//label[contains(text(),'%s')]", val);
-                    isElementVisible(xpath);
-                }
-                clickRuleTypeOkButton();
-                break;
-            case "Legal Populations":
-                RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB.click();
-                for (String val : ruleValues) {
-                    SEARCH_RULE_OPTION.fill(val);
-                    String xpath = String.format("//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[contains(@class, 'include-default')]", val);
-                    isElementVisible(xpath);
-                }
-                clickRuleTypeOkButton();
-                break;
+            switch (ruleType) {
+                case "Behavioral Segment":
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath = String.format("(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'segmentname')]/preceding-sibling::div[contains(@class, 'iconsWrapper')]//div[contains(@class, 'include-default')])[1]", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "IP Address":
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath = String.format("(//div[contains(text(), '%s')]/ancestor::div[contains(@class, 'left cliptext')]/preceding-sibling::div[contains(@class, 'left iconsWrapper')]//div[contains(@class, 'include-default')])[1]", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "In Condition":
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath = String.format("//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[contains(@class, 'include-default')]", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "Age":
+                    for (String val : ruleValues) {
+                        String xpath = String.format("//label[contains(text(),'%s')]", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "Health Pages":
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target']", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "Postal Codes":
+                    RULE_POSTAL_CODES_TEXTBOX.click();
+                    for (String val : ruleValues) {
+                        RULE_POSTAL_CODES_TEXTBOX.type(val.trim());
+                        RULE_POSTAL_CODES_TEXTBOX.press("Enter");
+                        page.waitForLoadState(LoadState.LOAD);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "Device":
+                    RULE_DEVICE_BLOCK.click();
+                    for (String val : ruleValues) {
+                        String xpath = String.format("//label[contains(text(),'%s')]", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+                case "Legal Populations":
+                    RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB.click();
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath = String.format("//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[contains(@class, 'include-default')]", val);
+                        isElementVisible(xpath);
+                    }
+                    clickRuleTypeOkButton();
+                    break;
+            }
         }
     }
 

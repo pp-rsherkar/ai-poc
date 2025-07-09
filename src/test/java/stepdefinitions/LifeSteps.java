@@ -876,6 +876,38 @@ public class LifeSteps {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
-        targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channel, rulesMap);
+        List<String> channelList = Arrays.stream(channel.split(",")).toList();
+        List<String> templateNameList  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+        flag = targetingTemplate.searchTargetingTemplate(templateNameList);
+    }
+
+    @Then("User searches and verifies the already created targeting template using the search option")
+    public void userSearchesTheAlreadyCreatedTargetingTemplateUsingTheSearchOption() {
+        Assert.assertTrue("Targeting template is not found in the search results", flag);
+    }
+
+    @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
+    public void userTriesToSaveTheTargetingTemplateWithTargetingRuleAndWithoutSpecifyingATemplateName(String targetingRule) {
+        Assert.assertEquals("Template Name is required", targetingTemplate.verifyErrorMessageForTemplateName(targetingRule));
+    }
+
+    @And("User tries to save the targeting template with template name {string} without specifying any targeting")
+    public void userTriesToSaveTheTargetingTemplateWithTemplateNameWithoutSpecifyingAnyTargeting(String templateName) {
+        Assert.assertEquals("Please select atleast one targeting",targetingTemplate.verifyErrorMessageForTargetingRules(templateName));
+    }
+
+    @And("User clicks on Show Expression and verifies the query is displayed for the {string}")
+    public void userClicksOnAndVerifiesTheQueryIsDisplayed(String templateName) {
+        Assert.assertTrue("Targeting container is not displayed", targetingTemplate.clickAndVerifyShowExpression(templateName));
+    }
+
+    @And("User edits an existing targeting template and verifies the changes are saved for the {string}")
+    public void userEditsAnExistingTargetingTemplateAndVerifiesTheChangesAreSaved(String templateName) {
+        Assert.assertTrue("Unable to edit targeting template", targetingTemplate.clickAndVerifyTargetTemplateEditable(templateName));
+    }
+
+    @And("User deletes an existing targeting template and verifies it is removed from the list for the {string}")
+    public void userDeletesAnExistingTargetingTemplateAndVerifiesItIsRemovedFromTheList(String templateName) {
+        Assert.assertTrue("Unable to delete existing targeting template", targetingTemplate.clickAndVerifyTargetTemplateDeletion(templateName));
     }
 }

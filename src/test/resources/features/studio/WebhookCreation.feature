@@ -6,6 +6,7 @@ Feature: Webhook Creation Regression - Verify below features
 
   @e2e @regression
   Scenario Outline: Create a webhook and verify macros are appended to the request URL and body
+    #1
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
@@ -13,9 +14,11 @@ Feature: Webhook Creation Regression - Verify below features
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
     And Verify Webhook panel is disabled before applying filters
+    #2
     When User applies the "<FILTER>" filter and selects "<OPTION>" option
     And User clicks on Ok and closes the filter popup
     Then Verify Webhook panel is enabled after applying engagement filters
+    #3
     When User clicks "GET" request method
     Then Verify inline error message for the invalid webhook entries "<INVALID_WEBHOOK_DATA>"
     And Verify error message when webhook setup is failed using "<ERROR_DATA>"
@@ -27,6 +30,7 @@ Feature: Webhook Creation Regression - Verify below features
     Then Verify if Macros Appended to the URL "<URL>"
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
+    #4
     When User clicks "POST" request method
     And User selects content type "<CONTENT_TYPE>"
     Then Verify inline error message for the invalid webhook entries "<INVALID_WEBHOOK_DATA>"
@@ -46,6 +50,7 @@ Feature: Webhook Creation Regression - Verify below features
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
     And User saves the workspace
+    #5
     Then Verify the HCP Explorer Workspace is saved
     Then Check the webhook icon is highlighted in green color
     When When User tries to delete the workspace associated with active webhook from the workspace list

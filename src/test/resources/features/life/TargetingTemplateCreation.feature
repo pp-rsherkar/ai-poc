@@ -19,9 +19,16 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
       | Behavioral Segment | AutoSegment  |
       | Age                | 25-29, 35-39 |
-    Then Search for the created targeting template
+      | IP Address         | AutoIP       |
+      | Postal Codes       | 112233       |
+    Then User searches and verifies the already created targeting template using the search option
+    And User tries to save the targeting template with targeting rule "Behavioral Segment" and without specifying a template name
+    And User tries to save the targeting template with template name "<TEMPLATE_NAME>" without specifying any targeting
+    And User clicks on Show Expression and verifies the query is displayed for the "Template"
+    And User edits an existing targeting template and verifies the changes are saved for the "Template"
+    And User deletes an existing targeting template and verifies it is removed from the list for the "Template"
 
     Examples:
-     | TEMPLATE_NAME | CHANNEL          | LINE_ITEMS              |
-     | Template      | Display Advanced | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video|
+     | TEMPLATE_NAME | CHANNEL                                         | LINE_ITEMS                                                                 |
+     | Template      | Display Advanced, Video Advanced, DOOH Advanced | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video|
 
