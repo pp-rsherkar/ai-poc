@@ -17,6 +17,12 @@ public class WorkspaceCreation {
     private final Locator MENU_ICON;
     private final FrameLocator WORKSPACE_FRAME;
     private final Locator WORKSPACE_TYPE;
+    private final Locator DELETE_DIALOG;
+    private final Locator DELETE_BUTTON;
+    private final Locator REMOVAL_CONFIRMATION_POPUP;
+    private final Locator REMOVAL_CONFIRMATION_TEXT;
+    private final Locator REMOVE_BUTTON;
+    private final Locator WORKSPACE_ARCHIVAL_ALERT;
     int counter = 0;
 
     public WorkspaceCreation(Page page) {
@@ -29,6 +35,12 @@ public class WorkspaceCreation {
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//span[contains(@class,'TextBase-sc')]");
         this.MENU_ICON = page.locator("//img[contains(@class,'menu-icon')]");
         this.WORKSPACE_TYPE = WORKSPACE_FRAME.locator("//label[text()='Workspace Type']");
+        this.DELETE_DIALOG = WORKSPACE_FRAME.locator("//div[@role='dialog']");
+        this.DELETE_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Delete')]");
+        this.REMOVAL_CONFIRMATION_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Removal Confirmation')]");
+        this.REMOVAL_CONFIRMATION_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'You are trying to delete the workspace')]");
+        this.REMOVE_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Remove']");
+        this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Workspace archived successfully')]");
     }
 
     public String studioDashboard() {
@@ -69,7 +81,7 @@ public class WorkspaceCreation {
     }
 
     public void verifyStudioWorkspaceFrame(){
-        CREATE_WORKSPACE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public void retryCreateWorkspace(boolean clickFlag) {
@@ -147,4 +159,23 @@ public class WorkspaceCreation {
         }
     }
 
+    public void searchWorkspaceAndDelete(String newWorkspaceName) {
+        WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",newWorkspaceName)).first().click();
+        DELETE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        DELETE_BUTTON.scrollIntoViewIfNeeded();
+        DELETE_BUTTON.click();
+        REMOVAL_CONFIRMATION_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
+    public String verifyDeletePopUp() {
+       return REMOVAL_CONFIRMATION_TEXT.innerText();
+    }
+
+    public String deleteWorkspaceWithActiveWebhook() {
+        String text = " ";
+        REMOVE_BUTTON.click();
+        text = WORKSPACE_ARCHIVAL_ALERT.innerText();
+        WORKSPACE_ARCHIVAL_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return text;
+    }
 }
