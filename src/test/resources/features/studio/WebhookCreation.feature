@@ -4,7 +4,7 @@ Feature: Webhook Creation Regression - Verify below features
   3. Verify error messages on wrong input
   4. Webhook setup
 
-  @e2e2 @regression
+  @e2e @regression
   Scenario Outline: Create a webhook and verify macros are appended to the request URL and body
     #1
     Given This scenario will be executed in the "Pre-release" environment as a "User"
