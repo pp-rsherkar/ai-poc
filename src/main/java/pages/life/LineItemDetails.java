@@ -52,8 +52,10 @@ public class LineItemDetails {
 
     public void selectLineItemType(String lineItemType) {
         LINE_ITEM_TYPE_DROPDOWN.click();
-        for(int i=0; i< LINE_ITEM_TYPE_VALUE.count(); i++) {
-            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().equalsIgnoreCase(lineItemType)) {
+        int count = LINE_ITEM_TYPE_VALUE.count();
+        for(int i=0; i< count; i++) {
+            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
+                LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
                 LINE_ITEM_TYPE_VALUE.nth(i).click();
                 break;
             }

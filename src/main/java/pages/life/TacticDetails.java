@@ -62,8 +62,8 @@ public class TacticDetails {
     }
 
     public boolean createTacticWithLineItems(List<String> lineItemTypeList, String advertiser, String newCampaignName, String campaignType, String budget, String newLineItemName, String lineBudget, String newTacticName, List<String> templateNameList) {
+       boolean flag = false;
         for(String lineItemType : lineItemTypeList) {
-
             npiSmartList.clickPulsepointICon();
             campaigns.campaignDashboard();
             campaigns.createCampaign();
@@ -87,11 +87,11 @@ public class TacticDetails {
             enterTacticName(newTacticName + "_" + CommonUtils.randomNumberGeneration());
             saveTacticDetails();
             importTargetingTemplate(lineItemType, templateNameList);
-            saveTacticDetails();
             if(IMPORTED_TARGET_TEMPLATE.isVisible())
-                return true;
+                flag = true;
+            saveTacticDetails();
         }
-        return false;
+        return flag;
     }
 
     private void importTargetingTemplate(String lineItemType, List<String> templateNameList) {
