@@ -44,7 +44,7 @@ Feature: End to End Workflow of NPI Lists.
     Then Verify smart action is saved successfully and navigates to Audience tab
     # 4 & 5
     When User clicks on NPI Lists
-    Then Verify NPI list created in LIFE is present
+    Then Verify NPI list created is present
     And User adds NPI list to the smart action
     When User clicks on Ok and Save
     Then Verify data is saved successfully
@@ -61,7 +61,7 @@ Feature: End to End Workflow of NPI Lists.
 
 
   @e2e @regression
-  Scenario Outline: End to End Workflow of LIFE Static NPI lists Integration with HCP365
+  Scenario Outline: End to End Workflow of Static NPI lists Integration with HCP365 Smart Action
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to NPI Lists page
@@ -92,7 +92,7 @@ Feature: End to End Workflow of NPI Lists.
     Then Verify smart action is saved successfully and navigates to Audience tab
     # 4 & 5
     When User clicks on NPI Lists
-    Then Verify NPI list created in LIFE is present
+    Then Verify NPI list created is present
     And User adds NPI list to the smart action
     When User clicks on Ok and Save
     Then Verify data is saved successfully

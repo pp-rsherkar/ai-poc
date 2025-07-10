@@ -23,6 +23,7 @@ public class StudioSteps {
     static String workspaceName;
     static String newWorkspaceName;
     static Boolean expansionFlag = true;
+    static final String WEBHOOK_URL = "https://webhook.site/4312c282-2efc-486e-bedf-3cd385a0c3da";
     List<String[]> fileContent;
     List<String[]> actualValue;
     List<String> fileContentData;
@@ -312,7 +313,7 @@ public class StudioSteps {
         workspace.closeWebhookPanel();
     }
 
-    @Then("Verify Webhook panel is enabled after applying filters")
+    @Then("Verify Webhook panel is enabled after applying engagement filters")
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         workspace.clickWebhookIcon();
         Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
@@ -325,19 +326,19 @@ public class StudioSteps {
         workspace.clickRequestOrContentButton(requestType);
     }
 
-    @And("User adds valid URL {string} and append Macros with {string} to the {string} as follow")
-    public void userAddsURLAndMacrosWithToTheURLAsFollow(String url, String param, String textType, DataTable macros) {
+    @And("User adds valid URL and append Macros with {string} to the {string} as follow")
+    public void userAddsURLAndMacrosWithToTheURLAsFollow(String param, String textType, DataTable macros) {
         List<String> macrosList = macros.asList(String.class);
-        workspace.addURL(url);
+        workspace.addURL(WEBHOOK_URL);
         workspace.addMacros(textType, param, macrosList);
     }
 
-    @Then("Verify if Macros Appended to the URL {string}")
-    public void verifyIfMacrosAppendedToTheURL(String url) {
+    @Then("Verify if Macros Appended to the URL")
+    public void verifyIfMacrosAppendedToTheURL() {
         String text = workspace.verifyMacrosAppendedToURL();
         Assert.assertTrue(
                 "Macros are not correctly appended to the URL",
-                text.matches(Pattern.quote(url) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%")
+                text.matches(Pattern.quote(WEBHOOK_URL) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%")
         );
     }
 
@@ -393,7 +394,7 @@ public class StudioSteps {
         Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
     }
 
-    @When("User deletes the webhook from the workspace list")
+    @When("User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
         workspaceCreation.searchWorkspaceAndDelete(newWorkspaceName);
