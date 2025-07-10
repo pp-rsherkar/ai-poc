@@ -18,22 +18,23 @@ import static utils.CommonUtils.normalize;
 
 public class LifeSteps {
 
-    static String campaignNameRandom;
-    static String lineItemNameRandom;
-    static String tacticNameRandom;
-    static String dealNameRandom;
-    static String dealIDRandom;
+    static String newCampaignName;
+    static String newLineItemName;
+    static String newTacticName;
+    static String newDealName;
+    static String newDealID;
     static String tacticPMP;
     static String url;
     static String username;
     static String password;
     static String npiName;
     static String npiNameEdited;
-    static String templateNameRandom;
+    static String newTemplateName;
     static String dimensionName;
     static String metricName;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
+    List<String> templateNameList = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -49,7 +50,6 @@ public class LifeSteps {
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     Constants constants = new Constants();
-    String timestamp = CommonUtils.timeStampCalculation();
     boolean flag = false;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -91,17 +91,15 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
-        /*campaignListing.setGroupByFilter();
-        navigation.clickOnIcon(" Group By Campaign ");*/
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
     public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget) {
-        campaignNameRandom = campaign_name + '_' + timestamp;
+        newCampaignName = campaign_name + '_' + CommonUtils.timeStampCalculation();
         campaigns.selectAdvertiser(advertiser);
-        campaigns.enterCampaignName(campaignNameRandom);
+        campaigns.enterCampaignName(newCampaignName);
         campaigns.setCampaignType(campaign_type);
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
@@ -115,8 +113,8 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
-        lineItemDetails.enterLineItemName(lineItemNameRandom);
+        newLineItemName = lineItemName + '_' + CommonUtils.randomNumberGeneration();
+        lineItemDetails.enterLineItemName(newLineItemName);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
@@ -131,8 +129,8 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + UUID.randomUUID().toString().substring(0, 10);
-        tacticDetails.enterTacticName(tacticNameRandom);
+        newTacticName = tacticName + '_' + CommonUtils.randomNumberGeneration();
+        tacticDetails.enterTacticName(newTacticName);
         tacticDetails.saveTacticDetails();
     }
 
@@ -178,11 +176,11 @@ public class LifeSteps {
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
     public void verify_the_newly_created_campaign_details_in_the_campaign_list() {
         campaigns.navigateToCampaignListing();
-        campaignListing.searchCreatedCampaign(campaignNameRandom);
-        Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
-        Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
+        campaignListing.searchCreatedCampaign(newCampaignName);
+        Assert.assertEquals(newCampaignName, campaignListing.verifyCreatedCampaign(newCampaignName));
+        Assert.assertEquals(newLineItemName, campaignListing.verifyCreatedLineItem(newLineItemName));
         campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
+        Assert.assertEquals(newTacticName, campaignListing.verifyCreatedTactic());
     }
 
     @Given("User navigates to NPI Lists page")
@@ -230,7 +228,7 @@ public class LifeSteps {
 
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
@@ -275,8 +273,8 @@ public class LifeSteps {
     public void user_enters_the_template_details_as(String templateName, String dimension, String metric) {
         dimensionName = dimension;
         metricName = metric;
-        templateNameRandom = templateName + '_' + timestamp;
-        reportTemplates.enterTemplateName(templateNameRandom);
+        newTemplateName = templateName + '_' + CommonUtils.timeStampCalculation();
+        reportTemplates.enterTemplateName(newTemplateName);
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
         reportTemplates.selectMetric(metric);
@@ -284,8 +282,8 @@ public class LifeSteps {
 
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
-        templateNameRandom = templateName + '_' + timestamp;
-        reportTemplates.enterTemplateName(templateNameRandom);
+        newTemplateName = templateName + '_' + CommonUtils.timeStampCalculation();
+        reportTemplates.enterTemplateName(newTemplateName);
         List<String> dimensionList = Arrays.asList(dimension.split(","));
 
         for (String dimensionValue : dimensionList) {
@@ -316,8 +314,8 @@ public class LifeSteps {
     @Then("Verify new template is saved and displayed in the template list")
     public void verify_new_template_is_saved_and_displayed_in_the_template_list() {
         assert reportTemplates.reportTemplateSuccess().contains("Template created successfully");
-        reportTemplates.searchCreatedReportTemplate(templateNameRandom);
-        Assert.assertEquals(templateNameRandom, reportTemplates.verifyCreatedReportTemplate(templateNameRandom));
+        reportTemplates.searchCreatedReportTemplate(newTemplateName);
+        Assert.assertEquals(newTemplateName, reportTemplates.verifyCreatedReportTemplate(newTemplateName));
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
@@ -352,11 +350,11 @@ public class LifeSteps {
 
     @Then("Verify the newly created campaign in the database")
     public void verify_campaign_in_database() throws SQLException {
-        String actualValue = DatabaseActions.getData(constants.CAMPAIGN_NAME, campaignNameRandom);
+        String actualValue = DatabaseActions.getData(constants.CAMPAIGN_NAME, newCampaignName);
         if (actualValue != null) {
-            Assert.assertEquals(campaignNameRandom, actualValue);
+            Assert.assertEquals(newCampaignName, actualValue);
         } else {
-            throw new SQLException("Campaign not found in the database with the expected name: " + campaignNameRandom);
+            throw new SQLException("Campaign not found in the database with the expected name: " + newCampaignName);
         }
     }
 
@@ -400,7 +398,7 @@ public class LifeSteps {
 
     @Then("User enters the NPI list details as {string} {string}")
     public void user_enters_the_npi_list_details_as(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiSmartList.enterListName(npiName);
         npiSmartList.selectAdvertiser(advertiser);
     }
@@ -455,13 +453,13 @@ public class LifeSteps {
 
     @Then("User selects the report template created tactic and other fields for running the report")
     public void user_enter_input_for_running_report() {
-        reportTemplates.enterDetailsToRunReport(templateNameRandom,tacticNameRandom);
+        reportTemplates.enterDetailsToRunReport(newTemplateName, newTacticName);
     }
 
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-       Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
+       Assert.assertEquals(newCampaignName, reportTemplates.verifyAutopopulatedCampaign(newCampaignName));
+       Assert.assertEquals(newLineItemName, reportTemplates.verifyAutopopulatedLineitem(newLineItemName));
        reportTemplates.runReport();
    }
 
@@ -475,10 +473,10 @@ public class LifeSteps {
 
     @Then("User downloads the report and verify the data in downloaded report")
     public void user_download_the_report_from_generated_report_page_and_verify_the_data() throws Exception {
-        String filePath = reportTemplates.downloadGeneratedReport(templateNameRandom);
+        String filePath = reportTemplates.downloadGeneratedReport(newTemplateName);
         navigation.clickSubMenu();
         navigation.clickReportTemplate();
-        Assert.assertTrue("Report headers match expected values!", reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath));
+        Assert.assertTrue("Report headers match expected values!", reportTemplates.verifyColumnsOfReport(newTemplateName, filePath));
     }
 
     /*Roshani Sherkar - 18-06-2025
@@ -695,7 +693,7 @@ public class LifeSteps {
 
     @And("User enters the NPI Static list details as {string} {string}")
     public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
     }
@@ -710,7 +708,7 @@ public class LifeSteps {
         npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + timestamp;
+        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
@@ -754,15 +752,15 @@ public class LifeSteps {
 
     @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}")
     public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String dealPriceType, String price) {
-        dealIDRandom = dealID + CommonUtils.timeStampCalculation();
-        dealNameRandom = dealName + CommonUtils.timeStampCalculation();
+        newDealID = dealID + CommonUtils.timeStampCalculation();
+        newDealName = dealName + CommonUtils.timeStampCalculation();
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
-        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, dealPriceType, price));
+        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, newDealID, newDealName, mediaTypeList, dealPriceType, price));
     }
 
     @When("User searches the deal and assign it from the deal list")
     public void userSelectsTheDealFromTheDealList() {
-        pmp.selectDealFromListAndAssign(dealNameRandom);
+        pmp.selectDealFromListAndAssign(newDealName);
     }
 
     @Then("Selected Deals should appear in Applied Deals panel")
@@ -782,7 +780,7 @@ public class LifeSteps {
 
     @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button {string}")
     public void dealDetailsShouldAppearOnTacticSettingsTab(String toggleButton) {
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom, toggleButton));
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(newDealName, toggleButton));
     }
 
     @And("Verify Delete icon is disabled and error message {string}")
@@ -796,17 +794,17 @@ public class LifeSteps {
         Map<String, String> rawMap = pricingStrategy.asMap(String.class, String.class);
         Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            pmp.verifyPricingStrategyIsEditable(dealIDRandom, entry.getKey(), entry.getValue());
+            pmp.verifyPricingStrategyIsEditable(newDealID, entry.getKey(), entry.getValue());
         }
     }
 
     @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
     public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String dealPriceType, String price, String toggleButton) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
-        dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
-        dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
+        newDealID = dealID + CommonUtils.timeStampCalculation() + "_01";
+        newDealName = dealName + CommonUtils.timeStampCalculation() + "_01";
         Assert.assertTrue("Assigned Deals are not present under targeting and deals section",
-                pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, dealPriceType, price, toggleButton));
+                pmp.applyDealsFromDealsSection(dealType, exchangeType, newDealID, newDealName, mediaTypeList, dealPriceType, price, toggleButton));
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
@@ -877,13 +875,12 @@ public class LifeSteps {
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
-        List<String> templateNameList  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
-        flag = targetingTemplate.searchTargetingTemplate(templateNameList);
+        templateNameList  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
     }
 
     @Then("User searches and verifies the already created targeting template using the search option")
     public void userSearchesTheAlreadyCreatedTargetingTemplateUsingTheSearchOption() {
-        Assert.assertTrue("Targeting template is not found in the search results", flag);
+        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(templateNameList));
     }
 
     @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
@@ -908,6 +905,17 @@ public class LifeSteps {
 
     @And("User deletes an existing targeting template and verifies it is removed from the list for the {string}")
     public void userDeletesAnExistingTargetingTemplateAndVerifiesItIsRemovedFromTheList(String templateName) {
-        Assert.assertTrue("Unable to delete existing targeting template", targetingTemplate.clickAndVerifyTargetTemplateDeletion(templateName));
+        Assert.assertEquals("Target template deleted successfully", targetingTemplate.clickAndVerifyTargetTemplateDeletion(templateName));
+    }
+
+    @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
+    public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
+        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
+    }
+
+    @Then("Verify the template created can be imported")
+    public void verifyTheTemplateCreatedCanBeImported() {
+        Assert.assertTrue("Tactic is not created with the imported template", flag);
     }
 }

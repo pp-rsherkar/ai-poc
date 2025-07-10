@@ -120,7 +120,6 @@ public class TargetingTemplate {
             SEARCH_BOX.fill(s.trim());
             page.locator(String.format("//div[contains(text(),'%s')]",s)).click();
             SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-            System.out.println(TEMPLATE_NAME_TEXT.innerText());
             if (TEMPLATE_NAME_TEXT.isVisible())
                 flag = true;
         }
@@ -128,24 +127,28 @@ public class TargetingTemplate {
     }
 
     public String verifyErrorMessageForTemplateName(String targetingRule) {
+        String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         ADD_TARGETINGRULE_BTN.click();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
-        TEMPLATE_NAME_ERROR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        return TEMPLATE_NAME_ERROR.innerText().trim();
+        alert = TEMPLATE_NAME_ERROR.innerText().trim();
+        TEMPLATE_NAME_ERROR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return alert;
     }
 
     public String verifyErrorMessageForTargetingRules(String templateName) {
+        String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         TEMPLATE_NAME_TEXT.fill(templateName+"_"+CommonUtils.timeStampCalculation());
         if(TARGETING_RULES_DELETE_ICON.isVisible())
             TARGETING_RULES_DELETE_ICON.click();
         SAVE_BUTTON.click();
-        TARGETING_RULES_ERROR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        return TARGETING_RULES_ERROR.innerText().trim();
+        alert = TARGETING_RULES_ERROR.innerText().trim();
+        TARGETING_RULES_ERROR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return alert;
     }
 
     public boolean clickAndVerifyShowExpression(String templateName) {
@@ -164,19 +167,21 @@ public class TargetingTemplate {
         TEMPLATE_NAME_TEXT.fill(templateName + "_edited_" + CommonUtils.timeStampCalculation());
         if (SAVE_BUTTON.isVisible()) {
             SAVE_BUTTON.click();
+            SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
             return true;
         }
         return false;
     }
 
-    public boolean clickAndVerifyTargetTemplateDeletion(String templateName) {
+    public String clickAndVerifyTargetTemplateDeletion(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         TARGET_TEMPLATE_DELETE_ICON.click();
         DELETE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         REMOVE_BUTTON.click();
-        return TEMPLATE_DELETED_ERROR.isVisible();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return TEMPLATE_DELETED_ERROR.innerText();
     }
 
 }
