@@ -181,7 +181,7 @@ public class NPISmartList {
     public void selectPrescribedDrug() {
         PRESCRIBED_DRUG.first().scrollIntoViewIfNeeded();
         PRESCRIBED_DRUG.first().check();
-        ADD_DRUG_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        ADD_DRUG_BTN.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.VISIBLE));
     }
 
     public void selectDrug(String drug) {

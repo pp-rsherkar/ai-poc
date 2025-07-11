@@ -34,6 +34,7 @@ public class LifeSteps {
     static String metricName;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
+    List<String> templateNameList = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -47,6 +48,7 @@ public class LifeSteps {
     PMP pmp = new PMP(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
+    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     boolean flag = false;
@@ -850,6 +852,74 @@ public class LifeSteps {
                 Assert.assertTrue("Expected value '" + expected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(expected));
             }
         }
+    }
+
+    /*Roshani Sherkar
+     * 08-07-2025*/
+    @When("User navigates to Targeting template page by clicking the icon from Activation section")
+    public void userNavigatesToTargetingTemplatePageByClickingTheIconFromActivationSection() {
+        navigation.clickSubMenu();
+        navigation.clickTargetingTemplate();
+    }
+
+    @Then("Verify New Template button is present above the Search option")
+    public void verifyNewTemplateButtonIsPresentAboveTheSearchOption() {
+        Assert.assertTrue("Targeting Button and Search Box are not displayed", targetingTemplate.verifyTargetingBtnAndSearchBox());
+    }
+
+    @And("Verify Targeting template section opens by clicking New Template button")
+    public void verifyTargetingTemplateSectionByClickingNewTemplateButton() {
+        Assert.assertTrue("All fields require to create targeting template are not available",targetingTemplate.clickAndVerifyTargetingTemplate());
+    }
+
+    @When("User creates Targeting template {string} for the line items {string} with channel {string} and Targeting Rules")
+    public void userCreatesTargetingTemplateForTheLineItemsWithChannelAndTargetingRules(String templateName, String lineItems, String channel, DataTable ruleTypeAndOptions) {
+        Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
+        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
+        List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
+        List<String> channelList = Arrays.stream(channel.split(",")).toList();
+        templateNameList  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+    }
+
+    @Then("User searches and verifies the already created targeting template using the search option")
+    public void userSearchesTheAlreadyCreatedTargetingTemplateUsingTheSearchOption() {
+        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(templateNameList));
+    }
+
+    @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
+    public void userTriesToSaveTheTargetingTemplateWithTargetingRuleAndWithoutSpecifyingATemplateName(String targetingRule) {
+        Assert.assertEquals("Template Name is required", targetingTemplate.verifyErrorMessageForTemplateName(targetingRule));
+    }
+
+    @And("User tries to save the targeting template with template name {string} without specifying any targeting")
+    public void userTriesToSaveTheTargetingTemplateWithTemplateNameWithoutSpecifyingAnyTargeting(String templateName) {
+        Assert.assertEquals("Please select atleast one targeting",targetingTemplate.verifyErrorMessageForTargetingRules(templateName));
+    }
+
+    @And("User clicks on Show Expression and verifies the query is displayed for the {string}")
+    public void userClicksOnAndVerifiesTheQueryIsDisplayed(String templateName) {
+        Assert.assertTrue("Targeting container is not displayed", targetingTemplate.clickAndVerifyShowExpression(templateName));
+    }
+
+    @And("User edits an existing targeting template and verifies the changes are saved for the {string}")
+    public void userEditsAnExistingTargetingTemplateAndVerifiesTheChangesAreSaved(String templateName) {
+        Assert.assertTrue("Unable to edit targeting template", targetingTemplate.clickAndVerifyTargetTemplateEditable(templateName));
+    }
+
+    @And("User deletes an existing targeting template and verifies it is removed from the list for the {string}")
+    public void userDeletesAnExistingTargetingTemplateAndVerifiesItIsRemovedFromTheList(String templateName) {
+        Assert.assertEquals("Target template deleted successfully", targetingTemplate.clickAndVerifyTargetTemplateDeletion(templateName));
+    }
+
+    @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
+    public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
+        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
+    }
+
+    @Then("Verify the template created can be imported")
+    public void verifyTheTemplateCreatedCanBeImported() {
+        Assert.assertTrue("Tactic is not created with the imported template", flag);
     }
 
 }
