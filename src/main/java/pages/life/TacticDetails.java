@@ -77,7 +77,7 @@ public class TacticDetails {
 
             //Line Item creation
             lineItemDetails.enterLineItemName(newLineItemName + "_" + CommonUtils.randomNumberGeneration());
-            lineItemDetails.selectLineItemType(lineItemType);
+            lineItemDetails.selectLineItemType(lineItemType.trim());
             navigation.clickOnIcon("Add Flight");
             lineItemDetails.enterLineItemBudget(lineBudget);
             lineItemDetails.enableLineItem();
@@ -86,7 +86,7 @@ public class TacticDetails {
             //Tactic creation
             enterTacticName(newTacticName + "_" + CommonUtils.randomNumberGeneration());
             saveTacticDetails();
-            importTargetingTemplate(lineItemType, templateNameList);
+            importTargetingTemplate(lineItemType.trim(), templateNameList);
             if(IMPORTED_TARGET_TEMPLATE.isVisible())
                 flag = true;
             saveTacticDetails();
@@ -96,7 +96,7 @@ public class TacticDetails {
 
     private void importTargetingTemplate(String lineItemType, List<String> templateNameList) {
         for(String templateName : templateNameList){
-            if(templateName.contains(lineItemType)){
+            if(templateName.contains(lineItemType.trim())){
                 IMPORT_TEMPLATE_ICON.click();
                 IMPORT_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                 TEMPLATE_SEARCH_BOX.fill(templateName);

@@ -17,6 +17,8 @@ public class CampaignListing {
     private final Locator SUB_TITLE_AFTERCAMPAIGNSEARCH;
     private final Locator FAVORITE_ONLY_CHECKBOX;
     private final Locator HIDE_FINISHED_CHECKBOX;
+    private final Locator FILTER_APPLIED_ICON;
+    private final Locator RESET_FILTER_ICON;
 
     public CampaignListing(Page page) {
         this.page = page;
@@ -31,6 +33,8 @@ public class CampaignListing {
         this.SUB_TITLE_AFTERCAMPAIGNSEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'1 Line items, 1 Campaigns, 1 Advertisers')]");
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
         this.HIDE_FINISHED_CHECKBOX = page.locator("//label[contains(text(),'Hide Finished')]/ancestor::sui-checkbox");
+        this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
+        this.RESET_FILTER_ICON = page.locator("//button[contains(text(),'Reset Filters')]");
     }
 
     public void verifyCampaignRadioBtnChecked() {
@@ -55,13 +59,23 @@ public class CampaignListing {
         }
     }
 
+    public void verifyAnyFilterApplied(){
+        if(FILTER_APPLIED_ICON.isVisible()){
+            RESET_FILTER_ICON.click();
+            PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+        }
+    }
+
     public void searchCreatedCampaign(String createdCampaign) {
         NOTE_ICON.last().waitFor(
                 new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         verifyCampaignRadioBtnChecked();
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
+        verifyAnyFilterApplied();
         SEARCH_CAMPAIGN.fill(createdCampaign);
+        if(PRE_LOADER.isVisible())
+            PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
         CLICK_CAMPAIGN_SEARCH.click();
         SUB_TITLE_AFTERCAMPAIGNSEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
