@@ -116,7 +116,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.randomNumberGeneration();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -132,7 +132,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + UUID.randomUUID().toString().substring(0, 10);
+        tacticNameRandom = tacticName + '_' + CommonUtils.randomNumberGeneration();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -913,13 +913,35 @@ public class LifeSteps {
 
     @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
     public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
-        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
-        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
+                .map(String::trim)
+                .toList();
+        flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
     }
 
-    @Then("Verify the template created can be imported")
+    @Then("Verify the template created can be imported in the tactic")
     public void verifyTheTemplateCreatedCanBeImported() {
         Assert.assertTrue("Tactic is not created with the imported template", flag);
+    }
+
+    /* Roshani Sherkar
+     * 18-07-2025
+     * Targeting Template Creation from Tactic
+     * */
+    @And("Create a tactic with below targeting rules and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
+    public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName, DataTable ruleTypeAndOptions) {
+        Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
+        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
+                .map(String::trim)
+                .toList();
+        templateNameList.clear();
+        templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
+    }
+
+    @Then("Verify the template created are saved")
+    public void verifyTheTemplateCreatedAreSaved() {
+        Assert.assertFalse("Unable to save targeting templates", templateNameList.isEmpty());
     }
 
 }

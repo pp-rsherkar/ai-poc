@@ -33,10 +33,30 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     And User deletes an existing targeting template and verifies it is removed from the list for the "Template"
     #5
     And Create a tactic with "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
-    Then Verify the template created can be imported
+    Then Verify the template created can be imported in the tactic
 
 
     Examples:
-      | TEMPLATE_NAME | CHANNEL                                         | LINE_ITEMS                                                                 | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
-      | Template      | Display Advanced, Video Advanced, DOOH Advanced | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video| 01- Advertiser | TargetingTemplate | Regular | 20000     | Line      | 500         | Tactic      |
+      | TEMPLATE_NAME | CHANNEL                                         | LINE_ITEMS                                                                 | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     |
+      | Template      | Display Advanced, Video Advanced, DOOH Advanced | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video| 01- Advertiser | TargetingTemplate | Regular | 20000     | TargetingLine | 500         | TargetingTactic |
 
+
+  @e2e @regression
+  Scenario Outline: Create a Targeting Template from Tactic and its availability under Targeting templates page
+    #1
+    And Create a tactic with below targeting rules and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
+      | Behavioral Segment | AutoSegment  |
+      | Age                | 25-29        |
+      | IP Address         | AutoIP       |
+      | Postal Codes       | 112233       |
+    Then Verify the template created are saved
+    #2
+    When User navigates to Targeting template page by clicking the icon from Activation section
+    Then Verify New Template button is present above the Search option
+    And Verify Targeting template section opens by clicking New Template button
+    #3
+    Then User searches and verifies the already created targeting template using the search option
+
+    Examples:
+     | LINE_ITEMS                                                                 | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     |
+     | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video| 01- Advertiser | TargetingTemplate | Regular | 20000     | TargetingLine | 500         | TargetingTactic |
