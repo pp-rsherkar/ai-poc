@@ -130,6 +130,8 @@ public class SmartActions {
     }
 
     public String getSavedMessage() {
-        return SAVED_SUCCESS_MESSAGE.innerText();
-    }
+    String alertText = SAVED_SUCCESS_MESSAGE.first().innerText();
+    SAVED_SUCCESS_MESSAGE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    return alertText;
+}
 }
