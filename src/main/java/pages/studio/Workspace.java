@@ -5,7 +5,9 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import utils.CommonUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 public class Workspace {
@@ -27,11 +29,20 @@ public class Workspace {
     private final Locator WEBHOOK_TOGGLE_BUTTON;
     private final Locator WEBHOOK_PANEL_TITLE;
     private final Locator WEBHOOK_CANCEL_BUTTON;
-    private final Locator GET_REQUEST;
-    private final Locator POST_REQUEST;
     private final Locator URL_TEXTAREA;
-    private final Locator MACROS;
+    private final Locator BODY_TEXTAREA;
     private final Locator PARAM;
+    private final Locator WEBHOOK_BUTTONS;
+    private final Locator WEBHOOK_SUCCESS_ALERT;
+    private final Locator WEBHOOK_SAVE_BUTTON;
+    private final Locator INLINE_ERROR_MESSAGE;
+    private final Locator ERROR_ALERT;
+    private final Locator CREATE_WORKSPACE;
+    private final Locator GO_TO_WORKSPACE_LIST;
+    private final Locator BEFORE_YOU_LEAVE_DAILOG;
+    private final Locator EXIT_BUTTON;
+    private Locator MACROS;
+
 
     public Workspace(Page page) {
         this.page = page;
@@ -51,11 +62,18 @@ public class Workspace {
         this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
         this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
         this.WEBHOOK_CANCEL_BUTTON = WORKSPACE_FRAME.locator("//button[@type='button']/div[contains(text(),'Cancel')]");
-        this.GET_REQUEST = WORKSPACE_FRAME.locator("//button[@value='GET']");
-        this.POST_REQUEST = WORKSPACE_FRAME.locator("//button[@value='POST']");
         this.URL_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@name='url']");
-        this.MACROS = WORKSPACE_FRAME.locator("//span[contains(@class,'styles__StyledBIChip')]/span/div");
+        this.BODY_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@name='body']");
         this.PARAM = WORKSPACE_FRAME.locator("//p[contains(@cursor,'pointer')]");
+        this.WEBHOOK_BUTTONS = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonItem-sc')]");
+        this.WEBHOOK_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Webhook setup successfully')]");
+        this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
+        this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
+        this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
+        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace']");
+        this.GO_TO_WORKSPACE_LIST = WORKSPACE_FRAME.locator("//div[contains(text(),'Go back to workspaces list')]");
+        this.BEFORE_YOU_LEAVE_DAILOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
+        this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
     }
 
     public void studio() {
@@ -64,7 +82,6 @@ public class Workspace {
     }
 
     public void searchWorkspace(String workspace) {
-        // WORKSPACE = WORKSPACE + '_' + UUID.randomUUID().toString().substring(0, 10);
         SEARCH_WORKSPACE.fill(workspace);
         Locator clickWorkspace = WORKSPACE_FRAME.getByText(workspace);
         clickWorkspace.click();
@@ -104,7 +121,7 @@ public class Workspace {
     }
 
     public void waitTillWorkspaceAlertHide(){
-        WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));;
+        WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void clickWebhookIcon(){
@@ -127,26 +144,96 @@ public class Workspace {
         WEBHOOK_CANCEL_BUTTON.click();
     }
 
-    public void clickRequestMethod(String requestType) {
-        if(requestType.contains("GET"))
-            GET_REQUEST.click();
-        POST_REQUEST.click();
-    }
-
-    public void addURLAndMacros(String url, String param, List<String> macrosList) {
-        URL_TEXTAREA.fill(url);
-        for(int i=0; i<MACROS.count(); i++){
-            MACROS.nth(i).locator("text="+macrosList.get(i)).click();
-            if(PARAM.isVisible())
-                PARAM.locator("text="+param).click();
+    public void clickRequestOrContentButton(String buttonName) {
+        for (int i = 0; i < WEBHOOK_BUTTONS.count(); i++) {
+            if (WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName) && WEBHOOK_BUTTONS.nth(i).getAttribute("aria-pressed").contains("true")) {
+                break;
+            }else if(WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName)){
+                WEBHOOK_BUTTONS.nth(i).click();
+                break;
+            }
         }
     }
 
-    public String verifyMacrosAppendedToURL() {
-        return URL_TEXTAREA.innerText();
+    public void addURL(String url) {
+        URL_TEXTAREA.fill(url);
     }
 
-    public void selectAndClickContentType(String contentType) {
-        page.locator(String.format("//button[contains(@value,'%s')]",contentType)).click();
+    public String verifyMacrosAppendedToURL() {
+        return URL_TEXTAREA.inputValue();
+    }
+
+    public void addBody(String jsonFile) throws IOException {
+        BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(jsonFile));
+    }
+
+    public void addMacros(String textType, String param, List<String> macrosList){
+        String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//span[contains(@class,'styles__StyledBIChip')]//span", textType);
+        MACROS = WORKSPACE_FRAME.locator(xpath);
+        for(int i = 0; i< MACROS.count(); i++){
+            MACROS.nth(i).locator("text=" + macrosList.get(i)).click();
+            if(PARAM.nth(i).isVisible()){
+                for (int j = 0; j < PARAM.count(); j++) {
+                    if (PARAM.nth(j).innerText().contains(param)) {
+                        PARAM.nth(j).click();
+                        page.keyboard().press("Escape");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void saveWebhookSetup(){
+        WEBHOOK_SAVE_BUTTON.click();
+    }
+
+    public String verifyWebhookCreationIsSuccess() {
+        String alert = WEBHOOK_SUCCESS_ALERT.innerText().trim();
+        WEBHOOK_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return alert;
+    }
+
+    public String verifyInlineErrorMessage(String invalidData) {
+        String error = " ";
+        URL_TEXTAREA.fill(invalidData);
+        if(BODY_TEXTAREA.isVisible())
+            BODY_TEXTAREA.fill(invalidData);
+        WEBHOOK_SAVE_BUTTON.click();
+        INLINE_ERROR_MESSAGE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if(INLINE_ERROR_MESSAGE.count()>0) {
+            for (int i = 0; i < INLINE_ERROR_MESSAGE.count(); i++) {
+                error = error + INLINE_ERROR_MESSAGE.nth(i).innerText();
+            }
+        }
+        return error.trim();
+    }
+
+    public String verifyErrorMsgWhenAPIFailed(List<String> mediaTypeList) throws IOException {
+        String alert = " ";
+        URL_TEXTAREA.fill(mediaTypeList.get(0));
+        if(BODY_TEXTAREA.isVisible()){
+            String file = mediaTypeList.get(1).trim();
+            BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(file));
+        }
+        WEBHOOK_SAVE_BUTTON.click();
+        alert = ERROR_ALERT.innerText();
+        ERROR_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return alert;
+    }
+
+    public String verifyMacrosAppendedToBody() {
+        return BODY_TEXTAREA.inputValue();
+    }
+
+    public String checkBackgroundColorOfWebhookIcon() {
+        return WEBHOOK_ICON.evaluate("element => getComputedStyle(element).backgroundColor").toString();
+    }
+
+    public void goToWorkspaceList() {
+        GO_TO_WORKSPACE_LIST.click();
+        BEFORE_YOU_LEAVE_DAILOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        EXIT_BUTTON.click();
+        CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 }

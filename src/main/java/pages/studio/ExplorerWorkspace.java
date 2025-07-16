@@ -92,7 +92,7 @@ public class ExplorerWorkspace {
     public void saveExplorerWorkspace() {
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        SAVE_EXPLORER_WORKSPACE.click();
+        SAVE_EXPLORER_WORKSPACE.first().click();
     }
 
     public String workspaceSuccess() {

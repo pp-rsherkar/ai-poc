@@ -61,7 +61,7 @@ public class HcpSteps {
         smartActions.clickNPIListsOption();
     }
 
-    @Then("Verify NPI list created in LIFE is present")
+    @Then("Verify NPI list created is present")
     public void verify_npi_list_created_in_life_is_present() {
         Assert.assertEquals(LifeSteps.npiName, smartActions.searchNPIList(LifeSteps.npiName));
     }

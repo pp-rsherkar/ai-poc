@@ -23,6 +23,7 @@ public class Navigation {
     private final Locator ACCOUNT_SEARCH;
     private final Locator ACCOUNT_ITEM;
     private final Locator PRE_LOADER;
+    private final Locator STUDIO_TITLE;
 
 
     public Navigation(Page page) {
@@ -42,6 +43,7 @@ public class Navigation {
         this.ACCOUNT_SEARCH = page.locator("//div[@id='accountSwitcher']/input[@placeholder='Search']");
         this.ACCOUNT_ITEM = page.locator("//div[@id='accountSwitcher']//div[@class='item']");
         this.PRE_LOADER = page.locator("//div[@class='preloader']");
+        this.STUDIO_TITLE = page.locator("//div[text()='Studio']");
 
     }
 
@@ -79,11 +81,13 @@ public class Navigation {
     }
 
     public void navigateToStudio() {
-        page.waitForLoadState();
+        //page.waitForLoadState();
+        SUB_MENU.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SUB_MENU.click();
-        page.waitForLoadState();
+        STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
-        page.waitForLoadState();
+        STUDIO_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        //page.waitForLoadState();
     }
 
     public void selectAccount(String account){
