@@ -1,10 +1,14 @@
 package utils;
 
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -61,4 +65,11 @@ public class CommonUtils {
     }
 
 
+    public static void uploadFile(Page page, String imageTextLocator, String fileName) {
+        Locator fileInput = page.locator("input[type='file']").first();
+        fileInput.setInputFiles(Paths.get("src/main/resources/" + fileName));
+        ElementHandle fileInputHandle = fileInput.elementHandle();
+        page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
+        page.waitForSelector(String.format(imageTextLocator, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+    }
 }

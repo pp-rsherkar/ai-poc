@@ -26,6 +26,7 @@ public class Navigation {
     private final Locator STUDIO_TITLE;
     private final Locator TARGETIN_TEMPLATE_ICON;
     private final Locator SPINNER;
+    private final Locator CREATIVE_LIBRARY_ICON;
 
     public Navigation(Page page) {
         this.page = page;
@@ -47,6 +48,7 @@ public class Navigation {
         this.STUDIO_TITLE = page.locator("//div[text()='Studio']");
         this.TARGETIN_TEMPLATE_ICON = page.locator("//div[contains(@class,'targetTemplateIcon')]");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
+        this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
     }
 
     public void navigateToUrl(String url) {
@@ -83,13 +85,11 @@ public class Navigation {
     }
 
     public void navigateToStudio() {
-        //page.waitForLoadState();
         SUB_MENU.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
         STUDIO_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        //page.waitForLoadState();
     }
 
     public void selectAccount(String account){
@@ -129,4 +129,8 @@ public class Navigation {
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
+    public void clickCreativeLibrary() {
+        CREATIVE_LIBRARY_ICON.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    }
 }

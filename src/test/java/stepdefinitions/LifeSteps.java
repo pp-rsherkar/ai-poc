@@ -13,6 +13,7 @@ import utils.*;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static utils.CommonUtils.normalize;
 
@@ -34,7 +35,7 @@ public class LifeSteps {
     static String metricName;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
-    List<String> templateNameList = new ArrayList<>();
+    List<String> nameList = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -49,6 +50,7 @@ public class LifeSteps {
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
+    CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     boolean flag = false;
@@ -878,12 +880,12 @@ public class LifeSteps {
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
-        templateNameList  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+        nameList = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
     }
 
     @Then("User searches and verifies the already created targeting template using the search option")
     public void userSearchesTheAlreadyCreatedTargetingTemplateUsingTheSearchOption() {
-        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(templateNameList));
+        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(nameList));
     }
 
     @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
@@ -916,7 +918,7 @@ public class LifeSteps {
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
                 .map(String::trim)
                 .toList();
-        flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
+        flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, nameList);
     }
 
     @Then("Verify the template created can be imported in the tactic")
@@ -935,13 +937,106 @@ public class LifeSteps {
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
                 .map(String::trim)
                 .toList();
-        templateNameList.clear();
-        templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
+        nameList.clear();
+        nameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
     }
 
     @Then("Verify the template created are saved")
     public void verifyTheTemplateCreatedAreSaved() {
-        Assert.assertFalse("Unable to save targeting templates", templateNameList.isEmpty());
+        Assert.assertFalse("Unable to save targeting templates", nameList.isEmpty());
     }
 
+
+    /*Roshani Sherkar
+    * 14-07-2024
+    * Creatives creation*/
+    @And("User clicks Creative Library options present under Activation tab")
+    public void userClicksCreativeLibraryOptionsPresentUnderActivationTab() {
+        navigation.clickSubMenu();
+        navigation.clickCreativeLibrary();
+    }
+
+    @Then("Verify Creative Library page is displayed")
+    public void verifyCreativeLibraryPageIsDisplayed() {
+        Assert.assertEquals("Creatives",createCreatives.verifyCreativeLibraryPageTitle());
+    }
+
+    @And("Check Activity buttons {string} and verify following filters are available and working")
+    public void checkActivityButtonsAndVerifyFollowingFiltersAreAvailableAndWorking(String buttonType, DataTable filters) {
+        Map<String, String> rawFilters = filters.asMap(String.class, String.class);
+        Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
+        createCreatives.clickActivityButton(buttonType);
+        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveBtnsPresent(buttonType));
+        Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveBtns());
+        for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
+            flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
+        }
+    }
+
+
+    @And("Verify the following sort options are available and working")
+    public void verifyTheFollowingSortOptionsAreAvailableAndWorking(DataTable sortOptions) {
+        List<String> sortOptionsList = sortOptions.asList(String.class);
+        Assert.assertTrue("Sort is not working",createCreatives.verifySortOptions(sortOptionsList));
+    }
+
+    @And("Verify Search Box is available and working")
+    public void verifySearchBoxIsAvailableAndWorking(DataTable searchValues) {
+        List<String> searchValuesList = searchValues.asList(String.class);
+        createCreatives.clickActivityButton("Active");
+        Assert.assertTrue("Search is not working",createCreatives.searchByValues(searchValuesList));
+    }
+
+    @And("Verify Copy option is available and working")
+    public void verifyCopyOptionIsAvailableAndWorking() {
+        Assert.assertEquals("Success!", createCreatives.copyCreative());
+    }
+
+
+    @When("User creates and saves {string} creative using details {string} as Advertiser, {string} as Creative Name, {string}, {string} and below Creative attributes")
+    public void userCreatesAndSavesCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType,String advertiser, String creativeName, String advertiserDSA, String financer, DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        nameList.clear();
+        for (Map<String, String> row : rows) {
+            String type = row.get("CreativeType").trim();
+            String attributes = row.get("CreativeAttributes").trim();
+
+            String newCreativeName = creativeType + "_" + creativeName + '_' + CommonUtils.timeStampCalculation();
+            createCreatives.clickNewCreativeButton();
+            createCreatives.enterCreativeDetails(advertiser, newCreativeName, advertiserDSA, financer);
+            createCreatives.selectCreativeType(creativeType);
+
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+
+            createCreatives.fillAttributes(type, attributeMap);
+            Assert.assertEquals("Success!",createCreatives.saveCreative());
+            nameList.addAll(createCreatives.fetchCreatives());
+        }
+    }
+
+    @Then("Verify the newly created creative is displayed in the Creative Library page")
+    public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPage() {
+        for(String name : nameList) {
+            Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.verifyCreativesInLibrary(name));
+        }
+    }
+
+    @And("Create and verify a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and assign the created creatives to it")
+    public void createATacticWithLineItemsAndOtherDetailsAndAssignTheCreatedCreativesToIt(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
+                .map(String::trim)
+                .toList();
+        for (String creativeName : nameList) {
+            for (String lineItem : lineItemTypeList) {
+                if(creativeName.replaceAll("_Creative_\\d+_\\d+", "").equals(lineItem)) {
+                    Assert.assertTrue("Creative is not assigned to Tactic",tacticDetails.createTacticWithLineItemsAndAssignCreative(lineItem, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName));
+                    break;
+                }
+            }
+        }
+
+    }
 }
