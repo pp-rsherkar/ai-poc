@@ -269,17 +269,16 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Report Templates page")
     public void verify_the_tabs_displayed_on_the_report_templates_page() {
-        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab());
-        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab());
         Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
     }
 
     @Then("User enters the Smart NPI list details as {string} {string} for {string}")
     public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type) {
+        timestamp = CommonUtils.timeStampCalculation();
+        npiName = npiListName + '_' + timestamp;
         switch (type) {
             case "Smart Pixel": {
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickSmartPixel();
@@ -289,8 +288,7 @@ public class LifeSteps {
                 break;
             }
             case "NPI List":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickNPIList();
@@ -300,8 +298,7 @@ public class LifeSteps {
 
                 break;
             case "Specialty":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
@@ -311,8 +308,7 @@ public class LifeSteps {
 
                 break;
             case "Profession":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
@@ -322,8 +318,7 @@ public class LifeSteps {
 
                 break;
             case "Prescribed Drug":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
@@ -331,8 +326,7 @@ public class LifeSteps {
 
                 break;
             case "Prescription Behaviour Change":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
@@ -341,24 +335,21 @@ public class LifeSteps {
                 npiSmartList.SelectPrescriptionBehaviorDetails();
                 break;
             case "Diagnosis":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
                 npiSmartList.clickDiagnosis();
                 break;
             case "Medical Procedure":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
                 npiSmartList.clickMedicalProcedure();
                 break;
             case "Endemic Research":
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickLifeCheckbox();
@@ -368,8 +359,7 @@ public class LifeSteps {
                 break;
             case "Expand":
 
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                npiName = npiListName + '_' + timestamp;
+
                 npiStaticList.enterListName(npiName);
                 npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickNPIList();

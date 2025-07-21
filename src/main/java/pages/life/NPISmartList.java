@@ -4,6 +4,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import utils.Constants;
 
 import java.util.regex.Pattern;
 
@@ -72,18 +73,25 @@ public class NPISmartList {
         this.CLICK_SPECIALTY_DROPDOWN = page.getByText("Select Specialities");
         this.SELECT_SPECIALTY_VALUE = page.locator(".pull-left > .iconSprite").first();
         this.CLICK_PRESCRIPTION_DROPDOWN = page.locator("#prescriptionBehaviorWrapper").getByRole(AriaRole.COMBOBOX);
-        this.CLICK_PRESCRIPTION_DROPDOWN_VALUE = page.getByText("Parastat44911-0034, 44911-");
+        this.CLICK_PRESCRIPTION_DROPDOWN_VALUE = page.getByText(Constants.PRESCRIPTION_DROPDOWN_VALUE);
+
+        //  this.CLICK_PRESCRIPTION_DROPDOWN_VALUE = page.getByText("Parastat44911-0034, 44911-");
         this.CLICK_PROFESSION_DROPDOWN = page.getByText("Select Profession");
-        this.SELECT_PROFESSION_VALUE = page.getByText("Nurse Practitioner");
+        this.SELECT_PROFESSION_VALUE = page.getByText(Constants.PROFESSION_VALUE);
+        // this.SELECT_PROFESSION_VALUE = page.getByText("Nurse Practitioner");
         this.CLICK_EXPAND_PRACTICE = page.getByText("Expand based on Practice and Hospital affiliation", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SMART_PIXEL_DROPDOWN = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Smart Pixel$"))).nth(1);
-        this.CLICK_SMART_PIXEL_DROPDOWN_VALUE = page.getByText("AutoCollection889379612");
+        this.CLICK_SMART_PIXEL_DROPDOWN_VALUE = page.getByText(Constants.SMART_PIXEL_DROPDOWN_VALUE);
+
+//        this.CLICK_SMART_PIXEL_DROPDOWN_VALUE = page.getByText("AutoCollection889379612");
         this.CLICK_ADD_VISITED_URL = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("altText?altText:''")).nth(2);
         this.CLICK_ADD_IGNORED_URL = page.getByText("Add URL").nth(1);
         this.INSERT_IGNORED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.INSERT_VISITED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.CLICK_NPI_GROUP = page.getByText("Select NPI Groups");
-        this.CLICK_NPI_GROUP_VALUE = page.getByText("AutoAdminNPIFileUpload187526255");
+       // this.CLICK_NPI_GROUP_VALUE = page.getByText("AutoAdminNPIFileUpload187526255");
+        this.CLICK_NPI_GROUP_VALUE = page.getByText(Constants.NPI_GROUP_VALUE);
+
 
 
         this.CLICK_LIFE_CHECKBOX = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
@@ -128,11 +136,11 @@ public class NPISmartList {
 
         CLICK_ADD_VISITED_URL.click();
 
-        INSERT_VISITED_URL.fill("www.google.com");
+        INSERT_VISITED_URL.fill(Constants.VISITED_URL_1);
 
         CLICK_ADD_VISITED_URL.click();
 
-        INSERT_VISITED_URL.fill("www.facebook.com");
+        INSERT_VISITED_URL.fill(Constants.VISITED_URL_2);
 
     }
 

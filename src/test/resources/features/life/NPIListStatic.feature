@@ -53,7 +53,7 @@ Feature: LIFE Regression - Create Static NPI List
 
     Examples:
       | ADVERTISER      | LIST_NAME       |Type|
-      | 01- Advertiser  | SMART_Pixel_NPI |Smart Pixel|
+      | 01- Advertiser  | SMART_Pixel_NPI |NPI List|
 
 
 
