@@ -39,8 +39,6 @@ Feature: LIFE Regression - Create Static NPI List
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |
 
 
-
-
   @jenkinsSwitch
   Scenario Outline: Create Smart NPI List by specifying Type.
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -48,12 +46,13 @@ Feature: LIFE Regression - Create Static NPI List
     And User navigates to NPI Lists page
     When User clicks on Create New List
     And User selects Smart List to create NPI list
-    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for "<Type>"
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for "<Type>" with "<PROFESSION_VALUE>" "<SMART_PIXEL_DROPDOWN_VALUE>" "<NPI_GROUP_VALUE>"
     Then Save and Verify the list gets saved successfully
 
+
     Examples:
-      | ADVERTISER      | LIST_NAME       |Type|
-      | 01- Advertiser  | SMART_Pixel_NPI |NPI List|
+      | ADVERTISER     | LIST_NAME       | Type     | PROFESSION_VALUE   | SMART_PIXEL_DROPDOWN_VALUE | NPI_GROUP_VALUE                 |
+      | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner | AutoCollection889379612    | AutoAdminNPIFileUpload187526255 |
 
 
 

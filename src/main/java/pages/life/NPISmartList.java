@@ -128,8 +128,8 @@ public class NPISmartList {
         CLICK_SMART_PIXEL_DROPDOWN.click();
     }
 
-    public void clickSmartPixelDropDownValue() {
-        CLICK_SMART_PIXEL_DROPDOWN_VALUE.click();
+    public void clickSmartPixelDropDownValue(String smartPixelDropdownValue) {
+        page.getByText(smartPixelDropdownValue).click();
     }
 
     public void insertVisitedURL() {
@@ -162,8 +162,9 @@ public class NPISmartList {
         CLICK_NPI_GROUP.click();
     }
 
-    public void clickNPIGroupValue() {
-        CLICK_NPI_GROUP_VALUE.click();
+    public void clickNPIGroupValue(String npiGroupValue) {
+       // CLICK_NPI_GROUP_VALUE.click();
+        page.getByText(npiGroupValue).click();
     }
 
 
@@ -223,8 +224,8 @@ public class NPISmartList {
         CLICK_PROFESSION_DROPDOWN.click();
     }
 
-    public void selectProfessionValue() {
-        SELECT_PROFESSION_VALUE.click();
+    public void selectProfessionValue(String professionValue) {
+        page.getByText(professionValue).click();
     }
 
     public void clickExpandPractice() {

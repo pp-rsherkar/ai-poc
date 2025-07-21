@@ -272,36 +272,29 @@ public class LifeSteps {
         Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
     }
 
-    @Then("User enters the Smart NPI list details as {string} {string} for {string}")
-    public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type) {
-        timestamp = CommonUtils.timeStampCalculation();
+    @Then("User enters the Smart NPI list details as {string} {string} for {string} with {string} {string} {string}")
+    public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type, String professionValue, String smartPixelDropdownValue, String npiGroupValue) {
         npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
         switch (type) {
             case "Smart Pixel": {
-
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickSmartPixel();
                 npiSmartList.clickSmartPixelDropDown();
-                npiSmartList.clickSmartPixelDropDownValue();
-                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickSmartPixelDropDownValue(smartPixelDropdownValue);
                 break;
             }
             case "NPI List":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickNPIList();
                 npiSmartList.clickNPIGroup();
-                npiSmartList.clickNPIGroupValue();
-                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickNPIGroupValue(npiGroupValue);
+
 
                 break;
             case "Specialty":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
                 npiSmartList.clickSpecialty();
                 npiSmartList.clickSpecialtyDropdown();
                 npiSmartList.selectSpecialtyValue();
@@ -309,63 +302,41 @@ public class LifeSteps {
                 break;
             case "Profession":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
                 npiSmartList.clickProfession();
                 npiSmartList.clickProfessionDropdown();
-                npiSmartList.selectProfessionValue();
+                npiSmartList.selectProfessionValue(professionValue);
 
                 break;
             case "Prescribed Drug":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
                 npiSmartList.clickPrescribedDrug();
 
                 break;
             case "Prescription Behaviour Change":
-
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
 
                 npiSmartList.clickPrescriptionBehaviorChange();
                 npiSmartList.SelectPrescriptionBehaviorDetails();
                 break;
             case "Diagnosis":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
                 npiSmartList.clickDiagnosis();
                 break;
             case "Medical Procedure":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
+
                 npiSmartList.clickMedicalProcedure();
                 break;
             case "Endemic Research":
 
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
-                npiSmartList.clickLifeCheckbox();
+
                 npiSmartList.clickEndemicResearch();
                 npiSmartList.SelectEndemicDetails();
 
                 break;
             case "Expand":
-
-
-                npiStaticList.enterListName(npiName);
-                npiStaticList.selectAdvertiser(advertiser);
                 npiSmartList.clickNPIList();
                 npiSmartList.clickNPIGroup();
-                npiSmartList.clickNPIGroupValue();
-                npiSmartList.clickLifeCheckbox();
+                npiSmartList.clickNPIGroupValue(npiGroupValue);
                 npiSmartList.clickExpandPractice();
 
                 break;
