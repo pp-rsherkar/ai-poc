@@ -26,6 +26,17 @@ public class ExplorerWorkspace {
     private final Locator SAVE_EXPLORER_WORKSPACE;
     private final Locator EXPLORER_WORKSPACE_SUCCESS;
     private final FrameLocator WORKSPACE_FRAME;
+    private final Locator INCLUDE_CHECKBOX;
+    private final Locator TO_YEAR;
+    private final Locator FROM_YEAR;
+    private final Locator REACHABLE_AUDIENCE;
+    private final Locator TAB_PANEL_SEARCH;
+    private final Locator SELECT_DESELECT_ALL;
+    private final Locator AI_CONFIGURATOR_BTN;
+    private final Locator AUDIENCE_DESCRIPTION_TEXTAREA;
+    private final Locator BUILD_AUDIENCE_BTN;
+    private final Locator TRY_ANOTHER_PROMPT_BTN;
+
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -44,6 +55,16 @@ public class ExplorerWorkspace {
         this.APPLIED_FILTER_OPTION = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterExpression-sc')]");
         this.SAVE_EXPLORER_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonBase__ButtonOuter')]/div[contains(text(),'Save')]");
         this.EXPLORER_WORKSPACE_SUCCESS = WORKSPACE_FRAME.locator("[id=\"\\32 \"] div").filter(new Locator.FilterOptions().setHasText("Workspace managementWorkspace")).nth(2);
+        this.TAB_PANEL_SEARCH = WORKSPACE_FRAME.locator("//div[@role='tabpanel']//input[@placeholder='Search']");
+        this.INCLUDE_CHECKBOX = WORKSPACE_FRAME.locator("//button[@data-testid='bi-include-exclude-check']");
+        this.TO_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-0']");
+        this.FROM_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-1']");
+        this.REACHABLE_AUDIENCE = WORKSPACE_FRAME.locator("//input[@type='checkbox' and contains(@class,'PrivateSwitchBase-input')]");
+        this.SELECT_DESELECT_ALL = WORKSPACE_FRAME.locator("//div[contains(text(),'Select/Deselect All')]");
+        this.AI_CONFIGURATOR_BTN = WORKSPACE_FRAME.locator("//span[text()='AI Configurator']");
+        this.AUDIENCE_DESCRIPTION_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@placeholder='Describe your Audience']");
+        this.BUILD_AUDIENCE_BTN = WORKSPACE_FRAME.locator("//div[text()='Build Audience']");
+        this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//button[text()='Try another prompt']");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -58,19 +79,55 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.press("Enter");
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void clickAddFilter(){
+    public void clickAddFilter() {
         ADD_FILTER.click();
     }
 
-    public void selectFilter(String filter, String option) {
+    public void selectFilter(String filter, List<String> options) {
         SEARCH_FILTER.fill(filter);
-        SELECT_FILTER.click();
-        if(filter.contains("Site") || filter.contains("Search")){
-            WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option)).click();
-        }else{
-            WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option)).click();
+        SELECT_FILTER.first().click();
+        switch (filter) {
+            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name":
+                if(filter.equals("Specialty"))
+                    WORKSPACE_FRAME.locator("//span[contains(text(),'All Speciality')]").click();
+                for (String option : options) {
+                    Locator locator = WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
+                    TAB_PANEL_SEARCH.fill(option);
+                    locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                    page.waitForTimeout(500);
+                    SELECT_DESELECT_ALL.click();
+                }
+                break;
+            case "NPI Gender", "NPI Age", "Years Practiced","Number of Patients", "Patient Age", "Patient Gender":
+                for (String option : options) {
+                    WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option.trim())).click();
+                }
+                break;
+            case "Site", "Search":
+                for (String option : options) {
+                    WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option.trim())).click();
+                }
+                break;
+            case "Graduation Year":
+                for(String option : options){
+                    String[] array = option.split("-");
+                    TO_YEAR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                    page.waitForTimeout(1000);
+                    TO_YEAR.fill(array[0]);
+                    FROM_YEAR.fill(array[1]);
+                }
+                break;
+            case "Net Worth":
+                for (String option : options) {
+                    WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option.trim())).first().click();
+                }
+                break;
+            case "Reachable Audience":
+                REACHABLE_AUDIENCE.click();
+                break;
         }
         FILTER_OK_BUTTON.click();
         SEARCH_FILTER.clear();
@@ -99,4 +156,12 @@ public class ExplorerWorkspace {
         EXPLORER_WORKSPACE_SUCCESS.waitFor();
         return EXPLORER_WORKSPACE_SUCCESS.innerText();
     }
+
+    public void clickUIConfigurator(String uiPrompt) {
+        AI_CONFIGURATOR_BTN.click();
+        AUDIENCE_DESCRIPTION_TEXTAREA.fill(uiPrompt);
+        BUILD_AUDIENCE_BTN.click();
+        TRY_ANOTHER_PROMPT_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
 }

@@ -35,7 +35,7 @@ public class Navigation {
         this.LOGIN_BUTTON = page.locator(".loginLabel");
         this.LIFE = page.getByText("Life");
         this.SIGNAL = page.getByText("Signal");
-        this.STUDIO = page.getByText("Studio");
+        this.STUDIO = page.locator("//div[contains(@class,'genomeMenuItem')]");
         this.RUN_REPORT = page.getByText("Run a Report");
         this.GENERATED_REPORT = page.locator("#megamenu").getByText("Generated Reports");
         this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
@@ -72,12 +72,13 @@ public class Navigation {
     }
 
     public String verifyProfilePage() {
-        page.waitForLoadState(LoadState.LOAD);
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
     public void navigateToLife() {
         LIFE.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void navigateToHCP() {

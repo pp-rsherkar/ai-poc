@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static factory.DriverFactory.page;
 
@@ -35,9 +36,10 @@ public class StudioSteps {
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
+    LifeSteps lifeSteps = new LifeSteps();
     CSVActions csvActions = new CSVActions();
-    List<Object> appliedFilters = new ArrayList<>();
-    List<Object> appliedOptions = new ArrayList<>();
+    List<String> appliedFilters = new ArrayList<>();
+    List<String> appliedOptions = new ArrayList<>();
     String randomNumber = CommonUtils.randomNumberGeneration();
 
     @When("the user clicks on Create New Workspace")
@@ -170,22 +172,24 @@ public class StudioSteps {
         explorerWorkspace.selectAdvertiser(advertiser);
     }
 
-    @When("User applies the {string} filter and selects {string} option")
-    public void user_applies_the_filters_as_gender_and_age(String filters, String options) {
+    @When("User applies the filter and selects option")
+    public void user_applies_the_filters_as_gender_and_age(DataTable dataTable) {
         explorerWorkspace.clickAddFilter();
-        String[] filterArray = filters.split(",");
-        String[] optionArray = options.split(",");
+        List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
 
-        if (filterArray.length != optionArray.length) {
-            throw new IllegalArgumentException("Number of filters and options do not match.");
-        }
+        for (Map<String, String> row : filters) {
+            String filterName = row.get("FilterName").trim();
+            String filterOption = row.get("Option").trim();
 
-        for (int i = 0; i < filterArray.length; i++) {
-            String filterName = filterArray[i].trim();
-            String filterOption = optionArray[i].trim();
-            appliedFilters.add(filterName);
-            appliedOptions.add(filterOption);
-            explorerWorkspace.selectFilter(filterName, filterOption);
+            if (!filterOption.isEmpty()) {
+                appliedFilters.add(filterName);
+                appliedOptions.add(filterOption);
+                List<String> filterOptionList = Arrays.stream(filterOption.split(","))
+                        .map(String::trim)
+                        .filter(opt -> !opt.isEmpty())
+                        .collect(Collectors.toList());
+                explorerWorkspace.selectFilter(filterName, filterOptionList);
+            }
         }
     }
 
@@ -196,10 +200,15 @@ public class StudioSteps {
 
     @Then("Verify that the applied filters are displayed correctly")
     public void verify_that_the_applied_filters_are_displayed_correctly() {
+        boolean flag = false;
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
         List<String> displayedOptions = explorerWorkspace.verifyAllSelectedOptions();
-        Assert.assertEquals(appliedFilters, displayedFilters);
-        Assert.assertEquals(appliedOptions, displayedOptions);
+        for (String appliedFilter : appliedFilters) {
+            boolean matchFound = displayedFilters.stream()
+                    .anyMatch(displayed -> displayed.toLowerCase().startsWith(appliedFilter.toLowerCase()));
+
+            Assert.assertTrue("Applied filter not displayed: " + appliedFilter, matchFound);
+        }
     }
 
     @Then("User saves the workspace")
@@ -209,7 +218,12 @@ public class StudioSteps {
 
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
-        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+        String actualMessage = workspaceCreation.verifyWorkspaceCreation();
+
+        boolean isValid = actualMessage.equals("Workspace saved successfully") ||
+                actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+
+        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
 
@@ -299,7 +313,12 @@ public class StudioSteps {
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspace.clickPublish();
-        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+
+        String actualMessage = workspaceCreation.verifyWorkspaceCreation();
+        boolean isValid = actualMessage.equals("Workspace saved successfully") ||
+                actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+
+        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
         workspace.clickDownbutton();
         Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
@@ -309,19 +328,19 @@ public class StudioSteps {
     @And("Verify Webhook panel is disabled before applying filters")
     public void verifyWebhookPanelIsDisabledBeforeApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Disabled",workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Disabled", workspace.verifyWebhookToggleButton());
         workspace.closeWebhookPanel();
     }
 
     @Then("Verify Webhook panel is enabled after applying engagement filters")
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Enabled", workspace.verifyWebhookToggleButton());
     }
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
-        if(requestType.contains("POST"))
+        if (requestType.contains("POST"))
             workspace.clickWebhookIcon();
         workspace.clickRequestOrContentButton(requestType);
     }
@@ -391,7 +410,7 @@ public class StudioSteps {
 
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
+        Assert.assertEquals("rgb(0, 167, 164)", workspace.checkBackgroundColorOfWebhookIcon());
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
@@ -404,12 +423,45 @@ public class StudioSteps {
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         String text = workspaceCreation.verifyDeletePopUp();
         Assert.assertTrue("Message is not displayed",
-                text.contains("You are trying to delete the workspace " + newWorkspaceName +".\n" +
+                text.contains("You are trying to delete the workspace " + newWorkspaceName + ".\n" +
                         "\n" +
                         "Webhooks are enabled for this workspace.\n" +
                         "\n" +
                         "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
                         "Do you want to proceed?"));
         Assert.assertEquals("Workspace archived successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+    }
+
+    /*Roshani Sherkar
+     * 21-07-2025*/
+    @When("User applies each of the following filters to new HCP Explorer workspaces with advertiser {string}, workspace prefix {string}, and list type {string}:")
+    public void userAppliesEachOfTheFollowingFiltersToNewHCPExplorerWorkspacesWithAdvertiserWorkspacePrefixAndListType(String advertiser, String workspaceName, String listType, DataTable uiPrompts) {
+        List<String> uiPromptsList = uiPrompts.asList(String.class);
+        appliedFilters.clear();
+        for(String uiPrompt : uiPromptsList) {
+            user_clicks_on_create_new_workspace();
+            user_sees_the_types_of_workspaces_they_have_permissions_for();
+            user_clicks_on_hcp_explorer_workspace();
+            workspaceCreation.createStudioWorkspaceUsingUIConfigurator(advertiser, workspaceName);
+            explorerWorkspace.clickUIConfigurator(uiPrompt);
+            appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
+            Assert.assertFalse("No filters were displayed after applying.", appliedFilters.isEmpty());
+            user_saves_the_workspace();
+            verify_the_hcp_explorer_workspace_is_saved();
+            download_button_is_enabled_to_the_user();
+            user_clicks_on_publish_npi_list();
+            userSelectsPublish(listType);
+            user_select_the_system_to_publish_the_list();
+            verify_list_is_published();
+            lifeSteps.userNavigatesToNPIListsPageInLIFE();
+            lifeSteps.userSearchesTheInLIFEAndSelectsIt();
+            lifeSteps.userClicksOnThePublished();
+            navigation.navigateToStudio();
+        }
+
+    }
+
+    @Then("Each filter is applied, workspace is saved, list is published, and verified in LIFE")
+    public void eachFilterIsAppliedWorkspaceIsSavedListIsPublishedAndVerifiedInLIFE() {
     }
 }

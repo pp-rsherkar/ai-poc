@@ -6,8 +6,13 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import pages.life.TacticSettings;
+import utils.CommonUtils;
 
 public class WorkspaceCreation {
+
+    ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     private final Page page;
     private final Locator CREATE_WORKSPACE;
     private final Locator HCP_EXPLORER;
@@ -23,6 +28,7 @@ public class WorkspaceCreation {
     private final Locator REMOVAL_CONFIRMATION_TEXT;
     private final Locator REMOVE_BUTTON;
     private final Locator WORKSPACE_ARCHIVAL_ALERT;
+    private final Locator OUTER_FRAME;
     int counter = 0;
 
     public WorkspaceCreation(Page page) {
@@ -41,6 +47,7 @@ public class WorkspaceCreation {
         this.REMOVAL_CONFIRMATION_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'You are trying to delete the workspace')]");
         this.REMOVE_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Remove']");
         this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Workspace archived successfully')]");
+        this.OUTER_FRAME = page.frameLocator("iframe#iframe0").locator("//div[@data-testid='chatty-frame']");
     }
 
     public String studioDashboard() {
@@ -81,6 +88,7 @@ public class WorkspaceCreation {
     }
 
     public void verifyStudioWorkspaceFrame(){
+        OUTER_FRAME.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
@@ -177,5 +185,10 @@ public class WorkspaceCreation {
         text = WORKSPACE_ARCHIVAL_ALERT.innerText();
         WORKSPACE_ARCHIVAL_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return text;
+    }
+
+    public void createStudioWorkspaceUsingUIConfigurator(String workspaceName, String advertiser) {
+        explorerWorkspace.enterWorkspaceName(workspaceName + "_" + CommonUtils.randomNumberGeneration());
+        explorerWorkspace.selectAdvertiser(advertiser);
     }
 }

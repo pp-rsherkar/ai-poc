@@ -48,7 +48,7 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
       | SearchByExchange | Pubmatic      |
     Then Verify private deals list should appear based on the filter selected
 
-  @regression
+  @e2e @regression
   Scenario Outline: Add New Private Deals and assigned to a tactic when Only Target Applied Deals toggle is ON
     When User clicks Tactic Setting tab
     Then User should navigate to respective Tactic Setting tab
@@ -75,7 +75,7 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor          | 230   | 34            | 60           |
 
 
-  @regression
+  @e2e @regression
   Scenario Outline: Add New Private Deals and assigned to a tactic when Only Target Applied Deals toggle is OFF
     When User clicks Tactic Setting tab
     Then User should navigate to respective Tactic Setting tab
