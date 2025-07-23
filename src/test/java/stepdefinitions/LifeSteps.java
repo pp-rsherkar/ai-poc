@@ -213,7 +213,7 @@ public class LifeSteps {
     @Then("User Verify the list is displayed in the Life")
     public void userVerifyTheListIsDisplayedInTheLife()
     {
-        //Assert.assertTrue(npiLists.availablePlatforms());
+        Assert.assertFalse("Labels were displayed in NPI List.", npiLists.verifyStudioFilterLabel().isEmpty());
     }
 
     @When("User clicks on Create New List")

@@ -8,6 +8,7 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import pages.admin.Accounts;
+import pages.life.NPILists;
 import pages.studio.*;
 import utils.*;
 
@@ -36,6 +37,7 @@ public class StudioSteps {
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
+    NPILists npiLists = new NPILists(DriverFactory.getPage());
     LifeSteps lifeSteps = new LifeSteps();
     CSVActions csvActions = new CSVActions();
     List<String> appliedFilters = new ArrayList<>();
@@ -436,16 +438,40 @@ public class StudioSteps {
      * 21-07-2025*/
     @When("User applies each of the following filters to new HCP Explorer workspaces with advertiser {string}, workspace prefix {string}, and list type {string}:")
     public void userAppliesEachOfTheFollowingFiltersToNewHCPExplorerWorkspacesWithAdvertiserWorkspacePrefixAndListType(String advertiser, String workspaceName, String listType, DataTable uiPrompts) {
-        List<String> uiPromptsList = uiPrompts.asList(String.class);
+        List<String> uiPromptsList = new ArrayList<>(uiPrompts.asList(String.class));
         appliedFilters.clear();
-        for(String uiPrompt : uiPromptsList) {
+        appliedOptions.clear();
+
+        for (int i = 0; i < uiPromptsList.size(); i++) {
+            String uiPrompt = uiPromptsList.get(i);
+            String newWorkspaceName = workspaceName + '_' + CommonUtils.timeStampCalculation();
+
+            // Workspace creation steps
             user_clicks_on_create_new_workspace();
             user_sees_the_types_of_workspaces_they_have_permissions_for();
             user_clicks_on_hcp_explorer_workspace();
-            workspaceCreation.createStudioWorkspaceUsingUIConfigurator(advertiser, workspaceName);
-            explorerWorkspace.clickUIConfigurator(uiPrompt);
+            explorerWorkspace.enterWorkspaceName(newWorkspaceName);
+            explorerWorkspace.selectAdvertiser(advertiser);
+            explorerWorkspace.clickAIConfigurator();
+
+            boolean flag = explorerWorkspace.describeAudience(uiPrompt);
+            int retryIndex = i + 1;
+
+            // Retry with next prompt if initial one fails
+            while (!flag && retryIndex < uiPromptsList.size()) {
+                String nextPrompt = uiPromptsList.get(retryIndex);
+                flag = explorerWorkspace.describeAudience(nextPrompt);
+                if (flag) {
+                    uiPrompt = nextPrompt;
+                    i = retryIndex;
+                }
+                retryIndex++;
+            }
+
+            Assert.assertTrue("Unable to apply audience filter for any prompt starting at: " + uiPrompt, flag);
             appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
-            Assert.assertFalse("No filters were displayed after applying.", appliedFilters.isEmpty());
+
+            // Saving and publishing the workspace
             user_saves_the_workspace();
             verify_the_hcp_explorer_workspace_is_saved();
             download_button_is_enabled_to_the_user();
@@ -453,9 +479,12 @@ public class StudioSteps {
             userSelectsPublish(listType);
             user_select_the_system_to_publish_the_list();
             verify_list_is_published();
+
+            // LIFE verification
             lifeSteps.userNavigatesToNPIListsPageInLIFE();
-            lifeSteps.userSearchesTheInLIFEAndSelectsIt();
-            lifeSteps.userClicksOnThePublished();
+            npiLists.searchNPILists(newWorkspaceName);
+            npiLists.selectPublishedList(newWorkspaceName);
+            appliedOptions = npiLists.verifyStudioFilterLabel();
             navigation.navigateToStudio();
         }
 
@@ -463,5 +492,11 @@ public class StudioSteps {
 
     @Then("Each filter is applied, workspace is saved, list is published, and verified in LIFE")
     public void eachFilterIsAppliedWorkspaceIsSavedListIsPublishedAndVerifiedInLIFE() {
+        Assert.assertFalse("No filters were displayed after applying.", appliedFilters.isEmpty());
+        Assert.assertFalse("Labels were displayed in NPI List.", appliedOptions.isEmpty());
+        Collections.sort(appliedFilters);
+        Collections.sort(appliedOptions);
+        Assert.assertEquals("Lists do not match after sorting", appliedFilters, appliedOptions);
+
     }
 }

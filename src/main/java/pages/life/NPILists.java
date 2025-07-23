@@ -5,6 +5,8 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
+import java.util.List;
+
 public class NPILists {
     private final Page page;
     private final Locator NPI_LISTS;
@@ -18,6 +20,7 @@ public class NPILists {
     private final Locator CREATE_NEW_LIST;
     private final Locator SEARCH_BOX;
     private final Locator SPINNER;
+    private final Locator STUDIO_FILTER_LABEL;
 
     public NPILists(Page page) {
         this.page = page;
@@ -32,6 +35,7 @@ public class NPILists {
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
+        this.STUDIO_FILTER_LABEL = page.locator("//span[contains(@class,'studioLabel')]");
     }
 
     public void clickNPILists() {
@@ -82,5 +86,10 @@ public class NPILists {
         page.waitForSelector(listNameXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         page.locator(listNameXpath).first().click();
         page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
+    public List<String> verifyStudioFilterLabel() {
+        STUDIO_FILTER_LABEL.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        return STUDIO_FILTER_LABEL.allInnerTexts();
     }
 }

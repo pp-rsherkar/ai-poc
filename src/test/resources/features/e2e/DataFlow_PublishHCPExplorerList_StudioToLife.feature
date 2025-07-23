@@ -26,7 +26,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
       | State              | New                                                                                                                     |
       | Profession         | Physician                                                                                                               |
       | Specialty          | Foot & Ankle Surgery, Internal Medicine                                                                                 |
-      | NPI List Name      | HCP                                                                                                                     |
+      | NPI List Name      | Large file test                                                                                                                     |
       | Medical School     | New York College                                                                                                        |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
@@ -46,7 +46,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
       | Abbvie     | Explorer       | Static    |
 
 
-  @e2e2 @regression
+  @e2e @regression
   Scenario Outline: Create and save HCP Explorer workspace using UI Configurator
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
@@ -58,7 +58,6 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
       | Focus on patients of specific age groups and genders.                                                                         |
       | Filter doctors by their gender and age, then filter by medical schools.                                                       |
       | Doctors with specific experience, states, wealth level, and patient count.                                                    |
-      | Doctors by graduation period, then target hospitals or clinics.                                                               |
     Then Each filter is applied, workspace is saved, list is published, and verified in LIFE
     Examples:
       | ADVERTISER | WORKSPACE_NAME | LIST_TYPE |

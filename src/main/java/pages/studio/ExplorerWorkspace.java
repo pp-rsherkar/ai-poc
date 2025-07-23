@@ -36,7 +36,7 @@ public class ExplorerWorkspace {
     private final Locator AUDIENCE_DESCRIPTION_TEXTAREA;
     private final Locator BUILD_AUDIENCE_BTN;
     private final Locator TRY_ANOTHER_PROMPT_BTN;
-
+    private final Locator FILTER_HEADER_TITLE;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -65,6 +65,7 @@ public class ExplorerWorkspace {
         this.AUDIENCE_DESCRIPTION_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@placeholder='Describe your Audience']");
         this.BUILD_AUDIENCE_BTN = WORKSPACE_FRAME.locator("//div[text()='Build Audience']");
         this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//button[text()='Try another prompt']");
+        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//h4[contains(@class,'style__HeaderTitle')]");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -148,7 +149,7 @@ public class ExplorerWorkspace {
 
     public void saveExplorerWorkspace() {
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setTimeout(240000).setState(WaitForSelectorState.VISIBLE));
         SAVE_EXPLORER_WORKSPACE.first().click();
     }
 
@@ -157,11 +158,14 @@ public class ExplorerWorkspace {
         return EXPLORER_WORKSPACE_SUCCESS.innerText();
     }
 
-    public void clickUIConfigurator(String uiPrompt) {
+    public void clickAIConfigurator() {
         AI_CONFIGURATOR_BTN.click();
-        AUDIENCE_DESCRIPTION_TEXTAREA.fill(uiPrompt);
-        BUILD_AUDIENCE_BTN.click();
-        TRY_ANOTHER_PROMPT_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
+    public boolean describeAudience(String aiPrompt) {
+        AUDIENCE_DESCRIPTION_TEXTAREA.fill(aiPrompt);
+        BUILD_AUDIENCE_BTN.click();
+        TRY_ANOTHER_PROMPT_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        return FILTER_HEADER_TITLE.isVisible();
+    }
 }

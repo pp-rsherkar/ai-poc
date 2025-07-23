@@ -186,9 +186,4 @@ public class WorkspaceCreation {
         WORKSPACE_ARCHIVAL_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return text;
     }
-
-    public void createStudioWorkspaceUsingUIConfigurator(String workspaceName, String advertiser) {
-        explorerWorkspace.enterWorkspaceName(workspaceName + "_" + CommonUtils.randomNumberGeneration());
-        explorerWorkspace.selectAdvertiser(advertiser);
-    }
 }
