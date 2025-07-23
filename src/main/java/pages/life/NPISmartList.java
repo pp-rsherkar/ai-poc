@@ -47,7 +47,7 @@ public class NPISmartList {
     private final Locator CLICK_EXPAND_PRACTICE;
 
     private final Locator SPINNER;
-    private final Locator ADD_DRUG_BTN;
+    private final Locator ADD_DRUG_BUTTON;
 
     public NPISmartList(Page page) {
         this.page = page;
@@ -87,7 +87,7 @@ public class NPISmartList {
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
-        this.ADD_DRUG_BTN = page.locator("//span[contains(text(), 'Add Drug')]");
+        this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
 
     }
 
@@ -181,12 +181,12 @@ public class NPISmartList {
     public void selectPrescribedDrug() {
         PRESCRIBED_DRUG.first().scrollIntoViewIfNeeded();
         PRESCRIBED_DRUG.first().check();
-        ADD_DRUG_BTN.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.VISIBLE));
+        ADD_DRUG_BUTTON.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.VISIBLE));
     }
 
     public void selectDrug(String drug) {
-        ADD_DRUG_BTN.scrollIntoViewIfNeeded();
-        ADD_DRUG_BTN.click();
+        ADD_DRUG_BUTTON.scrollIntoViewIfNeeded();
+        ADD_DRUG_BUTTON.click();
         SEARCH_DRUG.first().click();
         SEARCH_DRUG_FILL.fill(drug);
         SELECT_DRUG.click();
