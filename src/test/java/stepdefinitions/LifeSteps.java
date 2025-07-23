@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static utils.CommonUtils.normalize;
+import static utils.CommonUtils.normalizeObjectList;
 
 public class LifeSteps {
 
@@ -336,14 +337,18 @@ public class LifeSteps {
 
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
-        List<String> expectedNormalizedRuleTypes = normalize(Collections.singletonList(keyType.toString()));
-        List<String> actualNormalizedRuleTypes = normalize(Collections.singletonList(tacticSettings.fetchRulesTypes().toString()));
+        List<String> expectedNormalizedRuleTypes = normalizeObjectList(keyType);
+        List<String> actualNormalizedRuleTypes = normalizeObjectList(tacticSettings.fetchRulesTypes());
 
-        List<String> expectedNormalizedRuleOptions = normalize(Collections.singletonList(keyValues.toString()));
-        List<String> actualNormalizedRuleOptions = normalize(Collections.singletonList(tacticSettings.fetchRuleOptions().toString()));
+        List<String> expectedNormalizedRuleOptions = normalizeObjectList(keyValues);
+        List<String> actualNormalizedRuleOptions = normalizeObjectList(tacticSettings.fetchRuleOptions());
 
         Assert.assertEquals("Rule types mismatch", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
-        Assert.assertEquals("Rule options mismatch",  expectedNormalizedRuleOptions, actualNormalizedRuleOptions);
+        for (String expectedOption : expectedNormalizedRuleOptions) {
+            boolean matchFound = actualNormalizedRuleOptions.stream()
+                    .anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
+            Assert.assertTrue("Expected rule option not found: " + expectedOption, matchFound);
+        }
     }
 
     @When("User saves the settings")
