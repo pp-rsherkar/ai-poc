@@ -916,13 +916,13 @@ public class LifeSteps {
         Assert.assertEquals("Target template deleted successfully", targetingTemplate.clickAndVerifyTargetTemplateDeletion(templateName));
     }
 
-    @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
+    @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and import the template in Tactic")
     public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
         flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
     }
 
-    @Then("Verify the template created can be imported")
+    @Then("Verify the template created can be imported in the Tactic")
     public void verifyTheTemplateCreatedCanBeImported() {
         Assert.assertTrue("Tactic is not created with the imported template", flag);
     }
