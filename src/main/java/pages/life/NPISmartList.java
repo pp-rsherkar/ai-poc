@@ -33,7 +33,6 @@ public class NPISmartList {
     private final Locator CLICK_PRESCRIPTION_DROPDOWN_VALUE;
     private final Locator CLICK_SPECIALTY_DROPDOWN;
     private final Locator SELECT_SPECIALTY_VALUE;
-
     private final Locator CLICK_PROFESSION_DROPDOWN;
     private final Locator CLICK_LIFE_CHECKBOX;
     private final Locator LIST_NAME;
@@ -79,8 +78,6 @@ public class NPISmartList {
         this.INSERT_IGNORED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.INSERT_VISITED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.CLICK_NPI_GROUP = page.getByText("Select NPI Groups");
-
-
         this.CLICK_LIFE_CHECKBOX = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
@@ -95,7 +92,6 @@ public class NPISmartList {
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
-
     }
 
     public void clickSmartList() {
@@ -120,29 +116,18 @@ public class NPISmartList {
     }
 
     public void insertVisitedURL() {
-
         CLICK_ADD_VISITED_URL.click();
-
         INSERT_VISITED_URL.fill(Constants.VISITED_URL_1);
-
         CLICK_ADD_VISITED_URL.click();
-
         INSERT_VISITED_URL.fill(Constants.VISITED_URL_2);
-
     }
 
     public void checkDisabledNPI() {
-
-
     }
 
     public void insertIgnoredURL() {
-
         CLICK_ADD_IGNORED_URL.click();
-
         INSERT_IGNORED_URL.fill("www.google.com");
-
-
     }
 
     public void clickNPIGroup() {
@@ -152,7 +137,6 @@ public class NPISmartList {
     public void clickNPIGroupValue(String npiGroupValue) {
         page.getByText(npiGroupValue).click();
     }
-
 
     public void clickLifeCheckbox() {
         CLICK_LIFE_CHECKBOX.click();
@@ -252,7 +236,7 @@ public class NPISmartList {
         HCP365_AVAILABLE_IN.check();
     }
 
-    public void clickPulsepointICon() {
+    public void clickPulsepointIcon() {
         PULSEPOINT_ICON.click();
     }
 }

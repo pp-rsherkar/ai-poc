@@ -20,7 +20,7 @@ public class TargetingTemplate {
     private final Locator LINE_ITEMTYPE_VALUE;
     private final Locator CHANNEL_DROPDOWN;
     private final Locator CHANNEL_VALUE;
-    private final Locator ADD_TARGETINGRULE_BTN;
+    private final Locator ADD_TARGETINGRULE_BUTTON;
     private final Locator SAVE_BUTTON;
     private final Locator SPINNER;
     private final Locator TEMPLATE_NAME_ERROR;
@@ -43,7 +43,7 @@ public class TargetingTemplate {
         this.LINE_ITEMTYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
         this.CHANNEL_VALUE= page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
-        this.ADD_TARGETINGRULE_BTN = page.locator("//span[contains(text(),'Add Targeting Rule')]");
+        this.ADD_TARGETINGRULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.TEMPLATE_NAME_ERROR = page.locator("//div[contains(text(),'Template Name is required')]");
@@ -58,13 +58,13 @@ public class TargetingTemplate {
         this.TEMPLATE_DELETED_ERROR = page.locator("//div[contains(text(),'Target template deleted successfully')]");
     }
 
-    public boolean verifyTargetingBtnAndSearchBox() {
+    public boolean verifyTargetingButtonAndSearchBox() {
         return NEW_TEMPLATE_BUTTON.isVisible() && SEARCH_BOX.isVisible();
     }
 
     public boolean clickAndVerifyTargetingTemplate() {
         NEW_TEMPLATE_BUTTON.click();
-        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEMTYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETINGRULE_BTN.isVisible();
+        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEMTYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETINGRULE_BUTTON.isVisible();
     }
 
     public List<String> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
@@ -107,7 +107,7 @@ public class TargetingTemplate {
     }
 
     public void addTargetingRules(Map<String, List<String>> rulesMap){
-        ADD_TARGETINGRULE_BTN.click();
+        ADD_TARGETINGRULE_BUTTON.click();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
@@ -130,7 +130,7 @@ public class TargetingTemplate {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        ADD_TARGETINGRULE_BTN.click();
+        ADD_TARGETINGRULE_BUTTON.click();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
         alert = TEMPLATE_NAME_ERROR.innerText().trim();

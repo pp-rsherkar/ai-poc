@@ -209,7 +209,7 @@ public class LifeSteps {
 
     @Then("User Verify the list is displayed in the Life")
     public void userVerifyTheListIsDisplayedInTheLife() {
-        Assert.assertTrue(npiLists.availablePlatforms());
+        Assert.assertTrue("NPI list is not available in LIFE", npiLists.availablePlatforms());
     }
 
     @When("User clicks on Create New List")
@@ -219,7 +219,6 @@ public class LifeSteps {
 
     @Then("User selects Smart List to create NPI list")
     public void user_selects_smart_list_to_create_npi_list() {
-
         npiLists.clickSmartList();
     }
 
@@ -266,7 +265,9 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Report Templates page")
     public void verify_the_tabs_displayed_on_the_report_templates_page() {
-        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
+        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab().toUpperCase());
+        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab().toUpperCase());
+        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
     }
 
     @Then("User enters the Smart NPI list details as {string} {string} for {string} with {string} {string} {string}")
@@ -275,72 +276,50 @@ public class LifeSteps {
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
-        switch (type) {
-            case "Smart Pixel": {
+        switch(type.trim()) {
+            case "Smart Pixel":
                 npiSmartList.clickSmartPixel();
                 npiSmartList.clickSmartPixelDropDown();
                 npiSmartList.clickSmartPixelDropDownValue(smartPixelDropdownValue);
                 break;
-            }
             case "NPI List":
-
                 npiSmartList.clickNPIList();
                 npiSmartList.clickNPIGroup();
                 npiSmartList.clickNPIGroupValue(npiGroupValue);
-
-
                 break;
             case "Specialty":
-
                 npiSmartList.clickSpecialty();
                 npiSmartList.clickSpecialtyDropdown();
                 npiSmartList.selectSpecialtyValue();
-
                 break;
             case "Profession":
-
                 npiSmartList.clickProfession();
                 npiSmartList.clickProfessionDropdown();
                 npiSmartList.selectProfessionValue(professionValue);
-
                 break;
             case "Prescribed Drug":
-
                 npiSmartList.clickPrescribedDrug();
-
                 break;
             case "Prescription Behaviour Change":
-
                 npiSmartList.clickPrescriptionBehaviorChange();
                 npiSmartList.SelectPrescriptionBehaviorDetails();
                 break;
             case "Diagnosis":
-
                 npiSmartList.clickDiagnosis();
                 break;
             case "Medical Procedure":
-
-
                 npiSmartList.clickMedicalProcedure();
                 break;
             case "Endemic Research":
-
-
                 npiSmartList.clickEndemicResearch();
                 npiSmartList.SelectEndemicDetails();
-
                 break;
             case "Expand":
                 npiSmartList.clickNPIList();
                 npiSmartList.clickNPIGroup();
                 npiSmartList.clickNPIGroupValue(npiGroupValue);
                 npiSmartList.clickExpandPractice();
-
                 break;
-
-            default:
-                System.out.println("Invalid Type");
-
         }
     }
 
@@ -410,8 +389,8 @@ public class LifeSteps {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            keyType.add( entry.getKey());
-            keyValues.addAll( entry.getValue());
+            keyType.add(entry.getKey());
+            keyValues.addAll(entry.getValue());
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
         tacticSettings.closeRuleTypePanel();
@@ -511,7 +490,7 @@ public class LifeSteps {
 
     @Then("User navigates to Campaign Dashboard")
     public void user_navigates_to_campaign_dashboard() {
-        npiSmartList.clickPulsepointICon();
+        npiSmartList.clickPulsepointIcon();
     }
 
     @Then("Verify smart list is targeted in the tactic successfully")
@@ -543,15 +522,15 @@ public class LifeSteps {
 
     @Then("User selects the report template created tactic and other fields for running the report")
     public void user_enter_input_for_running_report() {
-        reportTemplates.enterDetailsToRunReport(templateNameRandom,tacticNameRandom);
+        reportTemplates.enterDetailsToRunReport(templateNameRandom, tacticNameRandom);
     }
 
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-       Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-       Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-       reportTemplates.runReport();
-   }
+        Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
+        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
+        reportTemplates.runReport();
+    }
 
     @Then("User navigates to generate report field and verifies the report name by campaign name")
     public void user_navigate_to_generate_report_page() {
@@ -684,9 +663,9 @@ public class LifeSteps {
     public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
         int count = campaignDashboard.verifyCampaignMarkedFavorite();
         String message = " ";
-        if(count == 0){
+        if (count == 0) {
             message = "No campaigns matching filtering criteria found";
-        }else{
+        } else {
             message = "Campaigns matching filtering criteria found";
         }
         Assert.assertTrue(message, true);
@@ -699,7 +678,7 @@ public class LifeSteps {
 
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
-        Assert.assertTrue("Campaigns with Finished Status are hidden",campaignDashboard.verifyHideFinishedCampaignList());
+        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.verifyHideFinishedCampaignList());
     }
 
     @When("User clicks Active Flights, Today and Yesterday filter option type")
@@ -758,7 +737,7 @@ public class LifeSteps {
 
     @Then("user should navigate to PMP Deals Panel")
     public void userShouldNavigateToPMPDealsPanel() {
-        Assert.assertEquals("All Deals ",pmp.verifyPMPDealsPanel());
+        Assert.assertEquals("All Deals ", pmp.verifyPMPDealsPanel());
     }
 
     @When("User clicks {string} Deals Tab")
@@ -899,7 +878,7 @@ public class LifeSteps {
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
     public void verifyBaseBidPriceAndMaxBidPriceFieldsAreEditableWhenDealsAreTargeted(String baseBidPrice, String maxBidPrice) {
-        Assert.assertTrue("Base and Max Bid Price fields are editable",pmp.verifyBaseAndMaxPriceIsEditable(baseBidPrice,maxBidPrice));
+        Assert.assertTrue("Base and Max Bid Price fields are editable", pmp.verifyBaseAndMaxPriceIsEditable(baseBidPrice, maxBidPrice));
     }
 
     @When("User clicks Save button from Tactic Setting tab")
@@ -951,12 +930,12 @@ public class LifeSteps {
 
     @Then("Verify New Template button is present above the Search option")
     public void verifyNewTemplateButtonIsPresentAboveTheSearchOption() {
-        Assert.assertTrue("Targeting Button and Search Box are not displayed", targetingTemplate.verifyTargetingBtnAndSearchBox());
+        Assert.assertTrue("Targeting Button and Search Box are not displayed", targetingTemplate.verifyTargetingButtonAndSearchBox());
     }
 
     @And("Verify Targeting template section opens by clicking New Template button")
     public void verifyTargetingTemplateSectionByClickingNewTemplateButton() {
-        Assert.assertTrue("All fields require to create targeting template are not available",targetingTemplate.clickAndVerifyTargetingTemplate());
+        Assert.assertTrue("All fields require to create targeting template are not available", targetingTemplate.clickAndVerifyTargetingTemplate());
     }
 
     @When("User creates Targeting template {string} for the line items {string} with channel {string} and Targeting Rules")
@@ -965,7 +944,7 @@ public class LifeSteps {
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
-        templateNameList  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+        templateNameList = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
     }
 
     @Then("User searches and verifies the already created targeting template using the search option")
@@ -980,7 +959,7 @@ public class LifeSteps {
 
     @And("User tries to save the targeting template with template name {string} without specifying any targeting")
     public void userTriesToSaveTheTargetingTemplateWithTemplateNameWithoutSpecifyingAnyTargeting(String templateName) {
-        Assert.assertEquals("Please select atleast one targeting",targetingTemplate.verifyErrorMessageForTargetingRules(templateName));
+        Assert.assertEquals("Please select atleast one targeting", targetingTemplate.verifyErrorMessageForTargetingRules(templateName));
     }
 
     @And("User clicks on Show Expression and verifies the query is displayed for the {string}")
