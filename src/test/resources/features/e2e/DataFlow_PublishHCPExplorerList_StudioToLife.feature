@@ -3,14 +3,18 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
   2. Publish the workspace as Studio List (Static List or Live List)
   3. Verify the published Studio list in LIFE
 
-  @e2e @regression
-  Scenario Outline: Create and save HCP Explorer workspace with specific filters
+  Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+
+  @e2e @regression
+  Scenario Outline: Create and save HCP Explorer workspace with specific filters
+    #1
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    #2
     And User applies the filter and selects option
       | FilterName         | Option                                                                                                                  |
       | NPI Age            | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
@@ -26,39 +30,24 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
       | State              | New                                                                                                                     |
       | Profession         | Physician                                                                                                               |
       | Specialty          | Foot & Ankle Surgery, Internal Medicine                                                                                 |
-      | NPI List Name      | Large file test                                                                                                                     |
+      | NPI List Name      | Large file test                                                                                                         |
       | Medical School     | New York College                                                                                                        |
     And User clicks on Ok and closes the filter popup
+    #3
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
     And Download button is enabled to the user
+    #4
     And User clicks on Publish NPI List
     And User selects publish "<LIST_TYPE>"
     And User select the system to publish the list
     Then Verify list is published
+    #5
     And User navigates to NPI Lists page in LIFE
     And User searches the workspace in LIFE and selects it
     And User clicks on the published workspace
     Then User Verify the list is displayed in the Life
-    Examples:
-      | ADVERTISER | WORKSPACE_NAME | LIST_TYPE |
-      | Abbvie     | Explorer       | Static    |
-
-
-  @e2e @regression
-  Scenario Outline: Create and save HCP Explorer workspace using UI Configurator
-    Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
-    When User applies each of the following filters to new HCP Explorer workspaces with advertiser "<ADVERTISER>", workspace prefix "<WORKSPACE_NAME>", and list type "<LIST_TYPE>":
-      | Filter doctors by their gender, how long they've been practicing, and then narrow down patients by their age groups.          |
-      | Look for doctors who graduated within a specific time frame, are located in certain states, and then focus on patient gender. |
-      | Find doctors within certain age ranges, with specific professions, and narrow by wealth.                                      |
-      | Search for doctors from specific medical schools with third-level specialties and certain patient counts.                     |
-      | Focus on patients of specific age groups and genders.                                                                         |
-      | Filter doctors by their gender and age, then filter by medical schools.                                                       |
-      | Doctors with specific experience, states, wealth level, and patient count.                                                    |
-    Then Each filter is applied, workspace is saved, list is published, and verified in LIFE
     Examples:
       | ADVERTISER | WORKSPACE_NAME | LIST_TYPE |
       | Abbvie     | Explorer       | Static    |

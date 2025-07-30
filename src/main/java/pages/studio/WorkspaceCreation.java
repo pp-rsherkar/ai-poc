@@ -38,7 +38,7 @@ public class WorkspaceCreation {
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
-        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//span[contains(@class,'TextBase-sc')]");
+        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//h3[contains(text(),'Saving workspace') or contains(text(),'Creating workspace')]/following-sibling::span");
         this.MENU_ICON = page.locator("//img[contains(@class,'menu-icon')]");
         this.WORKSPACE_TYPE = WORKSPACE_FRAME.locator("//label[text()='Workspace Type']");
         this.DELETE_DIALOG = WORKSPACE_FRAME.locator("//div[@role='dialog']");

@@ -13,18 +13,16 @@ import pages.studio.*;
 import utils.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static factory.DriverFactory.page;
 
 public class StudioSteps {
     static String workspaceName;
     static String newWorkspaceName;
-    static Boolean expansionFlag = true;
+    Boolean flag = true;
+    Boolean isOverwritten = false;
     static final String WEBHOOK_URL = "https://webhook.site/4312c282-2efc-486e-bedf-3cd385a0c3da";
     List<String[]> fileContent;
     List<String[]> actualValue;
@@ -40,8 +38,9 @@ public class StudioSteps {
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     LifeSteps lifeSteps = new LifeSteps();
     CSVActions csvActions = new CSVActions();
-    List<String> appliedFilters = new ArrayList<>();
-    List<String> appliedOptions = new ArrayList<>();
+    List<String> appliedFilterEntries = new ArrayList<>();
+    List<String> appliedFilterValues = new ArrayList<>();
+    List<String> previousNpiDetails = null;
     String randomNumber = CommonUtils.randomNumberGeneration();
 
     @When("the user clicks on Create New Workspace")
@@ -87,9 +86,7 @@ public class StudioSteps {
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("_ddMMyy_HHmmss_SSS");
-        String dateAndTimeStamp = LocalDateTime.now().format(formatter);
-        workspaceName = string + dateAndTimeStamp;
+        workspaceName = string + CommonUtils.timeStampCalculation();
         expworkspaces.renameExpansion(workspaceName);
     }
 
@@ -151,7 +148,7 @@ public class StudioSteps {
     @When("User clicks on Create New Workspace For Expansion")
     public void user_clicks_on_create_new_workspace_for_expansion() {
         Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
-        workspaceCreation.createWorkspaceExpansion(expansionFlag);
+        workspaceCreation.createWorkspaceExpansion(flag);
     }
 
     @Then("User sees the types of workspaces they have permissions for")
@@ -184,12 +181,9 @@ public class StudioSteps {
             String filterOption = row.get("Option").trim();
 
             if (!filterOption.isEmpty()) {
-                appliedFilters.add(filterName);
-                appliedOptions.add(filterOption);
-                List<String> filterOptionList = Arrays.stream(filterOption.split(","))
-                        .map(String::trim)
-                        .filter(opt -> !opt.isEmpty())
-                        .collect(Collectors.toList());
+                appliedFilterEntries.add(filterName);
+                appliedFilterValues.add(filterOption);
+                List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
                 explorerWorkspace.selectFilter(filterName, filterOptionList);
             }
         }
@@ -202,10 +196,8 @@ public class StudioSteps {
 
     @Then("Verify that the applied filters are displayed correctly")
     public void verify_that_the_applied_filters_are_displayed_correctly() {
-        boolean flag = false;
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
-        List<String> displayedOptions = explorerWorkspace.verifyAllSelectedOptions();
-        for (String appliedFilter : appliedFilters) {
+        for (String appliedFilter : appliedFilterEntries) {
             boolean matchFound = displayedFilters.stream()
                     .anyMatch(displayed -> displayed.toLowerCase().startsWith(appliedFilter.toLowerCase()));
 
@@ -405,7 +397,7 @@ public class StudioSteps {
 
     @And("Verify error message when webhook setup is failed using {string}")
     public void verifyErrorMessageWhenWebhookSetupIsFailed(String errorData) throws IOException {
-        List<String> mediaTypeList = Arrays.stream(errorData.split(",")).toList();
+        List<String> mediaTypeList = CommonUtils.parseCommaSeparatedString(errorData);
         String errorMessage = workspace.verifyErrorMsgWhenAPIFailed(mediaTypeList);
         Assert.assertTrue("Error message is not displayed", errorMessage.contains("Error occurred while saving workspace or editing webhook"));
     }
@@ -436,67 +428,109 @@ public class StudioSteps {
 
     /*Roshani Sherkar
      * 21-07-2025*/
-    @When("User applies each of the following filters to new HCP Explorer workspaces with advertiser {string}, workspace prefix {string}, and list type {string}:")
-    public void userAppliesEachOfTheFollowingFiltersToNewHCPExplorerWorkspacesWithAdvertiserWorkspacePrefixAndListType(String advertiser, String workspaceName, String listType, DataTable uiPrompts) {
-        List<String> uiPromptsList = new ArrayList<>(uiPrompts.asList(String.class));
-        appliedFilters.clear();
-        appliedOptions.clear();
-
-        for (int i = 0; i < uiPromptsList.size(); i++) {
-            String uiPrompt = uiPromptsList.get(i);
-            String newWorkspaceName = workspaceName + '_' + CommonUtils.timeStampCalculation();
-
-            // Workspace creation steps
-            user_clicks_on_create_new_workspace();
-            user_sees_the_types_of_workspaces_they_have_permissions_for();
-            user_clicks_on_hcp_explorer_workspace();
-            explorerWorkspace.enterWorkspaceName(newWorkspaceName);
-            explorerWorkspace.selectAdvertiser(advertiser);
-            explorerWorkspace.clickAIConfigurator();
-
-            boolean flag = explorerWorkspace.describeAudience(uiPrompt);
-            int retryIndex = i + 1;
-
-            // Retry with next prompt if initial one fails
-            while (!flag && retryIndex < uiPromptsList.size()) {
-                String nextPrompt = uiPromptsList.get(retryIndex);
-                flag = explorerWorkspace.describeAudience(nextPrompt);
-                if (flag) {
-                    uiPrompt = nextPrompt;
-                    i = retryIndex;
-                }
-                retryIndex++;
-            }
-
-            Assert.assertTrue("Unable to apply audience filter for any prompt starting at: " + uiPrompt, flag);
-            appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
-
-            // Saving and publishing the workspace
-            user_saves_the_workspace();
-            verify_the_hcp_explorer_workspace_is_saved();
-            download_button_is_enabled_to_the_user();
-            user_clicks_on_publish_npi_list();
-            userSelectsPublish(listType);
-            user_select_the_system_to_publish_the_list();
-            verify_list_is_published();
-
-            // LIFE verification
-            lifeSteps.userNavigatesToNPIListsPageInLIFE();
-            npiLists.searchNPILists(newWorkspaceName);
-            npiLists.selectPublishedList(newWorkspaceName);
-            appliedOptions = npiLists.verifyStudioFilterLabel();
-            navigation.navigateToStudio();
-        }
-
+    @And("User clicks on AI Configurator and build audience using the AIPrompt {string}")
+    public void userClicksOnAIConfiguratorAndBuildAudienceUsingTheAIprompt(String aiPrompt) {
+        explorerWorkspace.clickAIConfigurator();
+        flag = explorerWorkspace.describeAudience(aiPrompt);
     }
 
-    @Then("Each filter is applied, workspace is saved, list is published, and verified in LIFE")
-    public void eachFilterIsAppliedWorkspaceIsSavedListIsPublishedAndVerifiedInLIFE() {
-        Assert.assertFalse("No filters were displayed after applying.", appliedFilters.isEmpty());
-        Assert.assertFalse("Labels were displayed in NPI List.", appliedOptions.isEmpty());
-        Collections.sort(appliedFilters);
-        Collections.sort(appliedOptions);
-        Assert.assertEquals("Lists do not match after sorting", appliedFilters, appliedOptions);
+    @Then("Verify the filter is applied correctly {string}")
+    public void verifyTheFilterIsAppliedCorrectly(String primaryFilter) {
+        if(flag){
+            List<String> appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
+            List<String> expectedFilters = CommonUtils.parseCommaSeparatedString(primaryFilter);
 
+            for (String expected : expectedFilters) {
+                boolean isFilterApplied = appliedFilters.stream()
+                        .anyMatch(filter -> filter.equalsIgnoreCase(expected));
+                Assert.assertTrue("The filter '" + expected + "' is not applied correctly", isFilterApplied);
+            }
+            isOverwritten = true;
+        }else{
+            Assert.fail("AI is unable to build audience");
+        }
+    }
+
+
+    @And("User applies the following filters one by one and checks that NPI details are refined after each filter:")
+    public void userAppliesBelowFilterWithOptionAndCheckNPIDetails(DataTable dataTable) {
+        List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> row : filters) {
+            explorerWorkspace.clickAddFilter();
+            String filterName = row.get("FilterName").trim();
+            String filterOption = row.get("Option").trim();
+
+            if (!filterOption.isEmpty()) {
+                List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
+                explorerWorkspace.selectFilter(filterName, filterOptionList);
+            }
+            explorerWorkspace.applyFilter();
+            List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
+            //explorerWorkspace.deleteFilter();
+            if (previousNpiDetails != null) {
+                if (currentNpiDetails.equals(previousNpiDetails)) {
+                    Assert.assertEquals("Filter '" + filterName + "' with options '" + filterOption +
+                            "' did not refine the audience (NPI details remained the same)", currentNpiDetails, previousNpiDetails);
+                } else {
+                    Assert.assertTrue("Filter '" + filterName + "' refined the audience as expected",
+                            currentNpiDetails.size() <= previousNpiDetails.size());
+                }
+            }
+            previousNpiDetails = currentNpiDetails;
+        }
+    }
+
+
+    @And("Verify after adding ai prompt filter selected manually should be overwritten")
+    public void verifyAfterAddingAiPromptManuallySelectedFilterShouldBeOverwritten() {
+        Assert.assertTrue("AI filter did not overwrite manual filter", isOverwritten);
+    }
+
+    @And("Fetch and verify that NPI details are refined")
+    public void verifyThatNPIDetailsAreRefinedAfterEachFilter() {
+        List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
+        if (previousNpiDetails != null) {
+            if (currentNpiDetails.equals(previousNpiDetails)) {
+                Assert.assertEquals("Filter with options did not refine the audience (NPI details remained the same)", currentNpiDetails, previousNpiDetails);
+            } else {
+                Assert.assertTrue("Filter refined the audience as expected",
+                        currentNpiDetails.size() <= previousNpiDetails.size());
+            }
+        }
+        previousNpiDetails = currentNpiDetails;
+    }
+
+    @Then("Delete the filter")
+    public void deleteTheFilter() {
+        explorerWorkspace.deleteFilter();
+    }
+
+    /*Roshani Sherkar
+     * 24-07-2024*/
+    @And("User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it")
+    public void userHoversOverTheNPIVisualsIconAndClicksOnIt(DataTable dataTable) {
+        List<String> npiVisualList = dataTable.asList(String.class);
+        explorerWorkspace.hoverOverNPIVisualsIcon(npiVisualList);
+    }
+
+    @And("Verify that dashboard filters are displayed correctly in Filter section")
+    public void verifyThatCrossFiltersAreDisplayedCorrectlyInFilterSection() {
+        Assert.assertTrue("Filters were not added",explorerWorkspace.verifyCrossFiltersDisplayed());
+        appliedFilterEntries = explorerWorkspace.fetchMergedFilters();
+        System.out.println("Merge Filter" + appliedFilterEntries);
+    }
+
+    @And("Verify dashboard filters are merged with Primary filters")
+    public void verifyDashboardFiltersAreMergedWithPrimaryFilters() {
+        List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
+        System.out.println("Displayed Filter" + displayedFilters);
+
+        for (String mergedFilter : appliedFilterEntries) {
+            boolean matchFound = displayedFilters.stream()
+                    .anyMatch(displayed -> displayed.equalsIgnoreCase(mergedFilter));
+
+            Assert.assertTrue("Merged filter not displayed: " + mergedFilter, matchFound);
+        }
     }
 }

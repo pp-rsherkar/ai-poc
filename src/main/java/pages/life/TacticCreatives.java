@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class TacticCreatives {
@@ -45,6 +46,7 @@ public class TacticCreatives {
         ASSIGN_CREATIVE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CREATIVE.fill(creative);
         CLICK_SEARCH.click();
+        page.waitForTimeout(1000);
         SELECT_CREATIVE.scrollIntoViewIfNeeded();
         SELECT_CREATIVE.click();
         ASSIGN_CREATIVE_OK_BUTTON.click();
