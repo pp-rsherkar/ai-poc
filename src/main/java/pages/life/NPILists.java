@@ -18,6 +18,7 @@ public class NPILists {
     private final Locator CREATE_NEW_LIST;
     private final Locator SEARCH_BOX;
     private final Locator SPINNER;
+    private final Locator SMART_LIST;
 
     public NPILists(Page page) {
         this.page = page;
@@ -32,6 +33,7 @@ public class NPILists {
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
+        this.SMART_LIST = page.getByText("Dynamic list of NPI");
     }
 
     public void clickNPILists() {
@@ -54,6 +56,11 @@ public class NPILists {
 
     public void clickStaticList() {
         STATIC_LIST.click();
+    }
+
+    public void clickSmartList() {
+        SMART_LIST.click();
+
     }
 
     public void searchNPILists(String workspaceName) {

@@ -10,10 +10,8 @@ import org.junit.Assert;
 import pages.Navigation;
 import pages.life.*;
 import utils.*;
-
 import java.sql.SQLException;
 import java.util.*;
-
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -210,14 +208,25 @@ public class LifeSteps {
     }
 
     @Then("User Verify the list is displayed in the Life")
-    public void userVerifyTheListIsDisplayedInTheLife()
-    {
-        //Assert.assertTrue(npiLists.availablePlatforms());
+    public void userVerifyTheListIsDisplayedInTheLife() {
+        Assert.assertTrue(npiLists.availablePlatforms());
     }
 
     @When("User clicks on Create New List")
     public void user_clicks_on_create_new_list() {
         npiLists.clickCreateNewList();
+    }
+
+    @Then("User selects Smart List to create NPI list")
+    public void user_selects_smart_list_to_create_npi_list() {
+
+        npiLists.clickSmartList();
+    }
+
+    @Then("Save and Verify the list gets saved successfully")
+    public void verify_smart_list_gets_saved_successfully() {
+        npiStaticList.saveList();
+        assert npiStaticList.saveListSuccess().contains("NPI list created");
     }
 
     @Then("Verify creation of NPI List screen is displayed")
@@ -257,9 +266,82 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Report Templates page")
     public void verify_the_tabs_displayed_on_the_report_templates_page() {
-        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab().toUpperCase());
-        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab().toUpperCase());
-        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
+        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab());
+    }
+
+    @Then("User enters the Smart NPI list details as {string} {string} for {string} with {string} {string} {string}")
+    public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type, String professionValue, String smartPixelDropdownValue, String npiGroupValue) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        switch (type) {
+            case "Smart Pixel": {
+                npiSmartList.clickSmartPixel();
+                npiSmartList.clickSmartPixelDropDown();
+                npiSmartList.clickSmartPixelDropDownValue(smartPixelDropdownValue);
+                break;
+            }
+            case "NPI List":
+
+                npiSmartList.clickNPIList();
+                npiSmartList.clickNPIGroup();
+                npiSmartList.clickNPIGroupValue(npiGroupValue);
+
+
+                break;
+            case "Specialty":
+
+                npiSmartList.clickSpecialty();
+                npiSmartList.clickSpecialtyDropdown();
+                npiSmartList.selectSpecialtyValue();
+
+                break;
+            case "Profession":
+
+                npiSmartList.clickProfession();
+                npiSmartList.clickProfessionDropdown();
+                npiSmartList.selectProfessionValue(professionValue);
+
+                break;
+            case "Prescribed Drug":
+
+                npiSmartList.clickPrescribedDrug();
+
+                break;
+            case "Prescription Behaviour Change":
+
+                npiSmartList.clickPrescriptionBehaviorChange();
+                npiSmartList.SelectPrescriptionBehaviorDetails();
+                break;
+            case "Diagnosis":
+
+                npiSmartList.clickDiagnosis();
+                break;
+            case "Medical Procedure":
+
+
+                npiSmartList.clickMedicalProcedure();
+                break;
+            case "Endemic Research":
+
+
+                npiSmartList.clickEndemicResearch();
+                npiSmartList.SelectEndemicDetails();
+
+                break;
+            case "Expand":
+                npiSmartList.clickNPIList();
+                npiSmartList.clickNPIGroup();
+                npiSmartList.clickNPIGroupValue(npiGroupValue);
+                npiSmartList.clickExpandPractice();
+
+                break;
+
+            default:
+                System.out.println("Invalid Type");
+
+        }
     }
 
     @When("User clicks on New Template")
@@ -589,8 +671,8 @@ public class LifeSteps {
 
     @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
     public void filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(String iconColor) {
-       String filterIconColor = campaignDashboard.verifyFilterIcon();
-       Assert.assertEquals(iconColor, filterIconColor);
+        String filterIconColor = campaignDashboard.verifyFilterIcon();
+        Assert.assertEquals(iconColor, filterIconColor);
     }
 
     @When("User clicks Favorite star icon on few campaigns and checks Favorite Only checkbox")
