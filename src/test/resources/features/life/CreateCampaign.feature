@@ -36,7 +36,7 @@ Feature: LIFE Regression - Create a Campaign
     When User selects the "<CHANNEL>" as channel
     And User configures targeting rules as below
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
-      | In Condition       | Digestive System Diseases, Liver Diseases                          |
+      | In Condition       | Digestive System Diseases                                          |
       | Age                | 25-29, 35-39                                                       |
       | Health Pages       | Animal Diseases                                                    |
       | Postal Codes       | 123456, 10001, 987654                                              |

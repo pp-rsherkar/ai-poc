@@ -39,7 +39,7 @@ Feature: LIFE Regression - Create Static NPI List
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |
 
 
-  @jenkinsSwitch
+  @regression
   Scenario Outline: Create Smart NPI List by specifying Type.
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -51,7 +51,7 @@ Feature: LIFE Regression - Create Static NPI List
 
 
     Examples:
-      | ADVERTISER     | LIST_NAME       | Type     | PROFESSION_VALUE   | SMART_PIXEL_DROPDOWN_VALUE | NPI_GROUP_VALUE                 |
+      | ADVERTISER     | LIST_NAME       | Type       | PROFESSION_VALUE   | SMART_PIXEL_DROPDOWN_VALUE | NPI_GROUP_VALUE                 |
       | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner | AutoCollection889379612    | AutoAdminNPIFileUpload187526255 |
 
 
