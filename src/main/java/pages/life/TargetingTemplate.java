@@ -6,7 +6,7 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +33,8 @@ public class TargetingTemplate {
     private final Locator DELETE_DIALOG;
     private final Locator REMOVE_BUTTON;
     private final Locator TEMPLATE_DELETED_ERROR;
+    private final Locator TARGET_ITEM_LABEL;
+    private final Locator TARGET_ITEM_VALUE;
 
     public TargetingTemplate(Page page) {
         this.page = page;
@@ -56,6 +58,8 @@ public class TargetingTemplate {
         this.DELETE_DIALOG = page.locator("//div[contains(text(),' Delete Target Template ')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
         this.TEMPLATE_DELETED_ERROR = page.locator("//div[contains(text(),'Target template deleted successfully')]");
+        this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
+        this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
     }
 
     public boolean verifyTargetingButtonAndSearchBox() {
@@ -67,8 +71,9 @@ public class TargetingTemplate {
         return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEMTYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETINGRULE_BUTTON.isVisible();
     }
 
-    public List<String> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
-        List<String> templateNameList = new ArrayList<>();
+    public Map<String, Map<String, String>> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
+        Map<String, Map<String, String>> lineItemsToRuleCounts = new HashMap<>();
+
         for (String s : lineItemsList) {
             LINE_ITEMTYPE_DROPDOWN.click();
             for (int i = 0; i < LINE_ITEMTYPE_VALUE.count(); i++) {
@@ -82,13 +87,14 @@ public class TargetingTemplate {
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
                     SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-                    templateNameList.add(templateNameWithTimestamp);
+                    Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
+                    lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
                     NEW_TEMPLATE_BUTTON.click();
                     break;
                 }
             }
         }
-        return templateNameList;
+        return lineItemsToRuleCounts;
     }
 
     public void selectChannel(List<String> channelList) {
@@ -112,6 +118,15 @@ public class TargetingTemplate {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
         tacticSettings.closeRuleTypePanel();
+    }
+
+    public Map<String, String> fetchTargetingRulesCountFromTargeting(){
+        Map<String, String> labelCountMap = new HashMap<>();
+        int count = TARGET_ITEM_LABEL.count();
+        for(int i=0; i < count; i++) {
+            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(),TARGET_ITEM_VALUE.nth(i).innerText().trim());
+        }
+        return labelCountMap;
     }
 
     public boolean searchTargetingTemplate(List<String> templateNameList) {
