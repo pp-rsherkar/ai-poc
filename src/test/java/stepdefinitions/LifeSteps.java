@@ -490,7 +490,8 @@ public class LifeSteps {
 
     @Then("User navigates to Campaign Dashboard")
     public void user_navigates_to_campaign_dashboard() {
-        npiSmartList.clickPulsepointIcon();
+        navigation.clickSubMenu();
+        navigation.clickCampaigns();
     }
 
     @Then("Verify smart list is targeted in the tactic successfully")

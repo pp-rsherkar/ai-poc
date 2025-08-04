@@ -168,10 +168,10 @@ public class Workspace {
     }
 
     public void addMacros(String textType, String param, List<String> macrosList){
-        String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//span[contains(@class,'styles__StyledBIChip')]//span", textType);
+        String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]", textType);
         MACROS = WORKSPACE_FRAME.locator(xpath);
         for(int i = 0; i< MACROS.count(); i++){
-            MACROS.nth(i).locator("text=" + macrosList.get(i)).click();
+            MACROS.nth(i).locator(".//span[text()='%s']" + macrosList.get(i)).click();
             if(PARAM.nth(i).isVisible()){
                 for (int j = 0; j < PARAM.count(); j++) {
                     if (PARAM.nth(j).innerText().contains(param)) {
