@@ -30,6 +30,13 @@ public class CommonUtils {
                 .collect(Collectors.toList());
     }
 
+    public static List<String> normalizeObjectList(List<Object> list) {
+        return list.stream()
+                .map(Object::toString)
+                .map(s -> s.replaceAll("\\s+", " ").trim())
+                .collect(Collectors.toList());
+    }
+
     public static Map<String, List<String>> processDataTable(Map<String, String> map) {
         Map<String, List<String>> result = new LinkedHashMap<>();
 

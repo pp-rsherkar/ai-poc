@@ -59,7 +59,7 @@ public class CampaignListing {
         }
     }
 
-    public void verifyAnyFilterApplied(){
+    public void verifyIfFiltersExist(){
         if(FILTER_APPLIED_ICON.isVisible()){
             RESET_FILTER_ICON.click();
             PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
@@ -72,7 +72,7 @@ public class CampaignListing {
         verifyCampaignRadioBtnChecked();
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
-        verifyAnyFilterApplied();
+        verifyIfFiltersExist();
         SEARCH_CAMPAIGN.fill(createdCampaign);
         if(PRE_LOADER.isVisible())
             PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));

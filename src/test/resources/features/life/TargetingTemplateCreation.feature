@@ -32,8 +32,8 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     And User edits an existing targeting template and verifies the changes are saved for the "Template"
     And User deletes an existing targeting template and verifies it is removed from the list for the "Template"
     #5
-    And Create a tactic with "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
-    Then Verify the template created can be imported in the tactic
+    And Create a tactic with "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>" and import the template in Tactic
+    Then Verify the template created can be imported in the Tactic
 
 
     Examples:

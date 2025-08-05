@@ -116,7 +116,7 @@ public class TacticSettings {
                 case "In Condition":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
-                        String xpath = String.format("//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[contains(@class, 'include-default')]", val);
+                        String xpath = String.format("//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target']", val);
                         isElementVisible(xpath);
                     }
                     clickRuleTypeOkButton();

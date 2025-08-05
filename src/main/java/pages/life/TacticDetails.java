@@ -78,7 +78,7 @@ public class TacticDetails {
     public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList) {
         boolean flag = false;
         for(String lineItemType : lineItemTypeList) {
-            npiSmartList.clickPulsepointICon();
+            npiSmartList.clickPulsepointIcon();
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
