@@ -67,7 +67,7 @@ public class PMP {
         this.ADD_TARGETING_RULE = page.locator("//span[text()='Add Targeting Rule']");
         this.NEW_TARGETING_RULE = page.locator("//span[text()='New Targeting Rule']");
         this.SEARCH_RULE_TYPE = page.locator("//input[@name='search']");
-        this.ALLDEALS_PANEL = page.locator("//a[contains(@class,'nav-item ui header pointer active')]");
+        this.ALLDEALS_PANEL = page.locator("//div[@class='navbar']//a[contains(@class,'nav-item ui header pointer active')]");
         this.PRIVATE_DEALS_TAB = page.locator("//a[contains(text(),'Private Deals')]");
         this.ASSIGN_DEALS_BUTTON = page.locator("//span[contains(@class,'addDeal')]");
         this.ASSIGNED_DEALS_BUTTON = page.locator("//span[contains(@class,'addedDeal')]");

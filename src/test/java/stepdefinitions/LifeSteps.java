@@ -12,6 +12,8 @@ import pages.life.*;
 import utils.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 

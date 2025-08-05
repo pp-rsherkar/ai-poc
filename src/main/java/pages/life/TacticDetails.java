@@ -97,7 +97,7 @@ public class TacticDetails {
     public List<String> createTacticWithLineItemsAndTargetingRules(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, Map<String, List<String>> rulesMap) {
         List<String> templateNameList = new ArrayList<>();
         for (String lineItemType : lineItemTypeList) {
-            npiSmartList.clickPulsepointICon();
+            npiSmartList.clickPulsepointIcon();
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
@@ -166,7 +166,7 @@ public class TacticDetails {
     }
 
     public boolean createTacticWithLineItemsAndAssignCreative(String lineItemType, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, String CreativeName) {
-            npiSmartList.clickPulsepointICon();
+            npiSmartList.clickPulsepointIcon();
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
