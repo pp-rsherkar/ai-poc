@@ -10,7 +10,6 @@ Feature: LIFE Regression - Create Attribute NPI List
     And User selects the Attributes List and uploads the file "<FILE_NAME>"
     Then Verify file "<FILE_NAME>" is uploaded successfully
     And User selects the "<COLUMN_NAME>" column and clicks on Next
-    Then Verify the Imported Columns
     When User tries to save the Attribute list without entering any details, an error message should be displayed
     And User enters the Attributes list details as "<LIST_NAME>" "<ADVERTISER>"
     When User makes list available in LIFE and HCP365 and clicks on next

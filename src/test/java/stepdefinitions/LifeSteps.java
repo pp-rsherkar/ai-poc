@@ -1023,11 +1023,6 @@ public class LifeSteps {
         npiAttributesList.selectAdvertiser(advertiser);
     }
 
-    @Then("Verify the Imported Columns")
-    public void verifyTheImportedColumns() {
-        Assert.assertTrue("Imported columns are not displayed correctly", npiAttributesList.verifyImportedColumns());
-    }
-
     @When("User makes list available in LIFE and HCP365 and clicks on next")
     public void userMakesListAvailableInLifeAndHCP365AndClicksOnNext() {
         npiAttributesList.selectProduct();

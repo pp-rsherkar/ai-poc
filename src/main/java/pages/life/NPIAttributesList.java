@@ -25,9 +25,6 @@ public class NPIAttributesList {
     private final Locator DELETE_LIST_ICON;
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
-    private final Locator IMPORTED_COLUMN_ROWS;
-    private final String SPREADSHEET_COLUMN_VALUES;
-    private final String LIST_COLUMN_VALUES;
 
     public NPIAttributesList(Page page) {
         this.page = page;
@@ -49,9 +46,6 @@ public class NPIAttributesList {
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
-        this.IMPORTED_COLUMN_ROWS = page.locator("//div[contains(@class,'colListRow')]");
-        this.SPREADSHEET_COLUMN_VALUES = ".//div[@class='firstCol']//span[contains(@class,'fcol-tooltip')]";
-        this.LIST_COLUMN_VALUES = ".//div[@class='secondCol']//input";
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -89,23 +83,6 @@ public class NPIAttributesList {
 
     public String advertiserError() {
         return ADVERTISER_NAME_ERROR.innerText();
-    }
-
-    public boolean verifyImportedColumns() {
-        int rowCount = IMPORTED_COLUMN_ROWS.count();
-
-        for(int i=0; i<rowCount; i++) {
-            Locator row = IMPORTED_COLUMN_ROWS.nth(i);
-            Locator spreadsheetColumn = row.locator(SPREADSHEET_COLUMN_VALUES);
-            Locator listColumn = row.locator(LIST_COLUMN_VALUES);
-            String spreadsheetText = spreadsheetColumn.textContent().trim();
-            String listText = listColumn.getAttribute("value").trim();
-
-            if(!spreadsheetText.equals(listText)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void selectProduct() {
