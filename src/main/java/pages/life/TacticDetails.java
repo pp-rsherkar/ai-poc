@@ -16,9 +16,8 @@ public class TacticDetails {
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
-    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
+    Navigation navigation = new Navigation(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
-    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -76,35 +75,33 @@ public class TacticDetails {
     }
 
     public String tacticDetailsSuccess() {
-        return TACTIC_DETAILS_SUCCESS.innerText();
+        return TACTIC_DETAILS_SUCCESS.first().innerText();
     }
 
-    public boolean createTacticWithLineItems(List<String> lineItemTypeList, String advertiser, String newCampaignName, String campaignType, String budget, String newLineItemName, String lineBudget, String newTacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {
+    public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {
         List<Map<String, String>> labelCountMapList = new ArrayList<>();
-    public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList) {
-        boolean flag = false;
         for(String lineItemType : lineItemTypeList) {
             navigation.clickSubMenu();
             navigation.clickCampaigns();
             campaigns.campaignDashboard();
-
+            //Campaign, Line Item and Tactic creation
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
             createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
             createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
-
-            importTargetingTemplate(lineItemType.trim(), templateNameList);
-            if(IMPORTED_TARGET_TEMPLATE.isVisible())
-                    flag = true;
-
+            Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
+            labelCountMapList.add(labelCountMap);
             saveTacticDetails();
         }
-        return flag;
+        ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
+        labelCountMapList.sort(Comparator.comparing(Object::toString));
+        return ruleCountAndValueList.equals(labelCountMapList);
     }
 
     public List<String> createTacticWithLineItemsAndTargetingRules(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, Map<String, List<String>> rulesMap) {
         List<String> templateNameList = new ArrayList<>();
         for (String lineItemType : lineItemTypeList) {
-            npiSmartList.clickPulsepointICon();
+            navigation.clickSubMenu();
+            navigation.clickCampaigns();
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
@@ -127,6 +124,7 @@ public class TacticDetails {
         campaigns.setCampaignType(campaignType);
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -136,22 +134,13 @@ public class TacticDetails {
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-            //Tactic creation
-            enterTacticName(newTacticName + "_" + CommonUtils.randomNumberGeneration());
-            saveTacticDetails();
-            Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
-            labelCountMapList.add(labelCountMap);
-            saveTacticDetails();
-        }
-        ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
-        labelCountMapList.sort(Comparator.comparing(Object::toString));
-        return ruleCountAndValueList.equals(labelCountMapList);
-   }
-   private void createTactic(String tacticName) {
+    private void createTactic(String tacticName) {
         enterTacticName(tacticName);
         saveTacticDetails();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
@@ -186,5 +175,4 @@ public class TacticDetails {
         TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return templateName;
     }
-
 }

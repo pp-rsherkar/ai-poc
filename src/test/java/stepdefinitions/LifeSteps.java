@@ -981,14 +981,10 @@ public class LifeSteps {
 
     @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and import the template in Tactic")
     public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
-        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
-                .map(String::trim)
-                .toList();
-        flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
         List<String> templateList = new ArrayList<>(keyValueMap.keySet());
         List<Map<String, String>> ruleCountAndValueList = new ArrayList<>(keyValueMap.values());
-        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateList, ruleCountAndValueList);
+        flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateList, ruleCountAndValueList);
     }
 
     @Then("Verify the template created can be imported in the Tactic")
@@ -1080,13 +1076,15 @@ public class LifeSteps {
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
                 .map(String::trim)
                 .toList();
-        templateNameList.clear();
-        templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
+        List<String> templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
+        for (String templateName : templateNameList) {
+            keyValueMap.put(templateName, new HashMap<>());
+        }
     }
 
     @Then("Verify the template created are saved")
     public void verifyTheTemplateCreatedAreSaved() {
-        Assert.assertFalse("Unable to save targeting templates", templateNameList.isEmpty());
+        Assert.assertFalse("Unable to save targeting templates", keyValueMap.isEmpty());
     }
 
 }
