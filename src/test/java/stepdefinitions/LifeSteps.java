@@ -48,6 +48,7 @@ public class LifeSteps {
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
+    NPIAttributesList npiAttributesList = new NPIAttributesList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     boolean flag = false;
@@ -989,6 +990,79 @@ public class LifeSteps {
     @Then("Verify the template created can be imported in the Tactic")
     public void verifyTheTemplateCreatedCanBeImported() {
         Assert.assertTrue("Tactic is not created with the imported template", flag);
+    }
+
+    @And("User selects the Attributes List and uploads the file {string}")
+    public void userSelectsTheAttributesListAndUploadsTheFile(String attributesFile) {
+        npiAttributesList.uploadAttributesFile(attributesFile);
+        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded");
+    }
+
+    @Then("Verify file {string} is uploaded successfully")
+    public void verifyFileIsUploadedSuccessfully(String attributesFile) {
+        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded Excel file : " + attributesFile);
+    }
+
+    @And("User selects the {string} column and clicks on Next")
+    public void userSelectsTheNPIColumnAndClicksOnNext(String columnName) {
+        npiAttributesList.selectNPIColumn(columnName);
+        npiAttributesList.clickNextButton();
+    }
+
+    @When("User tries to save the Attribute list without entering any details, an error message should be displayed")
+    public void userSavesAttributeListWithoutAnyDetails() {
+        npiAttributesList.clickNextButton();
+        assert npiAttributesList.listNameError().contains("List Name is required");
+        String listName = "Temporary List Name";
+        npiAttributesList.enterListName(listName);
+        npiAttributesList.clickNextButton();
+        assert npiAttributesList.advertiserError().contains("Advertiser is required");
+    }
+
+    @And("User enters the Attributes list details as {string} {string}")
+    public void userEntersTheAttributesListDetailsAs(String listName, String advertiser) {
+        npiName = listName + '_' + timestamp;
+        npiAttributesList.enterListName(npiName);
+        npiAttributesList.selectAdvertiser(advertiser);
+    }
+
+    @When("User makes list available in LIFE and HCP365 and clicks on next")
+    public void userMakesListAvailableInLifeAndHCP365AndClicksOnNext() {
+        npiAttributesList.selectProduct();
+        npiAttributesList.clickNextButton();
+    }
+
+    @Then("Verify the Attributes list is saved successfully")
+    public void verifyTheAttributesListIsSavedSuccessfully() {
+        assert npiAttributesList.saveListSuccess().contains("NPI list created");
+    }
+
+    @When("User edits the saved list")
+    public void userEditsTheSavedList() {
+        npiAttributesList.clickBackToNPILists();
+        npiLists.searchList(npiName);
+        npiLists.openSearchedList(npiName);
+        npiNameEdited = "Edited" + '_' + timestamp;
+        npiAttributesList.editListName(npiNameEdited);
+        npiAttributesList.saveList();
+        assert npiAttributesList.updateListSuccess().contains("NPI list updated");
+    }
+
+    @Then("Verify the updates are applied successfully")
+    public void verifyTheUpdatesAreAppliedSuccessfully() {
+        npiAttributesList.clickBackToNPILists();
+        npiLists.searchList(npiNameEdited);
+        npiLists.openSearchedList(npiNameEdited);
+    }
+
+    @When("User deletes the Attribute list")
+    public void userDeletesTheAttributeList() {
+        npiAttributesList.deleteList();
+    }
+
+    @Then("Verify the list is deleted successfully")
+    public void verifyTheListIsDeletedSuccessfully() {
+        assert npiAttributesList.deleteSuccess().contains("NPI List Deleted");
     }
 
 }
