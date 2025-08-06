@@ -7,14 +7,14 @@ import factory.DriverFactory;
 import pages.Navigation;
 import utils.CommonUtils;
 
-import java.util.List;
+import java.util.*;
 
 public class TacticDetails {
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
-
+    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -28,6 +28,7 @@ public class TacticDetails {
     private final Locator REPLACE_BUTTON;
     private final Locator TEMPLATE_IMPORT_ALERT;
     private final Locator IMPORTED_TARGET_TEMPLATE;
+    private final Locator SPINNER;
 
     public TacticDetails(Page page) {
         this.page = page;
@@ -43,7 +44,7 @@ public class TacticDetails {
         this.REPLACE_BUTTON = page.locator("//button[contains(text(),'Replace Targeting')]");
         this.TEMPLATE_IMPORT_ALERT = page.locator("//div[contains(text(),'Template Imported Successfully')]");
         this.IMPORTED_TARGET_TEMPLATE = page.locator("//div[@class='targets-list']");
-
+        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
     }
 
     public String verifyTacticDetailsText() {
@@ -62,10 +63,11 @@ public class TacticDetails {
         return TACTIC_DETAILS_SUCCESS.innerText();
     }
 
-    public boolean createTacticWithLineItems(List<String> lineItemTypeList, String advertiser, String newCampaignName, String campaignType, String budget, String newLineItemName, String lineBudget, String newTacticName, List<String> templateNameList) {
-        boolean flag = false;
+    public boolean createTacticWithLineItems(List<String> lineItemTypeList, String advertiser, String newCampaignName, String campaignType, String budget, String newLineItemName, String lineBudget, String newTacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {
+        List<Map<String, String>> labelCountMapList = new ArrayList<>();
         for(String lineItemType : lineItemTypeList) {
-            npiSmartList.clickPulsepointIcon();
+            navigation.clickSubMenu();
+            navigation.clickCampaigns();
             campaigns.campaignDashboard();
             campaigns.createCampaign();
             campaigns.verifyCampaignText();
@@ -87,17 +89,19 @@ public class TacticDetails {
             //Tactic creation
             enterTacticName(newTacticName + "_" + CommonUtils.randomNumberGeneration());
             saveTacticDetails();
-            importTargetingTemplate(lineItemType.trim(), templateNameList);
-            if(IMPORTED_TARGET_TEMPLATE.isVisible())
-                flag = true;
+            Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
+            labelCountMapList.add(labelCountMap);
             saveTacticDetails();
         }
-        return flag;
+        ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
+        labelCountMapList.sort(Comparator.comparing(Object::toString));
+        return ruleCountAndValueList.equals(labelCountMapList);
     }
 
-    private void importTargetingTemplate(String lineItemType, List<String> templateNameList) {
+    private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
+        Map<String, String> labelCountMap = new LinkedHashMap<>();
         for(String templateName : templateNameList){
-            if(templateName.contains(lineItemType.trim())){
+            if (templateName.startsWith(lineItemType.trim() + "_")) {
                 IMPORT_TEMPLATE_ICON.click();
                 IMPORT_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                 TEMPLATE_SEARCH_BOX.fill(templateName);
@@ -105,9 +109,13 @@ public class TacticDetails {
                 IMPORT_BUTTON.click();
                 if(OVERRIDE_DIALOG.isVisible())
                     REPLACE_BUTTON.click();
+                SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
                 TEMPLATE_IMPORT_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+                labelCountMap = targetingTemplate.fetchTargetingRulesCountFromTargeting();
+                IMPORTED_TARGET_TEMPLATE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                 break;
             }
         }
+        return labelCountMap;
     }
 }

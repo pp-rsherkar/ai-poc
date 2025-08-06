@@ -33,7 +33,7 @@ public class LifeSteps {
     static String metricName;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
-    List<String> templateNameList = new ArrayList<>();
+    Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -490,7 +490,8 @@ public class LifeSteps {
 
     @Then("User navigates to Campaign Dashboard")
     public void user_navigates_to_campaign_dashboard() {
-        npiSmartList.clickPulsepointIcon();
+        navigation.clickSubMenu();
+        navigation.clickCampaigns();
     }
 
     @Then("Verify smart list is targeted in the tactic successfully")
@@ -944,12 +945,12 @@ public class LifeSteps {
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
-        templateNameList = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+        keyValueMap  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
     }
 
     @Then("User searches and verifies the already created targeting template using the search option")
     public void userSearchesTheAlreadyCreatedTargetingTemplateUsingTheSearchOption() {
-        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(templateNameList));
+        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(new ArrayList<>(keyValueMap.keySet())));
     }
 
     @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
@@ -980,7 +981,9 @@ public class LifeSteps {
     @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and import the template in Tactic")
     public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
-        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateNameList);
+        List<String> templateList = new ArrayList<>(keyValueMap.keySet());
+        List<Map<String, String>> ruleCountAndValueList = new ArrayList<>(keyValueMap.values());
+        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateList, ruleCountAndValueList);
     }
 
     @Then("Verify the template created can be imported in the Tactic")

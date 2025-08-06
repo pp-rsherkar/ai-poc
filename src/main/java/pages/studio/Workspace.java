@@ -41,7 +41,6 @@ public class Workspace {
     private final Locator GO_TO_WORKSPACE_LIST;
     private final Locator BEFORE_YOU_LEAVE_DAILOG;
     private final Locator EXIT_BUTTON;
-    private Locator MACROS;
 
 
     public Workspace(Page page) {
@@ -168,11 +167,11 @@ public class Workspace {
     }
 
     public void addMacros(String textType, String param, List<String> macrosList){
-        String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//span[contains(@class,'styles__StyledBIChip')]//span", textType);
-        MACROS = WORKSPACE_FRAME.locator(xpath);
-        for(int i = 0; i< MACROS.count(); i++){
-            MACROS.nth(i).locator("text=" + macrosList.get(i)).click();
-            if(PARAM.nth(i).isVisible()){
+        for (String macros : macrosList) {
+            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//span[contains(text(),'%s')]", textType, macros);
+            Locator MACROS = WORKSPACE_FRAME.locator(xpath);
+            if (MACROS.innerText().contains(macros)) {
+                MACROS.click();
                 for (int j = 0; j < PARAM.count(); j++) {
                     if (PARAM.nth(j).innerText().contains(param)) {
                         PARAM.nth(j).click();
