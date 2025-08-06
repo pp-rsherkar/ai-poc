@@ -1,4 +1,8 @@
-Feature: LIFE Regression - Create Static NPI List
+Feature: LIFE Regression - Create NPI List of following types:
+  1. Static NPI List by specifying NPI Numbers
+  2. Static NPI List by uploading file with NPI Numbers
+  3. Smart NPI List by specifying Type
+  4. Auto Import List creation
 
   @regression
   Scenario Outline: Create Static NPI List by specifying NPI Numbers.
@@ -53,6 +57,12 @@ Feature: LIFE Regression - Create Static NPI List
     Examples:
       | ADVERTISER     | LIST_NAME       | Type       | PROFESSION_VALUE   | SMART_PIXEL_DROPDOWN_VALUE | NPI_GROUP_VALUE                 |
       | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner | AutoCollection889379612    | AutoAdminNPIFileUpload187526255 |
+
+
+    @regression
+    Scenario Outline:
+
+      Examples:
 
 
 
