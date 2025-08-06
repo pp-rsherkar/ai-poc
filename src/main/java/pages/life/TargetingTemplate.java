@@ -35,6 +35,7 @@ public class TargetingTemplate {
     private final Locator TEMPLATE_DELETED_ERROR;
     private final Locator TARGET_ITEM_LABEL;
     private final Locator TARGET_ITEM_VALUE;
+    private final Locator TARGET_TEMPLATE_RULES;
 
     public TargetingTemplate(Page page) {
         this.page = page;
@@ -60,6 +61,7 @@ public class TargetingTemplate {
         this.TEMPLATE_DELETED_ERROR = page.locator("//div[contains(text(),'Target template deleted successfully')]");
         this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
         this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
+        this.TARGET_TEMPLATE_RULES = page.locator("//div[@class='targets-list']");
     }
 
     public boolean verifyTargetingButtonAndSearchBox() {
@@ -135,7 +137,7 @@ public class TargetingTemplate {
             SEARCH_BOX.fill(s.trim());
             page.locator(String.format("//div[contains(text(),'%s')]",s)).click();
             SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-            if (TEMPLATE_NAME_TEXT.isVisible())
+            if (TEMPLATE_NAME_TEXT.isVisible() && TARGET_TEMPLATE_RULES.isVisible())
                 flag = true;
         }
         return flag;

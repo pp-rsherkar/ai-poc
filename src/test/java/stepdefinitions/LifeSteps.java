@@ -48,6 +48,7 @@ public class LifeSteps {
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
+    NPIAttributesList npiAttributesList = new NPIAttributesList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     boolean flag = false;
@@ -115,7 +116,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.randomNumberGeneration();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -131,7 +132,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + UUID.randomUUID().toString().substring(0, 10);
+        tacticNameRandom = tacticName + '_' + CommonUtils.randomNumberGeneration();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -983,12 +984,107 @@ public class LifeSteps {
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
         List<String> templateList = new ArrayList<>(keyValueMap.keySet());
         List<Map<String, String>> ruleCountAndValueList = new ArrayList<>(keyValueMap.values());
-        flag = tacticDetails.createTacticWithLineItems(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateList, ruleCountAndValueList);
+        flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateList, ruleCountAndValueList);
     }
 
     @Then("Verify the template created can be imported in the Tactic")
     public void verifyTheTemplateCreatedCanBeImported() {
         Assert.assertTrue("Tactic is not created with the imported template", flag);
+    }
+
+    @And("User selects the Attributes List and uploads the file {string}")
+    public void userSelectsTheAttributesListAndUploadsTheFile(String attributesFile) {
+        npiAttributesList.uploadAttributesFile(attributesFile);
+        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded");
+    }
+
+    @Then("Verify file {string} is uploaded successfully")
+    public void verifyFileIsUploadedSuccessfully(String attributesFile) {
+        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded Excel file : " + attributesFile);
+    }
+
+    @And("User selects the {string} column and clicks on Next")
+    public void userSelectsTheNPIColumnAndClicksOnNext(String columnName) {
+        npiAttributesList.selectNPIColumn(columnName);
+        npiAttributesList.clickNextButton();
+    }
+
+    @When("User tries to save the Attribute list without entering any details, an error message should be displayed")
+    public void userSavesAttributeListWithoutAnyDetails() {
+        npiAttributesList.clickNextButton();
+        assert npiAttributesList.listNameError().contains("List Name is required");
+        String listName = "Temporary List Name";
+        npiAttributesList.enterListName(listName);
+        npiAttributesList.clickNextButton();
+        assert npiAttributesList.advertiserError().contains("Advertiser is required");
+    }
+
+    @And("User enters the Attributes list details as {string} {string}")
+    public void userEntersTheAttributesListDetailsAs(String listName, String advertiser) {
+        npiName = listName + '_' + timestamp;
+        npiAttributesList.enterListName(npiName);
+        npiAttributesList.selectAdvertiser(advertiser);
+    }
+
+    @When("User makes list available in LIFE and HCP365 and clicks on next")
+    public void userMakesListAvailableInLifeAndHCP365AndClicksOnNext() {
+        npiAttributesList.selectProduct();
+        npiAttributesList.clickNextButton();
+    }
+
+    @Then("Verify the Attributes list is saved successfully")
+    public void verifyTheAttributesListIsSavedSuccessfully() {
+        assert npiAttributesList.saveListSuccess().contains("NPI list created");
+    }
+
+    @When("User edits the saved list")
+    public void userEditsTheSavedList() {
+        npiAttributesList.clickBackToNPILists();
+        npiLists.searchList(npiName);
+        npiLists.openSearchedList(npiName);
+        npiNameEdited = "Edited" + '_' + timestamp;
+        npiAttributesList.editListName(npiNameEdited);
+        npiAttributesList.saveList();
+        assert npiAttributesList.updateListSuccess().contains("NPI list updated");
+    }
+
+    @Then("Verify the updates are applied successfully")
+    public void verifyTheUpdatesAreAppliedSuccessfully() {
+        npiAttributesList.clickBackToNPILists();
+        npiLists.searchList(npiNameEdited);
+        npiLists.openSearchedList(npiNameEdited);
+    }
+
+    @When("User deletes the Attribute list")
+    public void userDeletesTheAttributeList() {
+        npiAttributesList.deleteList();
+    }
+
+    @Then("Verify the list is deleted successfully")
+    public void verifyTheListIsDeletedSuccessfully() {
+        assert npiAttributesList.deleteSuccess().contains("NPI List Deleted");
+    }
+
+    /* Roshani Sherkar
+     * 18-07-2025
+     * Targeting Template Creation from Tactic
+     * */
+    @And("Create a tactic with below targeting rules and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
+    public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName, DataTable ruleTypeAndOptions) {
+        Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
+        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
+                .map(String::trim)
+                .toList();
+        List<String> templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
+        for (String templateName : templateNameList) {
+            keyValueMap.put(templateName, new HashMap<>());
+        }
+    }
+
+    @Then("Verify the template created are saved")
+    public void verifyTheTemplateCreatedAreSaved() {
+        Assert.assertFalse("Unable to save targeting templates", keyValueMap.isEmpty());
     }
 
 }
