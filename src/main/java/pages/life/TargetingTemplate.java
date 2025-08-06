@@ -6,7 +6,7 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +20,7 @@ public class TargetingTemplate {
     private final Locator LINE_ITEMTYPE_VALUE;
     private final Locator CHANNEL_DROPDOWN;
     private final Locator CHANNEL_VALUE;
-    private final Locator ADD_TARGETINGRULE_BTN;
+    private final Locator ADD_TARGETINGRULE_BUTTON;
     private final Locator SAVE_BUTTON;
     private final Locator SPINNER;
     private final Locator TEMPLATE_NAME_ERROR;
@@ -33,6 +33,8 @@ public class TargetingTemplate {
     private final Locator DELETE_DIALOG;
     private final Locator REMOVE_BUTTON;
     private final Locator TEMPLATE_DELETED_ERROR;
+    private final Locator TARGET_ITEM_LABEL;
+    private final Locator TARGET_ITEM_VALUE;
     private final Locator TARGET_TEMPLATE_RULES;
 
     public TargetingTemplate(Page page) {
@@ -44,7 +46,7 @@ public class TargetingTemplate {
         this.LINE_ITEMTYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
         this.CHANNEL_VALUE= page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
-        this.ADD_TARGETINGRULE_BTN = page.locator("//span[contains(text(),'Add Targeting Rule')]");
+        this.ADD_TARGETINGRULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.TEMPLATE_NAME_ERROR = page.locator("//div[contains(text(),'Template Name is required')]");
@@ -57,21 +59,23 @@ public class TargetingTemplate {
         this.DELETE_DIALOG = page.locator("//div[contains(text(),' Delete Target Template ')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
         this.TEMPLATE_DELETED_ERROR = page.locator("//div[contains(text(),'Target template deleted successfully')]");
+        this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
+        this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
         this.TARGET_TEMPLATE_RULES = page.locator("//div[@class='targets-list']");
-
     }
 
-    public boolean verifyTargetingBtnAndSearchBox() {
+    public boolean verifyTargetingButtonAndSearchBox() {
         return NEW_TEMPLATE_BUTTON.isVisible() && SEARCH_BOX.isVisible();
     }
 
     public boolean clickAndVerifyTargetingTemplate() {
         NEW_TEMPLATE_BUTTON.click();
-        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEMTYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETINGRULE_BTN.isVisible();
+        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEMTYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETINGRULE_BUTTON.isVisible();
     }
 
-    public List<String> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
-        List<String> templateNameList = new ArrayList<>();
+    public Map<String, Map<String, String>> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
+        Map<String, Map<String, String>> lineItemsToRuleCounts = new HashMap<>();
+
         for (String s : lineItemsList) {
             LINE_ITEMTYPE_DROPDOWN.click();
             for (int i = 0; i < LINE_ITEMTYPE_VALUE.count(); i++) {
@@ -85,13 +89,14 @@ public class TargetingTemplate {
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
                     SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-                    templateNameList.add(templateNameWithTimestamp);
+                    Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
+                    lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
                     NEW_TEMPLATE_BUTTON.click();
                     break;
                 }
             }
         }
-        return templateNameList;
+        return lineItemsToRuleCounts;
     }
 
     public void selectChannel(List<String> channelList) {
@@ -110,11 +115,20 @@ public class TargetingTemplate {
     }
 
     public void addTargetingRules(Map<String, List<String>> rulesMap){
-        ADD_TARGETINGRULE_BTN.click();
+        ADD_TARGETINGRULE_BUTTON.click();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
         tacticSettings.closeRuleTypePanel();
+    }
+
+    public Map<String, String> fetchTargetingRulesCountFromTargeting(){
+        Map<String, String> labelCountMap = new HashMap<>();
+        int count = TARGET_ITEM_LABEL.count();
+        for(int i=0; i < count; i++) {
+            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(),TARGET_ITEM_VALUE.nth(i).innerText().trim());
+        }
+        return labelCountMap;
     }
 
     public boolean searchTargetingTemplate(List<String> templateNameList) {
@@ -133,7 +147,7 @@ public class TargetingTemplate {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        ADD_TARGETINGRULE_BTN.click();
+        ADD_TARGETINGRULE_BUTTON.click();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
         alert = TEMPLATE_NAME_ERROR.innerText().trim();

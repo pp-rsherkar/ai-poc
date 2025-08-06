@@ -40,7 +40,7 @@ public class ExplorerWorkspace {
         this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
-        this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitle-sc-')]");
+        this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitleContainer-sc-')]");
         this.APPLIED_FILTER_OPTION = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterExpression-sc')]");
         this.SAVE_EXPLORER_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonBase__ButtonOuter')]/div[contains(text(),'Save')]");
         this.EXPLORER_WORKSPACE_SUCCESS = WORKSPACE_FRAME.locator("[id=\"\\32 \"] div").filter(new Locator.FilterOptions().setHasText("Workspace managementWorkspace")).nth(2);
@@ -81,7 +81,7 @@ public class ExplorerWorkspace {
     }
 
     public List<String> verifyAllSelectedFilters() {
-        DASHBOARD_CONTENT.waitFor();
+        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return APPLIED_FILTER.allInnerTexts();
     }
 

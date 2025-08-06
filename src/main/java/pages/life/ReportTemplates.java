@@ -176,6 +176,10 @@ public class ReportTemplates {
     public void enterDetailsToRunReport(String reportTemplateName, String tactic) {
         SELECT_TEMPLATE.fill(reportTemplateName);
         Locator optionLocator = page.getByTitle(reportTemplateName).first();
+        while(!optionLocator.isVisible()) {
+        SELECT_TEMPLATE.fill(reportTemplateName);
+        page.waitForTimeout(2000);
+        }
         optionLocator.click();
         SELECT_TACTIC.fill(tactic);
         page.locator(String.format("//div[contains(text(),'%s')]", tactic)).click();
