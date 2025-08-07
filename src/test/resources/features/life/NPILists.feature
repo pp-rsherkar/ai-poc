@@ -85,13 +85,11 @@ Feature: LIFE Regression - Create NPI List of following types:
     Then User saves the import settings and verifies the is saved successfully
     And Run API to upload the data into the list
     And Verify list data is uploaded successfully
-    And Verify Matched NPI section is displayed with the Total NPI count
-    And Verify records number is similar to the record present in uploaded file
-
+    And Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in "<FILE_NAME>"
     Examples:
-      | LIST_NAME     | ADVERTISER     | FILE_LOCATION                  | FILE_PATH           | FILE_NAME                 | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
-      | Auto_Imported | 01- Advertiser | AutoCustomDestination139921523 | /home/NPIAutoImport | AutoImport_Automation.csv | Plain List           | NPI             | Add new NPIs   |
-      | Auto_Imported | 01- Advertiser | AutoCustomDestination139921523 | /home/NPIAutoImport | AutoImport_Automation.csv | List with Attributes | NPI             | Import Columns |
+      | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH           | FILE_NAME                 | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
+      | Auto_Imported | 01- Advertiser | Our_VM        | /home/NPIAutoImport | AutoImport_Automation.csv | Plain List           | NPI             | Add new NPIs   |
+      | Auto_Imported | 01- Advertiser | Our_VM        | /home/NPIAutoImport | AutoImport_Automation.csv | List with Attributes | NPI             | Import Columns |
 
 
   @regression
@@ -111,8 +109,7 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify Reload Now button is available and enabled
     When User clicks on Reload Now button
     Then Verify the file is reloaded successfully
-    And Verify Matched NPI section is displayed with the Total NPI count
-    And Verify records number is similar to the record present in uploaded file
+    And Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in "<FILE_NAME>"
     Examples:
-      | LIST_NAME | ADVERTISER     | FILE_LOCATION | FILE_PATH | FILE_NAME | LIST_NAME | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
-      | ATTRIBUTE | 01- Advertiser |               |           |           |           | List With Attributes | NPI             | Import Columns |
+      | LIST_NAME | ADVERTISER     | FILE_LOCATION | FILE_PATH           | FILE_NAME                 | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
+      | ATTRIBUTE | 01- Advertiser | Our_VM        | /home/NPIAutoImport | AutoImport_Automation.csv | List With Attributes | NPI             | Import Columns |

@@ -1,5 +1,7 @@
 package stepdefinitions;
 
+import com.microsoft.playwright.APIResponse;
+import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
@@ -10,6 +12,8 @@ import org.junit.Assert;
 import pages.Navigation;
 import pages.life.*;
 import utils.*;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import static utils.CommonUtils.normalize;
@@ -51,6 +55,7 @@ public class LifeSteps {
     NPIAttributesAndAutoImportedList npiAttributesAndAutoImportedList = new NPIAttributesAndAutoImportedList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
+    APIResponse response;
     boolean flag = false;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -1155,30 +1160,35 @@ public class LifeSteps {
 
     @And("Run API to upload the data into the list")
     public void runAPIToUploadTheListDataIntoTheList() {
-        npiAttributesAndAutoImportedList.runAPI();
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Token", constants.TOKEN);
+        response = npiAttributesAndAutoImportedList.runAPI(constants.BASE_URL, constants.ENDPOINT_PATH, headers);
     }
 
     @And("Verify list data is uploaded successfully")
     public void verifyListDataIsUploadedSuccessfully() {
+        Assert.assertEquals(200, response.status());
     }
 
-    @And("Verify Matched NPI section is displayed with the Total NPI count")
-    public void verifyMatchedNPISectionIsDisplayedWithTheTotalNPICount() {
-    }
-
-    @And("Verify records number is similar to the record present in uploaded file")
-    public void verifyRecordsNumberIsSimilarToTheRecordPresentInUploadedFile() {
+    @And("Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in {string}")
+    public void verifyMatchedNPISectionIsDisplayedWithTheTotalNPICount(String fileName) throws CsvValidationException, IOException {
+        String totalNPICount = npiAttributesAndAutoImportedList.fetchTotalNPICount();
+        String npiRecordsFromFile = npiAttributesAndAutoImportedList.fetchNPIRecordFromTestFile(fileName);
+        Assert.assertEquals("Count is not matching", totalNPICount, npiRecordsFromFile);
     }
 
     @And("Verify Reload Now button is available and enabled")
     public void verifyReloadNowButtonIsAvailableAndEnabled() {
+        Assert.assertTrue("Reload Now Button is not available", npiAttributesAndAutoImportedList.verifyReloadNowButton());
     }
 
     @When("User clicks on Reload Now button")
     public void userClicksOnReloadNowButton() {
+        npiAttributesAndAutoImportedList.clickReloadNowButton();
     }
 
     @Then("Verify the file is reloaded successfully")
     public void verifyTheFileIsReloadedSuccessfully() {
+        Assert.assertEquals("File is reloaded", npiAttributesAndAutoImportedList.verifyIfFileIsReloaded());
     }
 }

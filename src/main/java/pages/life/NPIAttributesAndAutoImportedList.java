@@ -1,18 +1,23 @@
 package pages.life;
 
+import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
+import utils.ApiActions;
 import utils.CommonUtils;
 import utils.ExcelActions;
 import utils.WaitUtility;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class NPIAttributesAndAutoImportedList {
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-
+    ApiActions apiActions = new ApiActions();
     private final Page page;
     private final Locator FILE_INPUT;
     private final Locator FILE_UPLOAD_SUCCESS;
@@ -42,6 +47,9 @@ public class NPIAttributesAndAutoImportedList {
     private final Locator NPI_COLUMN;
     private final Locator CHECK_FILE_BUTTON;
     private final Locator OK_BUTTON;
+    private final Locator TOTAL_NPI_COUNT;
+    private final Locator RELOAD_NOW_BUTTON;
+    private final Locator RELOAD_SUCCESS_ALERT;
 
     public NPIAttributesAndAutoImportedList(Page page) {
         this.page = page;
@@ -73,6 +81,10 @@ public class NPIAttributesAndAutoImportedList {
         this.NPI_COLUMN = page.locator("//input[@formcontrolname='npiColumn']");
         this.CHECK_FILE_BUTTON = page.locator("//span[contains(text(),'Check File')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'saveButton')]");
+        this.TOTAL_NPI_COUNT = page.locator("//div[contains(@class,'npiAttrsMatchedNPI')]//div[text()='Total NPI']//preceding-sibling::div");
+        this.RELOAD_NOW_BUTTON = page.locator("//span[contains(text(),'Reload Now')]/parent::div");
+        this.RELOAD_SUCCESS_ALERT = page.locator("//div[@aria-label='File is reloaded']");
+
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -204,6 +216,32 @@ public class NPIAttributesAndAutoImportedList {
         OK_BUTTON.click();
     }
 
-    public void runAPI() {
+    public APIResponse runAPI(String baseURL, String endpointPath, HashMap<String, String> headers) {
+        APIResponse response;
+        response = apiActions.postRequestWithoutBody(baseURL, endpointPath, headers);
+        return response;
+    }
+
+    public String fetchTotalNPICount() {
+        return TOTAL_NPI_COUNT.innerText();
+    }
+
+    public String fetchNPIRecordFromTestFile(String fileName) throws CsvValidationException, IOException {
+        String filePath = "src/main/resources/uploadfiles/" + fileName;
+        int count = ExcelActions.countCsvRecords(filePath);
+        return String.valueOf(count);
+    }
+
+    public boolean verifyReloadNowButton() {
+        return RELOAD_NOW_BUTTON.isVisible();
+    }
+
+    public void clickReloadNowButton() {
+        RELOAD_NOW_BUTTON.click();
+        waitUtility.waitUntilLoaderHidden();
+    }
+
+    public String verifyIfFileIsReloaded() {
+        return RELOAD_SUCCESS_ALERT.innerText().trim();
     }
 }

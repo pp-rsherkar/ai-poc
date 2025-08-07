@@ -75,6 +75,7 @@ public class TacticDetails {
     }
 
     public String tacticDetailsSuccess() {
+        waitUtility.waitUntilLoaderHidden();
         return TACTIC_DETAILS_SUCCESS.first().innerText();
     }
 
