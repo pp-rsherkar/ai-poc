@@ -44,7 +44,7 @@ public class ExcelActions {
 
 
     public static void uploadFile(Locator fileInput, String fileName) {
-        Path filePath = Paths.get("src/test/resources/uploadfiles/" + fileName).toAbsolutePath();
+        Path filePath = Paths.get("src/main/resources/uploadfiles/" + fileName).toAbsolutePath();
         fileInput.setInputFiles(filePath);
     }
 }

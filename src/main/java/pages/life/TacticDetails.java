@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class TacticDetails {
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -31,7 +33,6 @@ public class TacticDetails {
     private final Locator REPLACE_BUTTON;
     private final Locator TEMPLATE_IMPORT_ALERT;
     private final Locator IMPORTED_TARGET_TEMPLATE;
-    private final Locator SPINNER;
     private final Locator TACTIC_SETTINGS_TAB;
     private final Locator SAVE_TEMPLATE_BUTTON;
     private final Locator SAVE_TEMPLATE_DIALOG;
@@ -53,7 +54,6 @@ public class TacticDetails {
         this.REPLACE_BUTTON = page.locator("//button[contains(text(),'Replace Targeting')]");
         this.TEMPLATE_IMPORT_ALERT = page.locator("//div[contains(text(),'Template Imported Successfully')]");
         this.IMPORTED_TARGET_TEMPLATE = page.locator("//div[@class='targets-list']");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.TACTIC_SETTINGS_TAB = page.locator("//a[contains(@class,'gaTabSettings')]");
         this.SAVE_TEMPLATE_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Save as Template')]/div");
         this.SAVE_TEMPLATE_DIALOG = page.locator("//div[contains(text(),'Save as Template')]");
@@ -124,7 +124,7 @@ public class TacticDetails {
         campaigns.setCampaignType(campaignType);
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -134,13 +134,13 @@ public class TacticDetails {
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
     }
 
     private void createTactic(String tacticName) {
         enterTacticName(tacticName);
         saveTacticDetails();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
@@ -154,7 +154,7 @@ public class TacticDetails {
                 IMPORT_BUTTON.click();
                 if(OVERRIDE_DIALOG.isVisible())
                     REPLACE_BUTTON.click();
-                SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+                waitUtility.waitUntilLoaderHidden();
                 TEMPLATE_IMPORT_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
                 labelCountMap = targetingTemplate.fetchTargetingRulesCountFromTargeting();
                 IMPORTED_TARGET_TEMPLATE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));

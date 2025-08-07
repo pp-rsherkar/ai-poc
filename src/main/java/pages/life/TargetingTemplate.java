@@ -2,9 +2,9 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class TargetingTemplate {
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator NEW_TEMPLATE_BUTTON;
     private final Locator SEARCH_BOX;
@@ -22,7 +23,6 @@ public class TargetingTemplate {
     private final Locator CHANNEL_VALUE;
     private final Locator ADD_TARGETINGRULE_BUTTON;
     private final Locator SAVE_BUTTON;
-    private final Locator SPINNER;
     private final Locator TEMPLATE_NAME_ERROR;
     private final Locator TARGETING_RULES_ERROR;
     private final Locator TARGETING_RULES_DELETE_ICON;
@@ -48,7 +48,6 @@ public class TargetingTemplate {
         this.CHANNEL_VALUE= page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
         this.ADD_TARGETINGRULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.TEMPLATE_NAME_ERROR = page.locator("//div[contains(text(),'Template Name is required')]");
         this.TARGETING_RULES_ERROR = page.locator("//div[contains(text(),'Please select atleast one targeting')]");
         this.TARGETING_RULES_DELETE_ICON = page.locator("//div[contains(@title,'delete')]");
@@ -88,7 +87,7 @@ public class TargetingTemplate {
                     selectChannel(channelList);
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
-                    SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+                    waitUtility.waitUntilLoaderHidden();
                     Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
                     lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
                     NEW_TEMPLATE_BUTTON.click();
@@ -136,7 +135,7 @@ public class TargetingTemplate {
         for (String s : templateNameList) {
             SEARCH_BOX.fill(s.trim());
             page.locator(String.format("//div[contains(text(),'%s')]",s)).click();
-            SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilLoaderHidden();
             if (TEMPLATE_NAME_TEXT.isVisible() && TARGET_TEMPLATE_RULES.isVisible())
                 flag = true;
         }
@@ -146,45 +145,45 @@ public class TargetingTemplate {
     public String verifyErrorMessageForTemplateName(String targetingRule) {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
         ADD_TARGETINGRULE_BUTTON.click();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
         alert = TEMPLATE_NAME_ERROR.innerText().trim();
-        TEMPLATE_NAME_ERROR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(TEMPLATE_NAME_ERROR);
         return alert;
     }
 
     public String verifyErrorMessageForTargetingRules(String templateName) {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
         TEMPLATE_NAME_TEXT.fill(templateName+"_"+CommonUtils.timeStampCalculation());
         if(TARGETING_RULES_DELETE_ICON.isVisible())
             TARGETING_RULES_DELETE_ICON.click();
         SAVE_BUTTON.click();
         alert = TARGETING_RULES_ERROR.innerText().trim();
-        TARGETING_RULES_ERROR.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(TARGETING_RULES_ERROR);
         return alert;
     }
 
     public boolean clickAndVerifyShowExpression(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
         SHOW_EXPRESSION_ICON.click();
-        TARGETING_CONTAINER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(TARGETING_CONTAINER);
         return TARGETING_CONTAINER.isVisible();
     }
 
     public boolean clickAndVerifyTargetTemplateEditable(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
         TEMPLATE_NAME_TEXT.fill(templateName + "_edited_" + CommonUtils.timeStampCalculation());
         if (SAVE_BUTTON.isVisible()) {
             SAVE_BUTTON.click();
-            SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilLoaderHidden();
             return true;
         }
         return false;
@@ -193,11 +192,11 @@ public class TargetingTemplate {
     public String clickAndVerifyTargetTemplateDeletion(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
         TARGET_TEMPLATE_DELETE_ICON.click();
-        DELETE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(DELETE_DIALOG);
         REMOVE_BUTTON.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilLoaderHidden();
         return TEMPLATE_DELETED_ERROR.innerText();
     }
 

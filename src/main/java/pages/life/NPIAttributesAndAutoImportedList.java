@@ -3,9 +3,16 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.CommonUtils;
 import utils.ExcelActions;
+import utils.WaitUtility;
 
-public class NPIAttributesList {
+import java.util.Collections;
+
+public class NPIAttributesAndAutoImportedList {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+
     private final Page page;
     private final Locator FILE_INPUT;
     private final Locator FILE_UPLOAD_SUCCESS;
@@ -25,8 +32,18 @@ public class NPIAttributesList {
     private final Locator DELETE_LIST_ICON;
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
+    private final Locator SETUP_IMPORTBUTTON;
+    private final Locator ERROR_MESSAGE;
+    private final Locator IMPORT_SETTING_TITLE;
+    private final Locator DESTINATION_DROPDOWN;
+    private final Locator DESTINATION_DROPDOWN_VALUE;
+    private final Locator FILE_PATH;
+    private final Locator FILE_NAME;
+    private final Locator NPI_COLUMN;
+    private final Locator CHECK_FILE_BUTTON;
+    private final Locator OK_BUTTON;
 
-    public NPIAttributesList(Page page) {
+    public NPIAttributesAndAutoImportedList(Page page) {
         this.page = page;
         this.FILE_INPUT = page.locator("input[type='file']");
         this.FILE_UPLOAD_SUCCESS = page.locator("//div[contains(@aria-label,'Successfully uploaded')]");
@@ -46,6 +63,16 @@ public class NPIAttributesList {
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
+        this.SETUP_IMPORTBUTTON = page.locator("//span[contains(text(),'Setup Import')]");
+        this.ERROR_MESSAGE = page.locator("//div[@aria-label='Advertiser is required']");
+        this.IMPORT_SETTING_TITLE = page.locator("//div[contains(text(),'Import Settings')]");
+        this.DESTINATION_DROPDOWN = page.locator("//ng-select[@placeholder='Select Destination']");
+        this.DESTINATION_DROPDOWN_VALUE = page.locator("//ng-dropdown-panel//div//span");
+        this.FILE_PATH = page.locator("//input[@placeholder='File Path']");
+        this.FILE_NAME = page.locator("//input[@placeholder='File Name']");
+        this.NPI_COLUMN = page.locator("//input[@formcontrolname='npiColumn']");
+        this.CHECK_FILE_BUTTON = page.locator("//span[contains(text(),'Check File')]");
+        this.OK_BUTTON = page.locator("//button[contains(@class,'saveButton')]");
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -57,6 +84,7 @@ public class NPIAttributesList {
     }
 
     public void enterListName(String listName) {
+        LIST_NAME.scrollIntoViewIfNeeded();
         LIST_NAME.fill(listName);
     }
 
@@ -124,4 +152,58 @@ public class NPIAttributesList {
         return DELETE_SUCCESS.innerText();
     }
 
+    public String verifyIfAutoImportPage(){
+        SETUP_IMPORTBUTTON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        return SETUP_IMPORTBUTTON.innerText().trim();
+    }
+
+    public String verifyErrorMessage(){
+        String errorMessage = ERROR_MESSAGE.innerText().trim();
+        waitUtility.waitUntilLoaderHidden();
+        return errorMessage;
+    }
+    public void clickSetupImportButton(){
+        SETUP_IMPORTBUTTON.scrollIntoViewIfNeeded();
+        SETUP_IMPORTBUTTON.click();
+    }
+
+    public void waitForImportSettingPanel(){
+        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitForLocatorVisible(IMPORT_SETTING_TITLE);
+    }
+
+    public void enterFileDetails(String fileLocation, String filePath, String fileName) {
+        DESTINATION_DROPDOWN.click();
+        CommonUtils.selectAndClickElement(DESTINATION_DROPDOWN_VALUE, Collections.singletonList(fileLocation));
+        FILE_PATH.fill(filePath);
+        FILE_NAME.fill(fileName);
+    }
+
+    public void selectListType(String listType) {
+        page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button",listType)).click();
+    }
+
+    public void enterColumnName(String npiColumn, String columnName) {
+        Locator locator = page.locator(String.format("//div[@class='selection' and contains(text(),'%s')]/parent::div", npiColumn));
+        if(!locator.getAttribute("class").contains("active"))
+            locator.click();
+        NPI_COLUMN.fill(columnName);
+    }
+
+    public void selectImportType(String importType) {
+        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", importType));
+        if(!locator.getAttribute("class").contains("mat-radio-checked"))
+            locator.click();
+    }
+
+    public void clickCheckFile() {
+        CHECK_FILE_BUTTON.click();
+    }
+
+    public void clickOKButton() {
+        OK_BUTTON.click();
+    }
+
+    public void runAPI() {
+    }
 }
