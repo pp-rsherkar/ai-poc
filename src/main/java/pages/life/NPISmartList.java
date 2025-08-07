@@ -4,6 +4,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import utils.Constants;
 
 import java.util.regex.Pattern;
 
@@ -13,7 +14,10 @@ public class NPISmartList {
     private final Locator CLICK_SMART_PIXEL;
     private final Locator CLICK_NPI_LIST;
     private final Locator CLICK_SMART_PIXEL_DROPDOWN;
-    private final Locator CLICK_SMART_PIXEL_DROPDOWN_VALUE;
+    private final Locator CLICK_ADD_VISITED_URL;
+    private final Locator CLICK_ADD_IGNORED_URL;
+    private final Locator INSERT_VISITED_URL;
+    private final Locator INSERT_IGNORED_URL;
     private final Locator CLICK_NPI_GROUP;
     private final Locator CLICK_SPECIALTY;
     private final Locator CLICK_PROFESSION;
@@ -23,15 +27,13 @@ public class NPISmartList {
     private final Locator CLICK_ENDEMIC_RESEARCH;
     private final Locator CLICK_ENDEMIC_DROPDOWN;
     private final Locator CLICK_ENDEMIC_DROPDOWN_VALUE;
+    private final Locator CLICK_ENDEMIC_SAVE;
     private final Locator CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE;
     private final Locator CLICK_PRESCRIPTION_DROPDOWN;
     private final Locator CLICK_PRESCRIPTION_DROPDOWN_VALUE;
     private final Locator CLICK_SPECIALTY_DROPDOWN;
     private final Locator SELECT_SPECIALTY_VALUE;
-
     private final Locator CLICK_PROFESSION_DROPDOWN;
-    private final Locator SELECT_PROFESSION_VALUE;
-    private final Locator CLICK_NPI_GROUP_VALUE;
     private final Locator CLICK_LIFE_CHECKBOX;
     private final Locator LIST_NAME;
     private final Locator SEARCH_ADVERTISER;
@@ -47,14 +49,14 @@ public class NPISmartList {
     private final Locator CLICK_EXPAND_PRACTICE;
 
     private final Locator SPINNER;
-    private final Locator ADD_DRUG_BTN;
+    private final Locator ADD_DRUG_BUTTON;
 
     public NPISmartList(Page page) {
         this.page = page;
         this.CLICK_SMART_LIST = page.getByText("Smart List", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SMART_PIXEL = page.getByText("Smart Pixel", new Page.GetByTextOptions().setExact(true));
         this.CLICK_NPI_LIST = page.getByText("NPI List", new Page.GetByTextOptions().setExact(true));
-        this.CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE= page.getByText("Prescription Behavior Change", new Page.GetByTextOptions().setExact(true));
+        this.CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE = page.getByText("Prescription Behavior Change", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SPECIALTY = page.getByText("Specialty", new Page.GetByTextOptions().setExact(true));
         this.CLICK_PROFESSION = page.getByText("Profession", new Page.GetByTextOptions().setExact(true));
         this.CLICK_PRESCRIBEDDRUG = page.getByText("Prescribed Drug", new Page.GetByTextOptions().setExact(true));
@@ -63,17 +65,19 @@ public class NPISmartList {
         this.CLICK_ENDEMIC_RESEARCH = page.getByText("Endemic Research", new Page.GetByTextOptions().setExact(true));
         this.CLICK_ENDEMIC_DROPDOWN = page.getByText("Select MESH Conditions");
         this.CLICK_ENDEMIC_DROPDOWN_VALUE = page.locator(".pull-left > .iconSprite").first();
-        this.CLICK_SPECIALTY_DROPDOWN =  page.getByText("Select Specialities");
-        this.SELECT_SPECIALTY_VALUE= page.locator(".pull-left > .iconSprite").first();
-        this.CLICK_PRESCRIPTION_DROPDOWN =  page.locator("#prescriptionBehaviorWrapper").getByRole(AriaRole.COMBOBOX);
-        this.CLICK_PRESCRIPTION_DROPDOWN_VALUE=  page.getByText("Parastat44911-0034, 44911-");
-        this.CLICK_PROFESSION_DROPDOWN =  page.getByText("Select Profession");
-        this.SELECT_PROFESSION_VALUE= page.getByText("Nurse Practitioner");
-        this.CLICK_EXPAND_PRACTICE=page.getByText("Expand based on Practice and Hospital affiliation", new Page.GetByTextOptions().setExact(true));
+        this.CLICK_ENDEMIC_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ok"));
+        this.CLICK_SPECIALTY_DROPDOWN = page.getByText("Select Specialities");
+        this.SELECT_SPECIALTY_VALUE = page.locator(".pull-left > .iconSprite").first();
+        this.CLICK_PRESCRIPTION_DROPDOWN = page.locator("#prescriptionBehaviorWrapper").getByRole(AriaRole.COMBOBOX);
+        this.CLICK_PRESCRIPTION_DROPDOWN_VALUE = page.getByText(Constants.PRESCRIPTION_DROPDOWN_VALUE);
+        this.CLICK_PROFESSION_DROPDOWN = page.getByText("Select Profession");
+        this.CLICK_EXPAND_PRACTICE = page.getByText("Expand based on Practice and Hospital affiliation", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SMART_PIXEL_DROPDOWN = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Smart Pixel$"))).nth(1);
-        this.CLICK_SMART_PIXEL_DROPDOWN_VALUE =  page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("01- Advertiser Smart Pixel 1").setExact(true)).locator("div");
+        this.CLICK_ADD_VISITED_URL = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("altText?altText:''")).nth(2);
+        this.CLICK_ADD_IGNORED_URL = page.getByText("Add URL").nth(1);
+        this.INSERT_IGNORED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
+        this.INSERT_VISITED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.CLICK_NPI_GROUP = page.getByText("Select NPI Groups");
-        this.CLICK_NPI_GROUP_VALUE = page.getByText("0_Test_PB_02");
         this.CLICK_LIFE_CHECKBOX = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
@@ -87,55 +91,81 @@ public class NPISmartList {
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
-        this.ADD_DRUG_BTN = page.locator("//span[contains(text(), 'Add Drug')]");
-
+        this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
     }
 
     public void clickSmartList() {
         CLICK_SMART_LIST.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
+
     public void clickSmartPixel() {
         CLICK_SMART_PIXEL.click();
     }
+
     public void clickNPIList() {
         CLICK_NPI_LIST.click();
     }
+
     public void clickSmartPixelDropDown() {
         CLICK_SMART_PIXEL_DROPDOWN.click();
     }
-    public void clickSmartPixelDropDownValue() {
-        CLICK_SMART_PIXEL_DROPDOWN_VALUE.click();
+
+    public void clickSmartPixelDropDownValue(String smartPixelDropdownValue) {
+        page.getByText(smartPixelDropdownValue).click();
     }
+
+    public void insertVisitedURL() {
+        CLICK_ADD_VISITED_URL.click();
+        INSERT_VISITED_URL.fill(Constants.VISITED_URL_1);
+        CLICK_ADD_VISITED_URL.click();
+        INSERT_VISITED_URL.fill(Constants.VISITED_URL_2);
+    }
+
+    public void checkDisabledNPI() {
+    }
+
+    public void insertIgnoredURL() {
+        CLICK_ADD_IGNORED_URL.click();
+        INSERT_IGNORED_URL.fill("www.google.com");
+    }
+
     public void clickNPIGroup() {
         CLICK_NPI_GROUP.click();
     }
-    public void clickNPIGroupValue() {
-        CLICK_NPI_GROUP_VALUE.click();
-    }
 
+    public void clickNPIGroupValue(String npiGroupValue) {
+        page.getByText(npiGroupValue).click();
+    }
 
     public void clickLifeCheckbox() {
         CLICK_LIFE_CHECKBOX.click();
     }
+
     public void clickSpecialty() {
         CLICK_SPECIALTY.click();
     }
+
     public void clickProfession() {
         CLICK_PROFESSION.click();
     }
+
     public void clickPrescribedDrug() {
         CLICK_PRESCRIBEDDRUG.click();
     }
+
     public void clickDiagnosis() {
         CLICK_DIAGNOSIS.click();
     }
+
     public void clickMedicalProcedure() {
         CLICK_MEDICAL_PROCEDURE.click();
     }
+
     public void clickEndemicResearch() {
         CLICK_ENDEMIC_RESEARCH.click();
     }
+
     public void clickPrescriptionBehaviorChange() {
         CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE.click();
     }
@@ -145,9 +175,11 @@ public class NPISmartList {
         CLICK_PRESCRIPTION_DROPDOWN.fill("para");
         CLICK_PRESCRIPTION_DROPDOWN_VALUE.click();
     }
+
     public void SelectEndemicDetails() {
         CLICK_ENDEMIC_DROPDOWN.click();
         CLICK_ENDEMIC_DROPDOWN_VALUE.click();
+        CLICK_ENDEMIC_SAVE.click();
     }
 
     public void clickSpecialtyDropdown() {
@@ -157,16 +189,19 @@ public class NPISmartList {
     public void selectSpecialtyValue() {
         SELECT_SPECIALTY_VALUE.click();
     }
+
     public void clickProfessionDropdown() {
         CLICK_PROFESSION_DROPDOWN.click();
     }
 
-    public void selectProfessionValue() {
-        SELECT_PROFESSION_VALUE.click();
+    public void selectProfessionValue(String professionValue) {
+        page.getByText(professionValue).click();
     }
+
     public void clickExpandPractice() {
         CLICK_EXPAND_PRACTICE.click();
     }
+
     public void enterListName(String listName) {
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         LIST_NAME.fill(listName);
@@ -181,12 +216,12 @@ public class NPISmartList {
     public void selectPrescribedDrug() {
         PRESCRIBED_DRUG.first().scrollIntoViewIfNeeded();
         PRESCRIBED_DRUG.first().check();
-        ADD_DRUG_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        ADD_DRUG_BUTTON.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.VISIBLE));
     }
 
     public void selectDrug(String drug) {
-        ADD_DRUG_BTN.scrollIntoViewIfNeeded();
-        ADD_DRUG_BTN.click();
+        ADD_DRUG_BUTTON.scrollIntoViewIfNeeded();
+        ADD_DRUG_BUTTON.click();
         SEARCH_DRUG.first().click();
         SEARCH_DRUG_FILL.fill(drug);
         SELECT_DRUG.click();
@@ -201,7 +236,7 @@ public class NPISmartList {
         HCP365_AVAILABLE_IN.check();
     }
 
-    public void clickPulsepointICon() {
+    public void clickPulsepointIcon() {
         PULSEPOINT_ICON.click();
     }
 }

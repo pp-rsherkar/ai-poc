@@ -41,6 +41,7 @@ public class TacticCreatives {
         ASSIGN_CREATIVE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CREATIVE.fill(creative);
         CLICK_SEARCH.click();
+        page.waitForTimeout(1000);
         SELECT_CREATIVE.scrollIntoViewIfNeeded();
         SELECT_CREATIVE.click();
         ASSIGN_CREATIVE_OK_BUTTON.click();

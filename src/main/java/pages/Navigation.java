@@ -24,7 +24,9 @@ public class Navigation {
     private final Locator ACCOUNT_ITEM;
     private final Locator PRE_LOADER;
     private final Locator STUDIO_TITLE;
-
+    private final Locator TARGETIN_TEMPLATE_ICON;
+    private final Locator SPINNER;
+    private final Locator CAMPAIGNS;
 
     public Navigation(Page page) {
         this.page = page;
@@ -44,7 +46,9 @@ public class Navigation {
         this.ACCOUNT_ITEM = page.locator("//div[@id='accountSwitcher']//div[@class='item']");
         this.PRE_LOADER = page.locator("//div[@class='preloader']");
         this.STUDIO_TITLE = page.locator("//div[text()='Studio']");
-
+        this.TARGETIN_TEMPLATE_ICON = page.locator("//div[contains(@class,'targetTemplateIcon')]");
+        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
+        this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
     }
 
     public void navigateToUrl(String url) {
@@ -117,8 +121,19 @@ public class Navigation {
         SCHEDULED_REPORT.click();
 
     }
-        public void clickReportTemplate()
+    public void clickReportTemplate()
     {
             REPORT_TEMPLATE.click();
     }
+
+    public void clickTargetingTemplate() {
+        TARGETIN_TEMPLATE_ICON.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
+    public void clickCampaigns() {
+        CAMPAIGNS.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
 }

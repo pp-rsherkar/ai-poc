@@ -14,6 +14,8 @@ public class LineItemDetails {
     private final Locator LINE_ITEM_TYPE;
     private final Locator CANCEL_TACTIC;
     private final Locator NEW_LINE_ITEM;
+    private final Locator LINE_ITEM_TYPE_DROPDOWN;
+    private final Locator LINE_ITEM_TYPE_VALUE;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -26,6 +28,8 @@ public class LineItemDetails {
         this.LINE_ITEM_TYPE = page.locator("//div[contains(@class,'ui dropdown selection form-control lineItemType')]");
         this.CANCEL_TACTIC =  page.locator("#lidcBody").getByText("Cancel");
         this.NEW_LINE_ITEM = page.getByText("New Line Item");
+        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
+        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
     }
 
     public String verifyLineItemText() {
@@ -53,15 +57,14 @@ public class LineItemDetails {
     }
 
     public void selectLineItemType(String lineItemType) {
-        LINE_ITEM_TYPE.click();
-        LINE_ITEM_TYPE.locator("text=" + lineItemType).first().click();
-    };
-
-    public void cancelTactic() {
-        CANCEL_TACTIC.click();
-    }
-
-    public void selectNewLineItem() {
-        NEW_LINE_ITEM.click();
+        LINE_ITEM_TYPE_DROPDOWN.click();
+        int count = LINE_ITEM_TYPE_VALUE.count();
+        for(int i=0; i< count; i++) {
+            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
+                LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
+                LINE_ITEM_TYPE_VALUE.nth(i).click();
+                break;
+            }
+        }
     }
 }
