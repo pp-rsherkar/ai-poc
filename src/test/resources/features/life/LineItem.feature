@@ -12,3 +12,5 @@ Feature: LIFE Regression - Create Line Items with different Line Item types
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME |  LINE_BUDGET |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500          |
+
+  Scenario Outline:

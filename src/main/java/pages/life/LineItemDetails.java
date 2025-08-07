@@ -67,4 +67,10 @@ public class LineItemDetails {
             }
         }
     }
+    public void cancelTactic() {
+        CANCEL_TACTIC.click();
+    }
+    public void selectNewLineItem() {
+        NEW_LINE_ITEM.click();
+    }
 }
