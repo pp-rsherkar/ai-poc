@@ -20,5 +20,5 @@ Feature: LIFE Regression - Create Attribute NPI List
     Then Verify the list is deleted successfully
 
     Examples:
-      | LIST_NAME  | ADVERTISER     | FILE_NAME             | COLUMN_NAME |
-      | ATTRIBUTE  | 01- Advertiser | NPIAttributeList.xlsx | NPI         |
+      | LIST_NAME | ADVERTISER     | FILE_NAME             | COLUMN_NAME |
+      | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx | NPI         |
