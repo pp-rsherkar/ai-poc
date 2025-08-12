@@ -88,7 +88,7 @@ public class NPIAttributesAndAutoImportedList {
     }
 
     public void uploadAttributesFile(String attributesFile) {
-        ExcelActions.uploadFile(FILE_INPUT, attributesFile);
+        CommonUtils.uploadFile(FILE_INPUT, attributesFile);
     }
 
     public String verifyFileUploadSuccess() {

@@ -43,7 +43,7 @@ public class TacticDetails {
     public TacticDetails(Page page) {
         this.page = page;
         this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
-        this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name']");
+        this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
         this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.IMPORT_TEMPLATE_ICON = page.locator("//app-icon-lable-link[contains(@text,'Import Template')]/div");

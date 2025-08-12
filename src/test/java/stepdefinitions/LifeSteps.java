@@ -53,8 +53,10 @@ public class LifeSteps {
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     NPIAttributesAndAutoImportedList npiAttributesAndAutoImportedList = new NPIAttributesAndAutoImportedList(DriverFactory.getPage());
+    DomainList domainList = new DomainList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
+    int fileCount = 0;
     APIResponse response;
     boolean flag = false;
 
@@ -500,8 +502,8 @@ public class LifeSteps {
         navigation.clickCampaigns();
     }
 
-    @Then("Verify smart list is targeted in the tactic successfully")
-    public void verify_smart_list_is_targeted_in_the_tactic_successfully() {
+    @Then("Verify list is targeted in the tactic successfully")
+    public void verify_list_is_targeted_in_the_tactic_successfully() {
         tacticSettings.verifyNPIRule();
         Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
     }
@@ -1190,5 +1192,172 @@ public class LifeSteps {
     @Then("Verify the file is reloaded successfully")
     public void verifyTheFileIsReloadedSuccessfully() {
         Assert.assertEquals("File is reloaded", npiAttributesAndAutoImportedList.verifyIfFileIsReloaded());
+    }
+
+    /*Roshani Sherkar
+    * 07-08-2025
+    * Domain List*/
+    @Given("User navigates to the Domain List page")
+    public void userNavigatesToTheDomainListPage() {
+        navigation.clickSubMenu();
+        domainList.clickDomainListFromMenu();
+    }
+
+    @And("Verify that the search option is present on the {string} tab")
+    public void verifyThatTheSearchOptionIsPresentOnTheTab(String listName) {
+        Assert.assertEquals("Tab is not opened", listName.trim(), domainList.verifyIfListPageIsOpen(listName.trim()));
+        Assert.assertTrue("Search Box is not available",domainList.verifyIfSearchBoxIsPresent());
+    }
+
+    @And("Verify that the sub-tabs {string} on the left navigation panel are available and {string} is selected by default")
+    public void verifyThatTheSubTabsOnTheLeftNavigationPanelAreAvailable(String subTabs, String defaultTabName) {
+        List<String> subTabsList = CommonUtils.convertStringToList(subTabs);
+        Assert.assertTrue("Tabs are not present", domainList.verifySubTabs(subTabsList));
+    }
+
+    @And("Verify that when the {string} tab is selected, only {string} lists are visible in the panel")
+    public void verifyThatWhenTheTabIsSelectedOnlyDomainListsAreVisibleInThePanel(String tabName, String listName) {
+        domainList.clickSubTab(tabName);
+        Assert.assertTrue(tabName + " Tab list is not available", domainList.verifyListIsAvailable(listName));
+    }
+
+    @Then("Verify that the Create Domain List screen is displayed")
+    public void verifyThatTheCreateDomainListScreenIsDisplayed() {
+        Assert.assertTrue("", domainList.verifyDomainListPage());
+    }
+
+    @And("Verify that an error message is displayed when no list names {string} or domain names {string} are specified")
+    public void verifyThatAnErrorMessageIsDisplayedWhenNoDomainNamesAreSpecified(String listName, String domainName) {
+        metricName = listName +"_" + CommonUtils.timeStampCalculation();
+        Assert.assertEquals("List Name is required",domainList.validateErrorOnEmptyListNameInput(metricName));
+        Assert.assertEquals("Domain name is required", domainList.validateErrorOnEmptyDomainListInput(metricName));
+    }
+
+    @And("Verify that if multiple domain names {string} are specified on a single line, a validation error is shown")
+    public void verifyThatIfMultipleDomainNamesAreSpecifiedOnASingleLineAValidationErrorIsShown(String domainName) {
+        List<String> domainNameList = CommonUtils.convertStringToList(domainName);
+        Assert.assertTrue("No Validation error is displayed", domainList.checkErrorOnSingleLineMultipleDomainsInput(domainNameList).contains("validation error(s)"));
+    }
+
+    @And("Verify that when domain names are specified manually {string}, the option to upload a file disappears")
+    public void verifyThatWhenDomainNamesAreSpecifiedManuallyTheOptionToUploadAFileDisappears(String domainName) {
+        keyValues.clear();
+        keyValues = new ArrayList<>(CommonUtils.convertStringToList(domainName));
+        Assert.assertTrue("Upload section is not available", domainList.verifyUploadSectionIsVisibleBeforeDomainInput());
+        domainList.enterDomainNames(keyValues);
+        Assert.assertTrue("Upload section is available", domainList.verifyUploadSectionIsVisibleAfterDomainInput());
+    }
+
+    @And("Verify that the user is able to create a domain list by specifying domain names manually")
+    public void verifyThatTheUserIsAbleToCreateADomainListBySpecifyingDomainNamesManually() {
+        domainList.saveDomainList();
+        Assert.assertEquals("Domain list created successfully", domainList.verifyDomainListCreationOrDeletion());
+    }
+
+    @And("Verify that PulsePoint provided domain lists are denoted with a purple {string} icon")
+    public void verifyThatPulsePointProvidedDomainListsAreDenotedWithAPurpleIconUnderTheTab(String pulsepointIcon) {
+    }
+
+    @And("Verify that the counter on the left displays the correct value for each list in the navigation panel")
+    public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueForEachListInTheNavigationPanel() {
+        domainList.searchAndOpenDomainList(metricName);
+        int domainCount = Integer.parseInt(domainList.fetchDomainListCountFromLeftPanel());
+        Assert.assertEquals(domainCount, keyValues.size());
+    }
+
+    @And("Verify that the user is able to edit an existing domain name list {string}")
+    public void verifyThatTheUserIsAbleToEditAnExistingDomainNameList(String newDomainName) {
+        keyValues = new ArrayList<>(CommonUtils.convertStringToList(newDomainName));
+        domainList.editAnExistingDomainList(keyValues);
+        domainList.saveDomainList();
+        Assert.assertEquals("Domains list updated successfully", domainList.verifyDomainListCreationOrDeletion());
+    }
+
+    @And("Verify that the user is able to delete an existing domain name list")
+    public void verifyThatTheUserIsAbleToDeleteAnExistingDomainNameList() {
+        domainList.deleteDomainList();
+        Assert.assertEquals(metricName, domainList.fetchRemovalConfirmation());
+        Assert.assertEquals("Domain deleted successfully", domainList.verifyDomainListCreationOrDeletion());
+    }
+
+    /*Roshani Sherkar
+    * 11/08/2025
+    * Domain List Creation by File Upload*/
+
+    @And("Verify that an error message is displayed when no list names is specified and user tries to upload a file {string}")
+    public void verifyThatAnErrorMessageIsDisplayedWhenNoListNamesIsSpecifiedAndUserTriesToUploadAFile(String fileName) {
+        domainList.uploadDomainFile(fileName);
+        Assert.assertEquals("List Name is required", domainList.fetchListErrorMessage());
+    }
+
+    @And("Verify that when enters {string} and upload file {string} option is selected, the text area to direct enter the domain names disappears")
+    public void verifyThatWhenUploadFileOptionIsSelectedTheTextAreaToDirectEnterTheDomainNamesDisappears(String listName, String fileName) {
+        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        domainList.enterListName(metricName);
+        Assert.assertTrue("Text area is not available", domainList.verifyTextAreaIsVisibleBeforeFileUpload());
+        domainList.uploadDomainFile(fileName);
+        Assert.assertTrue("Text area is available", domainList.verifyTextAreaIsVisibleAfterFileUpload());
+    }
+
+    @And("Verify the Uploaded Files section displays the domain count, includes download and delete icons after the file {string} is uploaded")
+    public void verifyUploadedFilesSectionDisplaysDomainEntriesIncludedInTheFileTimestampDownloadAndDeleteIconsOnceTheFileIsUploaded(String fileName) throws CsvValidationException, IOException {
+        Assert.assertEquals(fileName, domainList.fetchFileNameFromUploadedFilesSection(fileName));
+        Assert.assertEquals(ExcelActions.countCsvRecords("src/main/resources/uploadfiles/" + fileName), domainList.fetchDomainCountFromUploadedFilesSection(fileName));
+        Assert.assertTrue("No Download icon is available", domainList.isDownloadIconVisible(fileName));
+        Assert.assertTrue("No Delete icon is available", domainList.isDeleteIconVisible(fileName));
+
+    }
+
+    @And("Verify that the user is able to create a domain list through file upload")
+    public void verifyThatTheUserIsAbleToCreateADomainListThroughFileUpload() {
+        domainList.saveDomainList();
+        Assert.assertEquals("Domains list created successfully", domainList.verifyDomainListCreationOrDeletion());
+    }
+
+    @And("Verify that the counter on the left displays the correct value after file upload {string}")
+    public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUpload(String fileName) {
+        domainList.searchAndOpenDomainList(metricName);
+        int domainCount = Integer.parseInt(domainList.fetchDomainListCountFromLeftPanel());
+        fileCount = domainList.fetchDomainCountFromUploadedFilesSection(fileName);
+        Assert.assertEquals(domainCount, fileCount);
+    }
+
+    @And("Verify that the user is able to edit an existing domain name list by uploading same file {string} again and verify the changes")
+    public void verifyThatTheUserIsAbleToEditAnExistingDomainNameListByUploadingSameFileAgainAndVerifyTheChanges(String fileName) {
+        domainList.uploadDomainFile(fileName);
+        Assert.assertTrue("Different filename is displayed", domainList.verifyIfDuplicateFileDialogIsDisplayed(fileName));
+        domainList.clickReplaceButton();
+    }
+
+    @And("Verify that the user is able to edit and save an existing domain name list by uploading another file {string} and verify the changes")
+    public void verifyThatTheUserIsAbleToEditAnExistingDomainNameListByUploadingAnotherFileAndVerifyTheChanges(String fileName) throws CsvValidationException, IOException {
+        domainList.uploadDomainFile(fileName);
+        Assert.assertEquals(fileName, domainList.fetchFileNameFromUploadedFilesSection(fileName));
+        Assert.assertEquals(ExcelActions.countCsvRecords("src/main/resources/uploadfiles/" + fileName), domainList.fetchDomainCountFromUploadedFilesSection(fileName));
+        Assert.assertTrue("No Download icon is available", domainList.isDownloadIconVisible(fileName));
+        Assert.assertTrue("No Delete icon is available", domainList.isDeleteIconVisible(fileName));
+        domainList.saveDomainList();
+        Assert.assertEquals("Domains list updated successfully", domainList.verifyDomainListCreationOrDeletion());
+    }
+
+    @And("Verify that the counter on the left displays the updated value after new file upload {string}")
+    public void verifyThatTheCounterOnTheLeftDisplaysTheUpdatedValueAfterNewFileUpload(String fileName) {
+        domainList.searchAndOpenDomainList(metricName);
+        int domainCount = Integer.parseInt(domainList.fetchDomainListCountFromLeftPanel());
+        Assert.assertEquals(domainCount, fileCount + domainList.fetchDomainCountFromUploadedFilesSection(fileName));
+    }
+
+    @And("Verify that user is able to download the uploaded file {string}, {string}")
+    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) {
+        domainList.downloadFile(fileName1);
+        Assert.assertTrue("Downloaded file is not available", domainList.verifyDownloadedFile("domains"));
+        domainList.downloadFile(fileName2);
+        Assert.assertTrue("Downloaded file is not available", domainList.verifyDownloadedFile("domains"));
+    }
+
+    @And("Verify that the user is able to delete the uploaded file {string}")
+    public void verifyThatTheUserIsAbleToDeleteTheUploadedFile(String fileName) {
+        domainList.deleteFile(fileName);
+        Assert.assertEquals(fileName, domainList.fetchRemovalConfirmation());
     }
 }
