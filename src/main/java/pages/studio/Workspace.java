@@ -41,7 +41,7 @@ public class Workspace {
     private final Locator GO_TO_WORKSPACE_LIST;
     private final Locator BEFORE_YOU_LEAVE_DAILOG;
     private final Locator EXIT_BUTTON;
-
+    private final Locator BACK_ARROW;
 
     public Workspace(Page page) {
         this.page = page;
@@ -69,10 +69,11 @@ public class Workspace {
         this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
         this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
-        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace']");
+        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.GO_TO_WORKSPACE_LIST = WORKSPACE_FRAME.locator("//div[contains(text(),'Go back to workspaces list')]");
         this.BEFORE_YOU_LEAVE_DAILOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
         this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
+        this.BACK_ARROW = WORKSPACE_FRAME.locator("//div[contains(@style,'cursor: pointer')]");
     }
 
     public void studio() {
@@ -230,7 +231,8 @@ public class Workspace {
     }
 
     public void goToWorkspaceList() {
-        GO_TO_WORKSPACE_LIST.click();
+        BACK_ARROW.click();
+        //GO_TO_WORKSPACE_LIST.click();
         BEFORE_YOU_LEAVE_DAILOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         EXIT_BUTTON.click();
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
