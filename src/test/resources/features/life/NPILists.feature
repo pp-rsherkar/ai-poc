@@ -1,4 +1,7 @@
-Feature: LIFE Regression - Create Static NPI List
+Feature: LIFE Regression - Create NPI List of following types:
+  1. Static NPI List by specifying NPI Numbers
+  2. Static NPI List by uploading file with NPI Numbers
+  3. Smart NPI List by specifying Type
 
   @regression
   Scenario Outline: Create Static NPI List by specifying NPI Numbers.
