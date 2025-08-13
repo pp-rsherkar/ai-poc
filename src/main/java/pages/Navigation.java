@@ -26,6 +26,7 @@ public class Navigation {
     private final Locator STUDIO_TITLE;
     private final Locator TARGETIN_TEMPLATE_ICON;
     private final Locator SPINNER;
+    private final Locator CAMPAIGNS;
     private final Locator CREATIVE_LIBRARY_ICON;
 
     public Navigation(Page page) {
@@ -48,6 +49,7 @@ public class Navigation {
         this.STUDIO_TITLE = page.locator("//div[text()='Studio']");
         this.TARGETIN_TEMPLATE_ICON = page.locator("//div[contains(@class,'targetTemplateIcon')]");
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
+        this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
     }
 
@@ -126,6 +128,11 @@ public class Navigation {
 
     public void clickTargetingTemplate() {
         TARGETIN_TEMPLATE_ICON.click();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
+    public void clickCampaigns() {
+        CAMPAIGNS.click();
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 

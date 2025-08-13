@@ -4,17 +4,20 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
+import pages.Navigation;
 import utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 
 public class TacticDetails {
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
-    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
+    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
+    Navigation navigation = new Navigation(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
     TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
     private final Page page;
@@ -30,6 +33,7 @@ public class TacticDetails {
     private final Locator REPLACE_BUTTON;
     private final Locator TEMPLATE_IMPORT_ALERT;
     private final Locator IMPORTED_TARGET_TEMPLATE;
+    private final Locator SPINNER;
     private final Locator TACTIC_SETTINGS_TAB;
     private final Locator SAVE_TEMPLATE_BUTTON;
     private final Locator SAVE_TEMPLATE_DIALOG;
@@ -40,7 +44,7 @@ public class TacticDetails {
     public TacticDetails(Page page) {
         this.page = page;
         this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
-        this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name']");
+        this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
         this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.IMPORT_TEMPLATE_ICON = page.locator("//app-icon-lable-link[contains(@text,'Import Template')]/div");
@@ -51,6 +55,7 @@ public class TacticDetails {
         this.REPLACE_BUTTON = page.locator("//button[contains(text(),'Replace Targeting')]");
         this.TEMPLATE_IMPORT_ALERT = page.locator("//div[contains(text(),'Template Imported Successfully')]");
         this.IMPORTED_TARGET_TEMPLATE = page.locator("//div[@class='targets-list']");
+        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.TACTIC_SETTINGS_TAB = page.locator("//a[contains(@class,'gaTabSettings')]");
         this.SAVE_TEMPLATE_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Save as Template')]/div");
         this.SAVE_TEMPLATE_DIALOG = page.locator("//div[contains(text(),'Save as Template')]");
@@ -75,29 +80,30 @@ public class TacticDetails {
         return TACTIC_DETAILS_SUCCESS.innerText();
     }
 
-    public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList) {
-        boolean flag = false;
+    public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {
+        List<Map<String, String>> labelCountMapList = new ArrayList<>();
         for(String lineItemType : lineItemTypeList) {
-            npiSmartList.clickPulsepointIcon();
+            navigation.clickSubMenu();
+            navigation.clickCampaigns();
             campaigns.campaignDashboard();
-
+            //Campaign, Line Item and Tactic creation
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
             createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
             createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
-
-            importTargetingTemplate(lineItemType.trim(), templateNameList);
-            if(IMPORTED_TARGET_TEMPLATE.isVisible())
-                    flag = true;
-
+            Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
+            labelCountMapList.add(labelCountMap);
             saveTacticDetails();
         }
-        return flag;
+        ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
+        labelCountMapList.sort(Comparator.comparing(Object::toString));
+        return ruleCountAndValueList.equals(labelCountMapList);
     }
 
     public List<String> createTacticWithLineItemsAndTargetingRules(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, Map<String, List<String>> rulesMap) {
         List<String> templateNameList = new ArrayList<>();
         for (String lineItemType : lineItemTypeList) {
-            npiSmartList.clickPulsepointIcon();
+            navigation.clickSubMenu();
+            navigation.clickCampaigns();
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
@@ -120,6 +126,7 @@ public class TacticDetails {
         campaigns.setCampaignType(campaignType);
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -129,17 +136,19 @@ public class TacticDetails {
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     private void createTactic(String tacticName) {
         enterTacticName(tacticName);
         saveTacticDetails();
+        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-
-    private void importTargetingTemplate(String lineItemType, List<String> templateNameList) {
+    private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
+        Map<String, String> labelCountMap = new LinkedHashMap<>();
         for(String templateName : templateNameList){
-            if(templateName.contains(lineItemType.trim())){
+            if (templateName.startsWith(lineItemType.trim() + "_")) {
                 IMPORT_TEMPLATE_ICON.click();
                 IMPORT_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                 TEMPLATE_SEARCH_BOX.fill(templateName);
@@ -147,10 +156,14 @@ public class TacticDetails {
                 IMPORT_BUTTON.click();
                 if(OVERRIDE_DIALOG.isVisible())
                     REPLACE_BUTTON.click();
+                SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
                 TEMPLATE_IMPORT_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+                labelCountMap = targetingTemplate.fetchTargetingRulesCountFromTargeting();
+                IMPORTED_TARGET_TEMPLATE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                 break;
             }
         }
+        return labelCountMap;
     }
 
     private String saveTargetingTemplate(String lineItemType) {

@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Report Template
 
-  @e2eregression
+  @regression
   Scenario Outline: Create a Report Template
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"

@@ -61,6 +61,7 @@ public class CampaignListing {
 
     public void verifyIfFiltersExist(){
         if(FILTER_APPLIED_ICON.isVisible()){
+            FILTER_APPLIED_ICON.click();
             RESET_FILTER_ICON.click();
             PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
         }
