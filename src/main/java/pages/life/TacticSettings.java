@@ -94,10 +94,10 @@ public class TacticSettings {
         this.VIEWABILITY_PERCENTAGE_BOX = page.locator("//div[contains(@class, 'rightLabel')]//input[contains(@class, 'form-control-percent-mini-right')]");
         this.KEYWORDS_TEXTBOX = page.locator("//div[contains(@class,'text-area-container')]//textarea");
         this.GEO_RADIUS_ADD_POINT = page.locator("//div[normalize-space()='Add Point' and contains(@class,'semi-bold')]");
-        this.GEO_RADIUS_LAT = page.locator("//tr[@id='grRow0']//input[@placeholder='Latitude']");
-        this.GEO_RADIUS_LONG = page.locator("//tr[@id='grRow0']//input[@placeholder='Longitude']");
-        this.GEO_RADIUS_DISTANCE = page.locator("//tr[@id='grRow0']//input[@placeholder='Distance']");
-        this.GEO_RADIUS_POINT_NAME = page.locator("//tr[@id='grRow0']//input[@placeholder='Name']");
+        this.GEO_RADIUS_LAT = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='latitude']");
+        this.GEO_RADIUS_LONG = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='longitude']");
+        this.GEO_RADIUS_DISTANCE = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='distance']");
+        this.GEO_RADIUS_POINT_NAME = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='name']");
         this.GEO_RADIUS_SAVE = page.locator("(//div[@title='Save' and contains(@class,'saveGeoPtButton')])[1]");
     }
 
