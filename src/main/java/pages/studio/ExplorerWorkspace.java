@@ -23,9 +23,10 @@ public class ExplorerWorkspace {
     private final Locator FILTER_CLOSE_BUTTON;
     private final Locator APPLIED_FILTER;
     private final Locator APPLIED_FILTER_OPTION;
-    private final Locator SAVE_EXPLORER_WORKSPACE;
+    private final Locator SAVE_WORKSPACE;
     private final Locator EXPLORER_WORKSPACE_SUCCESS;
     private final FrameLocator WORKSPACE_FRAME;
+    private final Locator SAVE_WORKSPACE_NAME;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -42,8 +43,9 @@ public class ExplorerWorkspace {
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
         this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitleContainer-sc-')]");
         this.APPLIED_FILTER_OPTION = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterExpression-sc')]");
-        this.SAVE_EXPLORER_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonBase__ButtonOuter')]/div[contains(text(),'Save')]");
+        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledContainer')]//div[contains(text(),'Save')]");
         this.EXPLORER_WORKSPACE_SUCCESS = WORKSPACE_FRAME.locator("[id=\"\\32 \"] div").filter(new Locator.FilterOptions().setHasText("Workspace managementWorkspace")).nth(2);
+        this.SAVE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__DashboardContainer')]//div[contains(text(),'Save')]");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -56,6 +58,7 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.fill(advertiser);
         SEARCH_ADVERTISER.press("ArrowDown");
         SEARCH_ADVERTISER.press("Enter");
+        SAVE_WORKSPACE_NAME.click();
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
@@ -92,7 +95,7 @@ public class ExplorerWorkspace {
     public void saveExplorerWorkspace() {
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        SAVE_EXPLORER_WORKSPACE.first().click();
+        SAVE_WORKSPACE.first().click();
     }
 
     public String workspaceSuccess() {

@@ -13,6 +13,7 @@ public class LineItemDetails {
     private final Locator LINE_ITEM_SUCCESS;
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
     private final Locator LINE_ITEM_TYPE_VALUE;
+    private final Locator ADD_FLIGHT_BUTTON;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -24,6 +25,7 @@ public class LineItemDetails {
         this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
+        this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
     }
 
     public String verifyLineItemText() {
@@ -60,5 +62,8 @@ public class LineItemDetails {
                 break;
             }
         }
+    }
+    public void clickAddFlightButton() {
+        ADD_FLIGHT_BUTTON.click();
     }
 }
