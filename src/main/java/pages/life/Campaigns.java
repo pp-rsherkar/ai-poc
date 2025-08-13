@@ -2,6 +2,9 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class Campaigns {
     private final Page page;
@@ -14,24 +17,22 @@ public class Campaigns {
     private final Locator CAMPAIGN_TYPE_SEQUENTIAL;
     private final Locator BUDGET;
     private final Locator SAVE_CAMPAIGN;
+    private final Locator CAMPAIGN_LISTING;
     private final Locator CAMPAIGN_SUCCESS;
-    private final Locator NAVIGATE_TO_CAMPAIGN_LISTING;
 
     public Campaigns(Page page) {
         this.page = page;
         this.CREATE_CAMPAIGN = page.locator("//button[text()='Create a Campaign']");
         this.VERIFY_CAMPAIGN_PAGE = page.locator("//div[text()='Create New Campaign']");
-       // this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
         this.SEARCH_ADVERTISER = page.locator("(//input[@placeholder='Select Advertiser'])[1]");
-      //  this.SELECT_ADVERTISER = page.getByText("- Advertiser");
         this.SELECT_ADVERTISER = page.getByText("");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
         this.CAMPAIGN_TYPE_REGULAR = page.locator("//button[text()='Regular']");
         this.CAMPAIGN_TYPE_SEQUENTIAL = page.locator("//button[text()='Sequential']");
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
-        this.CAMPAIGN_SUCCESS = page.locator("//*[text()='Success!']");
-        this.NAVIGATE_TO_CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
+        this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
     }
 
     public void createCampaign() {
@@ -39,7 +40,7 @@ public class Campaigns {
     }
 
     public String campaignDashboard() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
@@ -61,8 +62,6 @@ public class Campaigns {
             CAMPAIGN_TYPE_REGULAR.click();
         } else if ("Sequential".equals(campaignType)) {
             CAMPAIGN_TYPE_SEQUENTIAL.click();
-        } else {
-            System.out.println("Invalid campaign type");
         }
     }
 
@@ -79,7 +78,7 @@ public class Campaigns {
     }
 
     public void navigateToCampaignListing() {
-        NAVIGATE_TO_CAMPAIGN_LISTING.click();
+        CAMPAIGN_LISTING.click();
         page.waitForLoadState();
     }
 }

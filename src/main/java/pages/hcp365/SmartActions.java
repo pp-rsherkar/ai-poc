@@ -3,6 +3,7 @@ package pages.hcp365;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 public class SmartActions {
 
@@ -13,7 +14,6 @@ public class SmartActions {
     private final Locator SMART_ACTION_NAME;
     private final Locator ADVERTISER;
     private final Locator SAVE_BUTTON;
-
     private final Locator SMART_ACTION_SUCCESS;
     private final Locator AUDIENCE_TAB;
     private final Locator AUDIENCE_NPI_LISTS_OPTION;
@@ -44,7 +44,7 @@ public class SmartActions {
         this.SMART_ACTION_SUCCESS = page.getByText("new Smart Action created successfully");
         this.AUDIENCE_TAB = page.locator("//div[@class='col-sm nav-tab selected']");
         this.AUDIENCE_NPI_LISTS_OPTION = page.getByText("NPI Lists");
-        this.NPI_LIST_SEARCH = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
+        this.NPI_LIST_SEARCH = page.locator("//input[@id='search-input']");
         this.NPI_LIST_TARGET = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@title='Target']");
         this.VERIFY_NPI_LIST_NAME = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@customclass='primary-tooltip']");
         this.OK_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ok"));
@@ -76,7 +76,6 @@ public class SmartActions {
         SAVE_BUTTON.click();
     }
 
-
     public void enterSmartActionName(String SmartActionName) {
         SMART_ACTION_NAME.fill(SmartActionName);
     }
@@ -84,7 +83,6 @@ public class SmartActions {
     public void enterAdvertiser(String advertiser) {
         ADVERTISER.click();
         SELECT_ADVERTISER.click();
-
     }
 
     public void saveSmartAction() {
@@ -119,8 +117,8 @@ public class SmartActions {
         NPI_LIST_SEARCH.click();
         NPI_LIST_SEARCH.fill(npiListName);
         NPI_LIST_SEARCH.press("Enter");
+        page.waitForTimeout(3000);
         return VERIFY_NPI_LIST_NAME.innerText();
-
     }
 
     public void targetNPIList() {
@@ -133,7 +131,8 @@ public class SmartActions {
     }
 
     public String getSavedMessage() {
-        return SAVED_SUCCESS_MESSAGE.innerText();
-    }
-
+    String alertText = SAVED_SUCCESS_MESSAGE.first().innerText();
+    SAVED_SUCCESS_MESSAGE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    return alertText;
+}
 }

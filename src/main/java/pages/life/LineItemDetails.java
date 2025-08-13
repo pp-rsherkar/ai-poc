@@ -11,6 +11,8 @@ public class LineItemDetails {
     private final Locator ENABLE_LINE_ITEM;
     private final Locator SAVE_LINE_ITEM;
     private final Locator LINE_ITEM_SUCCESS;
+    private final Locator LINE_ITEM_TYPE_DROPDOWN;
+    private final Locator LINE_ITEM_TYPE_VALUE;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -19,7 +21,9 @@ public class LineItemDetails {
         this.LINE_ITEM_BUDGET = page.locator("//input[@id='budget0']");
         this.ENABLE_LINE_ITEM = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_LINE_ITEM = page.locator("//span[text()='Save']");
-        this.LINE_ITEM_SUCCESS = page.locator("//*[text()='Success!']");
+        this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
+        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
     }
 
     public String verifyLineItemText() {
@@ -44,5 +48,17 @@ public class LineItemDetails {
 
     public String lineItemSuccess() {
         return LINE_ITEM_SUCCESS.innerText();
+    }
+
+    public void selectLineItemType(String lineItemType) {
+        LINE_ITEM_TYPE_DROPDOWN.click();
+        int count = LINE_ITEM_TYPE_VALUE.count();
+        for(int i=0; i< count; i++) {
+            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
+                LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
+                LINE_ITEM_TYPE_VALUE.nth(i).click();
+                break;
+            }
+        }
     }
 }
