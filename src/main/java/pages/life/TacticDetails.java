@@ -15,6 +15,7 @@ import java.util.*;
 public class TacticDetails {
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
+    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
@@ -42,7 +43,7 @@ public class TacticDetails {
     public TacticDetails(Page page) {
         this.page = page;
         this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
-        this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name']");
+        this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
         this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.IMPORT_TEMPLATE_ICON = page.locator("//app-icon-lable-link[contains(@text,'Import Template')]/div");
@@ -75,7 +76,7 @@ public class TacticDetails {
     }
 
     public String tacticDetailsSuccess() {
-        return TACTIC_DETAILS_SUCCESS.first().innerText();
+        return TACTIC_DETAILS_SUCCESS.innerText();
     }
 
     public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {

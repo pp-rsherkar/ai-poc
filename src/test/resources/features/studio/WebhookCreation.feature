@@ -24,10 +24,10 @@ Feature: Webhook Creation Regression - Verify below features
     And Verify error message when webhook setup is failed using "<ERROR_DATA>"
     #4
     When User adds valid URL and append Macros with "<PARAM>" to the "URL" as follow
-    | NPI        |
-    | URL        |
-    | Channel    |
-    | Param 1..5 |
+      | NPI        |
+      | URL        |
+      | Channel    |
+      | Param 1..5 |
     Then Verify if Macros Appended to the URL
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
@@ -60,5 +60,5 @@ Feature: Webhook Creation Regression - Verify below features
     Then Verify user receives a warning when attempting to delete a workspace with an active webhook
 
     Examples:
-      | ADVERTISER | FILTER       | OPTION                                | WORKSPACE_NAME | PARAM   | BODY             | CONTENT_TYPE | INVALID_WEBHOOK_DATA | ERROR_DATA                              |
-      | Abbvie     | Site, Search | Associated Device, Associated Network | Explorer       | Param 4 | WebhookData.json | JSON         | Test                 | https:www.google.com, WebhookData.json  |
+      | ADVERTISER | FILTER       | OPTION                                | WORKSPACE_NAME | PARAM   | BODY             | CONTENT_TYPE | INVALID_WEBHOOK_DATA | ERROR_DATA                             |
+      | Abbvie     | Site, Search | Associated Device, Associated Network | Explorer       | Param 4 | WebhookData.json | JSON         | Test                 | https:www.google.com, WebhookData.json |

@@ -32,7 +32,6 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
       | TEMPLATE_NAME | CHANNEL                                         | LINE_ITEMS                                                                  | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
       | Template      | Display Advanced, Video Advanced, DOOH Advanced | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video | 01- Advertiser | TargetingTemplate | Regular | 20000     | Line      | 500         | Tactic      |
 
-
   @regression
   Scenario Outline: Create a Targeting Template, verifies the existing template and import the template in Tactic
     #1

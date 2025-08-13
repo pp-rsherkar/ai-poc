@@ -59,7 +59,6 @@ Feature: End to End Workflow of NPI Lists.
       | ADVERTISER   | LIST_NAME  | DRUG_NAME | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | SMART_ACTION_NAME | SMART_LIST_NAME | DAYS |
       | Z_Automation | Smart List | Glynase   | Auto    | Regular | 2000      | Line      | 500         | TACTIC      | Display Advanced | SMART_ACTION      | SMART_LIST      | 5    |
 
-
   @e2e @regression
   Scenario Outline: End to End Workflow of Static NPI lists Integration with HCP365 Smart Action
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -100,6 +99,5 @@ Feature: End to End Workflow of NPI Lists.
     When User clicks on Action and enters the details and saves
     Then Verify data is saved successfully
     Examples:
-      | ADVERTISER   | LIST_NAME  | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | SMART_ACTION_NAME |  NPI_NUMBER    |
-      | Z_Automation | STATIC_NPI | Auto    | Regular | 2000      | Line      | 500         | TACTIC      | Display Advanced | SMART_ACTION      |  1234567890    |
-
+      | ADVERTISER   | LIST_NAME  | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | SMART_ACTION_NAME | NPI_NUMBER |
+      | Z_Automation | STATIC_NPI | Auto    | Regular | 2000      | Line      | 500         | TACTIC      | Display Advanced | SMART_ACTION      | 1234567890 |
