@@ -1,4 +1,4 @@
-Feature: End to End Workflow of Creative Creation and Assignment To Tactic
+Feature: End to End Workflow of Creative Creation and its assignment To Tactic
   It covers below points -
   1. Create a Creative for below types
     Display

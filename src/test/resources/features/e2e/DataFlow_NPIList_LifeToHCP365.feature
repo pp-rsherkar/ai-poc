@@ -1,13 +1,13 @@
 Feature: End to End Workflow of NPI Lists.
   It covers below points
-  1. Create a Smart and Static List from LIFE and to be available in LIFE & HCP365.
-  2. Create Campaign in LIFE with smart list targeting.
-  3. Create a Smart action from HCP365 and navigate to Audience tab.
-  4. Verify NPI list created in LIFE is available.
-  5. Add Smart list created in LIFE as the Audience.
-  6. Add action as Visits Brand page.
-  7. Add response to the smart action as Add NPI to the smart list.
-  8. Verify Smart action is saved successfully.
+    1. Create a Smart and Static NPI List from LIFE and make it available in LIFE & HCP365.
+    2. Create Campaign in LIFE with respective list targeting.
+    3. Create a Smart action from HCP365 and navigate to Audience tab.
+    4. Navigate to NPI Lists tab and verify the list created is available.
+    5. Add the list created to the Smart Actions.
+    6. Navigate to Action tab and add action as Visits Brand page.
+    7. In case of Smart List, navigate to Response tab and add response to the smart action.
+    8. And verify Smart action is saved successfully with details Smart List name and days.
 
   @e2e @regression
   Scenario Outline: End to End Workflow of LIFE NPI Smart lists Integration with HCP365
@@ -58,7 +58,6 @@ Feature: End to End Workflow of NPI Lists.
     Examples:
       | ADVERTISER   | LIST_NAME  | DRUG_NAME | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | SMART_ACTION_NAME | SMART_LIST_NAME | DAYS |
       | Z_Automation | Smart List | Glynase   | Auto    | Regular | 2000      | Line      | 500         | TACTIC      | Display Advanced | SMART_ACTION      | SMART_LIST      | 5    |
-
 
   @e2e @regression
   Scenario Outline: End to End Workflow of Static NPI lists Integration with HCP365 Smart Action
