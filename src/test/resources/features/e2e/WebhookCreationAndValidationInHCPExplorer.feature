@@ -9,7 +9,7 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
   8. Save the webhook setup and verify the webhook icon is highlighted in green color
   9. Verify user receives a warning when attempting to delete a workspace with an active webhook
 
-  @e2e @regression
+  @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the request URL and body
     #1
     Given This scenario will be executed in the "Pre-release" environment as a "User"

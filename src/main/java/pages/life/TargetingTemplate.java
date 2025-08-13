@@ -36,6 +36,7 @@ public class TargetingTemplate {
     private final Locator TARGET_ITEM_LABEL;
     private final Locator TARGET_ITEM_VALUE;
     private final Locator TARGET_TEMPLATE_RULES;
+    private final Locator SUCCESS_ALERT;
 
     public TargetingTemplate(Page page) {
         this.page = page;
@@ -62,6 +63,7 @@ public class TargetingTemplate {
         this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
         this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
         this.TARGET_TEMPLATE_RULES = page.locator("//div[@class='targets-list']");
+        this.SUCCESS_ALERT = page.locator("//div[contains(text(),'Target template created successfully')]");
     }
 
     public boolean verifyTargetingButtonAndSearchBox() {
@@ -88,10 +90,13 @@ public class TargetingTemplate {
                     selectChannel(channelList);
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
-                    SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-                    Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
-                    lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
-                    NEW_TEMPLATE_BUTTON.click();
+                    if(SUCCESS_ALERT.isVisible())
+                    {
+                        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+                        Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
+                        lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
+                        NEW_TEMPLATE_BUTTON.click();
+                    }
                     break;
                 }
             }

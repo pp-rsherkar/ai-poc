@@ -94,7 +94,7 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.type(ruleType);
         if(SELECT_RULE_TYPE.isVisible()){
             SELECT_RULE_TYPE.click();
-            SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            SPINNER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
 
             switch (ruleType) {
                 case "Behavioral Segment":

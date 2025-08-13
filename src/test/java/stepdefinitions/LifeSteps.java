@@ -869,7 +869,7 @@ public class LifeSteps {
         Map<String, String> rawMap = pricingStrategy.asMap(String.class, String.class);
         Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            pmp.verifyPricingStrategyIsEditable(dealIDRandom, entry.getKey(), entry.getValue());
+            pmp.verifyPricingStrategyIsEditable(dealNameRandom, entry.getKey(), entry.getValue());
         }
     }
 
@@ -1089,26 +1089,6 @@ public class LifeSteps {
     @Then("Verify the template created are saved")
     public void verifyTheTemplateCreatedAreSaved() {
         Assert.assertFalse("Unable to save targeting templates", keyValueMap.isEmpty());
-    }
-
-    /* Roshani Sherkar
-     * 18-07-2025
-     * Targeting Template Creation from Tactic
-     * */
-    @And("Create a tactic with below targeting rules and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
-    public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName, DataTable ruleTypeAndOptions) {
-        Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
-        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
-        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
-                .map(String::trim)
-                .toList();
-        nameList.clear();
-        nameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
-    }
-
-    @Then("Verify the template created are saved")
-    public void verifyTheTemplateCreatedAreSaved() {
-        Assert.assertFalse("Unable to save targeting templates", nameList.isEmpty());
     }
 
 

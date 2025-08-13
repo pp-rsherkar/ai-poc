@@ -1,4 +1,8 @@
-Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation and Assignment
+Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creation and Assignment
+  1. Verify Private Deals Tab
+  2. Verify Life Marketplace Deals Tab
+  3. Addition of Private Deals and assigned to a tactic when Only Target Applied Deals toggle is ON
+  4. Addition of Private Deals and assigned to a tactic when Only Target Applied Deals toggle is OFF
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
