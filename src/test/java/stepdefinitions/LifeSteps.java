@@ -1130,10 +1130,10 @@ public class LifeSteps {
 
     @And("User enters file details {string} {string} {string}")
     public void userEntersImportSettingWithDetails(String fileLocation, String filePath, String fileName) {
-        npiAttributesAndAutoImportedList.enterFileDetails(fileLocation, filePath, fileName);
+        npiAttributesAndAutoImportedList.enterFileDetails(fileLocation, filePath.trim(), fileName.trim());
     }
 
-    @And("User selects the List type {string}")
+    @And("User selects the {string} radio button")
     public void userSelectsTheListType(String listType) {
         npiAttributesAndAutoImportedList.selectListType(listType);
     }
@@ -1143,7 +1143,7 @@ public class LifeSteps {
         npiAttributesAndAutoImportedList.enterColumnName(npiColumn, columnName);
     }
 
-    @And("User selects the Import type {string}")
+    @And("User selects the {string}")
     public void userSelectsTheImportType(String importType) {
         npiAttributesAndAutoImportedList.selectImportType(importType);
     }
@@ -1153,12 +1153,18 @@ public class LifeSteps {
         npiAttributesAndAutoImportedList.clickCheckFile();
     }
 
-    @Then("User saves the import settings and verifies the is saved successfully")
+    @Then("User saves the import settings and verifies the data is imported successfully")
     public void userSavesTheImportSettingsAndVerifiesTheIsSavedSuccessfully() {
         npiAttributesAndAutoImportedList.clickOKButton();
     }
 
-    @And("Run API to upload the data into the list")
+    @And("Verify that Token is fetched successfully")
+    public void verifyThatTokenIsFetchedSuccessfully() {
+        constants.TOKEN = npiAttributesAndAutoImportedList.fetchToken();
+        Assert.assertNotNull("Token is not fetched", constants.TOKEN);
+    }
+
+    @And("Pass token in the API Header and run it to upload the data into the list")
     public void runAPIToUploadTheListDataIntoTheList() {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Token", constants.TOKEN);
@@ -1167,7 +1173,12 @@ public class LifeSteps {
 
     @And("Verify list data is uploaded successfully")
     public void verifyListDataIsUploadedSuccessfully() {
-        Assert.assertEquals(200, response.status());
+        Assert.assertEquals(204, response.status());
+    }
+
+    @And("Refresh the Browser to view the data uploaded")
+    public void refreshTheBrowserToViewTheDataUploaded() {
+        Assert.assertTrue("NPI List is not available", npiAttributesAndAutoImportedList.refreshBrowser());
     }
 
     @And("Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in {string}")
@@ -1179,6 +1190,7 @@ public class LifeSteps {
 
     @And("Verify Reload Now button is available and enabled")
     public void verifyReloadNowButtonIsAvailableAndEnabled() {
+        npiAttributesAndAutoImportedList.verifyIfImportSettingButtonIsVisible();
         Assert.assertTrue("Reload Now Button is not available", npiAttributesAndAutoImportedList.verifyReloadNowButton());
     }
 

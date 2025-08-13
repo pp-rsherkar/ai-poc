@@ -3,6 +3,7 @@ package pages.life;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Request;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
@@ -50,6 +51,10 @@ public class NPIAttributesAndAutoImportedList {
     private final Locator TOTAL_NPI_COUNT;
     private final Locator RELOAD_NOW_BUTTON;
     private final Locator RELOAD_SUCCESS_ALERT;
+    private final Locator FILE_OKAY_TEXT;
+    private final Locator IMPORT_SETTING_BUTTON;
+    private final Locator NPI_LIST_TEXTAREA;
+    private final Locator NPI_ATTRIBUTE_GRIDVIEW;
 
     public NPIAttributesAndAutoImportedList(Page page) {
         this.page = page;
@@ -81,10 +86,13 @@ public class NPIAttributesAndAutoImportedList {
         this.NPI_COLUMN = page.locator("//input[@formcontrolname='npiColumn']");
         this.CHECK_FILE_BUTTON = page.locator("//span[contains(text(),'Check File')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'saveButton')]");
-        this.TOTAL_NPI_COUNT = page.locator("//div[contains(@class,'npiAttrsMatchedNPI')]//div[text()='Total NPI']//preceding-sibling::div");
+        this.TOTAL_NPI_COUNT = page.locator("//div[text()='Total NPI']//preceding-sibling::div");
         this.RELOAD_NOW_BUTTON = page.locator("//span[contains(text(),'Reload Now')]/parent::div");
         this.RELOAD_SUCCESS_ALERT = page.locator("//div[@aria-label='File is reloaded']");
-
+        this.FILE_OKAY_TEXT = page.locator("//span[contains(text(),'File is okay')]");
+        this.IMPORT_SETTING_BUTTON = page.locator("//span[contains(text(),'Import Settings')]");
+        this.NPI_LIST_TEXTAREA = page.locator("//textarea[@name='npilist']");
+        this.NPI_ATTRIBUTE_GRIDVIEW = page.locator("//div[contains(@class,'npiattrsGridView')]");
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -172,6 +180,7 @@ public class NPIAttributesAndAutoImportedList {
     public String verifyErrorMessage(){
         String errorMessage = ERROR_MESSAGE.innerText().trim();
         waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitForLocatorHidden(ERROR_MESSAGE);
         return errorMessage;
     }
     public void clickSetupImportButton(){
@@ -210,10 +219,12 @@ public class NPIAttributesAndAutoImportedList {
 
     public void clickCheckFile() {
         CHECK_FILE_BUTTON.click();
+        waitUtility.waitForLocatorVisible(FILE_OKAY_TEXT);
     }
 
     public void clickOKButton() {
         OK_BUTTON.click();
+        waitUtility.waitUntilLoaderHidden();
     }
 
     public APIResponse runAPI(String baseURL, String endpointPath, HashMap<String, String> headers) {
@@ -223,6 +234,7 @@ public class NPIAttributesAndAutoImportedList {
     }
 
     public String fetchTotalNPICount() {
+        waitUtility.waitForLocatorVisible(TOTAL_NPI_COUNT);
         return TOTAL_NPI_COUNT.innerText();
     }
 
@@ -242,6 +254,28 @@ public class NPIAttributesAndAutoImportedList {
     }
 
     public String verifyIfFileIsReloaded() {
-        return RELOAD_SUCCESS_ALERT.innerText().trim();
+        String text = RELOAD_SUCCESS_ALERT.innerText().trim();
+        waitUtility.waitForLocatorHidden(RELOAD_SUCCESS_ALERT);
+        waitUtility.waitUntilLoaderHidden();
+        return text;
+    }
+
+    public void verifyIfImportSettingButtonIsVisible() {
+        waitUtility.waitForLocatorVisible(IMPORT_SETTING_BUTTON);
+    }
+
+    public String fetchToken(){
+        Request matchedRequest = page.waitForRequest(
+                request -> request.url().contains("BuyerProxy.ashx"),
+                page::reload
+        );
+        return matchedRequest.headers().get("token");
+    }
+
+    public boolean refreshBrowser() {
+        page.reload();
+        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitForLocatorVisible(TOTAL_NPI_COUNT);
+        return NPI_ATTRIBUTE_GRIDVIEW.isVisible() || NPI_LIST_TEXTAREA.isVisible();
     }
 }
