@@ -36,7 +36,6 @@ public class TacticSettings {
     private final Locator FETCH_TARGET_RULETYPES;
     private final Locator FETCH_TARGET_RULEOPTIONS;
     private final Locator TARGET_CATEGORY_NAME;
-    private final Locator SPINNER;
     private final Locator PERSON_TAB;
     private final Locator HOUSEHOLD_TAB;
     private final Locator HOUSEHOLD_IP_TAB;
@@ -82,7 +81,6 @@ public class TacticSettings {
         this.FETCH_TARGET_RULETYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULEOPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
         this.HOUSEHOLD_IP_TAB = page.locator("//button[normalize-space(text())='Household IP']");

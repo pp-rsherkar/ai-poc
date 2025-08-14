@@ -8,12 +8,12 @@ Feature: LIFE Regression - Create NPI List of following types:
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-
-  @regression
-  Scenario Outline: Create Static NPI List by specifying NPI Numbers.
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
+
+  @regression
+  Scenario Outline: Create Static NPI List by specifying NPI Numbers.
     And User selects Static List
     And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>" "<NPI_NUMBER>"
     When User makes list available in LIFE and saves the list
@@ -24,9 +24,6 @@ Feature: LIFE Regression - Create NPI List of following types:
 
   @regression
   Scenario Outline: Create Static NPI List by uploading file with NPI Numbers
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
     And User selects Static List
     When User tries to save the list without entering any details, an error message should be displayed
     And User enters the NPI Static list details as "<LIST_NAME>" "<ADVERTISER>"
@@ -44,9 +41,6 @@ Feature: LIFE Regression - Create NPI List of following types:
 
   @regression
   Scenario Outline: Create Smart NPI List by specifying Type.
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
     And User selects Smart List to create NPI list
     And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for "<Type>" with "<PROFESSION_VALUE>" "<SMART_PIXEL_DROPDOWN_VALUE>" "<NPI_GROUP_VALUE>"
     Then Save and Verify the list gets saved successfully
@@ -56,9 +50,6 @@ Feature: LIFE Regression - Create NPI List of following types:
 
   @regression
   Scenario Outline: Create Attribute NPI List by uploading file with NPI Attributes
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
     And User selects the Attributes List and uploads the file "<FILE_NAME>"
     Then Verify file "<FILE_NAME>" is uploaded successfully
     And User selects the "<COLUMN_NAME>" column and clicks on Next
@@ -76,9 +67,6 @@ Feature: LIFE Regression - Create NPI List of following types:
 
   @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using API
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
     And User selects the Auto-Imported List
     And Verify if user navigates to the Auto-Imported List page
     Then User tries to save the Auto-Imported list without entering any details, an error message should be displayed
@@ -104,9 +92,6 @@ Feature: LIFE Regression - Create NPI List of following types:
 
   @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using Reload Now button
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
     And User selects the Auto-Imported List
     And Verify if user navigates to the Auto-Imported List page
     Then User tries to save the Auto-Imported list without entering any details, an error message should be displayed
