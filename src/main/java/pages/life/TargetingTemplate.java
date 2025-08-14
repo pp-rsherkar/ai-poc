@@ -90,13 +90,11 @@ public class TargetingTemplate {
                     selectChannel(channelList);
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
-                    if(SUCCESS_ALERT.isVisible())
-                    {
-                        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-                        Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
-                        lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
-                        NEW_TEMPLATE_BUTTON.click();
-                    }
+                    SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                    SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+                    Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
+                    lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
+                    NEW_TEMPLATE_BUTTON.click();
                     break;
                 }
             }
@@ -119,7 +117,7 @@ public class TargetingTemplate {
         }
     }
 
-    public void addTargetingRules(Map<String, List<String>> rulesMap){
+    public void addTargetingRules(Map<String, List<String>> rulesMap) {
         ADD_TARGETINGRULE_BUTTON.click();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
@@ -127,11 +125,11 @@ public class TargetingTemplate {
         tacticSettings.closeRuleTypePanel();
     }
 
-    public Map<String, String> fetchTargetingRulesCountFromTargeting(){
+    public Map<String, String> fetchTargetingRulesCountFromTargeting() {
         Map<String, String> labelCountMap = new HashMap<>();
         int count = TARGET_ITEM_LABEL.count();
-        for(int i=0; i < count; i++) {
-            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(),TARGET_ITEM_VALUE.nth(i).innerText().trim());
+        for (int i = 0; i < count; i++) {
+            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(), TARGET_ITEM_VALUE.nth(i).innerText().trim());
         }
         return labelCountMap;
     }
