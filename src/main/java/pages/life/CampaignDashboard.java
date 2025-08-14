@@ -62,7 +62,6 @@ public class CampaignDashboard {
     private final Locator CREATIVE_TOOLTIP;
 
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
-    //boolean campaignFlag, lineItemFlag, tacticFlag, hideDashboardColumnFlag, showDashboardColumnFlag = false;
     boolean flag1, flag2, flag3 = false;
 
     public CampaignDashboard(Page page) {
@@ -113,7 +112,7 @@ public class CampaignDashboard {
     }
 
     public String verifyCampaignDashbaord(String text){
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitUntilPreLoaderHidden();
         page.waitForCondition(() -> CAMPAIGNPAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
         return CAMPAIGNPAGE_TEXT.innerText();

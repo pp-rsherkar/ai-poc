@@ -243,8 +243,5 @@ public class ReportTemplates {
 
         return allHeadersPresent;
     }
-
-   /* public Locator getTacticName(String id, int index) {
-        return page.locator(String.format("//*[@id='%s']/div/div[%d]", id, index));
-    }*/
+    
 }

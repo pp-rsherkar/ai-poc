@@ -76,7 +76,7 @@ public class Campaigns {
     }
 
     public String campaignSuccess() {
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return CAMPAIGN_SUCCESS.innerText();
     }
 

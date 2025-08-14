@@ -95,7 +95,7 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.type(ruleType);
         if(SELECT_RULE_TYPE.isVisible()){
             SELECT_RULE_TYPE.click();
-            waitUtility.waitUntilLoaderHidden();
+            waitUtility.waitUntilSpinnerHidden();
 
             switch (ruleType) {
                 case "Behavioral Segment":

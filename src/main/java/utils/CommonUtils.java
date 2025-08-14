@@ -8,8 +8,8 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -90,4 +90,11 @@ public class CommonUtils {
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
     }
 
+    public static void uploadFile(Page page, String locatorValue, String fileName) {
+        Locator fileInput = page.locator("input[type='file']").first();
+        fileInput.setInputFiles(Paths.get("src/main/resources/" + fileName));
+        ElementHandle fileInputHandle = fileInput.elementHandle();
+        page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
+        page.waitForSelector(String.format(locatorValue, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+    }
 }

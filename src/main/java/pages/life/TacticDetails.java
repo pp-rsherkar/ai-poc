@@ -16,9 +16,11 @@ import java.util.*;
 public class TacticDetails {
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
+    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
@@ -75,7 +77,7 @@ public class TacticDetails {
     }
 
     public String tacticDetailsSuccess() {
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return TACTIC_DETAILS_SUCCESS.first().innerText();
     }
 
@@ -125,7 +127,7 @@ public class TacticDetails {
         campaigns.setCampaignType(campaignType);
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -135,13 +137,13 @@ public class TacticDetails {
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     private void createTactic(String tacticName) {
         enterTacticName(tacticName);
         saveTacticDetails();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
@@ -155,7 +157,7 @@ public class TacticDetails {
                 IMPORT_BUTTON.click();
                 if(OVERRIDE_DIALOG.isVisible())
                     REPLACE_BUTTON.click();
-                waitUtility.waitUntilLoaderHidden();
+                waitUtility.waitUntilSpinnerHidden();
                 TEMPLATE_IMPORT_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
                 labelCountMap = targetingTemplate.fetchTargetingRulesCountFromTargeting();
                 IMPORTED_TARGET_TEMPLATE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -176,4 +178,20 @@ public class TacticDetails {
         TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return templateName;
     }
+
+    public boolean createTacticWithLineItemsAndAssignCreative(String lineItemType, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, String CreativeName) {
+            npiSmartList.clickPulsepointIcon();
+            campaigns.campaignDashboard();
+
+            createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
+            createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
+            createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
+
+            tacticCreatives.clickCreativeTab();
+            tacticCreatives.clickAssignCreatives();
+            tacticCreatives.assignCreatives(CreativeName);
+            saveTacticDetails();
+            return tacticCreatives.verifyCreativeAssigned(CreativeName);
+    }
+
 }

@@ -17,6 +17,8 @@ public class TacticCreatives {
     private final Locator NAVIGATE_TO_CAMPAIGN_DASHBOARD;
     private final Locator VERIFY_CAMPAIGN_RUNNING;
     private final Locator ASSIGN_CREATIVE_TITLE;
+    private final Locator CREATIVE_TAB;
+    private final Locator ASSIGN_EXISTING_CREATIVE;
 
     public TacticCreatives(Page page) {
         this.page = page;
@@ -31,6 +33,8 @@ public class TacticCreatives {
         this.NAVIGATE_TO_CAMPAIGN_DASHBOARD = page.locator("//div[contains(@class,'campaign-tile')]");
         this.VERIFY_CAMPAIGN_RUNNING = page.locator("//span[@class='status-label running']");
         this.ASSIGN_CREATIVE_TITLE = page.locator("//div[contains(text(),'Assign Creatives')]");
+        this.CREATIVE_TAB = page.locator("//a[contains(text(),'Creatives')]");
+        this.ASSIGN_EXISTING_CREATIVE = page.locator("//span[contains(text(),'Assign Existing Creatives')]");
     }
 
     public String verifyTacticCreativesText() {
@@ -65,5 +69,14 @@ public class TacticCreatives {
 
     public void navigateToCampaignDashboard() {
         NAVIGATE_TO_CAMPAIGN_DASHBOARD.click();
+    }
+
+    public void clickCreativeTab() { CREATIVE_TAB.click(); }
+
+    public void clickAssignCreatives() { ASSIGN_EXISTING_CREATIVE.click(); }
+
+    public boolean verifyCreativeAssigned(String CreativeName){
+        return page.locator(String.format("//td[@title='%s']",CreativeName)).isVisible();
+
     }
 }

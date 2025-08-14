@@ -1,4 +1,4 @@
-Feature: Webhook Creation in Studio :: HCP Explorer workspace and verify below features
+Feature: Webhook Creation and Validation in HCP Explorer Workspace
   1. Create a HCP Explorer workspace
   2. Verify the webhook is enabled after engagement filters are applied
   3. Create a webhook with GET and verify inline error messages when wrong data is entered and when webhook setup fails
@@ -9,8 +9,7 @@ Feature: Webhook Creation in Studio :: HCP Explorer workspace and verify below f
   8. Save the webhook setup and verify the webhook icon is highlighted in green color
   9. Verify user receives a warning when attempting to delete a workspace with an active webhook
 
-
-  @e2e @regression
+  @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the request URL and body
     #1
     Given This scenario will be executed in the "Pre-release" environment as a "User"
@@ -30,10 +29,10 @@ Feature: Webhook Creation in Studio :: HCP Explorer workspace and verify below f
     And Verify error message when webhook setup is failed using "<ERROR_DATA>"
     #4
     When User adds valid URL and append Macros with "<PARAM>" to the "URL" as follow
-    | NPI        |
-    | URL        |
-    | Channel    |
-    | Param 1..5 |
+      | NPI        |
+      | URL        |
+      | Channel    |
+      | Param 1..5 |
     Then Verify if Macros Appended to the URL
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
@@ -65,7 +64,6 @@ Feature: Webhook Creation in Studio :: HCP Explorer workspace and verify below f
     #9
     When User tries to delete the workspace associated with active webhook from the workspace list
     Then Verify user receives a warning when attempting to delete a workspace with an active webhook
-
     Examples:
-      | ADVERTISER | FILTER       | OPTION                                | WORKSPACE_NAME | PARAM   | BODY             | CONTENT_TYPE | INVALID_WEBHOOK_DATA | ERROR_DATA                              |
-      | Abbvie     | Site, Search | Associated Device, Associated Network | Explorer       | Param 4 | WebhookData.json | JSON         | Test                 | https:www.google.com, WebhookData.json  |
+      | ADVERTISER | FILTER       | OPTION                                | WORKSPACE_NAME | PARAM   | BODY             | CONTENT_TYPE | INVALID_WEBHOOK_DATA | ERROR_DATA                             |
+      | Abbvie     | Site, Search | Associated Device, Associated Network | Explorer       | Param 4 | WebhookData.json | JSON         | Test                 | https:www.google.com, WebhookData.json |

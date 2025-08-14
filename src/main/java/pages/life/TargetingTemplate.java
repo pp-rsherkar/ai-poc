@@ -36,6 +36,7 @@ public class TargetingTemplate {
     private final Locator TARGET_ITEM_LABEL;
     private final Locator TARGET_ITEM_VALUE;
     private final Locator TARGET_TEMPLATE_RULES;
+    private final Locator SUCCESS_ALERT;
 
     public TargetingTemplate(Page page) {
         this.page = page;
@@ -61,6 +62,7 @@ public class TargetingTemplate {
         this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
         this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
         this.TARGET_TEMPLATE_RULES = page.locator("//div[@class='targets-list']");
+        this.SUCCESS_ALERT = page.locator("//div[contains(text(),'Target template created successfully')]");
     }
 
     public boolean verifyTargetingButtonAndSearchBox() {
@@ -87,7 +89,8 @@ public class TargetingTemplate {
                     selectChannel(channelList);
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
-                    waitUtility.waitUntilLoaderHidden();
+                    waitUtility.waitForLocatorVisible(SUCCESS_ALERT);
+                    waitUtility.waitUntilSpinnerHidden();
                     Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
                     lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
                     NEW_TEMPLATE_BUTTON.click();
@@ -113,7 +116,7 @@ public class TargetingTemplate {
         }
     }
 
-    public void addTargetingRules(Map<String, List<String>> rulesMap){
+    public void addTargetingRules(Map<String, List<String>> rulesMap) {
         ADD_TARGETINGRULE_BUTTON.click();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
@@ -121,11 +124,11 @@ public class TargetingTemplate {
         tacticSettings.closeRuleTypePanel();
     }
 
-    public Map<String, String> fetchTargetingRulesCountFromTargeting(){
+    public Map<String, String> fetchTargetingRulesCountFromTargeting() {
         Map<String, String> labelCountMap = new HashMap<>();
         int count = TARGET_ITEM_LABEL.count();
-        for(int i=0; i < count; i++) {
-            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(),TARGET_ITEM_VALUE.nth(i).innerText().trim());
+        for (int i = 0; i < count; i++) {
+            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(), TARGET_ITEM_VALUE.nth(i).innerText().trim());
         }
         return labelCountMap;
     }
@@ -135,7 +138,7 @@ public class TargetingTemplate {
         for (String s : templateNameList) {
             SEARCH_BOX.fill(s.trim());
             page.locator(String.format("//div[contains(text(),'%s')]",s)).click();
-            waitUtility.waitUntilLoaderHidden();
+            waitUtility.waitUntilSpinnerHidden();
             if (TEMPLATE_NAME_TEXT.isVisible() && TARGET_TEMPLATE_RULES.isVisible())
                 flag = true;
         }
@@ -145,7 +148,7 @@ public class TargetingTemplate {
     public String verifyErrorMessageForTemplateName(String targetingRule) {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         ADD_TARGETINGRULE_BUTTON.click();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
@@ -157,7 +160,7 @@ public class TargetingTemplate {
     public String verifyErrorMessageForTargetingRules(String templateName) {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         TEMPLATE_NAME_TEXT.fill(templateName+"_"+CommonUtils.timeStampCalculation());
         if(TARGETING_RULES_DELETE_ICON.isVisible())
             TARGETING_RULES_DELETE_ICON.click();
@@ -170,7 +173,7 @@ public class TargetingTemplate {
     public boolean clickAndVerifyShowExpression(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         SHOW_EXPRESSION_ICON.click();
         waitUtility.waitForLocatorVisible(TARGETING_CONTAINER);
         return TARGETING_CONTAINER.isVisible();
@@ -179,11 +182,11 @@ public class TargetingTemplate {
     public boolean clickAndVerifyTargetTemplateEditable(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         TEMPLATE_NAME_TEXT.fill(templateName + "_edited_" + CommonUtils.timeStampCalculation());
         if (SAVE_BUTTON.isVisible()) {
             SAVE_BUTTON.click();
-            waitUtility.waitUntilLoaderHidden();
+            waitUtility.waitUntilSpinnerHidden();
             return true;
         }
         return false;
@@ -192,11 +195,11 @@ public class TargetingTemplate {
     public String clickAndVerifyTargetTemplateDeletion(String templateName) {
         SEARCH_BOX.fill(templateName.trim());
         SEARCH_FIRST_ITEM.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         TARGET_TEMPLATE_DELETE_ICON.click();
         waitUtility.waitForLocatorVisible(DELETE_DIALOG);
         REMOVE_BUTTON.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return TEMPLATE_DELETED_ERROR.innerText();
     }
 

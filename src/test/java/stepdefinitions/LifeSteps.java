@@ -16,6 +16,8 @@ import utils.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -38,6 +40,7 @@ public class LifeSteps {
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
+    List<String> nameList = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -52,7 +55,9 @@ public class LifeSteps {
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
-    NPIAttributesAndAutoImportedList npiAttributesAndAutoImportedList = new NPIAttributesAndAutoImportedList(DriverFactory.getPage());
+    CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
+    NPIAttributesList npiAttributesList = new NPIAttributesList(DriverFactory.getPage());
+    NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     DomainList domainList = new DomainList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
@@ -872,7 +877,7 @@ public class LifeSteps {
         Map<String, String> rawMap = pricingStrategy.asMap(String.class, String.class);
         Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            pmp.verifyPricingStrategyIsEditable(dealIDRandom, entry.getKey(), entry.getValue());
+            pmp.verifyPricingStrategyIsEditable(dealNameRandom, entry.getKey(), entry.getValue());
         }
     }
 
@@ -1001,75 +1006,75 @@ public class LifeSteps {
 
     @And("User selects the Attributes List and uploads the file {string}")
     public void userSelectsTheAttributesListAndUploadsTheFile(String attributesFile) {
-        npiAttributesAndAutoImportedList.uploadAttributesFile(attributesFile);
-        assert npiAttributesAndAutoImportedList.verifyFileUploadSuccess().contains("Successfully uploaded");
+        npiAttributesList.uploadAttributesFile(attributesFile);
+        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded");
     }
 
     @Then("Verify file {string} is uploaded successfully")
     public void verifyFileIsUploadedSuccessfully(String attributesFile) {
-        assert npiAttributesAndAutoImportedList.verifyFileUploadSuccess().contains("Successfully uploaded Excel file : " + attributesFile);
+        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded Excel file : " + attributesFile);
     }
 
     @And("User selects the {string} column and clicks on Next")
     public void userSelectsTheNPIColumnAndClicksOnNext(String columnName) {
-        npiAttributesAndAutoImportedList.selectNPIColumn(columnName);
-        npiAttributesAndAutoImportedList.clickNextButton();
+        npiAttributesList.selectNPIColumn(columnName);
+        npiAttributesList.clickNextButton();
     }
 
     @When("User tries to save the Attribute list without entering any details, an error message should be displayed")
     public void userSavesAttributeListWithoutAnyDetails() {
-        npiAttributesAndAutoImportedList.clickNextButton();
-        assert npiAttributesAndAutoImportedList.listNameError().contains("List Name is required");
+        npiAttributesList.clickNextButton();
+        assert npiAttributesList.listNameError().contains("List Name is required");
         String listName = "Temporary List Name";
-        npiAttributesAndAutoImportedList.enterListName(listName);
-        npiAttributesAndAutoImportedList.clickNextButton();
-        assert npiAttributesAndAutoImportedList.advertiserError().contains("Advertiser is required");
+        npiAttributesList.enterListName(listName);
+        npiAttributesList.clickNextButton();
+        assert npiAttributesList.advertiserError().contains("Advertiser is required");
     }
 
     @And("User enters the Attributes list details as {string} {string}")
     public void userEntersTheAttributesListDetailsAs(String listName, String advertiser) {
         npiName = listName + '_' + timestamp;
-        npiAttributesAndAutoImportedList.enterListName(npiName);
-        npiAttributesAndAutoImportedList.selectAdvertiser(advertiser);
+        npiAttributesList.enterListName(npiName);
+        npiAttributesList.selectAdvertiser(advertiser);
     }
 
     @When("User makes list available in LIFE and HCP365 and clicks on next")
     public void userMakesListAvailableInLifeAndHCP365AndClicksOnNext() {
-        npiAttributesAndAutoImportedList.selectProduct();
-        npiAttributesAndAutoImportedList.clickNextButton();
+        npiAttributesList.selectProduct();
+        npiAttributesList.clickNextButton();
     }
 
     @Then("Verify the Attributes list is saved successfully")
     public void verifyTheAttributesListIsSavedSuccessfully() {
-        assert npiAttributesAndAutoImportedList.saveListSuccess().contains("NPI list created");
+        assert npiAttributesList.saveListSuccess().contains("NPI list created");
     }
 
     @When("User edits the saved list")
     public void userEditsTheSavedList() {
-        npiAttributesAndAutoImportedList.clickBackToNPILists();
+        npiAttributesList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
         npiNameEdited = "Edited" + '_' + timestamp;
-        npiAttributesAndAutoImportedList.editListName(npiNameEdited);
-        npiAttributesAndAutoImportedList.saveList();
-        assert npiAttributesAndAutoImportedList.updateListSuccess().contains("NPI list updated");
+        npiAttributesList.editListName(npiNameEdited);
+        npiAttributesList.saveList();
+        assert npiAttributesList.updateListSuccess().contains("NPI list updated");
     }
 
     @Then("Verify the updates are applied successfully")
     public void verifyTheUpdatesAreAppliedSuccessfully() {
-        npiAttributesAndAutoImportedList.clickBackToNPILists();
+        npiAttributesList.clickBackToNPILists();
         npiLists.searchList(npiNameEdited);
         npiLists.openSearchedList(npiNameEdited);
     }
 
     @When("User deletes the Attribute list")
     public void userDeletesTheAttributeList() {
-        npiAttributesAndAutoImportedList.deleteList();
+        npiAttributesList.deleteList();
     }
 
     @Then("Verify the list is deleted successfully")
     public void verifyTheListIsDeletedSuccessfully() {
-        assert npiAttributesAndAutoImportedList.deleteSuccess().contains("NPI List Deleted");
+        assert npiAttributesList.deleteSuccess().contains("NPI List Deleted");
     }
 
     /* Roshani Sherkar
@@ -1094,6 +1099,100 @@ public class LifeSteps {
         Assert.assertFalse("Unable to save targeting templates", keyValueMap.isEmpty());
     }
 
+
+    /*Roshani Sherkar
+    * 14-07-2024
+    * Creatives creation*/
+    @And("User clicks Creative Library options present under Activation tab")
+    public void userClicksCreativeLibraryOptionsPresentUnderActivationTab() {
+        navigation.clickSubMenu();
+        navigation.clickCreativeLibrary();
+    }
+
+    @Then("Verify Creative Library page is displayed")
+    public void verifyCreativeLibraryPageIsDisplayed() {
+        Assert.assertEquals("Creatives",createCreatives.verifyCreativeLibraryPageTitle());
+    }
+
+    @And("Check Activity buttons {string} and verify following filters are available and working")
+    public void checkActivityButtonsAndVerifyFollowingFiltersAreAvailableAndWorking(String buttonType, DataTable filters) {
+        Map<String, String> rawFilters = filters.asMap(String.class, String.class);
+        Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
+        createCreatives.clickActivityButton(buttonType);
+        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveBtnsPresent(buttonType));
+        Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveBtns());
+        for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
+            flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
+        }
+    }
+
+
+    @And("Verify the following sort options are available and working")
+    public void verifyTheFollowingSortOptionsAreAvailableAndWorking(DataTable sortOptions) {
+        List<String> sortOptionsList = sortOptions.asList(String.class);
+        Assert.assertTrue("Sort is not working",createCreatives.verifySortOptions(sortOptionsList));
+    }
+
+    @And("Verify Search Box is available and working")
+    public void verifySearchBoxIsAvailableAndWorking(DataTable searchValues) {
+        List<String> searchValuesList = searchValues.asList(String.class);
+        createCreatives.clickActivityButton("Active");
+        Assert.assertTrue("Search is not working",createCreatives.searchByValues(searchValuesList));
+    }
+
+    @And("Verify Copy option is available and working")
+    public void verifyCopyOptionIsAvailableAndWorking() {
+        Assert.assertEquals("Success!", createCreatives.copyCreative());
+    }
+
+
+    @When("User creates and saves {string} creative using details {string} as Advertiser, {string} as Creative Name, {string}, {string} and below Creative attributes")
+    public void userCreatesAndSavesCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType,String advertiser, String creativeName, String advertiserDSA, String financer, DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        nameList.clear();
+        for (Map<String, String> row : rows) {
+            String type = row.get("CreativeType").trim();
+            String attributes = row.get("CreativeAttributes").trim();
+
+            String newCreativeName = creativeType + "_" + creativeName + '_' + CommonUtils.timeStampCalculation();
+            createCreatives.clickNewCreativeButton();
+            createCreatives.enterCreativeDetails(advertiser, newCreativeName, advertiserDSA, financer);
+            createCreatives.selectCreativeType(creativeType);
+
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+
+            createCreatives.fillAttributes(type, attributeMap);
+            Assert.assertEquals("Success!",createCreatives.saveCreative());
+            nameList.addAll(createCreatives.fetchCreatives());
+        }
+    }
+
+    @Then("Verify the newly created creative is displayed in the Creative Library page")
+    public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPage() {
+        for(String name : nameList) {
+            Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.verifyCreativesInLibrary(name));
+        }
+    }
+
+    @And("Create and verify a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and assign the created creatives to it")
+    public void createATacticWithLineItemsAndOtherDetailsAndAssignTheCreatedCreativesToIt(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
+                .map(String::trim)
+                .toList();
+        for (String creativeName : nameList) {
+            for (String lineItem : lineItemTypeList) {
+                if(creativeName.replaceAll("_Creative_\\d+_\\d+", "").equals(lineItem)) {
+                    Assert.assertTrue("Creative is not assigned to Tactic",tacticDetails.createTacticWithLineItemsAndAssignCreative(lineItem, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName));
+                    break;
+                }
+            }
+        }
+
+    }
+
     /*Roshani Sherkar
     * Auto-Imported List*/
     @And("User selects the Auto-Imported List")
@@ -1103,95 +1202,107 @@ public class LifeSteps {
 
     @And("Verify if user navigates to the Auto-Imported List page")
     public void verifyIfUserNavigatesToTheAutoImportedListPage() {
-        Assert.assertEquals("Setup Import", npiAttributesAndAutoImportedList.verifyIfAutoImportPage());
+        Assert.assertEquals("Setup Import", npiAutoImportedList.verifyIfAutoImportPage());
     }
 
     @Then("User tries to save the Auto-Imported list without entering any details, an error message should be displayed")
     public void userTriesToSaveTheAutoImportedListWithoutEnteringAnyDetailsAnErrorMessageShouldBeDisplayed() {
-        npiAttributesAndAutoImportedList.clickSetupImportButton();
-        Assert.assertEquals("Advertiser is required",npiAttributesAndAutoImportedList.verifyErrorMessage());
+        npiAutoImportedList.clickSetupImportButton();
+        Assert.assertEquals("Advertiser is required",npiAutoImportedList.verifyErrorMessage());
     }
 
     @When("User enters the Auto-Imported list details as {string} {string}")
     public void userEntersTheAutoImportedListDetailsAs(String listName, String advertiser) {
         npiName = listName + '_' + timestamp;
-        npiAttributesAndAutoImportedList.enterListName(npiName);
-        npiAttributesAndAutoImportedList.selectAdvertiser(advertiser);
+        npiAttributesList.enterListName(npiName);
+        npiAttributesList.selectAdvertiser(advertiser);
     }
 
     @And("User makes list available in LIFE and HCP365 module")
     public void userMakesListAvailableInLIFEAndHCP() {
-        npiAttributesAndAutoImportedList.selectProduct();
+        npiAttributesList.selectProduct();
     }
 
     @And("User clicks Setup Import button to import File details")
     public void userClicksSetupImportButtonToImportFileDetails() {
-        npiAttributesAndAutoImportedList.clickSetupImportButton();
-        npiAttributesAndAutoImportedList.waitForImportSettingPanel();
+        npiAutoImportedList.clickSetupImportButton();
+        npiAutoImportedList.waitForImportSettingPanel();
     }
 
     @And("User enters file details {string} {string} {string}")
     public void userEntersImportSettingWithDetails(String fileLocation, String filePath, String fileName) {
-        npiAttributesAndAutoImportedList.enterFileDetails(fileLocation, filePath, fileName);
+        npiAutoImportedList.enterFileDetails(fileLocation, filePath.trim(), fileName.trim());
     }
 
-    @And("User selects the List type {string}")
+    @And("User selects the {string} radio button")
     public void userSelectsTheListType(String listType) {
-        npiAttributesAndAutoImportedList.selectListType(listType);
+        npiAutoImportedList.selectListType(listType);
     }
 
     @And("User enters NPI column {string} {string}")
     public void userEntersNPIColumnName(String npiColumn, String columnName) {
-        npiAttributesAndAutoImportedList.enterColumnName(npiColumn, columnName);
+        npiAutoImportedList.enterColumnName(npiColumn, columnName);
     }
 
-    @And("User selects the Import type {string}")
+    @And("User selects the {string}")
     public void userSelectsTheImportType(String importType) {
-        npiAttributesAndAutoImportedList.selectImportType(importType);
+        npiAutoImportedList.selectImportType(importType);
     }
 
     @Then("User clicks Check File button to verify the file details are correct")
     public void userClicksCheckFileButtonToVerifyTheFileDetailsAreCorrect() {
-        npiAttributesAndAutoImportedList.clickCheckFile();
+        npiAutoImportedList.clickCheckFile();
     }
 
-    @Then("User saves the import settings and verifies the is saved successfully")
+    @Then("User saves the import settings and verifies the data is imported successfully")
     public void userSavesTheImportSettingsAndVerifiesTheIsSavedSuccessfully() {
-        npiAttributesAndAutoImportedList.clickOKButton();
+        npiAutoImportedList.clickOKButton();
     }
 
-    @And("Run API to upload the data into the list")
+    @And("Verify that Token is fetched successfully from URL {string}")
+    public void verifyThatTokenIsFetchedSuccessfully(String url) {
+        constants.TOKEN = npiAutoImportedList.fetchToken(url);
+        Assert.assertNotNull("Token is not fetched", constants.TOKEN);
+    }
+
+    @And("Pass token in the API Header and run it to upload the data into the list")
     public void runAPIToUploadTheListDataIntoTheList() {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Token", constants.TOKEN);
-        response = npiAttributesAndAutoImportedList.runAPI(constants.BASE_URL, constants.ENDPOINT_PATH, headers);
+        response = npiAutoImportedList.runAPI(constants.BASE_URL, constants.ENDPOINT_PATH, headers);
     }
 
     @And("Verify list data is uploaded successfully")
     public void verifyListDataIsUploadedSuccessfully() {
-        Assert.assertEquals(200, response.status());
+        Assert.assertEquals(204, response.status());
+    }
+
+    @And("Refresh the Browser to view the data uploaded")
+    public void refreshTheBrowserToViewTheDataUploaded() {
+        Assert.assertTrue("NPI List is not available", npiAutoImportedList.refreshBrowser());
     }
 
     @And("Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in {string}")
     public void verifyMatchedNPISectionIsDisplayedWithTheTotalNPICount(String fileName) throws CsvValidationException, IOException {
-        String totalNPICount = npiAttributesAndAutoImportedList.fetchTotalNPICount();
-        String npiRecordsFromFile = npiAttributesAndAutoImportedList.fetchNPIRecordFromTestFile(fileName);
+        String totalNPICount = npiAutoImportedList.fetchTotalNPICount();
+        String npiRecordsFromFile = npiAutoImportedList.fetchNPIRecordFromTestFile(fileName);
         Assert.assertEquals("Count is not matching", totalNPICount, npiRecordsFromFile);
     }
 
     @And("Verify Reload Now button is available and enabled")
     public void verifyReloadNowButtonIsAvailableAndEnabled() {
-        Assert.assertTrue("Reload Now Button is not available", npiAttributesAndAutoImportedList.verifyReloadNowButton());
+        npiAutoImportedList.verifyIfImportSettingButtonIsVisible();
+        Assert.assertTrue("Reload Now Button is not available", npiAutoImportedList.verifyReloadNowButton());
     }
 
     @When("User clicks on Reload Now button")
     public void userClicksOnReloadNowButton() {
-        npiAttributesAndAutoImportedList.clickReloadNowButton();
+        npiAutoImportedList.clickReloadNowButton();
     }
 
     @Then("Verify the file is reloaded successfully")
     public void verifyTheFileIsReloadedSuccessfully() {
-        Assert.assertEquals("File is reloaded", npiAttributesAndAutoImportedList.verifyIfFileIsReloaded());
+        Assert.assertEquals("File is reloaded", npiAutoImportedList.verifyIfFileIsReloaded());
     }
 
     /*Roshani Sherkar
