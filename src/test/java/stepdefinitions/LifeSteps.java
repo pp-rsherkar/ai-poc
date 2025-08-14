@@ -1365,8 +1365,10 @@ public class LifeSteps {
         Assert.assertEquals("Domain list created successfully", domainList.verifyDomainListCreationOrDeletion());
     }
 
-    @And("Verify that PulsePoint provided domain lists are denoted with a purple {string} icon")
-    public void verifyThatPulsePointProvidedDomainListsAreDenotedWithAPurpleIconUnderTheTab(String pulsepointIcon) {
+    @And("Verify that PulsePoint provided domain list {string} is denoted with a purple P icon")
+    public void verifyThatPulsePointProvidedDomainListsAreDenotedWithAPurpleIconUnderTheTab(String pulsepointProvidedDomainList) {
+        domainList.searchAndOpenDomainList(pulsepointProvidedDomainList);
+        Assert.assertTrue("P icon is not present on the PulsePoint provided list", domainList.fetchPulsepointIcon(pulsepointProvidedDomainList));
     }
 
     @And("Verify that the counter on the left displays the correct value for each list in the navigation panel")

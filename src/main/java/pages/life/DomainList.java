@@ -7,7 +7,6 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class DomainList {
@@ -62,7 +61,7 @@ public class DomainList {
 
     public void clickDomainListFromMenu() {
         DOMAIN_LIST.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String verifyIfListPageIsOpen(String listName) {
@@ -94,7 +93,7 @@ public class DomainList {
 
     public void clickSubTab(String tabName){
         SUB_TABS_BUTTON.locator("text=" + tabName).click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean verifyListIsAvailable(String tabName) {
@@ -161,7 +160,7 @@ public class DomainList {
 
     public String verifyDomainListCreationOrDeletion() {
         String text = fetchLocatorText(SUCCESS_ALERT);
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return text;
     }
 
@@ -173,7 +172,7 @@ public class DomainList {
         SEARCH_KEYWORD.fill(metricName);
         SEARCHED_DOMAIN_ENTRY.isVisible();
         SEARCHED_DOMAIN_ENTRY.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void editAnExistingDomainList(List<Object> domainList) {
@@ -249,7 +248,7 @@ public class DomainList {
     public void clickReplaceButton(){
         REPLACE_BUTTON.isVisible();
         REPLACE_BUTTON.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void downloadFile(String fileName) {
@@ -270,4 +269,10 @@ public class DomainList {
         Locator locator = page.locator(String.format("//div[@title='%s']/following-sibling::div//img[contains(@src,'delete.svg')]", fileName));
         locator.click();
     }
+
+    public boolean fetchPulsepointIcon(String listName) {
+        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div/following-sibling::div/div[contains(@class,'sharedList-icon')]", listName));
+        return locator.isVisible();
+    }
+
 }

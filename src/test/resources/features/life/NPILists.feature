@@ -130,7 +130,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
 
 
-  @e2e @regression
+  @regression
   Scenario Outline: Create Domain List by entering domain names manually
     Given User navigates to the Domain List page
     And Verify that the search option is present on the "Domain/App Lists" tab
@@ -142,7 +142,7 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify that if multiple domain names "<DOMAIN_NAMES>" are specified on a single line, a validation error is shown
     And Verify that when domain names are specified manually "<DOMAIN_NAMES>", the option to upload a file disappears
     And Verify that the user is able to create a domain list by specifying domain names manually
-    And Verify that PulsePoint provided domain lists are denoted with a purple "P" icon
+    And Verify that PulsePoint provided domain list "Automation_DomainList" is denoted with a purple P icon
     And Verify that the counter on the left displays the correct value for each list in the navigation panel
     And Verify that the user is able to edit an existing domain name list "<EDITED_DOMAIN_NAMES>"
     And Verify that the user is able to delete an existing domain name list
@@ -150,7 +150,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | SUB_TABS                   | LIST_NAME | DOMAIN_NAMES                     | EDITED_DOMAIN_NAMES              |
       | Both, Domains, App Bundles | Domain    | domaintest.com, domaintest.co.in | puslepoint.com, pulsepoint.co.in |
 
-  @e2e @regression
+  @regression
   Scenario Outline: Create Domain List by entering domain names manually
     Given User navigates to the Domain List page
     And Verify that the search option is present on the "Domain/App Lists" tab
