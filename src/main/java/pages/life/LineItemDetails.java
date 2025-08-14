@@ -60,7 +60,7 @@ public class LineItemDetails {
         LINE_ITEM_TYPE_DROPDOWN.click();
         int count = LINE_ITEM_TYPE_VALUE.count();
         for(int i=0; i< count; i++) {
-            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
+            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().equals(lineItemType)) {
                 LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
                 LINE_ITEM_TYPE_VALUE.nth(i).click();
                 break;

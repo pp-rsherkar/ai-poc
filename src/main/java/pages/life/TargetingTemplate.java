@@ -36,6 +36,7 @@ public class TargetingTemplate {
     private final Locator TARGET_ITEM_LABEL;
     private final Locator TARGET_ITEM_VALUE;
     private final Locator TARGET_TEMPLATE_RULES;
+    private final Locator SUCCESS_ALERT;
 
     public TargetingTemplate(Page page) {
         this.page = page;
@@ -61,6 +62,7 @@ public class TargetingTemplate {
         this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
         this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
         this.TARGET_TEMPLATE_RULES = page.locator("//div[@class='targets-list']");
+        this.SUCCESS_ALERT = page.locator("//div[contains(text(),'Target template created successfully')]");
     }
 
     public boolean verifyTargetingButtonAndSearchBox() {
@@ -87,6 +89,7 @@ public class TargetingTemplate {
                     selectChannel(channelList);
                     addTargetingRules(rulesMap);
                     SAVE_BUTTON.click();
+                    SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     waitUtility.waitUntilLoaderHidden();
                     Map<String, String> labelCountMap = fetchTargetingRulesCountFromTargeting();
                     lineItemsToRuleCounts.put(templateNameWithTimestamp, labelCountMap);
@@ -113,7 +116,7 @@ public class TargetingTemplate {
         }
     }
 
-    public void addTargetingRules(Map<String, List<String>> rulesMap){
+    public void addTargetingRules(Map<String, List<String>> rulesMap) {
         ADD_TARGETINGRULE_BUTTON.click();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
@@ -121,11 +124,11 @@ public class TargetingTemplate {
         tacticSettings.closeRuleTypePanel();
     }
 
-    public Map<String, String> fetchTargetingRulesCountFromTargeting(){
+    public Map<String, String> fetchTargetingRulesCountFromTargeting() {
         Map<String, String> labelCountMap = new HashMap<>();
         int count = TARGET_ITEM_LABEL.count();
-        for(int i=0; i < count; i++) {
-            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(),TARGET_ITEM_VALUE.nth(i).innerText().trim());
+        for (int i = 0; i < count; i++) {
+            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(), TARGET_ITEM_VALUE.nth(i).innerText().trim());
         }
         return labelCountMap;
     }
