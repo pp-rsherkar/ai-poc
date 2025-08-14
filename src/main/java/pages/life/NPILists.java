@@ -42,7 +42,7 @@ public class NPILists {
 
     public void clickNPILists() {
         NPI_LISTS.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void clickNPIListsStg() {
@@ -51,7 +51,7 @@ public class NPILists {
 
     public void clickCreateNewList() {
         CREATE_NEW_LIST.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String verifyNPIListText() {
@@ -75,7 +75,7 @@ public class NPILists {
     public void selectPublishedList(String listname) {
         page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
         waitUtility.waitForLocatorVisible(PARENT_LIST_LABEL);
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean availablePlatforms() {

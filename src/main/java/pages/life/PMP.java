@@ -198,13 +198,6 @@ public class PMP {
     public void selectDealFromListAndAssign(String dealName) {
         DEAL_SEARCHFILTER.fill(dealName);
         waitUtility.waitForElementVisible(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName));
-        EXPAND_DEALNAME.first().click();
-        if(ASSIGNED_DEALS_BUTTON.first().isVisible())
-            ASSIGNED_DEALS_BUTTON.first().click();
-        ASSIGN_DEALS_BUTTON.first().click();
-        page.waitForSelector(
-                String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName),
-                new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         String xpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/parent::div/preceding-sibling::span", dealName);
         page.locator(xpath).click();
         String assignDealXpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/ancestor::div[@class='left dealDetails']/following-sibling::div/span[contains(@class,'addDeal')]", dealName);
@@ -243,7 +236,7 @@ public class PMP {
     public void clickAddNewDeals(){
         ADD_NEWDEAL_BUTTON.click();
         waitUtility.waitForLocatorVisible(ADDNEWDEAL_LABEL);
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String addAndSaveNewDeals(String exchangeType, String dealID, String dealName, List<String> mediaType, String dealPriceType, String price) {
@@ -260,7 +253,7 @@ public class PMP {
         ENTER_PRICE.fill(price);
         NEWDEAL_SAVEBTN.click();
         String text = SUCCESS_ALERT.innerText().trim();
-        SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return text;
     }
 
@@ -291,12 +284,12 @@ public class PMP {
         }
         saveTacticSettings();
         verifyTacticIsSaved();
-        SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
     }
 
     public boolean applyDealsFromDealsSection(String dealType, String exchangeType, String dealID, String dealName, List<String> mediaType, String dealPriceType, String price, String toggleButton) {
         ADDDEAL_BUTTON.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
         clickDealsTab(dealType);
         clickAddNewDeals();
         addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, dealPriceType, price);
@@ -318,8 +311,7 @@ public class PMP {
     }
 
     public boolean verifyAllPremiumHubsOnMarketPlace(List<String> premiumHubsList) {
-        ALL_LIFEMARKETPLACE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-
+        waitUtility.waitForLocatorVisible(ALL_LIFEMARKETPLACE);
         for (int i = 0; i < ALL_PREMIUMPUBS.count(); i++) {
             String classAttr = ALL_PREMIUMPUBS.nth(i).getAttribute("class");
             if (classAttr != null) {

@@ -64,7 +64,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | LIST_NAME | ADVERTISER     | FILE_NAME             | COLUMN_NAME |
       | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx | NPI         |
 
-  @regression @e2e2
+  @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using API
     And User selects the Auto-Imported List
     And Verify if user navigates to the Auto-Imported List page
@@ -78,7 +78,7 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects the "<IMPORT_TYPE>"
     Then User clicks Check File button to verify the file details are correct
     Then User saves the import settings and verifies the data is imported successfully
-    And Verify that Token is fetched successfully
+    And Verify that Token is fetched successfully from URL "BuyerProxy.ashx"
     And Pass token in the API Header and run it to upload the data into the list
     And Verify list data is uploaded successfully
     And Refresh the Browser to view the data uploaded
@@ -89,7 +89,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
 
 
-  @regression @e2e2
+  @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using Reload Now button
     And User selects the Auto-Imported List
     And Verify if user navigates to the Auto-Imported List page

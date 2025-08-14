@@ -15,7 +15,7 @@ public class WaitUtility {
         this.PRE_LOADER = page.locator("//div[@class='preloader']");
     }
 
-    public void waitUntilLoaderHidden(){
+    public void waitUntilSpinnerHidden(){
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
@@ -33,6 +33,10 @@ public class WaitUtility {
 
     public void waitForLocatorHidden(Locator locator){
         locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
+    public void waitForLocatorHidden(Locator locator, double timeout){
+        locator.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
     }
 
     public void waitForLocatorDetached(Locator locator){

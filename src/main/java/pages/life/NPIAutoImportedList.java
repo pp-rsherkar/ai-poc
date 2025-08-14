@@ -16,28 +16,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class NPIAttributesAndAutoImportedList {
+public class NPIAutoImportedList {
+
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     ApiActions apiActions = new ApiActions();
+
     private final Page page;
-    private final Locator FILE_INPUT;
-    private final Locator FILE_UPLOAD_SUCCESS;
-    private final Locator LIST_NAME;
-    private final Locator SEARCH_ADVERTISER;
-    private final Locator SELECT_ADVERTISER;
-    private final Locator NPI_COLUMN_DROPDOWN;
-    private final Locator NEXT_BUTTON;
-    private final Locator LIST_NAME_ERROR;
-    private final Locator ADVERTISER_NAME_ERROR;
-    private final Locator AVAILABLE_IN_LIFE;
-    private final Locator AVAILABLE_IN_HCP365;
-    private final Locator LIST_SUCCESS;
-    private final Locator BACK_TO_NPI_LISTS;
-    private final Locator SAVE_BUTTON;
-    private final Locator LIST_UPDATE_SUCCESS;
-    private final Locator DELETE_LIST_ICON;
-    private final Locator DELETE_LIST_BUTTON;
-    private final Locator DELETE_SUCCESS;
     private final Locator SETUP_IMPORTBUTTON;
     private final Locator ERROR_MESSAGE;
     private final Locator IMPORT_SETTING_TITLE;
@@ -56,26 +40,9 @@ public class NPIAttributesAndAutoImportedList {
     private final Locator NPI_LIST_TEXTAREA;
     private final Locator NPI_ATTRIBUTE_GRIDVIEW;
 
-    public NPIAttributesAndAutoImportedList(Page page) {
+
+    public NPIAutoImportedList(Page page) {
         this.page = page;
-        this.FILE_INPUT = page.locator("input[type='file']");
-        this.FILE_UPLOAD_SUCCESS = page.locator("//div[contains(@aria-label,'Successfully uploaded')]");
-        this.LIST_NAME = page.locator("//input[contains(@placeholder,'List Name')]");
-        this.SEARCH_ADVERTISER = page.locator("//div[contains(text(),'Select Advertiser')]");
-        this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
-        this.NPI_COLUMN_DROPDOWN = page.locator("//ng-select[contains(@class,'hcpDropdown') and contains(@placeholder,'NPI Column')]");
-        this.NEXT_BUTTON = page.locator("//button[contains(@class,'saveButton')]");
-        this.LIST_NAME_ERROR = page.locator("//div[contains(@aria-label,'List Name is required')]");
-        this.ADVERTISER_NAME_ERROR = page.locator("//div[contains(@aria-label,'Advertiser is required')]");
-        this.AVAILABLE_IN_LIFE = page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='Life'])[1]");
-        this.AVAILABLE_IN_HCP365 = page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='HCP365'])[1]");
-        this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
-        this.BACK_TO_NPI_LISTS = page.locator("//app-icon-lable-link[@icon='12-back.svg']");
-        this.SAVE_BUTTON = page.locator("//span[text()='Save']");
-        this.LIST_UPDATE_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list updated')]");
-        this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
-        this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
-        this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
         this.SETUP_IMPORTBUTTON = page.locator("//span[contains(text(),'Setup Import')]");
         this.ERROR_MESSAGE = page.locator("//div[@aria-label='Advertiser is required']");
         this.IMPORT_SETTING_TITLE = page.locator("//div[contains(text(),'Import Settings')]");
@@ -95,101 +62,26 @@ public class NPIAttributesAndAutoImportedList {
         this.NPI_ATTRIBUTE_GRIDVIEW = page.locator("//div[contains(@class,'npiattrsGridView')]");
     }
 
-    public void uploadAttributesFile(String attributesFile) {
-        ExcelActions.uploadFile(FILE_INPUT, attributesFile);
-    }
 
-    public String verifyFileUploadSuccess() {
-        return FILE_UPLOAD_SUCCESS.innerText();
-    }
-
-    public void enterListName(String listName) {
-        LIST_NAME.scrollIntoViewIfNeeded();
-        LIST_NAME.fill(listName);
-    }
-
-    public void selectAdvertiser(String advertiser) {
-        SEARCH_ADVERTISER.click();
-        SELECT_ADVERTISER.locator("text=" + advertiser).click();
-    }
-
-    public void selectNPIColumn(String columnName) {
-        FILE_UPLOAD_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
-        NPI_COLUMN_DROPDOWN.click();
-        Locator columnOption = page.locator("//div[contains(@class,'ng-option') and normalize-space()='" + columnName + "']");
-        columnOption.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        columnOption.click();
-    }
-
-    public void clickNextButton() {
-        NEXT_BUTTON.click();
-    }
-
-    public String listNameError() {
-        return LIST_NAME_ERROR.innerText();
-    }
-
-    public String advertiserError() {
-        return ADVERTISER_NAME_ERROR.innerText();
-    }
-
-    public void selectProduct() {
-        AVAILABLE_IN_LIFE.check();
-        AVAILABLE_IN_HCP365.check();
-    }
-
-    public String saveListSuccess() {
-        return LIST_SUCCESS.innerText();
-    }
-
-    public void clickBackToNPILists() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
-        BACK_TO_NPI_LISTS.click();
-        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
-    }
-
-    public void editListName(String newListName) {
-        page.waitForTimeout(5000);
-        BACK_TO_NPI_LISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        LIST_NAME.fill(newListName);
-    }
-
-    public void saveList() {
-        SAVE_BUTTON.click();
-    }
-
-    public String updateListSuccess() {
-        return LIST_UPDATE_SUCCESS.innerText();
-    }
-
-    public void deleteList() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
-        DELETE_LIST_ICON.click();
-        DELETE_LIST_BUTTON.click();
-    }
-
-    public String deleteSuccess() {
-        return DELETE_SUCCESS.innerText();
-    }
-
-    public String verifyIfAutoImportPage(){
+    public String verifyIfAutoImportPage() {
         SETUP_IMPORTBUTTON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return SETUP_IMPORTBUTTON.innerText().trim();
     }
 
-    public String verifyErrorMessage(){
+    public String verifyErrorMessage() {
         String errorMessage = ERROR_MESSAGE.innerText().trim();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorHidden(ERROR_MESSAGE);
         return errorMessage;
     }
-    public void clickSetupImportButton(){
+
+    public void clickSetupImportButton() {
         SETUP_IMPORTBUTTON.scrollIntoViewIfNeeded();
         SETUP_IMPORTBUTTON.click();
     }
 
-    public void waitForImportSettingPanel(){
-        waitUtility.waitUntilLoaderHidden();
+    public void waitForImportSettingPanel() {
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(IMPORT_SETTING_TITLE);
     }
 
@@ -201,19 +93,19 @@ public class NPIAttributesAndAutoImportedList {
     }
 
     public void selectListType(String listType) {
-        page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button",listType)).click();
+        page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", listType)).click();
     }
 
     public void enterColumnName(String npiColumn, String columnName) {
         Locator locator = page.locator(String.format("//div[@class='selection' and contains(text(),'%s')]/parent::div", npiColumn));
-        if(!locator.getAttribute("class").contains("active"))
+        if (!locator.getAttribute("class").contains("active"))
             locator.click();
         NPI_COLUMN.fill(columnName);
     }
 
     public void selectImportType(String importType) {
         Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", importType));
-        if(!locator.getAttribute("class").contains("mat-radio-checked"))
+        if (!locator.getAttribute("class").contains("mat-radio-checked"))
             locator.click();
     }
 
@@ -224,7 +116,7 @@ public class NPIAttributesAndAutoImportedList {
 
     public void clickOKButton() {
         OK_BUTTON.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public APIResponse runAPI(String baseURL, String endpointPath, HashMap<String, String> headers) {
@@ -250,13 +142,13 @@ public class NPIAttributesAndAutoImportedList {
 
     public void clickReloadNowButton() {
         RELOAD_NOW_BUTTON.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String verifyIfFileIsReloaded() {
         String text = RELOAD_SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(RELOAD_SUCCESS_ALERT);
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return text;
     }
 
@@ -264,9 +156,9 @@ public class NPIAttributesAndAutoImportedList {
         waitUtility.waitForLocatorVisible(IMPORT_SETTING_BUTTON);
     }
 
-    public String fetchToken(){
+    public String fetchToken(String backgroundUrl) {
         Request matchedRequest = page.waitForRequest(
-                request -> request.url().contains("BuyerProxy.ashx"),
+                request -> request.url().contains(backgroundUrl),
                 page::reload
         );
         return matchedRequest.headers().get("token");
@@ -274,8 +166,9 @@ public class NPIAttributesAndAutoImportedList {
 
     public boolean refreshBrowser() {
         page.reload();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TOTAL_NPI_COUNT);
         return NPI_ATTRIBUTE_GRIDVIEW.isVisible() || NPI_LIST_TEXTAREA.isVisible();
     }
+
 }

@@ -77,7 +77,7 @@ public class TacticDetails {
     }
 
     public String tacticDetailsSuccess() {
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return TACTIC_DETAILS_SUCCESS.first().innerText();
     }
 
@@ -127,7 +127,7 @@ public class TacticDetails {
         campaigns.setCampaignType(campaignType);
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -137,13 +137,13 @@ public class TacticDetails {
         lineItemDetails.enterLineItemBudget(lineBudget);
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     private void createTactic(String tacticName) {
         enterTacticName(tacticName);
         saveTacticDetails();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
@@ -157,7 +157,7 @@ public class TacticDetails {
                 IMPORT_BUTTON.click();
                 if(OVERRIDE_DIALOG.isVisible())
                     REPLACE_BUTTON.click();
-                waitUtility.waitUntilLoaderHidden();
+                waitUtility.waitUntilSpinnerHidden();
                 TEMPLATE_IMPORT_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
                 labelCountMap = targetingTemplate.fetchTargetingRulesCountFromTargeting();
                 IMPORTED_TARGET_TEMPLATE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));

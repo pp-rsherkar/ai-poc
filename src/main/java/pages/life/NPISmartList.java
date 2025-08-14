@@ -96,7 +96,7 @@ public class NPISmartList {
 
     public void clickSmartList() {
         CLICK_SMART_LIST.click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void clickSmartPixel() {
@@ -203,14 +203,14 @@ public class NPISmartList {
     }
 
     public void enterListName(String listName) {
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         LIST_NAME.fill(listName);
     }
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void selectPrescribedDrug() {

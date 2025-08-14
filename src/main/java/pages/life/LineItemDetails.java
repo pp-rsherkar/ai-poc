@@ -52,7 +52,7 @@ public class LineItemDetails {
     }
 
     public String lineItemSuccess() {
-        waitUtility.waitUntilLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
         return LINE_ITEM_SUCCESS.innerText();
     }
 
