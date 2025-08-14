@@ -81,6 +81,17 @@ public class TacticSettings {
         RULE_TYPE_CLOSE.click();
     }
 
+    public void selectRuleType(String ruleType, String ruleOption) {
+        SEARCH_RULE_TYPE.fill(ruleType);
+        SEARCH_RULE_TYPE.press("Enter");
+        SELECT_RULE_TYPE.click();
+        SEARCH_RULE_OPTION.fill(ruleOption);
+        String xpath = String.format("//div[@title='%s']/preceding-sibling::div[contains(@class,'iconsWrapper')]//div[contains(@class,'include-default')]", ruleOption);
+        isElementVisible(xpath);
+        clickRuleTypeOkButton();
+        closeRuleTypePanel();
+    }
+
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
     }
@@ -264,5 +275,13 @@ public class TacticSettings {
             }
         }
         return Collections.emptyList();
+    }
+
+    public String verifyRuleType() {
+        return FETCH_TARGET_RULETYPES.innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
+    }
+
+    public String verifyRuleOption() {
+        return FETCH_TARGET_RULEOPTIONS.innerText();
     }
 }
