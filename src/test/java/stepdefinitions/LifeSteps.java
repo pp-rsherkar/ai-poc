@@ -1111,8 +1111,8 @@ public class LifeSteps {
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(buttonType);
-        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveBtnsPresent(buttonType));
-        Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveBtns());
+        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveButtonsPresent(buttonType));
+        Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveButtons());
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
             flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
         }
