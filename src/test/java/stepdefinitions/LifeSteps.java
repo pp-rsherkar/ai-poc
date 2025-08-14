@@ -412,12 +412,23 @@ public class LifeSteps {
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         List<String> expectedNormalizedRuleTypes = normalizeObjectList(keyType);
+        int expectedCount = expectedNormalizedRuleTypes.size();
+        tacticSettings.fetchRulesTypesCount(expectedCount);
         List<String> actualNormalizedRuleTypes = normalizeObjectList(tacticSettings.fetchRulesTypes());
+
+        Set<String> expectedSet = new LinkedHashSet<>(expectedNormalizedRuleTypes);
+        Set<String> actualSet = new LinkedHashSet<>(actualNormalizedRuleTypes);
+
+        List<String> expectedUniqueAndSorted = new ArrayList<>(expectedSet);
+        List<String> actualUniqueAndSorted = new ArrayList<>(actualSet);
+
+        Collections.sort(expectedUniqueAndSorted);
+        Collections.sort(actualUniqueAndSorted);
 
         List<String> expectedNormalizedRuleOptions = normalizeObjectList(keyValues);
         List<String> actualNormalizedRuleOptions = normalizeObjectList(tacticSettings.fetchRuleOptions());
 
-        Assert.assertEquals("Rule types mismatch", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
+        Assert.assertEquals("Rule types mismatch", expectedUniqueAndSorted, actualUniqueAndSorted);
         for (String expectedOption : expectedNormalizedRuleOptions) {
             boolean matchFound = actualNormalizedRuleOptions.stream()
                     .anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
