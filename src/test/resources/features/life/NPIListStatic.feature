@@ -51,3 +51,34 @@ Feature: LIFE Regression - Create Static NPI List
     Examples:
       | ADVERTISER     | LIST_NAME       | Type       | PROFESSION_VALUE   | SMART_PIXEL_DROPDOWN_VALUE | NPI_GROUP_VALUE                 |
       | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner | AutoCollection889379612    | AutoAdminNPIFileUpload187526255 |
+
+
+  @regression
+  Scenario Outline: Verify Testcases and Assertions for Smart List NPI creation.
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User navigates to NPI Lists page
+    When User clicks on Create New List
+    And User selects Smart List to create NPI list
+    And User verify Smart List options present to create NPI list
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Smart Pixel with "<SMART_PIXEL_DROPDOWN_VALUE>"
+    And User verify all fields under Smart pixel options
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for NPI List with "<NPI_GROUP_VALUE>"
+    And User verify all fields under NPI List options
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Speciality
+    And User verify all fields under Speciality options
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Profession with "<PROFESSION_VALUE>"
+    And User verify all fields under Profession options
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Prescribed drug
+    And User verify all fields under Prescribed drug options
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Diagnosis
+    And User verify all fields under Diagnosis options
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Medical Procedure
+    And User verify all fields under Medical Procedure options
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Expand based on Practice and Hospital affiliation
+    And User verify all fields under Expand based on Practice and Hospital affiliation options
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME       | PROFESSION_VALUE   | SMART_PIXEL_DROPDOWN_VALUE | NPI_GROUP_VALUE                 |
+      | 01- Advertiser | SMART_Pixel_NPI  | Nurse Practitioner | AutoCollection889379612    | AutoAdminNPIFileUpload187526255 |
