@@ -28,6 +28,9 @@ public class Accounts {
     private final Locator SWITCH_CLICK_ACCOUNT;
     private final Locator WORKSPACE_NAME;
     private final Locator ACCOUNTS_TAB_TEXT;
+    private final Locator SELECT_USER_TAB;
+    private final Locator ENABLE_STUDIO_EXTERNAL_ACCOUNT;
+    private final Locator CLICK_EXTERNAL_ACCOUNT;
 
     public Accounts(Page page) {
         this.page = page;
@@ -48,6 +51,9 @@ public class Accounts {
         this.SWITCH_CLICK_ACCOUNT = page.locator("#accountSwitcher").getByText("100Plus");
         this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
         this.ACCOUNTS_TAB_TEXT = page.locator("//span[text()='Account Management']");
+        this.SELECT_USER_TAB=page.locator("(\"#header-tabs-container\").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName(\"Users\"))");
+        this.ENABLE_STUDIO_EXTERNAL_ACCOUNT=page.locator("getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(\"Studio\"))");
+        this.CLICK_EXTERNAL_ACCOUNT=page.locator("//*[@id='parentTable']/div[1]/table//tr[1]//td[1]");
     }
 
     public void clickAdministration() {
@@ -58,13 +64,26 @@ public class Accounts {
         page.waitForLoadState();
         ACCOUNTS_TAB.click();
     }
+/*public void clickExternalAccount() {
+        CLICK_EXTERNAL_ACCOUNT.click();
+    }*/
+
+    public void selectUserTab() {
+        SELECT_USER_TAB.click();
+    }
+
+    public void enableStudioForExternalAccount() {
+        ENABLE_STUDIO_EXTERNAL_ACCOUNT.click();
+    }
 
     public void searchAccount(String accountName) {
         page.waitForLoadState();
         ACCOUNTS_TAB_TEXT.waitFor(WaitForOptions.setState(WaitForSelectorState.VISIBLE));
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
-        SELECT_ACCOUNT.click();
+        page.waitForLoadState();
+        //SELECT_ACCOUNT.click();
+        CLICK_EXTERNAL_ACCOUNT.click();
     }
 
     public void enableStudio() {

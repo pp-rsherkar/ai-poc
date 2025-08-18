@@ -40,6 +40,7 @@ public class StudioSteps {
     List<Object> appliedOptions = new ArrayList<>();
     String randomNumber = CommonUtils.randomNumberGeneration();
 
+
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
         workspaceCreation.createStudioWorkspace();
@@ -411,5 +412,35 @@ public class StudioSteps {
                         "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
                         "Do you want to proceed?"));
         Assert.assertEquals("Workspace archived successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+    }
+
+    @When("Navigate to administration")
+    public void navigate_to_administration() {
+        accounts. verifyStudioMenu();
+        accounts.clickAdministration();
+
+    }
+    @When("Click on accounts tab")
+    public void click_on_accounts_tab() {
+        accounts.selectAccountsTab();
+
+    }
+    @When("Locate an account {string} with external user permission and select it")
+    public void locate_an_account_with_external_user_permission_and_select_it(String EXTERNAL_ACCOUNT) {
+        accounts.searchAccount(EXTERNAL_ACCOUNT);
+       // accounts.clickExternalAccount();
+
+    }
+    @When("Go to users tab and select studio tab")
+    public void go_to_users_tab_and_select_studio_tab() {
+        accounts.selectUserTab();
+    }
+    @Then("Turn on studio toggle for external users")
+    public void turn_on_studio_toggle_for_external_users() {
+    accounts.enableStudioForExternalAccount();
+    }
+    @Then("Verify studio platform is enabled for {string}")
+    public void verify_studio_platform_is_enabled_for(String string) {
+
     }
 }
