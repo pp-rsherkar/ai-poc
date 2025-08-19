@@ -1367,6 +1367,9 @@ public class LifeSteps {
             case "Keywords":
                 Assert.assertEquals("Keyword is required", sharedList.validateErrorOnEmptyListInput(metricName));
                 break;
+            case "IP Address":
+                Assert.assertEquals("IPAddress is required", sharedList.validateErrorOnEmptyListInput(metricName));
+                break;
             default:
                 Assert.fail("Invalid list type specified: " + listType);
         }
@@ -1399,6 +1402,9 @@ public class LifeSteps {
                 break;
             case "Keywords":
                 Assert.assertEquals("Keywords list created successfully", sharedList.isListCreatedOrDeleted());
+                break;
+            case "IP Address":
+                Assert.assertEquals("IPAddress list created successfully", sharedList.isListCreatedOrDeleted());
                 break;
             default:
                 Assert.fail("Invalid list type specified: " + listType);
@@ -1433,6 +1439,9 @@ public class LifeSteps {
             case "Keywords":
                 Assert.assertEquals("Keywords list updated successfully", sharedList.isListCreatedOrDeleted());
                 break;
+            case "IP Address":
+                Assert.assertEquals("IPAddresses list updated successfully", sharedList.isListCreatedOrDeleted());
+                break;
             default:
                 Assert.fail("Invalid list type specified: " + listType);
         }
@@ -1451,6 +1460,9 @@ public class LifeSteps {
                 break;
             case "Keywords":
                 Assert.assertEquals("Keyword deleted successfully", sharedList.isListCreatedOrDeleted());
+                break;
+            case "IP Address":
+                Assert.assertEquals("IPAddress deleted successfully", sharedList.isListCreatedOrDeleted());
                 break;
             default:
                 Assert.fail("Invalid list type specified: " + listType);
@@ -1496,6 +1508,9 @@ public class LifeSteps {
             case "Keywords":
                 Assert.assertEquals("Keywords list created successfully", sharedList.isListCreatedOrDeleted());
                 break;
+            case "IP Address":
+                Assert.assertEquals("IPAddresses list created successfully", sharedList.isListCreatedOrDeleted());
+                break;
             default:
                 Assert.fail("Invalid list type specified: " + listType);
         }
@@ -1533,6 +1548,9 @@ public class LifeSteps {
                 break;
             case "Keywords":
                 Assert.assertEquals("Keywords list updated successfully", sharedList.isListCreatedOrDeleted());
+                break;
+            case "IP Address":
+                Assert.assertEquals("IPAddresses list updated successfully", sharedList.isListCreatedOrDeleted());
                 break;
             default:
                 Assert.fail("Invalid list type specified: " + listType);

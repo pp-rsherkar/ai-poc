@@ -37,12 +37,12 @@ public class SharedList {
         this.SUB_TABS_BUTTON = page.locator("//div[contains(@class,'lookupGroups')]/button");
         this.LIST_CREATION_PAGE_TITLE = page.locator("//div[normalize-space(text())='List Name']");
         this.LIST_NAME = page.locator("//input[@placeholder='List Name']");
-        this.LIST_TEXTAREA = page.locator("//textarea[@placeholder='Domains (one domain per line)' or @placeholder='AppBundles (one appbundle per line)' or @placeholder='Keywords (one keyword per line)']");
+        this.LIST_TEXTAREA = page.locator("//textarea[@placeholder='Domains (one domain per line)' or @placeholder='AppBundles (one appbundle per line)' or @placeholder='Keywords (one keyword per line)' or @placeholder='IPAddresses (one ipAddress per line)']");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.LIST_ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='List Name is required']");
-        this.ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='Domain name is required' or @aria-label='AppBundle name is required' or @aria-label='Keyword is required']");
+        this.ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='Domain name is required' or @aria-label='AppBundle name is required' or @aria-label='Keyword is required' or @aria-label='IPAddress is required']");
         this.VALIDATION_ERROR = page.locator("//span[contains(text(),'validation error(s)')]");
-        this.UPLOAD_SECTION = page.locator("//div[contains(@class,'fileUploadSection')]");
+        this.UPLOAD_SECTION = page.locator("//div[contains(@class,'fileUploadSection')] | //app-drop-file[contains(@class,'setup-drag')]");
         this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' " +
                                                      "or text()='Domains list created successfully' " +
                                                      "or text()='Domains list updated successfully' " +
@@ -52,7 +52,11 @@ public class SharedList {
                                                      "or text()='AppBundleGroup deleted successfully' " +
                                                      "or text()='Keywords list created successfully' " +
                                                      "or text()='Keywords list updated successfully' " +
-                                                     "or text()='Keyword deleted successfully']");
+                                                     "or text()='Keyword deleted successfully' " +
+                                                     "or text()='IPAddress list created successfully' " +
+                                                     "or text()='IPAddresses list created successfully' " +
+                                                     "or text()='IPAddresses list updated successfully' " +
+                                                     "or text()='IPAddress deleted successfully']" );
         this.LIST_DELETE_ICON = page.locator("//div[@tooltip='Delete'] | //span[@tooltip='Delete']//img[contains(@src,'delete.svg')]");
         this.REMOVAL_CONFIRMATION_DIALOG = page.locator("//div[contains(text(),'Removal Confirmation')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
@@ -171,8 +175,9 @@ public class SharedList {
     public String fetchCountFromLeftPanel(String listName) {
         Locator locator = page.locator(String.format(
                 "(//div[contains(text(),'%s')]/parent::div/following-sibling::div/div[contains(@class, 'right circular label')] | " +
-                        "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class, 'right circular label')])",
-                listName, listName
+                        "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class, 'right circular label')] | " +
+                        "//div[contains(text(),'%s')]/following-sibling::div[contains(@class, 'right circular label')])",
+                listName, listName, listName
         ));
         return locator.innerText();
     }
