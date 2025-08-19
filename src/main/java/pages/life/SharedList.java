@@ -9,15 +9,14 @@ import utils.WaitUtility;
 import java.io.File;
 import java.util.*;
 
-public class DomainList {
+public class SharedList {
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
-    private final Locator DOMAIN_LIST;
     private final Locator SEARCH_KEYWORD;
     private final Locator SUB_TABS_BUTTON;
     private final Locator LIST_CREATION_PAGE_TITLE;
     private final Locator LIST_NAME;
-    private final Locator DOMAIN_OR_APPBUNDLE_TEXTAREA;
+    private final Locator LIST_TEXTAREA;
     private final Locator SAVE_BUTTON;
     private final Locator LIST_ERROR_MESSAGE_ALERT;
     private final Locator ERROR_MESSAGE_ALERT;
@@ -32,21 +31,29 @@ public class DomainList {
     private final Locator DUPLICATE_FILE_DIALOG_TEXT;
     private final Locator REPLACE_BUTTON;
 
-    public DomainList(Page page) {
+    public SharedList(Page page) {
         this.page = page;
-        this.DOMAIN_LIST = page.locator("//div[contains(text(),'Domain & App Lists')]");
         this.SEARCH_KEYWORD = page.locator("//div[@id='searchKeyowrd']/input");
         this.SUB_TABS_BUTTON = page.locator("//div[contains(@class,'lookupGroups')]/button");
         this.LIST_CREATION_PAGE_TITLE = page.locator("//div[normalize-space(text())='List Name']");
         this.LIST_NAME = page.locator("//input[@placeholder='List Name']");
-        this.DOMAIN_OR_APPBUNDLE_TEXTAREA = page.locator("//textarea[@placeholder='Domains (one domain per line)' or @placeholder='AppBundles (one appbundle per line)']");
+        this.LIST_TEXTAREA = page.locator("//textarea[@placeholder='Domains (one domain per line)' or @placeholder='AppBundles (one appbundle per line)' or @placeholder='Keywords (one keyword per line)']");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.LIST_ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='List Name is required']");
-        this.ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='Domain name is required' or @aria-label='AppBundle name is required']");
+        this.ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='Domain name is required' or @aria-label='AppBundle name is required' or @aria-label='Keyword is required']");
         this.VALIDATION_ERROR = page.locator("//span[contains(text(),'validation error(s)')]");
         this.UPLOAD_SECTION = page.locator("//div[contains(@class,'fileUploadSection')]");
-        this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' or text()='Domains list created successfully' or text()='Domains list updated successfully' or text()='Domain deleted successfully' or text()='AppBundle list created successfully' or text()='AppBundle list updated successfully' or text()='AppBundleGroup deleted successfully']");
-        this.LIST_DELETE_ICON = page.locator("//div[@tooltip='Delete']//img[contains(@src,'delete.svg')]");
+        this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' " +
+                                                     "or text()='Domains list created successfully' " +
+                                                     "or text()='Domains list updated successfully' " +
+                                                     "or text()='Domain deleted successfully' " +
+                                                     "or text()='AppBundle list created successfully' " +
+                                                     "or text()='AppBundle list updated successfully' " +
+                                                     "or text()='AppBundleGroup deleted successfully' " +
+                                                     "or text()='Keywords list created successfully' " +
+                                                     "or text()='Keywords list updated successfully' " +
+                                                     "or text()='Keyword deleted successfully']");
+        this.LIST_DELETE_ICON = page.locator("//div[@tooltip='Delete'] | //span[@tooltip='Delete']//img[contains(@src,'delete.svg')]");
         this.REMOVAL_CONFIRMATION_DIALOG = page.locator("//div[contains(text(),'Removal Confirmation')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
         this.DOMAIN_NAME_FROM_REMOVAL_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal')]//span");
@@ -55,8 +62,9 @@ public class DomainList {
         this.REPLACE_BUTTON = page.locator("//span[contains(text(),'Replace')]");
     }
 
-    public void clickDomainListFromMenu() {
-        DOMAIN_LIST.click();
+    public void clickDomainListFromMenu(String pageName) {
+        Locator locator = page.locator(String.format("//div[contains(@class,'menuLabel') and contains(text(),'%s')]", pageName));
+        locator.click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
@@ -124,11 +132,11 @@ public class DomainList {
 
     public String checkErrorOnSingleLineMultipleDomainsInput(List<String> domainNameList) {
         String text = "";
-        DOMAIN_OR_APPBUNDLE_TEXTAREA.fill(String.valueOf(domainNameList));
+        LIST_TEXTAREA.fill(String.valueOf(domainNameList));
         SAVE_BUTTON.click();
         if(VALIDATION_ERROR.isVisible())
             text = fetchLocatorText(VALIDATION_ERROR);
-        DOMAIN_OR_APPBUNDLE_TEXTAREA.clear();
+        LIST_TEXTAREA.clear();
         return text;
     }
 
@@ -140,7 +148,7 @@ public class DomainList {
     public void enterDomainNames(List<Object> domainNameList) {
         for (Object domainName : domainNameList) {
             if (domainName instanceof String) {
-                DOMAIN_OR_APPBUNDLE_TEXTAREA.type((String) domainName);
+                LIST_TEXTAREA.type((String) domainName);
                 page.keyboard().press("Shift+Enter");
             }
         }
@@ -161,20 +169,24 @@ public class DomainList {
     }
 
     public String fetchCountFromLeftPanel(String listName) {
-        Locator DOMAIN_COUNT = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div/div[contains(@class, 'right circular label')]", listName));
-        return DOMAIN_COUNT.innerText();
+        Locator locator = page.locator(String.format(
+                "(//div[contains(text(),'%s')]/parent::div/following-sibling::div/div[contains(@class, 'right circular label')] | " +
+                        "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class, 'right circular label')])",
+                listName, listName
+        ));
+        return locator.innerText();
     }
 
     public void searchAndOpenCreatedList(String listName) {
         SEARCH_KEYWORD.fill(listName);
-        Locator SEARCHED_DOMAIN_ENTRY = page.locator(String.format("//span[@class='lookupCircel']//following-sibling::div[contains(text(),'%s')]", listName));
+        Locator SEARCHED_DOMAIN_ENTRY = page.locator(String.format("//div[contains(text(),'%s')]", listName));
         SEARCHED_DOMAIN_ENTRY.isVisible();
         SEARCHED_DOMAIN_ENTRY.click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
     public void editAnExistingList(List<Object> domainList) {
-        DOMAIN_OR_APPBUNDLE_TEXTAREA.click();
+        LIST_TEXTAREA.click();
         page.keyboard().press("Shift+Enter");
         enterDomainNames(domainList);
     }
@@ -196,6 +208,7 @@ public class DomainList {
 
     public void uploadDomainFile(String fileName){
         CommonUtils.uploadFileThroughSystemDialog(page, fileName);
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String fetchListErrorMessage() {
@@ -207,11 +220,11 @@ public class DomainList {
     }
 
     public boolean verifyTextAreaIsVisibleBeforeFileUpload() {
-        return DOMAIN_OR_APPBUNDLE_TEXTAREA.isVisible();
+        return LIST_TEXTAREA.isVisible();
     }
 
     public boolean verifyTextAreaIsVisibleAfterFileUpload() {
-        return !DOMAIN_OR_APPBUNDLE_TEXTAREA.isVisible();
+        return !LIST_TEXTAREA.isVisible();
     }
 
     public String fetchFileNameFromUploadedFilesSection(String fileName) {
@@ -269,7 +282,8 @@ public class DomainList {
     }
 
     public boolean fetchPulsepointIcon(String listName) {
-        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div/following-sibling::div/div[contains(@class,'sharedList-icon')]", listName));
+        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div/following-sibling::div/div[contains(@class,'sharedList-icon')] | " +
+                "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class,'sharedList-icon')]", listName, listName));
         return locator.isVisible();
     }
 
