@@ -1578,4 +1578,11 @@ public class LifeSteps {
         Assert.assertEquals(fileName, sharedList.fetchRemovalConfirmation());
     }
 
+    /*Roshani Sherkar
+    * 20-08-2025
+    * Atrribute NPI List creation and targeting it at tactic level*/
+    @And("User add and configure NPI targeting rule")
+    public void userAddAndConfigureNPITargetingRule() {
+        tacticSettings.selectNPIRule(npiName);
+    }
 }
