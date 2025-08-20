@@ -13,6 +13,8 @@ public class Pixels {
     private final Locator SMART_PIXEL;
     private final Locator CONVERSION_PIXEL;
     private final Locator SEARCH_BOX;
+    private final Locator SAVE_BUTTON;
+    private final Locator SAVE_SUCCESS;
 
     public Pixels(Page page) {
         this.page = page;
@@ -23,6 +25,8 @@ public class Pixels {
         this.SMART_PIXEL = page.locator("//span[text()='Smart Pixel']");
         this.CONVERSION_PIXEL = page.locator("//span[text()='Conversion Pixel']");
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search' and contains(@class,'search icon')]");
+        this.SAVE_BUTTON = page.locator("//button[text()='Save']");
+        this.SAVE_SUCCESS = page.locator("//div[contains(@aria-label,'Success!')]");
     }
 
     public void clickPixelsMenuItem() {
@@ -49,8 +53,28 @@ public class Pixels {
         return CONVERSION_PIXEL.innerText();
     }
 
-    public void clickRetargetingPixel() {
-        RETARGETING_PIXEL.click();
+    public void selectPixelType(String pixelType) {
+        switch (pixelType) {
+            case "Retargeting Pixel":
+                RETARGETING_PIXEL.click();
+                break;
+            case "Smart Pixel":
+                SMART_PIXEL.click();
+                break;
+            case "Conversion Pixel":
+                CONVERSION_PIXEL.click();
+                break;
+        }
+    }
+
+    public void savePixel() {
+        SAVE_BUTTON.click();
+    }
+
+    public String verifySaveSuccess() {
+        String successMessage = SAVE_SUCCESS.innerText();
+        SAVE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        return successMessage;
     }
 
     public void searchSavedPixel(String pixelName) {

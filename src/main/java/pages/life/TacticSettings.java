@@ -124,8 +124,22 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
         SEARCH_RULE_OPTION.fill(ruleOption);
-        String xpath = String.format("//div[@title='%s']/preceding-sibling::div[contains(@class,'iconsWrapper')]//div[contains(@class,'include-default')]", ruleOption);
-        isElementVisible(xpath);
+
+        String pixelXpath;
+        switch (ruleType) {
+            case "Retargeting Pixels":
+                pixelXpath = String.format("//div[@title='%s']/preceding-sibling::div[contains(@class,'iconsWrapper')]//div[contains(@class,'include-default')]", ruleOption);
+                isElementVisible(pixelXpath);
+                break;
+            case "NPI":
+                pixelXpath = String.format("(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'npilist-itemWrapper')]//div[contains(@class, 'include-default')])[1]", ruleOption);
+                isElementVisible(pixelXpath);
+                break;
+            case "Converters":
+                pixelXpath = String.format("//span[contains(normalize-space(),'%s')]/parent::div/preceding-sibling::div[contains(@class,'targetBlockIcons')]//div[@title='Target']", ruleOption);
+                isElementVisible(pixelXpath);
+                break;
+        }
         clickRuleTypeOkButton();
         closeRuleTypePanel();
     }

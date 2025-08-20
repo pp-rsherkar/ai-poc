@@ -1120,9 +1120,9 @@ public class LifeSteps {
         Assert.assertEquals("CONVERSION PIXEL", pixels.verifyConversionPixel().toUpperCase());
     }
 
-    @And("User selects the Retargeting Pixel type")
-    public void userSelectsRetargetingPixelType() {
-        pixels.clickRetargetingPixel();
+    @And("User selects the {string} type")
+    public void userSelectsThePixelType(String pixelType) {
+        pixels.selectPixelType(pixelType);
     }
 
     @And("User enters the pixel details as {string} {string}")
@@ -1134,12 +1134,12 @@ public class LifeSteps {
 
     @And("User saves the pixel")
     public void userSavesThePixel() {
-        retargetingPixel.saveRetargetingPixel();
+        pixels.savePixel();
     }
 
     @Then("Verify the pixel is saved successfully and displayed in the pixel list")
     public void verifyPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
-        assert retargetingPixel.verifySaveSuccess().contains("Success!");
+        assert pixels.verifySaveSuccess().contains("Success!");
         pixels.searchSavedPixel(newPixelName);
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }

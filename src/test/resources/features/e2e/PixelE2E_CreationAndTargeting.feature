@@ -13,7 +13,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     And User navigates to Pixels page
     When User clicks on Add Pixel button
     Then Verify the Create New Pixel panel and types of Pixel
-    And User selects the Retargeting Pixel type
+    And User selects the "<PIXEL_TYPE>" type
     And User enters the pixel details as "<PIXEL_NAME>" "<ADVERTISER>"
     And User saves the pixel
     Then Verify the pixel is saved successfully and displayed in the pixel list
@@ -35,5 +35,5 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
 
     Examples:
-      | PIXEL_NAME  | ADVERTISER     | CP_NAME              | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE         |
-      | Retargeting | 01- Advertiser | Retargeting_Campaign | Regular | 10000     | New_Line  | 50          | New_Tactic  | Display Advanced | Retargeting Pixels | Retargeting_Auto |
+      | PIXEL_TYPE        | PIXEL_NAME  | ADVERTISER     | CP_NAME              | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE         |
+      | Retargeting Pixel | Retargeting | 01- Advertiser | Retargeting_Campaign | Regular | 10000     | New_Line  | 50          | New_Tactic  | Display Advanced | Retargeting Pixels | Retargeting_Auto |
