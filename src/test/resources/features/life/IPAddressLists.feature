@@ -10,7 +10,7 @@ Feature: LIFE Regression - Create IP Address Lists of following types:
     When User clicks on Create New List
     Then Verify that the Create New List screen is displayed
 
-  @regression @e2e2
+  @regression
   Scenario Outline: Create IP Address List by entering IP address manually
     And Verify that an error message is displayed when no listname "<LIST_NAME>" or "IP Address" names are specified
     And Verify that if multiple "<IP_ADDRESS>" are specified on a single line, a validation error is shown
@@ -24,7 +24,7 @@ Feature: LIFE Regression - Create IP Address Lists of following types:
       | IP_Address | 123.46.7.5, 123.46.7.7 | 123.46.7.0, 684D:1111:222:3333:4444:5555:6:9 |
 
 
-  @regression @e2e2
+  @regression
   Scenario Outline: Create IP Address List by uploading IP addresses using a file
     And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"
     And Verify that when enters "<LIST_NAME>" and upload file "<UPLOAD_FILENAME1>" option is selected, the text area to direct enter the names disappears
