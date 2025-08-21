@@ -13,7 +13,7 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
 
-  @e2e2
+  @e2e
   Scenario Outline: Create a Attribute NPI List and target in 'NPI' targeting at Tactic level
     #3
     And User selects the Attributes List and uploads the file "<FILE_NAME>"
