@@ -1,6 +1,6 @@
-Feature: LIFE Regression - Create Keyword Lists of following types:
-  1. Keyword List by entering keywords manually
-  2. Keyword List by uploading file
+Feature: LIFE Regression – Generate Keyword Lists in the following ways:
+  1. Manually input keywords to create a list
+  2. Upload a file to generate a keyword list automatically
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -11,7 +11,7 @@ Feature: LIFE Regression - Create Keyword Lists of following types:
     Then Verify that the Create New List screen is displayed
 
   @regression
-  Scenario Outline: Create Keyword List by entering keywords manually
+  Scenario Outline: Manage a Keyword List by entering keywords manually (Create, Edit, and Delete)
     And Verify that an error message is displayed when no listname "<LIST_NAME>" or "Keywords" names are specified
     And Verify that when "<KEYWORD_NAMES>" names are specified manually, the option to upload a file disappears
     And Verify that the user is able to create a "Keywords" list by specifying names manually
@@ -24,7 +24,7 @@ Feature: LIFE Regression - Create Keyword Lists of following types:
       | Keyword   | AutoImmune System, Glyconase | Paracetamol, Dolo65   |
 
   @regression
-  Scenario Outline: Create Keyword List by uploading keywords using a file
+  Scenario Outline: Manage a Keyword List by uploading keywords using a file (Create, Edit, and Delete)
     And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"
     And Verify that when enters "<LIST_NAME>" and upload file "<UPLOAD_FILENAME1>" option is selected, the text area to direct enter the names disappears
     And Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file "<UPLOAD_FILENAME1>" is uploaded
