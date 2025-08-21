@@ -20,7 +20,8 @@ public class CreateCreatives {
     private final Locator CREATIVE_PAGE_TITLE;
     private final Locator UNARCHIVED_BUTTON;
     private final Locator ARCHIVED_BUTTON;
-    private final Locator SELECT_ADVITISER;
+    private final Locator PRE_LOADER;
+    private final Locator SELECT_ADVERTISER;
     private final Locator DROPDOWN_VALUES;
     private final Locator CLEAR_ALL_BUTTON;
     private final Locator SELECT_CAMPAIGN;
@@ -73,7 +74,8 @@ public class CreateCreatives {
         this.CREATIVE_PAGE_TITLE = page.locator("//div[contains(text(),'Creatives')]");
         this.UNARCHIVED_BUTTON = page.locator("//img[@title='unarchive']");
         this.ARCHIVED_BUTTON = page.locator("//img[@title='archive']");
-        this.SELECT_ADVITISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
+        this.PRE_LOADER = page.locator("//div[@class='preloader']");
+        this.SELECT_ADVERTISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
         this.DROPDOWN_VALUES = page.locator("//div[@class='menu transition visible']//div[@class='item']/span");
         this.CLEAR_ALL_BUTTON = page.locator("//div[contains(text(),'Clear All')]");
         this.SELECT_CAMPAIGN = page.locator("//app-multi-select[contains(@placeholder,'Select Campaigns')]/div/span/input");
@@ -143,7 +145,7 @@ public class CreateCreatives {
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
-    public boolean verifyArchiveUnarchiveBtnsPresent(String buttonType) {
+    public boolean verifyArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
         if(buttonType.contains("Active") && ARCHIVED_BUTTON.first().isVisible()){
             waitUtility.waitUntilPreLoaderHidden();
@@ -156,7 +158,7 @@ public class CreateCreatives {
         return flag;
     }
 
-    public boolean clickArchiveUnarchiveBtns() {
+    public boolean clickArchiveUnarchiveButtons() {
         boolean flag = false;
         if(ARCHIVED_BUTTON.first().isVisible()){
             ARCHIVED_BUTTON.first().click();
@@ -178,7 +180,7 @@ public class CreateCreatives {
         boolean flag = false;
         switch (key) {
             case "Advertiser":
-                selectDropdownAndFill(SELECT_ADVITISER, values);
+                selectDropdownAndFill(SELECT_ADVERTISER, values);
                 for (String value : values) {
                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
                 }
