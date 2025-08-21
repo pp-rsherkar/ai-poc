@@ -5,7 +5,7 @@ Feature: LIFE Regression - Validate the ability to create and delete Domain and 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    Given User navigates to the Domain List page
+    Given User navigates to the "Domain & App Lists" page
     And Verify that the search option is present on the "Domain/App Lists" tab
 
   @regression
@@ -37,7 +37,7 @@ Feature: LIFE Regression - Validate the ability to create and delete Domain and 
     And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"
     And Verify that when enters "<LIST_NAME>" and upload file "<UPLOAD_FILENAME1>" option is selected, the text area to direct enter the names disappears
     And Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file "<UPLOAD_FILENAME1>" is uploaded
-    And Verify that the user is able to create a "Domain" list through file upload
+    And Verify that the user is able to create a "Domains" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that the user is able to edit an existing list by uploading same file "<UPLOAD_FILENAME1>" again and verify the changes
     And Verify that the user is able to edit and save an existing "Domains" list by uploading another file "<UPLOAD_FILENAME2>" and verify the changes
