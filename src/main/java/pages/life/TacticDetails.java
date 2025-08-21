@@ -19,6 +19,7 @@ public class TacticDetails {
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -176,4 +177,20 @@ public class TacticDetails {
         TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return templateName;
     }
+
+    public boolean createTacticWithLineItemsAndAssignCreative(String lineItemType, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, String CreativeName) {
+            npiSmartList.clickPulsepointIcon();
+            campaigns.campaignDashboard();
+
+            createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
+            createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
+            createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
+
+            tacticCreatives.clickCreativeTab();
+            tacticCreatives.clickAssignCreatives();
+            tacticCreatives.assignCreatives(CreativeName);
+            saveTacticDetails();
+            return tacticCreatives.verifyCreativeAssigned(CreativeName);
+    }
+
 }
