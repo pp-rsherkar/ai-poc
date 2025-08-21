@@ -1,6 +1,6 @@
-Feature: LIFE Regression - Create Domain and App Bundle Lists of following types:
-  1. Domain List by entering domain names manually
-  2. Domain List by uploading file
+Feature: LIFE Regression - Validate the ability to create and delete Domain and App Bundle Lists using two input methods:
+  1. Manual entry of domain or app bundle names
+  2. File upload containing domain or app bundle names
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -9,7 +9,7 @@ Feature: LIFE Regression - Create Domain and App Bundle Lists of following types
     And Verify that the search option is present on the "Domain/App Lists" tab
 
   @regression
-  Scenario Outline: Create Domain List by entering domain names manually
+  Scenario Outline: Manage a Domain List by manually entering domain names (Create, Edit, and Delete)
     And Verify that the sub-tabs "<SUB_TABS>" on the left navigation panel are available and "Both" is selected by default
     And Verify that when the "Domains" tab is selected, only "domain" lists are visible in the panel
     When User clicks on Create New List
@@ -28,7 +28,7 @@ Feature: LIFE Regression - Create Domain and App Bundle Lists of following types
       | Both, Domains, App Bundles | Domain    | domaintest.com, domaintest.co.in | puslepoint.com, pulsepoint.co.in |
 
   @regression
-  Scenario Outline: Create Domain List by uploading domain names using a file
+  Scenario Outline: Manage a Domain List by uploading domain names from a file (Create, Edit, and Delete)
     And Verify that the sub-tabs "<SUB_TABS>" on the left navigation panel are available and "Both" is selected by default
     And Verify that when the "Domains" tab is selected, only "domain" lists are visible in the panel
     When User clicks on Create New List
@@ -50,7 +50,7 @@ Feature: LIFE Regression - Create Domain and App Bundle Lists of following types
       | Both, Domains, App Bundles | Domain_FileUpload | DomainNameFile1.csv | DomainNameFile2.csv |
 
   @regression
-  Scenario Outline: Create App Bundle List by entering AppBundle names manually
+  Scenario Outline: Manage a App Bundle List by entering AppBundle names manually (Create, Edit, and Delete)
     And Verify that the sub-tabs "<SUB_TABS>" on the left navigation panel are available and "Both" is selected by default
     And Verify that when the "App Bundles" tab is selected, only "applist" lists are visible in the panel
     When User clicks on Create New List
@@ -68,7 +68,7 @@ Feature: LIFE Regression - Create Domain and App Bundle Lists of following types
       | Both, Domains, App Bundles | App_Bundle | cambridge.org, redcross.org | wikipedia.org, mitre.org |
 
   @regression
-  Scenario Outline: Create App Bundle List by uploading AppBundles names through a file
+  Scenario Outline: Manage a App Bundle List by uploading AppBundles names from a file (Create, Edit, and Delete)
     And Verify that the sub-tabs "<SUB_TABS>" on the left navigation panel are available and "Both" is selected by default
     And Verify that when the "App Bundles" tab is selected, only "applist" lists are visible in the panel
     When User clicks on Create New List
