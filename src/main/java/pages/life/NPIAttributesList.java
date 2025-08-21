@@ -3,9 +3,12 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.ExcelActions;
+import utils.WaitUtility;
 
 public class NPIAttributesList {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator FILE_INPUT;
     private final Locator FILE_UPLOAD_SUCCESS;
@@ -46,6 +49,7 @@ public class NPIAttributesList {
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
+
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -57,6 +61,7 @@ public class NPIAttributesList {
     }
 
     public void enterListName(String listName) {
+        LIST_NAME.scrollIntoViewIfNeeded();
         LIST_NAME.fill(listName);
     }
 
@@ -66,10 +71,10 @@ public class NPIAttributesList {
     }
 
     public void selectNPIColumn(String columnName) {
-        FILE_UPLOAD_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(FILE_UPLOAD_SUCCESS);
         NPI_COLUMN_DROPDOWN.click();
         Locator columnOption = page.locator("//div[contains(@class,'ng-option') and normalize-space()='" + columnName + "']");
-        columnOption.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(columnOption);
         columnOption.click();
     }
 
@@ -95,14 +100,14 @@ public class NPIAttributesList {
     }
 
     public void clickBackToNPILists() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(LIST_SUCCESS);
         BACK_TO_NPI_LISTS.click();
         page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void editListName(String newListName) {
         page.waitForTimeout(5000);
-        BACK_TO_NPI_LISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(BACK_TO_NPI_LISTS);
         LIST_NAME.fill(newListName);
     }
 
@@ -115,7 +120,7 @@ public class NPIAttributesList {
     }
 
     public void deleteList() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(LIST_SUCCESS);
         DELETE_LIST_ICON.click();
         DELETE_LIST_BUTTON.click();
     }

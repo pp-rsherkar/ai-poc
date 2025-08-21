@@ -14,7 +14,7 @@ public class ApiActions {
     APIResponse response;
     private APIRequestContext request;
 
-    public APIResponse getResponse(HashMap<String, String> headers) {
+    public APIResponse getRequestWithoutBody(HashMap<String, String> headers) {
         request = playwright.request().newContext(new APIRequest.NewContextOptions()
                 // All requests we send go to this API endpoint.
                 .setBaseURL("https://api.github.com")
@@ -23,12 +23,11 @@ public class ApiActions {
         return response;
     }
 
-    public APIResponse postResponse(HashMap<String, String> headers) {
+    public APIResponse postRequestWithoutBody(String baseURL, String endpointPath, HashMap<String, String> headers) {
         request = playwright.request().newContext(new APIRequest.NewContextOptions()
-                // All requests we send go to this API endpoint.
-                .setBaseURL("https://api.github.com")
+                .setBaseURL(baseURL)
                 .setExtraHTTPHeaders(headers));
-        response = request.post("");
+        response = request.post(endpointPath);
         return response;
     }
 }

@@ -1,5 +1,7 @@
 package stepdefinitions;
 
+import com.microsoft.playwright.APIResponse;
+import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
@@ -10,6 +12,8 @@ import org.junit.Assert;
 import pages.Navigation;
 import pages.life.*;
 import utils.*;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,8 +57,10 @@ public class LifeSteps {
     TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
     CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
     NPIAttributesList npiAttributesList = new NPIAttributesList(DriverFactory.getPage());
+    NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
+    APIResponse response;
     boolean flag = false;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -1194,5 +1200,116 @@ public class LifeSteps {
             }
         }
 
+    }
+    /*Roshani Sherkar
+    * Auto-Imported List*/
+    @And("User selects the Auto-Imported List")
+    public void userSelectsTheAutoImportedList() {
+        npiLists.clickAutoImportedList();
+    }
+
+    @And("Verify if user navigates to the Auto-Imported List page")
+    public void verifyIfUserNavigatesToTheAutoImportedListPage() {
+        Assert.assertEquals("Setup Import", npiAutoImportedList.verifyIfAutoImportPage());
+    }
+
+    @Then("User tries to save the Auto-Imported list without entering any details, an error message should be displayed")
+    public void userTriesToSaveTheAutoImportedListWithoutEnteringAnyDetailsAnErrorMessageShouldBeDisplayed() {
+        npiAutoImportedList.clickSetupImportButton();
+        Assert.assertEquals("Advertiser is required",npiAutoImportedList.verifyErrorMessage());
+    }
+
+    @When("User enters the Auto-Imported list details as {string} {string}")
+    public void userEntersTheAutoImportedListDetailsAs(String listName, String advertiser) {
+        npiName = listName + '_' + timestamp;
+        npiAttributesList.enterListName(npiName);
+        npiAttributesList.selectAdvertiser(advertiser);
+    }
+
+    @And("User makes list available in LIFE and HCP365 module")
+    public void userMakesListAvailableInLIFEAndHCP() {
+        npiAttributesList.selectProduct();
+    }
+
+    @And("User clicks Setup Import button to import File details")
+    public void userClicksSetupImportButtonToImportFileDetails() {
+        npiAutoImportedList.clickSetupImportButton();
+        npiAutoImportedList.waitForImportSettingPanel();
+    }
+
+    @And("User enters file details {string} {string} {string}")
+    public void userEntersImportSettingWithDetails(String fileLocation, String filePath, String fileName) {
+        npiAutoImportedList.enterFileDetails(fileLocation, filePath.trim(), fileName.trim());
+    }
+
+    @And("User selects the {string} radio button")
+    public void userSelectsTheListType(String listType) {
+        npiAutoImportedList.selectListType(listType);
+    }
+
+    @And("User enters NPI column {string} {string}")
+    public void userEntersNPIColumnName(String npiColumn, String columnName) {
+        npiAutoImportedList.enterColumnName(npiColumn, columnName);
+    }
+
+    @And("User selects the {string}")
+    public void userSelectsTheImportType(String importType) {
+        npiAutoImportedList.selectImportType(importType);
+    }
+
+    @Then("User clicks Check File button to verify the file details are correct")
+    public void userClicksCheckFileButtonToVerifyTheFileDetailsAreCorrect() {
+        npiAutoImportedList.clickCheckFile();
+    }
+
+    @Then("User saves the import settings and verifies the data is imported successfully")
+    public void userSavesTheImportSettingsAndVerifiesTheIsSavedSuccessfully() {
+        npiAutoImportedList.clickOKButton();
+    }
+
+    @And("Verify that Token is fetched successfully from URL {string}")
+    public void verifyThatTokenIsFetchedSuccessfully(String url) {
+        constants.TOKEN = npiAutoImportedList.fetchToken(url);
+        Assert.assertNotNull("Token is not fetched", constants.TOKEN);
+    }
+
+    @And("Pass token in the API Header and run it to upload the data into the list")
+    public void runAPIToUploadTheListDataIntoTheList() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Token", constants.TOKEN);
+        response = npiAutoImportedList.runAPI(constants.BASE_URL, constants.ENDPOINT_PATH, headers);
+    }
+
+    @And("Verify list data is uploaded successfully")
+    public void verifyListDataIsUploadedSuccessfully() {
+        Assert.assertEquals(204, response.status());
+    }
+
+    @And("Refresh the Browser to view the data uploaded")
+    public void refreshTheBrowserToViewTheDataUploaded() {
+        Assert.assertTrue("NPI List is not available", npiAutoImportedList.refreshBrowser());
+    }
+
+    @And("Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in {string}")
+    public void verifyMatchedNPISectionIsDisplayedWithTheTotalNPICount(String fileName) throws CsvValidationException, IOException {
+        String totalNPICount = npiAutoImportedList.fetchTotalNPICount();
+        String npiRecordsFromFile = npiAutoImportedList.fetchNPIRecordFromTestFile(fileName);
+        Assert.assertEquals("Count is not matching", totalNPICount, npiRecordsFromFile);
+    }
+
+    @And("Verify Reload Now button is available and enabled")
+    public void verifyReloadNowButtonIsAvailableAndEnabled() {
+        npiAutoImportedList.verifyIfImportSettingButtonIsVisible();
+        Assert.assertTrue("Reload Now Button is not available", npiAutoImportedList.verifyReloadNowButton());
+    }
+
+    @When("User clicks on Reload Now button")
+    public void userClicksOnReloadNowButton() {
+        npiAutoImportedList.clickReloadNowButton();
+    }
+
+    @Then("Verify the file is reloaded successfully")
+    public void verifyTheFileIsReloadedSuccessfully() {
+        Assert.assertEquals("File is reloaded", npiAutoImportedList.verifyIfFileIsReloaded());
     }
 }

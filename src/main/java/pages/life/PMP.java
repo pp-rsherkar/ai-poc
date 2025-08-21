@@ -4,11 +4,14 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.List;
 
 public class PMP {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator ADD_TARGETING_RULE;
@@ -110,7 +113,7 @@ public class PMP {
     }
 
     public void navigateToTacticSettingTab() {
-        SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         TACTICSETTING_TAB.click();
     }
 
@@ -134,7 +137,7 @@ public class PMP {
     }
 
     public String verifyPMPDealsPanel(){
-        ALLDEALS_PANEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(ALLDEALS_PANEL);
         return ALLDEALS_PANEL.innerText();
     }
 
@@ -156,7 +159,7 @@ public class PMP {
             flag1 = TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
         }else if(toggleButton.equalsIgnoreCase("OFF")){
             TARGET_APPLIED_DEAL_TOGGLE.click();
-            SERVE_EVERYWHERE_DAILOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+            waitUtility.waitForLocatorVisible(SERVE_EVERYWHERE_DAILOG);
             SERVE_EVERYWHERE_OKBTN.click();
             flag1 = !TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
         }
@@ -167,7 +170,7 @@ public class PMP {
         OK_BUTTON.click();
         if(RULE_TYPE_CLOSE.isVisible())
             RULE_TYPE_CLOSE.click();
-        TACTICSETTING_TAB.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(TACTICSETTING_TAB);
     }
 
     public boolean verifyAssignedDealsOnTactic(String dealName, String toggleButton) {
@@ -194,9 +197,7 @@ public class PMP {
 
     public void selectDealFromListAndAssign(String dealName) {
         DEAL_SEARCHFILTER.fill(dealName);
-        page.waitForSelector(
-                String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName),
-                new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForElementVisible(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName));
         String xpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/parent::div/preceding-sibling::span", dealName);
         page.locator(xpath).click();
         String assignDealXpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/ancestor::div[@class='left dealDetails']/following-sibling::div/span[contains(@class,'addDeal')]", dealName);
@@ -228,14 +229,14 @@ public class PMP {
                 }
                 break;
         }
-        DEALS_LIST.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(DEALS_LIST.first());
         return DEALS_LIST.first().isVisible();
     }
 
     public void clickAddNewDeals(){
         ADD_NEWDEAL_BUTTON.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        ADDNEWDEAL_LABEL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(ADDNEWDEAL_LABEL);
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String addAndSaveNewDeals(String exchangeType, String dealID, String dealName, List<String> mediaType, String dealPriceType, String price) {
@@ -252,7 +253,7 @@ public class PMP {
         ENTER_PRICE.fill(price);
         NEWDEAL_SAVEBTN.click();
         String text = SUCCESS_ALERT.innerText().trim();
-        SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return text;
     }
 
@@ -283,12 +284,12 @@ public class PMP {
         }
         saveTacticSettings();
         verifyTacticIsSaved();
-        SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
     }
 
     public boolean applyDealsFromDealsSection(String dealType, String exchangeType, String dealID, String dealName, List<String> mediaType, String dealPriceType, String price, String toggleButton) {
         ADDDEAL_BUTTON.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
         clickDealsTab(dealType);
         clickAddNewDeals();
         addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, dealPriceType, price);
@@ -310,8 +311,7 @@ public class PMP {
     }
 
     public boolean verifyAllPremiumHubsOnMarketPlace(List<String> premiumHubsList) {
-        ALL_LIFEMARKETPLACE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-
+        waitUtility.waitForLocatorVisible(ALL_LIFEMARKETPLACE);
         for (int i = 0; i < ALL_PREMIUMPUBS.count(); i++) {
             String classAttr = ALL_PREMIUMPUBS.nth(i).getAttribute("class");
             if (classAttr != null) {
@@ -321,12 +321,12 @@ public class PMP {
 
                         boolean dealVisible = false, noDealVisible = false;
                         try {
-                            DEALS_LIST.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                            waitUtility.waitForLocatorVisible(DEALS_LIST.first());
                             dealVisible = true;
                         } catch (Exception ignored) {}
                         if (!dealVisible) {
                             try {
-                                NO_DEAL_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                                waitUtility.waitForLocatorVisible(NO_DEAL_TEXT.first());
                                 noDealVisible = true;
                             } catch (Exception ignored) {}
                         }

@@ -4,7 +4,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 
 public class TacticSettings {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -132,7 +135,7 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.type(ruleType);
         if(SELECT_RULE_TYPE.isVisible()){
             SELECT_RULE_TYPE.click();
-            SPINNER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilSpinnerHidden();
 
             switch (ruleType) {
                 case "Behavioral Segment":

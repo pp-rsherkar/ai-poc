@@ -72,11 +72,11 @@ public class CommonUtils {
     }
 
 
-    public static void uploadFile(Page page, String imageTextLocator, String fileName) {
+    public static void uploadFile(Page page, String locatorValue, String fileName) {
         Locator fileInput = page.locator("input[type='file']").first();
         fileInput.setInputFiles(Paths.get("src/main/resources/" + fileName));
         ElementHandle fileInputHandle = fileInput.elementHandle();
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
-        page.waitForSelector(String.format(imageTextLocator, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        page.waitForSelector(String.format(locatorValue, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
     }
 }
