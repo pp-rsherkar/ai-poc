@@ -410,12 +410,23 @@ public class LifeSteps {
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         List<String> expectedNormalizedRuleTypes = normalizeObjectList(keyType);
+        int expectedCount = expectedNormalizedRuleTypes.size();
+        tacticSettings.fetchRulesTypesCount(expectedCount);
         List<String> actualNormalizedRuleTypes = normalizeObjectList(tacticSettings.fetchRulesTypes());
+
+        Set<String> expectedSet = new LinkedHashSet<>(expectedNormalizedRuleTypes);
+        Set<String> actualSet = new LinkedHashSet<>(actualNormalizedRuleTypes);
+
+        List<String> expectedUniqueAndSorted = new ArrayList<>(expectedSet);
+        List<String> actualUniqueAndSorted = new ArrayList<>(actualSet);
+
+        Collections.sort(expectedUniqueAndSorted);
+        Collections.sort(actualUniqueAndSorted);
 
         List<String> expectedNormalizedRuleOptions = normalizeObjectList(keyValues);
         List<String> actualNormalizedRuleOptions = normalizeObjectList(tacticSettings.fetchRuleOptions());
 
-        Assert.assertEquals("Rule types mismatch", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
+        Assert.assertEquals("Rule types mismatch", expectedUniqueAndSorted, actualUniqueAndSorted);
         for (String expectedOption : expectedNormalizedRuleOptions) {
             boolean matchFound = actualNormalizedRuleOptions.stream()
                     .anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
@@ -1117,8 +1128,8 @@ public class LifeSteps {
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(buttonType);
-        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveBtnsPresent(buttonType));
-        Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveBtns());
+        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveButtonsPresent(buttonType));
+        Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveButtons());
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
             flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
         }
