@@ -28,7 +28,6 @@ public class LifeSteps {
     static String tacticNameRandom;
     static String dealNameRandom;
     static String dealIDRandom;
-    static String tacticPMP;
     static String url;
     static String username;
     static String password;
@@ -61,7 +60,8 @@ public class LifeSteps {
     SharedList sharedList = new SharedList(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
-    int fileCount = 0;
+    int itemCount = 0;
+    int totalNPIListCount = 0;
     APIResponse response;
     boolean flag = false;
 
@@ -1520,8 +1520,8 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUpload(String fileName) {
         sharedList.searchAndOpenCreatedList(metricName);
         int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        fileCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
-        Assert.assertEquals(domainCount, fileCount);
+        itemCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
+        Assert.assertEquals(domainCount, itemCount);
     }
 
     @And("Verify that the user is able to edit an existing list by uploading same file {string} again and verify the changes")
@@ -1561,7 +1561,7 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheUpdatedValueAfterNewFileUpload(String fileName) {
         sharedList.searchAndOpenCreatedList(metricName);
         int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        Assert.assertEquals(domainCount, fileCount + sharedList.fetchDomainCountFromUploadedFilesSection(fileName));
+        Assert.assertEquals(domainCount, itemCount + sharedList.fetchDomainCountFromUploadedFilesSection(fileName));
     }
 
     @And("Verify that user is able to download the uploaded file {string}, {string}")
@@ -1581,8 +1581,44 @@ public class LifeSteps {
     /*Roshani Sherkar
     * 20-08-2025
     * Atrribute NPI List creation and targeting it at tactic level*/
-    @And("User add and configure NPI targeting rule")
+    @And("Navigate to Campaign Dashboard and clicks on Create Campaign")
+    public void navigateToCampaignDashboardAndClicksOnCreateCampaign() {
+        navigation.clickSubMenu();
+        navigation.clickCampaigns();
+        campaigns.createCampaign();
+    }
+
+    @And("User add and configure NPI targeting rule and verify list is displayed in the targeting rule")
     public void userAddAndConfigureNPITargetingRule() {
         tacticSettings.selectNPIRule(npiName);
+        Assert.assertTrue("NPI List is not available", tacticSettings.isListAvailableInTargetingPanel(npiName));
+        tacticSettings.clickTarget();
+        itemCount = tacticSettings.fetchSelectedListCountFromTargetingPanel();
     }
+
+
+    @And("Verify the Total NPI count from the list is displayed in the targeting rule and save it")
+    public void verifyTheTotalNPICountFromTheListIsDisplayedInTheTargetingRule() {
+        totalNPIListCount = tacticSettings.fetchTotalNPICountFromNewTab(npiName);
+        int npiCountFromTargetingPanel = tacticSettings.fetchNPICountFromTargetingPanel();
+        Assert.assertEquals("Total NPI count from the list is not matching with the count in targeting rule", totalNPIListCount, npiCountFromTargetingPanel);
+        tacticSettings.clickOk();
+        tacticSettings.clickClose();
+    }
+
+    @Then("verify that the NPI rule is added to the tactic and retrieve the count of selected lists")
+    public void verifyThatTheNPIRuleIsAddedToTheTacticAndRetrieveTheCountOfSelectedLists() {
+        Assert.assertTrue("Unable to add NPI Rule", tacticSettings.verifyIfNPIRuleIsAdded().contains("NPI"));
+        String text = tacticSettings.fetchSelectedListCountFromTactic();
+        Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(itemCount)));
+    }
+
+    @And("verify that the selected list is displayed in the targeting rule and retrieve the total NPI count")
+    public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
+        Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
+        String text = tacticSettings.fetchSelectedListNPICountFromTactic();
+        Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalNPIListCount)));
+    }
+
+
 }

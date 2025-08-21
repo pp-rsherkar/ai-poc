@@ -39,6 +39,7 @@ public class Campaigns {
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String campaignDashboard() {
@@ -76,8 +77,9 @@ public class Campaigns {
     }
 
     public String campaignSuccess() {
+        String successMessage = CAMPAIGN_SUCCESS.innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
-        return CAMPAIGN_SUCCESS.innerText();
+        return successMessage;
     }
 
     public void navigateToCampaignListing() {

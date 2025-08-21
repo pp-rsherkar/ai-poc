@@ -23,7 +23,7 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     When User makes list available in LIFE and HCP365 and clicks on next
     Then Verify the Attributes list is saved successfully
     #4
-    And User clicks on Create Campaign
+    And Navigate to Campaign Dashboard and clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     #5
@@ -33,13 +33,14 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" as channel
-    And User add and configure NPI targeting rule
+    And User add and configure NPI targeting rule and verify list is displayed in the targeting rule
+    And Verify the Total NPI count from the list is displayed in the targeting rule and save it
     #7
-    Then Verify list is targeted in the tactic successfully
+    Then verify that the NPI rule is added to the tactic and retrieve the count of selected lists
+    And verify that the selected list is displayed in the targeting rule and retrieve the total NPI count
     And User saves the targeting
 
 
     Examples:
-      | LIST_NAME | ADVERTISER     | FILE_NAME             | COLUMN_NAME | ADVERTISER     | CP_NAME               | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE |
-      | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx | NPI         | 01- Advertiser | AttributeNPI_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | NPI       |
-
+      | LIST_NAME | ADVERTISER     | FILE_NAME             | COLUMN_NAME | ADVERTISER     | CP_NAME               | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
+      | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx | NPI         | 01- Advertiser | AttributeNPI_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced |
