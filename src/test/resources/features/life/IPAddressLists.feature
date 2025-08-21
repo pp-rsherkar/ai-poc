@@ -1,6 +1,6 @@
-Feature: LIFE Regression - Create IP Address Lists of following types:
-  1. IP Address List by entering domain names manually
-  2. IP Address List by uploading file
+Feature: LIFE Regression – Generate IP Address Lists in the following ways:
+  1. Manually input ip address to create a list
+  2. Upload a file to generate a id address list automatically
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -11,7 +11,7 @@ Feature: LIFE Regression - Create IP Address Lists of following types:
     Then Verify that the Create New List screen is displayed
 
   @regression
-  Scenario Outline: Create IP Address List by entering IP address manually
+  Scenario Outline: Manage an IP Address List by manually adding, updating, and removing IP addresses
     And Verify that an error message is displayed when no listname "<LIST_NAME>" or "IP Address" names are specified
     And Verify that if multiple "<IP_ADDRESS>" are specified on a single line, a validation error is shown
     And Verify that when "<IP_ADDRESS>" names are specified manually, the option to upload a file disappears
@@ -25,7 +25,7 @@ Feature: LIFE Regression - Create IP Address Lists of following types:
 
 
   @regression
-  Scenario Outline: Create IP Address List by uploading IP addresses using a file
+  Scenario Outline: Manage an IP Address List by uploading a file to create, update, and delete IP addresses
     And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"
     And Verify that when enters "<LIST_NAME>" and upload file "<UPLOAD_FILENAME1>" option is selected, the text area to direct enter the names disappears
     And Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file "<UPLOAD_FILENAME1>" is uploaded

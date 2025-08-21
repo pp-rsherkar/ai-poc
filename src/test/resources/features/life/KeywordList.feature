@@ -11,7 +11,7 @@ Feature: LIFE Regression – Generate Keyword Lists in the following ways:
     Then Verify that the Create New List screen is displayed
 
   @regression
-  Scenario Outline: Manage a Keyword List by entering keywords manually (Create, Edit, and Delete)
+  Scenario Outline: Manage a Keyword List by manually adding, editing, and deleting keywords
     And Verify that an error message is displayed when no listname "<LIST_NAME>" or "Keywords" names are specified
     And Verify that when "<KEYWORD_NAMES>" names are specified manually, the option to upload a file disappears
     And Verify that the user is able to create a "Keywords" list by specifying names manually
@@ -20,11 +20,11 @@ Feature: LIFE Regression – Generate Keyword Lists in the following ways:
     And Verify that the user is able to delete an existing "Keywords" name list
     And Verify that PulsePoint provided domain list "Automation_KeywordList" is denoted with a purple P icon
     Examples:
-      | LIST_NAME | KEYWORD_NAMES                | EDITED_KEYWORDS_NAMES |
-      | Keyword   | AutoImmune System, Glyconase | Paracetamol, Dolo65   |
+      | LIST_NAME | KEYWORD_NAMES                              | EDITED_KEYWORDS_NAMES        |
+      | Keyword   | Active Shooter, Antisemitism, Church Shoot | Cory Booker, Clinton Package |
 
   @regression
-  Scenario Outline: Manage a Keyword List by uploading keywords using a file (Create, Edit, and Delete)
+  Scenario Outline: Manage a Keyword List by uploading a file to create, edit, and delete keywords
     And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"
     And Verify that when enters "<LIST_NAME>" and upload file "<UPLOAD_FILENAME1>" option is selected, the text area to direct enter the names disappears
     And Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file "<UPLOAD_FILENAME1>" is uploaded
