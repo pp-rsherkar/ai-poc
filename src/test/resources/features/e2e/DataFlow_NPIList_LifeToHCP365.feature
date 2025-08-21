@@ -33,7 +33,7 @@ Feature: End to End Workflow of NPI Lists.
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" channel, configure NPI targeting rule
-    Then Verify smart list is targeted in the tactic successfully
+    Then Verify list is targeted in the tactic successfully
     And User saves the targeting
     # 3
     And User navigates to Smart actions from the main menu
@@ -80,7 +80,7 @@ Feature: End to End Workflow of NPI Lists.
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" channel, configure NPI targeting rule
-    Then Verify smart list is targeted in the tactic successfully
+    Then Verify list is targeted in the tactic successfully
     And User saves the targeting
     # 3
     And User navigates to Smart actions from the main menu

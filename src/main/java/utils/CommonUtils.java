@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -71,6 +72,23 @@ public class CommonUtils {
         return new String(is.readAllBytes(), StandardCharsets.UTF_8);
     }
 
+    public static List<String> convertStringToList(String stringData){
+        return Arrays.stream(stringData.split(","))
+                .map(String::trim)
+                .toList();
+    }
+
+    public static void uploadFile(Locator fileInput, String fileName) {
+        Path filePath = Paths.get("src/main/resources/uploadfiles/" + fileName).toAbsolutePath();
+        fileInput.setInputFiles(filePath);
+    }
+
+    public static void uploadFileThroughSystemDialog(Page page, String fileName) {
+        Locator fileInput = page.locator("input[type='file']").first();
+        fileInput.setInputFiles(Paths.get("src/main/resources/uploadfiles/" + fileName));
+        ElementHandle fileInputHandle = fileInput.elementHandle();
+        page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
+    }
 
     public static void uploadFile(Page page, String locatorValue, String fileName) {
         Locator fileInput = page.locator("input[type='file']").first();

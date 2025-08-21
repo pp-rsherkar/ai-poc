@@ -31,6 +31,10 @@ public class WaitUtility {
         locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
+    public void waitForLocatorVisible(Locator locator, double timeout){
+        locator.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.VISIBLE));
+    }
+
     public void waitForLocatorHidden(Locator locator){
         locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }

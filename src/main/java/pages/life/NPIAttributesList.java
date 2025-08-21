@@ -4,7 +4,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-import utils.ExcelActions;
+import utils.CommonUtils;
 import utils.WaitUtility;
 
 public class NPIAttributesList {
@@ -53,7 +53,7 @@ public class NPIAttributesList {
     }
 
     public void uploadAttributesFile(String attributesFile) {
-        ExcelActions.uploadFile(FILE_INPUT, attributesFile);
+        CommonUtils.uploadFile(FILE_INPUT, attributesFile);
     }
 
     public String verifyFileUploadSuccess() {

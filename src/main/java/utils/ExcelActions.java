@@ -37,12 +37,6 @@ public class ExcelActions {
         return actualHeaders;
     }
 
-
-    public static void uploadFile(Locator fileInput, String fileName) {
-        Path filePath = Paths.get("src/main/resources/uploadfiles/" + fileName).toAbsolutePath();
-        fileInput.setInputFiles(filePath);
-    }
-
     public static int countCsvRecords(String filePath) throws IOException, CsvValidationException {
         int rowCount = 0;
         try (CSVReader reader = new CSVReader(new FileReader(filePath))) {

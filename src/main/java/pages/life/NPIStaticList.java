@@ -5,7 +5,7 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-import utils.ExcelActions;
+import utils.CommonUtils;
 import utils.WaitUtility;
 
 public class NPIStaticList {
@@ -78,7 +78,7 @@ public class NPIStaticList {
 
     public void uploadStaticListFile(String fileName) {
         Locator fileInput = page.locator("input[type='file']"); // will remove the hardcoding
-        ExcelActions.uploadFile(fileInput, fileName);
+        CommonUtils.uploadFile(fileInput, fileName);
     }
 
     public void clickBackToNPILists() {
