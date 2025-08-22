@@ -1600,7 +1600,7 @@ public class LifeSteps {
     }
 
 
-    @And("Verify the Total NPI and Match NPI count from the list is displayed in the targeting rule and save it")
+    @And("Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule and save it")
     public void verifyTheTotalNPICountFromTheListIsDisplayedInTheTargetingRule() {
         String npiCount = tacticSettings.fetchTotalNPICountFromNewTab(npiName);
         String[] parts = npiCount.split("&");
