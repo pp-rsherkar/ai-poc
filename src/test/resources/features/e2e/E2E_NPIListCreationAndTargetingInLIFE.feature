@@ -13,7 +13,7 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
 
-  @e2e
+  @e2e2
   Scenario Outline: Create a Attribute NPI List and target in 'NPI' targeting at Tactic level
     #3
     And User selects the Attributes List and uploads the file "<FILE_NAME>"
@@ -34,13 +34,13 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" as channel
     And User add and configure NPI targeting rule and verify list is displayed in the targeting rule
-    And Verify the Total NPI count from the list is displayed in the targeting rule and save it
+    And Verify the Total NPI and Match NPI count from the list is displayed in the targeting rule and save it
     #7
-    Then verify that the NPI rule is added to the tactic and retrieve the count of selected lists
-    And verify that the selected list is displayed in the targeting rule and retrieve the total NPI count
+    Then Verify that the NPI rule is added to the tactic and retrieve the count of selected lists
+    And Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count
     And User saves the targeting
 
 
     Examples:
-      | LIST_NAME | ADVERTISER     | FILE_NAME             | COLUMN_NAME | ADVERTISER     | CP_NAME               | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
-      | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx | NPI         | 01- Advertiser | AttributeNPI_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced |
+      | LIST_NAME | ADVERTISER     | FILE_NAME                | COLUMN_NAME | CP_NAME               | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
+      | ATTRIBUTE | 01- Advertiser | NPI_AttributeList01.xlsx | NPI         | AttributeNPI_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced |

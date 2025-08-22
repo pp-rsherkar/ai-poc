@@ -1597,23 +1597,28 @@ public class LifeSteps {
     }
 
 
-    @And("Verify the Total NPI count from the list is displayed in the targeting rule and save it")
+    @And("Verify the Total NPI and Match NPI count from the list is displayed in the targeting rule and save it")
     public void verifyTheTotalNPICountFromTheListIsDisplayedInTheTargetingRule() {
-        totalNPIListCount = tacticSettings.fetchTotalNPICountFromNewTab(npiName);
-        int npiCountFromTargetingPanel = tacticSettings.fetchNPICountFromTargetingPanel();
-        Assert.assertEquals("Total NPI count from the list is not matching with the count in targeting rule", totalNPIListCount, npiCountFromTargetingPanel);
+        String npiCount = tacticSettings.fetchTotalNPICountFromNewTab(npiName);
+        String[] parts = npiCount.split("&");
+        totalNPIListCount = Integer.parseInt(parts[0].split("-")[1]);
+        int matchedNPIListCount = Integer.parseInt(parts[1].split("-")[1]);
+        String npiCountFromTargetingPanel = tacticSettings.fetchNPICountFromTargetingPanel();
+        String matchedNpiCountFromTargetingPanel = tacticSettings.fetchMatchedNPICountFromTargetingPanel();
+        Assert.assertEquals("Total NPI count from the list is not matching with the count in targeting rule", String.valueOf(totalNPIListCount), npiCountFromTargetingPanel);
+        Assert.assertTrue("Matched NPI count from the list is not matching with the count in targeting rule", matchedNpiCountFromTargetingPanel.contains(String.valueOf(matchedNPIListCount)));
         tacticSettings.clickOk();
         tacticSettings.clickClose();
     }
 
-    @Then("verify that the NPI rule is added to the tactic and retrieve the count of selected lists")
+    @Then("Verify that the NPI rule is added to the tactic and retrieve the count of selected lists")
     public void verifyThatTheNPIRuleIsAddedToTheTacticAndRetrieveTheCountOfSelectedLists() {
         Assert.assertTrue("Unable to add NPI Rule", tacticSettings.verifyIfNPIRuleIsAdded().contains("NPI"));
         String text = tacticSettings.fetchSelectedListCountFromTactic();
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(itemCount)));
     }
 
-    @And("verify that the selected list is displayed in the targeting rule and retrieve the total NPI count")
+    @And("Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count")
     public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
         Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
         String text = tacticSettings.fetchSelectedListNPICountFromTactic();

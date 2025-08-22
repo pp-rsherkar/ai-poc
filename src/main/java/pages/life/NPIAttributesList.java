@@ -29,6 +29,7 @@ public class NPIAttributesList {
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
     private final Locator TOTAL_NPI_LIST_COUNT;
+    private final Locator MATCH_NPI_COUNT;
 
     public NPIAttributesList(Page page) {
         this.page = page;
@@ -51,6 +52,7 @@ public class NPIAttributesList {
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
         this.TOTAL_NPI_LIST_COUNT = page.locator("//div[@class='label' and text()='Total NPI']/preceding-sibling::div");
+        this.MATCH_NPI_COUNT = page.locator("//div[@class='label' and text()='Matched NPI']/preceding-sibling::div");
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -133,12 +135,13 @@ public class NPIAttributesList {
         return DELETE_SUCCESS.innerText();
     }
 
-    public int fetchTotalNPIListCount(String listName) {
-        int npiCount = 0;
+    public String fetchTotalNPIListCount(String listName) {
+        String npiCount = "";
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TOTAL_NPI_LIST_COUNT);
+        waitUtility.waitForLocatorVisible(MATCH_NPI_COUNT);
         if(listName.contains(LIST_NAME.innerText()))
-            npiCount = Integer.parseInt(TOTAL_NPI_LIST_COUNT.innerText().trim());
+            npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-" + MATCH_NPI_COUNT.innerText().trim();
         return npiCount;
     }
 }

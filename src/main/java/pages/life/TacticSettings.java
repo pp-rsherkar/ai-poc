@@ -57,6 +57,8 @@ public class TacticSettings {
     private final Locator GEO_RADIUS_SAVE;
     private final Locator TOTAL_NPI_COUNT;
     private final Locator SELECTED_LIST;
+    private final Locator SHOW_MATCHED_NPI_BUTTON;
+    private final Locator MATCHED_NPI_COUNT;
 
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -104,6 +106,8 @@ public class TacticSettings {
         this.GEO_RADIUS_SAVE = page.locator("(//div[@title='Save' and contains(@class,'saveGeoPtButton')])[1]");
         this.TOTAL_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']");
         this.SELECTED_LIST = page.locator("//span[contains(text(),'Selected Only')]");
+        this.SHOW_MATCHED_NPI_BUTTON = page.locator("//span[contains(text(),'show')]");
+        this.MATCHED_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']/span[@class='supportedNPIsNumber']");
     }
 
     public String verifyTacticSettingsText() {
@@ -451,7 +455,7 @@ public class TacticSettings {
     /*Roshani Sherkar
     * 20-08-2025
     * Open NPI list created in new browser tab */
-    public int fetchTotalNPICountFromNewTab(String listName) {
+    public String fetchTotalNPICountFromNewTab(String listName) {
         Page originalPage = DriverFactory.getPage();
         Page newTab = DriverFactory.context.waitForPage(() -> {
             DriverFactory.getPage()
@@ -462,14 +466,14 @@ public class TacticSettings {
         DriverFactory.threadLocalDriver.set(newTab);
         newTab.waitForLoadState();
         NPIAttributesList npiAttributesList = new NPIAttributesList(newTab);
-        int npiCount = npiAttributesList.fetchTotalNPIListCount(listName);
+        String npiCount = npiAttributesList.fetchTotalNPIListCount(listName);
         newTab.close();
         originalPage.bringToFront();
         return npiCount;
     }
 
-    public int fetchNPICountFromTargetingPanel(){
-        return Integer.parseInt(TOTAL_NPI_COUNT.first().innerText().trim());
+    public String fetchNPICountFromTargetingPanel(){
+        return TOTAL_NPI_COUNT.first().innerText().trim();
     }
 
     public boolean isListAvailableInTargetingPanel(String npiName) {
@@ -496,5 +500,13 @@ public class TacticSettings {
     public String fetchSelectedListNPICountFromTactic() {
         Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("xpath=./following-sibling::span");
         return targetCount.innerText().trim();
+    }
+
+    public String fetchMatchedNPICountFromTargetingPanel() {
+        if(SHOW_MATCHED_NPI_BUTTON.isVisible()) {
+            SHOW_MATCHED_NPI_BUTTON.click();
+            waitUtility.waitForLocatorVisible(MATCHED_NPI_COUNT);
+        }
+        return MATCHED_NPI_COUNT.innerText().trim();
     }
 }
