@@ -1,13 +1,14 @@
-Feature: End to End Workflow of Creative Creation and Assignment To Tactic
+Feature: End to End Workflow of Creative Creation and its assignment To Tactic
   It covers below points -
   1. Create a Creative for below types
-  Display
-  Audio
-  Video
-  Native Display
-  Native Video
-  Search Extension
-  2. Assign the created Creative to a Tactic
+    Display
+    Audio
+    Video
+    Native Display
+    Native Video
+    Search Extension
+  2. Verify Creatives on the Creative Library page
+  3. Assign the created Creative to a Tactic
 
 
   @e2e
@@ -29,7 +30,6 @@ Feature: End to End Workflow of Creative Creation and Assignment To Tactic
     And User creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                           |
       | Search       | Size:300x600, Headline:Test Automation Headline, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ClickThroughURL:pulsepoint.com, IAB:Profane |
-    # Native Display
     And User creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                                  |
       | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |

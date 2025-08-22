@@ -26,9 +26,10 @@ public class ExplorerWorkspace {
     private final Locator FILTER_CLOSE_BUTTON;
     private final Locator APPLIED_FILTER;
     private final Locator APPLIED_FILTER_OPTION;
-    private final Locator SAVE_EXPLORER_WORKSPACE;
+    private final Locator SAVE_WORKSPACE;
     private final Locator EXPLORER_WORKSPACE_SUCCESS;
     private final FrameLocator WORKSPACE_FRAME;
+    private final Locator SAVE_WORKSPACE_NAME;
     private final Locator TO_YEAR;
     private final Locator FROM_YEAR;
     private final Locator REACHABLE_AUDIENCE;
@@ -55,17 +56,18 @@ public class ExplorerWorkspace {
         this.WORKSPACE_NAME = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX).nth(1);
         this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
         this.DASHBOARD_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content"));
-        this.DASHBOARD_ELEMENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content")).locator("//p[contains(@class,'TextBase-sc')]");
+        this.DASHBOARD_ELEMENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content")).locator("(//p[contains(@class,'TextBase-sc')])[1]");
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
-        this.ADD_FILTER = WORKSPACE_FRAME.locator("//button[contains(@class,'StyledAddFilterButton') or contains(@class,'style__AddFiltersButton')]");
+        this.ADD_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Add Filters"));
         this.SEARCH_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
         this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
-        this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitle-sc-')]");
+        this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitleContainer-sc-')]");
         this.APPLIED_FILTER_OPTION = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterExpression-sc')]");
-        this.SAVE_EXPLORER_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonBase__ButtonOuter')]/div[contains(text(),'Save')]");
+        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledContainer')]//div[contains(text(),'Save')]");
         this.EXPLORER_WORKSPACE_SUCCESS = WORKSPACE_FRAME.locator("[id=\"\\32 \"] div").filter(new Locator.FilterOptions().setHasText("Workspace managementWorkspace")).nth(2);
+        this.SAVE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__DashboardContainer')]//div[contains(text(),'Save')]");
         this.TAB_PANEL_SEARCH = WORKSPACE_FRAME.locator("//div[@role='tabpanel']//input[@placeholder='Search']");
         this.TO_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-0']");
         this.FROM_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-1']");
@@ -96,12 +98,13 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.fill(advertiser);
         SEARCH_ADVERTISER.press("ArrowDown");
         SEARCH_ADVERTISER.press("Enter");
+        SAVE_WORKSPACE_NAME.click();
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void clickAddFilter() {
+    public void clickAddFilter(){
         ADD_FILTER.click();
     }
 
@@ -157,7 +160,7 @@ public class ExplorerWorkspace {
     }
 
     public List<String> verifyAllSelectedFilters() {
-        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setTimeout(240000).setState(WaitForSelectorState.VISIBLE));
+        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return APPLIED_FILTER.allInnerTexts();
     }
 
@@ -166,9 +169,9 @@ public class ExplorerWorkspace {
     }
 
     public void saveExplorerWorkspace() {
-        DASHBOARD_ELEMENT.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setTimeout(240000).setState(WaitForSelectorState.VISIBLE));
-        SAVE_EXPLORER_WORKSPACE.first().click();
+        DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SAVE_WORKSPACE.first().click();
     }
 
     public String workspaceSuccess() {

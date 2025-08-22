@@ -18,7 +18,7 @@ public class ApiSteps {
     public void i_call_with_parameters(String string, String string2, String string3) {
         HashMap<String, String> map = new HashMap<>();
 //      Add headers & body as per need
-        response = apiActions.getResponse(map);
+        response = apiActions.getRequestWithoutBody(map);
     }
 
     @Then("Verify response have {string} & {string} & {string}")

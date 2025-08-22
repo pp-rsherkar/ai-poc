@@ -51,3 +51,5 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     Examples:
       | ADVERTISER | WORKSPACE_NAME | LIST_TYPE |
       | Abbvie     | Explorer       | Static    |
+      | ADVERTISER | FILTER              | OPTION           | WORKSPACE_NAME | LIST_TYPE |
+      | Abbvie     | NPI Gender, NPI Age | Male, 25 to 35   | Explorer       | Static    |

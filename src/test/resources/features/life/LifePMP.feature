@@ -1,4 +1,8 @@
-Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation and Assignment
+Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creation and Assignment
+  1. Verify Private Deals Tab
+  2. Verify Life Marketplace Deals Tab
+  3. Addition of Private Deals and assigned to a tactic when Only Target Applied Deals toggle is ON
+  4. Addition of Private Deals and assigned to a tactic when Only Target Applied Deals toggle is OFF
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -74,8 +78,7 @@ Feature: Life Regression - Verify Private and Life MarketPlace Deals Creation an
       | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEALPRICE_TYPE | PRICE | BASE_BIDPRICE | MAX_BIDPRICE |
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor          | 230   | 34            | 60           |
 
-
-  @e2e @regression
+  @regression
   Scenario Outline: Add New Private Deals and assigned to a tactic when Only Target Applied Deals toggle is OFF
     When User clicks Tactic Setting tab
     Then User should navigate to respective Tactic Setting tab

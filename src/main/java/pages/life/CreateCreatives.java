@@ -3,7 +3,9 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateCreatives {
-
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<String> creativesList = new ArrayList<>();
     String imageTextLocator = "//span[contains(text(),'%s')]";
     private final Page page;
@@ -19,7 +21,7 @@ public class CreateCreatives {
     private final Locator UNARCHIVED_BUTTON;
     private final Locator ARCHIVED_BUTTON;
     private final Locator PRE_LOADER;
-    private final Locator SELECT_ADVITISER;
+    private final Locator SELECT_ADVERTISER;
     private final Locator DROPDOWN_VALUES;
     private final Locator CLEAR_ALL_BUTTON;
     private final Locator SELECT_CAMPAIGN;
@@ -73,7 +75,7 @@ public class CreateCreatives {
         this.UNARCHIVED_BUTTON = page.locator("//img[@title='unarchive']");
         this.ARCHIVED_BUTTON = page.locator("//img[@title='archive']");
         this.PRE_LOADER = page.locator("//div[@class='preloader']");
-        this.SELECT_ADVITISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
+        this.SELECT_ADVERTISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
         this.DROPDOWN_VALUES = page.locator("//div[@class='menu transition visible']//div[@class='item']/span");
         this.CLEAR_ALL_BUTTON = page.locator("//div[contains(text(),'Clear All')]");
         this.SELECT_CAMPAIGN = page.locator("//app-multi-select[contains(@placeholder,'Select Campaigns')]/div/span/input");
@@ -124,7 +126,7 @@ public class CreateCreatives {
 
 
     public String verifyCreativeLibraryPageTitle() {
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         return CREATIVE_PAGE_TITLE.innerText().trim();
     }
 
@@ -133,41 +135,41 @@ public class CreateCreatives {
         String classAttr = button.getAttribute("class");
         if (classAttr == null || !classAttr.contains("active")) {
             button.click();
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden();
         }
     }
 
     public void clickClearAllButton() {
         CLEAR_ALL_BUTTON.scrollIntoViewIfNeeded();
         CLEAR_ALL_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
-    public boolean verifyArchiveUnarchiveBtnsPresent(String buttonType) {
+    public boolean verifyArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
         if(buttonType.contains("Active") && ARCHIVED_BUTTON.first().isVisible()){
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         }
         else if(buttonType.contains("Archived") && UNARCHIVED_BUTTON.first().isVisible()){
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         }
         return flag;
     }
 
-    public boolean clickArchiveUnarchiveBtns() {
+    public boolean clickArchiveUnarchiveButtons() {
         boolean flag = false;
         if(ARCHIVED_BUTTON.first().isVisible()){
             ARCHIVED_BUTTON.first().click();
             if(ARCHIVE_DIALOG.isVisible())
                 ARCHIVE_BUTTON.click();
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         }
         else if(UNARCHIVED_BUTTON.first().isVisible()){
             UNARCHIVED_BUTTON.first().click();
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         }
         return flag;
@@ -178,7 +180,7 @@ public class CreateCreatives {
         boolean flag = false;
         switch (key) {
             case "Advertiser":
-                selectDropdownAndFill(SELECT_ADVITISER, values);
+                selectDropdownAndFill(SELECT_ADVERTISER, values);
                 for (String value : values) {
                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
                 }
@@ -229,7 +231,7 @@ public class CreateCreatives {
             DROPDOWN_VALUES.first().click();
         }
         page.keyboard().press("Escape");
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public boolean verifySortOptions(List<String> sortOptionsList) {
@@ -240,7 +242,7 @@ public class CreateCreatives {
             if (options.length < 2) continue;
             String direction = options[1].equalsIgnoreCase("Asc") ? "up" : "down";
             page.locator(String.format("//span[contains(text(),'%s')]/following-sibling::i[contains(@class,'%s')]", options[0], direction)).click();
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden();
             if ((direction.equals("up") && SORT_BY_UP.isVisible()) ||
                     (direction.equals("down") && SORT_BY_DOWN.isVisible())) {
                 flag = true;
@@ -261,19 +263,19 @@ public class CreateCreatives {
     public void searchCreative(String searchValue){
         SEARCH_BOX.fill(searchValue);
         page.keyboard().press("Enter");
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
 
     public String copyCreative() {
         COPY_ICON.first().click();
-        CREATIVE_HEADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(CREATIVE_HEADER);
         return saveCreative();
     }
 
     public void clickNewCreativeButton() {
         NEW_CREATIVE_BUTTON.click();
-        CREATIVE_HEADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(CREATIVE_HEADER);
     }
 
     public void enterCreativeDetails(String advertiser, String creativeName, String advertiserDSA, String financer) {
@@ -284,7 +286,7 @@ public class CreateCreatives {
         ADVERTISER_DSA.fill(advertiserDSA);
         FINANCER.scrollIntoViewIfNeeded();
         FINANCER.fill(financer);
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public void selectCreativeType(String creativeType) {
@@ -379,7 +381,7 @@ public class CreateCreatives {
     public List<String> fetchCreatives(){
         String creativeName = CREATIVE_NAME_TEXT.innerText().replaceAll("\\b(Creative|created)\\b\\p{Punct}?", "").trim().replaceAll(" +", " ");
         creativesList.add(creativeName);
-        SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return creativesList;
     }
 

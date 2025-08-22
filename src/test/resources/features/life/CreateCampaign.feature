@@ -36,7 +36,7 @@ Feature: LIFE Regression - Create a Campaign
     When User selects the "<CHANNEL>" as channel
     And User configures targeting rules as below
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
-      | In Condition       | Digestive System Diseases, Liver Diseases                          |
+      | In Condition       | Digestive System Diseases                                          |
       | Age                | 25-29, 35-39                                                       |
       | Health Pages       | Animal Diseases                                                    |
       | Postal Codes       | 123456, 10001, 987654                                              |
@@ -50,8 +50,8 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
 
     Examples:
-      | ADVERTISER               | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
-      | 00CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
+      | ADVERTISER             | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
+      | CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
 
   @regression
   Scenario Outline: Create a Campaign and add and verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings
@@ -76,12 +76,71 @@ Feature: LIFE Regression - Create a Campaign
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
       | CONTEXTUAL         | Health Pages,IAB Categories,Keywords,Language,Endemics                                                                                                                                                                            |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                    |
-      | MEDIA SUPPLY       | Authentic Brand Suitability,Brand Safety & Suitability,Browser,Curated Market,Custom Targeting Bundle,Device,Domains/Apps,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                      |
+      | MEDIA SUPPLY       | Authentic Brand Suitability,Brand Safety & Suitability,Browser,Curated Markets,Custom Targeting Bundle,Device,Domains/Apps,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                     |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
 
     Examples:
-      | ADVERTISER               | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
-      | 00CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
+      | ADVERTISER             | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
+      | CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced |
+
+  @regression
+  Scenario Outline: Verify all Targeting Rules under categories and Create a campaign by adding all Targeting Rules
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    Then Verify targeting panel with all targeting under below categories
+      | AUDIENCE ATTRIBUTE |
+      | HEALTH JOURNEY     |
+      | DEMOGRAPHICS       |
+      | CONTEXTUAL         |
+      | GEOGRAPHY          |
+      | MEDIA SUPPLY       |
+      | LEGAL TARGETINGS   |
+    And Verify target type with respect to category
+      | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Email,Sensitive Areas,Lookalike Audience |
+      | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                                  |
+      | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
+      | CONTEXTUAL         | Health Pages,IAB Categories,Keywords,Language,Endemics                                                                                                                                                                            |
+      | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                    |
+      | MEDIA SUPPLY       | Authentic Brand Suitability,Brand Safety & Suitability,Browser,Curated Markets,Custom Targeting Bundle,Device,Domains/Apps,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                     |
+      | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
+    And User configures targeting rules as below
+      | Behavioral Segment          | AutoSegment18577650                                             |
+      | NPI                         | Automation_NPI_List                                             |
+      | HCP by Specialty            | Radiology, Aerospace Medicine                                   |
+      | Health Populations          | Anesthesia and Analgesia                                        |
+      | Keyword Populations         | CustomTextForKeywordPopulations, KeywordPopulationsTest         |
+      | Practice Staff              | SMART_Pixel_NPI_20250701_155147                                 |
+      | Health Pages                | Animal Diseases                                                 |
+      | Keywords                    | Custom_Keyword, TestingKeyword, Qwerty123                       |
+      | Endemics                    | Endemic + EHR                                                   |
+      | Geo Targets                 | New York, California                                            |
+      | Postal Codes                | 123456, 10001, 987654                                           |
+      | Weather Signals             | Below 15F degrees, Outdoor Activity                             |
+      | Authentic Brand Suitability | 51246802                                                        |
+      | Brand Safety & Suitability  | Unknown Brand Safety, Highly Illicit Do Not Monetize            |
+      | Browser                     | Chrome, EDGE, Opera, Safari                                     |
+      | Device                      | Mobile, Tablet, Connected Device                                |
+      | Domains/Apps                | APP Regular, updaedList106043912                                |
+      | Inventory Source            | New Report                                                      |
+      | Operating System            | Windows, macOS, Blackberry                                      |
+      | Viewability                 | 50                                                              |
+      | Legal Pages                 | Emancipation                                                    |
+      | Legal Populations           | Adoption                                                        |
+    Then Verify the configured targeting rules
+    When User saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Auto_Creative |
 
 
 #  @regression

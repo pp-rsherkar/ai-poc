@@ -23,7 +23,7 @@ Feature: LIFE Regression - Create a Creative Library for below creative types an
       | Creative Type        | Image, Video             |
     And Check Activity buttons "Archived" and verify following filters are available and working
       | Advertiser           | Amgen                      |
-      | Associated Campaigns | AutoCampaign123ds130041773 |
+      | Associated Campaigns | AutoCampaign               |
       | Approval Status      | Approved                   |
       | Ad Sizes             | 1024x576                   |
       | CreatedBy            | Anand                      |
