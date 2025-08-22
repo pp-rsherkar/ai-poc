@@ -36,6 +36,7 @@ public class LifeSteps {
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
+    static String newPixelName;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -58,6 +59,8 @@ public class LifeSteps {
     NPIAttributesList npiAttributesList = new NPIAttributesList(DriverFactory.getPage());
     NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     SharedList sharedList = new SharedList(DriverFactory.getPage());
+    Pixels pixels = new Pixels(DriverFactory.getPage());
+    ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
@@ -1625,5 +1628,61 @@ public class LifeSteps {
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalNPIListCount)));
     }
 
+
+    @And("User navigates to Pixels page")
+    public void userNavigatesToPixelsPage() {
+        navigation.clickSubMenu();
+        pixels.clickPixelsMenuItem();
+    }
+
+    @When("User clicks on Add Pixel button")
+    public void userClicksOnAddPixelButton() {
+        pixels.clickAddPixelButton();
+    }
+
+    @Then("Verify the Create New Pixel panel and types of Pixel")
+    public void verifyCreateNewPixelPanelAndTypesOfPixel() {
+        Assert.assertEquals("CREATE NEW PIXEL", pixels.verifyCreateNewPixelLabel().toUpperCase());
+        Assert.assertEquals("RETARGETING PIXEL", pixels.verifyRetargetingPixel().toUpperCase());
+        Assert.assertEquals("SMART PIXEL", pixels.verifySmartPixel().toUpperCase());
+        Assert.assertEquals("CONVERSION PIXEL", pixels.verifyConversionPixel().toUpperCase());
+    }
+
+    @And("User selects the {string} type")
+    public void userSelectsThePixelType(String pixelType) {
+        pixels.selectPixelType(pixelType);
+    }
+
+    @And("User enters the pixel details as {string} {string} {string} {string}")
+    public void userEntersPixelDetails(String pixelName, String advertiser, String conversionPixelScope, String conversionPixelType) {
+        newPixelName = pixelName + '_' + timestamp;
+        conversionPixel.enterPixelName(newPixelName);
+        conversionPixel.selectAdvertiser(advertiser);
+        conversionPixel.selectConversionPixelScope(conversionPixelScope);
+        conversionPixel.selectConversionPixelType(conversionPixelType);
+    }
+
+    @And("User saves the pixel")
+    public void userSavesThePixel() {
+        pixels.savePixel();
+    }
+
+    @Then("Verify the pixel is saved successfully and displayed in the pixel list")
+    public void verifyPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
+        assert pixels.verifySaveSuccess().contains("Success!");
+        pixels.searchSavedPixel(newPixelName);
+        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
+    }
+
+    @When("User selects {string} as rule type and selects the created pixel")
+    public void userSelectsRuleTypeAndSelectsCreatedPixelAndSavesSettings(String ruleType) {
+        tacticSettings.selectRuleType(ruleType, newPixelName);
+    }
+
+    @Then("Verify the selected targeting rule {string}")
+    public void verifyTheSelectedTargetingRules(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+    }
 
 }
