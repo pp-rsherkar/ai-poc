@@ -45,8 +45,7 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
 
 
   @e2e
-  Scenario Outline: Create a Auto Imported NPI List and target in 'NPI' targeting at Tactic level
-    #3
+  Scenario Outline: Create Auto-Imported NPI List using Reload Now button and target in 'NPI' targeting at Tactic level    #3
     And User selects the Auto-Imported List
     And Verify if user navigates to the Auto-Imported List page
     When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
@@ -73,7 +72,7 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" as channel
     And User add and configure NPI targeting rule and verify list is displayed in the targeting rule
-    And Verify the Total NPI and Match NPI count from the list is displayed in the targeting rule and save it
+    And Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule and save it
     #7
     Then Verify that the NPI rule is added to the tactic and retrieve the count of selected lists
     And Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count
