@@ -2,8 +2,11 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class LineItemDetails {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_LINE_ITEM_PAGE;
     private final Locator LINE_ITEM_NAME;
@@ -16,6 +19,7 @@ public class LineItemDetails {
     private final Locator NEW_LINE_ITEM;
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
     private final Locator LINE_ITEM_TYPE_VALUE;
+    private final Locator ADD_FLIGHT_BUTTON;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -30,6 +34,7 @@ public class LineItemDetails {
         this.NEW_LINE_ITEM = page.getByText("New Line Item");
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
+        this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
     }
 
     public String verifyLineItemText() {
@@ -53,6 +58,7 @@ public class LineItemDetails {
     }
 
     public String lineItemSuccess() {
+        waitUtility.waitUntilSpinnerHidden();
         return LINE_ITEM_SUCCESS.innerText();
     }
 
@@ -72,5 +78,8 @@ public class LineItemDetails {
     }
     public void selectNewLineItem() {
         NEW_LINE_ITEM.click();
+    }
+    public void clickAddFlightButton() {
+        ADD_FLIGHT_BUTTON.click();
     }
 }
