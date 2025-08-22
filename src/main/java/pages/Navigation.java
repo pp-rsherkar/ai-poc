@@ -80,7 +80,7 @@ public class Navigation {
 
     public void navigateToLife() {
         LIFE.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void navigateToHCP() {

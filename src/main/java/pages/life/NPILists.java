@@ -109,7 +109,7 @@ public class NPILists {
     }
 
     public List<String> verifyStudioFilterLabel() {
-        STUDIO_FILTER_LABEL.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(STUDIO_FILTER_LABEL.first());
         return STUDIO_FILTER_LABEL.allInnerTexts();
     }
 }
