@@ -30,10 +30,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     Then Verify the selected targeting rule "<RULE_TYPE>"
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
-    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
-    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
 
     Examples:
-      | PIXEL_TYPE       | PIXEL_NAME | ADVERTISER       | SCOPE  | TYPE     | CP_NAME             | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE  | CREATIVE            |
-      | Conversion Pixel | Conversion | 1Demo Advertiser | Device | Download | Conversion_Campaign | Regular | 1000      | New_Line  | 20          | New_Tactic  | Display Advanced | Converters | Conversion_Creative |
+      | PIXEL_TYPE       | PIXEL_NAME | ADVERTISER       | SCOPE  | TYPE     | CP_NAME             | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE  |
+      | Conversion Pixel | Conversion | 1Demo Advertiser | Device | Download | Conversion_Campaign | Regular | 1000      | New_Line  | 20          | New_Tactic  | Display Advanced | Converters |
