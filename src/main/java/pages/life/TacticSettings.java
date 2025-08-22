@@ -4,7 +4,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 
 public class TacticSettings {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -33,7 +36,6 @@ public class TacticSettings {
     private final Locator FETCH_TARGET_RULETYPES;
     private final Locator FETCH_TARGET_RULEOPTIONS;
     private final Locator TARGET_CATEGORY_NAME;
-    private final Locator SPINNER;
     private final Locator PERSON_TAB;
     private final Locator HOUSEHOLD_TAB;
     private final Locator HOUSEHOLD_IP_TAB;
@@ -79,7 +81,6 @@ public class TacticSettings {
         this.FETCH_TARGET_RULETYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULEOPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
         this.HOUSEHOLD_IP_TAB = page.locator("//button[normalize-space(text())='Household IP']");
@@ -157,7 +158,7 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.type(ruleType);
         if(SELECT_RULE_TYPE.isVisible()){
             SELECT_RULE_TYPE.click();
-            SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilSpinnerHidden();
 
             switch (ruleType) {
                 case "Behavioral Segment":

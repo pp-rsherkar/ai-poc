@@ -1,14 +1,9 @@
 package utils;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,9 +37,15 @@ public class ExcelActions {
         return actualHeaders;
     }
 
-
-    public static void uploadFile(Locator fileInput, String fileName) {
-        Path filePath = Paths.get("src/test/resources/uploadfiles/" + fileName).toAbsolutePath();
-        fileInput.setInputFiles(filePath);
+    public static int countCsvRecords(String filePath) throws IOException, CsvValidationException {
+        int rowCount = 0;
+        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
+            reader.readNext();
+            while (reader.readNext() != null) {
+                rowCount++;
+            }
+        }
+        return rowCount;
     }
+
 }

@@ -6,15 +6,17 @@ import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CampaignDashboard {
-    private final Page page;
     CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
-    private final Locator SPINNER;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+
+    private final Page page;
     private final Locator CAMPAIGNPAGE_TEXT;
     private final Locator CAMPAIGN_COMMENTBOX;
     private final Locator LINEITEM_COMMENTBOX;
@@ -26,7 +28,6 @@ public class CampaignDashboard {
     private final Locator TOOLTIP_TEXT;
     private final Locator LINEITEM_TOGGLE_BUTTON;
     private final Locator TACTIC_TOGGLE_BUTTON;
-    private final Locator PRE_LOADER;
     private final Locator BACK_TO_DASHBOARD;
     private final Locator LINEITEM_NAME;
     private final Locator TACTIC_NAME;
@@ -61,12 +62,10 @@ public class CampaignDashboard {
     private final Locator CREATIVE_TOOLTIP;
 
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
-    //boolean campaignFlag, lineItemFlag, tacticFlag, hideDashboardColumnFlag, showDashboardColumnFlag = false;
     boolean flag1, flag2, flag3 = false;
 
     public CampaignDashboard(Page page) {
         this.page = page;
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.CAMPAIGNPAGE_TEXT = page.locator("//span[contains(text(),'Campaigns')]");
         this.CAMPAIGN_COMMENTBOX = page.locator("//div[@class='camp-data']//span[@class='notesIconEmpty' or @class='notesIconProvided']");
         this.LINEITEM_COMMENTBOX = page.locator("//div[contains(@class,'lineitem-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");
@@ -78,7 +77,6 @@ public class CampaignDashboard {
         this.TOOLTIP_TEXT = page.locator("//span[@class='tooltip-text']");
         this.LINEITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.TACTIC_TOGGLE_BUTTON = page.locator("//div[contains(@class,'tactic-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
-        this.PRE_LOADER = page.locator("//div[@class='preloader']");
         this.BACK_TO_DASHBOARD = page.locator("//span[contains(@class,'breadCrumbRoot') and contains(text(),'Campaigns')]");
         this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section ng-star-inserted')]");
         this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
@@ -114,8 +112,8 @@ public class CampaignDashboard {
     }
 
     public String verifyCampaignDashbaord(String text){
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitUntilPreLoaderHidden();
         page.waitForCondition(() -> CAMPAIGNPAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
         return CAMPAIGNPAGE_TEXT.innerText();
     }
@@ -154,9 +152,9 @@ public class CampaignDashboard {
     public String addComments(String comment){
         COMMENT_BOX.fill(comment);
         COMMENTBOX_OKBUTTON.click();
-        COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(COMMENT_SUCCESS_ALERT);
         String successAlertText = COMMENT_SUCCESS_ALERT.innerText();
-        COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT);
         return successAlertText;
     }
 
@@ -175,7 +173,7 @@ public class CampaignDashboard {
         List<String> returnValues = new ArrayList<>();
         for(int i=0; i<COMMENT_ICON.count(); i++){
             COMMENT_ICON.nth(i).hover();
-            TOOLTIP_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+            waitUtility.waitForLocatorVisible(TOOLTIP_TEXT);
             returnValues.add(TOOLTIP_TEXT.innerText());
         }
         return returnValues;
@@ -187,12 +185,12 @@ public class CampaignDashboard {
         page.keyboard().press("Escape");
         lineItemClassBeforeClick = LINEITEM_TOGGLE_BUTTON.getAttribute("class");
         LINEITEM_TOGGLE_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         lineItemClassAfterClick = LINEITEM_TOGGLE_BUTTON.getAttribute("class");
 
         tacticClassBeforeClick = TACTIC_TOGGLE_BUTTON.getAttribute("class");
         TACTIC_TOGGLE_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         tacticClassAfterClick = TACTIC_TOGGLE_BUTTON.getAttribute("class");
     }
 
@@ -202,7 +200,7 @@ public class CampaignDashboard {
 
     public void navigateToCampaignLIAndTactic(String campaignID){
         page.locator(String.format("//span[contains(text(),'%s')]", campaignID)).click();
-        CAMPAIGN_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(CAMPAIGN_PAGETITLE);
         if(CAMPAIGN_PAGETITLE.getAttribute("class").contains("campaign"))
             flag1 = true;
         BACK_TO_DASHBOARD.click();
@@ -216,11 +214,11 @@ public class CampaignDashboard {
         campaignListing.searchCreatedCampaign(campaignID);
         campaignListing.expandCreatedLineItem();
         TACTIC_NAME.click();
-        TACTIC_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(TACTIC_PAGETITLE);
         if(TACTIC_PAGETITLE.getAttribute("class").contains("tactic-name"))
             flag3 = true;
         BACK_TO_DASHBOARD.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public boolean verifyPanelTitleText() {
@@ -271,7 +269,7 @@ public class CampaignDashboard {
             page.locator(valueXpath).click();
         }
         FILTER_OKBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public List<String> verifySelectedFilter() {
@@ -287,7 +285,7 @@ public class CampaignDashboard {
                 .evaluate("element => getComputedStyle(element).backgroundImage")
                 .toString();
         RESET_FILTER_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         return bgImage.substring(bgImage.lastIndexOf("/") + 1, bgImage.length() - 2);
     }
 
@@ -295,7 +293,7 @@ public class CampaignDashboard {
         campaignListing.verifyCampaignRadioBtnChecked();
         campaignListing.verifyFavoriteCheckbox();
         FAVORITE_ONLY_CHECKBOX.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
     public int verifyCampaignMarkedFavorite() {
@@ -312,7 +310,7 @@ public class CampaignDashboard {
         campaignListing.verifyCampaignRadioBtnChecked();
         campaignListing.verifyHideFinishedCheckbox();
         HIDE_FINISHED_CHECKBOX.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
     public boolean verifyHideFinishedCampaignList() {
@@ -329,7 +327,7 @@ public class CampaignDashboard {
         Locator[] filterButtons = { ACTIVE_FLIGHT_BUTTON, TODAY_BUTTON, YESTERDAY_BUTTON };
         for (Locator button : filterButtons) {
             button.click();
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden(120000);
             if (INACTIVE_FLIGHTS.isVisible()) {
                 return false;
             }
@@ -347,17 +345,17 @@ public class CampaignDashboard {
     public boolean clickGroupByOptionsAndFilterDashboardData(){
         SETTING_ICON.click();
         GROUPBYCAMPAIGN_RADIOBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
         if(ADVERTISER_COLUMNNAME.isVisible())
             flag1 = true;
         SETTING_ICON.click();
         GROUPBYADVERTISER_RADIOBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
         if(CAMPAIGN_COLUMNNAME.isVisible())
             flag2 = true;
         SETTING_ICON.click();
         NOGROUP_RADIOBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         if(ADVERTISER_COLUMNNAME.isVisible() && CAMPAIGN_COLUMNNAME.isVisible())
             flag3 = true;
         return flag1 && flag2 && flag3;

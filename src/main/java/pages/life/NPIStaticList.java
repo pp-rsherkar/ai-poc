@@ -4,9 +4,12 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import utils.ExcelActions;
+import factory.DriverFactory;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class NPIStaticList {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator LIST_NAME;
     private final Locator SEARCH_ADVERTISER;
@@ -29,8 +32,6 @@ public class NPIStaticList {
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.NPI_NUMBER = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
         this.AVAILABLE_IN = page.locator(".mat-checkbox-inner-container").first();
-        //     this.AVAILABLE_IN = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
-
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(text(),'List Name is required')]");
@@ -45,7 +46,6 @@ public class NPIStaticList {
     public void enterListName(String npiListName) {
         LIST_NAME.fill(npiListName);
     }
-
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
@@ -78,22 +78,22 @@ public class NPIStaticList {
 
     public void uploadStaticListFile(String fileName) {
         Locator fileInput = page.locator("input[type='file']"); // will remove the hardcoding
-        ExcelActions.uploadFile(fileInput, fileName);
+        CommonUtils.uploadFile(fileInput, fileName);
     }
 
     public void clickBackToNPILists() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(LIST_SUCCESS);
         BACK_TO_NPI_LISTS.click();
         page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void editListName(String newListName) {
-        BACK_TO_NPI_LISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(BACK_TO_NPI_LISTS);
         LIST_NAME.fill(newListName);
     }
 
     public void deleteList() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(LIST_SUCCESS);
         DELETE_LIST_ICON.click();
         DELETE_LIST_BUTTON.click();
     }
