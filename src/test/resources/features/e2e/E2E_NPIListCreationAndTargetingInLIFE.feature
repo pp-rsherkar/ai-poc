@@ -45,7 +45,8 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
 
 
   @e2e
-  Scenario Outline: Create Auto-Imported NPI List using Reload Now button and target in 'NPI' targeting at Tactic level    #3
+  Scenario Outline: Create Auto-Imported NPI List using Reload Now button and target in 'NPI' targeting at Tactic level
+    #3
     And User selects the Auto-Imported List
     And Verify if user navigates to the Auto-Imported List page
     When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
