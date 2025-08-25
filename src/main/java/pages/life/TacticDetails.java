@@ -41,6 +41,9 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
+    private final Locator NEW_TACTIC_BUTTON;
+    private final Locator CUSTOM_FIELD;
+    private final Locator TACTICS;
 
     public TacticDetails(Page page) {
         this.page = page;
@@ -62,6 +65,9 @@ public class TacticDetails {
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
+        this.NEW_TACTIC_BUTTON = page.locator("//span[normalize-space(text())='New Tactic']");
+        this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
+        this.TACTICS = page.locator("//div[contains(@class,'tactic-main-details')]");
     }
 
     public String verifyTacticDetailsText() {
@@ -73,7 +79,15 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
+        CUSTOM_FIELD.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SAVE_TACTIC_DETAILS.click();
+    }
+    public void clickNewTactic(){
+        NEW_TACTIC_BUTTON.click();
+    }
+
+    public List<String> getAllTactics(){
+        return TACTICS.allInnerTexts();
     }
 
     public String tacticDetailsSuccess() {

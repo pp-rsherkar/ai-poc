@@ -606,6 +606,19 @@ public class LifeSteps {
         }
     }
 
+    @Then("User creates new tactics and verifies it")
+    public void user_creates_new_tactics_and_verifies_it (DataTable dataTable)  {
+        List<String> tacticNames = dataTable.asList(String.class);
+        for( String tacticName : tacticNames) {
+            tacticDetails.enterTacticName(tacticName);
+            tacticDetails.saveTacticDetails();
+            tacticDetails.clickNewTactic();
+        }
+        List<String> savedTactics =   tacticDetails.getAllTactics();
+        // Using a HashSet to compare the lists regardless of their order of entries.
+        Assert.assertEquals(new HashSet<>(tacticNames), new HashSet<>(savedTactics));
+    }
+
     @Then("Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(String colour) {
         List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
