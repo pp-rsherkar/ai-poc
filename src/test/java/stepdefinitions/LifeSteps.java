@@ -39,6 +39,7 @@ public class LifeSteps {
     static String newPixelName;
     static String lineItemTypeList;
     static int i=0;
+    static String lineItem;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -1686,5 +1687,25 @@ public class LifeSteps {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
     }
+    /*Ampoli Rajyalaxmi
+     * 24/08/2025
+     * Different types line item*/
 
+    @When("User enters the line item details as {string} {string} {string}, enables the line item and saves the changes")
+    public void user_enters_the_line_item_details_as_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget, String lineItemType) {
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
+                .map(String::trim)
+                .toList();
+     for (int i=0; i<lineItemTypeList.size(); i++) {
+             String lineItem = lineItemTypeList.get(i);
+         lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.randomNumberGeneration();
+         tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
+         assert lineItemDetails.lineItemSuccess().contains("Success!");
+         lineItemDetails.cancelTactic();
+        if (i< lineItemTypeList.size() -1) {
+           lineItemDetails.selectNewLineItem();
+         }
+     }
+
+    }
 }

@@ -14,11 +14,9 @@ public class LineItemDetails {
     private final Locator ENABLE_LINE_ITEM;
     private final Locator SAVE_LINE_ITEM;
     private final Locator LINE_ITEM_SUCCESS;
-    private final Locator LINE_ITEM_TYPE;
     private final Locator CANCEL_TACTIC;
     private final Locator NEW_LINE_ITEM;
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
-    private final Locator LINE_ITEM_TYPE_VALUE;
     private final Locator ADD_FLIGHT_BUTTON;
 
     public LineItemDetails(Page page) {
@@ -29,11 +27,9 @@ public class LineItemDetails {
         this.ENABLE_LINE_ITEM = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_LINE_ITEM = page.locator("//span[text()='Save']");
         this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
-        this.LINE_ITEM_TYPE = page.locator("//div[contains(@class,'ui dropdown selection form-control lineItemType')]");
         this.CANCEL_TACTIC =  page.locator("#lidcBody").getByText("Cancel");
-        this.NEW_LINE_ITEM = page.getByText("New Line Item");
+        this.NEW_LINE_ITEM=page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
-        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
         this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
     }
 
@@ -65,14 +61,6 @@ public class LineItemDetails {
 
     public void selectLineItemType(String lineItemType) {
         LINE_ITEM_TYPE_DROPDOWN.click();
-        int count = LINE_ITEM_TYPE_VALUE.count();
-        for(int i=0; i< count; i++) {
-            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
-                LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
-                LINE_ITEM_TYPE_VALUE.nth(i).click();
-                break;
-            }
-        }
     }
     public void cancelTactic() {
         CANCEL_TACTIC.click();
