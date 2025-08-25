@@ -77,8 +77,9 @@ public class TacticDetails {
     }
 
     public String tacticDetailsSuccess() {
+        String successMessage = TACTIC_DETAILS_SUCCESS.first().innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
-        return TACTIC_DETAILS_SUCCESS.first().innerText();
+        return successMessage;
     }
 
     public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {
