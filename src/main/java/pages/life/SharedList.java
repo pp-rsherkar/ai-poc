@@ -136,7 +136,10 @@ public class SharedList {
 
     public String checkErrorOnSingleLineMultipleDomainsInput(List<String> domainNameList) {
         String text = "";
-        LIST_TEXTAREA.fill(String.valueOf(domainNameList));
+        for(String domainName : domainNameList) {
+            LIST_TEXTAREA.type(domainName);
+            page.keyboard().press("Space");
+        }
         SAVE_BUTTON.click();
         if(VALIDATION_ERROR.isVisible())
             text = fetchLocatorText(VALIDATION_ERROR);
@@ -146,7 +149,7 @@ public class SharedList {
 
 
     public boolean verifyUploadSectionIsVisibleBeforeListInput() {
-        return UPLOAD_SECTION.isVisible();
+        return UPLOAD_SECTION.first().isVisible();
     }
 
     public void enterDomainNames(List<Object> domainNameList) {
