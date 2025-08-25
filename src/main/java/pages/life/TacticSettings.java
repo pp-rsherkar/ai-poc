@@ -55,6 +55,10 @@ public class TacticSettings {
     private final Locator GEO_RADIUS_DISTANCE;
     private final Locator GEO_RADIUS_POINT_NAME;
     private final Locator GEO_RADIUS_SAVE;
+    private final Locator TOTAL_NPI_COUNT;
+    private final Locator SELECTED_LIST;
+    private final Locator SHOW_MATCHED_NPI_BUTTON;
+    private final Locator MATCHED_NPI_COUNT;
 
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -100,6 +104,10 @@ public class TacticSettings {
         this.GEO_RADIUS_DISTANCE = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='distance']");
         this.GEO_RADIUS_POINT_NAME = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='name']");
         this.GEO_RADIUS_SAVE = page.locator("(//div[@title='Save' and contains(@class,'saveGeoPtButton')])[1]");
+        this.TOTAL_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']");
+        this.SELECTED_LIST = page.locator("//span[contains(text(),'Selected Only')]");
+        this.SHOW_MATCHED_NPI_BUTTON = page.locator("//span[contains(text(),'show')]");
+        this.MATCHED_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']/span[@class='supportedNPIsNumber']");
     }
 
     public String verifyTacticSettingsText() {
@@ -116,8 +124,33 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
         SELECT_OPTION.click();
-        RULE_TYPE_OK_BUTTON.click();
-        RULE_TYPE_CLOSE.click();
+        clickOk();
+        clickClose();
+    }
+
+    public void selectRuleType(String ruleType, String ruleOption) {
+        SEARCH_RULE_TYPE.fill(ruleType);
+        SEARCH_RULE_TYPE.press("Enter");
+        SELECT_RULE_TYPE.click();
+        SEARCH_RULE_OPTION.fill(ruleOption);
+
+        String pixelXpath;
+        switch (ruleType) {
+            case "Retargeting Pixels":
+                pixelXpath = String.format("//div[@title='%s']/preceding-sibling::div[contains(@class,'iconsWrapper')]//div[contains(@class,'include-default')]", ruleOption);
+                isElementVisible(pixelXpath);
+                break;
+            case "NPI":
+                pixelXpath = String.format("(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'npilist-itemWrapper')]//div[contains(@class, 'include-default')])[1]", ruleOption);
+                isElementVisible(pixelXpath);
+                break;
+            case "Converters":
+                pixelXpath = String.format("//span[contains(normalize-space(),'%s')]/parent::div/preceding-sibling::div[contains(@class,'targetBlockIcons')]//div[@title='Target']", ruleOption);
+                isElementVisible(pixelXpath);
+                break;
+        }
+        clickRuleTypeOkButton();
+        closeRuleTypePanel();
     }
 
     public void saveTacticSettings() {
@@ -442,5 +475,71 @@ public class TacticSettings {
             }
         }
         return Collections.emptyList();
+    }
+
+    /*Roshani Sherkar
+    * 20-08-2025
+    * Open NPI list created in new browser tab */
+    public String fetchTotalNPICountFromNewTab(String listName) {
+        Page originalPage = DriverFactory.getPage();
+        Page newTab = DriverFactory.context.waitForPage(() -> {
+            DriverFactory.getPage()
+                    .locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName))
+                    .click();
+        });
+        newTab.bringToFront();
+        DriverFactory.threadLocalDriver.set(newTab);
+        newTab.waitForLoadState();
+        NPIAttributesList npiAttributesList = new NPIAttributesList(newTab);
+        String npiCount = npiAttributesList.fetchTotalNPIListCount(listName);
+        newTab.close();
+        originalPage.bringToFront();
+        return npiCount;
+    }
+
+    public String fetchNPICountFromTargetingPanel(){
+        return TOTAL_NPI_COUNT.first().innerText().trim();
+    }
+
+    public boolean isListAvailableInTargetingPanel(String npiName) {
+        return page.locator(String.format("//span[@title='%s']", npiName)).isVisible();
+    }
+
+    public int fetchSelectedListCountFromTargetingPanel(){
+        return Integer.parseInt(SELECTED_LIST.innerText().replaceAll("^.*\\((\\d+)\\).*$", "$1").trim());
+    }
+
+    public String verifyIfNPIRuleIsAdded() {
+        return FETCH_TARGET_RULETYPES.innerText().trim();
+    }
+
+    public String fetchSelectedListCountFromTactic() {
+        Locator targetCount = FETCH_TARGET_RULETYPES.locator("xpath=./span[@class='target-item__count']");
+        return targetCount.innerText().trim();
+    }
+
+    public boolean isSelectedListPresentInTactic(String npiName) {
+        return FETCH_TARGET_RULEOPTIONS.isVisible();
+    }
+
+    public String fetchSelectedListNPICountFromTactic() {
+        Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("xpath=./following-sibling::span");
+        return targetCount.innerText().trim();
+    }
+
+    public String fetchMatchedNPICountFromTargetingPanel() {
+        if(SHOW_MATCHED_NPI_BUTTON.isVisible()) {
+            SHOW_MATCHED_NPI_BUTTON.click();
+            waitUtility.waitForLocatorVisible(MATCHED_NPI_COUNT);
+        }
+        return MATCHED_NPI_COUNT.innerText().trim();
+    }
+
+    public String verifyRuleType() {
+        return FETCH_TARGET_RULETYPES.innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
+    }
+
+    public String verifyRuleOption() {
+        return FETCH_TARGET_RULEOPTIONS.innerText();
     }
 }

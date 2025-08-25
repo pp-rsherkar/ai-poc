@@ -58,8 +58,9 @@ public class LineItemDetails {
     }
 
     public String lineItemSuccess() {
+        String successMessage = LINE_ITEM_SUCCESS.innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
-        return LINE_ITEM_SUCCESS.innerText();
+        return successMessage;
     }
 
     public void selectLineItemType(String lineItemType) {

@@ -28,7 +28,6 @@ public class LifeSteps {
     static String tacticNameRandom;
     static String dealNameRandom;
     static String dealIDRandom;
-    static String tacticPMP;
     static String url;
     static String username;
     static String password;
@@ -37,6 +36,7 @@ public class LifeSteps {
     static String templateNameRandom;
     static String dimensionName;
     static String metricName;
+    static String newPixelName;
     static String lineItemTypeList;
     static int i=0;
     List<Object> keyType = new ArrayList<>();
@@ -61,9 +61,12 @@ public class LifeSteps {
     NPIAttributesList npiAttributesList = new NPIAttributesList(DriverFactory.getPage());
     NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     SharedList sharedList = new SharedList(DriverFactory.getPage());
+    Pixels pixels = new Pixels(DriverFactory.getPage());
+    ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
-    int fileCount = 0;
+    int itemCount = 0;
+    int totalNPIListCount = 0;
     APIResponse response;
     boolean flag = false;
 
@@ -130,21 +133,6 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        List<String> lineItemTypeList = List.of("Display", "Video", "Audio", "Native Display", "Native Video", "Search Extension", "DOOH");
-        for (String type : lineItemTypeList) {
-            i += 1;
-            lineItemNameRandom = lineItemName + '_' + UUID.randomUUID().toString().substring(0, 10);
-            lineItemDetails.enterLineItemName(lineItemNameRandom);
-            lineItemDetails.selectLineItemType(type);
-            navigation.clickOnIcon("Add Flight");
-            lineItemDetails.enterLineItemBudget(lineBudget);
-            lineItemDetails.enableLineItem();
-            lineItemDetails.saveLineItem();
-            if (i < 7){
-                lineItemDetails.cancelTactic();
-                lineItemDetails.selectNewLineItem();
-            }
-        }
         lineItemNameRandom = lineItemName + '_' + CommonUtils.randomNumberGeneration();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
@@ -445,7 +433,7 @@ public class LifeSteps {
         List<String> expectedNormalizedRuleOptions = normalizeObjectList(keyValues);
         List<String> actualNormalizedRuleOptions = normalizeObjectList(tacticSettings.fetchRuleOptions());
 
-        Assert.assertEquals("Rule types mismatch", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
+        Assert.assertEquals("Rule types mismatch", expectedUniqueAndSorted, actualUniqueAndSorted);
         for (String expectedOption : expectedNormalizedRuleOptions) {
             boolean matchFound = actualNormalizedRuleOptions.stream()
                     .anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
@@ -1537,8 +1525,8 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUpload(String fileName) {
         sharedList.searchAndOpenCreatedList(metricName);
         int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        fileCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
-        Assert.assertEquals(domainCount, fileCount);
+        itemCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
+        Assert.assertEquals(domainCount, itemCount);
     }
 
     @And("Verify that the user is able to edit an existing list by uploading same file {string} again and verify the changes")
@@ -1578,7 +1566,7 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheUpdatedValueAfterNewFileUpload(String fileName) {
         sharedList.searchAndOpenCreatedList(metricName);
         int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        Assert.assertEquals(domainCount, fileCount + sharedList.fetchDomainCountFromUploadedFilesSection(fileName));
+        Assert.assertEquals(domainCount, itemCount + sharedList.fetchDomainCountFromUploadedFilesSection(fileName));
     }
 
     @And("Verify that user is able to download the uploaded file {string}, {string}")
@@ -1593,6 +1581,110 @@ public class LifeSteps {
     public void verifyThatTheUserIsAbleToDeleteTheUploadedFile(String fileName) {
         sharedList.deleteFile(fileName);
         Assert.assertEquals(fileName, sharedList.fetchRemovalConfirmation());
+    }
+
+    /*Roshani Sherkar
+    * 20-08-2025
+    * Atrribute NPI List creation and targeting it at tactic level*/
+    @And("Navigate to Campaign Dashboard and clicks on Create Campaign")
+    public void navigateToCampaignDashboardAndClicksOnCreateCampaign() {
+        navigation.clickSubMenu();
+        navigation.clickCampaigns();
+        campaigns.createCampaign();
+    }
+
+    @And("User add and configure NPI targeting rule and verify list is displayed in the targeting rule")
+    public void userAddAndConfigureNPITargetingRule() {
+        tacticSettings.selectNPIRule(npiName);
+        Assert.assertTrue("NPI List is not available", tacticSettings.isListAvailableInTargetingPanel(npiName));
+        tacticSettings.clickTarget();
+        itemCount = tacticSettings.fetchSelectedListCountFromTargetingPanel();
+    }
+
+
+    @And("Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule and save it")
+    public void verifyTheTotalNPICountFromTheListIsDisplayedInTheTargetingRule() {
+        String npiCount = tacticSettings.fetchTotalNPICountFromNewTab(npiName);
+        String[] parts = npiCount.split("&");
+        totalNPIListCount = Integer.parseInt(parts[0].split("-")[1]);
+        int matchedNPIListCount = Integer.parseInt(parts[1].split("-")[1]);
+        String npiCountFromTargetingPanel = tacticSettings.fetchNPICountFromTargetingPanel();
+        String matchedNpiCountFromTargetingPanel = tacticSettings.fetchMatchedNPICountFromTargetingPanel();
+        Assert.assertEquals("Total NPI count from the list is not matching with the count in targeting rule", String.valueOf(totalNPIListCount), npiCountFromTargetingPanel);
+        Assert.assertTrue("Matched NPI count from the list is not matching with the count in targeting rule", matchedNpiCountFromTargetingPanel.contains(String.valueOf(matchedNPIListCount)));
+        tacticSettings.clickOk();
+        tacticSettings.clickClose();
+    }
+
+    @Then("Verify that the NPI rule is added to the tactic and retrieve the count of selected lists")
+    public void verifyThatTheNPIRuleIsAddedToTheTacticAndRetrieveTheCountOfSelectedLists() {
+        Assert.assertTrue("Unable to add NPI Rule", tacticSettings.verifyIfNPIRuleIsAdded().contains("NPI"));
+        String text = tacticSettings.fetchSelectedListCountFromTactic();
+        Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(itemCount)));
+    }
+
+    @And("Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count")
+    public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
+        Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
+        String text = tacticSettings.fetchSelectedListNPICountFromTactic();
+        Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalNPIListCount)));
+    }
+
+
+    @And("User navigates to Pixels page")
+    public void userNavigatesToPixelsPage() {
+        navigation.clickSubMenu();
+        pixels.clickPixelsMenuItem();
+    }
+
+    @When("User clicks on Add Pixel button")
+    public void userClicksOnAddPixelButton() {
+        pixels.clickAddPixelButton();
+    }
+
+    @Then("Verify the Create New Pixel panel and types of Pixel")
+    public void verifyCreateNewPixelPanelAndTypesOfPixel() {
+        Assert.assertEquals("CREATE NEW PIXEL", pixels.verifyCreateNewPixelLabel().toUpperCase());
+        Assert.assertEquals("RETARGETING PIXEL", pixels.verifyRetargetingPixel().toUpperCase());
+        Assert.assertEquals("SMART PIXEL", pixels.verifySmartPixel().toUpperCase());
+        Assert.assertEquals("CONVERSION PIXEL", pixels.verifyConversionPixel().toUpperCase());
+    }
+
+    @And("User selects the {string} type")
+    public void userSelectsThePixelType(String pixelType) {
+        pixels.selectPixelType(pixelType);
+    }
+
+    @And("User enters the pixel details as {string} {string} {string} {string}")
+    public void userEntersPixelDetails(String pixelName, String advertiser, String conversionPixelScope, String conversionPixelType) {
+        newPixelName = pixelName + '_' + timestamp;
+        conversionPixel.enterPixelName(newPixelName);
+        conversionPixel.selectAdvertiser(advertiser);
+        conversionPixel.selectConversionPixelScope(conversionPixelScope);
+        conversionPixel.selectConversionPixelType(conversionPixelType);
+    }
+
+    @And("User saves the pixel")
+    public void userSavesThePixel() {
+        pixels.savePixel();
+    }
+
+    @Then("Verify the pixel is saved successfully and displayed in the pixel list")
+    public void verifyPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
+        assert pixels.verifySaveSuccess().contains("Success!");
+        pixels.searchSavedPixel(newPixelName);
+        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
+    }
+
+    @When("User selects {string} as rule type and selects the created pixel")
+    public void userSelectsRuleTypeAndSelectsCreatedPixelAndSavesSettings(String ruleType) {
+        tacticSettings.selectRuleType(ruleType, newPixelName);
+    }
+
+    @Then("Verify the selected targeting rule {string}")
+    public void verifyTheSelectedTargetingRules(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
     }
 
 }

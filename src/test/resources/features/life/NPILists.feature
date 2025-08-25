@@ -49,7 +49,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner | AutoCollection889379612    | AutoAdminNPIFileUpload187526255 |
 
   @regression
-  Scenario Outline: Create Attribute NPI List by uploading file with NPI Attributes
+  Scenario Outline: Create, update, and delete an Attribute NPI List by uploading a "<FILE_NAME>" file with NPI Attributes
     And User selects the Attributes List and uploads the file "<FILE_NAME>"
     Then Verify file "<FILE_NAME>" is uploaded successfully
     And User selects the "<COLUMN_NAME>" column and clicks on Next
@@ -62,8 +62,11 @@ Feature: LIFE Regression - Create NPI List of following types:
     When User deletes the Attribute list
     Then Verify the list is deleted successfully
     Examples:
-      | LIST_NAME | ADVERTISER     | FILE_NAME             | COLUMN_NAME |
-      | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx | NPI         |
+      | LIST_NAME | ADVERTISER     | FILE_NAME                 | COLUMN_NAME |
+      | ATTRIBUTE | 01- Advertiser | NPIAttributeList.xlsx     | NPI         |
+      | ATTRIBUTE | 01- Advertiser | NPI_AttributeListCSV.csv  | NPI         |
+      | ATTRIBUTE | 01- Advertiser | NPI_AttributeListText.txt | NPI         |
+
 
   @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using API
