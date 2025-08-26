@@ -60,6 +60,7 @@ public class LifeSteps {
     NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     SharedList sharedList = new SharedList(DriverFactory.getPage());
     Pixels pixels = new Pixels(DriverFactory.getPage());
+    RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
@@ -1651,6 +1652,13 @@ public class LifeSteps {
     @And("User selects the {string} type")
     public void userSelectsThePixelType(String pixelType) {
         pixels.selectPixelType(pixelType);
+    }
+
+    @And("User enters the pixel details as {string} {string}")
+    public void userEntersPixelDetails(String pixelName, String advertiser) {
+        newPixelName = pixelName + '_' + timestamp;
+        retargetingPixel.enterPixelName(newPixelName);
+        retargetingPixel.selectAdvertiser(advertiser);
     }
 
     @And("User enters the pixel details as {string} {string} {string} {string}")
