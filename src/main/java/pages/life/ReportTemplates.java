@@ -72,7 +72,7 @@ public class ReportTemplates {
         this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Ok']");
         this.TEMPLATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
-        this.CLICK_TEMPLATE_SEARCH = page.locator("div.iconSprite.search.search-icon");
+        this.CLICK_TEMPLATE_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.SELECT_TEMPLATE = page.locator("//input[@placeholder='Select Template']");
         this.SELECT_TACTIC = page.locator("//input[@placeholder='All Tactics']");
         this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
@@ -161,6 +161,7 @@ public class ReportTemplates {
 
     public void searchCreatedReportTemplate(String createdReportTemplate) {
         SEARCH_TEMPLATE.fill(createdReportTemplate);
+        waitUtility.waitForLocatorVisible(CLICK_TEMPLATE_SEARCH, 5000);
         CLICK_TEMPLATE_SEARCH.click(new Locator.ClickOptions().setForce(true));
     }
 

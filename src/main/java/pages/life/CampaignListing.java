@@ -27,7 +27,7 @@ public class CampaignListing {
         this.page = page;
         this.CLICK_SETTINGS = page.locator("//i[@class='icon gearIcon']");
         this.SEARCH_CAMPAIGN = page.locator("//input[@placeholder='Search' and contains(@class, 'gaTableSearch')]");
-        this.CLICK_CAMPAIGN_SEARCH = page.locator("//div[@class='iconSprite search1']");
+        this.CLICK_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.EXPAND_CREATED_LINE_ITEM = page.locator("//div[contains(@class,'campaignExpand')]/div[contains(@class,'collapsed-thin')]");
         this.VERIFY_CREATED_TACTIC = page.locator("//span[contains(@class,'tactic-name')]");
         this.NOTE_ICON = page.locator("//div[contains(@class,'notes-icon-col')]");
