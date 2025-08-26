@@ -617,6 +617,23 @@ public class LifeSteps {
         List<String> savedTactics =   tacticDetails.getAllTactics();
         // Using a HashSet to compare the lists regardless of their order of entries.
         Assert.assertEquals(new HashSet<>(tacticNames), new HashSet<>(savedTactics));
+
+    }
+    @Then("Availability of three tabs for tactics")
+    public void availability_of_three_tabs_for_tactics (DataTable dataTable) {
+        List<String> tacticTabNames = dataTable.asList(String.class);
+        List<String> ActualTabs = tacticDetails.newTacticTabs();
+        Assert.assertEquals(tacticTabNames,ActualTabs);
+    }
+    @And("Verify the status of saved tactic")
+    public void verify_the_status_of_saved_tactic() {
+        String actualStatus = tacticDetails.verifyTacticState();
+        Assert.assertEquals("Incomplete",actualStatus);
+    }
+
+    @Then("User creates new custom field and deletes it")
+    public void userCreatesNewCustomFieldAndDeletesIt() {
+
     }
 
     @Then("Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
