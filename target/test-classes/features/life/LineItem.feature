@@ -1,5 +1,5 @@
 Feature: LIFE Regression - Create Line Items
-
+  @regression1
   Scenario Outline: Creation of different types of Line Items
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -14,4 +14,4 @@ Feature: LIFE Regression - Create Line Items
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME |  LINE_BUDGET | LINE_TYPE                                                                   |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500          | Display, Audio, Video, Native Display, Native Video, DOOH, Search Extension |
 
-  #Scenario Outline:
+  #Scenario Outline: Opening an existing Campaign
