@@ -1,5 +1,4 @@
 Feature: LIFE Regression - Create Line Items
-
   @regression1
   Scenario Outline: Creation of different types of Line Items
     Given This scenario will be executed in the "Demo" environment as a "User"
