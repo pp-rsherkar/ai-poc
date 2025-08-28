@@ -33,11 +33,12 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" as channel
-    And User add and configure NPI targeting rule and verify list is displayed in the targeting rule
-    And Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule and save it
+    And User add and configure "NPI" targeting rule and verify list is displayed in the targeting rule
+    And Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule
+    And User saves the rule configured in the tactic
     #7
-    Then Verify that the NPI rule is added to the tactic and retrieve the count of selected lists
-    And Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count
+    Then Verify that the "NPI" rule is added to the tactic and retrieve the count of selected lists
+    And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     And User saves the targeting
     Examples:
       | LIST_NAME | ADVERTISER     | FILE_NAME                | COLUMN_NAME | CP_NAME               | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
@@ -72,11 +73,12 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     And User selects the "<CHANNEL>" as channel
-    And User add and configure NPI targeting rule and verify list is displayed in the targeting rule
-    And Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule and save it
+    And User add and configure "NPI" targeting rule and verify list is displayed in the targeting rule
+    And Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule
+    And User saves the rule configured in the tactic
     #7
-    Then Verify that the NPI rule is added to the tactic and retrieve the count of selected lists
-    And Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count
+    Then Verify that the "NPI" rule is added to the tactic and retrieve the count of selected lists
+    And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     And User saves the targeting
     Examples:
       | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    | CP_NAME                  | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |

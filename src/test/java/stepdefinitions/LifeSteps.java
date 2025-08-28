@@ -63,11 +63,12 @@ public class LifeSteps {
     NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     SharedList sharedList = new SharedList(DriverFactory.getPage());
     Pixels pixels = new Pixels(DriverFactory.getPage());
+    RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
-    int totalNPIListCount = 0;
+    int totalListCount = 0;
     APIResponse response;
     boolean flag = false;
 
@@ -535,12 +536,12 @@ public class LifeSteps {
         tacticSettings.saveTacticSettings();
     }
 
-    @When("User selects the {string} channel, configure NPI targeting rule")
-    public void user_selects_the_channel_configure_npi_targeting_rule(String channel) {
+    @When("User selects the {string} channel, configure {string} targeting rule")
+    public void user_selects_the_channel_configure_npi_targeting_rule(String channel, String ruleType) {
         tacticSettings.selectChannel(channel);
         navigation.clickOnIcon("Add Targeting Rule");
-        tacticSettings.selectNPIRule(npiName);
-        tacticSettings.clickTarget();
+        tacticSettings.selectTargetingRule(ruleType, npiName);
+        tacticSettings.clickTarget(npiName);
         tacticSettings.clickOk();
         tacticSettings.clickClose();
     }
@@ -1426,8 +1427,8 @@ public class LifeSteps {
     @And("Verify that the counter on the left displays the correct value for each list in the navigation panel")
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueForEachListInTheNavigationPanel() {
         sharedList.searchAndOpenCreatedList(metricName);
-        int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        Assert.assertEquals(domainCount, keyValues.size());
+        totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
+        Assert.assertEquals(totalListCount, keyValues.size());
     }
 
     @And("Verify that the user is able to edit an existing {string} name list {string}")
@@ -1487,6 +1488,7 @@ public class LifeSteps {
     @And("Verify that when enters {string} and upload file {string} option is selected, the text area to direct enter the names disappears")
     public void verifyThatWhenUploadFileOptionIsSelectedTheTextAreaToDirectEnterTheNamesDisappears(String listName, String fileName) {
         metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        npiName = metricName;
         sharedList.enterListName(metricName);
         Assert.assertTrue("Text area is not available", sharedList.verifyTextAreaIsVisibleBeforeFileUpload());
         sharedList.uploadDomainFile(fileName);
@@ -1525,9 +1527,9 @@ public class LifeSteps {
     @And("Verify that the counter on the left displays the correct value after file upload {string}")
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUpload(String fileName) {
         sharedList.searchAndOpenCreatedList(metricName);
-        int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
+        totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
         itemCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
-        Assert.assertEquals(domainCount, itemCount);
+        Assert.assertEquals(totalListCount, itemCount);
     }
 
     @And("Verify that the user is able to edit an existing list by uploading same file {string} again and verify the changes")
@@ -1594,41 +1596,46 @@ public class LifeSteps {
         campaigns.createCampaign();
     }
 
-    @And("User add and configure NPI targeting rule and verify list is displayed in the targeting rule")
-    public void userAddAndConfigureNPITargetingRule() {
-        tacticSettings.selectNPIRule(npiName);
-        Assert.assertTrue("NPI List is not available", tacticSettings.isListAvailableInTargetingPanel(npiName));
-        tacticSettings.clickTarget();
+    @And("User add and configure {string} targeting rule and verify list is displayed in the targeting rule")
+    public void userAddAndConfigureNPITargetingRule(String ruleType) {
+        tacticSettings.selectTargetingRule(ruleType, npiName);
+        Assert.assertTrue("List is not available", tacticSettings.isListAvailableInTargetingPanel(npiName));
+        tacticSettings.clickTarget(npiName);
         itemCount = tacticSettings.fetchSelectedListCountFromTargetingPanel();
     }
 
 
-    @And("Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule and save it")
+    @And("Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule")
     public void verifyTheTotalNPICountFromTheListIsDisplayedInTheTargetingRule() {
         String npiCount = tacticSettings.fetchTotalNPICountFromNewTab(npiName);
         String[] parts = npiCount.split("&");
-        totalNPIListCount = Integer.parseInt(parts[0].split("-")[1]);
+        totalListCount = Integer.parseInt(parts[0].split("-")[1]);
         int matchedNPIListCount = Integer.parseInt(parts[1].split("-")[1]);
         String npiCountFromTargetingPanel = tacticSettings.fetchNPICountFromTargetingPanel();
         String matchedNpiCountFromTargetingPanel = tacticSettings.fetchMatchedNPICountFromTargetingPanel();
-        Assert.assertEquals("Total NPI count from the list is not matching with the count in targeting rule", String.valueOf(totalNPIListCount), npiCountFromTargetingPanel);
+        Assert.assertEquals("Total NPI count from the list is not matching with the count in targeting rule", String.valueOf(totalListCount), npiCountFromTargetingPanel);
         Assert.assertTrue("Matched NPI count from the list is not matching with the count in targeting rule", matchedNpiCountFromTargetingPanel.contains(String.valueOf(matchedNPIListCount)));
+
+    }
+
+    @And("User saves the rule configured in the tactic")
+    public void userSavesTheRuleConfiguredInTheTactic() {
         tacticSettings.clickOk();
         tacticSettings.clickClose();
     }
 
-    @Then("Verify that the NPI rule is added to the tactic and retrieve the count of selected lists")
-    public void verifyThatTheNPIRuleIsAddedToTheTacticAndRetrieveTheCountOfSelectedLists() {
-        Assert.assertTrue("Unable to add NPI Rule", tacticSettings.verifyIfNPIRuleIsAdded().contains("NPI"));
+    @Then("Verify that the {string} rule is added to the tactic and retrieve the count of selected lists")
+    public void verifyThatTheNPIRuleIsAddedToTheTacticAndRetrieveTheCountOfSelectedLists(String ruleType) {
+        Assert.assertTrue("Unable to add Rule", tacticSettings.verifyIfRuleIsAdded().contains(ruleType));
         String text = tacticSettings.fetchSelectedListCountFromTactic();
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(itemCount)));
     }
 
-    @And("Verify that the selected list is displayed in the targeting rule and retrieve the total NPI count")
+    @And("Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items")
     public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
         Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
-        String text = tacticSettings.fetchSelectedListNPICountFromTactic();
-        Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalNPIListCount)));
+        String text = tacticSettings.fetchSelectedListItemCountFromTactic();
+        Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalListCount)));
     }
 
 
@@ -1654,6 +1661,13 @@ public class LifeSteps {
     @And("User selects the {string} type")
     public void userSelectsThePixelType(String pixelType) {
         pixels.selectPixelType(pixelType);
+    }
+
+    @And("User enters the pixel details as {string} {string}")
+    public void userEntersPixelDetails(String pixelName, String advertiser) {
+        newPixelName = pixelName + '_' + timestamp;
+        retargetingPixel.enterPixelName(newPixelName);
+        retargetingPixel.selectAdvertiser(advertiser);
     }
 
     @And("User enters the pixel details as {string} {string} {string} {string}")
@@ -1686,6 +1700,15 @@ public class LifeSteps {
     public void verifyTheSelectedTargetingRules(String ruleType) {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+    }
+    /*Roshani Sherkar
+    * 25-08-2025
+    * E2E Domain List creation and targeting it at tactic level*/
+    @And("User enters {string} in the List Name field")
+    public void userEntersInTheListNameField(String listName) {
+        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        sharedList.enterListName(metricName);
+        npiName = metricName;
     }
     /*Ampoli Rajyalaxmi
      * 24/08/2025
