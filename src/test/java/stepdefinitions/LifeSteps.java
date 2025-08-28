@@ -37,7 +37,7 @@ public class LifeSteps {
     static String dimensionName;
     static String metricName;
     static String newPixelName;
-    static int i=0;
+    static int i = 0;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -294,7 +294,7 @@ public class LifeSteps {
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
-        switch(type.trim()) {
+        switch (type.trim()) {
             case "Smart Pixel":
                 npiSmartList.clickSmartPixel();
                 npiSmartList.clickSmartPixelDropDown();
@@ -974,7 +974,7 @@ public class LifeSteps {
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
-        keyValueMap  = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+        keyValueMap = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
     }
 
     @Then("User searches and verifies the already created targeting template using the search option")
@@ -1117,8 +1117,8 @@ public class LifeSteps {
 
 
     /*Roshani Sherkar
-    * 14-07-2024
-    * Creatives creation*/
+     * 14-07-2024
+     * Creatives creation*/
     @And("User clicks Creative Library options present under Activation tab")
     public void userClicksCreativeLibraryOptionsPresentUnderActivationTab() {
         navigation.clickSubMenu();
@@ -1127,7 +1127,7 @@ public class LifeSteps {
 
     @Then("Verify Creative Library page is displayed")
     public void verifyCreativeLibraryPageIsDisplayed() {
-        Assert.assertEquals("Creatives",createCreatives.verifyCreativeLibraryPageTitle());
+        Assert.assertEquals("Creatives", createCreatives.verifyCreativeLibraryPageTitle());
     }
 
     @And("Check Activity buttons {string} and verify following filters are available and working")
@@ -1135,7 +1135,7 @@ public class LifeSteps {
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(buttonType);
-        Assert.assertTrue("Activity " + buttonType +" button is not clicked", createCreatives.verifyArchiveUnarchiveButtonsPresent(buttonType));
+        Assert.assertTrue("Activity " + buttonType + " button is not clicked", createCreatives.verifyArchiveUnarchiveButtonsPresent(buttonType));
         Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveButtons());
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
             flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
@@ -1146,14 +1146,14 @@ public class LifeSteps {
     @And("Verify the following sort options are available and working")
     public void verifyTheFollowingSortOptionsAreAvailableAndWorking(DataTable sortOptions) {
         List<String> sortOptionsList = sortOptions.asList(String.class);
-        Assert.assertTrue("Sort is not working",createCreatives.verifySortOptions(sortOptionsList));
+        Assert.assertTrue("Sort is not working", createCreatives.verifySortOptions(sortOptionsList));
     }
 
     @And("Verify Search Box is available and working")
     public void verifySearchBoxIsAvailableAndWorking(DataTable searchValues) {
         List<String> searchValuesList = searchValues.asList(String.class);
         createCreatives.clickActivityButton("Active");
-        Assert.assertTrue("Search is not working",createCreatives.searchByValues(searchValuesList));
+        Assert.assertTrue("Search is not working", createCreatives.searchByValues(searchValuesList));
     }
 
     @And("Verify Copy option is available and working")
@@ -1163,7 +1163,7 @@ public class LifeSteps {
 
 
     @When("User creates and saves {string} creative using details {string} as Advertiser, {string} as Creative Name, {string}, {string} and below Creative attributes")
-    public void userCreatesAndSavesCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType,String advertiser, String creativeName, String advertiserDSA, String financer, DataTable dataTable) {
+    public void userCreatesAndSavesCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String creativeName, String advertiserDSA, String financer, DataTable dataTable) {
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         nameList.clear();
         for (Map<String, String> row : rows) {
@@ -1181,14 +1181,14 @@ public class LifeSteps {
                     .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
 
             createCreatives.fillAttributes(type, attributeMap);
-            Assert.assertEquals("Success!",createCreatives.saveCreative());
+            Assert.assertEquals("Success!", createCreatives.saveCreative());
             nameList.addAll(createCreatives.fetchCreatives());
         }
     }
 
     @Then("Verify the newly created creative is displayed in the Creative Library page")
     public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPage() {
-        for(String name : nameList) {
+        for (String name : nameList) {
             Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.verifyCreativesInLibrary(name));
         }
     }
@@ -1200,8 +1200,8 @@ public class LifeSteps {
                 .toList();
         for (String creativeName : nameList) {
             for (String lineItem : lineItemTypeList) {
-                if(creativeName.replaceAll("_Creative_\\d+_\\d+", "").equals(lineItem)) {
-                    Assert.assertTrue("Creative is not assigned to Tactic",tacticDetails.createTacticWithLineItemsAndAssignCreative(lineItem, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName));
+                if (creativeName.replaceAll("_Creative_\\d+_\\d+", "").equals(lineItem)) {
+                    Assert.assertTrue("Creative is not assigned to Tactic", tacticDetails.createTacticWithLineItemsAndAssignCreative(lineItem, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName));
                     break;
                 }
             }
@@ -1210,7 +1210,7 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * Auto-Imported List*/
+     * Auto-Imported List*/
     @And("User selects the Auto-Imported List")
     public void userSelectsTheAutoImportedList() {
         npiLists.clickAutoImportedList();
@@ -1224,7 +1224,7 @@ public class LifeSteps {
     @Then("User tries to save the Auto-Imported list without entering any details, an error message should be displayed")
     public void userTriesToSaveTheAutoImportedListWithoutEnteringAnyDetailsAnErrorMessageShouldBeDisplayed() {
         npiAutoImportedList.clickSetupImportButton();
-        Assert.assertEquals("Advertiser is required",npiAutoImportedList.verifyErrorMessage());
+        Assert.assertEquals("Advertiser is required", npiAutoImportedList.verifyErrorMessage());
     }
 
     @When("User enters the Auto-Imported list details as {string} {string}")
@@ -1322,8 +1322,8 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * 07-08-2025
-    * Domain List*/
+     * 07-08-2025
+     * Domain List*/
     @Given("User navigates to the {string} page")
     public void userNavigatesToTheDomainListPage(String pageName) {
         navigation.clickSubMenu();
@@ -1360,9 +1360,9 @@ public class LifeSteps {
 
     @And("Verify that an error message is displayed when no listname {string} or {string} names are specified")
     public void verifyThatAnErrorMessageIsDisplayedWhenNoNamesAreSpecified(String listName, String listType) {
-        metricName = listName +"_" + CommonUtils.timeStampCalculation();
+        metricName = listName + "_" + CommonUtils.timeStampCalculation();
         Assert.assertEquals("List Name is required", sharedList.validateErrorOnEmptyListNameInput(metricName));
-        switch (listType){
+        switch (listType) {
             case "Domains":
                 Assert.assertEquals("Domain name is required", sharedList.validateErrorOnEmptyListInput(metricName));
                 break;
@@ -1398,7 +1398,7 @@ public class LifeSteps {
     @And("Verify that the user is able to create a {string} list by specifying names manually")
     public void verifyThatTheUserIsAbleToCreateAListBySpecifyingNamesManually(String listType) {
         sharedList.saveList();
-        switch (listType){
+        switch (listType) {
             case "Domains":
                 Assert.assertEquals("Domain list created successfully", sharedList.isListCreatedOrDeleted());
                 break;
@@ -1434,7 +1434,7 @@ public class LifeSteps {
         keyValues = new ArrayList<>(CommonUtils.convertStringToList(modifiedName));
         sharedList.editAnExistingList(keyValues);
         sharedList.saveList();
-        switch (listType){
+        switch (listType) {
             case "Domains":
                 Assert.assertEquals("Domains list updated successfully", sharedList.isListCreatedOrDeleted());
                 break;
@@ -1456,7 +1456,7 @@ public class LifeSteps {
     public void verifyThatTheUserIsAbleToDeleteAnExistingNameList(String listType) {
         sharedList.deleteList();
         Assert.assertEquals(metricName, sharedList.fetchRemovalConfirmation());
-        switch (listType){
+        switch (listType) {
             case "Domains":
                 Assert.assertEquals("Domain deleted successfully", sharedList.isListCreatedOrDeleted());
                 break;
@@ -1475,8 +1475,8 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * 11/08/2025
-    * Domain List Creation by File Upload*/
+     * 11/08/2025
+     * Domain List Creation by File Upload*/
     @And("Verify that an error message is displayed when no list names is specified and user tries to upload a file {string}")
     public void verifyThatAnErrorMessageIsDisplayedWhenNoListNamesIsSpecifiedAndUserTriesToUploadAFile(String fileName) {
         sharedList.uploadDomainFile(fileName);
@@ -1504,7 +1504,7 @@ public class LifeSteps {
     @And("Verify that the user is able to create a {string} list through file upload")
     public void verifyThatTheUserIsAbleToCreateAListThroughFileUpload(String listType) {
         sharedList.saveList();
-        switch (listType){
+        switch (listType) {
             case "Domains":
                 Assert.assertEquals("Domains list created successfully", sharedList.isListCreatedOrDeleted());
                 break;
@@ -1545,7 +1545,7 @@ public class LifeSteps {
         Assert.assertTrue("No Download icon is available", sharedList.isDownloadIconVisible(fileName));
         Assert.assertTrue("No Delete icon is available", sharedList.isDeleteIconVisible(fileName));
         sharedList.saveList();
-        switch (listType){
+        switch (listType) {
             case "Domains":
                 Assert.assertEquals("Domains list updated successfully", sharedList.isListCreatedOrDeleted());
                 break;
@@ -1585,8 +1585,8 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * 20-08-2025
-    * Atrribute NPI List creation and targeting it at tactic level*/
+     * 20-08-2025
+     * Atrribute NPI List creation and targeting it at tactic level*/
     @And("Navigate to Campaign Dashboard and clicks on Create Campaign")
     public void navigateToCampaignDashboardAndClicksOnCreateCampaign() {
         navigation.clickSubMenu();
@@ -1699,9 +1699,10 @@ public class LifeSteps {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
     }
+
     /*Roshani Sherkar
-    * 25-08-2025
-    * E2E Domain List creation and targeting it at tactic level*/
+     * 25-08-2025
+     * E2E Domain List creation and targeting it at tactic level*/
     @And("User enters {string} in the List Name field")
     public void userEntersInTheListNameField(String listName) {
         metricName = listName + "_" + CommonUtils.timeStampCalculation();
@@ -1715,16 +1716,16 @@ public class LifeSteps {
     @When("User enters the line item details as {string} {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_as_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget, String lineItemType) {
         List<String> lineItemTypeList = CommonUtils.convertStringToList(lineItemType);
-     for (int i=0; i<lineItemTypeList.size(); i++) {
-             String lineItem = lineItemTypeList.get(i);
-         lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.randomNumberGeneration();
-         tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
-         assert lineItemDetails.lineItemSuccess().contains("Success!");
-         lineItemDetails.cancelTactic();
-        if (i< lineItemTypeList.size() -1) {
-           lineItemDetails.selectNewLineItem();
-         }
-     }
+        for (int i = 0; i < lineItemTypeList.size(); i++) {
+            String lineItem = lineItemTypeList.get(i);
+            lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.randomNumberGeneration();
+            tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
+            assert lineItemDetails.lineItemSuccess().contains("Success!");
+            lineItemDetails.cancelTactic();
+            if (i < lineItemTypeList.size() - 1) {
+                lineItemDetails.selectNewLineItem();
+            }
+        }
 
     }
 }
