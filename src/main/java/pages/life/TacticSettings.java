@@ -7,10 +7,7 @@ import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class TacticSettings {
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
@@ -59,6 +56,9 @@ public class TacticSettings {
     private final Locator SELECTED_LIST;
     private final Locator SHOW_MATCHED_NPI_BUTTON;
     private final Locator MATCHED_NPI_COUNT;
+    private final Locator TARGETING_RULES_PANEL_TITLE;
+    private final Locator KEYWORD_CUSTOM_LIST;
+    private final Locator KEYWORD_SELECTED_LIST;
 
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -108,6 +108,9 @@ public class TacticSettings {
         this.SELECTED_LIST = page.locator("//span[contains(text(),'Selected Only')]");
         this.SHOW_MATCHED_NPI_BUTTON = page.locator("//span[contains(text(),'show')]");
         this.MATCHED_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']/span[@class='supportedNPIsNumber']");
+        this.TARGETING_RULES_PANEL_TITLE = page.locator("//div[text()='HCP Direct Match Targeting' or text()='Targeting Rule']");
+        this.KEYWORD_CUSTOM_LIST = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Custom Lists')]");
+        this.KEYWORD_SELECTED_LIST = page.locator("//span[contains(text(),'Custom Keyword')]/following-sibling::span[contains(text(),'Selected Only')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -422,15 +425,37 @@ public class TacticSettings {
         return ruleOptions;
     }
 
-    public void selectNPIRule(String listname) {
-        NPI_RULE.click();
-        NPI_PANEL_SEARCH.click();
-        NPI_PANEL_SEARCH.fill(listname);
-        NPI_PANEL_SEARCH.press("Enter");
+    public void selectTargetingRule(String ruleType, String listName) {
+        SEARCH_RULE_TYPE.clear();
+        SEARCH_RULE_TYPE.type(ruleType);
+        if(SELECT_RULE_TYPE.isVisible()) {
+            SELECT_RULE_TYPE.click();
+            waitUtility.waitForLocatorVisible(TARGETING_RULES_PANEL_TITLE);
+            Map<String, Locator> ruleOptionMap = new HashMap<>();
+            ruleOptionMap.put("AppBundle", RULE_APP_BUNDLES_LISTS_OPTION);
+            ruleOptionMap.put("Keyword", KEYWORD_CUSTOM_LIST);
+            for (Map.Entry<String, Locator> entry : ruleOptionMap.entrySet()) {
+                if (listName.contains(entry.getKey())) {
+                    entry.getValue().click();
+                    break;
+                }
+            }
+            Locator searchInput = listName.contains("Keyword")
+                    ? SEARCH_RULE_OPTION.nth(1)
+                    : SEARCH_RULE_OPTION;
+            searchInput.fill(listName);
+            page.waitForLoadState();
+            searchInput.press("Enter");
+        }
     }
 
-    public void clickTarget() {
-        TARGET_OPTION.click();
+    public void clickTarget(String listName) {
+        Locator locator = page.locator(String.format(
+                "//div[@title='%s']/preceding-sibling::div/div[@title='Target'] | " +
+                "//span[@title='%s']/ancestor::div/preceding-sibling::div/div[@title='Target'] | " +
+                "//div[text()='%s']/ancestor::div/preceding-sibling::div/div[@title='Target']",
+                listName, listName, listName));
+        locator.click();
     }
 
     public void clickOk() {
@@ -501,15 +526,22 @@ public class TacticSettings {
         return TOTAL_NPI_COUNT.first().innerText().trim();
     }
 
-    public boolean isListAvailableInTargetingPanel(String npiName) {
-        return page.locator(String.format("//span[@title='%s']", npiName)).isVisible();
+    public boolean isListAvailableInTargetingPanel(String listName) {
+        Locator locator = page.locator(String.format(
+                "//span[@title='%s'] | //div[@title='%s'] | //div[contains(@class,'text-cls') and contains(text(),'%s')]",
+                listName, listName, listName
+        ));
+        locator.scrollIntoViewIfNeeded();
+        return locator.isVisible();
     }
 
     public int fetchSelectedListCountFromTargetingPanel(){
-        return Integer.parseInt(SELECTED_LIST.innerText().replaceAll("^.*\\((\\d+)\\).*$", "$1").trim());
+        Locator locator = SELECTED_LIST.count() > 1 ? KEYWORD_SELECTED_LIST : SELECTED_LIST;
+        String text = locator.innerText();
+        return Integer.parseInt(text.replaceAll("^.*\\((\\d+)\\).*$", "$1").trim());
     }
 
-    public String verifyIfNPIRuleIsAdded() {
+    public String verifyIfRuleIsAdded() {
         return FETCH_TARGET_RULETYPES.innerText().trim();
     }
 
@@ -522,7 +554,7 @@ public class TacticSettings {
         return FETCH_TARGET_RULEOPTIONS.isVisible();
     }
 
-    public String fetchSelectedListNPICountFromTactic() {
+    public String fetchSelectedListItemCountFromTactic() {
         Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("xpath=./following-sibling::span");
         return targetCount.innerText().trim();
     }

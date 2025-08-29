@@ -3,8 +3,11 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class TacticCreatives {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_CREATIVES_PAGE;
     private final Locator SEARCH_CREATIVE;
@@ -24,7 +27,7 @@ public class TacticCreatives {
         this.page = page;
         this.VERIFY_TACTIC_CREATIVES_PAGE = page.locator("//div[text()='Creative(s)']");
         this.SEARCH_CREATIVE = page.locator("//input[contains(@class, 'gaTableSearch')]");
-        this.CLICK_SEARCH = page.locator("//div[@class='iconSprite search search-icon']");
+        this.CLICK_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.SELECT_CREATIVE = page.locator("(//sui-checkbox[contains(@class,'checkbox-fullheight ui checkbox ng-untouched ng-pristine ng-valid')])[2]");
         this.ASSIGN_CREATIVE_OK_BUTTON = page.locator("//button[@class='ui primary button okButton' and normalize-space(text())='Ok']");
         this.ENABLE_CREATIVE = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
@@ -45,7 +48,7 @@ public class TacticCreatives {
         ASSIGN_CREATIVE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CREATIVE.fill(creative);
         CLICK_SEARCH.click();
-        page.waitForTimeout(1000);
+        waitUtility.waitForLocatorVisible(SELECT_CREATIVE, 5000);
         SELECT_CREATIVE.scrollIntoViewIfNeeded();
         SELECT_CREATIVE.click();
         ASSIGN_CREATIVE_OK_BUTTON.click();

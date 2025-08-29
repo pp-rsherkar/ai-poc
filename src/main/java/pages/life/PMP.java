@@ -101,7 +101,7 @@ public class PMP {
         this.ADDDEAL_BUTTON = page.locator("//span[@class='add-action-new-deal']");
         this.DEALPRICE_TYPE = page.locator("//button[@name='DealPriceType']");
         this.MORE_OPTION = page.locator("//label[contains(normalize-space(), 'Curated Markets and Deals')]/ancestor::div[contains(@class, 'target-item')]//div[contains(@class, 'rule-options-icon')]");
-        this.CLEARING_CPM_COLNAME = page.locator("//div[text()='CLEARING PRICE']");
+        this.CLEARING_CPM_COLNAME = page.locator("//div[translate(normalize-space(text()), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'CLEARING PRICE']");
         this.BASE_BIDPRICE = page.locator("//input[contains(@placeholder,'Base Bid Price')]");
         this.MAX_BIDPRICE = page.locator("//input[contains(@placeholder,'Max Bid Price')]");
         this.SERVE_EVERYWHERE_DAILOG = page.locator("//div[contains(text(),'Serve Everywhere')]");

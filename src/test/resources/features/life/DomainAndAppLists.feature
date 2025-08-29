@@ -24,8 +24,8 @@ Feature: LIFE Regression - Validate the ability to create and delete Domain and 
     And Verify that the user is able to delete an existing "Domains" name list
     And Verify that PulsePoint provided domain list "Automation_DomainList" is denoted with a purple P icon
     Examples:
-      | SUB_TABS                   | LIST_NAME | DOMAIN_NAMES                     | EDITED_DOMAIN_NAMES              |
-      | Both, Domains, App Bundles | Domain    | domaintest.com, domaintest.co.in | puslepoint.com, pulsepoint.co.in |
+      | SUB_TABS                   | LIST_NAME | DOMAIN_NAMES                      | EDITED_DOMAIN_NAMES           |
+      | Both, Domains, App Bundles | Domain    | brooklyn.com, docs.pulsepoint.com | manhattan.com, pulsepoint.com |
 
   @regression
   Scenario Outline: Manage a Domain List by uploading domain names from a file (Create, Edit, and Delete)
