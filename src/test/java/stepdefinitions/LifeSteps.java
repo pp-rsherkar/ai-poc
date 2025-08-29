@@ -620,8 +620,26 @@ public class LifeSteps {
         Assert.assertEquals(new HashSet<>(tacticNames), new HashSet<>(savedTactics));
 
     }
-    @Then("Availability of three tabs for tactics")
-    public void availability_of_three_tabs_for_tactics (DataTable dataTable) {
+
+
+    @Then("User creates new custom field and verifies the same")
+    public void user_creates_new_custom_field_and_verifies_the_same(DataTable dataTable) {
+        List<String> customNames = dataTable.asList(String.class);
+        String customFieldName = customNames.get(0)+"_"+CommonUtils.randomNumberGeneration();
+        tacticDetails.clickDetailsTab();
+        tacticDetails.addCustomField(customFieldName);
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0]; // To remove unwanted space and text
+        Assert.assertEquals(customFieldName,actualName);
+    }
+
+    @Then("User deletes the custom field")
+    public void user_deletes_the_custom_field() {
+        tacticDetails.deleteCustomField();
+    }
+
+    @Then("User verifies the availability of three tabs for tactics")
+    public void user_verifies_availability_of_three_tabs_for_tactics(DataTable dataTable) {
         List<String> tacticTabNames = dataTable.asList(String.class);
         List<String> ActualTabs = tacticDetails.newTacticTabs();
         Assert.assertEquals(tacticTabNames,ActualTabs);
@@ -632,10 +650,6 @@ public class LifeSteps {
         Assert.assertEquals("Incomplete",actualStatus);
     }
 
-    @Then("User creates new custom field and deletes it")
-    public void userCreatesNewCustomFieldAndDeletesIt() {
-
-    }
 
     @Then("Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(String colour) {
