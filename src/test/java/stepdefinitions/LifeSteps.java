@@ -917,7 +917,7 @@ public class LifeSteps {
 
     @Then("Deals should get assigned to the Tactic")
     public void dealsShouldGetAssignedToTheTactic() {
-        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved());
+        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved().trim());
     }
 
 
@@ -1631,7 +1631,7 @@ public class LifeSteps {
     @And("Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items")
     public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
         Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
-        String text = tacticSettings.fetchSelectedListItemCountFromTactic();
+        String text = tacticSettings.fetchSelectedListItemCountFromTactic(npiName);
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalListCount)));
     }
 

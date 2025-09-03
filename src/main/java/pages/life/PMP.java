@@ -3,7 +3,6 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -58,7 +57,6 @@ public class PMP {
     private final Locator ALL_LIFEMARKETPLACE;
     private final Locator ALL_PREMIUMPUBS;
     private final Locator NO_DEAL_TEXT;
-    private final Locator SPINNER;
 
     boolean flag1, flag2 = false;
 
@@ -101,7 +99,7 @@ public class PMP {
         this.ADDDEAL_BUTTON = page.locator("//span[@class='add-action-new-deal']");
         this.DEALPRICE_TYPE = page.locator("//button[@name='DealPriceType']");
         this.MORE_OPTION = page.locator("//label[contains(normalize-space(), 'Curated Markets and Deals')]/ancestor::div[contains(@class, 'target-item')]//div[contains(@class, 'rule-options-icon')]");
-        this.CLEARING_CPM_COLNAME = page.locator("//div[translate(normalize-space(text()), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'CLEARING PRICE']");
+        this.CLEARING_CPM_COLNAME = page.locator("//div[translate(normalize-space(text()), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'FLOOR PRICE']");
         this.BASE_BIDPRICE = page.locator("//input[contains(@placeholder,'Base Bid Price')]");
         this.MAX_BIDPRICE = page.locator("//input[contains(@placeholder,'Max Bid Price')]");
         this.SERVE_EVERYWHERE_DAILOG = page.locator("//div[contains(text(),'Serve Everywhere')]");
@@ -109,7 +107,6 @@ public class PMP {
         this.ALL_LIFEMARKETPLACE = page.locator("//div[contains(@class,'allPremiumPubs')]");
         this.ALL_PREMIUMPUBS = page.locator("//div[contains(@class,'premiumPub')]");
         this.NO_DEAL_TEXT = page.locator("//div[contains(@class,'noDealsTxt')]");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
     }
 
     public void navigateToTacticSettingTab() {
