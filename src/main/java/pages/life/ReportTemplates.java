@@ -5,7 +5,9 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.ExcelActions;
+import utils.WaitUtility;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -15,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ReportTemplates {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator REPORT_TEMPLATE_LINK;
     private final Locator VERIFY_TEMPLATES_TAB;
@@ -69,7 +72,7 @@ public class ReportTemplates {
         this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Ok']");
         this.TEMPLATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
-        this.CLICK_TEMPLATE_SEARCH = page.locator("div.iconSprite.search.search-icon");
+        this.CLICK_TEMPLATE_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.SELECT_TEMPLATE = page.locator("//input[@placeholder='Select Template']");
         this.SELECT_TACTIC = page.locator("//input[@placeholder='All Tactics']");
         this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
@@ -157,19 +160,18 @@ public class ReportTemplates {
     }
 
     public void searchCreatedReportTemplate(String createdReportTemplate) {
-        //page.waitForSelector("div.pagination-wrapper.ng-star-inserted", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_TEMPLATE.fill(createdReportTemplate);
+        waitUtility.waitForLocatorVisible(CLICK_TEMPLATE_SEARCH, 5000);
         CLICK_TEMPLATE_SEARCH.click(new Locator.ClickOptions().setForce(true));
     }
 
     public String verifyCreatedReportTemplate(String createdReportTemplate) {
         String templateNameXpath = String.format("//div[contains(text(),'%s')]", createdReportTemplate);
-        page.waitForSelector(templateNameXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForElementVisible(templateNameXpath);
         return page.locator(templateNameXpath).innerText();
     }
 
     public int searchResultRowCount() {
-        //String searchResultXpath = "//tbody[@popuptrigger='manual']//tr[contains(@class,'fixedrow')]";
         return page.locator("//tbody[@popuptrigger='manual']//tr[contains(@class,'fixedrow')]").count();
     }
 
@@ -177,8 +179,8 @@ public class ReportTemplates {
         SELECT_TEMPLATE.fill(reportTemplateName);
         Locator optionLocator = page.getByTitle(reportTemplateName).first();
         while(!optionLocator.isVisible()) {
-        SELECT_TEMPLATE.fill(reportTemplateName);
-        page.waitForTimeout(2000);
+            SELECT_TEMPLATE.fill(reportTemplateName);
+            page.waitForTimeout(2000);
         }
         optionLocator.click();
         SELECT_TACTIC.fill(tactic);
@@ -188,12 +190,10 @@ public class ReportTemplates {
     }
 
     public String verifyAutopopulatedCampaign(String createdCampaign) {
-        //String campaignNameXpath = String.format("//a[contains(normalize-space(), '%s')]", createdCampaign);
         return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdCampaign)).innerText();
     }
 
     public String verifyAutopopulatedLineitem(String createdLineitem) {
-        //String lineitemNameXpath = String.format("//a[contains(normalize-space(), '%s')]", createdLineitem);
         return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdLineitem)).innerText();
     }
 
@@ -202,16 +202,16 @@ public class ReportTemplates {
     }
 
     public String downloadGeneratedReport(String templateNameRandom) throws IOException {
-        page.waitForSelector("div.ui.dropdown.selection.sort-option-dropdown", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(60000));
+        waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
         SEARCH_REPORT.fill(templateNameRandom);
         SEARCH_BUTTON.click();
-        page.waitForSelector(String.format("//div[contains(text(), '%s')]", templateNameRandom), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom));
         while (REPORT_PROGRESS_ICON.isVisible()) {
             SEARCH_BUTTON.click();
             page.waitForTimeout(5000); // wait for 1 second
         }
-        REPORT_PROGRESS_ICON.waitFor(
-                new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));        REPORT_DOWNLOAD_OPTION.click();
+        waitUtility.waitForLocatorDetached(REPORT_PROGRESS_ICON);
+        REPORT_DOWNLOAD_OPTION.click();
         Download download = page.waitForDownload(() -> DOWNLOAD_REPORT.click());
         reportName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String downloadPath = Paths.get(System.getProperty("user.home"), "Downloads").toString();
@@ -221,11 +221,10 @@ public class ReportTemplates {
     }
 
     public boolean verifyColumnsOfReport(String templateNameRandom, String filePath) throws Exception {
-        page.waitForSelector("div.pagination-wrapper.ng-star-inserted", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForElementVisible("div.pagination-wrapper.ng-star-inserted");
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click(new Locator.ClickOptions().setForce(true));
-        page.waitForSelector(String.format("//div[contains(text(), '%s')]", templateNameRandom), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
-
+        waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom));
         List<String> expectedHeaders = Arrays.stream(TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*"))
                 .map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize expected
                 .toList();
@@ -245,8 +244,5 @@ public class ReportTemplates {
 
         return allHeadersPresent;
     }
-
-   /* public Locator getTacticName(String id, int index) {
-        return page.locator(String.format("//*[@id='%s']/div/div[%d]", id, index));
-    }*/
+    
 }

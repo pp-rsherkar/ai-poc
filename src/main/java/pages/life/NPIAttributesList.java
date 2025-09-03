@@ -3,9 +3,12 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import utils.ExcelActions;
+import factory.DriverFactory;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class NPIAttributesList {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator FILE_INPUT;
     private final Locator FILE_UPLOAD_SUCCESS;
@@ -25,6 +28,8 @@ public class NPIAttributesList {
     private final Locator DELETE_LIST_ICON;
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
+    private final Locator TOTAL_NPI_LIST_COUNT;
+    private final Locator MATCH_NPI_COUNT;
 
     public NPIAttributesList(Page page) {
         this.page = page;
@@ -46,10 +51,13 @@ public class NPIAttributesList {
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
+        this.TOTAL_NPI_LIST_COUNT = page.locator("//div[@class='label' and text()='Total NPI']/preceding-sibling::div");
+        this.MATCH_NPI_COUNT = page.locator("//div[@class='label' and text()='Matched NPI']/preceding-sibling::div");
     }
 
     public void uploadAttributesFile(String attributesFile) {
-        ExcelActions.uploadFile(FILE_INPUT, attributesFile);
+        CommonUtils.uploadFile(FILE_INPUT, attributesFile);
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String verifyFileUploadSuccess() {
@@ -57,6 +65,7 @@ public class NPIAttributesList {
     }
 
     public void enterListName(String listName) {
+        LIST_NAME.scrollIntoViewIfNeeded();
         LIST_NAME.fill(listName);
     }
 
@@ -66,10 +75,10 @@ public class NPIAttributesList {
     }
 
     public void selectNPIColumn(String columnName) {
-        FILE_UPLOAD_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(FILE_UPLOAD_SUCCESS);
         NPI_COLUMN_DROPDOWN.click();
         Locator columnOption = page.locator("//div[contains(@class,'ng-option') and normalize-space()='" + columnName + "']");
-        columnOption.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(columnOption);
         columnOption.click();
     }
 
@@ -91,18 +100,20 @@ public class NPIAttributesList {
     }
 
     public String saveListSuccess() {
-        return LIST_SUCCESS.innerText();
+        String text = LIST_SUCCESS.innerText();
+        waitUtility.waitForLocatorHidden(LIST_SUCCESS);
+        return text;
     }
 
     public void clickBackToNPILists() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(LIST_SUCCESS);
         BACK_TO_NPI_LISTS.click();
         page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void editListName(String newListName) {
         page.waitForTimeout(5000);
-        BACK_TO_NPI_LISTS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(BACK_TO_NPI_LISTS);
         LIST_NAME.fill(newListName);
     }
 
@@ -115,7 +126,7 @@ public class NPIAttributesList {
     }
 
     public void deleteList() {
-        LIST_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(LIST_SUCCESS);
         DELETE_LIST_ICON.click();
         DELETE_LIST_BUTTON.click();
     }
@@ -124,4 +135,13 @@ public class NPIAttributesList {
         return DELETE_SUCCESS.innerText();
     }
 
+    public String fetchTotalNPIListCount(String listName) {
+        String npiCount = "";
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(TOTAL_NPI_LIST_COUNT);
+        waitUtility.waitForLocatorVisible(MATCH_NPI_COUNT);
+        if(listName.contains(LIST_NAME.innerText()))
+            npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-" + MATCH_NPI_COUNT.innerText().trim();
+        return npiCount;
+    }
 }

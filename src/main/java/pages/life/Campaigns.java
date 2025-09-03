@@ -2,11 +2,13 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class Campaigns {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+
     private final Page page;
     private final Locator CREATE_CAMPAIGN;
     private final Locator VERIFY_CAMPAIGN_PAGE;
@@ -37,6 +39,7 @@ public class Campaigns {
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String campaignDashboard() {
@@ -74,7 +77,9 @@ public class Campaigns {
     }
 
     public String campaignSuccess() {
-        return CAMPAIGN_SUCCESS.innerText();
+        String successMessage = CAMPAIGN_SUCCESS.innerText().trim();
+        waitUtility.waitUntilSpinnerHidden();
+        return successMessage;
     }
 
     public void navigateToCampaignListing() {

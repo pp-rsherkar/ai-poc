@@ -1,13 +1,13 @@
 Feature: End to End Workflow of NPI Lists.
   It covers below points
-  1. Create a Smart and Static List from LIFE and to be available in LIFE & HCP365.
-  2. Create Campaign in LIFE with smart list targeting.
-  3. Create a Smart action from HCP365 and navigate to Audience tab.
-  4. Verify NPI list created in LIFE is available.
-  5. Add Smart list created in LIFE as the Audience.
-  6. Add action as Visits Brand page.
-  7. Add response to the smart action as Add NPI to the smart list.
-  8. Verify Smart action is saved successfully.
+    1. Create a Smart and Static NPI List from LIFE and make it available in LIFE & HCP365.
+    2. Create Campaign in LIFE with respective list targeting.
+    3. Create a Smart action from HCP365 and navigate to Audience tab.
+    4. Navigate to NPI Lists tab and verify the list created is available.
+    5. Add the list created to the Smart Actions.
+    6. Navigate to Action tab and add action as Visits Brand page.
+    7. In case of Smart List, navigate to Response tab and add response to the smart action.
+    8. And verify Smart action is saved successfully with details Smart List name and days.
 
   @e2e @regression
   Scenario Outline: End to End Workflow of LIFE NPI Smart lists Integration with HCP365
@@ -32,8 +32,8 @@ Feature: End to End Workflow of NPI Lists.
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    When User selects the "<CHANNEL>" channel, configure NPI targeting rule
-    Then Verify smart list is targeted in the tactic successfully
+    When User selects the "<CHANNEL>" channel, configure "NPI" targeting rule
+    Then Verify list is targeted in the tactic successfully
     And User saves the targeting
     # 3
     And User navigates to Smart actions from the main menu
@@ -79,8 +79,8 @@ Feature: End to End Workflow of NPI Lists.
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    When User selects the "<CHANNEL>" channel, configure NPI targeting rule
-    Then Verify smart list is targeted in the tactic successfully
+    When User selects the "<CHANNEL>" channel, configure "NPI" targeting rule
+    Then Verify list is targeted in the tactic successfully
     And User saves the targeting
     # 3
     And User navigates to Smart actions from the main menu

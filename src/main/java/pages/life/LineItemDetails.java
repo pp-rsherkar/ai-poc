@@ -2,8 +2,11 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class LineItemDetails {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_LINE_ITEM_PAGE;
     private final Locator LINE_ITEM_NAME;
@@ -49,14 +52,16 @@ public class LineItemDetails {
     }
 
     public String lineItemSuccess() {
-        return LINE_ITEM_SUCCESS.innerText();
+        String successMessage = LINE_ITEM_SUCCESS.innerText().trim();
+        waitUtility.waitUntilSpinnerHidden();
+        return successMessage;
     }
 
     public void selectLineItemType(String lineItemType) {
         LINE_ITEM_TYPE_DROPDOWN.click();
         int count = LINE_ITEM_TYPE_VALUE.count();
         for(int i=0; i< count; i++) {
-            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
+            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().equals(lineItemType)) {
                 LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
                 LINE_ITEM_TYPE_VALUE.nth(i).click();
                 break;
