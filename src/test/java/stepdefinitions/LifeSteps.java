@@ -37,6 +37,7 @@ public class LifeSteps {
     static String dimensionName;
     static String metricName;
     static String newPixelName;
+    private String customFieldName;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -622,27 +623,30 @@ public class LifeSteps {
     }
 
 
-    @Then("User creates new custom field and verifies the same")
-    public void user_creates_new_custom_field_and_verifies_the_same(DataTable dataTable) {
-        List<String> customNames = dataTable.asList(String.class);
-        String customFieldName = customNames.get(0)+"_"+CommonUtils.randomNumberGeneration();
+    @Then("User creates new custom field {string} and verifies the same")
+    public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
+        String customFieldName = customField+"_"+CommonUtils.randomNumberGeneration();
+        this.customFieldName = customFieldName;
         tacticDetails.clickDetailsTab();
         tacticDetails.addCustomField(customFieldName);
         String raw = tacticDetails.verifyCustomField(customFieldName);
         String actualName = raw.split("\\R")[0]; // To remove unwanted space and text
         Assert.assertEquals(customFieldName,actualName);
+
     }
 
     @Then("User deletes the custom field")
     public void user_deletes_the_custom_field() {
-        tacticDetails.deleteCustomField();
+        tacticDetails.deleteCustomField(customFieldName);
     }
 
-    @Then("User verifies the availability of three tabs for tactics")
-    public void user_verifies_availability_of_three_tabs_for_tactics(DataTable dataTable) {
+    @Then("User verifies the availability of all the tabs for tactics")
+    public void user_verifies_availability_of_all_the_tabs_for_tactics(DataTable dataTable) {
+        tacticDetails.verifyDetailsTab();
+
         List<String> tacticTabNames = dataTable.asList(String.class);
-        List<String> ActualTabs = tacticDetails.newTacticTabs();
-        Assert.assertEquals(tacticTabNames,ActualTabs);
+        List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
+        Assert.assertEquals(tacticTabNames,disabledTabs);
     }
     @And("Verify the status of saved tactic")
     public void verify_the_status_of_saved_tactic() {

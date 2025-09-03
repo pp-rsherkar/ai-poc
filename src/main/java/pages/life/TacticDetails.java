@@ -51,10 +51,11 @@ public class TacticDetails {
     private final Locator TACTIC_DETAILS_TAB;
     private final Locator SAVE_CUSTOM_FIELD_BUTTON;
     private final Locator FIELD_CREATE_SUCCESS;
-    private final Locator FIELD_OPTIONS;
     private final Locator DELETE_BUTTON;
     private final Locator CONFIRM_DELETE;
     private final Locator DELETE_SUCCESS;
+    private final Locator DETAILS_TAB;
+
 
     public TacticDetails(Page page) {
         this.page = page;
@@ -86,10 +87,11 @@ public class TacticDetails {
         this.TACTIC_DETAILS_TAB = page.locator("//a[normalize-space()='Details']");
         this.SAVE_CUSTOM_FIELD_BUTTON = page.locator("//button[normalize-space()='Save']");
         this.FIELD_CREATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
-        this.FIELD_OPTIONS = page.locator("//img[@class='three-dots']");
         this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]");
         this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Detail')]");
+
     }
 
     public String verifyTacticDetailsText() {
@@ -136,11 +138,17 @@ public class TacticDetails {
         return customField.innerText().trim();
 
     }
-    public void deleteCustomField (){
-        FIELD_OPTIONS.last().click();
+    public void deleteCustomField (String customFieldName){
+        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
+        FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
         DELETE_SUCCESS.isVisible();
+    }
+    public void verifyDetailsTab(){
+        DETAILS_TAB.isVisible();
+        System.out.println(DETAILS_TAB.innerText().trim());
+
     }
 
     public String tacticDetailsSuccess() {
