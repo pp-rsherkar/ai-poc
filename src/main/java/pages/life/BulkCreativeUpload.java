@@ -52,6 +52,8 @@ public class BulkCreativeUpload {
     private final Locator IAB_CATEGORY_DROPDOWN;
     private final Locator CLICKTHROUGH_URL;
     private final Locator INLINE_VALIDATION_MESSAGE;
+    private final Locator WIDTH_BOX;
+    private final Locator HEIGHT_BOX;
 
     public BulkCreativeUpload(Page page) {
         this.page = page;
@@ -68,7 +70,8 @@ public class BulkCreativeUpload {
         this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or " +
                 "contains(@aria-label,'Select Advertiser') or " +
                 "contains(@aria-label,'Landing Page Domain is required') or " +
-                "contains(@aria-label, 'Landing Page Domain is not valid.')]");
+                "contains(@aria-label, 'Landing Page Domain is not valid.') or " +
+                "contains(@aria-label,'1 error')]");
         this.SUCCESS_ALERT = page.locator("//div[contains(text(),'BulkUpload created successfully.')]");
         this.BULK_UPLOAD_HEADER = page.locator("//div[contains(text(),'Bulk Upload')]");
         this.CREATIVE_NAME_FROM_TABLE = page.locator("//tbody//span/input");
@@ -98,6 +101,8 @@ public class BulkCreativeUpload {
         this.IAB_CATEGORY_DROPDOWN = page.locator("//sui-multi-select[contains(@placeholder,'Search Categories')]//input");
         this.CLICKTHROUGH_URL = page.locator("//input[@formcontrolname='clickThruUrl']");
         this.INLINE_VALIDATION_MESSAGE = page.locator("//p[contains(@class,'ng-star-inserted')]");
+        this.WIDTH_BOX = page.locator("//input[contains(@placeholder,'width')]");
+        this.HEIGHT_BOX = page.locator("//input[contains(@placeholder, 'height')]");
     }
 
     public void clickBulkUploadButton() {
@@ -360,6 +365,37 @@ public class BulkCreativeUpload {
 
     public void enterClickthroughURL(String validURL) {
         CLICKTHROUGH_URL.fill(validURL);
+    }
+
+    public void isRemoveFileIconAvailable(){
+        if(REMOVE_FILE_ICON.isVisible()) {
+            REMOVE_FILE_ICON.click();
+        }
+    }
+
+    public boolean isWidthHeightVisibleAndBlank() {
+        for (int i = 0; i < WIDTH_BOX.count(); i++) {
+            if (!WIDTH_BOX.nth(i).isVisible() ||
+                    !HEIGHT_BOX.nth(i).isVisible() ||
+                    !WIDTH_BOX.nth(i).inputValue().trim().isEmpty() ||
+                    !HEIGHT_BOX.nth(i).inputValue().trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void enterWidthHeight(String size) {
+        String[] parts = size.split("x");
+        if (parts.length == 2) {
+            String width = parts[0].trim();
+            String height = parts[1].trim();
+            int count = Math.min(WIDTH_BOX.count(), HEIGHT_BOX.count());
+            for (int i = 0; i < count; i++) {
+                WIDTH_BOX.nth(i).fill(width);
+                HEIGHT_BOX.nth(i).fill(height);
+            }
+        }
     }
 }
 

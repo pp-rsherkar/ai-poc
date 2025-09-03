@@ -110,7 +110,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
 
 
   @regression
-  Scenario Outline: Verify Bulk Creative Upload with Pending Approval, Approved, and Denied statuses
+  Scenario Outline: Verify Bulk Creative Upload with Approval status as "<STATUS>"
     Given User clicks Bulk Upload button on Creative Library page
     When User selects the "<CREATIVE_TYPE>" creative type
     When The advertiser "<ADVERTISER>" is selected for "Display" creative the following sections are visible
@@ -118,7 +118,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Upload Creatives                |
       | Third Party Tracking Pixel/Tag  |
     And User enters "<ADVERTISER_DSA>", "<FINANCER>" mandatory fields data for Display creative
-    And User uploads a valid file "<FILE_NAME>" for "Display" creative and previews the creative details
+    And User uploads a valid file "<FILE_NAME>" for "Display" creative
     And User selects the Approval status "<STATUS>"
     And Verify an appropriate error message when user attempts to click the Preview or OK button without selecting a creative file
     Then Verify the header message for "<STATUS>" status
@@ -215,7 +215,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | ADVERTISER     | IMAGE_FILENAME          | CAMPAIGN_NAME | FILE_NAME                     | BLANK_TEMPLATE                     | ADVERTISER_DSA | FINANCER      | LANDING_DOMAIN | IAB     | STATUS   |
       | 01- Advertiser | NativeDisplay_Image.jpg | Creative      | NativeBulkUploadTemplate.xlsx | BlankNativeBulkUploadTemplate.xlsx | Auto_DSA       | Auto_Financer | www.google.com | Profane | Approved |
 
-  @regression @e2e2
+  @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Video Creatives
     Given User clicks Bulk Upload button on Creative Library page
     When User selects the "Video" creative type
@@ -230,7 +230,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the AdChoices Icon should be "TopRight"
     And Verify default value of the Notes Column field should be "None"
     And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
-      | DCM File | DCM_HTML_BulkUpload.xlsx |
+      | DCM File | DCM_VIDEO_BulkUpload.xlsx |
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
       | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  |

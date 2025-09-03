@@ -1723,7 +1723,7 @@ public class LifeSteps {
     }
 
     @And("Verify the availability of below Creative Type options and the Default option is {string}")
-    public void verifyTheAvailabilityOfBelowCreativeTypeOptionsAndTheDefaultOptionIsDisplay(DataTable dataTable, String defaultOption) {
+    public void verifyTheAvailabilityOfBelowCreativeTypeOptionsAndTheDefaultOptionIsDisplay(String defaultOption, DataTable dataTable) {
         List<String> creativeTypeOptions = dataTable.asList(String.class);
         Assert.assertEquals("All creative type options are available.", bulkCreativeUpload.verifyCreativeTypeOptions(creativeTypeOptions));
         Assert.assertTrue("Expected 'Display' to be the default selected creative type.",
@@ -1746,6 +1746,7 @@ public class LifeSteps {
 
     @And("Verify an appropriate error message when user attempts to click the Preview or OK button without selecting a creative file")
     public void userAttemptsToClickThePreviewButtonWithoutSelectingACreativeFile() {
+        bulkCreativeUpload.isRemoveFileIconAvailable();
         bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Atleast one creative should be selected", bulkCreativeUpload.fetchErrorAlert());
     }
@@ -1764,6 +1765,11 @@ public class LifeSteps {
                 break;
         }
 
+    }
+
+    @And("User uploads a valid file {string} for {string} creative")
+    public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
+        bulkCreativeUpload.uploadCreativeTemplate(fileName);
     }
 
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
@@ -1928,6 +1934,8 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
+            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+                bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
         }
