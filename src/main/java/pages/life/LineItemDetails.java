@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
@@ -18,6 +19,7 @@ public class LineItemDetails {
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
     private final Locator ADD_FLIGHT_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    private final Locator PULSEPOINT_LOGO;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -31,6 +33,7 @@ public class LineItemDetails {
         this.NEW_LINE_ITEM = page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
+        this.PULSEPOINT_LOGO = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("logo")).first();
     }
 
     public String verifyLineItemText() {
@@ -73,5 +76,9 @@ public class LineItemDetails {
 
     public void clickAddFlightButton() {
         ADD_FLIGHT_BUTTON.click();
+    }
+
+    public void clickPulsePointLogo() {
+        PULSEPOINT_LOGO.click();
     }
 }
