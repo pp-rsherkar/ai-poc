@@ -2,7 +2,6 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -20,7 +19,6 @@ public class CreateCreatives {
     private final Locator CREATIVE_PAGE_TITLE;
     private final Locator UNARCHIVED_BUTTON;
     private final Locator ARCHIVED_BUTTON;
-    private final Locator PRE_LOADER;
     private final Locator SELECT_ADVERTISER;
     private final Locator DROPDOWN_VALUES;
     private final Locator CLEAR_ALL_BUTTON;
@@ -54,7 +52,6 @@ public class CreateCreatives {
     private final Locator CREATIVE_AD_SIZE_VALUE;
     private final Locator DOMAIN_LANDING;
     private final Locator CLICKTHROUGH_URL;
-    private final Locator NAME_SECTION;
     private final Locator DURATION;
     private final Locator URL;
     private final Locator VAST_XML_TEXTAREA;
@@ -74,7 +71,6 @@ public class CreateCreatives {
         this.CREATIVE_PAGE_TITLE = page.locator("//div[contains(text(),'Creatives')]");
         this.UNARCHIVED_BUTTON = page.locator("//img[@title='unarchive']");
         this.ARCHIVED_BUTTON = page.locator("//img[@title='archive']");
-        this.PRE_LOADER = page.locator("//div[@class='preloader']");
         this.SELECT_ADVERTISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
         this.DROPDOWN_VALUES = page.locator("//div[@class='menu transition visible']//div[@class='item']/span");
         this.CLEAR_ALL_BUTTON = page.locator("//div[contains(text(),'Clear All')]");
@@ -108,7 +104,6 @@ public class CreateCreatives {
         this.CREATIVE_AD_SIZE_VALUE = page.locator("//div[contains(text(),'Select Ad Size')]/following-sibling::div/div");
         this.DOMAIN_LANDING = page.locator("//input[contains(@formcontrolname,'landingDomain')]");
         this.CLICKTHROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
-        this.NAME_SECTION = page.locator("//div[contains(@class,'name-section')]");
         this.DURATION = page.locator("//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");
         this.URL = page.locator("//input[contains(@placeholder,'url')]");
         this.VAST_XML_TEXTAREA = page.locator("//textarea[contains(@formcontrolname,'vastDoc') or contains(@formcontrolname,'vastAudioDoc')]");
@@ -387,6 +382,7 @@ public class CreateCreatives {
 
     public boolean verifyCreativesInLibrary(String name) {
         searchCreative(name);
-        return NAME_SECTION.locator("text = " + name).innerText().equalsIgnoreCase(name);
+        Locator locator = page.locator(String.format("//div[@title='%s']", name));
+        return locator.innerText().equalsIgnoreCase(name);
     }
 }

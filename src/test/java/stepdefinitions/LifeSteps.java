@@ -60,6 +60,7 @@ public class LifeSteps {
     NPIAutoImportedList npiAutoImportedList = new NPIAutoImportedList(DriverFactory.getPage());
     SharedList sharedList = new SharedList(DriverFactory.getPage());
     Pixels pixels = new Pixels(DriverFactory.getPage());
+    RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
     BulkCreativeUpload bulkCreativeUpload = new BulkCreativeUpload(DriverFactory.getPage());
     Constants constants = new Constants();
@@ -917,7 +918,7 @@ public class LifeSteps {
 
     @Then("Deals should get assigned to the Tactic")
     public void dealsShouldGetAssignedToTheTactic() {
-        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved());
+        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved().trim());
     }
 
 
@@ -1631,7 +1632,7 @@ public class LifeSteps {
     @And("Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items")
     public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
         Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
-        String text = tacticSettings.fetchSelectedListItemCountFromTactic();
+        String text = tacticSettings.fetchSelectedListItemCountFromTactic(npiName);
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalListCount)));
     }
 
@@ -1658,6 +1659,13 @@ public class LifeSteps {
     @And("User selects the {string} type")
     public void userSelectsThePixelType(String pixelType) {
         pixels.selectPixelType(pixelType);
+    }
+
+    @And("User enters the pixel details as {string} {string}")
+    public void userEntersPixelDetails(String pixelName, String advertiser) {
+        newPixelName = pixelName + '_' + timestamp;
+        retargetingPixel.enterPixelName(newPixelName);
+        retargetingPixel.selectAdvertiser(advertiser);
     }
 
     @And("User enters the pixel details as {string} {string} {string} {string}")
