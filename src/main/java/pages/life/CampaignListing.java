@@ -36,7 +36,7 @@ public class CampaignListing {
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
         this.HIDE_FINISHED_CHECKBOX = page.locator("//label[contains(text(),'Hide Finished')]/ancestor::sui-checkbox");
         this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
-        this.RESET_FILTER_ICON = page.locator("//button[contains(text(),'Reset Filters')]");
+        this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.PRE_LOADER = page.locator("//div[@class='preloader']");
     }
 
