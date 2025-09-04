@@ -20,7 +20,7 @@ Feature: LIFE Regression - Create Line Items
    # Then Verify line item details are saved and user is navigated to the tactic page
    # When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
    # Then Verify tactic details are saved and user is navigated to the settings tab
-   # When User clicks on pulsepoint 'P' icon
+   # When User clicks on Pulsepoint 'P' icon
     #Then Verify Search Box is available and working on Campaign Dashboard
    # When User searches for the above created Campaign
    # Then Verify matching results are displayed
