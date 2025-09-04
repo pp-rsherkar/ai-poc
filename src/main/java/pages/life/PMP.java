@@ -167,6 +167,7 @@ public class PMP {
         OK_BUTTON.click();
         if(RULE_TYPE_CLOSE.isVisible())
             RULE_TYPE_CLOSE.click();
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TACTICSETTING_TAB);
     }
 
@@ -292,8 +293,6 @@ public class PMP {
         addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, dealPriceType, price);
         selectDealFromListAndAssign(dealName);
         saveDealsAssigned();
-        if(toggleButton.equalsIgnoreCase("ON"))
-            MORE_OPTION.scrollIntoViewIfNeeded();
         return verifyAssignedDealsOnTactic(dealName, toggleButton);
     }
 
