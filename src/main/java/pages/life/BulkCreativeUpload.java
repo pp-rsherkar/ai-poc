@@ -194,7 +194,7 @@ public class BulkCreativeUpload {
         return text;
     }
 
-    public void uploadCreativeTemplate(String fileName) {
+    public void uploadDisplayCreativeTemplate(String fileName) {
         String locator = "//div[contains(@title,'%s')]";
         CommonUtils.uploadFile(page, 1, locator, fileName);
     }
@@ -306,7 +306,6 @@ public class BulkCreativeUpload {
             String locator = "//div[contains(@aria-label,'Unable to parse file')]";
             REMOVE_FILE_ICON.click();
             CommonUtils.uploadFile(page, 0, locator, fileName);
-
         }
     }
 
@@ -335,7 +334,7 @@ public class BulkCreativeUpload {
         return RICH_MEDIA_CHECKBOX.getAttribute("class").contains("checked");
     }
 
-    public void selectFileValue(String fileType, List<String> fileName) {
+    public void selectFileTypeAndUploadFile(String fileType, List<String> fileName) {
         String locatorValue = "//div[@title='%s']";
         FILE_DROPDOWN.click();
         CommonUtils.selectAndClickElement(FILE_DROPDOWN_VALUE, Collections.singletonList(fileType));
@@ -349,7 +348,7 @@ public class BulkCreativeUpload {
 
     public List<String> enterCreativeName(String name) {
         List<String> nameList = new ArrayList<>();
-        for(int i = 0; i< HTML_CREATIVE_NAME.count(); i++){
+        for (int i = 0; i < HTML_CREATIVE_NAME.count(); i++) {
             String newName = name + "_" + CommonUtils.timeStampCalculation() + "_" + CommonUtils.randomFourDigitNumber();
             HTML_CREATIVE_NAME.nth(i).fill(newName);
             nameList.add(newName);
@@ -367,8 +366,8 @@ public class BulkCreativeUpload {
         CLICKTHROUGH_URL.fill(validURL);
     }
 
-    public void isRemoveFileIconAvailable(){
-        if(REMOVE_FILE_ICON.isVisible()) {
+    public void isRemoveFileIconAvailable() {
+        if (REMOVE_FILE_ICON.isVisible()) {
             REMOVE_FILE_ICON.click();
         }
     }
@@ -395,6 +394,37 @@ public class BulkCreativeUpload {
                 WIDTH_BOX.nth(i).fill(width);
                 HEIGHT_BOX.nth(i).fill(height);
             }
+        }
+    }
+
+    public void enterCreativeAndDSADetails(String advertiser, String advertiserDSA, String financer) {
+        selectAdvertiser(advertiser);
+        enterAdvertiserDSA(advertiserDSA);
+        enterFinancer(financer);
+    }
+
+    public void fillAttributes(String type, Map<String, String> attributeMap, String updatedCreativeName) {
+        switch (type) {
+            case "Display", "Native":
+                uploadDisplayCreativeTemplate(attributeMap.get("FileName"));
+                if(LANDING_PAGE_DOMAIN.isVisible())
+                    enterLandingPageDomain(attributeMap.get("LandingDomain"));
+                if(IAB_CATEGORY_DROPDOWN.isVisible())
+                    typeIABCategory(attributeMap.get("IAB"));
+                selectApprovalStatus(attributeMap.get("Status"));
+                clickPreviewButton();
+                updateCreativeName(updatedCreativeName);
+                break;
+            case "HTML", "Video":
+                selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
+                if(CLICKTHROUGH_URL.isVisible())
+                    enterClickthroughURL(attributeMap.get("ClickThroughURL"));
+                enterLandingPageDomain(attributeMap.get("LandingDomain"));
+                selectApprovalStatus(attributeMap.get("Status"));
+                HTML_CREATIVE_NAME.fill(updatedCreativeName);
+                if(type.contains("Video"))
+                    enterWidthHeight(attributeMap.get("Size"));
+                break;
         }
     }
 }

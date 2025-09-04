@@ -1199,11 +1199,16 @@ public class LifeSteps {
                 .map(String::trim)
                 .toList();
         for (String creativeName : nameList) {
-            for (String lineItem : lineItemTypeList) {
-                if (creativeName.replaceAll("_Creative_\\d+_\\d+", "").equals(lineItem)) {
-                    Assert.assertTrue("Creative is not assigned to Tactic", tacticDetails.createTacticWithLineItemsAndAssignCreative(lineItem, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName));
-                    break;
-                }
+            String creativeType = creativeName.replaceAll("_Creative_\\d+_\\d+", "").trim();
+            String matchedLineItemType;
+            switch (creativeType) {
+                case "HTML" -> matchedLineItemType = "Display";
+                case "Native" -> matchedLineItemType = "Native Display";
+                default -> matchedLineItemType = creativeType;
+            }
+            if (lineItemTypeList.contains(matchedLineItemType)) {
+                boolean result = tacticDetails.createTacticWithLineItemsAndAssignCreative(matchedLineItemType, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName);
+                Assert.assertTrue("Creative is not assigned to Tactic", result);
             }
         }
 
@@ -1769,12 +1774,12 @@ public class LifeSteps {
 
     @And("User uploads a valid file {string} for {string} creative")
     public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
-        bulkCreativeUpload.uploadCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
     }
 
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
-        bulkCreativeUpload.uploadCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
         bulkCreativeUpload.clickPreviewButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
         bulkCreativeUpload.updateCreativeName(metricName);
@@ -1833,7 +1838,7 @@ public class LifeSteps {
 
     @And("User is able to browse and select a template {string} from the system")
     public void userIsAbleToBrowseAndSelectATemplateFromTheSystem(String fileName) {
-        bulkCreativeUpload.uploadCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
     }
 
     @And("Verify default value of the Approval Status field is {string}")
@@ -1930,7 +1935,7 @@ public class LifeSteps {
             bulkCreativeUpload.selectAdvertiser(advertiser);
             bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
             bulkCreativeUpload.enterFinancer(financer);
-            bulkCreativeUpload.selectFileValue(entry.getKey(), entry.getValue());
+            bulkCreativeUpload.selectFileTypeAndUploadFile(entry.getKey(), entry.getValue());
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
@@ -1959,5 +1964,26 @@ public class LifeSteps {
     public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
         bulkCreativeUpload.enterClickthroughURL(validURL);
         Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @When("User creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
+    public void userCreatesAndSavesBulkUploadCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String advertiserDSA, String financer, DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        for (Map<String, String> row : rows) {
+            String type = row.get("CreativeType").trim();
+            String attributes = row.get("CreativeAttributes").trim();
+            String creativeName = creativeType + "_Creative_" + CommonUtils.timeStampCalculation();
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            bulkCreativeUpload.clickBulkUploadButton();
+            bulkCreativeUpload.selectAndClickCreativeType(creativeType);
+            bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
+            bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
+            bulkCreativeUpload.clickOKButton();
+            Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+            nameList.add(creativeName);
+        }
     }
 }
