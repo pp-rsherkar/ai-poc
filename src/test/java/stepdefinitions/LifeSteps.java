@@ -239,6 +239,20 @@ public class LifeSteps {
         npiLists.clickSmartList();
     }
 
+
+    @Then("User verifies Smart List options present to create NPI list")
+    public void User_verifies_Smart_List_options_present_to_create_NPI_list() {
+        Assert.assertEquals("Smart Pixel\n" +
+                "NPI List\n" +
+                "Specialty\n" +
+                "Profession\n" +
+                "Prescribed Drug\n" +
+                "Prescription Behavior Change\n" +
+                "Diagnosis\n" +
+                "Medical Procedure\n" +
+                "Expand based on Practice and Hospital affiliation", NPISmartList.verifyOptionNPISmartList());
+    }
+
     @Then("Save and Verify the list gets saved successfully")
     public void verify_smart_list_gets_saved_successfully() {
         npiStaticList.saveList();
@@ -1116,8 +1130,8 @@ public class LifeSteps {
 
 
     /*Roshani Sherkar
-    * 14-07-2024
-    * Creatives creation*/
+     * 14-07-2024
+     * Creatives creation*/
     @And("User clicks Creative Library options present under Activation tab")
     public void userClicksCreativeLibraryOptionsPresentUnderActivationTab() {
         navigation.clickSubMenu();
@@ -1209,7 +1223,7 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * Auto-Imported List*/
+     * Auto-Imported List*/
     @And("User selects the Auto-Imported List")
     public void userSelectsTheAutoImportedList() {
         npiLists.clickAutoImportedList();
@@ -1321,8 +1335,8 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * 07-08-2025
-    * Domain List*/
+     * 07-08-2025
+     * Domain List*/
     @Given("User navigates to the {string} page")
     public void userNavigatesToTheDomainListPage(String pageName) {
         navigation.clickSubMenu();
@@ -1474,8 +1488,8 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * 11/08/2025
-    * Domain List Creation by File Upload*/
+     * 11/08/2025
+     * Domain List Creation by File Upload*/
     @And("Verify that an error message is displayed when no list names is specified and user tries to upload a file {string}")
     public void verifyThatAnErrorMessageIsDisplayedWhenNoListNamesIsSpecifiedAndUserTriesToUploadAFile(String fileName) {
         sharedList.uploadDomainFile(fileName);
@@ -1584,8 +1598,8 @@ public class LifeSteps {
     }
 
     /*Roshani Sherkar
-    * 20-08-2025
-    * Atrribute NPI List creation and targeting it at tactic level*/
+     * 20-08-2025
+     * Atrribute NPI List creation and targeting it at tactic level*/
     @And("Navigate to Campaign Dashboard and clicks on Create Campaign")
     public void navigateToCampaignDashboardAndClicksOnCreateCampaign() {
         navigation.clickSubMenu();
@@ -1699,12 +1713,245 @@ public class LifeSteps {
         Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
     }
     /*Roshani Sherkar
-    * 25-08-2025
-    * E2E Domain List creation and targeting it at tactic level*/
+     * 25-08-2025
+     * E2E Domain List creation and targeting it at tactic level*/
     @And("User enters {string} in the List Name field")
     public void userEntersInTheListNameField(String listName) {
         metricName = listName + "_" + CommonUtils.timeStampCalculation();
         sharedList.enterListName(metricName);
         npiName = metricName;
+
+
     }
+
+    @And("User enters the Smart NPI list details as {string} {string} for Smart Pixel with {string} {string} {string} {string} {string} {string} {string}{string}{string}")
+    public void userEntersTheSmartNPIListDetailsAsForSmartPixelWith(String npiListName, String advertiser, String smartPixelDropdownValue, String recency, String engagement, String days, String pages, String visitedUrl, String ignoredUrl,String keyword,String keywordValue) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickSmartPixel();
+        npiSmartList.clickSmartPixelDropDown();
+        npiSmartList.clickSmartPixelDropDownValue(smartPixelDropdownValue);
+
+        switch (engagement) {
+            case "Engaged on Site":
+                switch (recency){
+                    case "All Observed NPIs":
+
+                        break;
+                    case "Observed within the last":
+                        System.out.println("d");
+                        npiSmartList.selectObservedWithinLastValues(days);
+                        break;
+                }
+                npiSmartList.selectSiteActivities(pages);
+                npiSmartList.addVisitedUrl(visitedUrl);
+                npiSmartList.addIgnoredUrl(ignoredUrl);
+                break;
+
+            case "Engaged via Search":
+                npiSmartList.clickEngagedViaSearch();
+                switch (recency){
+                    case "All Observed NPIs":
+
+                        break;
+                    case "Observed within the last":
+                        System.out.println("d");
+                        npiSmartList.selectObservedWithinLastValues(days);
+                        break;
+                }
+                npiSmartList.clickSeachKeywordCheckboxEngagedViaSearch();
+                switch (keyword){
+                    case "Present":
+
+                        break;
+                    case "Absent":
+                        npiSmartList.clickAbsentButton();
+                        break;
+                }
+
+                npiSmartList.addSearchKeyword(keywordValue);
+                break;
+            case "Engaged Anywhere":
+                npiSmartList.clickEngagedAnywhere();
+                switch (recency){
+                    case "All Observed NPIs":
+
+                        break;
+                    case "Observed within the last":
+                        System.out.println("d");
+                        npiSmartList.selectObservedWithinLastValues(days);
+                        break;
+                }
+                npiSmartList.selectSiteActivities(pages);
+                npiSmartList.addVisitedUrl(visitedUrl);
+                npiSmartList.addIgnoredUrl(ignoredUrl);
+                npiSmartList.clickSeachKeywordCheckboxEngagedAnywhere();
+                switch (keyword){
+                    case "Present":
+
+                        break;
+                    case "Absent":
+                        npiSmartList.clickAbsentButton();
+                        break;
+                }
+                npiSmartList.addSearchKeyword(keywordValue);
+                break;
+
+        }
+
+
+
+
+    }
+
+    @And("User verifies NPI option is disabled when Advertiser is not selected")
+    public void userVerifiesNPIOptionIsDisabledWhenAdvertiserIsNotSelected() {
+
+//        Assert.assertTrue("NPI option is not disabled", npiSmartList.verifyNPIOptionDisabled());
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string} for NPI List with {string}")
+    public void userEntersTheSmartNPIListDetailsAsForNPIListWith(String npiListName, String advertiser, String npiGroupValue) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        Assert.assertTrue("NPI option is not Disabled", npiSmartList.verifyNPIOptionDisabled());
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickNPIList();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Mandatory field error missing", npiSmartList.verifyNPIErrorMessage());
+        npiSmartList.clickNPIGroup();
+        npiSmartList.clickNPIGroupValue(npiGroupValue);
+        Assert.assertTrue("NPI option is not Enabled", npiSmartList.verifyNPIOptionEnabled());
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string} for Speciality")
+    public void userEntersTheSmartNPIListDetailsAsForSpeciality(String npiListName, String advertiser) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickSpecialty();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Mandatory field error missing", npiSmartList.verifySpecialtyErrorMessage());
+        npiSmartList.clickSpecialtyDropdown();
+        npiSmartList.selectSpecialtyValue();
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string} for Profession with {string}")
+    public void userEntersTheSmartNPIListDetailsAsForProfessionWith(String npiListName, String advertiser, String professionValue) {
+
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickProfession();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Mandatory field error missing", npiSmartList.verifyProfessionErrorMessage());
+        npiSmartList.clickProfessionDropdown();
+        npiSmartList.selectProfessionValue(professionValue);
+
+    }
+
+    @When("User enters the Smart NPI list details as {string} {string} for Prescribed drug with {string}{string}{string}")
+    public void userEntersTheSmartNPIListDetailsAsForPrescribedDrug(
+            String npiListName, String advertiser,String prescribedDrugValue,String recency, String decileRange) {
+
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickExpandBasedOnPracticeAndHospitalAffiliation();
+        npiSmartList.clickPrescribedDrug();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Prescribed Drug mandatory field error missing", npiSmartList.verifyPrescribedDrugErrorMessage());
+        npiSmartList.verifyRecencyValidation();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Recency mandatory field error missing", npiSmartList.verifyRecencyErrorMessage());
+        npiSmartList.enterRecency(recency);
+        npiSmartList.selectNPIPrescribedDrug(prescribedDrugValue);
+        npiSmartList.selectDecileRange(decileRange);
+    }
+
+    @When("User enters the Smart NPI list details as {string} {string} for Diagnosis with {string}{string}{string}")
+    public void userEntersTheSmartNPIListDetailsAsForDiagnosisWith(
+            String npiListName, String advertiser,String diseaseValue,String recency, String decileRange){
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickExpandBasedOnPracticeAndHospitalAffiliation();
+        npiSmartList.clickDiagnosis();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Disease mandatory field error missing", npiSmartList.verifyDiseaseErrorMessage());
+        npiSmartList.verifyRecencyValidation();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Recency mandatory field error missing", npiSmartList.verifyDiagnosisRecencyErrorMessage());
+        npiSmartList.enterRecency(recency);
+        npiSmartList.selectDisease(diseaseValue);
+        npiSmartList.selectDecileRange(decileRange);
+    }
+
+    @When("User enters the Smart NPI list details as {string} {string} for Medical Procedure with {string}{string}{string}")
+    public void userEntersTheSmartNPIListDetailsAsForMedicalProcedureWith(String npiListName, String advertiser,String procedureValue,String recency, String decileRange) {
+
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickExpandBasedOnPracticeAndHospitalAffiliation();
+        npiSmartList.clickMedicalProcedure();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Procedure mandatory field error missing", npiSmartList.verifyProcedureErrorMessage());
+
+        npiSmartList.verifyRecencyValidation();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Recency mandatory field error missing", npiSmartList.verifyMedicalProcedureRecencyErrorMessage());
+        npiSmartList.enterRecency(recency);
+        npiSmartList.selectMedicalProcedure(procedureValue);
+        npiSmartList.selectMedicalDecileRange(decileRange);
+
+
+
+    }
+
+    @When("User enters the Smart NPI list details as {string} {string} for Expand based on Practice and Hospital affiliation with {string}{string}{string}")
+    public void userEntersTheSmartNPIListDetailsAsForExpandBasedOnPracticeAndHospitalAffiliationWith(String npiListName, String advertiser,String procedureValue,String recency, String decileRange) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickExpandBasedOnPracticeAndHospitalAffiliation();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Procedure mandatory field error missing", npiSmartList.verifyPracticeAndHospitalErrorMessage());
+        npiSmartList.clickMedicalProcedure();
+        npiSmartList.verifyRecencyValidation();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Recency mandatory field error missing", npiSmartList.verifyMedicalProcedureRecencyErrorMessage());
+        npiSmartList.enterRecency(recency);
+        npiSmartList.selectMedicalProcedure(procedureValue);
+        npiSmartList.selectDecileRange(decileRange);
+
+    }
+
+    @When("User enters the Smart NPI list details as {string} {string} for Prescription Behavior Change with {string}{string}{string}{string}")
+    public void userEntersTheSmartNPIListDetailsAsForPrescriptionBehaviorChangeWith(String npiListName, String advertiser, String prescriptionType, String drugs, String topPercent, String timeFrame) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickExpandBasedOnPracticeAndHospitalAffiliation();
+        npiSmartList.clickPrescriptionBehaviorChange();
+        npiStaticList.clickSaveList();
+        Assert.assertTrue("Prescription Type mandatory field error missing", npiSmartList.verifyPrescriptionTypeErrorMessage());
+        npiSmartList.selectDrugs(drugs);
+        npiSmartList.selectTopPercent(topPercent);
+//        npiSmartList.selectTimeFrame(timeFrame);
+
+
+    }
+
+
 }

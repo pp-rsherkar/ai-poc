@@ -25,6 +25,7 @@ public class NPIStaticList {
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
 
+
     public NPIStaticList(Page page) {
         this.page = page;
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
@@ -100,5 +101,10 @@ public class NPIStaticList {
 
     public String deleteSuccess() {
         return DELETE_SUCCESS.innerText();
+    }
+    public void clickSaveList() {
+        SAVE_BUTTON.click();
+
+
     }
 }

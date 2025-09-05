@@ -36,7 +36,7 @@ public class NPILists {
         this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
-        this.SMART_LIST = page.getByText("Dynamic list of NPI");
+        this.SMART_LIST = page.getByText("Dynamic list of NPIs based on");
         this.AUTO_IMPORTED_LIST = page.locator("//app-npilisttype[@listtypename='Auto-Imported List']");
     }
 

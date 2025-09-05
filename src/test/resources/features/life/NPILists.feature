@@ -114,3 +114,108 @@ Feature: LIFE Regression - Create NPI List of following types:
     Examples:
       | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
       | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
+
+
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Smart Pixel under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Smart Pixel with "<SMART_PIXEL_DROPDOWN_VALUE>" "<RECENCY>" "<ENGAGEMENT>" "<DAYS>" "<PAGES>" "<VISITED_URLS>" "<IGNORED_URLS>""<KEYWORD>""<KEYWORD_VALUE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME       | SMART_PIXEL_DROPDOWN_VALUE | RECENCY                  | ENGAGEMENT       | DAYS | PAGES | VISITED_URLS    | IGNORED_URLS    | KEYWORD | KEYWORD_VALUE |
+      | 01- Advertiser | SMART_Pixel_NPI | AutoCollection889379612    | Observed within the last | Engaged Anywhere | 1    | 2     | www.visited.com | www.ignored.com | Absent  | Keyword       |
+
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for NPI under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for NPI List with "<NPI_GROUP_VALUE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME      | NPI_GROUP_VALUE                 |
+      | 01- Advertiser | SMART_LIST_NPI | AutoAdminNPIFileUpload187526255 |
+
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Speciality under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Speciality
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME |
+      | 01- Advertiser | SPECIALTY |
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Profession under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Profession with "<PROFESSION_VALUE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME            | PROFESSION_VALUE   |
+      | 01- Advertiser | SMART_PROFESSION_NPI | Nurse Practitioner |
+
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Prescribed drug under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Prescribed drug with "<DRUG>""<RECENCY>""<DECILE_RANGE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME           | DRUG      | RECENCY | DECILE_RANGE |
+      | 01- Advertiser | PRESCRIBED_DRUG_NPI | 40032-089 | 240     | 7            |
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Diagnosis under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Diagnosis with "<DISEASES>""<RECENCY>""<DECILE_RANGE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME     | DISEASES | RECENCY | DECILE_RANGE |
+      | 01- Advertiser | DIAGNOSIS_NPI | A920     | 200     | 7            |
+
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Medical Procedure under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Medical Procedure with "<PROCEDURES>""<RECENCY>""<DECILE_RANGE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME             | PROCEDURES | RECENCY | DECILE_RANGE |
+      | 01- Advertiser | MEDICAL_PROCEDURE_NPI | 90660      | 200     | 7            |
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Expand based on Practice and Hospital affiliation under NPI Smart List .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Expand based on Practice and Hospital affiliation with "<PROCEDURES>""<RECENCY>""<DECILE_RANGE>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME                          | PROCEDURES | RECENCY | DECILE_RANGE |
+      | 01- Advertiser | EXPAND_BASED_MEDICAL_PROCEDURE_NPI | 90660      | 200     | 7            |
+
+  @regression
+  Scenario Outline: Verify field level validation and Assertions for Prescription Behavior Change .
+    And User selects Smart List to create NPI list
+    And User verifies Smart List options present to create NPI list
+    When User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for Prescription Behavior Change with "<PRESCRIPTION_TYPE>""<DRUG>""<TOP_DROPPERS_PERCENTAGE>""<TIME_FRAME>"
+    Then Save and Verify the list gets saved successfully
+
+    Examples:
+      | ADVERTISER     | LIST_NAME                          | PRESCRIPTION_TYPE | DRUG     | TOP_DROPPERS_PERCENTAGE | TIME_FRAME |
+      | 01- Advertiser | EXPAND_BASED_MEDICAL_PROCEDURE_NPI | DROPPERS          | Parastat | 50                      | 10         |
