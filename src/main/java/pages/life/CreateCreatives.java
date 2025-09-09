@@ -298,10 +298,10 @@ public class CreateCreatives {
             case "Html", "Html5", "Image":
                 page.locator(String.format("//button[text()='%s']",type)).click();
                 if(type.equals("Html5")){
-                    CommonUtils.uploadFile(page, imageTextLocator, attributeMap.get("ArchiveFile"));
+                    CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ArchiveFile"));
                 }
                 if (type.contains("Image")){
-                    CommonUtils.uploadFile(page, imageTextLocator, attributeMap.get("ImageFile"));
+                    CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ImageFile"));
                 }
                 else{
                     CREATIVE_HTMLCODE.fill(attributeMap.get("HTMLCode"));
@@ -318,7 +318,7 @@ public class CreateCreatives {
             case "Upload", "Audio URL", "VAST URL", "VAST XML", "Video URL":
                 page.locator(String.format("//button[text()='%s']",type)).click();
                 if(type.contains("Upload"))
-                    CommonUtils.uploadFile(page, imageTextLocator, attributeMap.get("FileName"));
+                    CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("FileName"));
                 else if(type.contains("Audio URL") || type.contains("Video URL"))
                     URL.fill(attributeMap.get("URL"));
                 else if(type.contains("VAST URL"))
@@ -355,7 +355,7 @@ public class CreateCreatives {
                 break;
 
             case "Native Display":
-                CommonUtils.uploadFile(page, imageTextLocator, attributeMap.get("ImageFile"));
+                CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ImageFile"));
                 CLICKTHROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 DOMAIN_LANDING.fill(attributeMap.get("DomainLanding"));
                 IAB_CATEGORY.fill(attributeMap.get("IAB"));
