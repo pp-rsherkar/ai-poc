@@ -62,9 +62,11 @@ public class LifeSteps {
     Pixels pixels = new Pixels(DriverFactory.getPage());
     RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
+    SmartPixel smartPixel = new SmartPixel(DriverFactory.getPage());
     BulkCreativeUpload bulkCreativeUpload = new BulkCreativeUpload(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
+    int selectedOptionsCount = 0;
     int itemCount = 0;
     int totalListCount = 0;
     APIResponse response;
@@ -1682,6 +1684,12 @@ public class LifeSteps {
         conversionPixel.selectConversionPixelType(conversionPixelType);
     }
 
+    @And("User selects the {string} and the associated campaign")
+    public void userSelectsTheFromTheList(String advertiser) {
+        smartPixel.selectAdvertiser(advertiser);
+        smartPixel.selectAssociatedCampaign();
+    }
+
     @And("User saves the pixel")
     public void userSavesThePixel() {
         pixels.savePixel();
@@ -1694,15 +1702,50 @@ public class LifeSteps {
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
 
-    @When("User selects {string} as rule type and selects the created pixel")
-    public void userSelectsRuleTypeAndSelectsCreatedPixelAndSavesSettings(String ruleType) {
-        tacticSettings.selectRuleType(ruleType, newPixelName);
+    @Then("Verify the smart pixel is saved successfully and displayed in the pixel list")
+    public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
+        assert pixels.verifySaveSuccess().contains("Success!");
+        newPixelName = smartPixel.getPixelName();
+        pixels.searchSavedPixel(newPixelName);
+        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
 
-    @Then("Verify the selected targeting rule {string}")
-    public void verifyTheSelectedTargetingRules(String ruleType) {
+    @When("User selects {string} as rule type and selects the created pixel")
+    public void userSelectsRuleTypeAndSelectsCreatedPixelAndSavesSettings(String ruleType) {
+        selectedOptionsCount = tacticSettings.selectRuleType(ruleType, newPixelName);
+    }
+
+    @Then("Verify the selected targeting rule {string} for {string}")
+    public void verifyTheSelectedTargetingRules(String ruleType, String pixelType) {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
-        Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+        if (pixelType.equals("Retargeting Pixel") || pixelType.equals("Conversion Pixel")) {
+            Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+        } else if (pixelType.equals("Smart Pixel")) {
+            Assert.assertEquals(npiName, tacticSettings.verifyRuleOption());
+        }
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string} for {string}")
+    public void userEntersTheSmartNPIListDetailsAsFor(String npiListName, String advertiser, String product) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickSmartPixel();
+        npiSmartList.clickSmartPixelDropDown();
+        npiSmartList.clickSmartPixelDropDownValue(newPixelName);
+    }
+
+    @And("User selects {string} as rule type and selects the created Smart list")
+    public void userSelectsRuleTypeAndSelectsCreatedSmartList(String ruleType) {
+        selectedOptionsCount = tacticSettings.selectRuleType(ruleType, npiName);
+    }
+
+    @Then("Verify the count of selected entities")
+    public void verifyTheCountOfSelectedEntities() {
+        String optionsCount = tacticSettings.fetchSelectedListCountFromTactic();
+        int targetedOptionsCount = Integer.parseInt(optionsCount.replaceAll("[^0-9]", ""));
+        Assert.assertEquals("Selected options count does not match", selectedOptionsCount, targetedOptionsCount);
     }
 
     /*Roshani Sherkar

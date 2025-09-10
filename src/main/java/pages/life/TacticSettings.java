@@ -131,7 +131,7 @@ public class TacticSettings {
         clickClose();
     }
 
-    public void selectRuleType(String ruleType, String ruleOption) {
+    public int selectRuleType(String ruleType, String ruleOption) {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
@@ -152,8 +152,11 @@ public class TacticSettings {
                 isElementVisible(pixelXpath);
                 break;
         }
+        int selectCount = fetchSelectedListCountFromTargetingPanel();
         clickRuleTypeOkButton();
         closeRuleTypePanel();
+
+        return selectCount;
     }
 
     public void saveTacticSettings() {
