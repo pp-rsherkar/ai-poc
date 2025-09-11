@@ -11,7 +11,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
-  @e2e
+  @regression
   Scenario Outline: Validate Run Report panel's field verification on Reports Page and allow report generation
     And User navigates to Administrative section and fetches the advertiser for the account "automation@pulsepoint"
     When User navigates to run report from mega menu of the life application
@@ -58,7 +58,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          |
 
-  @e2e
+  @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report using Template and Custom Dates option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -85,7 +85,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | REPORT_FORMATS                                                             |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
 
-  @e2e
+  @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report using a Pick Dimensions/Metrics and Life Time option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -111,7 +111,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | DIMENSIONS                                                 | METRICS             | TIME_ZONE                |
       | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT-05:00) Central Time |
 
-  @e2e
+  @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report by entering Tactic and Fight option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -127,7 +127,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | TACTIC_INITIALS |
       | AutoTemplate20 | CreativeTactic  |
 
-  @e2e
+  @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
@@ -141,7 +141,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify dropdown dimensions with the template
     And Verify dropdown metrics with the template
 
-  @e2e
+  @regression
   Scenario Outline: Verify Report generation for file breakdown "<FILE_BREAKDOWN_TYPE>" button and verify Filter Report checkbox label
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
