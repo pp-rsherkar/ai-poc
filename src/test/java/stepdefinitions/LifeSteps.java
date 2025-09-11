@@ -10,6 +10,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.Navigation;
+import pages.admin.Accounts;
 import pages.life.*;
 import utils.*;
 
@@ -41,6 +42,8 @@ public class LifeSteps {
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
     List<String> nameList = new ArrayList<>();
+    List<String> capturedDetails = new ArrayList<>();
+    List<String> advertiserList = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -63,6 +66,8 @@ public class LifeSteps {
     RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
     BulkCreativeUpload bulkCreativeUpload = new BulkCreativeUpload(DriverFactory.getPage());
+    RunReportPanel runReportPanel = new RunReportPanel(DriverFactory.getPage());
+    Accounts accounts = new Accounts(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
@@ -547,6 +552,7 @@ public class LifeSteps {
     @And("User navigates to run report from mega menu of the life application")
     public void user_navigate_to_run_report() {
         navigation.clickSubMenu();
+        navigation.clickMenuAngle();
         navigation.clickRunReport();
     }
 
@@ -567,6 +573,7 @@ public class LifeSteps {
         navigation.clickSubMenu();
         navigation.clickScheduledReport();
         navigation.clickSubMenu();
+        navigation.clickMenuAngle();
         navigation.clickGeneratedReport();
     }
 
@@ -574,6 +581,7 @@ public class LifeSteps {
     public void user_download_the_report_from_generated_report_page_and_verify_the_data() throws Exception {
         String filePath = reportTemplates.downloadGeneratedReport(templateNameRandom);
         navigation.clickSubMenu();
+        navigation.clickMenuAngle();
         navigation.clickReportTemplate();
         Assert.assertTrue("Report headers match expected values!", reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath));
     }
@@ -1985,5 +1993,296 @@ public class LifeSteps {
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
             nameList.add(creativeName);
         }
+    }
+
+    /*Run A Report - Fields verification and validation*/
+    @And("Verify Run Report panel should be opened")
+    public void verifyRunReportPanelIsOpened() {
+        Assert.assertTrue("Run Report panel is not opened", runReportPanel.isRunReportPanelOpened());
+    }
+
+    @And("Template drop-down should display templates created under {string}")
+    public void templateDropDownShouldDisplayTemplatesCreatedUnder(String templateName) {
+        Assert.assertTrue("Template dropdown is not present", runReportPanel.isTemplateDropdownAvailable());
+        //Template present in logged account
+    }
+
+    @When("User clicks on {string} link")
+    public void userClicksOnLink(String linkName) {
+        runReportPanel.clickLink(linkName);
+    }
+
+    @Then("Dimensions and Metrics fields should be displayed")
+    public void dimensionsAndMetricsFieldsShouldBeDisplayed() {
+        Assert.assertTrue("Dimension and Metrics dropdown are not displayed", runReportPanel.isDimensionsAndMetricsDisplayed());
+    }
+
+    @And("User should navigate back to Template drop-down by clicking {string}")
+    public void userShouldNavigateBackToTemplateDropDownByClicking(String linkName) {
+        runReportPanel.clickLink(linkName);
+    }
+
+    @Then("Template drop-down should be visible")
+    public void templateDropDownShouldBeVisible() {
+        Assert.assertTrue("Template dropdown is not present", runReportPanel.isTemplateDropdownAvailable());
+    }
+
+    @Then("Data Granularity should have default value {string}")
+    public void dataGranularityShouldHaveDefaultValue(String defaultValue) {
+        Assert.assertEquals(defaultValue.trim(), runReportPanel.getDefaultDataGranularity());
+    }
+
+    @And("Verify Data Granularity dropdown should show below list of values")
+    public void verifyDataGranularityDropdownShouldShowBelowListOfValues(DataTable dataTable) {
+        List<String> dropdownValues = dataTable.asList(String.class);
+        runReportPanel.showDataGranularityOptions();
+        Assert.assertEquals(new HashSet<>(dropdownValues), new HashSet<>(runReportPanel.fetchDataGranularityOptions()));
+    }
+
+    @And("Verify Data Granularity field should allow selection any of the values {string} from the dropdown")
+    public void verifyDataGranularityFieldShouldAllowSelectionAnyOfTheValuesFromTheDropdown(String dropdownValue) {
+        Assert.assertTrue("Unable to set Data Granularity value from drop-down", runReportPanel.setDataGranularity(dropdownValue));
+    }
+
+    @Then("Advertiser drop-down should list advertisers mapped to {string}")
+    public void advertiserDropDownShouldListAdvertisersMappedTo(String arg0) {
+        Assert.assertTrue("Advertiser dropdown is not present", runReportPanel.isAdvertiserDropdownAvailable());
+        runReportPanel.clickAdvertiserDropdown();
+        List<String> advertiser = runReportPanel.fetchAdvertisers();
+        Assert.assertTrue("Advertiser List does not match", advertiser.containsAll(advertiserList));
+    }
+
+    @And("User should be able to select multiple advertisers from the list")
+    public void userShouldBeAbleToSelectMultipleAdvertisersFromTheList() {
+        runReportPanel.clickAdvertiserDropdown();
+        Assert.assertTrue("Unable to select multiple advertisers", runReportPanel.selectMultipleAdvertisersFromDropdown());
+    }
+
+    @And("Verify on selecting {string} option, previously selected individual advertisers should be cleared")
+    public void verifyOnSelectingOptionPreviouslySelectedIndividualAdvertisersShouldBeCleared(String advertiser) {
+        Assert.assertEquals(advertiser, runReportPanel.selectAdvertiser(advertiser));
+    }
+
+    @And("User should be able to select template {string} from the dropdown")
+    public void userShouldBeAbleToSelectTemplateFromTheDropdownAndAdvertiserAs(String templateName) {
+        runReportPanel.selectTemplateFromDropdown(templateName);
+        templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
+        nameList.add(templateNameRandom);
+    }
+
+    @And("User should be able to select advertiser as {string}")
+    public void userShouldBeAbleToSelectAdvertiserAs(String advertiser) {
+        runReportPanel.clickAdvertiserDropdown();
+        Assert.assertEquals(advertiser, runReportPanel.selectAdvertiser(advertiser));
+        nameList.add(advertiser);
+    }
+
+    @When("Campaign should load for selection when user types campaign initials {string} in {string} field")
+    public void campaignShouldLoadForSelectionWhenUserTypesCampaignInitialsInCampaignField(String campaignInitials, String fieldName) {
+        Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(campaignInitials, fieldName));
+    }
+
+    @Then("User should be able to select multiple values from dropdown")
+    public void userShouldBeAbleToSelectMultipleValuesFromDropdown() {
+        List<String> valuesSelected = runReportPanel.selectMultipleValueFromDropdown();
+        Assert.assertFalse("Unable to select multiple values from dropdown", valuesSelected.isEmpty());
+        nameList.addAll(valuesSelected);
+    }
+
+    @When("Line Items of selected campaigns should load when user types line items initials {string} in {string} field")
+    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials,String fieldName) {
+        Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(lineItemInitials, fieldName));
+    }
+
+    @When("Tactic of selected line items should load when user types tactic names initials {string} in {string} field")
+    public void tacticOfSelectedLineItemsShouldLoadWhenUserTypesTacticNamesInitialsInTacticField(String tacticInitials, String fieldName) {
+        Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(tacticInitials, fieldName));
+    }
+
+    @When("Creative of selected tactic should load when user types creative names initials {string} in {string} field")
+    public void creativeOfSelectedTacticShouldLoadWhenUserTypesCreativeNamesInitialsInCreativeField(String creativeInitials, String fieldName) {
+        Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(creativeInitials, fieldName));
+    }
+
+    @When("User clicks on Advanced Settings")
+    public void userClicksOn() {
+        runReportPanel.clickAdvanceSettings();
+    }
+
+    @Then("{string} section should be visible with label {string} checkbox")
+    public void checkboxShouldBeVisibleWithLabel(String filterReportSection, String checkboxLabel) {
+        Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
+        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
+            Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel));
+    }
+
+    @Then("{string} and {string} tabs should be present in the Run Report pop-up")
+    public void andTabsShouldBePresentInTheRunReportPopUp(String runNowTab, String scheduleTab) {
+        Assert.assertTrue("Run Now and Schedule tabs are not available", runReportPanel.isRunNowAndScheduleTabsAvailable(runNowTab, scheduleTab));
+    }
+
+    @When("On Run Now tab, Report Period field should have options below")
+    public void onRunNowTabReportPeriodFieldShouldHaveOptionsBelow(DataTable dataTable) {
+        List<String> dropdownValues = dataTable.asList(String.class);
+        Assert.assertEquals(new HashSet<>(dropdownValues), new HashSet<>(runReportPanel.fetchReportPeriodOptions()));
+    }
+
+    @And("User selects the option Only Report on Impressions with Identifiable NPIs")
+    public void userSelectsTheOptionOnlyReportOnImpressionsWithIdentifiableNPIs() {
+        runReportPanel.clickFilterReportCheckbox();
+    }
+
+    @And("User should able to generate the report")
+    public void userShouldAbleToGenerateTheReport(){
+        String fileName = "Custom Report";
+        runReportPanel.clickRunButton(fileName);
+        Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+    }
+
+    @And("And confirm that the report panel retains the entered data")
+    public void andConfirmThatTheReportPanelRetainsTheEnteredData() {
+        runReportPanel.clickModifyOption(templateNameRandom);
+        capturedDetails.addAll(runReportPanel.fetchTemplateValue());
+        capturedDetails.addAll(runReportPanel.fetchDimensionAndMetricValues());
+        capturedDetails.addAll(runReportPanel.fetchAdvertiserName());
+        capturedDetails.addAll(runReportPanel.fetchCampaignName());
+        capturedDetails.addAll(runReportPanel.fetchLineItemName());
+        capturedDetails.addAll(runReportPanel.fetchTacticName());
+        capturedDetails.addAll(runReportPanel.fetchCreativeName());
+        Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
+    }
+
+    @And("Verify that by default {string} option is selected for Report Period Field")
+    public void verifyThatByDefaultCustomDatesOptionIsSelectedForReportPeriodField(String buttonType) {
+        Assert.assertTrue("Custom Dates button is not enabled by default", runReportPanel.isReportPeriodSelected(buttonType));
+    }
+
+    @And("Verify that user is able to select start date and end date when Custom Dates option is selected")
+    public void verifyThatUserIsAbleToSelectStartDateAndEndDateWhenCustomDatesOptionIsSelected() {
+        Assert.assertTrue("Unable to select date from date picker", runReportPanel.selectStartAndEndDate());
+    }
+
+    @And("Verify that user is able to select start {string} and end time {string} when Custom Dates option is selected")
+    public void verifyThatUserIsAbleToSelectStartAndEndTimeWhenCustomDatesOptionIsSelected(String startTime, String endTime) {
+        Assert.assertTrue("Unable to select time", runReportPanel.enterStartAndEndTime(startTime, endTime));
+    }
+
+    @And("Verify that user is able to select Timezone field value {string}")
+    public void verifyThatUserIsAbleToSelectTimezoneFieldValue(String timeZone) {
+        Assert.assertTrue("Unable to select time zone", runReportPanel.selectTimeZone(timeZone.trim()));
+    }
+
+    @And("Verify the default value of the the Report Format field is {string}")
+    public void verifyTheDefaultValueOfTheTheReportFormatFieldIsCSV(String fileFormat) {
+        Assert.assertEquals(fileFormat, runReportPanel.fetchDefaultReportFormat(fileFormat));
+    }
+
+    @And("Verify the availability of various options of the Report Format field - {string}")
+    public void verifyTheAvailabilityOfVariousOptionsOfTheReportFormatField(String reportFormats) {
+        List<String> expectedFormats = CommonUtils.convertStringToList(reportFormats);
+        List<String> reportFormatValues = runReportPanel.fetchReportFormatList();
+        for (String format : expectedFormats) {
+            Assert.assertTrue("Missing report format: " + format, reportFormatValues.contains(format));
+        }
+    }
+
+    @And("Verify by default the Test Qualifier checkbox is checked")
+    public void verifyByDefaultTheTestQualifierCheckboxIsChecked() {
+        Assert.assertTrue("Test Qualifier is not checked by default", runReportPanel.isTestQualifierCheckboxChecked());
+    }
+
+    @And("Verify that {string} and {string} options are disabled until a Line Item is selected")
+    public void verifyThatLifetimeAndFlightsOptionsAreDisabledUntilALineItemIsSelected(String lifeTime, String flights) {
+        List<String> disabledButtons = runReportPanel.verifyButtonsDisabledBeforeLineItemSelection();
+        Assert.assertTrue("Expected disabled button missing: " + lifeTime, disabledButtons.contains(lifeTime));
+        Assert.assertTrue("Expected disabled button missing: " + flights, disabledButtons.contains(flights));
+    }
+
+    @And("User should be able to select {string} and {string}")
+    public void userShouldBeAbleToSelectAnd(String dimensions, String metrics) {
+        List<String> dimensionList = CommonUtils.convertStringToList(dimensions);
+        List<String> metricsList = CommonUtils.convertStringToList(metrics);
+        runReportPanel.selectDimension(dimensionList);
+        runReportPanel.selectMetrics(metricsList);
+        nameList.addAll(dimensionList);
+        nameList.addAll(metricsList);
+        templateNameRandom = "Custom Template";
+    }
+
+    @And("Verify that {string} and {string} options are enabled")
+    public void verifyThatLifetimeAndFlightsOptionsAreEnabled(String lifeTime, String flights) {
+        List<String> enabledButtons = runReportPanel.verifyButtonsEnabledAfterLineItemSelection();
+        Assert.assertTrue("Expected " + lifeTime + " button to be enabled", enabledButtons.contains("Lifetime"));
+        Assert.assertTrue("Expected " + flights + " button to be enabled", enabledButtons.contains("Flights"));
+    }
+
+    @And("User clicks {string} report period button")
+    public void userClicksReportPeriodButton(String buttonName) {
+        runReportPanel.selectReportPeriodButton(buttonName);
+    }
+
+    @Then("User should be able to select value from dropdown")
+    public void userShouldBeAbleToSelectValueFromDropdown() {
+        String valuesSelected = runReportPanel.selectValueFromDropdown();
+        Assert.assertFalse("Unable to select value from dropdown", valuesSelected.isEmpty());
+        nameList.add(valuesSelected);
+    }
+
+    @And("User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic")
+    public void userShouldBeAbleToFetchDetailsAdvertiserCampaignLineItemTactic() {
+        nameList.addAll(runReportPanel.fetchAdvertiserName());
+        nameList.addAll(runReportPanel.fetchCampaignName());
+        nameList.addAll(runReportPanel.fetchLineItemName());
+    }
+
+    @And("Verify that Flight details field is displayed with value")
+    public void verifyThatFlightDetailsFieldIsDisplayedWithValue() {
+        Assert.assertFalse("Flight details are not populated", runReportPanel.isFlightDetailsDisplayed().isEmpty());
+    }
+
+    @And("User navigates to Administrative section and fetches the advertiser for the account {string}")
+    public void userNavigatesToAdministrativeSectionAndFetchesTheAdvertiserForTheAccount(String account) {
+        navigation.clickSubMenu();
+        accounts.clickAdministration();
+        accounts.clickAdvertiserTab();
+        accounts.selectAccount(account);
+        advertiserList = accounts.fetchAdvertiserList();
+        navigation.clickPulsePointLogo();
+    }
+
+    @And("Expand all the groups and fetch dimensions and metrics")
+    public void expandAllTheGroupsAndFetchDimensions() {
+        nameList = reportTemplates.expandGroupsAndFetchDimensionsAndMetrics();
+        reportTemplates.clickMetricsTab();
+        capturedDetails = reportTemplates.expandGroupsAndFetchDimensionsAndMetrics();
+        reportTemplates.clickCancelButton();
+    }
+
+    @And("Verify dropdown dimensions with the template")
+    public void verifyDropdownDimensionsWithTheTemplate() {
+        List<String> dimensionList = runReportPanel.clickDimensionDropdownAndFetchValues();
+        Assert.assertTrue("Template's Dimension values are not available in Run report", dimensionList.containsAll(nameList));
+    }
+
+    @And("Verify dropdown metrics with the template")
+    public void verifyDropdownMetricsWithTheTemplate() {
+        List<String> metricList = runReportPanel.clickMetricDropdownAndFetchValues();
+        Assert.assertTrue("Template's Dimension values are not available in Run report", metricList.containsAll(capturedDetails));
+    }
+
+    @And("User selects {string} button")
+    public void userSelects(String buttonType) {
+        runReportPanel.clickFileBreakdownType(buttonType);
+    }
+
+    @Then("{string} section should be visible with label {string}, {string}, {string} checkbox")
+    public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
+        Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
+        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
+            Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
+        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
+            Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
+        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
+            Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
     }
 }

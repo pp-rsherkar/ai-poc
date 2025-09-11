@@ -1,16 +1,17 @@
 package pages.admin;
 
 import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Locator.WaitForOptions;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
+import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class Accounts {
     private final Page page;
-    private final WaitForOptions WaitForOptions = new Locator.WaitForOptions();
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Locator SUB_MENU;
     private final Locator ADMINISTRATION;
     private final Locator ACCOUNTS_TAB;
@@ -28,6 +29,11 @@ public class Accounts {
     private final Locator SWITCH_CLICK_ACCOUNT;
     private final Locator WORKSPACE_NAME;
     private final Locator ACCOUNTS_TAB_TEXT;
+    private final Locator ADVERTISER_TAB;
+    private final Locator ACCOUNT_DROPDOWN;
+    private final Locator ACCOUNT_DROPDOWN_TEXTAREA;
+    private final Locator SEARCH_BUTTON;
+    private final Locator ADVERTISER_LIST;
 
     public Accounts(Page page) {
         this.page = page;
@@ -48,6 +54,11 @@ public class Accounts {
         this.SWITCH_CLICK_ACCOUNT = page.locator("#accountSwitcher").getByText("100Plus");
         this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
         this.ACCOUNTS_TAB_TEXT = page.locator("//span[text()='Account Management']");
+        this.ADVERTISER_TAB = page.locator("//a[@routerlink='/advertisers/list']");
+        this.ACCOUNT_DROPDOWN = page.locator("//app-single-select-dropdown[@placeholder='Any Account']");
+        this.ACCOUNT_DROPDOWN_TEXTAREA = page.locator("//input[@placeholder='Any Account']");
+        this.SEARCH_BUTTON = page.locator("//span[text()='Search']");
+        this.ADVERTISER_LIST = page.locator("//td[contains(@class,'gaTableRow')]//div");
     }
 
     public void clickAdministration() {
@@ -61,7 +72,7 @@ public class Accounts {
 
     public void searchAccount(String accountName) {
         page.waitForLoadState();
-        ACCOUNTS_TAB_TEXT.waitFor(WaitForOptions.setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
@@ -82,7 +93,7 @@ public class Accounts {
     public void disableStudioForAccount(String accountName) {
         ADMINISTRATION.click();
         ACCOUNTS_TAB.click();
-        ACCOUNTS_TAB_TEXT.waitFor(WaitForOptions.setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
@@ -106,5 +117,22 @@ public class Accounts {
         PULSEPOINT_ICON.click();
         SUB_MENU.click();
         assertThat(STUDIO_MENU).isHidden();
+    }
+
+    public void clickAdvertiserTab(){
+        ADVERTISER_TAB.click();
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+    }
+
+    public void selectAccount(String account){
+        ACCOUNT_DROPDOWN.click();
+        ACCOUNT_DROPDOWN_TEXTAREA.fill(account);
+        ACCOUNT_DROPDOWN.getByText(account).click();
+        SEARCH_BUTTON.click();
+    }
+
+    public List<String> fetchAdvertiserList(){
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+        return ADVERTISER_LIST.allInnerTexts();
     }
 }
