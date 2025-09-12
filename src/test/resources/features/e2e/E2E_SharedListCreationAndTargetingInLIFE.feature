@@ -68,8 +68,9 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     And User saves the rule configured in the tactic
     #7
     Then Verify that the "<RULE_TYPE>" rule is added to the tactic and retrieve the count of selected lists
-    And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     And User saves the targeting
+    And User clicks Tactic Setting tab
+    And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     Examples:
       | LIST_NAME | UPLOAD_FILENAME1   | ADVERTISER     | CP_NAME                | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE    |
       | AppBundle | AppBundleFile1.csv | 01- Advertiser | AppBundleList_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Domains/Apps |
@@ -101,8 +102,9 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     And User saves the rule configured in the tactic
     #7
     Then Verify that the "<RULE_TYPE>" rule is added to the tactic and retrieve the count of selected lists
-    And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     And User saves the targeting
+    And User clicks Tactic Setting tab
+    And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     Examples:
       | LIST_NAME | KEYWORD_NAMES                              | ADVERTISER     | CP_NAME          | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE |
       | Keyword   | Active Shooter, Antisemitism, Church Shoot | 01- Advertiser | Keyword_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Keywords  |

@@ -267,6 +267,7 @@ public class TacticDetails {
             tacticCreatives.clickAssignCreatives();
             tacticCreatives.assignCreatives(CreativeName);
             saveTacticDetails();
+            waitUtility.waitUntilSpinnerHidden();
             return tacticCreatives.verifyCreativeAssigned(CreativeName);
     }
 

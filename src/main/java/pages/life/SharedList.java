@@ -275,13 +275,8 @@ public class SharedList {
         locator.click();
     }
 
-    public boolean verifyDownloadedFile(String fileName) {
-        File downloadDir = new File(System.getProperty("user.home") + "/Downloads");
-        File latest = Arrays.stream(Objects.requireNonNull(downloadDir.listFiles((d, name) -> name.matches(fileName + "( \\(\\d+\\))?\\.csv"))))
-                .max(Comparator.comparingLong(File::lastModified))
-                .orElse(null);
-
-        return latest != null;
+    public boolean verifyDownloadedFile(String fileName, String fileExtension) {
+        return CommonUtils.isDownloadedFileAvailable(fileName, fileExtension);
     }
 
     public void deleteFile(String fileName) {

@@ -515,6 +515,7 @@ public class TacticSettings {
         newTab.bringToFront();
         DriverFactory.threadLocalDriver.set(newTab);
         newTab.waitForLoadState();
+        newTab.waitForTimeout(3000);
         NPIAttributesList npiAttributesList = new NPIAttributesList(newTab);
         String npiCount = npiAttributesList.fetchTotalNPIListCount(listName);
         newTab.close();
@@ -551,11 +552,14 @@ public class TacticSettings {
     }
 
     public boolean isSelectedListPresentInTactic(String npiName) {
-        return FETCH_TARGET_RULEOPTIONS.isVisible();
+        FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).scrollIntoViewIfNeeded();
+        return FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).isVisible();
     }
 
-    public String fetchSelectedListItemCountFromTactic() {
-        Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("xpath=./following-sibling::span");
+    public String fetchSelectedListItemCountFromTactic(String npiName) {
+        Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).locator("xpath=./following-sibling::span");
+        if(!targetCount.isVisible())
+            return "";
         return targetCount.innerText().trim();
     }
 

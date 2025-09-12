@@ -50,6 +50,7 @@ public class ReportTemplates {
     private final Locator SEARCH_BUTTON;
     private final Locator DOWNLOAD_REPORT;
     private final Locator REPORT_PROGRESS_ICON;
+    private final Locator TEMPLATE_PAGINATION;
     private String reportName;
 
 
@@ -85,6 +86,7 @@ public class ReportTemplates {
         this.SEARCH_REPORT = page.locator("input.form-control.ng-untouched.ng-pristine.ng-valid");
         this.SEARCH_BUTTON = page.locator("div.iconSprite.search1");
         this.DOWNLOAD_REPORT = page.locator("//span[text()='Download']");
+        this.TEMPLATE_PAGINATION = page.locator("div.pagination-wrapper");
     }
 
     public void clickReportTemplatesLink() {
@@ -221,10 +223,11 @@ public class ReportTemplates {
     }
 
     public boolean verifyColumnsOfReport(String templateNameRandom, String filePath) throws Exception {
-        waitUtility.waitForElementVisible("div.pagination-wrapper.ng-star-inserted");
+        waitUtility.waitForLocatorVisible(TEMPLATE_PAGINATION);
+        waitUtility.waitUntilPreLoaderHidden();
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click(new Locator.ClickOptions().setForce(true));
-        waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom));
+        waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom), 5000);
         List<String> expectedHeaders = Arrays.stream(TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*"))
                 .map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize expected
                 .toList();
