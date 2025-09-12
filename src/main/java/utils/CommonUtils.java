@@ -100,7 +100,7 @@ public class CommonUtils {
     public static void uploadFile(Page page, int inputIndex, String locatorValue, String fileName) {
         Path basePath = Paths.get("src/main/resources", fileName);
         if (!Files.exists(basePath)) {
-            basePath = Paths.get("src/main/resources/uploadFiles", fileName);
+            basePath = Paths.get("src/main/resources/uploadfiles", fileName);
         }
         Locator fileInputs = page.locator("input[type='file']");
         int fileInputCount = fileInputs.count();
