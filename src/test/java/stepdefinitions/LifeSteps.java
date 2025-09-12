@@ -38,6 +38,8 @@ public class LifeSteps {
     static String metricName;
     static String newPixelName;
     private String customFieldName;
+    private String uiCustomFieldName;
+
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -620,7 +622,6 @@ public class LifeSteps {
         List<String> savedTactics =   tacticDetails.getAllTactics();
         // Using a HashSet to compare the lists regardless of their order of entries.
         Assert.assertEquals(new HashSet<>(tacticNames), new HashSet<>(savedTactics));
-
     }
 
 
@@ -631,10 +632,20 @@ public class LifeSteps {
         tacticDetails.clickDetailsTab();
         tacticDetails.addCustomField(customFieldName);
         String raw = tacticDetails.verifyCustomField(customFieldName);
-        String actualName = raw.split("\\R")[0]; // To remove unwanted space and text
+        String actualName = raw.split("\\R")[0];// To remove unwanted space and text
         Assert.assertEquals(customFieldName,actualName);
+        this.uiCustomFieldName=actualName;
 
     }
+    @And("User verifies if new custom field is visible in new and existing tactic")
+    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic(DataTable dataTable) {
+        List<String> tacticNames = dataTable.asList(String.class);
+        tacticDetails.clickNewTactic();
+        Assert.assertEquals(customFieldName,uiCustomFieldName);
+        tacticDetails.clickTactic(tacticNames.get(0));
+        Assert.assertEquals(customFieldName,uiCustomFieldName);
+    }
+
 
     @Then("User deletes the custom field")
     public void user_deletes_the_custom_field() {

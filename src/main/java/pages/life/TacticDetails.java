@@ -145,6 +145,13 @@ public class TacticDetails {
         CONFIRM_DELETE.click();
         DELETE_SUCCESS.isVisible();
     }
+
+    public void clickTactic(String tacticName){
+        Locator tacticTab = page.locator(String.format("//div[contains(text(),'%s')]", tacticName));
+        tacticTab.click();
+
+    }
+
     public void verifyDetailsTab(){
         DETAILS_TAB.isVisible();
         System.out.println(DETAILS_TAB.innerText().trim());
