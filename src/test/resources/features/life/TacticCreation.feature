@@ -29,7 +29,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
 
-  @regression @vp
+  @regression
   Scenario Outline: Create new custom field in tactic and delete it
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
