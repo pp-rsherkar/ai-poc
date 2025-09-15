@@ -11,7 +11,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
-  @e2e
+  @regression
   Scenario Outline: Validate Run Report panel's field verification on Reports Page and allow report generation
     And User navigates to Administrative section and fetches the advertiser for the account "automation@pulsepoint"
     When User navigates to run report from mega menu of the life application
@@ -38,7 +38,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
     Then User should be able to select multiple values from dropdown
-    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Items" field
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
     Then User should be able to select multiple values from dropdown
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
     Then User should be able to select multiple values from dropdown
@@ -58,7 +58,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          |
 
-  @e2e
+  @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report using Template and Custom Dates option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -66,7 +66,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
     Then User should be able to select value from dropdown
-    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Items" field
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
     Then User should be able to select value from dropdown
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
     Then User should be able to select value from dropdown
@@ -85,7 +85,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | REPORT_FORMATS                                                             |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
 
-  @e2e
+  @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report using a Pick Dimensions/Metrics and Life Time option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -96,7 +96,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
     Then User should be able to select value from dropdown
     And Verify that "Lifetime" and "Flights" options are disabled until a Line Item is selected
-    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Items" field
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
     Then User should be able to select value from dropdown
     And Verify that "Lifetime" and "Flights" options are enabled
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
@@ -111,8 +111,9 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | DIMENSIONS                                                 | METRICS             | TIME_ZONE                |
       | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT-05:00) Central Time |
 
-  @e2e
+  @regressionn
   Scenario Outline:  Validate One time report section's field verification and generate One time report by entering Tactic and Fight option from Run Now
+    Then User searches the Campaign "<CAMPAIGN_NAME>", navigates to LineItem and fetches the flight details
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
@@ -121,13 +122,14 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to select template "<TEMPLATE>" from the dropdown
     And User clicks "Flights" report period button
     And Verify that Flight details field is displayed with value
+    And User fetches all the Flight details and verifies that selected Line Item flight details appear in the Flight tab of the Run Report panel
     And User should able to generate the report
     And And confirm that the report panel retains the entered data
     Examples:
-      | TEMPLATE       | TACTIC_INITIALS |
-      | AutoTemplate20 | CreativeTactic  |
+      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME            |
+      | Template_Automation | Multiple_Flight | Multiple_Flight_Campaign |
 
-  @e2e
+  @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
@@ -141,7 +143,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify dropdown dimensions with the template
     And Verify dropdown metrics with the template
 
-  @e2e
+  @regression
   Scenario Outline: Verify Report generation for file breakdown "<FILE_BREAKDOWN_TYPE>" button and verify Filter Report checkbox label
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -149,7 +151,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
     Then User should be able to select value from dropdown
-    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Items" field
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
     Then User should be able to select value from dropdown
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
     Then User should be able to select value from dropdown
@@ -159,7 +161,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User selects "<FILE_BREAKDOWN_TYPE>" button
     Then "Filter Report" section should be visible with label "Only Report on Impressions with Identifiable NPIs", "Only Report on Running Advertisers", "Only Report on Running Campaigns" checkbox
     And User should able to generate the report
-    And And confirm that the report panel retains the entered data
+    And User downloads the Scheduled report and verify the data in downloaded report
+    # And And confirm that the report panel retains the entered data
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | FILE_BREAKDOWN_TYPE |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Single File         |

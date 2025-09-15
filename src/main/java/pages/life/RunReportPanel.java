@@ -60,7 +60,9 @@ public class RunReportPanel {
     private final Locator DIMENSION_LABEL;
     private final Locator FILE_NAME_TEXTAREA;
     private final Locator FILE_NAME_ERROR;
-    private final Locator FLIGHT_DETAILS;
+    private final Locator DEFAULT_FLIGHT_DETAILS;
+    private final Locator FLIGHT_DETAILS_DROPDOWN;
+    private final Locator FLIGHT_DETAILS_DROPDOWN_VALUE;
     private final Locator FILE_BREAKDOWN_TYPE;
 
     public RunReportPanel(Page page) {
@@ -105,7 +107,9 @@ public class RunReportPanel {
         this.DIMENSION_LABEL = page.locator("//label[contains(text(),'Dimensions')]");
         this.FILE_NAME_TEXTAREA = page.locator("//textarea[@placeholder='File Name']");
         this.FILE_NAME_ERROR = page.locator("//div[contains(text(),'Invalid file Name')]");
-        this.FLIGHT_DETAILS = page.locator("//div[@id='date-option-dropdown']/div[contains(@class, 'text')]");
+        this.DEFAULT_FLIGHT_DETAILS = page.locator("//div[@id='date-option-dropdown']/div[contains(@class, 'text')]");
+        this.FLIGHT_DETAILS_DROPDOWN = page.locator("//div[@id='date-option-dropdown']");
+        this.FLIGHT_DETAILS_DROPDOWN_VALUE = page.locator("//div[@id='date-option-dropdown']/div[@class='menu transition visible']/div");
         this.FILE_BREAKDOWN_TYPE = page.locator("//label[contains(text(),'File Breakdown')]/following-sibling::div/button");
     }
 
@@ -189,7 +193,7 @@ public class RunReportPanel {
     }
 
     public boolean isDropdownValueLoadedForInitials(String initials, String fieldName) {
-        Locator locator = page.locator(String.format("//input[contains(@placeholder,'%s')]", fieldName));
+        Locator locator = page.locator(String.format("//label[text()='%s']/following-sibling::div//input[contains(@placeholder,'%s')]", fieldName,fieldName));
         locator.click();
         locator.type(initials);
         try {
@@ -295,6 +299,7 @@ public class RunReportPanel {
                 }
             }
         }
+        waitUtility.waitUntilSpinnerHidden();
         try {
             waitUtility.waitForLocatorVisible(FETCHED_TEMPLATE_NAME, 5000);
         } catch (Exception e) {
@@ -387,6 +392,18 @@ public class RunReportPanel {
         }
     }
 
+    public String fetchStartTime(){
+        if(START_TIME.isVisible())
+            return START_TIME.inputValue();
+        return " ";
+    }
+
+    public String fetchEndTime(){
+        if(END_TIME.isVisible())
+            return END_TIME.inputValue();
+        return " ";
+    }
+
     public boolean selectTimeZone(String timeZone) {
         try {
             TIME_ZONE.selectOption(new SelectOption().setLabel(timeZone));
@@ -394,6 +411,12 @@ public class RunReportPanel {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String fetchTimeZone(){
+        if(TIME_ZONE.isVisible())
+            return TIME_ZONE.locator("option:checked").textContent().trim();
+        return " ";
     }
 
     public String fetchDefaultReportFormat(String fileFormat) {
@@ -471,8 +494,8 @@ public class RunReportPanel {
 
     public String isFlightDetailsDisplayed() {
         try {
-            waitUtility.waitForLocatorVisible(FLIGHT_DETAILS);
-            return FLIGHT_DETAILS.innerText();
+            waitUtility.waitForLocatorVisible(DEFAULT_FLIGHT_DETAILS);
+            return DEFAULT_FLIGHT_DETAILS.innerText();
         }catch (Exception e){
             return " ";
         }
@@ -501,5 +524,19 @@ public class RunReportPanel {
         }
     }
 
+    public List<String> fetchAndSelectFlightDetails() {
+        FLIGHT_DETAILS_DROPDOWN.click();
+        waitUtility.waitForLocatorVisible(FLIGHT_DETAILS_DROPDOWN_VALUE.last());
+        List<String> flightDetails = FLIGHT_DETAILS_DROPDOWN_VALUE.allInnerTexts();
+        if (!FLIGHT_DETAILS_DROPDOWN_VALUE.all().isEmpty()) {
+            FLIGHT_DETAILS_DROPDOWN_VALUE.first().click();
+        }
+        return flightDetails;
+    }
+
+    public void downloadScheduledReport() {
+        waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
+
+    }
 }
 

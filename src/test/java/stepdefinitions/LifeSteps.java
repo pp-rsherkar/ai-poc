@@ -16,6 +16,8 @@ import utils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,7 @@ public class LifeSteps {
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
     List<String> nameList = new ArrayList<>();
     List<String> capturedDetails = new ArrayList<>();
-    List<String> advertiserList = new ArrayList<>();
+    List<String> itemList = new ArrayList<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -68,6 +70,8 @@ public class LifeSteps {
     BulkCreativeUpload bulkCreativeUpload = new BulkCreativeUpload(DriverFactory.getPage());
     RunReportPanel runReportPanel = new RunReportPanel(DriverFactory.getPage());
     Accounts accounts = new Accounts(DriverFactory.getPage());
+    ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
+    LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
@@ -2049,7 +2053,7 @@ public class LifeSteps {
         Assert.assertTrue("Advertiser dropdown is not present", runReportPanel.isAdvertiserDropdownAvailable());
         runReportPanel.clickAdvertiserDropdown();
         List<String> advertiser = runReportPanel.fetchAdvertisers();
-        Assert.assertTrue("Advertiser List does not match", advertiser.containsAll(advertiserList));
+        Assert.assertTrue("Advertiser List does not match", advertiser.containsAll(itemList));
     }
 
     @And("User should be able to select multiple advertisers from the list")
@@ -2149,6 +2153,11 @@ public class LifeSteps {
         capturedDetails.addAll(runReportPanel.fetchLineItemName());
         capturedDetails.addAll(runReportPanel.fetchTacticName());
         capturedDetails.addAll(runReportPanel.fetchCreativeName());
+        capturedDetails.add(runReportPanel.fetchStartTime());
+        capturedDetails.add(runReportPanel.fetchEndTime());
+        capturedDetails.add(runReportPanel.fetchTimeZone());
+        System.out.println("Entered data = " + nameList);
+        System.out.println("Captured data = " + capturedDetails);
         Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
     }
 
@@ -2165,11 +2174,14 @@ public class LifeSteps {
     @And("Verify that user is able to select start {string} and end time {string} when Custom Dates option is selected")
     public void verifyThatUserIsAbleToSelectStartAndEndTimeWhenCustomDatesOptionIsSelected(String startTime, String endTime) {
         Assert.assertTrue("Unable to select time", runReportPanel.enterStartAndEndTime(startTime, endTime));
+        nameList.add(startTime);
+        nameList.add(endTime);
     }
 
     @And("Verify that user is able to select Timezone field value {string}")
     public void verifyThatUserIsAbleToSelectTimezoneFieldValue(String timeZone) {
         Assert.assertTrue("Unable to select time zone", runReportPanel.selectTimeZone(timeZone.trim()));
+        nameList.add(timeZone);
     }
 
     @And("Verify the default value of the the Report Format field is {string}")
@@ -2246,7 +2258,7 @@ public class LifeSteps {
         accounts.clickAdministration();
         accounts.clickAdvertiserTab();
         accounts.selectAccount(account);
-        advertiserList = accounts.fetchAdvertiserList();
+        itemList = accounts.fetchAdvertiserList();
         navigation.clickPulsePointLogo();
     }
 
@@ -2284,5 +2296,276 @@ public class LifeSteps {
             Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
         if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
             Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
+    }
+
+    @When("User navigates to Schedule report from mega menu of the life application")
+    public void userNavigatesToScheduleReportFromMegaMenuOfTheLifeApplication() {
+        navigation.clickSubMenu();
+        navigation.clickMenuAngle();
+        navigation.clickScheduledReport();
+    }
+
+    @And("User clicks Schedule Report button")
+    public void userClicksScheduleReportButton() {
+        scheduleReport.clickScheduleReportButton();
+    }
+
+    @And("Verify Schedule Report panel should be opened")
+    public void verifyScheduleReportPanelShouldBeOpened() {
+        Assert.assertTrue("Schedule Report panel is not opened", scheduleReport.isScheduleReportPanelOpened());
+    }
+
+    @And("Verify Report Name field is available and accepts input {string}")
+    public void verifyReportNameFieldIsAvailableAndAcceptsInput(String name) {
+        Assert.assertTrue("Report Name field is not available", scheduleReport.isReportNameAvailable());
+        metricName = name + "_" + CommonUtils.timeStampCalculation();
+        scheduleReport.enterReportName(metricName);
+        nameList.add(metricName);
+    }
+
+    @And("Verify availability of frequency field with options below")
+    public void verifyAvailabilityOfFrequencyFieldWithOptions(DataTable dataTable) {
+        List<String> buttonLabels = dataTable.asList(String.class);
+        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(scheduleReport.fetchFrequencyOptions()));
+    }
+
+    @And("Verify default value of the Frequency field is {string}")
+    public void verifyDefaultValueOfTheFrequencyFieldIs(String defaultValue) {
+        Assert.assertTrue("Weekly is not selected by default", scheduleReport.checkDefaultFrequencyOption(defaultValue));
+    }
+
+    @And("Verify that user is able to select Schedule start date and Schedule end date")
+    public void verifyThatUserIsAbleToSelectScheduleStartDateAndScheduleEndDate() {
+        Assert.assertTrue("Unable to select start date from date picker", scheduleReport.selectScheduleStartDate());
+        Assert.assertTrue("Unable to select end date from date picker", scheduleReport.selectScheduleEndDate());
+    }
+
+    @And("Verify default value of Data Timezone is {string}")
+    public void verifyDefaultValueOfDataTimezoneIs(String timeZone) {
+        Assert.assertEquals(timeZone.trim(), scheduleReport.fetchDefaultTimeZone());
+    }
+
+    @And("Verify that user is able to select Data Timezone field value {string}")
+    public void verifyThatUserIsAbleToSelectDataTimezoneFieldValue(String timeZone) {
+        Assert.assertTrue("Unable to select time zone", scheduleReport.selectDataTimeZone(timeZone.trim()));
+        nameList.add(timeZone);
+    }
+
+    @And("The Send On field should contain all days of the week when {string} is selected as Frequency")
+    public void theSendOnFieldShouldContainAllDaysOfTheWeekWhenIsSelectedAsFrequency(String frequencyOption, DataTable dataTable) {
+        List<String> buttonLabels = dataTable.asList(String.class);
+        Assert.assertTrue("Weekly is not selected by default", scheduleReport.checkDefaultFrequencyOption(frequencyOption));
+        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(scheduleReport.fetchWeekDays()));
+    }
+
+    @And("Verify default value of Send On is {string}")
+    public void verifyDefaultValueOfSendOnIs(String defaultValue) {
+        Assert.assertTrue("Sun is not selected by default", scheduleReport.checkDefaultWeekDay(defaultValue));
+    }
+
+    @And("Verify Send At field is available with Start Time and Timezone fields")
+    public void verifySendAtFieldIsAvailableWithStartTimeAndTimezoneFields() {
+        Assert.assertTrue("Send At fields - Time and TimeZone are not available", scheduleReport.isSendAtFieldAvailable());
+    }
+
+    @And("Verify default value of Send At fields - Start Time is {string} and Timezone is {string}")
+    public void verifyDefaultValueOfSendAtFieldsStartTimeIsAndTimezoneIs(String defaultTime, String defaultTimezone) {
+        Assert.assertEquals("Default time "  + defaultTime+" is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
+        Assert.assertEquals("Default time "  + defaultTimezone+" is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
+    }
+
+    @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
+    public void verifyUserIsAbleToSelectTimeAndTimezoneForSendAtFields(String time, String timeZone) {
+        Assert.assertTrue("Unable to enter time and timezone", scheduleReport.enterSendAtTimeAndTimezone(time, timeZone));
+        nameList.add(time);
+        nameList.add(timeZone);
+    }
+
+    @And("Verify Delivery field has two methods - {string} and {string}")
+    public void verifyDeliveryFieldHasTwoMethodsAnd(String email, String customDestination) {
+        List<String> methodNames = scheduleReport.verifyDeliveryMethods();
+        Assert.assertTrue("Methods are not available", methodNames.contains(email) && methodNames.contains(customDestination));
+    }
+
+    @When("User clicks on {string} tab as Delivery Method")
+    public void userClicksOnTabAsDeliveryMethod(String tabName) {
+        scheduleReport.clickDeliveryTab(tabName);
+    }
+
+    @Then("Verify Deliver to Users field is available")
+    public void verifyDeliverToUsersFieldIsAvailable() {
+        Assert.assertTrue("Deliver To Users field is not available", scheduleReport.isDeliveryToUserAvailable());
+    }
+
+    @And("User should able to specify multiple users in Deliver to Users field")
+    public void userShouldAbleToSpecifyMultipleUsersInDeliverToUsersField(DataTable dataTable) {
+        List<String> userLists = dataTable.asList(String.class);
+        scheduleReport.selectUsersForDelivery(userLists);
+    }
+
+    @And("Verify that Add Emails link is available below Deliver to Users")
+    public void verifyThatAddEmailsLinkIsAvailableBelowDeliverToUsers() {
+        Assert.assertTrue("Deliver To Users field is not available", scheduleReport.isAddEmailLinkAvailable());
+    }
+
+    @When("User clicks Add Emails link, Deliver to External Emails field should display")
+    public void userClicksAddEmailsLinkDeliverToExternalEmailsFieldShouldDisplay() {
+        scheduleReport.clickAddEmailsLink();
+        Assert.assertTrue("Deliver To External Users field is not available", scheduleReport.isDeliverToExternalEmailsAvailable());
+    }
+
+    @And("User should be able to add multiple emails in Deliver to External Emails field")
+    public void userShouldBeAbleToAddMultipleEmailsInDeliverToExternalEmailsField(DataTable dataTable) {
+        List<String> emailList = dataTable.asList(String.class);
+        scheduleReport.enterExternalEmails(emailList);
+    }
+
+    @Then("Verify Destination dropdown field is available")
+    public void verifyDestinationDropdownFieldIsAvailable() {
+        Assert.assertTrue("Destination field is not available", scheduleReport.isDestinationAvailable());
+    }
+
+    @And("Verify {string} button is available in Destination dropdown field")
+    public void verifyAddDestinationButtonIsAvailableInDestinationDropdownField(String buttonName) {
+        Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
+    }
+
+    @When("User clicks {string} button")
+    public void userClicksAddDestinationButton(String buttonName) {
+        scheduleReport.clickAddDestination(buttonName);
+    }
+
+    @Then("Verify Destination Name, Destination Type fields are displayed")
+    public void verifyDestinationNameDestinationTypeFieldsAreDisplayed() {
+        Assert.assertTrue("Destination Name and Type fields are not available", scheduleReport.isDestinationNameAndTypeDisplayed());
+    }
+
+    @And("Verify that Destination Type has values {string}")
+    public void verifyThatDestinationTypeHasValues(String destinationTypes) {
+        List<String> expectedTypes = CommonUtils.convertStringToList(destinationTypes);
+        List<String> actualTypes = scheduleReport.fetchDestinationTypes();
+        for (String type : expectedTypes) {
+            Assert.assertTrue("Missing Destination Type: " + type, actualTypes.contains(type));
+        }
+    }
+
+    @And("Verify File Path field is available")
+    public void verifyFilePathFieldIsAvailable() {
+        Assert.assertTrue("File Path field is not available", scheduleReport.isFilePathAvailable());
+    }
+
+    @And("Verify File Name field is available")
+    public void verifyFileNameFieldIsAvailable() {
+        Assert.assertTrue("File Path field is not available", scheduleReport.isFileNameAvailable());
+    }
+
+    @And("Verify Compression field is available with below options and default value is {string}")
+    public void verifyCompressionFieldIsAvailableWithBelowOptions(String defaultCompressionType, DataTable dataTable) {
+        List<String> buttonLabels = dataTable.asList(String.class);
+        Assert.assertTrue("None is not selected by default", scheduleReport.checkDefaultCompression(defaultCompressionType));
+        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(scheduleReport.fetchCompressionTypes()));
+    }
+
+    @And("Verify Control File checkbox is present and by default it should be unchecked")
+    public void verifyControlFileCheckboxIsPresentAndByDefaultItShouldBeUnchecked() {
+        Assert.assertTrue("Control File checkbox is not available", scheduleReport.isControlFileCheckboxAvailable());
+        Assert.assertTrue("Control File checkbox is not unchecked by default", scheduleReport.isControlFileCheckboxSelected());
+    }
+
+    @And("User clicks {string} as frequency")
+    public void userClicksAsFrequency(String frequencyType) {
+        scheduleReport.clickFrequencyOption(frequencyType);
+    }
+
+    @And("User selects Send On date")
+    public void userSelectsSendOnDate() {
+        Assert.assertTrue("Unable to select date from date picker", scheduleReport.selectScheduleStartDate());
+    }
+
+    @And("Verify Report Period is selected as {string}")
+    public void verifyReportPeriodIsSelectedAs(String periodType) {
+        scheduleReport.selectReportPeriod(periodType);
+        nameList.add(periodType);
+    }
+
+    @And("User selects start date and end date when Custom Dates option is selected")
+    public void userSelectsStartDateAndEndDateWhenCustomDatesOptionIsSelected() {
+        Assert.assertTrue("Unable to select start date", scheduleReport.selectStartDate());
+        Assert.assertTrue("Unable to select end date", scheduleReport.selectEndDate());
+    }
+
+    @And("User selects start {string} and end time {string} when Custom Dates option is selected")
+    public void userSelectsStartAndEndTimeWhenCustomDatesOptionIsSelected(String startTime, String endTime) {
+        Assert.assertTrue("Unable to select start and end time", scheduleReport.selectStartAndEndTime(startTime, endTime));
+        nameList.add(startTime);
+        nameList.add(endTime);
+    }
+
+    @And("User clicks Schedule button to generate the report")
+    public void userClicksScheduleButtonForReportGeneration() {
+        scheduleReport.clickScheduleButton();
+        Assert.assertEquals("Success!", scheduleReport.fetchSuccessAlert());
+    }
+
+    @And("User searches the report and checks the report panel retains the entered data")
+    public void userSearchesTheReportAndChecksTheReportPanelRetainsTheEnteredData() {
+        scheduleReport.searchReport(metricName);
+        scheduleReport.clickReportName(metricName);
+        capturedDetails.addAll(runReportPanel.fetchTemplateValue());
+        capturedDetails.addAll(runReportPanel.fetchAdvertiserName());
+        capturedDetails.addAll(runReportPanel.fetchCampaignName());
+        capturedDetails.addAll(runReportPanel.fetchLineItemName());
+        capturedDetails.addAll(runReportPanel.fetchTacticName());
+        capturedDetails.addAll(runReportPanel.fetchCreativeName());
+        capturedDetails.add(scheduleReport.fetchReportName());
+        capturedDetails.add(scheduleReport.fetchTimeZone());
+        capturedDetails.add(scheduleReport.fetchSendAtTime());
+        capturedDetails.add(scheduleReport.fetchSendAtTimezone());
+        capturedDetails.add(scheduleReport.fetchReportPeriod());
+        capturedDetails.add(scheduleReport.fetchStartTime());
+        capturedDetails.add(scheduleReport.fetchEndTime());
+        Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
+    }
+
+    @And("Verify Send On field is visible and user should be able to select the day {string} of the month")
+    public void verifySendOnFieldIsVisibleAndUserShouldBeAbleToSelectTheDayOfTheMonth(String dayOfTheMonth) {
+        Assert.assertTrue("Send On field is not available", scheduleReport.isSendOnAvailable());
+        Assert.assertTrue("Unable to select Day of the Month", scheduleReport.selectDayOfTheMonth(dayOfTheMonth));
+    }
+
+    @And("Verify that user is able to select Send On day {string}")
+    public void verifyThatUserIsAbleToSelectSendOnDay(String day) {
+        Assert.assertTrue("Unable to select Send On Day", scheduleReport.selectWeekDay(day));
+    }
+
+    @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
+    public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
+        campaignListing.searchCreatedCampaign(campaignName);
+        campaignDashboard.navigateToLineItemDetails(campaignName);
+        lineItemFlights.clickFlightTab();
+        Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
+        itemList = lineItemFlights.fetchFlightDates();
+    }
+
+    @And("User fetches all the Flight details and verifies that selected Line Item flight details appear in the Flight tab of the Run Report panel")
+    public void userFetchesAllTheFlightDetailsAndSelects() throws ParseException {
+        List<String> flightDescriptions = runReportPanel.fetchAndSelectFlightDetails();
+        SimpleDateFormat descFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
+        SimpleDateFormat extractedFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+        SimpleDateFormat compareFormat = new SimpleDateFormat("MM/dd/yyyy");
+        for (int i = 0; i < flightDescriptions.size(); i++) {
+            String desc = flightDescriptions.get(i).split(":")[1].split("-")[0].trim();
+            desc = desc.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            String expected = compareFormat.format(descFormat.parse(desc));
+            String actual = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
+            if (expected.equals(actual))
+                Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expected, actual);
+        }
+    }
+
+
+    @And("User downloads the Scheduled report and verify the data in downloaded report")
+    public void userDownloadsTheScheduledReportAndVerifyTheDataInDownloadedReport() {
+        runReportPanel.downloadScheduledReport();
     }
 }

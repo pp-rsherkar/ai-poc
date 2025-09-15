@@ -78,7 +78,7 @@ public class CampaignDashboard {
         this.LINEITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.TACTIC_TOGGLE_BUTTON = page.locator("//div[contains(@class,'tactic-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.BACK_TO_DASHBOARD = page.locator("//span[contains(@class,'breadCrumbRoot') and contains(text(),'Campaigns')]");
-        this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section ng-star-inserted')]");
+        this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section')]");
         this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
         this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'left truncate campaign-name')]");
         this.TACTIC_NAME = page.locator("//span[contains(@class,'color-black tactic-name-section')]");
@@ -375,5 +375,10 @@ public class CampaignDashboard {
             }
         }
         return true;
+    }
+
+    public void navigateToLineItemDetails(String campaignID){
+        LINEITEM_NAME.click();
+        LINEITEM_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 }
