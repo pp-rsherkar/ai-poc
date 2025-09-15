@@ -76,7 +76,7 @@ public class Pixels {
 
     public String verifySaveSuccess() {
         String successMessage = SAVE_SUCCESS.innerText();
-        SAVE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(SAVE_SUCCESS);
         return successMessage;
     }
 
@@ -88,7 +88,7 @@ public class Pixels {
 
     public String verifyCreatedPixel(String pixelName) {
         String createdPixelXpath = String.format("//div[contains(text(),'%s')]", pixelName);
-        page.waitForSelector(createdPixelXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(page.locator(createdPixelXpath));
         return page.locator(createdPixelXpath).innerText();
     }
 }

@@ -27,8 +27,8 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the created pixel
-    Then Verify the selected targeting rule "<RULE_TYPE>" for "<PIXEL_TYPE>"
-    Then Verify the count of selected entities
+    Then Verify the selected targeting rule "<RULE_TYPE>"
+    Then Verify the count of rule options for the selected targeting rule on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
 
@@ -50,7 +50,8 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     And User navigates to NPI Lists page
     When User clicks on Create New List
     And User selects Smart List to create NPI list
-    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" for "<TYPE>"
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" and selects the created Smart Pixel
+    Then Verify the selected Smart Pixel
     Then Save and Verify the list gets saved successfully
     And User navigates to Campaign Dashboard
     And User clicks on Create Campaign
@@ -62,14 +63,14 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the created Smart list
-    Then Verify the selected targeting rule "<RULE_TYPE>" for "<PIXEL_TYPE>"
-    Then Verify the count of selected entities
+    Then Verify the selected targeting rule "<RULE_TYPE>" for Smart list
+    Then Verify the count of rule options for the selected targeting rule on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
 
     Examples:
-      | PIXEL_TYPE  | ADVERTISER       | LIST_NAME   | TYPE        | CP_NAME        | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE |
-      | Smart Pixel | 1Demo Advertiser | Smart_Pixel | Smart Pixel | Smart_Campaign | Regular | 12500     | Auto_Line | 70          | Auto_Tactic | Display Advanced | NPI       |
+      | PIXEL_TYPE  | ADVERTISER       | LIST_NAME   | CP_NAME        | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE |
+      | Smart Pixel | 1Demo Advertiser | Smart_Pixel | Smart_Campaign | Regular | 12500     | Auto_Line | 70          | Auto_Tactic | Display Advanced | NPI       |
 
   @e2e
   Scenario Outline: Create a Conversion Pixel and target in 'Converters' targeting at Tactic level
@@ -92,8 +93,8 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the created pixel
-    Then Verify the selected targeting rule "<RULE_TYPE>" for "<PIXEL_TYPE>"
-    Then Verify the count of selected entities
+    Then Verify the selected targeting rule "<RULE_TYPE>"
+    Then Verify the count of rule options for the selected targeting rule on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
 
