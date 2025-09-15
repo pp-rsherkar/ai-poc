@@ -3,8 +3,11 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class Pixels {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator PIXELS_MENU_ITEM;
     private final Locator ADD_PIXEL_BUTTON;
@@ -73,19 +76,19 @@ public class Pixels {
 
     public String verifySaveSuccess() {
         String successMessage = SAVE_SUCCESS.innerText();
-        SAVE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitForLocatorDetached(SAVE_SUCCESS);
         return successMessage;
     }
 
     public void searchSavedPixel(String pixelName) {
+        waitUtility.waitUntilSpinnerHidden();
         SEARCH_BOX.fill(pixelName);
         SEARCH_BOX.press("Enter");
     }
 
     public String verifyCreatedPixel(String pixelName) {
         String createdPixelXpath = String.format("//div[contains(text(),'%s')]", pixelName);
-        page.waitForSelector(createdPixelXpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(page.locator(createdPixelXpath));
         return page.locator(createdPixelXpath).innerText();
     }
-
 }
