@@ -55,6 +55,7 @@ public class TacticDetails {
     private final Locator CONFIRM_DELETE;
     private final Locator DELETE_SUCCESS;
     private final Locator DETAILS_TAB;
+    private final Locator SAVED_TACTIC_TABS;
 
 
     public TacticDetails(Page page) {
@@ -81,6 +82,7 @@ public class TacticDetails {
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
         this.SAVED_TACTICS = page.locator("//div[contains(@class,'tactic-main-details')]");
         this.NEW_TACTIC_TABS = page.locator("//a[@disabled='disabled']");
+        this.SAVED_TACTIC_TABS = page.locator("//a[contains(@class,'gaTab')]");
         this.TACTIC_STATUS = page.locator("//span[contains(@class, 'status-label')]/span");
         this.ADD_CUSTOM_FIELD = page.locator("//span[contains(text(),'Add Custom Field')]");
         this.ADD_CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
@@ -110,8 +112,14 @@ public class TacticDetails {
     public List<String> newTacticTabs(){
        return NEW_TACTIC_TABS.allInnerTexts();
     }
-    public String verifyTacticState(){
+    public List<String> savedTacticTabs(){
+       return SAVED_TACTIC_TABS.allInnerTexts();
+    }
+
+    public void CLICK_FIRST_TACTIC(){
         SAVED_TACTICS.first().click();
+    }
+    public String verifyTacticState(){
         return TACTIC_STATUS.innerText();
     }
     public void clickNewTactic(){

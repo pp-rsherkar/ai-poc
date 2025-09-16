@@ -19,7 +19,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Audience Group tactic |
       | Targeting Segment     |
       | Health Populations    |
-    Then User verifies the availability of all the tabs for tactics
+    Then Verify that for unsaved tactics only details tab is enabled and other three tabs are disabled
       |Settings|
       |Creatives|
       |Debugger |
@@ -37,7 +37,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates new tactics and verifies it
      | Targeting Segment  |
-    Then Verify the status of saved tactic
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible in new and existing tactic
       | Targeting Segment  |

@@ -628,6 +628,7 @@ public class LifeSteps {
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
+        tacticDetails.clickNewTactic();
         String customFieldName = customField+"_"+CommonUtils.randomNumberGeneration();
         this.customFieldName = customFieldName;
         tacticDetails.clickDetailsTab();
@@ -653,16 +654,22 @@ public class LifeSteps {
         tacticDetails.deleteCustomField(customFieldName);
     }
 
-    @Then("User verifies the availability of all the tabs for tactics")
-    public void user_verifies_availability_of_all_the_tabs_for_tactics(DataTable dataTable) {
+    @Then("Verify that for unsaved tactics only details tab is enabled and other three tabs are disabled")
+    public void verify_that_for_unsaved_tactics_only_details_tab_is_enabled_and_other_three_tabs_are_disabled(DataTable dataTable) {
+        tacticDetails.clickNewTactic();
         tacticDetails.verifyDetailsTab();
-
-        List<String> tacticTabNames = dataTable.asList(String.class);
+        List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
         List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
         Assert.assertEquals(tacticTabNames,disabledTabs);
+        tacticDetails.CLICK_FIRST_TACTIC();
+        List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
+        tacticTabNames.add("Details");
+        Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
+
     }
     @And("Verify the status of saved tactic")
     public void verify_the_status_of_saved_tactic() {
+        tacticDetails.CLICK_FIRST_TACTIC();
         String actualStatus = tacticDetails.verifyTacticState();
         Assert.assertEquals("Incomplete",actualStatus);
     }
