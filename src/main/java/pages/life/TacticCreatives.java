@@ -79,6 +79,7 @@ public class TacticCreatives {
     public void clickAssignCreatives() { ASSIGN_EXISTING_CREATIVE.click(); }
 
     public boolean verifyCreativeAssigned(String CreativeName){
+        waitUtility.waitForElementVisible(String.format("//td[@title='%s']",CreativeName));
         return page.locator(String.format("//td[@title='%s']",CreativeName)).isVisible();
 
     }
