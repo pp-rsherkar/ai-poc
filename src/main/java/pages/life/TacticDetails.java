@@ -114,7 +114,7 @@ public class TacticDetails {
 
             targetingTemplate.addTargetingRules(rulesMap);
             saveTacticDetails();
-
+            waitUtility.waitUntilSpinnerHidden();
             templateNameList.add(saveTargetingTemplate(lineItemType.trim()));
         }
         return templateNameList;
