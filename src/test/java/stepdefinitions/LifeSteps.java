@@ -65,6 +65,7 @@ public class LifeSteps {
     Pixels pixels = new Pixels(DriverFactory.getPage());
     RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
+    SmartPixel smartPixel = new SmartPixel(DriverFactory.getPage());
     BulkCreativeUpload bulkCreativeUpload = new BulkCreativeUpload(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
@@ -1741,6 +1742,12 @@ public class LifeSteps {
         conversionPixel.selectConversionPixelType(conversionPixelType);
     }
 
+    @And("User selects the {string} and the associated campaign")
+    public void userSelectsTheFromTheList(String advertiser) {
+        smartPixel.selectAdvertiser(advertiser);
+        smartPixel.selectAssociatedCampaign();
+    }
+
     @And("User saves the pixel")
     public void userSavesThePixel() {
         pixels.savePixel();
@@ -1753,15 +1760,57 @@ public class LifeSteps {
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
 
+    @Then("Verify the smart pixel is saved successfully and displayed in the pixel list")
+    public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
+        assert pixels.verifySaveSuccess().contains("Success!");
+        newPixelName = smartPixel.getPixelName();
+        pixels.searchSavedPixel(newPixelName);
+        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
+    }
+
     @When("User selects {string} as rule type and selects the created pixel")
     public void userSelectsRuleTypeAndSelectsCreatedPixelAndSavesSettings(String ruleType) {
-        tacticSettings.selectRuleType(ruleType, newPixelName);
+        itemCount = tacticSettings.selectRuleType(ruleType, newPixelName);
     }
 
     @Then("Verify the selected targeting rule {string}")
-    public void verifyTheSelectedTargetingRules(String ruleType) {
+    public void verifyTheSelectedTargetingRule(String ruleType) {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+    }
+
+    @Then("Verify the selected targeting rule {string} for Smart list")
+    public void verifyTheSelectedTargetingRuleForSmartList(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(npiName, tacticSettings.verifyRuleOption());
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string} and selects the created Smart Pixel")
+    public void userEntersTheSmartNPIListDetailsAndSelectsTheCreatedSmartPixel(String npiListName, String advertiser) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickSmartPixel();
+        npiSmartList.clickSmartPixelDropDown();
+        npiSmartList.clickSmartPixelDropDownValue(newPixelName);
+    }
+
+    @Then("Verify the selected Smart Pixel")
+    public void verifyTheSelectedSmartPixel() {
+        Assert.assertEquals(newPixelName, npiSmartList.verifySelectedSmartPixel());
+    }
+
+    @And("User selects {string} as rule type and selects the created Smart list")
+    public void userSelectsRuleTypeAndSelectsCreatedSmartList(String ruleType) {
+        itemCount = tacticSettings.selectRuleType(ruleType, npiName);
+    }
+
+    @Then("Verify the count of rule options for the selected targeting rule on the Tactic Settings page")
+    public void verifyTheCountOfSelectedRuleOptions() {
+        String optionsCount = tacticSettings.fetchSelectedListCountFromTactic();
+        int targetedOptionsCount = Integer.parseInt(optionsCount.replaceAll("[^0-9]", ""));
+        Assert.assertEquals("Selected options count does not match", itemCount, targetedOptionsCount);
     }
 
     /*Roshani Sherkar

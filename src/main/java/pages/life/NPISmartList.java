@@ -51,6 +51,7 @@ public class NPISmartList {
     private final Locator PULSEPOINT_ICON;
     private final Locator CLICK_EXPAND_PRACTICE;
     private final Locator ADD_DRUG_BUTTON;
+    private final Locator SELECTED_SMART_PIXEL;
 
     public NPISmartList(Page page) {
         this.page = page;
@@ -92,6 +93,7 @@ public class NPISmartList {
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
+        this.SELECTED_SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
     }
 
     public void clickSmartList() {
@@ -238,5 +240,9 @@ public class NPISmartList {
 
     public void clickPulsepointIcon() {
         PULSEPOINT_ICON.click();
+    }
+
+    public String verifySelectedSmartPixel() {
+        return SELECTED_SMART_PIXEL.innerText().trim();
     }
 }
