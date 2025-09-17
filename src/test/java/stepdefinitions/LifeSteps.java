@@ -2185,16 +2185,17 @@ public class LifeSteps {
         runReportPanel.clickFilterReportCheckbox();
     }
 
-    @And("User should able to generate the report")
+    @And("User should be able to generate the report")
     public void userShouldAbleToGenerateTheReport(){
         String fileName = "Custom Report";
+        metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
         Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
     }
 
-    @And("And confirm that the report panel retains the entered data")
+    @And("Confirms that the report panel retains the entered data")
     public void andConfirmThatTheReportPanelRetainsTheEnteredData() {
-        runReportPanel.clickModifyOption(templateNameRandom);
+        runReportPanel.clickModifyOption(metricName);
         capturedDetails.addAll(runReportPanel.fetchTemplateValue());
         capturedDetails.addAll(runReportPanel.fetchDimensionAndMetricValues());
         capturedDetails.addAll(runReportPanel.fetchAdvertiserName());
@@ -2205,8 +2206,6 @@ public class LifeSteps {
         capturedDetails.add(runReportPanel.fetchStartTime());
         capturedDetails.add(runReportPanel.fetchEndTime());
         capturedDetails.add(runReportPanel.fetchTimeZone());
-        System.out.println("Entered data = " + nameList);
-        System.out.println("Captured data = " + capturedDetails);
         Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
     }
 
@@ -2233,7 +2232,7 @@ public class LifeSteps {
         nameList.add(timeZone);
     }
 
-    @And("Verify the default value of the the Report Format field is {string}")
+    @And("Verify the default value of the Report Format field is {string}")
     public void verifyTheDefaultValueOfTheTheReportFormatFieldIsCSV(String fileFormat) {
         Assert.assertEquals(fileFormat, runReportPanel.fetchDefaultReportFormat(fileFormat));
     }
@@ -2616,5 +2615,59 @@ public class LifeSteps {
     @And("User downloads the Scheduled report and verify the data in downloaded report")
     public void userDownloadsTheScheduledReportAndVerifyTheDataInDownloadedReport() {
         runReportPanel.downloadScheduledReport();
+    }
+
+    @When("User navigates to Administrative section and go to Accounts Tab")
+    public void userNavigatesToAdministrativeSectionAndGoToTab() throws Exception {
+        navigation.clickSubMenu();
+        accounts.clickAdministration();
+        accounts.selectAccountsTab();
+    }
+
+    @And("User searches the account {string} in which Destination to be created")
+    public void userSearchesTheAccountInWhichDestinationToBeCreated(String account) {
+        accounts.searchAccount(account);
+        Assert.assertTrue("Reporting Tab is not displayed", accounts.isReportingTabDisplayed());
+    }
+
+    @And("User navigates to Reporting tab")
+    public void userNavigatesToReportingTab() {
+        accounts.clickReportingTab();
+    }
+
+    @Then("User clicks Add Destination button")
+    public void userClicksAddDestinationButton() {
+        accounts.clickAddDestination();
+    }
+
+    @And("User enters Destination details - {string}, {string}, {string}, {string}")
+    public void userEntersDestinationDetails(String destinationName, String destinationType, String hostName, String port) throws Exception {
+        dimensionName = destinationName + CommonUtils.timeStampCalculation();
+        accounts.enterDestinationName(dimensionName);
+        accounts.selectDestinationType(destinationType);
+        accounts.enterHostName(hostName);
+        accounts.enterUserName(ConfigReader.getCustomDestinationUsername());
+        accounts.enterPassword(ConfigReader.getCustomDestinationPassword());
+        accounts.enterPortName(port);
+    }
+
+    @And("User clicks Test Connection link to verify if connection happened successfully")
+    public void userClicksTestConnectionLinkToVerifyIfConnectionHappenedSuccessfully() {
+        accounts.clickTestConnection();
+    }
+
+    @Then("User selects destination name created, and other details - {string}, {string}")
+    public void userSelectsDestinationNameCreatedAndOtherDetails(String filePath, String fileName) {
+        scheduleReport.enterCustomDestinationDetailsOnReportPanel(dimensionName, filePath, fileName);
+    }
+
+    @And("User clicks PulsePoint icon to navigate back to Life")
+    public void userClicksPulsePointIconToNavigateBackToLife() {
+        navigation.clickPulsePointLogo();
+    }
+
+    @And("User saves the custom destination")
+    public void userSavesTheCustomDestination() {
+        accounts.clickOKButton();
     }
 }

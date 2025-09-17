@@ -34,6 +34,18 @@ public class Accounts {
     private final Locator ACCOUNT_DROPDOWN_TEXTAREA;
     private final Locator SEARCH_BUTTON;
     private final Locator ADVERTISER_LIST;
+    private final Locator REPORTING_TAB;
+    private final Locator CUSTOM_DESTINATION_SECTION;
+    private final Locator ADD_DESTINATION_BUTTON;
+    private final Locator ENTER_DESTINATION_NAME;
+    private final Locator DESTINATION_TYPE_DROPDOWN;
+    private final Locator ENTER_HOSTNAME;
+    private final Locator ENTER_USERNAME;
+    private final Locator ENTER_PASSWORD;
+    private final Locator ENTER_PORT;
+    private final Locator TEST_CONNECTION_LINK;
+    private final Locator CONNECTION_CONFIRMATION_TEXT;
+    private final Locator OK_BUTTON;
 
     public Accounts(Page page) {
         this.page = page;
@@ -59,6 +71,18 @@ public class Accounts {
         this.ACCOUNT_DROPDOWN_TEXTAREA = page.locator("//input[@placeholder='Any Account']");
         this.SEARCH_BUTTON = page.locator("//span[text()='Search']");
         this.ADVERTISER_LIST = page.locator("//td[contains(@class,'gaTableRow')]//div");
+        this.REPORTING_TAB = page.locator("//a[@routerlink='reporting']");
+        this.CUSTOM_DESTINATION_SECTION = page.locator("//div[@id='custom-destinations']");
+        this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']");
+        this.ENTER_DESTINATION_NAME = page.locator("//input[@placeholder='Enter Destination Name']");
+        this.DESTINATION_TYPE_DROPDOWN = page.locator("//label[text()='Destination Type']/following-sibling::select");
+        this.ENTER_HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
+        this.ENTER_USERNAME = page.locator("//input[@placeholder='Enter User Name']");
+        this.ENTER_PASSWORD = page.locator("//input[@placeholder='Enter Password']");
+        this.ENTER_PORT = page.locator("//input[@placeholder='Enter Port Number']");
+        this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
+        this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
+        this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
     }
 
     public void clickAdministration() {
@@ -68,14 +92,17 @@ public class Accounts {
     public void selectAccountsTab() {
         page.waitForLoadState();
         ACCOUNTS_TAB.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public void searchAccount(String accountName) {
-        page.waitForLoadState();
         waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
-        SELECT_ACCOUNT.click();
+        Locator selectAccount = page.locator(String.format("//div[@title='%s']", accountName));
+        waitUtility.waitForLocatorVisible(selectAccount);
+        selectAccount.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void enableStudio() {
@@ -134,5 +161,55 @@ public class Accounts {
     public List<String> fetchAdvertiserList(){
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
         return ADVERTISER_LIST.allInnerTexts();
+    }
+
+    public boolean isReportingTabDisplayed(){
+        return REPORTING_TAB.isVisible();
+    }
+
+    public void clickReportingTab() {
+        REPORTING_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CUSTOM_DESTINATION_SECTION);
+    }
+
+    public void clickAddDestination() {
+        ADD_DESTINATION_BUTTON.click();
+        waitUtility.waitForLocatorVisible(ENTER_DESTINATION_NAME.last());
+    }
+
+
+    public void enterDestinationName(String metricName) {
+        ENTER_DESTINATION_NAME.last().fill(metricName);
+    }
+
+    public void selectDestinationType(String destinationType) {
+        DESTINATION_TYPE_DROPDOWN.last().selectOption(destinationType);
+    }
+
+    public void enterHostName(String hostName) {
+        ENTER_HOSTNAME.last().fill(hostName);
+    }
+
+    public void enterPortName(String port) {
+        ENTER_PORT.last().fill(port);
+    }
+
+    public void enterUserName(String demoUser) {
+        ENTER_USERNAME.last().fill(demoUser);
+    }
+
+    public void enterPassword(String demoPassword) {
+        ENTER_PASSWORD.last().fill(demoPassword);
+    }
+
+    public void clickTestConnection() {
+        TEST_CONNECTION_LINK.last().click();
+        waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
+    }
+
+    public void clickOKButton() {
+        OK_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 }

@@ -52,8 +52,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | Lifetime     |
       | Flights      |
     And User selects the option Only Report on Impressions with Identifiable NPIs
-    And User should able to generate the report
-    And And confirm that the report panel retains the entered data
+    And User should be able to generate the report
+    And Confirms that the report panel retains the entered data
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          |
@@ -76,11 +76,11 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify that user is able to select start date and end date when Custom Dates option is selected
     And Verify that user is able to select start "12:00" and end time "09:00" when Custom Dates option is selected
     And Verify that user is able to select Timezone field value "<TIME_ZONE>"
-    And Verify the default value of the the Report Format field is "CSV"
+    And Verify the default value of the Report Format field is "CSV"
     And Verify the availability of various options of the Report Format field - "<REPORT_FORMATS>"
     And Verify by default the Test Qualifier checkbox is checked
-    And User should able to generate the report
-    And And confirm that the report panel retains the entered data
+    And User should be able to generate the report
+    And Confirms that the report panel retains the entered data
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | REPORT_FORMATS                                                             |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
@@ -105,14 +105,14 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Then User should be able to select value from dropdown
     And User clicks "Lifetime" report period button
     And Verify that user is able to select Timezone field value "<TIME_ZONE>"
-    And User should able to generate the report
-    And And confirm that the report panel retains the entered data
+    And User should be able to generate the report
+    And Confirms that the report panel retains the entered data
     Examples:
       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | DIMENSIONS                                                 | METRICS             | TIME_ZONE                |
       | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT-05:00) Central Time |
 
-  @regressionn
-  Scenario Outline:  Validate One time report section's field verification and generate One time report by entering Tactic and Fight option from Run Now
+  @regression
+  Scenario Outline:  Validate One time report section's field verification and generate One time report by entering Tactic and Flight option from Run Now
     Then User searches the Campaign "<CAMPAIGN_NAME>", navigates to LineItem and fetches the flight details
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -123,11 +123,11 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User clicks "Flights" report period button
     And Verify that Flight details field is displayed with value
     And User fetches all the Flight details and verifies that selected Line Item flight details appear in the Flight tab of the Run Report panel
-    And User should able to generate the report
-    And And confirm that the report panel retains the entered data
+    And User should be able to generate the report
+    And Confirms that the report panel retains the entered data
     Examples:
-      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME            |
-      | Template_Automation | Multiple_Flight | Multiple_Flight_Campaign |
+      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME                       |
+      | Template_Automation | Multiple_Flight | Automation_Multiple_Flight_Campaign |
 
   @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report
@@ -160,8 +160,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     When User clicks on Advanced Settings
     And User selects "<FILE_BREAKDOWN_TYPE>" button
     Then "Filter Report" section should be visible with label "Only Report on Impressions with Identifiable NPIs", "Only Report on Running Advertisers", "Only Report on Running Campaigns" checkbox
-    And User should able to generate the report
-    And User downloads the Scheduled report and verify the data in downloaded report
+    And User should be able to generate the report
+    # And User downloads the Scheduled report and verify the data in downloaded report
     # And And confirm that the report panel retains the entered data
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | FILE_BREAKDOWN_TYPE |

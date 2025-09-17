@@ -114,7 +114,7 @@ public class TacticDetails {
 
             targetingTemplate.addTargetingRules(rulesMap);
             saveTacticDetails();
-
+            waitUtility.waitUntilSpinnerHidden();
             templateNameList.add(saveTargetingTemplate(lineItemType.trim()));
         }
         return templateNameList;
@@ -171,6 +171,7 @@ public class TacticDetails {
     private String saveTargetingTemplate(String lineItemType) {
         String templateName = lineItemType + "_Template_" + CommonUtils.timeStampCalculation();
         TACTIC_SETTINGS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
         tacticSettings.verifyTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
         SAVE_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));

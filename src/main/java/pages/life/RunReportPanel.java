@@ -7,9 +7,7 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +36,6 @@ public class RunReportPanel {
     private final Locator REPORT_PERIOD_BUTTONS;
     private final Locator RUN_BUTTON;
     private final Locator SUCCESS_ALERT;
-    private final Locator REPORT_OPTIONS;
     private final Locator REPORT_MODIFY_OPTION;
     private final Locator FETCHED_TEMPLATE_NAME;
     private final Locator FETCHED_ADVERTISER_NAME;
@@ -54,7 +51,7 @@ public class RunReportPanel {
     private final Locator END_TIME;
     private final Locator TIME_ZONE;
     private final Locator REPORT_FORMAT_SELECTED_VALUE;
-    private final Locator DATE_CELL;
+    private final Locator CALENDAR_VIEW;
     private final Locator TEXT_QUALIFIER_CHECKBOX;
     private final Locator FETCHED_DIMENSIONS_AND_METRICS;
     private final Locator DIMENSION_LABEL;
@@ -85,7 +82,6 @@ public class RunReportPanel {
         this.REPORT_PERIOD_BUTTONS = page.locator("//label[contains(text(),'Report Period')]/following-sibling::div//button");
         this.RUN_BUTTON = page.locator("//button[contains(@class, 'okButton') and contains(text(),'Run')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
-        this.REPORT_OPTIONS = page.locator("//div[@class='icon report-progress']/ancestor::div[@class='left icon-section']/following-sibling::div//img");
         this.REPORT_MODIFY_OPTION = page.locator("//div[@class='icon report-progress']/ancestor::div[@class='left icon-section']/following-sibling::div//img/following-sibling::div//span[contains(text(),'Modify and Re-run')]");
         this.FETCHED_TEMPLATE_NAME = page.locator("//label[text()='Template']//following-sibling::app-single-select-dropdown//input/following-sibling::span");
         this.FETCHED_ADVERTISER_NAME = page.locator("//sui-multi-select[@placeholder='Select Advertiser']//sui-multi-select-label//span[2]");
@@ -101,7 +97,7 @@ public class RunReportPanel {
         this.END_TIME = page.locator("input[formcontrolname='endTime']");
         this.TIME_ZONE = page.locator("//select[@formcontrolname='stimeZone']");
         this.REPORT_FORMAT_SELECTED_VALUE = page.locator("//div[text()='Report Format']/following-sibling::div//div[@class='text']");
-        this.DATE_CELL = page.locator("//sui-calendar-date-view//td[contains(@class, 'link') and not(contains(@class, 'disabled'))]");
+        this.CALENDAR_VIEW = page.locator("sui-calendar-date-view");
         this.TEXT_QUALIFIER_CHECKBOX = page.locator("//div[text()='Text Qualifier']/following-sibling::div/sui-checkbox");
         this.FETCHED_DIMENSIONS_AND_METRICS = page.locator("//div[@class='field customTemplate']//span");
         this.DIMENSION_LABEL = page.locator("//label[contains(text(),'Dimensions')]");
@@ -276,35 +272,18 @@ public class RunReportPanel {
     }
 
     public void clickModifyOption(String templateName) {
-        waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
         if(!templateName.contains("Custom Template")) {
             SEARCH_REPORT.fill(templateName);
             SEARCH_BUTTON.click();
         }
         Locator templateElements = page.locator(
-                String.format("//div[contains(text(),'%s')]/preceding::div[contains(@class,'report-progress')]", templateName));
-        waitUtility.waitForLocatorVisible(templateElements);
-        int totalTemplates = templateElements.count();
-        if (totalTemplates == 1) {
-            REPORT_OPTIONS.first().click();
-            REPORT_MODIFY_OPTION.first().click();
-        } else {
-            String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            for (int i = 0; i < totalTemplates; i++) {
-                String innerText = templateElements.nth(i).innerText();
-                if (innerText.contains(today)) {
-                    REPORT_OPTIONS.first().click();
-                    REPORT_MODIFY_OPTION.first().click();
-                    break;
-                }
-            }
-        }
+                String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
+        templateElements.first().click();
+        REPORT_MODIFY_OPTION.first().click();
         waitUtility.waitUntilSpinnerHidden();
-        try {
-            waitUtility.waitForLocatorVisible(FETCHED_TEMPLATE_NAME, 5000);
-        } catch (Exception e) {
-            waitUtility.waitForLocatorVisible(DIMENSION_LABEL, 5000);
-        }
+        page.waitForCondition(() -> FETCHED_TEMPLATE_NAME.isVisible() || DIMENSION_LABEL.isVisible());
     }
 
     public List<String> extractInnerTextFromLocator(Locator locator) {
@@ -372,10 +351,15 @@ public class RunReportPanel {
         String dayToSelect = String.valueOf(day);
         try {
             input.click();
-            waitUtility.waitForLocatorVisible(DATE_CELL.first(), 2000);
-            Locator dayCell = DATE_CELL.filter(new Locator.FilterOptions().setHasText(dayToSelect));
-            dayCell.nth(0).click();
-            waitUtility.waitForElementDetached("sui-calendar-date-view");
+            CALENDAR_VIEW.waitFor(new Locator.WaitForOptions().setTimeout(3000));
+            Locator dayCells = CALENDAR_VIEW.locator("//td[normalize-space()='" + dayToSelect + "']");
+            Locator correctDay = dayCells.nth(0);
+            int maxDay = YearMonth.now().lengthOfMonth();
+            if (day >= 1 && day <= maxDay) {
+                correctDay = dayCells.last();
+            }
+            correctDay.click();
+            waitUtility.waitForLocatorDetached(CALENDAR_VIEW);
             return true;
         } catch (Exception e) {
             return false;
@@ -536,7 +520,10 @@ public class RunReportPanel {
 
     public void downloadScheduledReport() {
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
+    }
 
+    public String fetchFileName(){
+        return FILE_NAME_TEXTAREA.inputValue().trim();
     }
 }
 

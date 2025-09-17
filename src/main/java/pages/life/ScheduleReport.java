@@ -3,9 +3,7 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-import org.apache.poi.ss.formula.functions.T;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
@@ -25,14 +23,12 @@ public class ScheduleReport {
     private final Locator FREQUENCY_BUTTON;
     private final Locator SCHEDULE_START_DATE;
     private final Locator SCHEDULE_END_DATE;
-    private final Locator DATE_CELL;
+    private final Locator CALENDAR_VIEW;
     private final Locator TIME_ZONE;
-    private final Locator TIME_ZONE_VALUES;
     private final Locator DEFAULT_TIME_ZONE;
     private final Locator WEEK_DAYS_BUTTON;
     private final Locator SEND_AT_TIME;
     private final Locator SEND_AT_TIMEZONE;
-    private final Locator SEND_AT_TIMEZONE_VALUES;
     private final Locator DELIVERY_METHODS;
     private final Locator DELIVERY_TO_USER;
     private final Locator ADD_EMAILS_LINK;
@@ -71,14 +67,12 @@ public class ScheduleReport {
         this.FREQUENCY_BUTTON = page.locator("//button[@name='frequencyOptionType']");
         this.SCHEDULE_START_DATE = page.locator("//input[@id='scheduleStartDate']");
         this.SCHEDULE_END_DATE = page.locator("//input[@id='scheduleEndDate']");
-        this.DATE_CELL = page.locator("//sui-calendar-date-view//td[contains(@class, 'link') and not(contains(@class, 'disabled'))]");
+        this.CALENDAR_VIEW = page.locator("sui-calendar-date-view");
         this.TIME_ZONE = page.locator("//div[@id='timeZoneTypeDropdown']");
-        this.TIME_ZONE_VALUES = page.locator("//div[@id='timeZoneTypeDropdown']//div[contains(@class,'menu transition visible')]/div");
         this.DEFAULT_TIME_ZONE = page.locator("//div[@id='timeZoneTypeDropdown']/div[@class='text']");
         this.WEEK_DAYS_BUTTON = page.locator("//button[@name='reportScheduleWeekDayTYpe']");
         this.SEND_AT_TIME = page.locator("//label[contains(text(),'Send At')]/following-sibling::div/input[@type='time']");
         this.SEND_AT_TIMEZONE = page.locator("//div[contains(@class,'gaTimezone')]");
-        this.SEND_AT_TIMEZONE_VALUES = page.locator("//div[contains(@class,'gaTimezone')]//div[contains(@class,'menu transition visible')]/div");
         this.DELIVERY_METHODS = page.locator("//div[contains(@class,'delivery-method-navbar')]/a");
         this.DELIVERY_TO_USER = page.locator("//div[contains(text(),'Deliver to Users')]/following-sibling::div/app-multi-select");
         this.ADD_EMAILS_LINK = page.locator("//label[contains(text(),'Add Emails')]");
@@ -96,7 +90,7 @@ public class ScheduleReport {
         this.END_DATE = page.locator("//input[@placeholder='End Date']");
         this.SCHEDULE_START_TIME = page.locator("//input[@formcontrolname='scheduleDataStartTime']");
         this.SCHEDULE_END_TIME = page.locator("//input[@formcontrolname='scheduleDataEndTime']");
-        this.SCHEDULE_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Schedule')]");
+        this.SCHEDULE_BUTTON = page.locator("//button[contains(@class, 'okButton') and contains(text(),'Schedule')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
         this.SEARCH_TEXTBOX = page.locator("//input[contains(@class,'gaTableSearch')]");
         this.SEARCH_ICON = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
@@ -146,10 +140,16 @@ public class ScheduleReport {
         String dayToSelect = String.valueOf(day);
         try {
             input.click();
-            waitUtility.waitForLocatorVisible(DATE_CELL.first(), 2000);
-            Locator dayCell = DATE_CELL.filter(new Locator.FilterOptions().setHasText(dayToSelect));
-            dayCell.nth(0).click();
-            waitUtility.waitForElementDetached("sui-calendar-date-view");
+            CALENDAR_VIEW.waitFor(new Locator.WaitForOptions().setTimeout(3000));
+            Locator dayCells = CALENDAR_VIEW.locator("//td[normalize-space()='" + dayToSelect + "']");
+            Locator correctDay = dayCells.nth(0);
+
+            int maxDay = YearMonth.now().lengthOfMonth();
+            if (day >= 1 && day <= maxDay) {
+                correctDay = dayCells.last();
+            }
+            correctDay.click();
+            waitUtility.waitForLocatorDetached(CALENDAR_VIEW);
             return true;
         } catch (Exception e) {
             return false;
@@ -405,5 +405,15 @@ public class ScheduleReport {
             }
         }
         return false;
+    }
+
+    public void enterCustomDestinationDetailsOnReportPanel(String destinationName, String filePath, String fileName) {
+        waitUtility.waitForLocatorVisible(DESTINATION_DROPDOWN);
+        DESTINATION_DROPDOWN.click();
+        page.getByText(destinationName).click();
+        FILE_PATH.click();
+        FILE_PATH.fill(filePath);
+        FILE_NAME.click();
+        FILE_NAME.fill(fileName);
     }
 }
