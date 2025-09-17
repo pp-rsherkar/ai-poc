@@ -62,6 +62,8 @@ public class LifeSteps {
     Pixels pixels = new Pixels(DriverFactory.getPage());
     RetargetingPixel retargetingPixel = new RetargetingPixel(DriverFactory.getPage());
     ConversionPixel conversionPixel = new ConversionPixel(DriverFactory.getPage());
+    SmartPixel smartPixel = new SmartPixel(DriverFactory.getPage());
+    BulkCreativeUpload bulkCreativeUpload = new BulkCreativeUpload(DriverFactory.getPage());
     Constants constants = new Constants();
     String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
@@ -917,7 +919,7 @@ public class LifeSteps {
 
     @Then("Deals should get assigned to the Tactic")
     public void dealsShouldGetAssignedToTheTactic() {
-        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved());
+        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved().trim());
     }
 
 
@@ -1198,11 +1200,16 @@ public class LifeSteps {
                 .map(String::trim)
                 .toList();
         for (String creativeName : nameList) {
-            for (String lineItem : lineItemTypeList) {
-                if (creativeName.replaceAll("_Creative_\\d+_\\d+", "").equals(lineItem)) {
-                    Assert.assertTrue("Creative is not assigned to Tactic", tacticDetails.createTacticWithLineItemsAndAssignCreative(lineItem, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName));
-                    break;
-                }
+            String creativeType = creativeName.replaceAll("_Creative_\\d+_\\d+", "").trim();
+            String matchedLineItemType;
+            switch (creativeType) {
+                case "HTML" -> matchedLineItemType = "Display";
+                case "Native" -> matchedLineItemType = "Native Display";
+                default -> matchedLineItemType = creativeType;
+            }
+            if (lineItemTypeList.contains(matchedLineItemType)) {
+                boolean result = tacticDetails.createTacticWithLineItemsAndAssignCreative(matchedLineItemType, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, creativeName);
+                Assert.assertTrue("Creative is not assigned to Tactic", result);
             }
         }
 
@@ -1572,9 +1579,9 @@ public class LifeSteps {
     @And("Verify that user is able to download the uploaded file {string}, {string}")
     public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) {
         sharedList.downloadFile(fileName1);
-        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains"));
+        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains", "csv"));
         sharedList.downloadFile(fileName2);
-        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains"));
+        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains", "csv"));
     }
 
     @And("Verify that the user is able to delete the uploaded file {string}")
@@ -1631,7 +1638,7 @@ public class LifeSteps {
     @And("Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items")
     public void verifyThatTheSelectedListIsDisplayedInTheTargetingRuleAndRetrieveTheTotalNPICount() {
         Assert.assertTrue("Selected List is not available", tacticSettings.isSelectedListPresentInTactic(npiName));
-        String text = tacticSettings.fetchSelectedListItemCountFromTactic();
+        String text = tacticSettings.fetchSelectedListItemCountFromTactic(npiName);
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(totalListCount)));
     }
 
@@ -1676,6 +1683,12 @@ public class LifeSteps {
         conversionPixel.selectConversionPixelType(conversionPixelType);
     }
 
+    @And("User selects the {string} and the associated campaign")
+    public void userSelectsTheFromTheList(String advertiser) {
+        smartPixel.selectAdvertiser(advertiser);
+        smartPixel.selectAssociatedCampaign();
+    }
+
     @And("User saves the pixel")
     public void userSavesThePixel() {
         pixels.savePixel();
@@ -1688,15 +1701,57 @@ public class LifeSteps {
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
 
+    @Then("Verify the smart pixel is saved successfully and displayed in the pixel list")
+    public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
+        assert pixels.verifySaveSuccess().contains("Success!");
+        newPixelName = smartPixel.getPixelName();
+        pixels.searchSavedPixel(newPixelName);
+        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
+    }
+
     @When("User selects {string} as rule type and selects the created pixel")
     public void userSelectsRuleTypeAndSelectsCreatedPixelAndSavesSettings(String ruleType) {
-        tacticSettings.selectRuleType(ruleType, newPixelName);
+        itemCount = tacticSettings.selectRuleType(ruleType, newPixelName);
     }
 
     @Then("Verify the selected targeting rule {string}")
-    public void verifyTheSelectedTargetingRules(String ruleType) {
+    public void verifyTheSelectedTargetingRule(String ruleType) {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+    }
+
+    @Then("Verify the selected targeting rule {string} for Smart list")
+    public void verifyTheSelectedTargetingRuleForSmartList(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(npiName, tacticSettings.verifyRuleOption());
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string} and selects the created Smart Pixel")
+    public void userEntersTheSmartNPIListDetailsAndSelectsTheCreatedSmartPixel(String npiListName, String advertiser) {
+        npiName = npiListName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+        npiSmartList.clickSmartPixel();
+        npiSmartList.clickSmartPixelDropDown();
+        npiSmartList.clickSmartPixelDropDownValue(newPixelName);
+    }
+
+    @Then("Verify the selected Smart Pixel")
+    public void verifyTheSelectedSmartPixel() {
+        Assert.assertEquals(newPixelName, npiSmartList.verifySelectedSmartPixel());
+    }
+
+    @And("User selects {string} as rule type and selects the created Smart list")
+    public void userSelectsRuleTypeAndSelectsCreatedSmartList(String ruleType) {
+        itemCount = tacticSettings.selectRuleType(ruleType, npiName);
+    }
+
+    @Then("Verify the count of rule options for the selected targeting rule on the Tactic Settings page")
+    public void verifyTheCountOfSelectedRuleOptions() {
+        String optionsCount = tacticSettings.fetchSelectedListCountFromTactic();
+        int targetedOptionsCount = Integer.parseInt(optionsCount.replaceAll("[^0-9]", ""));
+        Assert.assertEquals("Selected options count does not match", itemCount, targetedOptionsCount);
     }
 
     /*Roshani Sherkar
@@ -1727,5 +1782,277 @@ public class LifeSteps {
             }
         }
 
+    }
+
+    /*Creative Bulk Upload */
+    @Given("User clicks Bulk Upload button on Creative Library page")
+    public void userClicksBulkUploadButtonOnCreativeLibraryPage() {
+        bulkCreativeUpload.clickBulkUploadButton();
+    }
+
+    @Then("Verify Bulk Upload panel is displayed with following options - Creative Type and Advertiser Dropdown")
+    public void verifyBulkUploadPanelIsDisplayedWithFollowingOptionsCreativeTypeAndAdvertiserDropdown() {
+        Assert.assertTrue("Creative Type Options are not available", bulkCreativeUpload.checkCreativeTypeButtonsArePresent());
+        Assert.assertTrue("Advertiser dropdown is not available", bulkCreativeUpload.checkAdvertiserDropdownIsShown());
+    }
+
+    @And("Verify the availability of below Creative Type options and the Default option is {string}")
+    public void verifyTheAvailabilityOfBelowCreativeTypeOptionsAndTheDefaultOptionIsDisplay(String defaultOption, DataTable dataTable) {
+        List<String> creativeTypeOptions = dataTable.asList(String.class);
+        Assert.assertEquals("All creative type options are available.", bulkCreativeUpload.verifyCreativeTypeOptions(creativeTypeOptions));
+        Assert.assertTrue("Expected 'Display' to be the default selected creative type.",
+                bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
+    }
+
+    @And("Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account")
+    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {
+    }
+
+    @When("User selects the {string} creative type")
+    public void userSelectsTheCreativeType(String creativeType) {
+        bulkCreativeUpload.selectAndClickCreativeType(creativeType);
+    }
+
+    @And("User selects the Approval status {string}")
+    public void userSelectsTheApprovalStatus(String status) {
+        bulkCreativeUpload.selectApprovalStatus(status);
+    }
+
+    @And("Verify an appropriate error message when user attempts to click the Preview or OK button without selecting a creative file")
+    public void userAttemptsToClickThePreviewButtonWithoutSelectingACreativeFile() {
+        bulkCreativeUpload.isRemoveFileIconAvailable();
+        bulkCreativeUpload.clickPreviewButton();
+        Assert.assertEquals("Atleast one creative should be selected", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @Then("Verify the header message for {string} status")
+    public void verifyForStatusTheHeaderMessageShouldBeDisplayed(String status) {
+        switch (status) {
+            case "Pending":
+                Assert.assertEquals("CREATIVE IS NOT APPROVED YET", bulkCreativeUpload.fetchHeaderMessage());
+                break;
+            case "Approved":
+                Assert.assertEquals("CREATIVE IS APPROVED", bulkCreativeUpload.fetchHeaderMessage());
+                break;
+            case "Denied":
+                Assert.assertEquals("CREATIVE IS DENIED", bulkCreativeUpload.fetchHeaderMessage());
+                break;
+        }
+
+    }
+
+    @And("User uploads a valid file {string} for {string} creative")
+    public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
+        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+    }
+
+    @And("User uploads a valid file {string} for {string} creative and previews the creative details")
+    public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
+        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.clickPreviewButton();
+        metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
+        bulkCreativeUpload.updateCreativeName(metricName);
+        nameList.clear();
+        nameList.add(metricName);
+    }
+
+    @And("User saves the creative")
+    public void userSavesTheCreative() {
+        bulkCreativeUpload.clickOKButton();
+        Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+    }
+
+    /*Dislay Creative Bulk Upload*/
+    @When("The advertiser {string} is selected for {string} creative the following sections are visible")
+    public void theAdvertiserIsSelectedForCreativeTheFollowingSectionsAreVisible(String advertiser, String creativeType, DataTable dataTable) {
+        bulkCreativeUpload.selectAndClickCreativeType(creativeType);
+        bulkCreativeUpload.selectAdvertiser(advertiser);
+        List<String> displayCreativeSections = dataTable.asList(String.class);
+        for (String section : displayCreativeSections) {
+            boolean flag = bulkCreativeUpload.verifyDisplayCreativeSections(section);
+            Assert.assertTrue(section + " section is not available", flag);
+        }
+    }
+
+    @And("Verify under the {string} section the options {string} and {string} are available")
+    public void underTheSectionTheOptionsAndAreAvailable(String sectionName, String option1, String option2) {
+        Assert.assertTrue(option1 + " is not available under " + sectionName, bulkCreativeUpload.isDownloadTemplateButtonVisible());
+        Assert.assertTrue(option2 + " is not available under " + sectionName, bulkCreativeUpload.isBrowseFileButtonVisible(option2));
+    }
+
+    @And("User is able to download a blank template using the {string} option")
+    public void userIsAbleToDownloadABlankTemplateUsingTheOption(String arg0) {
+        bulkCreativeUpload.clickBlankTemplateDownloadButton();
+        Assert.assertTrue("Downloaded file is not available", bulkCreativeUpload.verifyDownloadedFile("DisplayBulkUploadTemplate", "xlsx"));
+    }
+
+    @And("Verify user is able to upload images {string} to get a template with URLs")
+    public void userIsAbleToUploadImagesToGetATemplateWithURLsUsingTheOption(String imageFileName) {
+        bulkCreativeUpload.uploadImageFile(imageFileName);
+        bulkCreativeUpload.clickTemplateWithURLsLink();
+        Assert.assertTrue("Downloaded file is not available", bulkCreativeUpload.verifyDownloadedFile("DisplayBulkUploadTemplate", "xlsx"));
+    }
+
+    @And("Verify under the {string} section the fields {string}, {string}, {string} are available")
+    public void verifyUnderTheSectionTheFieldsAreAvailable(String sectionName, String field1, String field2, String field3) {
+        Assert.assertTrue(field1 + " field is not available under " + sectionName, bulkCreativeUpload.isCampaignToRestrictVisible());
+        Assert.assertTrue(field2 + " field is not available under " + sectionName, bulkCreativeUpload.isBrowseFileButtonVisible(field2));
+        Assert.assertTrue(field2 + " field is not available under " + sectionName, bulkCreativeUpload.isApprovalStatusVisible());
+    }
+
+    @And("User is able to select a {string} from the Campaign Restrict dropdown")
+    public void userIsAbleToSelectAFromTheCampaignRestrictDropdown(String campaignName) {
+        bulkCreativeUpload.clickCampaignName(campaignName);
+    }
+
+    @And("User is able to browse and select a template {string} from the system")
+    public void userIsAbleToBrowseAndSelectATemplateFromTheSystem(String fileName) {
+        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+    }
+
+    @And("Verify default value of the Approval Status field is {string}")
+    public void defaultValueOfTheFieldIsForCreatives(String defaultStatus) {
+        Assert.assertTrue("Expected 'Pending' to be the default selected status.", bulkCreativeUpload.checkDefaultApprovalStatus(defaultStatus));
+    }
+
+    @And("Verify under the {string} section the fields Add Third Party Tracking Pixel and Add DoubleVerify Pixel are available")
+    public void verifyUnderTheSectionTheFieldsAddThirdPartyTrackingPixelTagAndAddDoubleVerifyPixelAreAvailable(String sectionName) {
+        Assert.assertTrue("Add Third Party Tracking Pixel/Tag field is not available under " + sectionName, bulkCreativeUpload.isThirdPartyTrackingPixelAvailable());
+        Assert.assertTrue("Add DoubleVerify Pixel is not available under " + sectionName, bulkCreativeUpload.isDoubleVerifyPixelAvailable());
+    }
+
+    @And("User is able to click a third-party tracking pixel and add details {string}")
+    public void userIsAbleToSelectAThirdPartyTrackingPixelForACreative(String pixelDetails) {
+        bulkCreativeUpload.addThirdPartyTrackingPixel(pixelDetails);
+    }
+
+    @And("User is able to add a DoubleVerify pixel")
+    public void userIsAbleToAddADoubleVerifyPixelForACreative() {
+        Assert.assertTrue("Unable to add DoubleVerify Pixel", bulkCreativeUpload.addDoubleVerifyPixel());
+    }
+
+    @And("User is able to delete third-party tracking pixel entries")
+    public void userIsAbleToDeleteThirdPartyTrackingPixelEntries() {
+        Assert.assertTrue("Unable to delete Third Party Tracking Pixel", bulkCreativeUpload.deleteThirdPartyTrackingPixel());
+    }
+
+    @And("An error message is displayed when a blank template {string} is uploaded")
+    public void anErrorMessageIsDisplayedWhenABlankTemplateIsUploaded(String fileName) {
+        bulkCreativeUpload.uploadBlankTemplate(fileName);
+    }
+
+    @And("User enters {string}, {string} mandatory fields data for Display creative")
+    public void userEntersMandatoryFieldsDataForCreative(String advertiserDSA, String financer) {
+        bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
+        bulkCreativeUpload.enterFinancer(financer);
+    }
+
+    @And("Verify Advertiser field should be mandatory")
+    public void verifyAdvertiserFieldShouldBeMandatory() {
+        bulkCreativeUpload.clickOKButton();
+        Assert.assertEquals("Select Advertiser", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @And("Verify that the Landing Domain field is mandatory when all other required fields, including {string} are filled")
+    public void verifyLandingDomainFieldShouldBeMandatoryByEnteringOtherMandatoryFields(String advertiser) {
+        bulkCreativeUpload.selectAdvertiser(advertiser);
+        bulkCreativeUpload.clickOKButton();
+        Assert.assertEquals("Landing Page Domain is required", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @And("Verify that an appropriate error message is displayed when invalid data {string} is entered for the Landing Domain")
+    public void verifyThatAnAppropriateErrorMessageIsDisplayedWhenInvalidDataIsEnteredForTheLandingDomain(String invalidLandingDomain) {
+        bulkCreativeUpload.enterLandingPageDomain(invalidLandingDomain);
+        bulkCreativeUpload.clickOKButton();
+        Assert.assertEquals("Landing Page Domain is not valid.", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @And("Verify only valid Landing Domain {string} values should be permitted")
+    public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
+        bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
+        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @And("Verify default value of the File field should be {string}")
+    public void verifyDefaultValueOfTheFileFieldShouldBe(String defaultValue) {
+        Assert.assertEquals(defaultValue, bulkCreativeUpload.fetchFileDefaultValue());
+    }
+
+    @And("Verify default value of the AdChoices Icon should be {string}")
+    public void verifyDefaultValueOfTheAdChoicesIconShouldBe(String defaultValue) {
+        Assert.assertEquals(defaultValue, bulkCreativeUpload.fetchAdChoiceDefaultValue());
+    }
+
+    @And("Verify default value of the Notes Column field should be {string}")
+    public void verifyDefaultValueOfTheNotesColumnFieldShouldBe(String defaultValue) {
+        Assert.assertEquals(defaultValue, bulkCreativeUpload.fetchNotesColumnDefaultValue());
+    }
+
+    @And("Verify Rich Media checkbox should be present and selectable {string}")
+    public void verifyRichMediaCheckboxShouldBePresentAndSelectable(String direction) {
+        Assert.assertTrue("Rich Media Checkbox is not available", bulkCreativeUpload.isRichMediaCheckboxAvailable());
+        Assert.assertTrue("Rich Media Checkbox is not clickable", bulkCreativeUpload.isRichMediaCheckboxClickable());
+        bulkCreativeUpload.selectAndClickDirection(direction);
+    }
+
+    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, DataTable dataTable) {
+        nameList.clear();
+        Map<String, String> rawFilters = dataTable.asMap(String.class, String.class);
+        Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
+        for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
+            bulkCreativeUpload.selectAdvertiser(advertiser);
+            bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
+            bulkCreativeUpload.enterFinancer(financer);
+            bulkCreativeUpload.selectFileTypeAndUploadFile(entry.getKey(), entry.getValue());
+            bulkCreativeUpload.enterLandingPageDomain(landingDomain);
+            bulkCreativeUpload.selectApprovalStatus(status);
+            nameList = bulkCreativeUpload.enterCreativeName(creativeName);
+            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+                bulkCreativeUpload.enterWidthHeight("800x250");
+            bulkCreativeUpload.clickOKButton();
+            Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+        }
+    }
+
+    @And("Verify user is able to type in {string} categories")
+    public void verifyUserIsAbleToTypeInCategories(String iabCategory) {
+        bulkCreativeUpload.typeIABCategory(iabCategory);
+    }
+
+    @And("Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
+    public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
+        bulkCreativeUpload.clickOKButton();
+        List<String> expectedMessages = Arrays.asList(
+                "Clickthrough URL is required",
+                "Landing Page Domain is required");
+        Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
+    }
+
+    @And("Verify only valid Clickthrough URL {string} values should be permitted")
+    public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
+        bulkCreativeUpload.enterClickthroughURL(validURL);
+        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+    }
+
+    @When("User creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
+    public void userCreatesAndSavesBulkUploadCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String advertiserDSA, String financer, DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        for (Map<String, String> row : rows) {
+            String type = row.get("CreativeType").trim();
+            String attributes = row.get("CreativeAttributes").trim();
+            String creativeName = creativeType + "_Creative_" + CommonUtils.timeStampCalculation();
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            bulkCreativeUpload.clickBulkUploadButton();
+            bulkCreativeUpload.selectAndClickCreativeType(creativeType);
+            bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
+            bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
+            bulkCreativeUpload.clickOKButton();
+            Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+            nameList.add(creativeName);
+        }
     }
 }
