@@ -91,7 +91,7 @@ public class BulkCreativeUpload {
         this.TEMPLATE_BROWSE_BUTTON = page.locator("//span[contains(text(),'Spreadsheet')]/ancestor::div//div[contains(@class,'drop-wrapper')]");
         this.LANDING_PAGE_DOMAIN = page.locator("//input[@formcontrolname='landingDomain']");
         this.FILE_DROPDOWN = page.locator("//label[text()='File']/parent::div//div[contains(@class,'text')]");
-        this.FILE_DROPDOWN_VALUE = page.locator("//label[text()='File']/parent::div//div[contains(@class,'text')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
+        this.FILE_DROPDOWN_VALUE = page.locator("//label[text()='File']/following-sibling::div//div[contains(@class,'text')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
         this.ADCHOICES_DROPDOWN = page.locator("//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
         this.NOTES_DROPDOWN = page.locator("//span[contains(text(),'Notes Column')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
         this.RICH_MEDIA_CHECKBOX = page.locator("//sui-checkbox[@formcontrolname='expandable']");
