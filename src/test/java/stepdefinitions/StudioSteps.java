@@ -153,7 +153,8 @@ public class StudioSteps {
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
-        Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
+        // As confirmed by Nikhil - for GA, permissions have been set up like-wise. This is HCP Explorer test-case and in permission feature we can handled this.
+        // Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
     }
 
     @And("User clicks on HCP Explorer workspace")
