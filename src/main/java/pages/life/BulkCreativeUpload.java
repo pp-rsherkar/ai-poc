@@ -399,6 +399,7 @@ public class BulkCreativeUpload {
 
     public void enterCreativeAndDSADetails(String advertiser, String advertiserDSA, String financer) {
         selectAdvertiser(advertiser);
+        waitUtility.waitUntilSpinnerHidden();
         enterAdvertiserDSA(advertiserDSA);
         enterFinancer(financer);
     }
