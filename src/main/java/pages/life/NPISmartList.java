@@ -51,37 +51,7 @@ public class NPISmartList {
     private final Locator PULSEPOINT_ICON;
     private final Locator CLICK_EXPAND_PRACTICE;
     private final Locator ADD_DRUG_BUTTON;
-    private final Locator OBSERVED_WITHIN_LAST_DAYS;
-    private final Locator DAYS_FIELD;
-    private final Locator VISITED_MORE_THAN;
-    private final Locator PAGES_FIELD;
-    private final Locator SEARCH_KEYWORD_CHECKBOX_ENGAGEDVIASEARCH;
-    private final Locator SEARCH_KEYWORD_CHECKBOX_ENGAGEDANYWHERE;
-    private final Locator PRESENT_BUTTON;
-    private final Locator ABSENT_BUTTON;
-    private final Locator KEYWORD_TEXTFIELD;
-    private final Locator NPI_CHECKBOX;
-    private final Locator PROFESSIONAL_POPUP;
-    private final Locator PRESCRIBED_DRUG_POPUP;
-    private final Locator NPI_PRESCRIBED_DRUG;
-    private final Locator NPI_ADD_DRUG;
-    private final Locator NPI_FILL_DRUG;
-    private final Locator NPI_DRUG_SELECT;
-    private final Locator RECENCY_FIELD;
-    private final Locator RECENCY_POPUP;
-    private final Locator DECILE_RANGE;
-    private final Locator MEDICAL_DECILE_RANGE;
-    private final Locator  DISEASE_POPUP;
-    private final Locator  DISEASE_VALUE;
-    private final Locator  DIAGNOSIS_RECENCY_POPUP;
-    private final Locator NPI_DISEASE;
-    private final Locator DISEASE_SELECT;
-    private final Locator DRUG_FIELD;
-    private final Locator DRUG_VALUE;
-    private static Locator ENGAGED_ONSITE_OPTIONS = null;
-    private static Locator ENGAGED_VIA_SEARCH_OPTIONS = null;
-    private static Locator ENGAGED_ANYWHERE_OPTIONS = null;
-    private static Locator SMART_NPI_OPTIONS = null;
+    private final Locator SELECTED_SMART_PIXEL;
 
     public NPISmartList(Page page) {
         this.page = page;
@@ -123,38 +93,7 @@ public class NPISmartList {
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
-        this.OBSERVED_WITHIN_LAST_DAYS =page.locator("#mat-radio-3 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle");
-        this.DAYS_FIELD = page.locator("#recencyControls").getByRole(AriaRole.TEXTBOX);
-        this.VISITED_MORE_THAN = page.locator("(//div[@class='mat-checkbox-inner-container'])[2]");
-        this.PAGES_FIELD =  page.getByRole(AriaRole.TEXTBOX).nth(4);
-        this.SEARCH_KEYWORD_CHECKBOX_ENGAGEDVIASEARCH=page.locator("(//div[@class='mat-checkbox-inner-container'])[2]");
-        this.SEARCH_KEYWORD_CHECKBOX_ENGAGEDANYWHERE=page.locator("(//div[@class='mat-checkbox-inner-container'])[3]");
-        this.PRESENT_BUTTON = page.locator("#mat-radio-8 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle");
-        this.ABSENT_BUTTON = page.locator("(//div[@class='mat-radio-outer-circle'])[4]");
-        this.KEYWORD_TEXTFIELD =page.locator("textarea");
-        this.NPI_CHECKBOX = page.locator("(//div[@class='mat-checkbox-inner-container'])[3]");
-        this.PROFESSIONAL_POPUP = page.getByText("× Select Professions");
-        this.PRESCRIBED_DRUG_POPUP = page.locator("//div[@role='alertdialog' and contains(., 'Invalid drug selection at row number 1')]");
-        this.NPI_PRESCRIBED_DRUG = page.getByRole(AriaRole.LISTBOX).filter(new Locator.FilterOptions().setHasText(Pattern.compile("^$"))).locator("span").first();
-        this.NPI_ADD_DRUG = page.getByText("Add Drug");
-        this.NPI_FILL_DRUG =  page.locator("(//input[@role='combobox'])[8]");
-        this.NPI_DRUG_SELECT =  page.locator("(//div[contains(@title,'40032-089')])[1]");
-        this.RECENCY_FIELD =page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX);
-        this.RECENCY_POPUP =page.getByText("Prescribed Drug recency can not be less than 30 days");
-        this.DIAGNOSIS_RECENCY_POPUP =page.getByText("Diagnosis recency can not be less than 30 days");
-        this.DECILE_RANGE =page.locator("(//div[@class='text ng-star-inserted'][normalize-space()='1-10 decile'])[1]");
-        this.MEDICAL_DECILE_RANGE =page.locator("(//div[@class='text ng-star-inserted'][normalize-space()='1-10 decile'])[2]");
-        this.DISEASE_POPUP = page.getByText("Please select a diagnosis");
-        this.DISEASE_VALUE =  page.locator("(//input[@role='combobox'])[9]");
-        this.NPI_DISEASE = page.getByText("Select Diagnosis");
-        this.DISEASE_SELECT =   page.getByText("A920: Chikungunya virus");
-        this.DRUG_FIELD = page.locator("#prescriptionBehaviorWrapper").getByRole(AriaRole.COMBOBOX);
-        this.DRUG_VALUE =  page.getByText("Parastat44911-0487, 44911-");
-        ENGAGED_ONSITE_OPTIONS = page.getByText("Select Smart Pixel Engagement");
-        ENGAGED_VIA_SEARCH_OPTIONS = page.getByText("Engaged via Search");
-        ENGAGED_ANYWHERE_OPTIONS = page.getByText("Engaged Anywhere");
-        SMART_NPI_OPTIONS =page.locator("#smartlistDetailsContainer");
-
+        this.SELECTED_SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
     }
 
     public void clickSmartList() {
@@ -185,24 +124,14 @@ public class NPISmartList {
         INSERT_VISITED_URL.fill(Constants.VISITED_URL_2);
     }
 
+    public void checkDisabledNPI() {
+    }
 
     public void insertIgnoredURL() {
         CLICK_ADD_IGNORED_URL.click();
         INSERT_IGNORED_URL.fill("www.google.com");
     }
 
-    public static String verifyOptionNPISmartList() {
-        return SMART_NPI_OPTIONS.innerText();
-    }
-    public static String verifyOptionEngagedOnsite() {
-        return ENGAGED_ONSITE_OPTIONS.innerText();
-    }
-    public static String verifyOptionEngagedViaSearch() {
-        return ENGAGED_VIA_SEARCH_OPTIONS.innerText();
-    }
-    public static String verifyOptionEngagedAnywhere() {
-        return ENGAGED_ANYWHERE_OPTIONS.innerText();
-    }
     public void clickNPIGroup() {
         CLICK_NPI_GROUP.click();
     }
@@ -313,210 +242,7 @@ public class NPISmartList {
         PULSEPOINT_ICON.click();
     }
 
-    public void selectObservedWithinLastValues(String days) {
-        OBSERVED_WITHIN_LAST_DAYS.click();
-        DAYS_FIELD.fill(days);
-
-
-
-
-    }
-
-    public void selectSiteActivities(String pages) {
-        VISITED_MORE_THAN.click();
-        PAGES_FIELD.fill(pages);
-    }
-
-    public void addVisitedUrl(String visitedUrl) {
-
-        CLICK_ADD_VISITED_URL.click();
-        INSERT_VISITED_URL.fill(visitedUrl);
-    }
-
-    public void addIgnoredUrl(String ignoredUrl) {
-        CLICK_ADD_IGNORED_URL.click();
-        INSERT_IGNORED_URL.fill(ignoredUrl);
-    }
-
-    public void addSearchKeyword(String keywordValue) {
-
-
-        KEYWORD_TEXTFIELD.fill(keywordValue);
-    }
-
-
-    public void clickSeachKeywordCheckboxEngagedViaSearch() {
-
-        SEARCH_KEYWORD_CHECKBOX_ENGAGEDVIASEARCH.click();
-
-
-    }
-
-    public void clickPresentButton() {
-
-        PRESENT_BUTTON.click();
-    }
-    public void clickAbsentButton() {
-
-        ABSENT_BUTTON.click();
-    }
-
-    public void clickEngagedViaSearch() {
-
-        ENGAGED_VIA_SEARCH_OPTIONS.click();
-
-    }
-    public void clickEngagedAnywhere() {
-
-        ENGAGED_ANYWHERE_OPTIONS.click();
-
-    }
-
-    public void clickSeachKeywordCheckboxEngagedAnywhere() {
-
-        SEARCH_KEYWORD_CHECKBOX_ENGAGEDANYWHERE.click();
-    }
-
-    public boolean verifyNPIOptionDisabled() {
-
-        return NPI_CHECKBOX.isDisabled();
-    }
-    public boolean verifyNPIOptionEnabled() {
-
-        return NPI_CHECKBOX.isEnabled();
-    }
-
-
-    public boolean verifyNPIErrorMessage() {
-
-        return page.locator("text=Select HCP target list").isVisible();
-    }
-
-    public boolean verifySpecialtyErrorMessage() {
-
-        return page.locator("text=Select Specialties").isVisible();
-
-
-    }
-
-    public boolean verifyProfessionErrorMessage() {
-        return PROFESSIONAL_POPUP.isVisible();
-
-    }
-
-    public boolean verifyPrescribedDrugErrorMessage() {
-        return PRESCRIBED_DRUG_POPUP.isVisible();
-
-    }
-
-    public void selectNPIPrescribedDrug(String drug) {
-
-//        NPI_ADD_DRUG.click();
-        NPI_PRESCRIBED_DRUG.click();
-        NPI_FILL_DRUG.fill(drug);
-        NPI_DRUG_SELECT.click();
-    }
-
-    public void enterRecency(String recency) {
-        RECENCY_FIELD.fill(recency);
-    }
-
-    public void verifyRecencyValidation() {
-
-        RECENCY_FIELD.fill("29");
-
-    }
-
-    public boolean verifyRecencyErrorMessage() {
-        return RECENCY_POPUP.isVisible();
-
-    }
-
-    public void selectDecileRange(String decileRange) {
-
-        DECILE_RANGE.click();
-        String decile_value = String.format("//span[@class='ngx-slider-span ngx-slider-tick-legend ng-star-inserted'][normalize-space()='%s']", decileRange);
-        page.locator(decile_value).click();
-        page.keyboard().press("Escape");
-
-    }
-    public void selectMedicalDecileRange(String decileRange) {
-
-        MEDICAL_DECILE_RANGE.click();
-        String decile_value = String.format("//span[@class='ngx-slider-span ngx-slider-tick-legend ng-star-inserted'][normalize-space()='%s']", decileRange);
-        page.locator(decile_value).click();
-        page.keyboard().press("Escape");
-
-    }
-
-    public boolean verifyDiseaseErrorMessage() {
-
-        return DISEASE_POPUP.isVisible();
-
-    }
-    public boolean verifyDiagnosisRecencyErrorMessage() {
-        return DIAGNOSIS_RECENCY_POPUP.isVisible();
-
-    }
-
-    public void selectDisease(String diseaseValue) {
-
-        NPI_DISEASE.click();
-        DISEASE_VALUE.fill(diseaseValue);
-        DISEASE_SELECT.click();
-    }
-
-    public boolean verifyProcedureErrorMessage() {
-        return page.locator("text=Please select a treatment").isVisible();
-    }
-
-    public boolean verifyMedicalProcedureRecencyErrorMessage() {
-        return page.locator("text=Medical Procedure recency can not be less than 30 days").isVisible();
-    }
-
-    public void selectMedicalProcedure(String procedureValue) {
-        page.getByText("Select Medical Procedure").click();
-        page.locator("#smartlistDetailsContainer").getByRole(AriaRole.COMBOBOX).fill(procedureValue);
-        page.getByText(procedureValue).click();
-    }
-
-    public void clickExpandBasedOnPracticeAndHospitalAffiliation() {
-        CLICK_EXPAND_PRACTICE.click();
-    }
-
-    public boolean verifyPracticeAndHospitalErrorMessage() {
-        return page.locator("text=Select one or more List Population Options").isVisible();
-    }
-
-    public boolean verifyPrescriptionTypeErrorMessage() {
-        return page.locator("Please select a drug for").isVisible();
-    }
-
-    public void selectPrescriptionType(String prescriptionType) {
-
-        if (prescriptionType.equals("Droppers")) {
-
-        } else if (prescriptionType.equals("New Prescribers")) {
-            page.getByText("New to Brand").click();
-        }
-
-    }
-
-    public void selectDrugs(String drugs) {
-        DRUG_FIELD.click();
-        DRUG_FIELD.fill(drugs);
-        DRUG_VALUE.click();
-    }
-
-    public void selectTopPercent(String topPercent) {
-        Locator slider = page.locator("ngx-slider")
-                .filter(new Locator.FilterOptions().setHasText(topPercent))
-                .getByLabel("ngx-slider");
-        slider.click();
-    }
-
-    public void selectTimeFrame(String timeFrame) {
-        String timeFrameValue = String.format("//span[@class='ngx-slider-span ngx-slider-tick-legend ng-star-inserted'][normalize-space()='%s']", timeFrame);
-        page.locator(timeFrameValue).click();
+    public String verifySelectedSmartPixel() {
+        return SELECTED_SMART_PIXEL.innerText().trim();
     }
 }
