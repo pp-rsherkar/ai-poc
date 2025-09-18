@@ -221,7 +221,6 @@ public class StudioSteps {
 
     @Then("user clicks on the searched workspace")
     public void user_clicks_on_the_searched_workspace() {
-        workspacedownloadnpi.clickWorkspace();
         workspacedownloadnpi.clickDownloadButton();
         workspacedownloadnpi.clickNPIDownload();
         workspacedownloadnpi.clickCSVFile();

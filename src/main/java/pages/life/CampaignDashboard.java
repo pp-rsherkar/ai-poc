@@ -60,6 +60,7 @@ public class CampaignDashboard {
     private final Locator ADVERTISER_COLUMNNAME;
     private final Locator CAMPAIGN_COLUMNNAME;
     private final Locator CREATIVE_TOOLTIP;
+    private final Locator LIFE_TIME;
 
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
     boolean flag1, flag2, flag3 = false;
@@ -80,7 +81,7 @@ public class CampaignDashboard {
         this.BACK_TO_DASHBOARD = page.locator("//span[contains(@class,'breadCrumbRoot') and contains(text(),'Campaigns')]");
         this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section ng-star-inserted')]");
         this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
-        this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'left truncate campaign-name')]");
+        this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'campaign-name')]");
         this.TACTIC_NAME = page.locator("//span[contains(@class,'color-black tactic-name-section')]");
         this.TACTIC_PAGETITLE = page.locator("//div[contains(@class,'left truncate tactic-name')]");
         this.DASHBOARD_MENUICON = page.locator("//span[@class='icon-bars']");
@@ -90,7 +91,7 @@ public class CampaignDashboard {
         this.DASHBOARD_MENUCOLUMNS = page.locator("//div[contains(@class,'data-table-header')]/div[contains(@id,'liHeader') or contains(@class,'align-left')]");
         this.FILTER_OKBUTTON = page.locator("//button[contains(@class,'ui primary button')]");
         this.SELECTED_FILTER = page.locator("//div[contains(@class,'selected-filters')]//label");
-        this.RESET_FILTER_BUTTON = page.locator("//button[contains(text(),'Reset Filters')]");
+        this.RESET_FILTER_BUTTON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.FILTER_ICON = page.locator("//div[contains(@class,'filterApplied')]");
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
         this.FAVORITE_CAMPAIGN_LIST = page.locator("//i[contains(@class,'star display-inline')]");
@@ -109,6 +110,7 @@ public class CampaignDashboard {
         this.ADVERTISER_COLUMNNAME = page.locator("//div[contains(@id,'liHeaderAdvertiser')]");
         this.CAMPAIGN_COLUMNNAME = page.locator("//div[contains(@class,'display-inline')]/span[contains(text(),'CAMPAIGN')]");
         this.CREATIVE_TOOLTIP = page.locator("//span[contains(@class,'statusTooltipBackgroundImage')]");
+        this.LIFE_TIME = page.locator("//button[@data-title='Lifetime']");
     }
 
     public String verifyCampaignDashbaord(String text){
@@ -129,18 +131,21 @@ public class CampaignDashboard {
         switch (commentType) {
             case "Campaign Name":
                 for (String val : commentValues) {
+                    CAMPAIGN_COMMENTBOX.isVisible();
                     CAMPAIGN_COMMENTBOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
             case "Line Item Name":
                 for (String val : commentValues) {
+                    LINEITEM_COMMENTBOX.isVisible();
                     LINEITEM_COMMENTBOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
             case "Tactic Name":
                 for (String val : commentValues) {
+                    TACTIC_NAME_COMMENTBOX.isVisible();
                     TACTIC_NAME_COMMENTBOX.click();
                     successAlertText = addComments(val);
                 }
@@ -258,14 +263,11 @@ public class CampaignDashboard {
     }
 
     public void applyFilterOnSelectedColumns(String filterName, List<String> filterValues) {
-        page.locator(String.format("//span[contains(text(),'%s')]", filterName)).hover();
         String filterXpath = String.format(
-                "//span[contains(text(),'%s')]/ancestor::div[contains(@class,'filter-container')]//i[contains(@class,'filter icon')]",
-                filterName
-        );
+                "//span[contains(text(), '%s')]/following-sibling::div//span[contains(@class,'filter')]", filterName);
         page.locator(filterXpath).click();
         for (String value : filterValues) {
-            String valueXpath = String.format("//label[contains(text(),'%s')]", value);
+            String valueXpath = String.format("//app-overlay[@class='line-item-list-filter']//label[contains(text(),'%s')]", value);
             page.locator(valueXpath).click();
         }
         FILTER_OKBUTTON.click();
@@ -375,5 +377,10 @@ public class CampaignDashboard {
             }
         }
         return true;
+    }
+
+    public void clickLifetimeFilter() {
+        LIFE_TIME.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 }

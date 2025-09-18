@@ -29,7 +29,7 @@ public class WorkspaceCreation {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
-        this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Explorer')]");
+        this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//h3[contains(text(),'Saving workspace') or contains(text(),'Creating workspace')]/following-sibling::span");
