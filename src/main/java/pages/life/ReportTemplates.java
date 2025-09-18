@@ -50,6 +50,10 @@ public class ReportTemplates {
     private final Locator SEARCH_BUTTON;
     private final Locator DOWNLOAD_REPORT;
     private final Locator REPORT_PROGRESS_ICON;
+    private final Locator TEMPLATE_PAGINATION;
+    private final Locator TREE_COLLAPSED_ICON;
+    private final Locator DIMENSION_AND_METRICS_LABELS;
+    private final Locator CANCEL_BUTTON;
     private String reportName;
 
 
@@ -72,7 +76,7 @@ public class ReportTemplates {
         this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Ok']");
         this.TEMPLATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
-        this.CLICK_TEMPLATE_SEARCH = page.locator("div.iconSprite.search.search-icon");
+        this.CLICK_TEMPLATE_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.SELECT_TEMPLATE = page.locator("//input[@placeholder='Select Template']");
         this.SELECT_TACTIC = page.locator("//input[@placeholder='All Tactics']");
         this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
@@ -85,6 +89,10 @@ public class ReportTemplates {
         this.SEARCH_REPORT = page.locator("input.form-control.ng-untouched.ng-pristine.ng-valid");
         this.SEARCH_BUTTON = page.locator("div.iconSprite.search1");
         this.DOWNLOAD_REPORT = page.locator("//span[text()='Download']");
+        this.TEMPLATE_PAGINATION = page.locator("div.pagination-wrapper");
+        this.TREE_COLLAPSED_ICON = page.locator("//i[@class='icon_custom tree-collapsed']");
+        this.DIMENSION_AND_METRICS_LABELS = page.locator("//div[contains(@class,'checkbox-group-item')]//sui-checkbox//label");
+        this.CANCEL_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Cancel')]");
     }
 
     public void clickReportTemplatesLink() {
@@ -161,6 +169,7 @@ public class ReportTemplates {
 
     public void searchCreatedReportTemplate(String createdReportTemplate) {
         SEARCH_TEMPLATE.fill(createdReportTemplate);
+        waitUtility.waitForLocatorVisible(CLICK_TEMPLATE_SEARCH, 5000);
         CLICK_TEMPLATE_SEARCH.click(new Locator.ClickOptions().setForce(true));
     }
 
@@ -220,10 +229,11 @@ public class ReportTemplates {
     }
 
     public boolean verifyColumnsOfReport(String templateNameRandom, String filePath) throws Exception {
-        waitUtility.waitForElementVisible("div.pagination-wrapper.ng-star-inserted");
+        waitUtility.waitForLocatorVisible(TEMPLATE_PAGINATION);
+        waitUtility.waitUntilPreLoaderHidden();
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click(new Locator.ClickOptions().setForce(true));
-        waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom));
+        waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom), 5000);
         List<String> expectedHeaders = Arrays.stream(TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*"))
                 .map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize expected
                 .toList();
@@ -243,5 +253,16 @@ public class ReportTemplates {
 
         return allHeadersPresent;
     }
-    
+
+    public List<String> expandGroupsAndFetchDimensionsAndMetrics() {
+        while (TREE_COLLAPSED_ICON.count() > 0) {
+            TREE_COLLAPSED_ICON.first().scrollIntoViewIfNeeded();
+            TREE_COLLAPSED_ICON.first().click();
+        }
+        return DIMENSION_AND_METRICS_LABELS.allInnerTexts();
+    }
+
+    public void clickCancelButton(){
+        CANCEL_BUTTON.click();
+    }
 }

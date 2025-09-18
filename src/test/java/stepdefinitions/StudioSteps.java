@@ -154,7 +154,8 @@ public class StudioSteps {
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
-        Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
+        // As confirmed by Nikhil - for GA, permissions have been set up like-wise. This is HCP Explorer test-case and in permission feature we can handled this.
+        // Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
     }
 
     @And("User clicks on HCP Explorer workspace")
@@ -307,12 +308,7 @@ public class StudioSteps {
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspace.clickPublish();
-
-        String actualMessage = workspaceCreation.verifyWorkspaceCreation();
-        boolean isValid = actualMessage.equals("Workspace saved successfully") ||
-                actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
-
-        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
+        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
         workspace.waitTillWorkspaceAlertHide();
         workspace.clickDownbutton();
         Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
@@ -322,19 +318,19 @@ public class StudioSteps {
     @And("Verify Webhook panel is disabled before applying filters")
     public void verifyWebhookPanelIsDisabledBeforeApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Disabled", workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Disabled",workspace.verifyWebhookToggleButton());
         workspace.closeWebhookPanel();
     }
 
     @Then("Verify Webhook panel is enabled after applying engagement filters")
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Enabled", workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
     }
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
-        if (requestType.contains("POST"))
+        if(requestType.contains("POST"))
             workspace.clickWebhookIcon();
         workspace.clickRequestOrContentButton(requestType);
     }
@@ -404,7 +400,7 @@ public class StudioSteps {
 
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 167, 164)", workspace.checkBackgroundColorOfWebhookIcon());
+        Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
@@ -417,7 +413,7 @@ public class StudioSteps {
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         String text = workspaceCreation.verifyDeletePopUp();
         Assert.assertTrue("Message is not displayed",
-                text.contains("You are trying to delete the workspace " + newWorkspaceName + ".\n" +
+                text.contains("You are trying to delete the workspace " + newWorkspaceName +".\n" +
                         "\n" +
                         "Webhooks are enabled for this workspace.\n" +
                         "\n" +

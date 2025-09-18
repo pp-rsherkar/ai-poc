@@ -58,4 +58,8 @@ public class WaitUtility {
     public void waitForElementHidden(String xpath) {
         page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
+
+    public void waitForElementDetached(String xpath){
+        page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.DETACHED));
+    }
 }
