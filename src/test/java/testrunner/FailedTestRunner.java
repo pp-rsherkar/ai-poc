@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
         // Rerun failed tests from rerun.txt file
         features = {"@target/failed_scenarios.txt"}
         , glue = {"stepdefinitions", "hooks"}
-        , tags = "@regression"
+        , tags = "@e2e"
         , plugin = {"pretty", "html:target/cucumber-reports/report.html", "json:target/cucumber-reports/cucumber.json", "junit:target/cucumber-reports/Cucumber.xml"
 })
 

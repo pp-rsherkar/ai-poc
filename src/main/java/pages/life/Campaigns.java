@@ -21,6 +21,7 @@ public class Campaigns {
     private final Locator SAVE_CAMPAIGN;
     private final Locator CAMPAIGN_LISTING;
     private final Locator CAMPAIGN_SUCCESS;
+    private final Locator LIFE_TIME_FILTER;
 
     public Campaigns(Page page) {
         this.page = page;
@@ -35,6 +36,7 @@ public class Campaigns {
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
         this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
+        this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
     }
 
     public void createCampaign() {
@@ -84,6 +86,10 @@ public class Campaigns {
 
     public void navigateToCampaignListing() {
         CAMPAIGN_LISTING.click();
-        page.waitForLoadState();
+        waitUtility.waitForLocatorVisible(CAMPAIGN_LISTING);
+        if(LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
+            LIFE_TIME_FILTER.click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
     }
 }

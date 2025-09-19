@@ -222,7 +222,7 @@ public class BulkCreativeUpload {
     }
 
     public void clickBlankTemplateDownloadButton() {
-        DOWNLOAD_BLANK_TEMPLATE.isVisible();
+        DOWNLOAD_BLANK_TEMPLATE.click();
     }
 
     public boolean isBrowseFileButtonVisible(String field) {

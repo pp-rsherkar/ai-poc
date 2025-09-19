@@ -60,7 +60,7 @@ public class CampaignDashboard {
     private final Locator ADVERTISER_COLUMNNAME;
     private final Locator CAMPAIGN_COLUMNNAME;
     private final Locator CREATIVE_TOOLTIP;
-    private final Locator LIFE_TIME;
+    private final Locator LIFE_TIME_FILTER;
 
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
     boolean flag1, flag2, flag3 = false;
@@ -78,7 +78,7 @@ public class CampaignDashboard {
         this.TOOLTIP_TEXT = page.locator("//span[@class='tooltip-text']");
         this.LINEITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.TACTIC_TOGGLE_BUTTON = page.locator("//div[contains(@class,'tactic-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
-        this.BACK_TO_DASHBOARD = page.locator("//span[contains(@class,'breadCrumbRoot') and contains(text(),'Campaigns')]");
+        this.BACK_TO_DASHBOARD = page.locator("//div[@class='logo-lists']/img");
         this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section ng-star-inserted')]");
         this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
         this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'campaign-name')]");
@@ -110,7 +110,7 @@ public class CampaignDashboard {
         this.ADVERTISER_COLUMNNAME = page.locator("//div[contains(@id,'liHeaderAdvertiser')]");
         this.CAMPAIGN_COLUMNNAME = page.locator("//div[contains(@class,'display-inline')]/span[contains(text(),'CAMPAIGN')]");
         this.CREATIVE_TOOLTIP = page.locator("//span[contains(@class,'statusTooltipBackgroundImage')]");
-        this.LIFE_TIME = page.locator("//button[@data-title='Lifetime']");
+        this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
     }
 
     public String verifyCampaignDashbaord(String text){
@@ -380,7 +380,7 @@ public class CampaignDashboard {
     }
 
     public void clickLifetimeFilter() {
-        LIFE_TIME.click();
+        LIFE_TIME_FILTER.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
 }

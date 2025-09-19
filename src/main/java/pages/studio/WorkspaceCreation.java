@@ -40,7 +40,7 @@ public class WorkspaceCreation {
         this.REMOVAL_CONFIRMATION_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Removal Confirmation')]");
         this.REMOVAL_CONFIRMATION_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'You are trying to delete the workspace')]");
         this.REMOVE_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Remove']");
-        this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Workspace archived successfully')]");
+        this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Workspace deleted successfully')]");
     }
 
     public String studioDashboard() {

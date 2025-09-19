@@ -171,6 +171,7 @@ public class SharedList {
 
     public String isListCreatedOrDeleted() {
         String text = fetchLocatorText(SUCCESS_ALERT);
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         waitUtility.waitUntilSpinnerHidden();
         return text;
     }
@@ -273,6 +274,7 @@ public class SharedList {
     public void downloadFile(String fileName) {
         Locator locator = page.locator(String.format("//div[@title='%s']/following-sibling::div//img[contains(@src,'export.svg')]", fileName));
         locator.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean verifyDownloadedFile(String fileName, String fileExtension) {
