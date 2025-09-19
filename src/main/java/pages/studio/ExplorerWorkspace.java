@@ -110,7 +110,7 @@ public class ExplorerWorkspace {
 
     public void selectFilter(String filter, List<String> options) {
         SEARCH_FILTER.fill(filter);
-        SELECT_FILTER.first().click();
+        WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).click();
         switch (filter) {
             case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name":
                 if (filter.equals("Specialty"))
