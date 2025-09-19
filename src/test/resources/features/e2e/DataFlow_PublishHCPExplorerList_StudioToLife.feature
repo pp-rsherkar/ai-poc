@@ -3,7 +3,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
   2. Publish the workspace as Studio List (Static List or Live List)
   3. Verify the published Studio list in LIFE
 
-  @e2e @regressionn
+  @e2e @regression
   Scenario Outline: Create and save HCP Explorer workspace with specific filters
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
