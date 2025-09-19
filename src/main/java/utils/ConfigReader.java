@@ -32,6 +32,14 @@ public class ConfigReader {
     public static String getDbPassword() throws Exception {
         return EncryptionDecryption.decrypt(getProperty("dbPassword"));
     }
+
+    public static String getCustomDestinationUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("customDestinationUserName"));
+    }
+
+    public static String getCustomDestinationPassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("customDestinationPassword"));
+    }
 }
 
 

@@ -379,6 +379,11 @@ public class CampaignDashboard {
         return true;
     }
 
+    public void navigateToLineItemDetails(String campaignID){
+        LINEITEM_NAME.click();
+        LINEITEM_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
     public void clickLifetimeFilter() {
         LIFE_TIME_FILTER.click();
         waitUtility.waitUntilPreLoaderHidden();

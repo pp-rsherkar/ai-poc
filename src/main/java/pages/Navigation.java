@@ -30,6 +30,8 @@ public class Navigation {
     private final Locator TARGETING_TEMPLATE_ICON;
     private final Locator CAMPAIGNS;
     private final Locator CREATIVE_LIBRARY_ICON;
+    private final Locator MENU_ANGLE;
+    private final Locator PULSEPOINT_LOGO;
 
     public Navigation(Page page) {
         this.page = page;
@@ -38,7 +40,7 @@ public class Navigation {
         this.LOGIN_BUTTON = page.locator(".loginLabel");
         this.LIFE = page.getByText("Life");
         this.SIGNAL = page.getByText("Signal");
-        this.STUDIO = page.getByText("Studio");
+        this.STUDIO = page.locator("//div[contains(@class,'genomeMenuItem')]");
         this.RUN_REPORT = page.getByText("Run a Report");
         this.GENERATED_REPORT = page.locator("#megamenu").getByText("Generated Reports");
         this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
@@ -51,6 +53,8 @@ public class Navigation {
         this.TARGETING_TEMPLATE_ICON = page.locator("//div[contains(@class,'targetTemplateIcon')]");
         this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
+        this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
+        this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo");
     }
 
     public void navigateToUrl(String url) {
@@ -74,12 +78,13 @@ public class Navigation {
     }
 
     public String verifyProfilePage() {
-        page.waitForLoadState(LoadState.LOAD);
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
     public void navigateToLife() {
         LIFE.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void navigateToHCP() {
@@ -101,16 +106,22 @@ public class Navigation {
             page.waitForLoadState(LoadState.LOAD);
             ACCOUNT_ITEM.click();
         }
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
     public void clickSubMenu() {
         SUB_MENU.click();
     }
+
+    public void clickMenuAngle(){
+        if(MENU_ANGLE.isVisible() && MENU_ANGLE.getAttribute("class").contains("fa-angle-left"))
+            MENU_ANGLE.click();
+    }
+
     public void clickRunReport() {
         RUN_REPORT.click();
     }
-
 
     public void clickGeneratedReport() {
         page.waitForTimeout(5000);
@@ -139,5 +150,10 @@ public class Navigation {
     public void clickCreativeLibrary() {
         CREATIVE_LIBRARY_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickPulsePointLogo(){
+        PULSEPOINT_LOGO.click();
+        waitUtility.waitForLocatorVisible(SUB_MENU);
     }
 }

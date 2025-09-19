@@ -51,6 +51,9 @@ public class ReportTemplates {
     private final Locator DOWNLOAD_REPORT;
     private final Locator REPORT_PROGRESS_ICON;
     private final Locator TEMPLATE_PAGINATION;
+    private final Locator TREE_COLLAPSED_ICON;
+    private final Locator DIMENSION_AND_METRICS_LABELS;
+    private final Locator CANCEL_BUTTON;
     private String reportName;
 
 
@@ -87,6 +90,9 @@ public class ReportTemplates {
         this.SEARCH_BUTTON = page.locator("div.iconSprite.search1");
         this.DOWNLOAD_REPORT = page.locator("//span[text()='Download']");
         this.TEMPLATE_PAGINATION = page.locator("div.pagination-wrapper");
+        this.TREE_COLLAPSED_ICON = page.locator("//i[@class='icon_custom tree-collapsed']");
+        this.DIMENSION_AND_METRICS_LABELS = page.locator("//div[contains(@class,'checkbox-group-item')]//sui-checkbox//label");
+        this.CANCEL_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Cancel')]");
     }
 
     public void clickReportTemplatesLink() {
@@ -247,5 +253,16 @@ public class ReportTemplates {
 
         return allHeadersPresent;
     }
-    
+
+    public List<String> expandGroupsAndFetchDimensionsAndMetrics() {
+        while (TREE_COLLAPSED_ICON.count() > 0) {
+            TREE_COLLAPSED_ICON.first().scrollIntoViewIfNeeded();
+            TREE_COLLAPSED_ICON.first().click();
+        }
+        return DIMENSION_AND_METRICS_LABELS.allInnerTexts();
+    }
+
+    public void clickCancelButton(){
+        CANCEL_BUTTON.click();
+    }
 }
