@@ -18,8 +18,8 @@ public class LineItemDetails {
     private final Locator NEW_LINE_ITEM;
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
     private final Locator ADD_FLIGHT_BUTTON;
+    private final Locator LINE_ITEM_PANEL_NAME;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    private final Locator PULSEPOINT_LOGO;
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -33,7 +33,8 @@ public class LineItemDetails {
         this.NEW_LINE_ITEM = page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
-        this.PULSEPOINT_LOGO = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("logo")).first();
+        this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']").last();
+
     }
 
     public String verifyLineItemText() {
@@ -78,7 +79,7 @@ public class LineItemDetails {
         ADD_FLIGHT_BUTTON.click();
     }
 
-    public void clickPulsePointLogo() {
-        PULSEPOINT_LOGO.click();
+    public String verifyLineItemPanelName() {
+        return LINE_ITEM_PANEL_NAME.innerText();
     }
 }

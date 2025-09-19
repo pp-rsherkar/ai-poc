@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.Locator;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static factory.DriverFactory.page;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -1776,12 +1778,12 @@ public class LifeSteps {
             lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.randomNumberGeneration();
             tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
             assert lineItemDetails.lineItemSuccess().contains("Success!");
+            Assert.assertEquals(lineItemNameRandom, lineItemDetails.verifyLineItemPanelName());
             lineItemDetails.cancelTactic();
             if (i < lineItemTypeList.size() - 1) {
                 lineItemDetails.selectNewLineItem();
             }
         }
-
     }
 
     /*Creative Bulk Upload */
@@ -2008,7 +2010,7 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
