@@ -19,15 +19,18 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Audience Group tactic |
       | Targeting Segment     |
       | Health Populations    |
-    Then Verify that for unsaved tactics only details tab is enabled and other three tabs are disabled
+    Then Verify that the tabs gets enabled only after saving tactics
       |Settings|
       |Creatives|
       |Debugger |
     And Verify the status of saved tactic
+    When User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |CHANNEL       | RULE_TYPE          |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Display Advanced  | Behavioral Segment |
 
   @regression
   Scenario Outline: Create new custom field in tactic and delete it

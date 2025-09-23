@@ -654,8 +654,8 @@ public class LifeSteps {
         tacticDetails.deleteCustomField(customFieldName);
     }
 
-    @Then("Verify that for unsaved tactics only details tab is enabled and other three tabs are disabled")
-    public void verify_that_for_unsaved_tactics_only_details_tab_is_enabled_and_other_three_tabs_are_disabled(DataTable dataTable) {
+    @Then("Verify that the tabs gets enabled only after saving tactics")
+    public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
         tacticDetails.clickNewTactic();
         tacticDetails.verifyDetailsTab();
         List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
@@ -1050,7 +1050,7 @@ public class LifeSteps {
     }
 
     @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
-    public void userTriesToSaveTheTargetingTemplateWithTargetingRuleAndWithoutSpecifyingATemplateName(String targetingRule) {
+    public void userTriesToSaveTheTargetingTemplateWithTargetingRuleAndWithoutSpecifyingATemplateName(String targetingRule) throws InterruptedException {
         Assert.assertEquals("Template Name is required", targetingTemplate.verifyErrorMessageForTemplateName(targetingRule));
     }
 

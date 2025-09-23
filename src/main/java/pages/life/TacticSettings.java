@@ -59,6 +59,11 @@ public class TacticSettings {
     private final Locator TARGETING_RULES_PANEL_TITLE;
     private final Locator KEYWORD_CUSTOM_LIST;
     private final Locator KEYWORD_SELECTED_LIST;
+    private final Locator SHOW_MORE_BUTTON;
+    private final Locator TARGETING_OPTIONS;
+    private final Locator SELECT_TARGETING;
+    private final Locator BLOCK_TARGETING;
+    private final Locator HOUSEHOLD_ICON;
 
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -111,6 +116,12 @@ public class TacticSettings {
         this.TARGETING_RULES_PANEL_TITLE = page.locator("//div[text()='HCP Direct Match Targeting' or text()='Targeting Rule']");
         this.KEYWORD_CUSTOM_LIST = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Custom Lists')]");
         this.KEYWORD_SELECTED_LIST = page.locator("//span[contains(text(),'Custom Keyword')]/following-sibling::span[contains(text(),'Selected Only')]");
+        this.SHOW_MORE_BUTTON = page.locator("//button[@class='show-more-button']");
+        this.TARGETING_OPTIONS = page.locator("//span[contains(@class,'max-width')]");
+        //this.SELECT_TARGETING = page.locator("//span[contains(@class,'max-width')]/ancestor::div[contains(@class,'cliptext')]/preceding-sibling::div/div[contains(@class,'include-default')]");
+        this.SELECT_TARGETING = page.locator("//div[@title='Target']");
+        this.BLOCK_TARGETING = page.locator("//div[@title='Block']");
+        this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");;
     }
 
     public String verifyTacticSettingsText() {
@@ -126,9 +137,22 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
-        SELECT_OPTION.click();
+        HOUSEHOLD_IP_TAB.click();
+        SHOW_MORE_BUTTON.click();
+        SELECT_TARGETING.last().click();
+        String selected = TARGETING_OPTIONS.last().innerText();
+        System.out.println(selected);
+        SHOW_MORE_BUTTON.click();
+        BLOCK_TARGETING.last().click();
+        String blocked = TARGETING_OPTIONS.last().innerText();
+        System.out.println(blocked);
         clickOk();
         clickClose();
+        waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
+        boolean ENTRY2 = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).isVisible();
+        System.out.println("Blocked visible? " + ENTRY2);
+        boolean ENTRY1 = page.locator(String.format("//span[contains(text(),'%s')]", selected)).isVisible();
+        System.out.println("Selected visible? " + ENTRY1);
     }
 
     public int selectRuleType(String ruleType, String ruleOption) {
