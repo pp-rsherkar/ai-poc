@@ -173,6 +173,7 @@ public class LifeSteps {
     @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
     public void user_configures_the_targeting_rules_and_saves_the_settings(String ruleType) {
         tacticSettings.selectRuleType(ruleType);
+       Assert.assertEquals(tacticSettings.SELECTED_BEHAVIOUR_SEGMENTS,tacticSettings.SAVED_BEHAVIOUR_SEGMENTS);
         tacticSettings.saveTacticSettings();
     }
 
@@ -618,6 +619,11 @@ public class LifeSteps {
         for( String tacticName : tacticNames) {
             tacticDetails.enterTacticName(tacticName);
             tacticDetails.saveTacticDetails();
+            tacticSettings.selectChannel("Standard");
+            navigation.clickOnIcon("Add Targeting Rule");
+            tacticSettings.selectRuleType("Behavioral Segment");
+            Assert.assertEquals(tacticSettings.SELECTED_BEHAVIOUR_SEGMENTS,tacticSettings.SAVED_BEHAVIOUR_SEGMENTS);
+            tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
         List<String> savedTactics =   tacticDetails.getAllTactics();

@@ -61,6 +61,8 @@ public class TacticSettings {
     private final Locator SELECT_TARGETING;
     private final Locator BLOCK_TARGETING;
     private final Locator HOUSEHOLD_ICON;
+    public final Set<String> SELECTED_BEHAVIOUR_SEGMENTS = new HashSet<>();
+    public final Set<String> SAVED_BEHAVIOUR_SEGMENTS = new HashSet<>();
 
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -135,18 +137,18 @@ public class TacticSettings {
         SHOW_MORE_BUTTON.click();
         SELECT_TARGETING.last().click();
         String selected = TARGETING_OPTIONS.last().innerText();
-        System.out.println(selected);
+        this.SELECTED_BEHAVIOUR_SEGMENTS.add(selected);
         SHOW_MORE_BUTTON.click();
         BLOCK_TARGETING.last().click();
         String blocked = TARGETING_OPTIONS.last().innerText();
-        System.out.println(blocked);
+        this.SELECTED_BEHAVIOUR_SEGMENTS.add(blocked);
         clickOk();
         clickClose();
         waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
-        boolean ENTRY2 = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).isVisible();
-        System.out.println("Blocked visible? " + ENTRY2);
-        boolean ENTRY1 = page.locator(String.format("//span[contains(text(),'%s')]", selected)).isVisible();
-        System.out.println("Selected visible? " + ENTRY1);
+        String blockedTarget = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).innerText();
+        String savedTarget = page.locator(String.format("//span[contains(text(),'%s')]", selected)).innerText();
+        SAVED_BEHAVIOUR_SEGMENTS.add(blockedTarget);
+        SAVED_BEHAVIOUR_SEGMENTS.add(savedTarget);
     }
 
     public int selectRuleType(String ruleType, String ruleOption) {
