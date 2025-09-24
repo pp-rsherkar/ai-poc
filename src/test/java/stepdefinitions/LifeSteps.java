@@ -715,7 +715,9 @@ public class LifeSteps {
     @Then("Verify dashboard is customized and only selected columns are displayed")
     public void verifyDashboardIsCustomizedAndOnlySelectedColumnsAreDisplayed() {
         List<String> columnName = campaignDashboard.fecthDashboardColumns();
-        Assert.assertEquals(new HashSet<>(keyValues), new HashSet<>(columnName));
+        Assert.assertEquals(
+                keyValues.stream().map(o -> ((String) o).toLowerCase()).collect(Collectors.toSet()),
+                columnName.stream().map(String::toLowerCase).collect(Collectors.toSet()));
     }
 
     @When("User clicks HideAll and ShowAll options from Menu")
@@ -742,7 +744,10 @@ public class LifeSteps {
     @Then("Verify the data should filter as per the selected filter values")
     public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
         List<String> selectedFilter = campaignDashboard.verifySelectedFilter();
-        Assert.assertEquals(keyValues, selectedFilter);
+        List<String> cleanedActual = selectedFilter.stream()
+                .map(s -> s.replaceAll(":$", ""))
+                .toList();
+        Assert.assertEquals(keyValues, cleanedActual);
     }
 
     @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
@@ -2100,5 +2105,10 @@ public class LifeSteps {
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
             nameList.add(creativeName);
         }
+    }
+
+    @And("User clicks Lifetime filter")
+    public void userClicksLifetimeFilter() {
+        campaignDashboard.clickLifetimeFilter();
     }
 }

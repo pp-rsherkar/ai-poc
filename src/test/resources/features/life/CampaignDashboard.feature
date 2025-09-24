@@ -9,6 +9,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
     When User enters "<Campaign ID>" and click Search button
     Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
     When User add and save comments to Campaign, Line Items and Tactics
@@ -30,9 +31,9 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     When User clicks HideAll and ShowAll options from Menu
     Then Dashboard columns should be hidden and shown accordingly
     When Navigate to any Dashboard column, select the filter and apply
-      | STATUS  | Incomplete, Pending Approval |
-      | ENABLED | Enabled                      |
-      | TYPE    | Audio, Native Display        |
+      | Status  | Incomplete, Pending Approval |
+      | Enabled | Enabled                      |
+      | Type    | Audio, Native Display        |
     Then Verify the data should filter as per the selected filter values
     And Filter icon should display in the column header to which filter is applied and a red bullet "<RED BULLET>" on the filter icon present next to global search
     When User clicks Active Flights, Today and Yesterday filter option type
@@ -50,4 +51,4 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
 
     Examples:
       | Campaign ID          | COLOUR                     | RED BULLET                             |
-      | Auto_20250625_123023 | 24-note-table-provided.svg | 20-filter-applied.1e22619f2d75d737.svg |
+      | Auto_20250821_213314 | 24-note-table-provided.svg | 20-filter-applied.1e22619f2d75d737.svg |
