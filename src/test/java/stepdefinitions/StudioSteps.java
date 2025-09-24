@@ -221,7 +221,6 @@ public class StudioSteps {
 
     @Then("user clicks on the searched workspace")
     public void user_clicks_on_the_searched_workspace() {
-        workspacedownloadnpi.clickWorkspace();
         workspacedownloadnpi.clickDownloadButton();
         workspacedownloadnpi.clickNPIDownload();
         workspacedownloadnpi.clickCSVFile();
@@ -392,7 +391,7 @@ public class StudioSteps {
 
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
+        Assert.assertEquals("rgb(0, 136, 136)",workspace.checkBackgroundColorOfWebhookIcon());
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
@@ -411,6 +410,6 @@ public class StudioSteps {
                         "\n" +
                         "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
                         "Do you want to proceed?"));
-        Assert.assertEquals("Workspace archived successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 }

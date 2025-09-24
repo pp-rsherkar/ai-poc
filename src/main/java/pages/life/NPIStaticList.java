@@ -50,6 +50,7 @@ public class NPIStaticList {
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void enterNPINumber(String npiNumber) {

@@ -48,7 +48,7 @@ public class Workspace {
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
         this.SEARCH_WORKSPACE = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator(".styles__StyledScheduleStatus-sc-u6f0o3-5 > svg").first();
+        this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator("//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button").first();
         this.PUBLISH_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish NPI List"));
         this.PUBLISHED_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Published NPI List"));
         this.STATIC_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Static List"));
@@ -57,7 +57,7 @@ public class Workspace {
         this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//h3[contains(text(),'Saving workspace') or contains(text(),'Creating workspace')]/following-sibling::span");
-        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//div[contains(@class,'styles__StyledScheduleStatus')])[3]"); //no unique identifier is available hence index needs to be provided
+        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
         this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
         this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
         this.WEBHOOK_CANCEL_BUTTON = WORKSPACE_FRAME.locator("//button[@type='button']/div[contains(text(),'Cancel')]");
@@ -169,7 +169,7 @@ public class Workspace {
 
     public void addMacros(String textType, String param, List<String> macrosList){
         for (String macros : macrosList) {
-            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//span[contains(text(),'%s')]", textType, macros);
+            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//p[contains(text(),'%s')]", textType, macros);
             Locator MACROS = WORKSPACE_FRAME.locator(xpath);
             if (MACROS.innerText().contains(macros)) {
                 MACROS.click();
