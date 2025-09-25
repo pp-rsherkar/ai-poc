@@ -2,7 +2,6 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import utils.WaitUtility;
@@ -10,8 +9,6 @@ import utils.WaitUtility;
 import java.util.*;
 
 public class TacticSettings {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -56,7 +53,7 @@ public class TacticSettings {
     private final Locator TARGETING_RULES_PANEL_TITLE;
     private final Locator KEYWORD_CUSTOM_LIST;
     private final Locator KEYWORD_SELECTED_LIST;
-
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
 
@@ -164,7 +161,7 @@ public class TacticSettings {
     public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues) {
         SEARCH_RULE_TYPE.clear();
         SEARCH_RULE_TYPE.type(ruleType);
-        if(SELECT_RULE_TYPE.isVisible()){
+        if (SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitUntilSpinnerHidden();
 
@@ -370,7 +367,7 @@ public class TacticSettings {
         }
     }
 
-    public void isElementVisible(String xpath){
+    public void isElementVisible(String xpath) {
         Locator locator = page.locator(xpath);
         boolean visible = false;
         for (int i = 0; i < 5; i++) {
@@ -388,9 +385,8 @@ public class TacticSettings {
         }
     }
 
-    public void clickRuleTypeOkButton(){
-        if(RULE_TYPE_OK_BUTTON.isEnabled())
-            RULE_TYPE_OK_BUTTON.click();
+    public void clickRuleTypeOkButton() {
+        if (RULE_TYPE_OK_BUTTON.isEnabled()) RULE_TYPE_OK_BUTTON.click();
         page.waitForLoadState(LoadState.LOAD);
     }
 
@@ -398,7 +394,7 @@ public class TacticSettings {
         RULE_TYPE_CLOSE.click();
     }
 
-    public List<Object> fetchRulesTypes(){
+    public List<Object> fetchRulesTypes() {
         ruleTypes = new ArrayList<>();
         FETCH_TARGET_RULETYPES.first().waitFor();
         for (int i = 0; i < FETCH_TARGET_RULETYPES.count(); i++) {
@@ -412,7 +408,7 @@ public class TacticSettings {
         FETCH_TARGET_RULETYPES.nth(expectedCount - 1).waitFor();
     }
 
-    public List<Object> fetchRuleOptions(){
+    public List<Object> fetchRuleOptions() {
         ruleOptions = new ArrayList<>();
         for (int i = 0; i < FETCH_TARGET_RULEOPTIONS.count(); i++) {
             String text = FETCH_TARGET_RULEOPTIONS.nth(i).innerText();
@@ -425,7 +421,7 @@ public class TacticSettings {
     public void selectTargetingRule(String ruleType, String listName) {
         SEARCH_RULE_TYPE.clear();
         SEARCH_RULE_TYPE.type(ruleType);
-        if(SELECT_RULE_TYPE.isVisible()) {
+        if (SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitForLocatorVisible(TARGETING_RULES_PANEL_TITLE);
             Map<String, Locator> ruleOptionMap = new HashMap<>();
@@ -437,9 +433,7 @@ public class TacticSettings {
                     break;
                 }
             }
-            Locator searchInput = listName.contains("Keyword")
-                    ? SEARCH_RULE_OPTION.nth(1)
-                    : SEARCH_RULE_OPTION;
+            Locator searchInput = listName.contains("Keyword") ? SEARCH_RULE_OPTION.nth(1) : SEARCH_RULE_OPTION;
             searchInput.fill(listName);
             page.waitForLoadState();
             searchInput.press("Enter");
@@ -447,11 +441,7 @@ public class TacticSettings {
     }
 
     public void clickTarget(String listName) {
-        Locator locator = page.locator(String.format(
-                "//div[@title='%s']/preceding-sibling::div/div[@title='Target'] | " +
-                "//span[@title='%s']/ancestor::div/preceding-sibling::div/div[@title='Target'] | " +
-                "//div[text()='%s']/ancestor::div/preceding-sibling::div/div[@title='Target']",
-                listName, listName, listName));
+        Locator locator = page.locator(String.format("//div[@title='%s']/preceding-sibling::div/div[@title='Target'] | " + "//span[@title='%s']/ancestor::div/preceding-sibling::div/div[@title='Target'] | " + "//div[text()='%s']/ancestor::div/preceding-sibling::div/div[@title='Target']", listName, listName, listName));
         locator.click();
     }
 
@@ -468,8 +458,8 @@ public class TacticSettings {
     }
 
     /*Roshani Sherkar
-    * 01-07-2025*/
-    public boolean fetchAndVerifyTargetCategoryName(List<String> targetCategoryList){
+     * 01-07-2025*/
+    public boolean fetchAndVerifyTargetCategoryName(List<String> targetCategoryList) {
         List<String> actualCategories = new ArrayList<>();
         int count = TARGET_CATEGORY_NAME.count();
         for (int i = 0; i < count; i++) {
@@ -500,14 +490,12 @@ public class TacticSettings {
     }
 
     /*Roshani Sherkar
-    * 20-08-2025
-    * Open NPI list created in new browser tab */
+     * 20-08-2025
+     * Open NPI list created in new browser tab */
     public String fetchTotalNPICountFromNewTab(String listName) {
         Page originalPage = DriverFactory.getPage();
         Page newTab = DriverFactory.context.waitForPage(() -> {
-            DriverFactory.getPage()
-                    .locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName))
-                    .click();
+            DriverFactory.getPage().locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName)).click();
         });
         newTab.bringToFront();
         DriverFactory.threadLocalDriver.set(newTab);
@@ -520,20 +508,17 @@ public class TacticSettings {
         return npiCount;
     }
 
-    public String fetchNPICountFromTargetingPanel(){
+    public String fetchNPICountFromTargetingPanel() {
         return TOTAL_NPI_COUNT.first().innerText().trim();
     }
 
     public boolean isListAvailableInTargetingPanel(String listName) {
-        Locator locator = page.locator(String.format(
-                "//span[@title='%s'] | //div[@title='%s'] | //div[contains(@class,'text-cls') and contains(text(),'%s')]",
-                listName, listName, listName
-        ));
+        Locator locator = page.locator(String.format("//span[@title='%s'] | //div[@title='%s'] | //div[contains(@class,'text-cls') and contains(text(),'%s')]", listName, listName, listName));
         locator.scrollIntoViewIfNeeded();
         return locator.isVisible();
     }
 
-    public int fetchSelectedListCountFromTargetingPanel(){
+    public int fetchSelectedListCountFromTargetingPanel() {
         Locator locator = SELECTED_LIST.count() > 1 ? KEYWORD_SELECTED_LIST : SELECTED_LIST;
         String text = locator.innerText();
         return Integer.parseInt(text.replaceAll("^.*\\((\\d+)\\).*$", "$1").trim());
@@ -549,19 +534,18 @@ public class TacticSettings {
     }
 
     public boolean isSelectedListPresentInTactic(String npiName) {
-        FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).scrollIntoViewIfNeeded();
-        return FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).isVisible();
+        FETCH_TARGET_RULEOPTIONS.locator("text=" + npiName).scrollIntoViewIfNeeded();
+        return FETCH_TARGET_RULEOPTIONS.locator("text=" + npiName).isVisible();
     }
 
     public String fetchSelectedListItemCountFromTactic(String npiName) {
-        Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).locator("xpath=./following-sibling::span");
-        if(!targetCount.isVisible())
-            return "";
+        Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("text=" + npiName).locator("xpath=./following-sibling::span");
+        if (!targetCount.isVisible()) return "";
         return targetCount.innerText().trim();
     }
 
     public String fetchMatchedNPICountFromTargetingPanel() {
-        if(SHOW_MATCHED_NPI_BUTTON.isVisible()) {
+        if (SHOW_MATCHED_NPI_BUTTON.isVisible()) {
             SHOW_MATCHED_NPI_BUTTON.click();
             waitUtility.waitForLocatorVisible(MATCHED_NPI_COUNT);
         }

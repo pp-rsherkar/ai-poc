@@ -120,27 +120,26 @@ public class Workspace {
         return PUBLISHED_NPI.innerText();
     }
 
-    public void waitTillWorkspaceAlertHide(){
+    public void waitTillWorkspaceAlertHide() {
         WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void clickWebhookIcon(){
+    public void clickWebhookIcon() {
         WEBHOOK_ICON.click();
     }
 
     public String verifyWebhookToggleButton() {
         WEBHOOK_PANEL_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-disabled")){
+        if (WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-disabled")) {
             return "Disabled";
-        }else {
+        } else {
             WEBHOOK_TOGGLE_BUTTON.click();
-            if(WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-checked"))
-                return "Enabled";
+            if (WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-checked")) return "Enabled";
         }
         return " ";
     }
 
-    public void closeWebhookPanel(){
+    public void closeWebhookPanel() {
         WEBHOOK_CANCEL_BUTTON.click();
     }
 
@@ -148,7 +147,7 @@ public class Workspace {
         for (int i = 0; i < WEBHOOK_BUTTONS.count(); i++) {
             if (WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName) && WEBHOOK_BUTTONS.nth(i).getAttribute("aria-pressed").contains("true")) {
                 break;
-            }else if(WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName)){
+            } else if (WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName)) {
                 WEBHOOK_BUTTONS.nth(i).click();
                 break;
             }
@@ -167,7 +166,7 @@ public class Workspace {
         BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(jsonFile));
     }
 
-    public void addMacros(String textType, String param, List<String> macrosList){
+    public void addMacros(String textType, String param, List<String> macrosList) {
         for (String macros : macrosList) {
             String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//p[contains(text(),'%s')]", textType, macros);
             Locator MACROS = WORKSPACE_FRAME.locator(xpath);
@@ -184,7 +183,7 @@ public class Workspace {
         }
     }
 
-    public void saveWebhookSetup(){
+    public void saveWebhookSetup() {
         WEBHOOK_SAVE_BUTTON.click();
     }
 
@@ -197,11 +196,10 @@ public class Workspace {
     public String verifyInlineErrorMessage(String invalidData) {
         String error = " ";
         URL_TEXTAREA.fill(invalidData);
-        if(BODY_TEXTAREA.isVisible())
-            BODY_TEXTAREA.fill(invalidData);
+        if (BODY_TEXTAREA.isVisible()) BODY_TEXTAREA.fill(invalidData);
         WEBHOOK_SAVE_BUTTON.click();
         INLINE_ERROR_MESSAGE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(INLINE_ERROR_MESSAGE.count()>0) {
+        if (INLINE_ERROR_MESSAGE.count() > 0) {
             for (int i = 0; i < INLINE_ERROR_MESSAGE.count(); i++) {
                 error = error + INLINE_ERROR_MESSAGE.nth(i).innerText();
             }
@@ -212,7 +210,7 @@ public class Workspace {
     public String verifyErrorMsgWhenAPIFailed(List<String> mediaTypeList) throws IOException {
         String alert = " ";
         URL_TEXTAREA.fill(mediaTypeList.get(0));
-        if(BODY_TEXTAREA.isVisible()){
+        if (BODY_TEXTAREA.isVisible()) {
             String file = mediaTypeList.get(1).trim();
             BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(file));
         }

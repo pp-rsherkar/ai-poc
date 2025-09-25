@@ -7,8 +7,6 @@ import factory.DriverFactory;
 import utils.WaitUtility;
 
 public class Campaigns {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-
     private final Page page;
     private final Locator CREATE_CAMPAIGN;
     private final Locator VERIFY_CAMPAIGN_PAGE;
@@ -22,6 +20,7 @@ public class Campaigns {
     private final Locator CAMPAIGN_LISTING;
     private final Locator CAMPAIGN_SUCCESS;
     private final Locator LIFE_TIME_FILTER;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
         this.page = page;
@@ -87,7 +86,7 @@ public class Campaigns {
     public void navigateToCampaignListing() {
         CAMPAIGN_LISTING.click();
         waitUtility.waitForLocatorVisible(CAMPAIGN_LISTING);
-        if(LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
+        if (LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
             LIFE_TIME_FILTER.click();
             waitUtility.waitUntilPreLoaderHidden();
         }

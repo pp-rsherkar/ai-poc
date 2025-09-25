@@ -6,12 +6,12 @@ import factory.DriverFactory;
 import utils.WaitUtility;
 
 public class SmartPixel {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator SELECT_ADVERTISER;
     private final Locator INACTIVE_CAMPAIGNS_BUTTON;
     private final Locator ASSOCIATED_CAMPAIGN;
     private final Locator PIXEL_NAME;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SmartPixel(Page page) {
         this.page = page;

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class TargetingTemplate {
-    TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator NEW_TEMPLATE_BUTTON;
     private final Locator SEARCH_BOX;
@@ -37,6 +35,8 @@ public class TargetingTemplate {
     private final Locator TARGET_ITEM_VALUE;
     private final Locator TARGET_TEMPLATE_RULES;
     private final Locator SUCCESS_ALERT;
+    TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public TargetingTemplate(Page page) {
         this.page = page;
@@ -46,7 +46,7 @@ public class TargetingTemplate {
         this.LINE_ITEMTYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.LINE_ITEMTYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
-        this.CHANNEL_VALUE= page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
+        this.CHANNEL_VALUE = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
         this.ADD_TARGETINGRULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.TEMPLATE_NAME_ERROR = page.locator("//div[contains(text(),'Template Name is required')]");
@@ -137,10 +137,9 @@ public class TargetingTemplate {
         boolean flag = false;
         for (String s : templateNameList) {
             SEARCH_BOX.fill(s.trim());
-            page.locator(String.format("//div[contains(text(),'%s')]",s)).click();
+            page.locator(String.format("//div[contains(text(),'%s')]", s)).click();
             waitUtility.waitUntilSpinnerHidden();
-            if (TEMPLATE_NAME_TEXT.isVisible() && TARGET_TEMPLATE_RULES.isVisible())
-                flag = true;
+            if (TEMPLATE_NAME_TEXT.isVisible() && TARGET_TEMPLATE_RULES.isVisible()) flag = true;
         }
         return flag;
     }
@@ -161,9 +160,8 @@ public class TargetingTemplate {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
-        TEMPLATE_NAME_TEXT.fill(templateName+"_"+CommonUtils.timeStampCalculation());
-        if(TARGETING_RULES_DELETE_ICON.isVisible())
-            TARGETING_RULES_DELETE_ICON.click();
+        TEMPLATE_NAME_TEXT.fill(templateName + "_" + CommonUtils.timeStampCalculation());
+        if (TARGETING_RULES_DELETE_ICON.isVisible()) TARGETING_RULES_DELETE_ICON.click();
         SAVE_BUTTON.click();
         alert = TARGETING_RULES_ERROR.innerText().trim();
         waitUtility.waitForLocatorHidden(TARGETING_RULES_ERROR);
@@ -202,5 +200,4 @@ public class TargetingTemplate {
         waitUtility.waitUntilSpinnerHidden();
         return TEMPLATE_DELETED_ERROR.innerText();
     }
-
 }

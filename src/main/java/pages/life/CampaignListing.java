@@ -7,7 +7,6 @@ import factory.DriverFactory;
 import utils.WaitUtility;
 
 public class CampaignListing {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator CLICK_SETTINGS;
     private final Locator SEARCH_CAMPAIGN;
@@ -22,6 +21,7 @@ public class CampaignListing {
     private final Locator FILTER_APPLIED_ICON;
     private final Locator RESET_FILTER_ICON;
     private final Locator PRE_LOADER;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public CampaignListing(Page page) {
         this.page = page;
@@ -55,15 +55,15 @@ public class CampaignListing {
         }
     }
 
-    public void verifyHideFinishedCheckbox(){
+    public void verifyHideFinishedCheckbox() {
         if (HIDE_FINISHED_CHECKBOX.getAttribute("class").contains("checked")) {
             HIDE_FINISHED_CHECKBOX.click();
             waitUtility.waitUntilPreLoaderHidden(120000);
         }
     }
 
-    public void verifyIfFiltersExist(){
-        if(FILTER_APPLIED_ICON.isVisible()){
+    public void verifyIfFiltersExist() {
+        if (FILTER_APPLIED_ICON.isVisible()) {
             FILTER_APPLIED_ICON.click();
             RESET_FILTER_ICON.click();
             waitUtility.waitUntilPreLoaderHidden(120000);
@@ -77,8 +77,7 @@ public class CampaignListing {
         verifyHideFinishedCheckbox();
         verifyIfFiltersExist();
         SEARCH_CAMPAIGN.fill(createdCampaign);
-        if(PRE_LOADER.isVisible())
-            waitUtility.waitUntilPreLoaderHidden(120000);
+        if (PRE_LOADER.isVisible()) waitUtility.waitUntilPreLoaderHidden(120000);
         CLICK_CAMPAIGN_SEARCH.click();
         SUB_TITLE_AFTERCAMPAIGNSEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
@@ -87,7 +86,6 @@ public class CampaignListing {
         String campaignNameXpath = String.format("//span[contains(text(),'%s')]", createdCampaign);
         waitUtility.waitForLocatorVisible(page.locator(campaignNameXpath).first());
         return page.locator(campaignNameXpath).first().innerText();
-
     }
 
     public String verifyCreatedLineItem(String lineItemNameRandom) {

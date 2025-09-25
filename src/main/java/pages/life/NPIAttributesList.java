@@ -8,7 +8,6 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 public class NPIAttributesList {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator FILE_INPUT;
     private final Locator FILE_UPLOAD_SUCCESS;
@@ -30,6 +29,7 @@ public class NPIAttributesList {
     private final Locator DELETE_SUCCESS;
     private final Locator TOTAL_NPI_LIST_COUNT;
     private final Locator MATCH_NPI_COUNT;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPIAttributesList(Page page) {
         this.page = page;
@@ -140,7 +140,7 @@ public class NPIAttributesList {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TOTAL_NPI_LIST_COUNT);
         waitUtility.waitForLocatorVisible(MATCH_NPI_COUNT);
-        if(listName.contains(LIST_NAME.innerText()))
+        if (listName.contains(LIST_NAME.innerText()))
             npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-" + MATCH_NPI_COUNT.innerText().trim();
         return npiCount;
     }

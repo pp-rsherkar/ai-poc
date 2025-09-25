@@ -7,7 +7,6 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ExplorerWorkspace {
     private final Page page;
@@ -63,16 +62,16 @@ public class ExplorerWorkspace {
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void clickAddFilter(){
+    public void clickAddFilter() {
         ADD_FILTER.click();
     }
 
     public void selectFilter(String filter, String option) {
         SEARCH_FILTER.fill(filter);
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).click();
-        if(filter.contains("Site") || filter.contains("Search")){
+        if (filter.contains("Site") || filter.contains("Search")) {
             WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option)).click();
-        }else{
+        } else {
             WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option)).click();
         }
         FILTER_OK_BUTTON.click();

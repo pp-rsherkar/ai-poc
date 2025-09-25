@@ -6,11 +6,10 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
-import java.io.File;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 public class SharedList {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator SEARCH_KEYWORD;
     private final Locator SUB_TABS_BUTTON;
@@ -30,6 +29,7 @@ public class SharedList {
     private final Locator DUPLICATE_FILE_DIALOG;
     private final Locator DUPLICATE_FILE_DIALOG_TEXT;
     private final Locator REPLACE_BUTTON;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SharedList(Page page) {
         this.page = page;
@@ -43,20 +43,7 @@ public class SharedList {
         this.ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='Domain name is required' or @aria-label='AppBundle name is required' or @aria-label='Keyword is required' or @aria-label='IPAddress is required']");
         this.VALIDATION_ERROR = page.locator("//span[contains(text(),'validation error(s)')]");
         this.UPLOAD_SECTION = page.locator("//div[contains(@class,'fileUploadSection')] | //app-drop-file[contains(@class,'setup-drag')]");
-        this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' " +
-                                                     "or text()='Domains list created successfully' " +
-                                                     "or text()='Domains list updated successfully' " +
-                                                     "or text()='Domain deleted successfully' " +
-                                                     "or text()='AppBundle list created successfully' " +
-                                                     "or text()='AppBundle list updated successfully' " +
-                                                     "or text()='AppBundleGroup deleted successfully' " +
-                                                     "or text()='Keywords list created successfully' " +
-                                                     "or text()='Keywords list updated successfully' " +
-                                                     "or text()='Keyword deleted successfully' " +
-                                                     "or text()='IPAddress list created successfully' " +
-                                                     "or text()='IPAddresses list created successfully' " +
-                                                     "or text()='IPAddresses list updated successfully' " +
-                                                     "or text()='IPAddress deleted successfully']" );
+        this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' " + "or text()='Domains list created successfully' " + "or text()='Domains list updated successfully' " + "or text()='Domain deleted successfully' " + "or text()='AppBundle list created successfully' " + "or text()='AppBundle list updated successfully' " + "or text()='AppBundleGroup deleted successfully' " + "or text()='Keywords list created successfully' " + "or text()='Keywords list updated successfully' " + "or text()='Keyword deleted successfully' " + "or text()='IPAddress list created successfully' " + "or text()='IPAddresses list created successfully' " + "or text()='IPAddresses list updated successfully' " + "or text()='IPAddress deleted successfully']");
         this.LIST_DELETE_ICON = page.locator("//div[@tooltip='Delete'] | //span[@tooltip='Delete']//img[contains(@src,'delete.svg')]");
         this.REMOVAL_CONFIRMATION_DIALOG = page.locator("//div[contains(text(),'Removal Confirmation')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
@@ -75,8 +62,7 @@ public class SharedList {
     public String verifyIfListPageIsOpen(String listName) {
         String text = " ";
         Locator locator = page.locator(String.format("//a[contains(text(),'%s')]", listName));
-        if(locator.getAttribute("class").contains("active"))
-            text = fetchLocatorText(locator);
+        if (locator.getAttribute("class").contains("active")) text = fetchLocatorText(locator);
         return text;
     }
 
@@ -86,12 +72,11 @@ public class SharedList {
 
     public boolean verifySubTabs(List<String> subTabsList) {
         boolean flag1 = false, flag2 = false;
-        for(String subtabs : subTabsList){
-            for (int i=0; i< SUB_TABS_BUTTON.count(); i++){
-                if(SUB_TABS_BUTTON.nth(i).innerText().contains(subtabs)) {
+        for (String subtabs : subTabsList) {
+            for (int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
+                if (SUB_TABS_BUTTON.nth(i).innerText().contains(subtabs)) {
                     flag1 = true;
-                    if(SUB_TABS_BUTTON.nth(i).getAttribute("class").contains("active"))
-                        flag2 = true;
+                    if (SUB_TABS_BUTTON.nth(i).getAttribute("class").contains("active")) flag2 = true;
                     break;
                 }
             }
@@ -99,14 +84,14 @@ public class SharedList {
         return flag1 && flag2;
     }
 
-    public void clickSubTab(String tabName){
+    public void clickSubTab(String tabName) {
         SUB_TABS_BUTTON.locator("text=" + tabName).click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean verifyListIsAvailable(String tabName) {
         int failed = 0;
-        Locator locator = page.locator(String.format("//span/img[contains(translate(@src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '%s')]",tabName.toLowerCase(Locale.ROOT)));
+        Locator locator = page.locator(String.format("//span/img[contains(translate(@src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '%s')]", tabName.toLowerCase(Locale.ROOT)));
         List<String> srcList = (List<String>) locator.evaluateAll("elements => elements.map(el => el.getAttribute('src'))");
         for (String src : srcList) {
             if (src == null || !src.toLowerCase(Locale.ROOT).contains(tabName.toLowerCase(Locale.ROOT))) {
@@ -125,7 +110,6 @@ public class SharedList {
         LIST_NAME.clear();
         SAVE_BUTTON.click();
         return fetchLocatorText(LIST_ERROR_MESSAGE_ALERT);
-
     }
 
     public String validateErrorOnEmptyListInput(String listName) {
@@ -136,17 +120,15 @@ public class SharedList {
 
     public String checkErrorOnSingleLineMultipleDomainsInput(List<String> domainNameList) {
         String text = "";
-        for(String domainName : domainNameList) {
+        for (String domainName : domainNameList) {
             LIST_TEXTAREA.type(domainName);
             page.keyboard().press("Space");
         }
         SAVE_BUTTON.click();
-        if(VALIDATION_ERROR.isVisible())
-            text = fetchLocatorText(VALIDATION_ERROR);
+        if (VALIDATION_ERROR.isVisible()) text = fetchLocatorText(VALIDATION_ERROR);
         LIST_TEXTAREA.clear();
         return text;
     }
-
 
     public boolean verifyUploadSectionIsVisibleBeforeListInput() {
         return UPLOAD_SECTION.first().isVisible();
@@ -177,12 +159,7 @@ public class SharedList {
     }
 
     public String fetchCountFromLeftPanel(String listName) {
-        Locator locator = page.locator(String.format(
-                "(//div[contains(text(),'%s')]/parent::div/following-sibling::div/div[contains(@class, 'right circular label')] | " +
-                        "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class, 'right circular label')] | " +
-                        "//div[contains(text(),'%s')]/following-sibling::div[contains(@class, 'right circular label')])",
-                listName, listName, listName
-        ));
+        Locator locator = page.locator(String.format("(//div[contains(text(),'%s')]/parent::div/following-sibling::div/div[contains(@class, 'right circular label')] | " + "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class, 'right circular label')] | " + "//div[contains(text(),'%s')]/following-sibling::div[contains(@class, 'right circular label')])", listName, listName, listName));
         return locator.innerText();
     }
 
@@ -200,7 +177,7 @@ public class SharedList {
         enterDomainNames(domainList);
     }
 
-    public void deleteList(){
+    public void deleteList() {
         LIST_DELETE_ICON.click();
     }
 
@@ -211,11 +188,11 @@ public class SharedList {
         return text;
     }
 
-    public String fetchLocatorText(Locator locator){
+    public String fetchLocatorText(Locator locator) {
         return locator.innerText().trim();
     }
 
-    public void uploadDomainFile(String fileName){
+    public void uploadDomainFile(String fileName) {
         CommonUtils.uploadFileThroughSystemDialog(page, fileName);
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -265,7 +242,7 @@ public class SharedList {
         return text.contains(fileName);
     }
 
-    public void clickReplaceButton(){
+    public void clickReplaceButton() {
         REPLACE_BUTTON.isVisible();
         REPLACE_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
@@ -287,8 +264,7 @@ public class SharedList {
     }
 
     public boolean fetchPulsepointIcon(String listName) {
-        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div/following-sibling::div/div[contains(@class,'sharedList-icon')] | " +
-                "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class,'sharedList-icon')]", listName, listName));
+        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div/following-sibling::div/div[contains(@class,'sharedList-icon')] | " + "//div[contains(text(),'%s')]/following-sibling::div/div[contains(@class,'sharedList-icon')]", listName, listName));
         return locator.isVisible();
     }
 
