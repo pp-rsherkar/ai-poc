@@ -17,7 +17,6 @@ public class LineItemDetails {
     private final Locator CANCEL_TACTIC;
     private final Locator NEW_LINE_ITEM;
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
-    //private final Locator LINE_ITEM_TYPE_VALUE;
     private final Locator ADD_FLIGHT_BUTTON;
     private final Locator LINE_ITEM_PANEL_NAME;
 
