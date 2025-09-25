@@ -31,7 +31,6 @@ public class LineItemDetails {
         this.CANCEL_TACTIC = page.locator("#lidcBody").getByText("Cancel");
         this.NEW_LINE_ITEM = page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
-        //this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
         this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
         this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']").last();
     }
