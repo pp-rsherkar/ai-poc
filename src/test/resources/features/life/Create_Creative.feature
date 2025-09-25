@@ -1,12 +1,12 @@
 Feature: LIFE Regression - Create a Creative Library and verify filters, sort, search options for all creative types including Bulk Upload
   It covers:
   1. Creating creatives via UI for the following types:
-  Display
-  Video
-  Audio
-  Native Display
-  Native Video
-  Search Extension
+    a.  Display
+    b.  Video
+    c.  Audio
+    d.  Native Display
+    e.  Native Video
+    f.  Search Extension
   2. Bulk uploading creatives for supported types
   3. Verifying available filters, sort, and search functionality on the Creative Library page
 
@@ -19,12 +19,12 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify filters under Active and Archived activity, clear-all button, sort, and search options on the Creative Library page
     And Check Activity buttons "Active" and verify following filters are available and working
-      | Advertiser           | 01- Advertiser           |
-      | Associated Campaigns | AutoCampaign123367676211 |
-      | Approval Status      | Approved                 |
-      | Ad Sizes             | 1025x800                 |
-      | CreatedBy            | Anand                    |
-      | Creative Type        | Image, Video             |
+      | Advertiser           | 01- Advertiser |
+      | Associated Campaigns | AutoCampaign   |
+      | Approval Status      | Approved       |
+      | Ad Sizes             | 1025x800       |
+      | CreatedBy            | Anand          |
+      | Creative Type        | Image, Video   |
     And Check Activity buttons "Archived" and verify following filters are available and working
       | Advertiser           | Amgen        |
       | Associated Campaigns | AutoCampaign |
@@ -47,7 +47,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | 120x600          |
     And Verify Copy option is available and working
 
-
   @regression
   Scenario Outline: Create new Creative Library entries for multiple Creative Types
     # Display
@@ -55,8 +54,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | CreativeType | CreativeAttributes                                                                                                               |
       | Html         | HTMLCode:<html>Auto_Creative</html>, Size:1024x576, DomainLanding:https://www.pulsepoint.com                                     |
       | Image        | ImageFile:Display_Image.jpg, Size:1024x576, ClickThroughURL:https://www.pulsepoint.com, DomainLanding:https://www.pulsepoint.com |
-       #| Html5        | ArchiveFile:Creative_Archive, Size:1024x576, DomainLanding:https://www.pulsepoint.com |
-
+      #| Html5        | ArchiveFile:Creative_Archive, Size:1024x576, DomainLanding:https://www.pulsepoint.com |
     # Audio
     And User creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                             |
@@ -64,7 +62,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Audio URL    | URL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane     |
       | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
       | VAST XML     | VASTXML:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
-
     # Video
     And User creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                |
@@ -72,17 +69,14 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Video URL    | URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane     |
       | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane |
       | VAST XML     | VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane |
-
     # Search Extension
     And User creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                           |
       | Search       | Size:300x600, Headline:Test Automation Headline, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ClickThroughURL:pulsepoint.com, IAB:Profane |
-
     # Native Display
     And User creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                                  |
       | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |
-
     # Native Video
     And User creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                                           |
@@ -90,9 +84,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Video URL    | URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com     |
       | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com |
       | VAST XML     | VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com |
-
     Then Verify the newly created creative is displayed in the Creative Library page
-
     Examples:
       | ADVERTISER     | CREATIVE_NAME | ADVERTISER_DSA | FINANCER      |
       | 01- Advertiser | Creative      | Auto_DSA       | Auto_Financer |
@@ -107,7 +99,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Native  |
       | Video   |
     And Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account
-
 
   @regression
   Scenario Outline: Verify Bulk Creative Upload with Approval status as "<STATUS>"
@@ -130,7 +121,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate.xlsx |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate.xlsx |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate.xlsx |
-
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Display Creatives
@@ -161,7 +151,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | ADVERTISER     | IMAGE_FILENAME    | CAMPAIGN_NAME | FILE_NAME                      | BLANK_TEMPLATE                      | ADVERTISER_DSA | FINANCER      | STATUS   |
       | 01- Advertiser | Display_Image.jpg | Creative      | DisplayBulkUploadTemplate.xlsx | BlankDisplayBulkUploadTemplate.xlsx | Auto_DSA       | Auto_Financer | Approved |
 
-
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for HTML Creatives
     Given User clicks Bulk Upload button on Creative Library page
@@ -183,11 +172,9 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
 #      | Adform       |
 #      | Flashtalking |
     And Verify the newly created creative is displayed in the Creative Library page
-
     Examples:
       | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME |
       | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative |
-
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Native Creatives

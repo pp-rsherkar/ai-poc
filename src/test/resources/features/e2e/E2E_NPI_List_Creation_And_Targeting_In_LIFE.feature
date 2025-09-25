@@ -3,7 +3,6 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
   1. Creation of NPI List - Attribute List and Auto-Imported List
   2. Targeting the created List at Tactic level
 
-
   Background:
     #1
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -43,7 +42,6 @@ Feature: End to End workflow for NPI Lists - Attributed and Auto-Imported creati
     Examples:
       | LIST_NAME | ADVERTISER     | FILE_NAME                | COLUMN_NAME | CP_NAME               | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
       | ATTRIBUTE | 01- Advertiser | NPI_AttributeList01.xlsx | NPI         | AttributeNPI_Campaign | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced |
-
 
   @e2e
   Scenario Outline: Create Auto-Imported NPI List using Reload Now button and target in 'NPI' targeting at Tactic level

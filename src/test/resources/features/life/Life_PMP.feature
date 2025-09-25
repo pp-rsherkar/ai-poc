@@ -27,7 +27,7 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     When User clicks "Private" Deals Tab
     Then User should see Add New Deal button, filters such as Exchange, Search
     When User enters below details in respective search field
-      | SearchByName     | Deal_Name_            |
+      | SearchByName     | Deal                  |
       | SearchByExchange | PulsePoint, JW Player |
     Then Verify private deals list should appear based on the filter selected
 
