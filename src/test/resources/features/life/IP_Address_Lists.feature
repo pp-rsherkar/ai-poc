@@ -23,7 +23,6 @@ Feature: LIFE Regression – Generate IP Address Lists in the following ways:
       | LIST_NAME  | IP_ADDRESS             | EDITED_IP_ADDRESS                            |
       | IP_Address | 123.46.7.5, 123.46.7.7 | 123.46.7.0, 684D:1111:222:3333:4444:5555:6:9 |
 
-
   @regression
   Scenario Outline: Manage an IP Address List by uploading a file to create, update, and delete IP addresses
     And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"

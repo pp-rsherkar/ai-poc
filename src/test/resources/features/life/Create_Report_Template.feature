@@ -12,7 +12,6 @@ Feature: LIFE Regression - Create a Report Template
     Then Verify the selected dimensions and metrics under the Template Structure section
     When User saves the new template
     Then Verify new template is saved and displayed in the template list
-
     Examples:
       | USER  | TEMPLATE NAME | DIMENSIONS      | METRICS     |
       | Admin | Template      | Advertiser Name | Impressions |
