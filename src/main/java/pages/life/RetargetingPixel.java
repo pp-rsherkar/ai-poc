@@ -39,5 +39,4 @@ public class RetargetingPixel {
         SAVE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
         return successMessage;
     }
-
 }

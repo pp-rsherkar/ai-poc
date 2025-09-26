@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 public class ReportTemplates {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator REPORT_TEMPLATE_LINK;
     private final Locator VERIFY_TEMPLATES_TAB;
@@ -51,8 +50,8 @@ public class ReportTemplates {
     private final Locator DOWNLOAD_REPORT;
     private final Locator REPORT_PROGRESS_ICON;
     private final Locator TEMPLATE_PAGINATION;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private String reportName;
-
 
     public ReportTemplates(Page page) {
         this.page = page;
@@ -180,7 +179,7 @@ public class ReportTemplates {
     public void enterDetailsToRunReport(String reportTemplateName, String tactic) {
         SELECT_TEMPLATE.fill(reportTemplateName);
         Locator optionLocator = page.getByTitle(reportTemplateName).first();
-        while(!optionLocator.isVisible()) {
+        while (!optionLocator.isVisible()) {
             SELECT_TEMPLATE.fill(reportTemplateName);
             page.waitForTimeout(2000);
         }
@@ -228,24 +227,19 @@ public class ReportTemplates {
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click(new Locator.ClickOptions().setForce(true));
         waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom), 5000);
-        List<String> expectedHeaders = Arrays.stream(TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*"))
-                .map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize expected
+        List<String> expectedHeaders = Arrays.stream(TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*")).map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize expected
                 .toList();
 
         List<String> rawActualHeaders = ExcelActions.readCsvExcludingFirstColumn(filePath);
-        List<String> actualHeaders = rawActualHeaders.stream()
-                .map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize actual
+        List<String> actualHeaders = rawActualHeaders.stream().map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize actual
                 .toList();
 
         boolean allHeadersPresent = expectedHeaders.stream().allMatch(expected -> {
-            boolean matchFound = actualHeaders.stream().anyMatch(actual ->
-                    actual.contains(expected) || expected.contains(actual)
-            );
+            boolean matchFound = actualHeaders.stream().anyMatch(actual -> actual.contains(expected) || expected.contains(actual));
 
             return matchFound;
         });
 
         return allHeadersPresent;
     }
-    
 }

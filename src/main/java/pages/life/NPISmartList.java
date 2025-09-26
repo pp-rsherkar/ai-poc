@@ -11,7 +11,6 @@ import utils.WaitUtility;
 import java.util.regex.Pattern;
 
 public class NPISmartList {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator CLICK_SMART_LIST;
     private final Locator CLICK_SMART_PIXEL;
@@ -52,6 +51,7 @@ public class NPISmartList {
     private final Locator CLICK_EXPAND_PRACTICE;
     private final Locator ADD_DRUG_BUTTON;
     private final Locator SELECTED_SMART_PIXEL;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
         this.page = page;

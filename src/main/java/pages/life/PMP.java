@@ -10,7 +10,6 @@ import utils.WaitUtility;
 import java.util.List;
 
 public class PMP {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator ADD_TARGETING_RULE;
@@ -57,7 +56,7 @@ public class PMP {
     private final Locator ALL_LIFEMARKETPLACE;
     private final Locator ALL_PREMIUMPUBS;
     private final Locator NO_DEAL_TEXT;
-
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     boolean flag1, flag2 = false;
 
     public PMP(Page page) {
@@ -119,9 +118,9 @@ public class PMP {
     }
 
     public void addNewTargetingRule() {
-        if(ADD_TARGETING_RULE.isVisible()){
+        if (ADD_TARGETING_RULE.isVisible()) {
             ADD_TARGETING_RULE.click();
-        }else{
+        } else {
             NEW_TARGETING_RULE.click();
         }
     }
@@ -133,15 +132,15 @@ public class PMP {
         page.waitForLoadState(LoadState.LOAD);
     }
 
-    public String verifyPMPDealsPanel(){
+    public String verifyPMPDealsPanel() {
         waitUtility.waitForLocatorVisible(ALLDEALS_PANEL);
         return ALLDEALS_PANEL.innerText();
     }
 
     public void clickDealsTab(String dealType) {
-        if(dealType.contains("Private")){
+        if (dealType.contains("Private")) {
             PRIVATE_DEALS_TAB.click();
-        }else{
+        } else {
             PREMIUM_DEALS_TAB.click();
         }
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
@@ -151,30 +150,28 @@ public class PMP {
         return APPLIEDDEAL_PANELLIST.count() > 0;
     }
 
-    public boolean verifyTargetAppliedDealsToggle(String toggleButton){
-        if(toggleButton.equalsIgnoreCase("ON")){
+    public boolean verifyTargetAppliedDealsToggle(String toggleButton) {
+        if (toggleButton.equalsIgnoreCase("ON")) {
             flag1 = TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
-        }else if(toggleButton.equalsIgnoreCase("OFF")){
+        } else if (toggleButton.equalsIgnoreCase("OFF")) {
             TARGET_APPLIED_DEAL_TOGGLE.click();
             waitUtility.waitForLocatorVisible(SERVE_EVERYWHERE_DAILOG);
             SERVE_EVERYWHERE_OKBTN.click();
             flag1 = !TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
         }
-            return flag1;
+        return flag1;
     }
 
     public void saveDealsAssigned() {
         OK_BUTTON.click();
-        if(RULE_TYPE_CLOSE.isVisible())
-            RULE_TYPE_CLOSE.click();
+        if (RULE_TYPE_CLOSE.isVisible()) RULE_TYPE_CLOSE.click();
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TACTICSETTING_TAB);
     }
 
     public boolean verifyAssignedDealsOnTactic(String dealName, String toggleButton) {
-        if(MORE_OPTION.isVisible())
-            MORE_OPTION.click();
-        if(toggleButton.equalsIgnoreCase("ON")){
+        if (MORE_OPTION.isVisible()) MORE_OPTION.click();
+        if (toggleButton.equalsIgnoreCase("ON")) {
             flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
             flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
         } else if (toggleButton.equalsIgnoreCase("OFF")) {
@@ -183,7 +180,6 @@ public class PMP {
         }
         return flag1 && flag2;
     }
-
 
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
@@ -200,29 +196,26 @@ public class PMP {
         page.locator(xpath).click();
         String assignDealXpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/ancestor::div[@class='left dealDetails']/following-sibling::div/span[contains(@class,'addDeal')]", dealName);
         String assignedDealXpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/ancestor::div[@class='left dealDetails']/following-sibling::div/span[contains(@class,'addedDeal')]", dealName);
-        if(!page.locator(assignedDealXpath).isVisible())
-            page.locator(assignDealXpath).click();
+        if (!page.locator(assignedDealXpath).isVisible()) page.locator(assignDealXpath).click();
     }
 
     public boolean verifyPrivateDealsFilterPanel() {
-        if(ADD_NEWDEAL_BUTTON.isVisible() && ADD_NEWDEAL_BUTTON.isEnabled())
-            flag1 = true;
-        if(DEAL_SEARCHFILTER.isVisible() && EXCHANGE_SEARCHFILTER.isVisible())
-            flag2 = true;
+        if (ADD_NEWDEAL_BUTTON.isVisible() && ADD_NEWDEAL_BUTTON.isEnabled()) flag1 = true;
+        if (DEAL_SEARCHFILTER.isVisible() && EXCHANGE_SEARCHFILTER.isVisible()) flag2 = true;
         return flag1 && flag2;
     }
 
     public boolean applyFilter(String key, List<String> value) {
         DEAL_SEARCHFILTER.clear();
         EXCHANGE_SEARCHFILTER.clear();
-        switch (key){
-            case "SearchByName" :
-                for(String val : value) {
+        switch (key) {
+            case "SearchByName":
+                for (String val : value) {
                     DEAL_SEARCHFILTER.fill(val);
                 }
                 break;
-            case "SearchByExchange" :
-                for(String val : value){
+            case "SearchByExchange":
+                for (String val : value) {
                     EXCHANGE_SEARCHFILTER.fill(val);
                 }
                 break;
@@ -231,7 +224,7 @@ public class PMP {
         return DEALS_LIST.first().isVisible();
     }
 
-    public void clickAddNewDeals(){
+    public void clickAddNewDeals() {
         ADD_NEWDEAL_BUTTON.click();
         waitUtility.waitForLocatorVisible(ADDNEWDEAL_LABEL);
         waitUtility.waitUntilSpinnerHidden();
@@ -256,21 +249,20 @@ public class PMP {
     }
 
     public boolean verifyDeleteIconAndMessage(String message) {
-        for(int i=0; i<DELETE_ICON.count(); i++){
-            if(DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
+        for (int i = 0; i < DELETE_ICON.count(); i++) {
+            if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
                 flag1 = true;
                 DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
                 DELETE_ICON.nth(i).click(new Locator.ClickOptions().setForce(true));
                 String tooltipText = TOOLTIP_TEXT.innerText();
-                if(message.equals(tooltipText))
-                    flag2 = true;
+                if (message.equals(tooltipText)) flag2 = true;
             }
         }
         return flag1 && flag2;
     }
 
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
-        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]/div",dealName);
+        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]/div", dealName);
         page.locator(xpath).first().scrollIntoViewIfNeeded();
         CLEARING_CPM_COLNAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
         page.locator(xpath).first().click();
@@ -298,7 +290,7 @@ public class PMP {
 
     public boolean verifyBaseAndMaxPriceIsEditable(String baseBidPrice, String maxBidPrice) {
         BASE_BIDPRICE.scrollIntoViewIfNeeded();
-        if(BASE_BIDPRICE.isEditable() && MAX_BIDPRICE.isEditable()){
+        if (BASE_BIDPRICE.isEditable() && MAX_BIDPRICE.isEditable()) {
             BASE_BIDPRICE.fill(baseBidPrice);
             MAX_BIDPRICE.fill(maxBidPrice);
             flag1 = true;
@@ -319,12 +311,14 @@ public class PMP {
                         try {
                             waitUtility.waitForLocatorVisible(DEALS_LIST.first());
                             dealVisible = true;
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                         if (!dealVisible) {
                             try {
                                 waitUtility.waitForLocatorVisible(NO_DEAL_TEXT.first());
                                 noDealVisible = true;
-                            } catch (Exception ignored) {}
+                            } catch (Exception ignored) {
+                            }
                         }
                         if (dealVisible == noDealVisible) {
                             return false;
@@ -337,4 +331,3 @@ public class PMP {
         return true;
     }
 }
-

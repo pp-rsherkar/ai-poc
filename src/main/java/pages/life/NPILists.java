@@ -9,7 +9,6 @@ import utils.WaitUtility;
 import java.util.List;
 
 public class NPILists {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator NPI_LISTS;
     private final Locator NPI_LISTS_STG;
@@ -23,6 +22,7 @@ public class NPILists {
     private final Locator SEARCH_BOX;
     private final Locator SMART_LIST;
     private final Locator AUTO_IMPORTED_LIST;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPILists(Page page) {
         this.page = page;
@@ -100,7 +100,7 @@ public class NPILists {
         waitUtility.waitForElementHidden(".block-ui-spinner");
     }
 
-    public void clickAutoImportedList(){
+    public void clickAutoImportedList() {
         AUTO_IMPORTED_LIST.click();
     }
 }

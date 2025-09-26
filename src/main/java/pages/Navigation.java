@@ -10,7 +10,6 @@ import utils.WaitUtility;
 
 public class Navigation {
 
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
@@ -30,6 +29,7 @@ public class Navigation {
     private final Locator TARGETING_TEMPLATE_ICON;
     private final Locator CAMPAIGNS;
     private final Locator CREATIVE_LIBRARY_ICON;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Navigation(Page page) {
         this.page = page;
@@ -94,8 +94,8 @@ public class Navigation {
         waitUtility.waitForLocatorVisible(STUDIO_TITLE);
     }
 
-    public void selectAccount(String account){
-        if(ACCOUNT_NAME.innerText().contains("buyer2")){
+    public void selectAccount(String account) {
+        if (ACCOUNT_NAME.innerText().contains("buyer2")) {
             ACCOUNT_NAME.click();
             ACCOUNT_SEARCH.fill(account);
             page.waitForLoadState(LoadState.LOAD);
@@ -107,6 +107,7 @@ public class Navigation {
     public void clickSubMenu() {
         SUB_MENU.click();
     }
+
     public void clickRunReport() {
         RUN_REPORT.click();
     }
@@ -121,9 +122,9 @@ public class Navigation {
         SCHEDULED_REPORT.click();
 
     }
-    public void clickReportTemplate()
-    {
-            REPORT_TEMPLATE.click();
+
+    public void clickReportTemplate() {
+        REPORT_TEMPLATE.click();
     }
 
     public void clickTargetingTemplate() {

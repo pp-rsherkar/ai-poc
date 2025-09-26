@@ -6,7 +6,6 @@ import factory.DriverFactory;
 import utils.WaitUtility;
 
 public class LineItemDetails {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_LINE_ITEM_PAGE;
     private final Locator LINE_ITEM_NAME;
@@ -19,6 +18,7 @@ public class LineItemDetails {
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
     private final Locator ADD_FLIGHT_BUTTON;
     private final Locator LINE_ITEM_PANEL_NAME;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -72,6 +72,7 @@ public class LineItemDetails {
     public void selectNewLineItem() {
         NEW_LINE_ITEM.click();
     }
+
 
     public String verifyLineItemPanelName() {
         return LINE_ITEM_PANEL_NAME.innerText();
