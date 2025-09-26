@@ -1993,7 +1993,7 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
@@ -2049,7 +2049,7 @@ public class LifeSteps {
     /*Ampoli Rajyalaxmi
      * 24/08/2025
      * Different types line item*/
-    @When("User enters the line item details with different line types {string} {string} {string}, enables the line item and saves the changes")
+    @When("User enters the line item details with different line types {string} {string} {string}, enables the line item and saves the changes and validate the created line item.")
     public void user_enters_the_line_item_details_with_different_line_types_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget, String lineItemType) {
         List<String> lineItemTypeList = CommonUtils.convertStringToList(lineItemType);
         for (int i = 0; i < lineItemTypeList.size(); i++) {

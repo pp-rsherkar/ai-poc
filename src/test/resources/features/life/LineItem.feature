@@ -7,9 +7,7 @@ Feature: LIFE Regression - Create Line Items
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
-    When User enters the line item details with different line types "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_TYPE>", enables the line item and saves the changes
-
-
+    When User enters the line item details with different line types "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_TYPE>", enables the line item and saves the changes and validate the created line item.
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_TYPE                                                                   |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Display, Audio, Video, Native Display, Native Video, DOOH, Search Extension |
