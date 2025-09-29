@@ -2065,10 +2065,10 @@ public class LifeSteps {
         String pixelNameTemp = "Temporary Pixel Name";
         retargetingPixel.enterPixelName(pixelNameTemp);
         pixels.savePixel();
-        assert retargetingPixel.advertiserError().contains("Advertiser is required");
+        Assert.assertEquals("Advertiser is required", retargetingPixel.advertiserError());
         retargetingPixel.clearPixelName();
         pixels.savePixel();
-        assert retargetingPixel.pixelNameError().contains("Pixel Name is required");
+        Assert.assertEquals("Pixel Name is required", retargetingPixel.pixelNameError());
     }
 
     @And("User selects the {string} pixel")
@@ -2105,13 +2105,7 @@ public class LifeSteps {
 
     @Then("Verify the pixel gets removed successfully")
     public void verifyPixelRemoved() {
-        //pixels.removeSuccess();
-        assert pixels.removeSuccess().contains("Pixel deleted successfully");
-    }
-
-    @Then("Verify the list of Advertisers displayed")
-    public void verifyListOfAdvertisersDisplayed() {
-        // Assert that the advertisers list is visible
+        Assert.assertEquals("Pixel deleted successfully", pixels.removeSuccess());
     }
 
     @When("User selects {string} as advertiser")
@@ -2186,15 +2180,15 @@ public class LifeSteps {
         String pixelNameTemp = "Temporary Pixel Name";
         conversionPixel.enterPixelName(pixelNameTemp);
         pixels.savePixel();
-        assert conversionPixel.advertiserError().contains("Advertiser is required");
+        Assert.assertEquals("Advertiser is required", conversionPixel.advertiserError());
         conversionPixel.clearPixelName();
         pixels.savePixel();
-        assert conversionPixel.pixelNameError().contains("Pixel Name is required");
+        Assert.assertEquals("Pixel Name is required", conversionPixel.pixelNameError());
         conversionPixel.enterPixelName(pixelNameTemp);
         // Temporary hardcoded selection of advertiser to validate mandatory fields
         conversionPixel.selectAdvertiser("01- Advertiser");
         pixels.savePixel();
-        assert conversionPixel.pixelTypeOptionError().contains("Conversion Type is required");
+        Assert.assertEquals("Conversion Type is required", conversionPixel.pixelTypeOptionError());
         pixels.clickCancelButton();
     }
 

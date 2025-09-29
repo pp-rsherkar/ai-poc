@@ -46,7 +46,7 @@ public class Pixels {
         this.REMOVE_PIXEL_ICON = page.locator("//app-icon-lable-link[@icon='20-delete.svg']");
         this.REMOVE_PIXEL_BUTTON = page.locator("//span[text()='Remove']");
         this.REMOVE_SUCCESS = page.locator("//div[@role='alert' and text()='Pixel deleted successfully']");
-        this.CANCEL_BUTTON = page.locator("//button[contains(@class,'ui cancel button') and normalize-space(text())='Cancel']");
+        this.CANCEL_BUTTON = page.locator("//button[contains(@class,'cancel secondary button') and normalize-space(text())='Cancel']");
     }
 
     public void clickPixelsMenuItem() {
@@ -146,7 +146,7 @@ public class Pixels {
     }
 
     public String removeSuccess() {
-        return REMOVE_SUCCESS.innerText();
+        return REMOVE_SUCCESS.innerText().trim();
     }
 
     public void clickCancelButton() {
