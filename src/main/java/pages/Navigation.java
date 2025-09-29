@@ -99,8 +99,8 @@ public class Navigation {
         waitUtility.waitForLocatorVisible(STUDIO_TITLE);
     }
 
-    public void selectAccount(String account){
-        if(ACCOUNT_NAME.innerText().contains("buyer2")){
+    public void selectAccount(String account) {
+        if (ACCOUNT_NAME.innerText().contains("buyer2")) {
             ACCOUNT_NAME.click();
             ACCOUNT_SEARCH.fill(account);
             page.waitForLoadState(LoadState.LOAD);
@@ -132,9 +132,9 @@ public class Navigation {
         SCHEDULED_REPORT.click();
 
     }
-    public void clickReportTemplate()
-    {
-            REPORT_TEMPLATE.click();
+
+    public void clickReportTemplate() {
+        REPORT_TEMPLATE.click();
     }
 
     public void clickTargetingTemplate() {

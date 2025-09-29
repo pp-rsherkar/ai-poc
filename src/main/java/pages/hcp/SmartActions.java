@@ -1,4 +1,4 @@
-package pages.hcp365;
+package pages.hcp;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -131,8 +131,8 @@ public class SmartActions {
     }
 
     public String getSavedMessage() {
-    String alertText = SAVED_SUCCESS_MESSAGE.first().innerText();
-    SAVED_SUCCESS_MESSAGE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-    return alertText;
-}
+        String alertText = SAVED_SUCCESS_MESSAGE.first().innerText();
+        SAVED_SUCCESS_MESSAGE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        return alertText;
+    }
 }

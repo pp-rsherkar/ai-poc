@@ -104,7 +104,7 @@ public class ExplorerWorkspace {
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void clickAddFilter(){
+    public void clickAddFilter() {
         ADD_FILTER.click();
     }
 

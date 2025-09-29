@@ -104,7 +104,7 @@ public class NPILists {
         waitUtility.waitForElementHidden(".block-ui-spinner");
     }
 
-    public void clickAutoImportedList(){
+    public void clickAutoImportedList() {
         AUTO_IMPORTED_LIST.click();
     }
 

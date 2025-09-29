@@ -9,7 +9,6 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 public class NPIStaticList {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator LIST_NAME;
     private final Locator SEARCH_ADVERTISER;
@@ -24,6 +23,7 @@ public class NPIStaticList {
     private final Locator DELETE_LIST_ICON;
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPIStaticList(Page page) {
         this.page = page;
@@ -41,7 +41,6 @@ public class NPIStaticList {
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
     }
-
 
     public void enterListName(String npiListName) {
         LIST_NAME.fill(npiListName);

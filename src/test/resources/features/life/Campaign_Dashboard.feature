@@ -48,7 +48,6 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     Then Verify the dashboard data should not reflect campaigns with Finished status
     When User hover on the image icon for creative in red color
     Then Tool tip whether creative is assigned to the campaign or not should be reflected
-
     Examples:
       | Campaign ID          | COLOUR                     | RED BULLET                             |
       | Auto_20250821_213314 | 24-note-table-provided.svg | 20-filter-applied.1e22619f2d75d737.svg |

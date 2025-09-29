@@ -42,5 +42,4 @@ public class ConversionPixel {
         PIXEL_TYPE_DROPDOWN.click();
         PIXEL_TYPE_OPTION.locator("text=" + type).click();
     }
-
 }

@@ -1,16 +1,15 @@
 Feature: End to End Workflow of Creative Creation and its assignment To Tactic
   It covers below points -
   1. Creating creatives via UI for the following types:
-  Display
-  Audio
-  Video
-  Native Display
-  Native Video
-  Search Extension
+    a.  Display
+    b.  Audio
+    c.  Video
+    d.  Native Display
+    e.  Native Video
+    f.  Search Extension
   2. Bulk uploading creatives for supported types - Display, HTML, Video, Native
   3. Verify Creatives on the Creative Library page
   4. Assign the created Creative to a Tactic
-
 
   @e2e
   Scenario Outline: End to End Workflow of Creative Creation with all the creative types and Assignment To Tactic

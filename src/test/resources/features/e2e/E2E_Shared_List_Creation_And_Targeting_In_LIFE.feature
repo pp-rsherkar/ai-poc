@@ -3,7 +3,6 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
   1. Creation of Shared List - Domain, App Bundles, Keywords and Email List
   2. Targeting the created List at Tactic level
 
-
   Background:
     #1
     Given This scenario will be executed in the "Demo" environment as a "User"
