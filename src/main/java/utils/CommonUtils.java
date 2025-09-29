@@ -71,7 +71,6 @@ public class CommonUtils {
     }
 
     public static void selectAndClickElement(Locator locator, List<String> values){
-        locator.first().waitFor();
         for (int i = 0; i < locator.count(); i++) {
             String text = locator.nth(i).innerText().trim();
             for (String value : values) {
