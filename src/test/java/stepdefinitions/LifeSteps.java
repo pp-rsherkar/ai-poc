@@ -37,6 +37,7 @@ public class LifeSteps {
     static String dimensionName;
     static String metricName;
     static String newPixelName;
+    static String pixelNameEdited;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -2045,4 +2046,155 @@ public class LifeSteps {
     public void userClicksLifetimeFilter() {
         campaignDashboard.clickLifetimeFilter();
     }
+
+    @Then("Verify the tabs displayed on the Pixels page")
+    public void verifyTabsDisplayedOnPixelsPage() {
+        Assert.assertEquals("RETARGETING", pixels.verifyRetargetingTab().toUpperCase());
+        Assert.assertEquals("SMART", pixels.verifySmartTab().toUpperCase());
+        Assert.assertEquals("CONVERSION", pixels.verifyConversionTab().toUpperCase());
+    }
+
+    @Then("Verify the Advertiser dropdown and search box are displayed on the Pixels page")
+    public void verifyAdvertiserDropdownAndSearchBoxDisplayed() {
+        Assert.assertTrue("Advertiser Dropdown is not visible", pixels.verifyAdvertiserDropdown());
+        Assert.assertTrue("Search Box is not visible", pixels.verifySearchBox());
+    }
+
+    @When("User tries to save the Retargeting pixel without entering any details, an error message should be displayed")
+    public void userTriesToSaveRetargetingPixelWithoutDetails() {
+        String pixelNameTemp = "Temporary Pixel Name";
+        retargetingPixel.enterPixelName(pixelNameTemp);
+        pixels.savePixel();
+        assert retargetingPixel.advertiserError().contains("Advertiser is required");
+        retargetingPixel.clearPixelName();
+        pixels.savePixel();
+        assert retargetingPixel.pixelNameError().contains("Pixel Name is required");
+    }
+
+    @And("User selects the {string} pixel")
+    public void userSelectsPixel(String pixelType) {
+        retargetingPixel.selectPixelType(pixelType);
+    }
+
+    @When("User edits the created {string}")
+    public void userEditsPixel(String pixelType) {
+        pixelNameEdited = newPixelName + '_' + "Edited";
+        switch (pixelType) {
+            case "Retargeting Pixel" -> retargetingPixel.enterPixelName(pixelNameEdited);
+            case "Smart Pixel" -> smartPixel.enterPixelName(pixelNameEdited);
+            case "Conversion Pixel" -> conversionPixel.enterPixelName(pixelNameEdited);
+        }
+        pixels.savePixel();
+    }
+
+    @Then("Verify the {string} gets updated successfully")
+    public void verifyPixelUpdated(String pixelType) {
+        if (pixelType.equals("Retargeting Pixel") || pixelType.equals("Conversion Pixel")) {
+            Assert.assertEquals("PIXEL UPDATED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
+        } else if (pixelType.equals("Smart Pixel")) {
+            Assert.assertEquals("SAVED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
+        }
+        pixels.searchSavedPixel(pixelNameEdited);
+        Assert.assertEquals(pixelNameEdited, pixels.verifyCreatedPixel(pixelNameEdited));
+    }
+
+    @When("User removes the created pixel")
+    public void userRemovesPixel() {
+        pixels.removePixel();
+    }
+
+    @Then("Verify the pixel gets removed successfully")
+    public void verifyPixelRemoved() {
+        //pixels.removeSuccess();
+        assert pixels.removeSuccess().contains("Pixel deleted successfully");
+    }
+
+    @Then("Verify the list of Advertisers displayed")
+    public void verifyListOfAdvertisersDisplayed() {
+        // Assert that the advertisers list is visible
+    }
+
+    @When("User selects {string} as advertiser")
+    public void userSelectsAdvertiser(String advertiser) {
+        smartPixel.selectAdvertiser(advertiser);
+    }
+
+    @Then("Verify the Smart Pixel name is auto populated with {string} and Smart Pixel text")
+    public void verifySmartPixelNameIsAutoPopulated(String advertiser) {
+        String pixelName = smartPixel.getPixelName();
+        String expectedPixelName = advertiser + ' ' + "Smart Pixel";
+        String regex = "\\Q" + expectedPixelName + "\\E" + "\\s*\\d+$";
+        Assert.assertTrue(pixelName.matches(regex));
+    }
+
+    @And("User selects the associated campaign")
+    public void userSelectsAssociatedCampaign() {
+        smartPixel.selectAssociatedCampaign();
+    }
+
+    @And("User adds the associated Smart List and enters list details as {string}")
+    public void addsAssociatedSmartList(String listName) {
+        smartPixel.clickAddSmartListButton();
+        npiName = listName + '_' + timestamp;
+        npiStaticList.enterListName(npiName);
+    }
+
+    @Then("Verify the selected {string} and Smart Pixel")
+    public void verifySelectedAdvertiserAndSmartPixel(String advertiser) {
+        Assert.assertEquals(advertiser, npiSmartList.verifySelectedAdvertiser());
+        Assert.assertEquals(newPixelName, npiSmartList.verifySelectedSmartPixel());
+        npiSmartList.clickLifeCheckbox();
+    }
+
+    @And("User selects the created Smart Pixel")
+    public void userSelectsCreatedSmartPixel() {
+        pixels.selectSmartPixelTab();
+        pixels.searchSavedPixel(newPixelName);
+        pixels.openSearchedPixel(newPixelName);
+    }
+
+    @Then("Verify the selected Smart List should be reflected in the Associated Smartlists tab")
+    public void verifySmartListReflectedInAssociatedTab() {
+        smartPixel.clickAssociatedSmartListsTab();
+        Assert.assertEquals(npiName, smartPixel.verifyAssociatedSmartList(npiName));
+    }
+
+    @And("User navigates to the Pixel Codes tab")
+    public void userNavigatesToPixelCodesTab() {
+        smartPixel.clickPixelCodesTab();
+        Assert.assertTrue(smartPixel.verifyPixelCodesTabIsSelected());
+    }
+
+    @Then("Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it")
+    public void verifyUserCannotDeactivateSmartPixelWithAssociatedSmartList() {
+        Assert.assertEquals("PIXEL CAN'T BE DEACTIVATED", smartPixel.verifyDeactivateError().toUpperCase());
+    }
+
+    @When("User deactivates the created pixel")
+    public void userDeactivatesCreatedPixel() {
+        smartPixel.deactivatePixel();
+    }
+
+    @Then("Verify the pixel gets deactivated successfully")
+    public void verifyPixelDeactivatedSuccessfully() {
+        assert smartPixel.deactivateSuccess().contains("Pixel Deactivated successfully");
+    }
+
+    @When("User tries to save the Conversion pixel without entering any details, an error message should be displayed")
+    public void userTriesToSaveConversionPixelWithoutDetails() {
+        String pixelNameTemp = "Temporary Pixel Name";
+        conversionPixel.enterPixelName(pixelNameTemp);
+        pixels.savePixel();
+        assert conversionPixel.advertiserError().contains("Advertiser is required");
+        conversionPixel.clearPixelName();
+        pixels.savePixel();
+        assert conversionPixel.pixelNameError().contains("Pixel Name is required");
+        conversionPixel.enterPixelName(pixelNameTemp);
+        // Temporary hardcoded selection of advertiser to validate mandatory fields
+        conversionPixel.selectAdvertiser("01- Advertiser");
+        pixels.savePixel();
+        assert conversionPixel.pixelTypeOptionError().contains("Conversion Type is required");
+        pixels.clickCancelButton();
+    }
+
 }

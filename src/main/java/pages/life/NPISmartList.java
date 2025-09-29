@@ -50,7 +50,8 @@ public class NPISmartList {
     private final Locator PULSEPOINT_ICON;
     private final Locator CLICK_EXPAND_PRACTICE;
     private final Locator ADD_DRUG_BUTTON;
-    private final Locator SELECTED_SMART_PIXEL;
+    private final Locator SMART_PIXEL;
+    private final Locator ADVERTISER_NAME;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
@@ -93,7 +94,8 @@ public class NPISmartList {
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
-        this.SELECTED_SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
+        this.SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
+        this.ADVERTISER_NAME = page.locator("//div[@class='chips']//span[contains(@class,'ng-value-label')]");
     }
 
     public void clickSmartList() {
@@ -243,6 +245,10 @@ public class NPISmartList {
     }
 
     public String verifySelectedSmartPixel() {
-        return SELECTED_SMART_PIXEL.innerText().trim();
+        return SMART_PIXEL.innerText().trim();
+    }
+
+    public String verifySelectedAdvertiser() {
+        return ADVERTISER_NAME.innerText().trim();
     }
 }
