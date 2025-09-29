@@ -23,12 +23,11 @@ public class NPILists {
     private final Locator SEARCH_BOX;
     private final Locator SMART_LIST;
     private final Locator AUTO_IMPORTED_LIST;
-    private final Locator SPINNER;
     private final Locator STUDIO_FILTER_LABEL;
 
     public NPILists(Page page) {
         this.page = page;
-        this.NPI_LISTS = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("NPI Lists")).nth(3);
+        this.NPI_LISTS = page.locator("//div[contains(@class, 'menu') and contains(text(),'NPI Lists')]");
         this.NPI_LISTS_STG = page.getByText("NPI Lists");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
@@ -40,11 +39,11 @@ public class NPILists {
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.SMART_LIST = page.getByText("Dynamic list of NPI");
         this.AUTO_IMPORTED_LIST = page.locator("//app-npilisttype[@listtypename='Auto-Imported List']");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.STUDIO_FILTER_LABEL = page.locator("//span[contains(@class,'studioLabel')]");
     }
 
     public void clickNPILists() {
+        waitUtility.waitForLocatorVisible(NPI_LISTS);
         NPI_LISTS.click();
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -59,6 +58,7 @@ public class NPILists {
     }
 
     public String verifyNPIListText() {
+        waitUtility.waitForLocatorVisible(CREATE_NPI_LIST);
         return CREATE_NPI_LIST.innerText();
     }
 

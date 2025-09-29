@@ -211,5 +211,6 @@ public class Accounts {
     public void clickOKButton() {
         OK_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(PULSEPOINT_ICON);
     }
 }

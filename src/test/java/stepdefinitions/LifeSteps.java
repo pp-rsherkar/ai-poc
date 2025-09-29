@@ -867,12 +867,12 @@ public class LifeSteps {
         pmp.clickAddNewDeals();
     }
 
-    @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}")
-    public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String dealPriceType, String price) {
+    @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price) {
         dealIDRandom = dealID + CommonUtils.timeStampCalculation();
         dealNameRandom = dealName + CommonUtils.timeStampCalculation();
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
-        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, dealPriceType, price));
+        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price));
     }
 
     @When("User searches the deal and assign it from the deal list")
@@ -915,13 +915,13 @@ public class LifeSteps {
         }
     }
 
-    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
-    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String dealPriceType, String price, String toggleButton) {
+    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
+    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String toggleButton) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
         dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
         Assert.assertTrue("Assigned Deals are not present under targeting and deals section",
-                pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, dealPriceType, price, toggleButton));
+                pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, toggleButton));
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")

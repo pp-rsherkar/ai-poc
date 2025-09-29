@@ -100,8 +100,8 @@ public class CreateCreatives {
         this.CREATIVE_TYPE = page.locator("//app-creativetype/div//following-sibling::div");
         this.CREATIVE_HTMLCODE = page.locator("//textarea[contains(@formcontrolname,'htmlCode')]");
         this.MACROS_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'multi_click_macros_check ')]");
-        this.CREATIVE_AD_SIZE = page.locator("//div[contains(text(),'Select Ad Size')]");
-        this.CREATIVE_AD_SIZE_VALUE = page.locator("//div[contains(text(),'Select Ad Size')]/following-sibling::div/div");
+        this.CREATIVE_AD_SIZE = page.locator("//app-single-select-dropdown//input[contains(@placeholder,'Select Ad Size')]");
+        this.CREATIVE_AD_SIZE_VALUE = page.locator("//input[contains(@placeholder,'Select Ad Size')]/following-sibling::div/div");
         this.DOMAIN_LANDING = page.locator("//input[contains(@formcontrolname,'landingDomain')]");
         this.CLICKTHROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
         this.DURATION = page.locator("//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");

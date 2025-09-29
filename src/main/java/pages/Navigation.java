@@ -45,7 +45,7 @@ public class Navigation {
         this.GENERATED_REPORT = page.locator("#megamenu").getByText("Generated Reports");
         this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
         this.REPORT_TEMPLATE = page.locator("#megamenu").getByText("Report Templates");
-        this.SUB_MENU = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("menu"));
+        this.SUB_MENU = page.locator("//img[contains(@alt,'menu')]");
         this.ACCOUNT_NAME = page.locator("//div[@class='accountname']");
         this.ACCOUNT_SEARCH = page.locator("//div[@id='accountSwitcher']/input[@placeholder='Search']");
         this.ACCOUNT_ITEM = page.locator("//div[@id='accountSwitcher']//div[@class='item']");

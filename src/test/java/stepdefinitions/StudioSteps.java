@@ -513,18 +513,14 @@ public class StudioSteps {
     public void verifyThatCrossFiltersAreDisplayedCorrectlyInFilterSection() {
         Assert.assertTrue("Filters were not added",explorerWorkspace.verifyCrossFiltersDisplayed());
         appliedFilterEntries = explorerWorkspace.fetchMergedFilters();
-        System.out.println("Merge Filter" + appliedFilterEntries);
     }
 
     @And("Verify dashboard filters are merged with Primary filters")
     public void verifyDashboardFiltersAreMergedWithPrimaryFilters() {
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
-        System.out.println("Displayed Filter" + displayedFilters);
-
         for (String mergedFilter : appliedFilterEntries) {
             boolean matchFound = displayedFilters.stream()
                     .anyMatch(displayed -> displayed.equalsIgnoreCase(mergedFilter));
-
             Assert.assertTrue("Merged filter not displayed: " + mergedFilter, matchFound);
         }
     }
