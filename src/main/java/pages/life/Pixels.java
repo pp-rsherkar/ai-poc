@@ -80,6 +80,7 @@ public class Pixels {
                 break;
             case "Smart Pixel":
                 SMART_PIXEL.click();
+                waitUtility.waitUntilSpinnerHidden();
                 break;
             case "Conversion Pixel":
                 CONVERSION_PIXEL.click();

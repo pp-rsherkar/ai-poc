@@ -14,7 +14,6 @@ public class SmartPixel {
     private final Locator ADD_SMARTLIST_BUTTON;
     private final Locator ASSOCIATED_SMARTLISTS_TAB;
     private final Locator PIXEL_CODES_TAB;
-    private final Locator ASSOCIATED_SMARTLIST;
     private final Locator DEACTIVATE_PIXEL_ICON;
     private final Locator DEACTIVATE_PIXEL_BUTTON;
     private final Locator DEACTIVATE_ERROR;
@@ -31,7 +30,6 @@ public class SmartPixel {
         this.ADD_SMARTLIST_BUTTON = page.locator("//app-icon-lable-link[@icon='20-add.svg' and @text='Add Smartlist']");
         this.ASSOCIATED_SMARTLISTS_TAB = page.locator("//span[contains(text(),'ASSOCIATED SMARTLISTS')]");
         this.PIXEL_CODES_TAB = page.locator("//span[contains(text(),'PIXEL CODES')]");
-        this.ASSOCIATED_SMARTLIST = page.locator("//div[@class='smartlist-card']");
         this.DEACTIVATE_PIXEL_ICON = page.locator("//app-icon-lable-link[@icon='20-clear.svg']");
         this.DEACTIVATE_PIXEL_BUTTON = page.locator("//span[text()='Deactivate']");
         this.DEACTIVATE_ERROR = page.locator("//div[contains(@class,'confirm-modal header')]");
@@ -60,6 +58,7 @@ public class SmartPixel {
 
     public void clickAddSmartListButton() {
         ADD_SMARTLIST_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void clickAssociatedSmartListsTab() {
@@ -81,15 +80,16 @@ public class SmartPixel {
     }
 
     public Boolean verifyPixelCodesTabIsSelected() {
-        Locator locator = PIXEL_CODES_TAB.locator("span");
-        System.out.println(locator);
-        String classAttribute = locator.getAttribute("class");
-        System.out.println(classAttribute);
+        String classAttribute = PIXEL_CODES_TAB.getAttribute("class");
         return classAttribute.contains("selectedTab");
     }
 
     public String verifyDeactivateError() {
         return DEACTIVATE_ERROR.innerText();
+    }
+
+    public void clickDeactivatePixelIcon() {
+        DEACTIVATE_PIXEL_ICON.click();
     }
 
     public void deactivatePixel() {

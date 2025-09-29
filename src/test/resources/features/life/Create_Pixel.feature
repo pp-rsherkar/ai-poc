@@ -65,8 +65,8 @@ Feature: LIFE Regression - Create Pixel of following types:
     Then Verify the "<PIXEL_TYPE>" gets updated successfully
     Then Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it
     Examples:
-      | PIXEL_TYPE  | ADVERTISER       | LIST_NAME   |
-      | Smart Pixel | 1Demo Advertiser | Smart_Pixel |
+      | PIXEL_TYPE  | ADVERTISER     | LIST_NAME   |
+      | Smart Pixel | 01- Advertiser | Smart_Pixel |
 
   @regression
   Scenario Outline: Manage a Smart Pixel without associated Smart List (Create, Edit and Deactivate)

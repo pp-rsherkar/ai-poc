@@ -2167,6 +2167,7 @@ public class LifeSteps {
 
     @Then("Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it")
     public void verifyUserCannotDeactivateSmartPixelWithAssociatedSmartList() {
+        smartPixel.clickDeactivatePixelIcon();
         Assert.assertEquals("PIXEL CAN'T BE DEACTIVATED", smartPixel.verifyDeactivateError().toUpperCase());
     }
 
