@@ -41,14 +41,14 @@ public class Workspace {
     private final Locator GO_TO_WORKSPACE_LIST;
     private final Locator BEFORE_YOU_LEAVE_DAILOG;
     private final Locator EXIT_BUTTON;
-
+    private final Locator BACK_ARROW;
 
     public Workspace(Page page) {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
         this.SEARCH_WORKSPACE = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator(".styles__StyledScheduleStatus-sc-u6f0o3-5 > svg").first();
+        this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator("//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button").first();
         this.PUBLISH_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish NPI List"));
         this.PUBLISHED_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Published NPI List"));
         this.STATIC_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Static List"));
@@ -57,7 +57,7 @@ public class Workspace {
         this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//h3[contains(text(),'Saving workspace') or contains(text(),'Creating workspace')]/following-sibling::span");
-        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//div[contains(@class,'styles__StyledScheduleStatus')])[3]"); //no unique identifier is available hence index needs to be provided
+        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
         this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
         this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
         this.WEBHOOK_CANCEL_BUTTON = WORKSPACE_FRAME.locator("//button[@type='button']/div[contains(text(),'Cancel')]");
@@ -69,10 +69,11 @@ public class Workspace {
         this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
         this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
-        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace']");
+        this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.GO_TO_WORKSPACE_LIST = WORKSPACE_FRAME.locator("//div[contains(text(),'Go back to workspaces list')]");
         this.BEFORE_YOU_LEAVE_DAILOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
         this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
+        this.BACK_ARROW = WORKSPACE_FRAME.locator("//div[contains(@style,'cursor: pointer')]");
     }
 
     public void studio() {
@@ -119,27 +120,26 @@ public class Workspace {
         return PUBLISHED_NPI.innerText();
     }
 
-    public void waitTillWorkspaceAlertHide(){
+    public void waitTillWorkspaceAlertHide() {
         WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void clickWebhookIcon(){
+    public void clickWebhookIcon() {
         WEBHOOK_ICON.click();
     }
 
     public String verifyWebhookToggleButton() {
         WEBHOOK_PANEL_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-disabled")){
+        if (WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-disabled")) {
             return "Disabled";
-        }else {
+        } else {
             WEBHOOK_TOGGLE_BUTTON.click();
-            if(WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-checked"))
-                return "Enabled";
+            if (WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-checked")) return "Enabled";
         }
         return " ";
     }
 
-    public void closeWebhookPanel(){
+    public void closeWebhookPanel() {
         WEBHOOK_CANCEL_BUTTON.click();
     }
 
@@ -147,7 +147,7 @@ public class Workspace {
         for (int i = 0; i < WEBHOOK_BUTTONS.count(); i++) {
             if (WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName) && WEBHOOK_BUTTONS.nth(i).getAttribute("aria-pressed").contains("true")) {
                 break;
-            }else if(WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName)){
+            } else if (WEBHOOK_BUTTONS.nth(i).innerText().contains(buttonName)) {
                 WEBHOOK_BUTTONS.nth(i).click();
                 break;
             }
@@ -166,9 +166,9 @@ public class Workspace {
         BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(jsonFile));
     }
 
-    public void addMacros(String textType, String param, List<String> macrosList){
+    public void addMacros(String textType, String param, List<String> macrosList) {
         for (String macros : macrosList) {
-            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//span[contains(text(),'%s')]", textType, macros);
+            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//p[contains(text(),'%s')]", textType, macros);
             Locator MACROS = WORKSPACE_FRAME.locator(xpath);
             if (MACROS.innerText().contains(macros)) {
                 MACROS.click();
@@ -183,7 +183,7 @@ public class Workspace {
         }
     }
 
-    public void saveWebhookSetup(){
+    public void saveWebhookSetup() {
         WEBHOOK_SAVE_BUTTON.click();
     }
 
@@ -196,11 +196,10 @@ public class Workspace {
     public String verifyInlineErrorMessage(String invalidData) {
         String error = " ";
         URL_TEXTAREA.fill(invalidData);
-        if(BODY_TEXTAREA.isVisible())
-            BODY_TEXTAREA.fill(invalidData);
+        if (BODY_TEXTAREA.isVisible()) BODY_TEXTAREA.fill(invalidData);
         WEBHOOK_SAVE_BUTTON.click();
         INLINE_ERROR_MESSAGE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(INLINE_ERROR_MESSAGE.count()>0) {
+        if (INLINE_ERROR_MESSAGE.count() > 0) {
             for (int i = 0; i < INLINE_ERROR_MESSAGE.count(); i++) {
                 error = error + INLINE_ERROR_MESSAGE.nth(i).innerText();
             }
@@ -211,7 +210,7 @@ public class Workspace {
     public String verifyErrorMsgWhenAPIFailed(List<String> mediaTypeList) throws IOException {
         String alert = " ";
         URL_TEXTAREA.fill(mediaTypeList.get(0));
-        if(BODY_TEXTAREA.isVisible()){
+        if (BODY_TEXTAREA.isVisible()) {
             String file = mediaTypeList.get(1).trim();
             BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(file));
         }
@@ -230,7 +229,8 @@ public class Workspace {
     }
 
     public void goToWorkspaceList() {
-        GO_TO_WORKSPACE_LIST.click();
+        BACK_ARROW.click();
+        //GO_TO_WORKSPACE_LIST.click();
         BEFORE_YOU_LEAVE_DAILOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         EXIT_BUTTON.click();
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));

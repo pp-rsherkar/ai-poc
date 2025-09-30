@@ -2,6 +2,8 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class LineItemDetails {
     private final Page page;
@@ -13,6 +15,8 @@ public class LineItemDetails {
     private final Locator LINE_ITEM_SUCCESS;
     private final Locator LINE_ITEM_TYPE_DROPDOWN;
     private final Locator LINE_ITEM_TYPE_VALUE;
+    private final Locator ADD_FLIGHT_BUTTON;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public LineItemDetails(Page page) {
         this.page = page;
@@ -24,6 +28,7 @@ public class LineItemDetails {
         this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
+        this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
     }
 
     public String verifyLineItemText() {
@@ -47,18 +52,24 @@ public class LineItemDetails {
     }
 
     public String lineItemSuccess() {
-        return LINE_ITEM_SUCCESS.innerText();
+        String successMessage = LINE_ITEM_SUCCESS.innerText().trim();
+        waitUtility.waitUntilSpinnerHidden();
+        return successMessage;
     }
 
     public void selectLineItemType(String lineItemType) {
         LINE_ITEM_TYPE_DROPDOWN.click();
         int count = LINE_ITEM_TYPE_VALUE.count();
-        for(int i=0; i< count; i++) {
-            if(LINE_ITEM_TYPE_VALUE.nth(i).innerText().contains(lineItemType)) {
+        for (int i = 0; i < count; i++) {
+            if (LINE_ITEM_TYPE_VALUE.nth(i).innerText().equals(lineItemType)) {
                 LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
                 LINE_ITEM_TYPE_VALUE.nth(i).click();
                 break;
             }
         }
+    }
+
+    public void clickAddFlightButton() {
+        ADD_FLIGHT_BUTTON.click();
     }
 }

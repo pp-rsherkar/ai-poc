@@ -7,7 +7,6 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ExplorerWorkspace {
     private final Page page;
@@ -23,9 +22,10 @@ public class ExplorerWorkspace {
     private final Locator FILTER_CLOSE_BUTTON;
     private final Locator APPLIED_FILTER;
     private final Locator APPLIED_FILTER_OPTION;
-    private final Locator SAVE_EXPLORER_WORKSPACE;
+    private final Locator SAVE_WORKSPACE;
     private final Locator EXPLORER_WORKSPACE_SUCCESS;
     private final FrameLocator WORKSPACE_FRAME;
+    private final Locator SAVE_WORKSPACE_NAME;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -39,11 +39,12 @@ public class ExplorerWorkspace {
         this.SEARCH_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
         this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
-        this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
+        this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("//h1[contains(text(),'Select Filter')]/following-sibling::button");
         this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitleContainer-sc-')]");
         this.APPLIED_FILTER_OPTION = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterExpression-sc')]");
-        this.SAVE_EXPLORER_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonBase__ButtonOuter')]/div[contains(text(),'Save')]");
+        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledContainer')]//div[contains(text(),'Save')]");
         this.EXPLORER_WORKSPACE_SUCCESS = WORKSPACE_FRAME.locator("[id=\"\\32 \"] div").filter(new Locator.FilterOptions().setHasText("Workspace managementWorkspace")).nth(2);
+        this.SAVE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__DashboardContainer')]//div[contains(text(),'Save')]");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -56,20 +57,21 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.fill(advertiser);
         SEARCH_ADVERTISER.press("ArrowDown");
         SEARCH_ADVERTISER.press("Enter");
+        SAVE_WORKSPACE_NAME.click();
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void clickAddFilter(){
+    public void clickAddFilter() {
         ADD_FILTER.click();
     }
 
     public void selectFilter(String filter, String option) {
         SEARCH_FILTER.fill(filter);
-        SELECT_FILTER.click();
-        if(filter.contains("Site") || filter.contains("Search")){
+        WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).click();
+        if (filter.contains("Site") || filter.contains("Search")) {
             WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option)).click();
-        }else{
+        } else {
             WORKSPACE_FRAME.locator(String.format("//label[contains(text(),'%s')]", option)).click();
         }
         FILTER_OK_BUTTON.click();
@@ -92,7 +94,7 @@ public class ExplorerWorkspace {
     public void saveExplorerWorkspace() {
         DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        SAVE_EXPLORER_WORKSPACE.first().click();
+        SAVE_WORKSPACE.first().click();
     }
 
     public String workspaceSuccess() {

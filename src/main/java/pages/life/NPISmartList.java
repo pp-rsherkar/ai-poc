@@ -4,7 +4,9 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.Constants;
+import utils.WaitUtility;
 
 import java.util.regex.Pattern;
 
@@ -47,9 +49,9 @@ public class NPISmartList {
     private final Locator HCP365_AVAILABLE_IN;
     private final Locator PULSEPOINT_ICON;
     private final Locator CLICK_EXPAND_PRACTICE;
-
-    private final Locator SPINNER;
     private final Locator ADD_DRUG_BUTTON;
+    private final Locator SELECTED_SMART_PIXEL;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
         this.page = page;
@@ -90,13 +92,13 @@ public class NPISmartList {
         this.LIFE_AVAILABLE_IN = page.locator("//span[contains(text(),'Life')]");
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
+        this.SELECTED_SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
     }
 
     public void clickSmartList() {
         CLICK_SMART_LIST.click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void clickSmartPixel() {
@@ -203,14 +205,14 @@ public class NPISmartList {
     }
 
     public void enterListName(String listName) {
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
         LIST_NAME.fill(listName);
     }
 
     public void selectAdvertiser(String advertiser) {
         SEARCH_ADVERTISER.click();
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void selectPrescribedDrug() {
@@ -238,5 +240,9 @@ public class NPISmartList {
 
     public void clickPulsepointIcon() {
         PULSEPOINT_ICON.click();
+    }
+
+    public String verifySelectedSmartPixel() {
+        return SELECTED_SMART_PIXEL.innerText().trim();
     }
 }

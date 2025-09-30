@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +14,6 @@ import java.util.Objects;
 
 public class CampaignDashboard {
     private final Page page;
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
-    private final Locator SPINNER;
     private final Locator CAMPAIGNPAGE_TEXT;
     private final Locator CAMPAIGN_COMMENTBOX;
     private final Locator LINEITEM_COMMENTBOX;
@@ -26,7 +25,6 @@ public class CampaignDashboard {
     private final Locator TOOLTIP_TEXT;
     private final Locator LINEITEM_TOGGLE_BUTTON;
     private final Locator TACTIC_TOGGLE_BUTTON;
-    private final Locator PRE_LOADER;
     private final Locator BACK_TO_DASHBOARD;
     private final Locator LINEITEM_NAME;
     private final Locator TACTIC_NAME;
@@ -59,14 +57,14 @@ public class CampaignDashboard {
     private final Locator ADVERTISER_COLUMNNAME;
     private final Locator CAMPAIGN_COLUMNNAME;
     private final Locator CREATIVE_TOOLTIP;
-
+    private final Locator LIFE_TIME_FILTER;
+    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
-    //boolean campaignFlag, lineItemFlag, tacticFlag, hideDashboardColumnFlag, showDashboardColumnFlag = false;
     boolean flag1, flag2, flag3 = false;
 
     public CampaignDashboard(Page page) {
         this.page = page;
-        this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
         this.CAMPAIGNPAGE_TEXT = page.locator("//span[contains(text(),'Campaigns')]");
         this.CAMPAIGN_COMMENTBOX = page.locator("//div[@class='camp-data']//span[@class='notesIconEmpty' or @class='notesIconProvided']");
         this.LINEITEM_COMMENTBOX = page.locator("//div[contains(@class,'lineitem-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");
@@ -78,11 +76,10 @@ public class CampaignDashboard {
         this.TOOLTIP_TEXT = page.locator("//span[@class='tooltip-text']");
         this.LINEITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.TACTIC_TOGGLE_BUTTON = page.locator("//div[contains(@class,'tactic-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
-        this.PRE_LOADER = page.locator("//div[@class='preloader']");
-        this.BACK_TO_DASHBOARD = page.locator("//span[contains(@class,'breadCrumbRoot') and contains(text(),'Campaigns')]");
+        this.BACK_TO_DASHBOARD = page.locator("//div[@class='logo-lists']/img");
         this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section ng-star-inserted')]");
         this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
-        this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'left truncate campaign-name')]");
+        this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'campaign-name')]");
         this.TACTIC_NAME = page.locator("//span[contains(@class,'color-black tactic-name-section')]");
         this.TACTIC_PAGETITLE = page.locator("//div[contains(@class,'left truncate tactic-name')]");
         this.DASHBOARD_MENUICON = page.locator("//span[@class='icon-bars']");
@@ -92,7 +89,7 @@ public class CampaignDashboard {
         this.DASHBOARD_MENUCOLUMNS = page.locator("//div[contains(@class,'data-table-header')]/div[contains(@id,'liHeader') or contains(@class,'align-left')]");
         this.FILTER_OKBUTTON = page.locator("//button[contains(@class,'ui primary button')]");
         this.SELECTED_FILTER = page.locator("//div[contains(@class,'selected-filters')]//label");
-        this.RESET_FILTER_BUTTON = page.locator("//button[contains(text(),'Reset Filters')]");
+        this.RESET_FILTER_BUTTON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.FILTER_ICON = page.locator("//div[contains(@class,'filterApplied')]");
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
         this.FAVORITE_CAMPAIGN_LIST = page.locator("//i[contains(@class,'star display-inline')]");
@@ -111,16 +108,17 @@ public class CampaignDashboard {
         this.ADVERTISER_COLUMNNAME = page.locator("//div[contains(@id,'liHeaderAdvertiser')]");
         this.CAMPAIGN_COLUMNNAME = page.locator("//div[contains(@class,'display-inline')]/span[contains(text(),'CAMPAIGN')]");
         this.CREATIVE_TOOLTIP = page.locator("//span[contains(@class,'statusTooltipBackgroundImage')]");
+        this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
     }
 
-    public String verifyCampaignDashbaord(String text){
-        SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    public String verifyCampaignDashbaord(String text) {
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitUntilPreLoaderHidden();
         page.waitForCondition(() -> CAMPAIGNPAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
         return CAMPAIGNPAGE_TEXT.innerText();
     }
 
-    public String verifyCampaignDetails(String campaignID){
+    public String verifyCampaignDetails(String campaignID) {
         return page.locator(String.format("//span[contains(text(),'%s')]", campaignID)).innerText();
     }
 
@@ -131,18 +129,21 @@ public class CampaignDashboard {
         switch (commentType) {
             case "Campaign Name":
                 for (String val : commentValues) {
+                    CAMPAIGN_COMMENTBOX.isVisible();
                     CAMPAIGN_COMMENTBOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
             case "Line Item Name":
                 for (String val : commentValues) {
+                    LINEITEM_COMMENTBOX.isVisible();
                     LINEITEM_COMMENTBOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
             case "Tactic Name":
                 for (String val : commentValues) {
+                    TACTIC_NAME_COMMENTBOX.isVisible();
                     TACTIC_NAME_COMMENTBOX.click();
                     successAlertText = addComments(val);
                 }
@@ -151,76 +152,71 @@ public class CampaignDashboard {
         return successAlertText;
     }
 
-    public String addComments(String comment){
+    public String addComments(String comment) {
         COMMENT_BOX.fill(comment);
         COMMENTBOX_OKBUTTON.click();
-        COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(COMMENT_SUCCESS_ALERT);
         String successAlertText = COMMENT_SUCCESS_ALERT.innerText();
-        COMMENT_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT);
         return successAlertText;
     }
 
-    public List<String> verifyCommentIconColor(){
+    public List<String> verifyCommentIconColor() {
         List<String> backgroundImages = new ArrayList<>();
         for (int i = 0; i < COMMENT_ICON.count(); i++) {
-            String bgImage = COMMENT_ICON.nth(i)
-                    .evaluate("element => getComputedStyle(element).backgroundImage")
-                    .toString();
+            String bgImage = COMMENT_ICON.nth(i).evaluate("element => getComputedStyle(element).backgroundImage").toString();
             backgroundImages.add(bgImage.substring(bgImage.lastIndexOf("/") + 1, bgImage.length() - 2));
         }
         return backgroundImages;
     }
 
-    public List<String> verifyCommentIconText(){
+    public List<String> verifyCommentIconText() {
         List<String> returnValues = new ArrayList<>();
-        for(int i=0; i<COMMENT_ICON.count(); i++){
+        for (int i = 0; i < COMMENT_ICON.count(); i++) {
             COMMENT_ICON.nth(i).hover();
-            TOOLTIP_TEXT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+            waitUtility.waitForLocatorVisible(TOOLTIP_TEXT);
             returnValues.add(TOOLTIP_TEXT.innerText());
         }
         return returnValues;
     }
 
-    public void clickLineAndTacticToggleButton(){
+    public void clickLineAndTacticToggleButton() {
         DASHBOARD_MENUICON.click();
         SHOW_ALL.click();
         page.keyboard().press("Escape");
         lineItemClassBeforeClick = LINEITEM_TOGGLE_BUTTON.getAttribute("class");
         LINEITEM_TOGGLE_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         lineItemClassAfterClick = LINEITEM_TOGGLE_BUTTON.getAttribute("class");
 
         tacticClassBeforeClick = TACTIC_TOGGLE_BUTTON.getAttribute("class");
         TACTIC_TOGGLE_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         tacticClassAfterClick = TACTIC_TOGGLE_BUTTON.getAttribute("class");
     }
 
-    public boolean verifyLineTacticToggleStatus(){
+    public boolean verifyLineTacticToggleStatus() {
         return !Objects.equals(lineItemClassBeforeClick, lineItemClassAfterClick) && !Objects.equals(tacticClassBeforeClick, tacticClassAfterClick);
     }
 
-    public void navigateToCampaignLIAndTactic(String campaignID){
+    public void navigateToCampaignLIAndTactic(String campaignID) {
         page.locator(String.format("//span[contains(text(),'%s')]", campaignID)).click();
-        CAMPAIGN_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(CAMPAIGN_PAGETITLE.getAttribute("class").contains("campaign"))
-            flag1 = true;
+        waitUtility.waitForLocatorVisible(CAMPAIGN_PAGETITLE);
+        if (CAMPAIGN_PAGETITLE.getAttribute("class").contains("campaign")) flag1 = true;
         BACK_TO_DASHBOARD.click();
         campaignListing.searchCreatedCampaign(campaignID);
         campaignListing.expandCreatedLineItem();
         LINEITEM_NAME.click();
         LINEITEM_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(LINEITEM_PAGETITLE.getAttribute("class").contains("lineitem"))
-            flag2 = true;
+        if (LINEITEM_PAGETITLE.getAttribute("class").contains("lineitem")) flag2 = true;
         BACK_TO_DASHBOARD.click();
         campaignListing.searchCreatedCampaign(campaignID);
         campaignListing.expandCreatedLineItem();
         TACTIC_NAME.click();
-        TACTIC_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if(TACTIC_PAGETITLE.getAttribute("class").contains("tactic-name"))
-            flag3 = true;
+        waitUtility.waitForLocatorVisible(TACTIC_PAGETITLE);
+        if (TACTIC_PAGETITLE.getAttribute("class").contains("tactic-name")) flag3 = true;
         BACK_TO_DASHBOARD.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public boolean verifyPanelTitleText() {
@@ -234,60 +230,52 @@ public class CampaignDashboard {
         page.keyboard().press("Escape");
     }
 
-    public List<String> fecthDashboardColumns(){
+    public List<String> fecthDashboardColumns() {
         List<String> columnNames = new ArrayList<>();
-        for(int i=0; i<DASHBOARD_MENUCOLUMNS.count(); i++){
+        for (int i = 0; i < DASHBOARD_MENUCOLUMNS.count(); i++) {
             columnNames.add(DASHBOARD_MENUCOLUMNS.nth(i).innerText());
         }
         return columnNames;
     }
 
-    public void clickHideAndShowAllOption(){
+    public void clickHideAndShowAllOption() {
         DASHBOARD_MENUICON.click();
         HIDE_ALL.click();
         page.keyboard().press("Escape");
-        if(DASHBOARD_MENUCOLUMNS.count() == 0)
-            flag1 = true;
+        if (DASHBOARD_MENUCOLUMNS.count() == 0) flag1 = true;
         DASHBOARD_MENUICON.click();
         SHOW_ALL.click();
         page.keyboard().press("Escape");
-        if(DASHBOARD_MENUCOLUMNS.count() > 0)
-            flag2 = true;
+        if (DASHBOARD_MENUCOLUMNS.count() > 0) flag2 = true;
     }
 
-    public boolean verifyColumnsCount(){
+    public boolean verifyColumnsCount() {
         return flag1 && flag2;
     }
 
     public void applyFilterOnSelectedColumns(String filterName, List<String> filterValues) {
-        page.locator(String.format("//span[contains(text(),'%s')]", filterName)).hover();
-        String filterXpath = String.format(
-                "//span[contains(text(),'%s')]/ancestor::div[contains(@class,'filter-container')]//i[contains(@class,'filter icon')]",
-                filterName
-        );
+        String filterXpath = String.format("//span[contains(text(), '%s')]/following-sibling::div//span[contains(@class,'filter')]", filterName);
         page.locator(filterXpath).click();
         for (String value : filterValues) {
-            String valueXpath = String.format("//label[contains(text(),'%s')]", value);
+            String valueXpath = String.format("//app-overlay[@class='line-item-list-filter']//label[contains(text(),'%s')]", value);
             page.locator(valueXpath).click();
         }
         FILTER_OKBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public List<String> verifySelectedFilter() {
         List<String> selectedFilter = new ArrayList<>();
-        for(int i=0; i<SELECTED_FILTER.count(); i++){
+        for (int i = 0; i < SELECTED_FILTER.count(); i++) {
             selectedFilter.add(SELECTED_FILTER.nth(i).innerText());
         }
         return selectedFilter;
     }
 
     public String verifyFilterIcon() {
-        String bgImage = FILTER_ICON
-                .evaluate("element => getComputedStyle(element).backgroundImage")
-                .toString();
+        String bgImage = FILTER_ICON.evaluate("element => getComputedStyle(element).backgroundImage").toString();
         RESET_FILTER_BUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden();
         return bgImage.substring(bgImage.lastIndexOf("/") + 1, bgImage.length() - 2);
     }
 
@@ -295,14 +283,14 @@ public class CampaignDashboard {
         campaignListing.verifyCampaignRadioBtnChecked();
         campaignListing.verifyFavoriteCheckbox();
         FAVORITE_ONLY_CHECKBOX.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
     public int verifyCampaignMarkedFavorite() {
         int flag = 0;
-        if(!FAVORITE_CAMPAIGN_LIST.first().isVisible()){
+        if (!FAVORITE_CAMPAIGN_LIST.first().isVisible()) {
             return flag;
-        }else if(FAVORITE_CAMPAIGN_LIST.count() > 0){
+        } else if (FAVORITE_CAMPAIGN_LIST.count() > 0) {
             flag = FAVORITE_CAMPAIGN_LIST.count();
         }
         return flag;
@@ -312,7 +300,7 @@ public class CampaignDashboard {
         campaignListing.verifyCampaignRadioBtnChecked();
         campaignListing.verifyHideFinishedCheckbox();
         HIDE_FINISHED_CHECKBOX.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
     public boolean verifyHideFinishedCampaignList() {
@@ -326,10 +314,10 @@ public class CampaignDashboard {
     }
 
     public boolean clickAndVerifyFilterOptionTypeButton() {
-        Locator[] filterButtons = { ACTIVE_FLIGHT_BUTTON, TODAY_BUTTON, YESTERDAY_BUTTON };
+        Locator[] filterButtons = {ACTIVE_FLIGHT_BUTTON, TODAY_BUTTON, YESTERDAY_BUTTON};
         for (Locator button : filterButtons) {
             button.click();
-            PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(120000).setState(WaitForSelectorState.HIDDEN));
+            waitUtility.waitUntilPreLoaderHidden(120000);
             if (INACTIVE_FLIGHTS.isVisible()) {
                 return false;
             }
@@ -337,29 +325,26 @@ public class CampaignDashboard {
         return true;
     }
 
-    public void clickAndVerifyCustomFilterOption(){
+    public void clickAndVerifyCustomFilterOption() {
         CUSTOM_BUTTON.click();
         CUSTOM_DATE_TEXTBOX.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CUSTOM_DATE_TEXTBOX.fill("06/01/2025 - 06/20/2025");
         page.keyboard().press("Enter");
     }
 
-    public boolean clickGroupByOptionsAndFilterDashboardData(){
+    public boolean clickGroupByOptionsAndFilterDashboardData() {
         SETTING_ICON.click();
         GROUPBYCAMPAIGN_RADIOBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        if(ADVERTISER_COLUMNNAME.isVisible())
-            flag1 = true;
+        waitUtility.waitUntilPreLoaderHidden(120000);
+        if (ADVERTISER_COLUMNNAME.isVisible()) flag1 = true;
         SETTING_ICON.click();
         GROUPBYADVERTISER_RADIOBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        if(CAMPAIGN_COLUMNNAME.isVisible())
-            flag2 = true;
+        waitUtility.waitUntilPreLoaderHidden(120000);
+        if (CAMPAIGN_COLUMNNAME.isVisible()) flag2 = true;
         SETTING_ICON.click();
         NOGROUP_RADIOBUTTON.click();
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
-        if(ADVERTISER_COLUMNNAME.isVisible() && CAMPAIGN_COLUMNNAME.isVisible())
-            flag3 = true;
+        waitUtility.waitUntilPreLoaderHidden();
+        if (ADVERTISER_COLUMNNAME.isVisible() && CAMPAIGN_COLUMNNAME.isVisible()) flag3 = true;
         return flag1 && flag2 && flag3;
     }
 
@@ -370,12 +355,15 @@ public class CampaignDashboard {
         int count = CREATIVE_TOOLTIP.count();
         for (int i = 0; i < count; i++) {
             String tooltipText = CREATIVE_TOOLTIP.nth(i).getAttribute("tooltip-text");
-            if (!(tooltipText.contains("No creative assigned") ||
-                    tooltipText.contains("are pending approval") ||
-                    tooltipText.contains("are denied"))) {
+            if (!(tooltipText.contains("No creative assigned") || tooltipText.contains("are pending approval") || tooltipText.contains("are denied"))) {
                 return false;
             }
         }
         return true;
+    }
+
+    public void clickLifetimeFilter() {
+        LIFE_TIME_FILTER.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 }

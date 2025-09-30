@@ -153,7 +153,8 @@ public class StudioSteps {
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
-        Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
+        // As confirmed by Nikhil - for GA, permissions have been set up like-wise. This is HCP Explorer test-case and in permission feature we can handled this.
+        // Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
     }
 
     @And("User clicks on HCP Explorer workspace")
@@ -220,7 +221,6 @@ public class StudioSteps {
 
     @Then("user clicks on the searched workspace")
     public void user_clicks_on_the_searched_workspace() {
-        workspacedownloadnpi.clickWorkspace();
         workspacedownloadnpi.clickDownloadButton();
         workspacedownloadnpi.clickNPIDownload();
         workspacedownloadnpi.clickCSVFile();
@@ -391,7 +391,7 @@ public class StudioSteps {
 
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 167, 164)",workspace.checkBackgroundColorOfWebhookIcon());
+        Assert.assertEquals("rgb(0, 136, 136)",workspace.checkBackgroundColorOfWebhookIcon());
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
@@ -410,6 +410,6 @@ public class StudioSteps {
                         "\n" +
                         "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
                         "Do you want to proceed?"));
-        Assert.assertEquals("Workspace archived successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 }

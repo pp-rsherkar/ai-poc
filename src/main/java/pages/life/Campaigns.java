@@ -2,9 +2,9 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class Campaigns {
     private final Page page;
@@ -19,6 +19,8 @@ public class Campaigns {
     private final Locator SAVE_CAMPAIGN;
     private final Locator CAMPAIGN_LISTING;
     private final Locator CAMPAIGN_SUCCESS;
+    private final Locator LIFE_TIME_FILTER;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
         this.page = page;
@@ -33,10 +35,12 @@ public class Campaigns {
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
         this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
+        this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
     }
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String campaignDashboard() {
@@ -74,11 +78,17 @@ public class Campaigns {
     }
 
     public String campaignSuccess() {
-        return CAMPAIGN_SUCCESS.innerText();
+        String successMessage = CAMPAIGN_SUCCESS.innerText().trim();
+        waitUtility.waitUntilSpinnerHidden();
+        return successMessage;
     }
 
     public void navigateToCampaignListing() {
         CAMPAIGN_LISTING.click();
-        page.waitForLoadState();
+        waitUtility.waitForLocatorVisible(CAMPAIGN_LISTING);
+        if (LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
+            LIFE_TIME_FILTER.click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
     }
 }
