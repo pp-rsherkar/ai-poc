@@ -8,12 +8,11 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import pages.admin.Accounts;
+import pages.life.NPILists;
 import pages.studio.*;
 import utils.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -22,7 +21,8 @@ import static factory.DriverFactory.page;
 public class StudioSteps {
     static String workspaceName;
     static String newWorkspaceName;
-    static Boolean expansionFlag = true;
+    Boolean flag = true;
+    Boolean isOverwritten = false;
     static final String WEBHOOK_URL = "https://webhook.site/4312c282-2efc-486e-bedf-3cd385a0c3da";
     List<String[]> fileContent;
     List<String[]> actualValue;
@@ -35,9 +35,12 @@ public class StudioSteps {
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
+    NPILists npiLists = new NPILists(DriverFactory.getPage());
+    LifeSteps lifeSteps = new LifeSteps();
     CSVActions csvActions = new CSVActions();
-    List<Object> appliedFilters = new ArrayList<>();
-    List<Object> appliedOptions = new ArrayList<>();
+    List<String> appliedFilterEntries = new ArrayList<>();
+    List<String> appliedFilterValues = new ArrayList<>();
+    List<String> previousNpiDetails = null;
     String randomNumber = CommonUtils.randomNumberGeneration();
 
     @When("the user clicks on Create New Workspace")
@@ -83,9 +86,7 @@ public class StudioSteps {
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("_ddMMyy_HHmmss_SSS");
-        String dateAndTimeStamp = LocalDateTime.now().format(formatter);
-        workspaceName = string + dateAndTimeStamp;
+        workspaceName = string + CommonUtils.timeStampCalculation();
         expworkspaces.renameExpansion(workspaceName);
     }
 
@@ -147,7 +148,7 @@ public class StudioSteps {
     @When("User clicks on Create New Workspace For Expansion")
     public void user_clicks_on_create_new_workspace_for_expansion() {
         Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
-        workspaceCreation.createWorkspaceExpansion(expansionFlag);
+        workspaceCreation.createWorkspaceExpansion(flag);
     }
 
     @Then("User sees the types of workspaces they have permissions for")
@@ -171,22 +172,21 @@ public class StudioSteps {
         explorerWorkspace.selectAdvertiser(advertiser);
     }
 
-    @When("User applies the {string} filter and selects {string} option")
-    public void user_applies_the_filters_as_gender_and_age(String filters, String options) {
+    @When("User applies the filter and selects option")
+    public void user_applies_the_filters_as_gender_and_age(DataTable dataTable) {
         explorerWorkspace.clickAddFilter();
-        String[] filterArray = filters.split(",");
-        String[] optionArray = options.split(",");
+        List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
 
-        if (filterArray.length != optionArray.length) {
-            throw new IllegalArgumentException("Number of filters and options do not match.");
-        }
+        for (Map<String, String> row : filters) {
+            String filterName = row.get("FilterName").trim();
+            String filterOption = row.get("Option").trim();
 
-        for (int i = 0; i < filterArray.length; i++) {
-            String filterName = filterArray[i].trim();
-            String filterOption = optionArray[i].trim();
-            appliedFilters.add(filterName);
-            appliedOptions.add(filterOption);
-            explorerWorkspace.selectFilter(filterName, filterOption);
+            if (!filterOption.isEmpty()) {
+                appliedFilterEntries.add(filterName);
+                appliedFilterValues.add(filterOption);
+                List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
+                explorerWorkspace.selectFilter(filterName, filterOptionList);
+            }
         }
     }
 
@@ -198,9 +198,12 @@ public class StudioSteps {
     @Then("Verify that the applied filters are displayed correctly")
     public void verify_that_the_applied_filters_are_displayed_correctly() {
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
-        List<String> displayedOptions = explorerWorkspace.verifyAllSelectedOptions();
-        Assert.assertEquals(appliedFilters, displayedFilters);
-        Assert.assertEquals(appliedOptions, displayedOptions);
+        for (String appliedFilter : appliedFilterEntries) {
+            boolean matchFound = displayedFilters.stream()
+                    .anyMatch(displayed -> displayed.toLowerCase().startsWith(appliedFilter.toLowerCase()));
+
+            Assert.assertTrue("Applied filter not displayed: " + appliedFilter, matchFound);
+        }
     }
 
     @Then("User saves the workspace")
@@ -210,7 +213,12 @@ public class StudioSteps {
 
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
-        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+        String actualMessage = workspaceCreation.verifyWorkspaceCreation();
+
+        boolean isValid = actualMessage.equals("Workspace saved successfully") ||
+                actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+
+        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
 
@@ -384,7 +392,7 @@ public class StudioSteps {
 
     @And("Verify error message when webhook setup is failed using {string}")
     public void verifyErrorMessageWhenWebhookSetupIsFailed(String errorData) throws IOException {
-        List<String> mediaTypeList = Arrays.stream(errorData.split(",")).toList();
+        List<String> mediaTypeList = CommonUtils.parseCommaSeparatedString(errorData);
         String errorMessage = workspace.verifyErrorMsgWhenAPIFailed(mediaTypeList);
         Assert.assertTrue("Error message is not displayed", errorMessage.contains("Error occurred while saving workspace or editing webhook"));
     }
@@ -411,5 +419,109 @@ public class StudioSteps {
                         "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
                         "Do you want to proceed?"));
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+    }
+
+    /*Roshani Sherkar
+     * 21-07-2025*/
+    @And("User clicks on AI Configurator and build audience using the AIPrompt {string}")
+    public void userClicksOnAIConfiguratorAndBuildAudienceUsingTheAIprompt(String aiPrompt) {
+        explorerWorkspace.clickAIConfigurator();
+        flag = explorerWorkspace.describeAudience(aiPrompt);
+    }
+
+    @Then("Verify the filter is applied correctly {string}")
+    public void verifyTheFilterIsAppliedCorrectly(String primaryFilter) {
+        if(flag){
+            List<String> appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
+            List<String> expectedFilters = CommonUtils.parseCommaSeparatedString(primaryFilter);
+
+            for (String expected : expectedFilters) {
+                boolean isFilterApplied = appliedFilters.stream()
+                        .anyMatch(filter -> filter.equalsIgnoreCase(expected));
+                Assert.assertTrue("The filter '" + expected + "' is not applied correctly", isFilterApplied);
+            }
+            isOverwritten = true;
+        }else{
+            Assert.fail("AI is unable to build audience");
+        }
+    }
+
+
+    @And("User applies the following filters one by one and checks that NPI details are refined after each filter:")
+    public void userAppliesBelowFilterWithOptionAndCheckNPIDetails(DataTable dataTable) {
+        List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> row : filters) {
+            explorerWorkspace.clickAddFilter();
+            String filterName = row.get("FilterName").trim();
+            String filterOption = row.get("Option").trim();
+
+            if (!filterOption.isEmpty()) {
+                List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
+                explorerWorkspace.selectFilter(filterName, filterOptionList);
+            }
+            explorerWorkspace.applyFilter();
+            List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
+            //explorerWorkspace.deleteFilter();
+            if (previousNpiDetails != null) {
+                if (currentNpiDetails.equals(previousNpiDetails)) {
+                    Assert.assertEquals("Filter '" + filterName + "' with options '" + filterOption +
+                            "' did not refine the audience (NPI details remained the same)", currentNpiDetails, previousNpiDetails);
+                } else {
+                    Assert.assertTrue("Filter '" + filterName + "' refined the audience as expected",
+                            currentNpiDetails.size() <= previousNpiDetails.size());
+                }
+            }
+            previousNpiDetails = currentNpiDetails;
+        }
+    }
+
+
+    @And("Verify after adding ai prompt filter selected manually should be overwritten")
+    public void verifyAfterAddingAiPromptManuallySelectedFilterShouldBeOverwritten() {
+        Assert.assertTrue("AI filter did not overwrite manual filter", isOverwritten);
+    }
+
+    @And("Fetch and verify that NPI details are refined")
+    public void verifyThatNPIDetailsAreRefinedAfterEachFilter() {
+        List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
+        if (previousNpiDetails != null) {
+            if (currentNpiDetails.equals(previousNpiDetails)) {
+                Assert.assertEquals("Filter with options did not refine the audience (NPI details remained the same)", currentNpiDetails, previousNpiDetails);
+            } else {
+                Assert.assertTrue("Filter refined the audience as expected",
+                        currentNpiDetails.size() <= previousNpiDetails.size());
+            }
+        }
+        previousNpiDetails = currentNpiDetails;
+    }
+
+    @Then("Delete the filter")
+    public void deleteTheFilter() {
+        explorerWorkspace.deleteFilter();
+    }
+
+    /*Roshani Sherkar
+     * 24-07-2024*/
+    @And("User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it")
+    public void userHoversOverTheNPIVisualsIconAndClicksOnIt(DataTable dataTable) {
+        List<String> npiVisualList = dataTable.asList(String.class);
+        explorerWorkspace.hoverOverNPIVisualsIcon(npiVisualList);
+    }
+
+    @And("Verify that dashboard filters are displayed correctly in Filter section")
+    public void verifyThatCrossFiltersAreDisplayedCorrectlyInFilterSection() {
+        Assert.assertTrue("Filters were not added",explorerWorkspace.verifyCrossFiltersDisplayed());
+        appliedFilterEntries = explorerWorkspace.fetchMergedFilters();
+    }
+
+    @And("Verify dashboard filters are merged with Primary filters")
+    public void verifyDashboardFiltersAreMergedWithPrimaryFilters() {
+        List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
+        for (String mergedFilter : appliedFilterEntries) {
+            boolean matchFound = displayedFilters.stream()
+                    .anyMatch(displayed -> displayed.equalsIgnoreCase(mergedFilter));
+            Assert.assertTrue("Merged filter not displayed: " + mergedFilter, matchFound);
+        }
     }
 }

@@ -20,7 +20,10 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
     #2
     And Verify Webhook panel is disabled before applying filters
-    When User applies the "<FILTER>" filter and selects "<OPTION>" option
+    When User applies the filter and selects option
+      | FilterName | Option             |
+      | Site       | Associated Device  |
+      | Search     | Associated Network |
     And User clicks on Ok and closes the filter popup
     Then Verify Webhook panel is enabled after applying engagement filters
     #3
@@ -65,5 +68,5 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     When User tries to delete the workspace associated with active webhook from the workspace list
     Then Verify user receives a warning when attempting to delete a workspace with an active webhook
     Examples:
-      | ADVERTISER | FILTER       | OPTION                                | WORKSPACE_NAME | PARAM   | BODY             | CONTENT_TYPE | INVALID_WEBHOOK_DATA | ERROR_DATA                             |
-      | Abbvie     | Site, Search | Associated Device, Associated Network | Explorer       | Param 4 | WebhookData.json | JSON         | Test                 | https:www.google.com, WebhookData.json |
+      | ADVERTISER | WORKSPACE_NAME | PARAM   | BODY             | CONTENT_TYPE | INVALID_WEBHOOK_DATA | ERROR_DATA                             |
+      | Abbvie     | Explorer       | Param 4 | WebhookData.json | JSON         | Test                 | https:www.google.com, WebhookData.json |
