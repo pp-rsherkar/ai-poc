@@ -403,7 +403,7 @@ public class RunReportPanel {
         return " ";
     }
 
-    public String fetchDefaultReportFormat(String fileFormat) {
+    public String fetchDefaultReportFormat() {
         return REPORT_FORMAT_SELECTED_VALUE.innerText().trim();
     }
 
@@ -422,7 +422,7 @@ public class RunReportPanel {
     }
 
 
-    public boolean isTestQualifierCheckboxChecked() {
+    public boolean isTextQualifierCheckboxChecked() {
         return TEXT_QUALIFIER_CHECKBOX.getAttribute("class").contains("checked");
     }
 

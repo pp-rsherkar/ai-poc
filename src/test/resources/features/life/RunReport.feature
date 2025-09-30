@@ -78,7 +78,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify that user is able to select Timezone field value "<TIME_ZONE>"
     And Verify the default value of the Report Format field is "CSV"
     And Verify the availability of various options of the Report Format field - "<REPORT_FORMATS>"
-    And Verify by default the Test Qualifier checkbox is checked
+    And Verify by default the Text Qualifier checkbox is checked
     And User should be able to generate the report
     And Confirms that the report panel retains the entered data
     Examples:

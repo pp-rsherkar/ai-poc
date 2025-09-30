@@ -56,8 +56,8 @@ public class ScheduleReport {
     YearMonth currentMonth = YearMonth.now();
     int maxDay = currentMonth.lengthOfMonth();
     int today = LocalDate.now().getDayOfMonth();
-    int startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
-    int endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
+    int startDay;
+    int endDay;
 
     public ScheduleReport(Page page) {
         this.page = page;
@@ -128,11 +128,26 @@ public class ScheduleReport {
         return false;
     }
 
+    private void generateScheduleDaysIfNeeded() {
+        if (startDay != 0 && endDay != 0) {
+            return;
+        }
+        if (today >= maxDay - 1) {
+            startDay = maxDay - 1;
+            endDay = maxDay;
+        } else {
+            startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
+            endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
+        }
+    }
+
     public boolean selectScheduleStartDate() {
+        generateScheduleDaysIfNeeded();
         return selectDate(SCHEDULE_START_DATE, startDay);
     }
 
     public boolean selectScheduleEndDate() {
+        generateScheduleDaysIfNeeded();
         return selectDate(SCHEDULE_END_DATE, endDay);
     }
 

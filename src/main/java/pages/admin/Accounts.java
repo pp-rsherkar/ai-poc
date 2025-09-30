@@ -39,10 +39,10 @@ public class Accounts {
     private final Locator ADD_DESTINATION_BUTTON;
     private final Locator ENTER_DESTINATION_NAME;
     private final Locator DESTINATION_TYPE_DROPDOWN;
-    private final Locator ENTER_HOSTNAME;
-    private final Locator ENTER_USERNAME;
-    private final Locator ENTER_PASSWORD;
-    private final Locator ENTER_PORT;
+    private final Locator HOSTNAME;
+    private final Locator USERNAME;
+    private final Locator PASSWORD;
+    private final Locator PORT;
     private final Locator TEST_CONNECTION_LINK;
     private final Locator CONNECTION_CONFIRMATION_TEXT;
     private final Locator OK_BUTTON;
@@ -76,10 +76,10 @@ public class Accounts {
         this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']");
         this.ENTER_DESTINATION_NAME = page.locator("//input[@placeholder='Enter Destination Name']");
         this.DESTINATION_TYPE_DROPDOWN = page.locator("//label[text()='Destination Type']/following-sibling::select");
-        this.ENTER_HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
-        this.ENTER_USERNAME = page.locator("//input[@placeholder='Enter User Name']");
-        this.ENTER_PASSWORD = page.locator("//input[@placeholder='Enter Password']");
-        this.ENTER_PORT = page.locator("//input[@placeholder='Enter Port Number']");
+        this.HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
+        this.USERNAME = page.locator("//input[@placeholder='Enter User Name']");
+        this.PASSWORD = page.locator("//input[@placeholder='Enter Password']");
+        this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
@@ -188,19 +188,19 @@ public class Accounts {
     }
 
     public void enterHostName(String hostName) {
-        ENTER_HOSTNAME.last().fill(hostName);
+        HOSTNAME.last().fill(hostName);
     }
 
     public void enterPortName(String port) {
-        ENTER_PORT.last().fill(port);
+        PORT.last().fill(port);
     }
 
     public void enterUserName(String demoUser) {
-        ENTER_USERNAME.last().fill(demoUser);
+        USERNAME.last().fill(demoUser);
     }
 
     public void enterPassword(String demoPassword) {
-        ENTER_PASSWORD.last().fill(demoPassword);
+        PASSWORD.last().fill(demoPassword);
     }
 
     public void clickTestConnection() {

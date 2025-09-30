@@ -2239,7 +2239,7 @@ public class LifeSteps {
 
     @And("Verify the default value of the Report Format field is {string}")
     public void verifyTheDefaultValueOfTheTheReportFormatFieldIsCSV(String fileFormat) {
-        Assert.assertEquals(fileFormat, runReportPanel.fetchDefaultReportFormat(fileFormat));
+        Assert.assertEquals(fileFormat, runReportPanel.fetchDefaultReportFormat());
     }
 
     @And("Verify the availability of various options of the Report Format field - {string}")
@@ -2251,9 +2251,9 @@ public class LifeSteps {
         }
     }
 
-    @And("Verify by default the Test Qualifier checkbox is checked")
-    public void verifyByDefaultTheTestQualifierCheckboxIsChecked() {
-        Assert.assertTrue("Test Qualifier is not checked by default", runReportPanel.isTestQualifierCheckboxChecked());
+    @And("Verify by default the Text Qualifier checkbox is checked")
+    public void verifyByDefaultTheTextQualifierCheckboxIsChecked() {
+        Assert.assertTrue("Text Qualifier is not checked by default", runReportPanel.isTextQualifierCheckboxChecked());
     }
 
     @And("Verify that {string} and {string} options are disabled until a Line Item is selected")
@@ -2450,7 +2450,7 @@ public class LifeSteps {
         Assert.assertTrue("Deliver To Users field is not available", scheduleReport.isDeliveryToUserAvailable());
     }
 
-    @And("User should able to specify multiple users in Deliver to Users field")
+    @And("User should be able to specify multiple users in Deliver to Users field")
     public void userShouldAbleToSpecifyMultipleUsersInDeliverToUsersField(DataTable dataTable) {
         List<String> userLists = dataTable.asList(String.class);
         scheduleReport.selectUsersForDelivery(userLists);

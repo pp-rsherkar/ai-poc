@@ -48,7 +48,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
   Scenario:Verify fields under Email tab in Schedule Report's Delivery Method section
     When User clicks on "Email" tab as Delivery Method
     Then Verify Deliver to Users field is available
-    And User should able to specify multiple users in Deliver to Users field
+    And User should be able to specify multiple users in Deliver to Users field
       | pbalu   |
       | pjadhav |
     And Verify that Add Emails link is available below Deliver to Users
