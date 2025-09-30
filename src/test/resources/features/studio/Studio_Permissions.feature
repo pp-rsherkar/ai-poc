@@ -1,9 +1,9 @@
-Feature: Enable Studio for an account
+Feature: Enable Studio permissions for an account,advertiser and external users
 
-  This Feature verifies the ability to enable Studio permissions for an account and external users.
-  It includes scenarios for both internal users and external users, ensuring that the Studio permissions can be granted and verified correctly.
-  It covers logging in, navigating through accounts, advertisers, and users, enabling permissions, and confirming that the external user can see the assigned Studio permissions in the workspace after logging in.
-  Multiple permission types and advertisers are validated using example data.
+  1. This Feature verifies the ability to enable Studio permissions for an account and external users.
+  2. It includes scenarios for both internal users and external users, ensuring that the Studio permissions can be granted and verified correctly.
+  3. It covers logging in, navigating through accounts, advertisers, and users, enabling permissions, and confirming that the external user can see the assigned Studio permissions in the workspace after logging in.
+  4. Multiple permission types and advertisers are validated using example data.
 
   @regression
   Scenario Outline: Enable Studio for an Account for internal users
