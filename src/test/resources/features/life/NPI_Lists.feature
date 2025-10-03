@@ -38,7 +38,6 @@ Feature: LIFE Regression - Create NPI List of following types:
       | LIST_NAME  | ADVERTISER     | FILE_NAME          |
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |
 
-
   @regression
   Scenario Outline: Create Smart NPI List by specifying Type.
     And User selects Smart List to create NPI list
@@ -67,7 +66,6 @@ Feature: LIFE Regression - Create NPI List of following types:
       | ATTRIBUTE | 01- Advertiser | NPI_AttributeListCSV.csv  | NPI         |
       | ATTRIBUTE | 01- Advertiser | NPI_AttributeListText.txt | NPI         |
 
-
   @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using API
     And User selects the Auto-Imported List
@@ -91,7 +89,6 @@ Feature: LIFE Regression - Create NPI List of following types:
       | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
       | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | Plain List           | NPI             | Add new NPIs   |
       | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
-
 
   @regression
   Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using Reload Now button

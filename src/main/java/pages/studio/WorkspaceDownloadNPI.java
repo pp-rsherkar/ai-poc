@@ -7,6 +7,7 @@ import com.microsoft.playwright.options.AriaRole;
 
 public class WorkspaceDownloadNPI {
     private final Page page;
+    private final FrameLocator WORKSPACE_FRAME;
     private final Locator searchWorkspace;
     private final Locator clickWorkspace;
     private final Locator clickDownloadbutton;
@@ -18,9 +19,10 @@ public class WorkspaceDownloadNPI {
 
     public WorkspaceDownloadNPI(Page page) {
         this.page = page;
+        this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.searchWorkspace = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
         this.clickWorkspace = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("PB_Test_Verify1");
-        this.clickDownloadbutton = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator(".styles__StyledScheduleStatus-sc-u6f0o3-5 > svg").first();
+        this.clickDownloadbutton = WORKSPACE_FRAME.locator("//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button").first();
         this.clickNpiListDownload = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Download NPIs"));
         this.clickCSV = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("CSV");
         this.clickXLSX = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("XLSX"));

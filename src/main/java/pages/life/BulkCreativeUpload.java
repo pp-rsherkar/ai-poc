@@ -6,11 +6,13 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BulkCreativeUpload {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator BULK_UPLOAD_BUTTON;
     private final Locator BULK_UPLOAD_CREATIVE_HEADER;
@@ -54,6 +56,7 @@ public class BulkCreativeUpload {
     private final Locator INLINE_VALIDATION_MESSAGE;
     private final Locator WIDTH_BOX;
     private final Locator HEIGHT_BOX;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public BulkCreativeUpload(Page page) {
         this.page = page;
@@ -67,11 +70,7 @@ public class BulkCreativeUpload {
         this.APPROVAL_STATUS_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
         this.PREVIEW_BUTTON = page.locator("//button[contains(text(),'Preview')]");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
-        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or " +
-                "contains(@aria-label,'Select Advertiser') or " +
-                "contains(@aria-label,'Landing Page Domain is required') or " +
-                "contains(@aria-label, 'Landing Page Domain is not valid.') or " +
-                "contains(@aria-label,'1 error')]");
+        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or " + "contains(@aria-label,'Select Advertiser') or " + "contains(@aria-label,'Landing Page Domain is required') or " + "contains(@aria-label, 'Landing Page Domain is not valid.') or " + "contains(@aria-label,'1 error')]");
         this.SUCCESS_ALERT = page.locator("//div[contains(text(),'BulkUpload created successfully.')]");
         this.BULK_UPLOAD_HEADER = page.locator("//div[contains(text(),'Bulk Upload')]");
         this.CREATIVE_NAME_FROM_TABLE = page.locator("//tbody//span/input");
@@ -133,7 +132,6 @@ public class BulkCreativeUpload {
             return "Missing creative type options: " + String.join(", ", missingOptions);
         }
     }
-
 
     public boolean checkDefaultCreativeType(String defaultOption) {
         for (int i = 0; i < CREATIVE_TYPE_BUTTON.count(); i++) {
@@ -222,14 +220,13 @@ public class BulkCreativeUpload {
     }
 
     public void clickBlankTemplateDownloadButton() {
-        DOWNLOAD_BLANK_TEMPLATE.isVisible();
+        DOWNLOAD_BLANK_TEMPLATE.click();
     }
 
     public boolean isBrowseFileButtonVisible(String field) {
         if (field.contains("Upload Images to Get Template With URLs"))
             return IMAGE_FILE_BROWSE_BUTTON.first().isVisible();
-        else if (field.contains("Spreadsheet"))
-            return TEMPLATE_BROWSE_BUTTON.isVisible();
+        else if (field.contains("Spreadsheet")) return TEMPLATE_BROWSE_BUTTON.isVisible();
         return false;
     }
 
@@ -374,10 +371,7 @@ public class BulkCreativeUpload {
 
     public boolean isWidthHeightVisibleAndBlank() {
         for (int i = 0; i < WIDTH_BOX.count(); i++) {
-            if (!WIDTH_BOX.nth(i).isVisible() ||
-                    !HEIGHT_BOX.nth(i).isVisible() ||
-                    !WIDTH_BOX.nth(i).inputValue().trim().isEmpty() ||
-                    !HEIGHT_BOX.nth(i).inputValue().trim().isEmpty()) {
+            if (!WIDTH_BOX.nth(i).isVisible() || !HEIGHT_BOX.nth(i).isVisible() || !WIDTH_BOX.nth(i).inputValue().trim().isEmpty() || !HEIGHT_BOX.nth(i).inputValue().trim().isEmpty()) {
                 return false;
             }
         }
@@ -408,25 +402,20 @@ public class BulkCreativeUpload {
         switch (type) {
             case "Display", "Native":
                 uploadDisplayCreativeTemplate(attributeMap.get("FileName"));
-                if(LANDING_PAGE_DOMAIN.isVisible())
-                    enterLandingPageDomain(attributeMap.get("LandingDomain"));
-                if(IAB_CATEGORY_DROPDOWN.isVisible())
-                    typeIABCategory(attributeMap.get("IAB"));
+                if (LANDING_PAGE_DOMAIN.isVisible()) enterLandingPageDomain(attributeMap.get("LandingDomain"));
+                if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 clickPreviewButton();
                 updateCreativeName(updatedCreativeName);
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
-                if(CLICKTHROUGH_URL.isVisible())
-                    enterClickthroughURL(attributeMap.get("ClickThroughURL"));
+                if (CLICKTHROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);
-                if(type.contains("Video"))
-                    enterWidthHeight(attributeMap.get("Size"));
+                if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
                 break;
         }
     }
 }
-

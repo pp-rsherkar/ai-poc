@@ -2,12 +2,10 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
 public class Pixels {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator PIXELS_MENU_ITEM;
     private final Locator ADD_PIXEL_BUTTON;
@@ -18,6 +16,7 @@ public class Pixels {
     private final Locator SEARCH_BOX;
     private final Locator SAVE_BUTTON;
     private final Locator SAVE_SUCCESS;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Pixels(Page page) {
         this.page = page;
@@ -75,8 +74,8 @@ public class Pixels {
     }
 
     public String verifySaveSuccess() {
-        String successMessage = SAVE_SUCCESS.innerText();
-        waitUtility.waitForLocatorDetached(SAVE_SUCCESS);
+        String successMessage = SAVE_SUCCESS.first().innerText();
+        waitUtility.waitForLocatorDetached(SAVE_SUCCESS.first());
         return successMessage;
     }
 

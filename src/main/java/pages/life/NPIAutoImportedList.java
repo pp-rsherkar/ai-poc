@@ -18,9 +18,6 @@ import java.util.HashMap;
 
 public class NPIAutoImportedList {
 
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    ApiActions apiActions = new ApiActions();
-
     private final Page page;
     private final Locator SETUP_IMPORTBUTTON;
     private final Locator ERROR_MESSAGE;
@@ -39,7 +36,8 @@ public class NPIAutoImportedList {
     private final Locator IMPORT_SETTING_BUTTON;
     private final Locator NPI_LIST_TEXTAREA;
     private final Locator NPI_ATTRIBUTE_GRIDVIEW;
-
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    ApiActions apiActions = new ApiActions();
 
     public NPIAutoImportedList(Page page) {
         this.page = page;
@@ -61,7 +59,6 @@ public class NPIAutoImportedList {
         this.NPI_LIST_TEXTAREA = page.locator("//textarea[@name='npilist']");
         this.NPI_ATTRIBUTE_GRIDVIEW = page.locator("//div[contains(@class,'npiattrsGridView')]");
     }
-
 
     public String verifyIfAutoImportPage() {
         SETUP_IMPORTBUTTON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -98,15 +95,13 @@ public class NPIAutoImportedList {
 
     public void enterColumnName(String npiColumn, String columnName) {
         Locator locator = page.locator(String.format("//div[@class='selection' and contains(text(),'%s')]/parent::div", npiColumn));
-        if (!locator.getAttribute("class").contains("active"))
-            locator.click();
+        if (!locator.getAttribute("class").contains("active")) locator.click();
         NPI_COLUMN.fill(columnName);
     }
 
     public void selectImportType(String importType) {
         Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", importType));
-        if (!locator.getAttribute("class").contains("mat-radio-checked"))
-            locator.click();
+        if (!locator.getAttribute("class").contains("mat-radio-checked")) locator.click();
     }
 
     public void clickCheckFile() {
@@ -157,10 +152,7 @@ public class NPIAutoImportedList {
     }
 
     public String fetchToken(String backgroundUrl) {
-        Request matchedRequest = page.waitForRequest(
-                request -> request.url().contains(backgroundUrl),
-                page::reload
-        );
+        Request matchedRequest = page.waitForRequest(request -> request.url().contains(backgroundUrl), page::reload);
         return matchedRequest.headers().get("token");
     }
 
@@ -170,5 +162,4 @@ public class NPIAutoImportedList {
         waitUtility.waitForLocatorVisible(TOTAL_NPI_COUNT);
         return NPI_ATTRIBUTE_GRIDVIEW.isVisible() || NPI_LIST_TEXTAREA.isVisible();
     }
-
 }

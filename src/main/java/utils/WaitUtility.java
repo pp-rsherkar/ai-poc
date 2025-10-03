@@ -12,7 +12,7 @@ public class WaitUtility {
     public WaitUtility(Page page) {
         this.page = page;
         this.SPINNER = page.locator("//div[contains(text(),'Loading...')]");
-        this.PRE_LOADER = page.locator("//div[@class='preloader']");
+        this.PRE_LOADER = page.locator("//div[contains(@class,'preloader')]");
     }
 
     public void waitUntilSpinnerHidden(){
@@ -57,5 +57,9 @@ public class WaitUtility {
 
     public void waitForElementHidden(String xpath) {
         page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
+    public void waitForElementDetached(String xpath){
+        page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.DETACHED));
     }
 }

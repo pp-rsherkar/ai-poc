@@ -6,11 +6,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.Navigation;
-import pages.hcp365.SmartActions;
+import pages.hcp.SmartActions;
 import utils.CommonUtils;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class HcpSteps {
 

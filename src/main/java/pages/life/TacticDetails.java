@@ -8,20 +8,9 @@ import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.*;
 
 public class TacticDetails {
-    Campaigns campaigns = new Campaigns(DriverFactory.getPage());
-    LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
-    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
-    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
-    Navigation navigation = new Navigation(DriverFactory.getPage());
-    TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
-    TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -41,6 +30,14 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
+    Campaigns campaigns = new Campaigns(DriverFactory.getPage());
+    LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
+    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
+    TargetingTemplate targetingTemplate = new TargetingTemplate(DriverFactory.getPage());
+    Navigation navigation = new Navigation(DriverFactory.getPage());
+    TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
+    TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public TacticDetails(Page page) {
         this.page = page;
@@ -84,7 +81,7 @@ public class TacticDetails {
 
     public boolean createTacticWithLineItemsAndImport(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, List<String> templateNameList, List<Map<String, String>> ruleCountAndValueList) {
         List<Map<String, String>> labelCountMapList = new ArrayList<>();
-        for(String lineItemType : lineItemTypeList) {
+        for (String lineItemType : lineItemTypeList) {
             navigation.clickSubMenu();
             navigation.clickCampaigns();
             campaigns.campaignDashboard();
@@ -149,15 +146,14 @@ public class TacticDetails {
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
         Map<String, String> labelCountMap = new LinkedHashMap<>();
-        for(String templateName : templateNameList){
+        for (String templateName : templateNameList) {
             if (templateName.startsWith(lineItemType.trim() + "_")) {
                 IMPORT_TEMPLATE_ICON.click();
                 IMPORT_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                 TEMPLATE_SEARCH_BOX.fill(templateName);
                 page.locator(String.format("//div[contains(@class,'item text-truncate') and contains(text(), '%s')]", templateName)).click();
                 IMPORT_BUTTON.click();
-                if(OVERRIDE_DIALOG.isVisible())
-                    REPLACE_BUTTON.click();
+                if (OVERRIDE_DIALOG.isVisible()) REPLACE_BUTTON.click();
                 waitUtility.waitUntilSpinnerHidden();
                 TEMPLATE_IMPORT_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
                 labelCountMap = targetingTemplate.fetchTargetingRulesCountFromTargeting();
@@ -182,19 +178,18 @@ public class TacticDetails {
     }
 
     public boolean createTacticWithLineItemsAndAssignCreative(String lineItemType, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, String CreativeName) {
-            npiSmartList.clickPulsepointIcon();
-            campaigns.campaignDashboard();
+        npiSmartList.clickPulsepointIcon();
+        campaigns.campaignDashboard();
 
-            createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
-            createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
-            createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
+        createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
+        createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
+        createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
 
-            tacticCreatives.clickCreativeTab();
-            tacticCreatives.clickAssignCreatives();
-            tacticCreatives.assignCreatives(CreativeName);
-            saveTacticDetails();
-            waitUtility.waitUntilSpinnerHidden();
-            return tacticCreatives.verifyCreativeAssigned(CreativeName);
+        tacticCreatives.clickCreativeTab();
+        tacticCreatives.clickAssignCreatives();
+        tacticCreatives.assignCreatives(CreativeName);
+        saveTacticDetails();
+        waitUtility.waitUntilSpinnerHidden();
+        return tacticCreatives.verifyCreativeAssigned(CreativeName);
     }
-
 }

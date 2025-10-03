@@ -11,6 +11,6 @@ Feature: Studio Publish NPI List
     And User select the system to publish the list
     Then Verify list is published
     Examples:
-      | WORKSPACE       | LIST_TYPE |
-      | PB_Test_Verify1 | Static    |
-      | PB_Test_Check_3 | Live      |
+      | WORKSPACE           | LIST_TYPE |
+      | Explorer_c7b72c12-8 | Static    |
+      | Explorer_eb41551a-c | Live      |

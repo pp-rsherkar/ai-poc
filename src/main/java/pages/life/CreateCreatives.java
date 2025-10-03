@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateCreatives {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    List<String> creativesList = new ArrayList<>();
-    String imageTextLocator = "//span[contains(text(),'%s')]";
     private final Page page;
     private final Locator CREATIVE_PAGE_TITLE;
     private final Locator UNARCHIVED_BUTTON;
@@ -65,8 +62,11 @@ public class CreateCreatives {
     private final Locator SPONSORED_BY;
     private final Locator PRODUCT_DESCRIPTION;
     private final Locator CREATIVE_NAME_TEXT;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    List<String> creativesList = new ArrayList<>();
+    String imageTextLocator = "//span[contains(text(),'%s')]";
 
-    public CreateCreatives(Page page){
+    public CreateCreatives(Page page) {
         this.page = page;
         this.CREATIVE_PAGE_TITLE = page.locator("//div[contains(text(),'Creatives')]");
         this.UNARCHIVED_BUTTON = page.locator("//img[@title='unarchive']");
@@ -100,8 +100,8 @@ public class CreateCreatives {
         this.CREATIVE_TYPE = page.locator("//app-creativetype/div//following-sibling::div");
         this.CREATIVE_HTMLCODE = page.locator("//textarea[contains(@formcontrolname,'htmlCode')]");
         this.MACROS_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'multi_click_macros_check ')]");
-        this.CREATIVE_AD_SIZE = page.locator("//div[contains(text(),'Select Ad Size')]");
-        this.CREATIVE_AD_SIZE_VALUE = page.locator("//div[contains(text(),'Select Ad Size')]/following-sibling::div/div");
+        this.CREATIVE_AD_SIZE = page.locator("//app-single-select-dropdown//input[contains(@placeholder,'Select Ad Size')]");
+        this.CREATIVE_AD_SIZE_VALUE = page.locator("//input[contains(@placeholder,'Select Ad Size')]/following-sibling::div/div");
         this.DOMAIN_LANDING = page.locator("//input[contains(@formcontrolname,'landingDomain')]");
         this.CLICKTHROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
         this.DURATION = page.locator("//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");
@@ -119,13 +119,12 @@ public class CreateCreatives {
         this.CREATIVE_NAME_TEXT = page.locator("//div[contains(@role,'alert')]");
     }
 
-
     public String verifyCreativeLibraryPageTitle() {
         waitUtility.waitUntilPreLoaderHidden();
         return CREATIVE_PAGE_TITLE.innerText().trim();
     }
 
-    public void clickActivityButton(String buttonType){
+    public void clickActivityButton(String buttonType) {
         Locator button = page.locator(String.format("//div[contains(text(), '%s')]/parent::button", buttonType));
         String classAttr = button.getAttribute("class");
         if (classAttr == null || !classAttr.contains("active")) {
@@ -142,11 +141,10 @@ public class CreateCreatives {
 
     public boolean verifyArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
-        if(buttonType.contains("Active") && ARCHIVED_BUTTON.first().isVisible()){
+        if (buttonType.contains("Active") && ARCHIVED_BUTTON.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
-        }
-        else if(buttonType.contains("Archived") && UNARCHIVED_BUTTON.first().isVisible()){
+        } else if (buttonType.contains("Archived") && UNARCHIVED_BUTTON.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         }
@@ -155,14 +153,12 @@ public class CreateCreatives {
 
     public boolean clickArchiveUnarchiveButtons() {
         boolean flag = false;
-        if(ARCHIVED_BUTTON.first().isVisible()){
+        if (ARCHIVED_BUTTON.first().isVisible()) {
             ARCHIVED_BUTTON.first().click();
-            if(ARCHIVE_DIALOG.isVisible())
-                ARCHIVE_BUTTON.click();
+            if (ARCHIVE_DIALOG.isVisible()) ARCHIVE_BUTTON.click();
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
-        }
-        else if(UNARCHIVED_BUTTON.first().isVisible()){
+        } else if (UNARCHIVED_BUTTON.first().isVisible()) {
             UNARCHIVED_BUTTON.first().click();
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
@@ -170,26 +166,25 @@ public class CreateCreatives {
         return flag;
     }
 
-
     public boolean verifyFilterOptions(String key, List<String> values) {
         boolean flag = false;
         switch (key) {
             case "Advertiser":
                 selectDropdownAndFill(SELECT_ADVERTISER, values);
                 for (String value : values) {
-                   flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
+                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
                 }
                 clickClearAllButton();
                 break;
             case "Associated Campaigns":
                 selectDropdownAndFill(SELECT_CAMPAIGN, values);
-                for(String value : values) {
+                for (String value : values) {
                     flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
                 }
                 clickClearAllButton();
                 break;
             case "Approval Status":
-                selectDropdownAndFill(APPROVAL_STATUS,values);
+                selectDropdownAndFill(APPROVAL_STATUS, values);
                 for (String value : values) {
                     flag = page.locator(String.format("//span[contains(text(),'%s')]", value)).first().isVisible();
                 }
@@ -218,7 +213,6 @@ public class CreateCreatives {
         return flag;
     }
 
-
     private void selectDropdownAndFill(Locator dropdown, List<String> values) {
         dropdown.click();
         for (String value : values) {
@@ -238,8 +232,7 @@ public class CreateCreatives {
             String direction = options[1].equalsIgnoreCase("Asc") ? "up" : "down";
             page.locator(String.format("//span[contains(text(),'%s')]/following-sibling::i[contains(@class,'%s')]", options[0], direction)).click();
             waitUtility.waitUntilPreLoaderHidden();
-            if ((direction.equals("up") && SORT_BY_UP.isVisible()) ||
-                    (direction.equals("down") && SORT_BY_DOWN.isVisible())) {
+            if ((direction.equals("up") && SORT_BY_UP.isVisible()) || (direction.equals("down") && SORT_BY_DOWN.isVisible())) {
                 flag = true;
             }
         }
@@ -248,19 +241,18 @@ public class CreateCreatives {
 
     public boolean searchByValues(List<String> searchValuesList) {
         boolean flag = false;
-        for(String searchValue : searchValuesList) {
-           searchCreative(searchValue);
+        for (String searchValue : searchValuesList) {
+            searchCreative(searchValue);
             flag = DATA_CONTENT_PANEL.first().isVisible();
         }
         return flag;
     }
 
-    public void searchCreative(String searchValue){
+    public void searchCreative(String searchValue) {
         SEARCH_BOX.fill(searchValue);
         page.keyboard().press("Enter");
         waitUtility.waitUntilPreLoaderHidden();
     }
-
 
     public String copyCreative() {
         COPY_ICON.first().click();
@@ -285,8 +277,8 @@ public class CreateCreatives {
     }
 
     public void selectCreativeType(String creativeType) {
-        for(int i=0; i<CREATIVE_TYPE.count(); i++) {
-            if(CREATIVE_TYPE.nth(i).innerText().trim().equalsIgnoreCase(creativeType)) {
+        for (int i = 0; i < CREATIVE_TYPE.count(); i++) {
+            if (CREATIVE_TYPE.nth(i).innerText().trim().equalsIgnoreCase(creativeType)) {
                 CREATIVE_TYPE.nth(i).click();
                 break;
             }
@@ -296,14 +288,13 @@ public class CreateCreatives {
     public void fillAttributes(String type, Map<String, String> attributeMap) {
         switch (type) {
             case "Html", "Html5", "Image":
-                page.locator(String.format("//button[text()='%s']",type)).click();
-                if(type.equals("Html5")){
+                page.locator(String.format("//button[text()='%s']", type)).click();
+                if (type.equals("Html5")) {
                     CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ArchiveFile"));
                 }
-                if (type.contains("Image")){
+                if (type.contains("Image")) {
                     CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ImageFile"));
-                }
-                else{
+                } else {
                     CREATIVE_HTMLCODE.fill(attributeMap.get("HTMLCode"));
                     MACROS_CHECKBOX.click();
                 }
@@ -316,16 +307,14 @@ public class CreateCreatives {
                 break;
 
             case "Upload", "Audio URL", "VAST URL", "VAST XML", "Video URL":
-                page.locator(String.format("//button[text()='%s']",type)).click();
-                if(type.contains("Upload"))
+                page.locator(String.format("//button[text()='%s']", type)).click();
+                if (type.contains("Upload"))
                     CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("FileName"));
-                else if(type.contains("Audio URL") || type.contains("Video URL"))
-                    URL.fill(attributeMap.get("URL"));
-                else if(type.contains("VAST URL"))
-                    URL.fill(attributeMap.get("VASTURL"));
+                else if (type.contains("Audio URL") || type.contains("Video URL")) URL.fill(attributeMap.get("URL"));
+                else if (type.contains("VAST URL")) URL.fill(attributeMap.get("VASTURL"));
                 else VAST_XML_TEXTAREA.fill(attributeMap.get("VASTXML"));
                 DURATION.fill(attributeMap.get("Durations"));
-                if(WIDTH.isVisible() && HEIGHT.isVisible() && CLICKTHROUGH_URL.isVisible()) {
+                if (WIDTH.isVisible() && HEIGHT.isVisible() && CLICKTHROUGH_URL.isVisible()) {
                     WIDTH.fill(attributeMap.get("Width"));
                     HEIGHT.fill(attributeMap.get("Height"));
                     CLICKTHROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
@@ -333,14 +322,10 @@ public class CreateCreatives {
                 DOMAIN_LANDING.fill(attributeMap.get("AdvertiserDomain"));
                 IAB_CATEGORY.fill(attributeMap.get("IAB"));
                 IAB_CATEGORY_VALUE.first().click();
-                if(HEADLINE.isVisible())
-                    HEADLINE.fill(attributeMap.get("Headline"));
-                if(SPONSORED_BY.isVisible())
-                    SPONSORED_BY.fill(attributeMap.get("SponsoredBy"));
-                if(PRODUCT_DESCRIPTION.isVisible())
-                    PRODUCT_DESCRIPTION.fill(attributeMap.get("Description"));
-                if(DISPLAY_URL.isVisible())
-                    DISPLAY_URL.fill(attributeMap.get("DisplayURL"));
+                if (HEADLINE.isVisible()) HEADLINE.fill(attributeMap.get("Headline"));
+                if (SPONSORED_BY.isVisible()) SPONSORED_BY.fill(attributeMap.get("SponsoredBy"));
+                if (PRODUCT_DESCRIPTION.isVisible()) PRODUCT_DESCRIPTION.fill(attributeMap.get("Description"));
+                if (DISPLAY_URL.isVisible()) DISPLAY_URL.fill(attributeMap.get("DisplayURL"));
                 break;
 
             case "Search":
@@ -367,13 +352,12 @@ public class CreateCreatives {
         }
     }
 
-
     public String saveCreative() {
         OK_BUTTON.click();
         return SUCCESS_ALERT.innerText().trim();
     }
 
-    public List<String> fetchCreatives(){
+    public List<String> fetchCreatives() {
         String creativeName = CREATIVE_NAME_TEXT.innerText().replaceAll("\\b(Creative|created)\\b\\p{Punct}?", "").trim().replaceAll(" +", " ");
         creativesList.add(creativeName);
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);

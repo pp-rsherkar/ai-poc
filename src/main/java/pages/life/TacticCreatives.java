@@ -2,12 +2,12 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
 public class TacticCreatives {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator VERIFY_TACTIC_CREATIVES_PAGE;
     private final Locator SEARCH_CREATIVE;
@@ -22,6 +22,7 @@ public class TacticCreatives {
     private final Locator ASSIGN_CREATIVE_TITLE;
     private final Locator CREATIVE_TAB;
     private final Locator ASSIGN_EXISTING_CREATIVE;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public TacticCreatives(Page page) {
         this.page = page;
@@ -74,13 +75,16 @@ public class TacticCreatives {
         NAVIGATE_TO_CAMPAIGN_DASHBOARD.click();
     }
 
-    public void clickCreativeTab() { CREATIVE_TAB.click(); }
+    public void clickCreativeTab() {
+        CREATIVE_TAB.click();
+    }
 
-    public void clickAssignCreatives() { ASSIGN_EXISTING_CREATIVE.click(); }
+    public void clickAssignCreatives() {
+        ASSIGN_EXISTING_CREATIVE.click();
+    }
 
-    public boolean verifyCreativeAssigned(String CreativeName){
-        waitUtility.waitForElementVisible(String.format("//td[@title='%s']",CreativeName));
-        return page.locator(String.format("//td[@title='%s']",CreativeName)).isVisible();
-
+    public boolean verifyCreativeAssigned(String CreativeName) {
+        waitUtility.waitForElementVisible(String.format("//td[@title='%s']", CreativeName));
+        return page.locator(String.format("//td[@title='%s']", CreativeName)).isVisible();
     }
 }

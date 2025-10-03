@@ -6,8 +6,13 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import pages.life.TacticSettings;
+import utils.CommonUtils;
 
 public class WorkspaceCreation {
+
+    ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     private final Page page;
     private final Locator CREATE_WORKSPACE;
     private final Locator HCP_EXPLORER;
@@ -23,13 +28,14 @@ public class WorkspaceCreation {
     private final Locator REMOVAL_CONFIRMATION_TEXT;
     private final Locator REMOVE_BUTTON;
     private final Locator WORKSPACE_ARCHIVAL_ALERT;
+    private final Locator OUTER_FRAME;
     int counter = 0;
 
     public WorkspaceCreation(Page page) {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
-        this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Explorer')]");
+        this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
         this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//h3[contains(text(),'Saving workspace') or contains(text(),'Creating workspace')]/following-sibling::span");
@@ -40,7 +46,8 @@ public class WorkspaceCreation {
         this.REMOVAL_CONFIRMATION_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Removal Confirmation')]");
         this.REMOVAL_CONFIRMATION_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'You are trying to delete the workspace')]");
         this.REMOVE_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Remove']");
-        this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Workspace archived successfully')]");
+        this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Workspace deleted successfully')]");
+        this.OUTER_FRAME = page.frameLocator("iframe#iframe0").locator("//div[@data-testid='chatty-frame']");
     }
 
     public String studioDashboard() {
@@ -81,6 +88,7 @@ public class WorkspaceCreation {
     }
 
     public void verifyStudioWorkspaceFrame(){
+        OUTER_FRAME.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
