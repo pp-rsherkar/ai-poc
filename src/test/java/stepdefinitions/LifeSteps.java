@@ -288,6 +288,7 @@ public class LifeSteps {
     @Given("User navigates to Report Templates page")
     public void user_navigates_to_report_templates_page() {
         navigation.clickSubMenu();
+        navigation.clickMenuAngle();
         reportTemplates.clickReportTemplatesLink();
     }
 
@@ -2679,5 +2680,12 @@ public class LifeSteps {
     @And("User clicks Lifetime filter")
     public void userClicksLifetimeFilter() {
         campaignDashboard.clickLifetimeFilter();
+    }
+
+    @And("User should be able to select the template created from the dropdown")
+    public void userShouldBeAbleToSelectTheTemplateCreatedFromTheDropdown() {
+        runReportPanel.selectTemplateFromDropdown(templateNameRandom);
+        templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
+        nameList.add(templateNameRandom);
     }
 }

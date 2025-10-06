@@ -13,12 +13,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class CommonUtils {
+    public static int startDay = 0;
+    public static int endDay = 0;
 
     public static String timeStampCalculation(){
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -213,4 +218,24 @@ public class CommonUtils {
         return false;
     }
 
+    public static void generateScheduleDaysIfNeeded() {
+        YearMonth currentMonth = YearMonth.now();
+        int maxDay = currentMonth.lengthOfMonth();
+        int today = LocalDate.now().getDayOfMonth();
+        int attempts = 0;
+        if (startDay != 0 && endDay != 0) {
+            return;
+        }
+        do {
+            if (today >= maxDay - 1) {
+                startDay = maxDay - 1;
+                endDay = maxDay;
+            } else {
+                startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
+                endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
+            }
+            attempts++;
+            if (attempts > 10) break;
+        } while (endDay <= startDay);
+    }
 }

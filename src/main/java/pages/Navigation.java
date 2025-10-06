@@ -118,9 +118,11 @@ public class Navigation {
     }
 
     public void clickMenuAngle(){
-        waitUtility.waitForLocatorVisible(MENU_ANGLE);
-        if(MENU_ANGLE.isVisible() && MENU_ANGLE.getAttribute("class").contains("fa-angle-left"))
-            MENU_ANGLE.click();
+        if(MENU_ANGLE.isVisible()) {
+            if (MENU_ANGLE.getAttribute("class").contains("fa-angle-left")) {
+                MENU_ANGLE.click();
+            }
+        }
     }
 
     public void clickRunReport() {

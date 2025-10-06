@@ -65,6 +65,3 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
       | admin11  | ppadmin1 | STATIC        | 43323   |
       | admin11  | ppadmin1 | ATTRIBUTE     | 43346   |
       | admin11  | ppadmin1 | SMART         | 43224   |
-
-    #@API Replace NPI
-    #@API Delete NPI
