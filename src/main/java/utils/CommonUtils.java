@@ -33,6 +33,15 @@ public class CommonUtils {
         return String.format("%04d", number);      // pads with leading zeros
     }
 
+    public static String generateRandomNpi() {
+        Random random = new Random();
+        StringBuilder npi = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            npi.append(random.nextInt(10));
+        }
+        return npi.toString();
+    }
+
     public static List<String> normalize(List<String> list) {
         return list.stream()
                 .map(s -> s.replaceAll("\\s+", " ").trim()) // replaces multiple spaces and trims

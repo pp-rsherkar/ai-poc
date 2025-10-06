@@ -77,7 +77,7 @@ public class CampaignDashboard {
         this.LINEITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.TACTIC_TOGGLE_BUTTON = page.locator("//div[contains(@class,'tactic-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.BACK_TO_DASHBOARD = page.locator("//div[@class='logo-lists']/img");
-        this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section ng-star-inserted')]");
+        this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section')]");
         this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
         this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'campaign-name')]");
         this.TACTIC_NAME = page.locator("//span[contains(@class,'color-black tactic-name-section')]");
