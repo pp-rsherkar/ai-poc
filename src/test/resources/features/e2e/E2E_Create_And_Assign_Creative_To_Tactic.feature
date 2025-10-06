@@ -62,7 +62,7 @@ Feature: End to End Workflow of Creative Creation and its assignment To Tactic
       | Video        | FileType: DCM File, FileName:DCM_VIDEO_E2E_BulkUpload.xlsx, Status:Denied, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, Size:800x250 |
     When User creates and saves "Native" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                               |
-      | Native       | FileType: DCM File, FileName:NativeBulkUploadTemplate.xlsx, Status:Approved, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, IAB:Profane, Size:800x250 |
+      | Native       | FileName:NativeBulkUploadTemplate.xlsx, Status:Approved, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, IAB:Profane, Size:800x250 |
     #2
     Then Verify the newly created creative is displayed in the Creative Library page
     #3
