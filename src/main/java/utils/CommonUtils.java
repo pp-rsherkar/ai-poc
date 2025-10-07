@@ -121,8 +121,8 @@ public class CommonUtils {
         } else if (inputIndex < fileInputCount) {
             targetInput = fileInputs.nth(inputIndex);
         }
-        targetInput.setInputFiles(basePath);
         ElementHandle fileInputHandle = targetInput.elementHandle();
+        targetInput.setInputFiles(basePath);
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
         if (locatorValue.contains("%s")) {
             page.waitForSelector(String.format(locatorValue, fileName),
