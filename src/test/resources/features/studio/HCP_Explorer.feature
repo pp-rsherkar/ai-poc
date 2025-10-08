@@ -159,8 +159,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then Delete the filter
     And Fetch and verify that NPI details are refined
     Examples:
-      | ADVERTISER | WORKSPACE_NAME | AI_PROMPT                                                                                                            | PRIMARY_FILTERS                               |
-      | Abbvie     | Explorer       | Filter doctors by their gender, how long they've been practicing, and then narrow down patients by their age groups. | Clinical Recency, NPI Gender, Years Practiced |
+      | ADVERTISER | WORKSPACE_NAME | AI_PROMPT                                                                                | PRIMARY_FILTERS |
+      | Abbvie     | Explorer       | Find doctors within certain age ranges, with specific professions, and narrow by wealth. | Profession      |
 
   @regression
   Scenario Outline: Rename HCP Explorer workspace

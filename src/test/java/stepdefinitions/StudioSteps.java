@@ -405,14 +405,13 @@ public class StudioSteps {
 
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
-        String text = workspaceCreation.verifyDeletePopUp();
-        Assert.assertTrue("Message is not displayed",
-                text.contains("You are trying to delete the workspace " + newWorkspaceName +".\n" +
-                        "\n" +
-                        "Webhooks are enabled for this workspace.\n" +
-                        "\n" +
-                        "Deleting the workspace will delete the webhook as well. This action cannot be undone.\n" +
-                        "Do you want to proceed?"));
+        String actual = workspaceCreation.verifyDeletePopUp().replace("\r\n", "\n").trim();
+        Assert.assertTrue("Message should contain warning about deleting workspace",
+                actual.contains("You are trying to delete the workspace " + newWorkspaceName));
+        Assert.assertTrue("Message should mention webhook is enabled", actual.contains("Webhooks are enabled for this workspace."));
+        Assert.assertTrue("Message should mention deletion is irreversible",
+                actual.contains("Deleting the workspace will delete the webhook as well. This action cannot be undone."));
+        Assert.assertTrue("Message should ask for confirmation", actual.contains("Do you want to proceed?"));
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 

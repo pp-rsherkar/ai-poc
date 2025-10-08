@@ -67,9 +67,9 @@ public class Workspace {
         this.WEBHOOK_CANCEL_BUTTON = WORKSPACE_FRAME.locator("//button[@type='button']/div[contains(text(),'Cancel')]");
         this.URL_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@name='url']");
         this.BODY_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@name='body']");
-        this.PARAM = WORKSPACE_FRAME.locator("//p[contains(@cursor,'pointer')]");
+        this.PARAM = WORKSPACE_FRAME.locator("//ul[contains(@role,'menu')]//p");
         this.WEBHOOK_BUTTONS = WORKSPACE_FRAME.locator("//button[contains(@class,'ButtonItem-sc')]");
-        this.WEBHOOK_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//span[contains(text(),'Webhook setup successfully')]");
+        this.WEBHOOK_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Webhook setup successfully')]");
         this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
         this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
