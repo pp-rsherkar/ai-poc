@@ -23,9 +23,9 @@ Feature: Studio Publish NPI List
     Then Verify list is published
     And Check the Download icon is highlighted in green color
     Examples:
-      | WORKSPACE_NAME| ADVERTISER | LIST_TYPE |
-      | Abbvie     | Explorer      | Static    |
-      | Abbvie     | Explorer      | Live      |
+      | WORKSPACE_NAME | ADVERTISER | LIST_TYPE |
+      | Explorer       | Abbvie     | Static    |
+      | Explorer       | Abbvie     | Live      |
 
   @regression
   Scenario Outline: Publish NPI List as Static List and Live List without selecting any platform
@@ -53,6 +53,6 @@ Feature: Studio Publish NPI List
     And User clicks on the published workspace
     And Verify the list should be available for LIFE platform by default
     Examples:
-      | WORKSPACE_NAME| ADVERTISER | LIST_TYPE |
-      | Abbvie     | Explorer      | Static    |
-      | Abbvie     | Explorer      | Live      |
+      | WORKSPACE_NAME | ADVERTISER | LIST_TYPE |
+      | Explorer       | Abbvie     | Static    |
+      | Explorer       | Abbvie     | Live      |

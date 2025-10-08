@@ -60,7 +60,7 @@ public class Workspace {
         this.SELECT_HCP = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP365"));
         this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
-        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//h3[contains(text(),'Saving workspace') or contains(text(),'Creating workspace')]/following-sibling::span");
+        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
         this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
         this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
         this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
@@ -80,7 +80,7 @@ public class Workspace {
         this.DOWNLOAD_NPI_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Download NPIs')]");
         this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Download']");
         this.DOWNLOAD_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//p[text()='Download completed successfully']");
-        this.IDENTIFIED_NPI_COUNT = WORKSPACE_FRAME.locator("//h3[text()='Identified NPIs']/ancestor::div/preceding-sibling::p//span");
+        this.IDENTIFIED_NPI_COUNT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//h3[contains(text(),'Identified NPIs')]/ancestor::div[contains(@class,'SingleValueVisualization')]//span");
     }
 
     public void studio() {
@@ -256,7 +256,8 @@ public class Workspace {
     }
 
     public String fetchIdentifiedNPICount() {
-        return IDENTIFIED_NPI_COUNT.innerText().replace(",", "");
+        waitUtility.waitForLocatorVisible(IDENTIFIED_NPI_COUNT);
+        return IDENTIFIED_NPI_COUNT.textContent().replace(",", "");
     }
 
     public String checkBackgroundColorOfDownloadIcon() {

@@ -13,4 +13,4 @@ Feature: Studio Download NPI List
     Examples:
       | WORKSPACE              | FILE_EXTENSION |
       | Automation_HCPExplorer | CSV            |
-      | Automation_HCPExplorer | XLSX
+      | Automation_HCPExplorer | XLSX           |
