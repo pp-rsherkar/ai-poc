@@ -8,11 +8,11 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import pages.*;
 import pages.admin.Accounts;
-import pages.life.NPILists;
 import pages.studio.*;
 import utils.*;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -23,25 +23,19 @@ public class StudioSteps {
     static String newWorkspaceName;
     Boolean flag = true;
     Boolean isOverwritten = false;
-    static final String WEBHOOK_URL = "https://webhook.site/4312c282-2efc-486e-bedf-3cd385a0c3da";
     List<String[]> fileContent;
-    List<String[]> actualValue;
     List<String> fileContentData;
-    List<String> actualValueData;
     Accounts accounts = new Accounts(DriverFactory.getPage());
     Navigation navigation = new Navigation(DriverFactory.getPage());
     WorkspaceCreation workspaceCreation = new WorkspaceCreation(DriverFactory.getPage());
-    ExpansionWorkspace expworkspaces = new ExpansionWorkspace(DriverFactory.getPage());
+    ExpansionWorkspace expansionWorkspace = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
-    WorkspaceDownloadNPI workspacedownloadnpi = new WorkspaceDownloadNPI(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
-    NPILists npiLists = new NPILists(DriverFactory.getPage());
-    LifeSteps lifeSteps = new LifeSteps();
-    CSVActions csvActions = new CSVActions();
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
     String randomNumber = CommonUtils.randomNumberGeneration();
+    String npiCount;
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -63,36 +57,36 @@ public class StudioSteps {
     @Then("the user selects the advertiser {string}")
     public void the_user_selects_the_advertiser(String advertiser) {
         page.waitForLoadState();
-        expworkspaces.clickAdvertiserDropdown(advertiser);
+        expansionWorkspace.clickAdvertiserDropdown(advertiser);
         page.waitForLoadState();
     }
 
     @Then("the user selects Source Audience {string}")
     public void the_user_selects_source_audience(String string) {
-        expworkspaces.selectSourceAudience(string);
+        expansionWorkspace.selectSourceAudience(string);
 
     }
 
     @Then("the user selects Expand With Care Team or Expand With Affiliation Graph and selects the value")
     public void the_user_selects_expand_with_care_team_or_expand_with_affiliation_graph_and_selects_the_value() {
-        expworkspaces.selectExpandCareTeam();
-        expworkspaces.selectExpandAffGraph();
+        expansionWorkspace.selectExpandCareTeam();
+        expansionWorkspace.selectExpandAffGraph();
     }
 
     @Then("the filters should be applied to the workspace")
     public void the_user_applies_the_following_filters() {
-        expworkspaces.addFilter();
+        expansionWorkspace.addFilter();
     }
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
         workspaceName = string + CommonUtils.timeStampCalculation();
-        expworkspaces.renameExpansion(workspaceName);
+        expansionWorkspace.renameExpansion(workspaceName);
     }
 
     @Then("the user saves the workspace and check the workspace is Saved")
     public void the_user_saves_the_workspace_and_check_the_workspace_is_Saved() {
-        expworkspaces.saveExpansion();
+        expansionWorkspace.saveExpansion();
         assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
     }
 
@@ -222,29 +216,9 @@ public class StudioSteps {
         workspace.waitTillWorkspaceAlertHide();
     }
 
-    @When("search for workspace")
-    public void search_for_workspace() {
-        workspacedownloadnpi.searchWorkspace();
-    }
-
-    @Then("user clicks on the searched workspace")
-    public void user_clicks_on_the_searched_workspace() {
-        workspacedownloadnpi.clickDownloadButton();
-        workspacedownloadnpi.clickNPIDownload();
-        workspacedownloadnpi.clickCSVFile();
-        workspacedownloadnpi.clickDownloadNPIButton();
-        // Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
-
-        workspacedownloadnpi.clickDownloadButton();
-        workspacedownloadnpi.clickNPIDownload();
-        workspacedownloadnpi.clickXSLXFile();
-        workspacedownloadnpi.clickDownloadNPIButton();
-        //Assert.assertEquals("NPI List file is ready for download","NPI List file is ready for download",workspacedownloadnpi.verifyToast());
-    }
-
     @Then("verify the file content")
     public void verify_the_file_content() {
-        fileContent = CSVActions.readAllDataAtOnce(ConfigReader.getProperty("csvFilePath"));
+        fileContent = FileActions.readAllDataAtOnce(ConfigReader.getProperty("csvFilePath"));
         fileContentData = new ArrayList<>();
         //To display the data from csv- Separate logic
         /*for (int i = 1; i < fileContent.size(); i++) {
@@ -259,46 +233,62 @@ public class StudioSteps {
 
     }
 
-    //DB result will be raised in next PR
-    /*@Then("verify db result")
-    public void verify_db_result() throws SQLException {
-       // String query = "select GRPNAME from adadmin.CMPGroup where GRPNAME = 'Auto_Feb_9'";
-        String expectedValue = "Auto_Feb_9";
-        actualValueData=new ArrayList<>();
-         actualValue = DatabaseActions.getData("select * from contextad.adadmin.CMPGroup where GRPNAME = ?", expectedValue);
-        for (String[] row : actualValue) {
-            //System.out.println("Row: " + String.join(", ", row));
-            actualValueData.add(String.join(", ", row));
-        }
-        System.out.println("Data from query :" + actualValueData);
-    }*/
-
     @When("Studio platform is available")
     public void studio_platform_is_available() {
         workspace.studio();
     }
 
     @And("User searches the {string} and selects it")
-    public void userSearchesTheAndSelectsIt(String WORKSPACE) {
-        workspace.searchWorkspace(WORKSPACE);
+    public void userSearchesTheAndSelectsIt(String workspace) {
+        workspaceCreation.searchWorkspaceName(workspace);
+        workspaceCreation.clickWorkspace(workspace);
+        Assert.assertTrue("Unable to navigate to workspace", workspaceCreation.navigateToWorkspace(workspace));
     }
 
-    @When("Download button is enabled to the user")
+    @And("User fetches the Identified NPI count from the workspace")
+    public void userFetchesTheIdentifiedNPICountFromTheWorkspace() {
+        npiCount = workspace.fetchIdentifiedNPICount();
+    }
+
+    @And("Download button is enabled to the user")
     public void download_button_is_enabled_to_the_user() {
-        workspace.clickDownbutton();
+        workspace.clickFlyOrPageButton();
+    }
+
+    @And("User clicks Download NPI option")
+    public void userClicksDownloadNPIOption() {
+        workspace.clickDownloadNPI();
+    }
+
+    @And("User selects download format as {string} and clicks Download button")
+    public void userSelectsFileTypeAsAndClicksDownloadButton(String fileExtension) {
+        workspace.selectFileExtension(fileExtension);
+        workspace.clickDownloadButton();
+        Assert.assertEquals("Download completed successfully",workspace.checkNPIDownloadComplete());
+    }
+
+    @And("User verifies the total Identified {string} count in the downloaded file - {string}")
+    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
+        Path latestFile = FileActions.getLatestDownloadedFile(fileExtension.toLowerCase());
+        int npiCountFromFile = 0;
+        if(fileExtension.equalsIgnoreCase("CSV")) 
+            npiCountFromFile = FileActions.fetchColumnCountFromCSV(latestFile, npiHeader);
+        else if(fileExtension.equalsIgnoreCase("XLSX"))
+            npiCountFromFile = FileActions.fetchColumnCountFromExcel(latestFile, npiHeader);
+        Assert.assertEquals("NPI count is not matching", Integer.parseInt(npiCount), npiCountFromFile);
     }
 
     @When("User clicks on Publish NPI List")
     public void user_clicks_on_publish_npi_list() {
-        workspace.clickPublishNpi();
+        workspace.clickPublishNPI();
     }
 
     @And("User selects publish {string}")
     public void userSelectsPublish(String listType) {
-        workspace.publish(listType);
+        workspace.publishNPI(listType);
     }
 
-    @When("User select the system to publish the list")
+    @When("User select the platform to publish the list")
     public void user_select_the_system_to_publish_the_list() {
         workspace.hcp();
         workspace.life();
@@ -309,9 +299,13 @@ public class StudioSteps {
         workspace.clickPublish();
         Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
         workspace.waitTillWorkspaceAlertHide();
-        workspace.clickDownbutton();
+        workspace.clickFlyOrPageButton();
         Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
+    }
 
+    @And("Check the Download icon is highlighted in green color")
+    public void checkTheDownloadIconIsHighlightedInGreenColor() {
+        Assert.assertEquals("rgb(0, 136, 136)",workspace.checkBackgroundColorOfDownloadIcon());
     }
 
     @And("Verify Webhook panel is disabled before applying filters")
@@ -337,7 +331,7 @@ public class StudioSteps {
     @And("User adds valid URL and append Macros with {string} to the {string} as follow")
     public void userAddsURLAndMacrosWithToTheURLAsFollow(String param, String textType, DataTable macros) {
         List<String> macrosList = macros.asList(String.class);
-        workspace.addURL(WEBHOOK_URL);
+        workspace.addURL(Constants.WEBHOOK_URL);
         workspace.addMacros(textType, param, macrosList);
     }
 
@@ -346,7 +340,7 @@ public class StudioSteps {
         String text = workspace.verifyMacrosAppendedToURL();
         Assert.assertTrue(
                 "Macros are not correctly appended to the URL",
-                text.matches(Pattern.quote(WEBHOOK_URL) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%")
+                text.matches(Pattern.quote(Constants.WEBHOOK_URL) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%")
         );
     }
 
@@ -405,7 +399,8 @@ public class StudioSteps {
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
-        workspaceCreation.searchWorkspaceAndDelete(newWorkspaceName);
+        workspaceCreation.openMoreActionsForWorkspace(newWorkspaceName);
+        workspaceCreation.deleteWorkspace();
     }
 
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
@@ -524,4 +519,54 @@ public class StudioSteps {
             Assert.assertTrue("Merged filter not displayed: " + mergedFilter, matchFound);
         }
     }
+
+    @And("Navigate to workspace dashboard and search the workspace created")
+    public void navigateToWorkspaceDashboardAndSearchTheWorkspaceCreated() {
+        workspace.goToWorkspaceList();
+        workspaceCreation.openMoreActionsForWorkspace(newWorkspaceName);
+    }
+
+    @And("User selects the Rename option by clicking More Actions button")
+    public void userSelectsTheRenameOptionByClickingThreeDotsButton() {
+        workspaceCreation.selectRenameWorkspaceFromOptions();
+    }
+
+    @And("Verify user is able to rename the workspace as {string}")
+    public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
+        workspaceName = newWorkspace + randomNumber;
+        Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(newWorkspaceName, workspaceName));
+    }
+
+    @And("User is able to search the workspace with the new name")
+    public void userIsAbleToSearchTheWorkspaceWithTheNewName() {
+        Assert.assertTrue("Unable to search renamed workspace", workspaceCreation.searchWorkspaceName(workspaceName));
+    }
+
+    @And("User selects the Delete option by clicking More Actions button")
+    public void userSelectsTheDeleteOptionByClickingMoreActionsButton() {
+        workspaceCreation.deleteWorkspace();
+    }
+
+    @And("Verify user is able to delete the workspace")
+    public void verifyUserIsAbleToDeleteTheWorkspace() {
+        String text = workspaceCreation.verifyDeletePopUp();
+        Assert.assertTrue("Message is not displayed",
+                text.contains("You are trying to delete the workspace " + newWorkspaceName +".\n" +
+                        "\n" +
+                        "This action cannot be undone – all deleted data will be lost.\n" +
+                        "Do you want to proceed?"));
+        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+    }
+
+    @And("User selects the Duplicate option by clicking More Actions button")
+    public void userSelectsTheDuplicateOptionByClickingMoreActionsButton() {
+        workspaceCreation.selectDuplicateWorkspaceFromOptions();
+    }
+
+    @And("Verify user is able to duplicate the workspace")
+    public void verifyUserIsAbleToDuplicateTheWorkspace() {
+        workspaceName = workspaceCreation.fetchDuplicateWorkspaceName();
+        Assert.assertEquals("Workspace duplicated successfully", workspaceCreation.clickDuplicateButton());
+    }
+
 }
