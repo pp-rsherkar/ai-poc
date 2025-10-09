@@ -43,12 +43,12 @@ public class CreateCreatives {
     private final Locator ADVERTISER_DSA;
     private final Locator FINANCER;
     private final Locator CREATIVE_TYPE;
-    private final Locator CREATIVE_HTMLCODE;
+    private final Locator CREATIVE_HTML_CODE;
     private final Locator MACROS_CHECKBOX;
     private final Locator CREATIVE_AD_SIZE;
     private final Locator CREATIVE_AD_SIZE_VALUE;
     private final Locator DOMAIN_LANDING;
-    private final Locator CLICKTHROUGH_URL;
+    private final Locator CLICK_THROUGH_URL;
     private final Locator DURATION;
     private final Locator URL;
     private final Locator VAST_XML_TEXTAREA;
@@ -98,12 +98,12 @@ public class CreateCreatives {
         this.ADVERTISER_DSA = page.locator("//input[contains(@placeholder,'Advertiser per DSA')]");
         this.FINANCER = page.locator("//input[contains(@placeholder,'Financer')]");
         this.CREATIVE_TYPE = page.locator("//app-creativetype/div//following-sibling::div");
-        this.CREATIVE_HTMLCODE = page.locator("//textarea[contains(@formcontrolname,'htmlCode')]");
+        this.CREATIVE_HTML_CODE = page.locator("//textarea[contains(@formcontrolname,'htmlCode')]");
         this.MACROS_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'multi_click_macros_check ')]");
         this.CREATIVE_AD_SIZE = page.locator("//app-single-select-dropdown//input[contains(@placeholder,'Select Ad Size')]");
         this.CREATIVE_AD_SIZE_VALUE = page.locator("//input[contains(@placeholder,'Select Ad Size')]/following-sibling::div/div");
         this.DOMAIN_LANDING = page.locator("//input[contains(@formcontrolname,'landingDomain')]");
-        this.CLICKTHROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
+        this.CLICK_THROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
         this.DURATION = page.locator("//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");
         this.URL = page.locator("//input[contains(@placeholder,'url')]");
         this.VAST_XML_TEXTAREA = page.locator("//textarea[contains(@formcontrolname,'vastDoc') or contains(@formcontrolname,'vastAudioDoc')]");
@@ -295,13 +295,13 @@ public class CreateCreatives {
                 if (type.contains("Image")) {
                     CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ImageFile"));
                 } else {
-                    CREATIVE_HTMLCODE.fill(attributeMap.get("HTMLCode"));
+                    CREATIVE_HTML_CODE.fill(attributeMap.get("HTMLCode"));
                     MACROS_CHECKBOX.click();
                 }
                 CREATIVE_AD_SIZE.click();
                 CommonUtils.selectAndClickElement(CREATIVE_AD_SIZE_VALUE, Collections.singletonList(attributeMap.get("Size")));
-                if (CLICKTHROUGH_URL.isEditable()) {
-                    CLICKTHROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
+                if (CLICK_THROUGH_URL.isEditable()) {
+                    CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 }
                 DOMAIN_LANDING.fill(attributeMap.get("DomainLanding"));
                 break;
@@ -314,10 +314,10 @@ public class CreateCreatives {
                 else if (type.contains("VAST URL")) URL.fill(attributeMap.get("VASTURL"));
                 else VAST_XML_TEXTAREA.fill(attributeMap.get("VASTXML"));
                 DURATION.fill(attributeMap.get("Durations"));
-                if (WIDTH.isVisible() && HEIGHT.isVisible() && CLICKTHROUGH_URL.isVisible()) {
+                if (WIDTH.isVisible() && HEIGHT.isVisible() && CLICK_THROUGH_URL.isVisible()) {
                     WIDTH.fill(attributeMap.get("Width"));
                     HEIGHT.fill(attributeMap.get("Height"));
-                    CLICKTHROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
+                    CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 }
                 DOMAIN_LANDING.fill(attributeMap.get("AdvertiserDomain"));
                 IAB_CATEGORY.fill(attributeMap.get("IAB"));
@@ -334,14 +334,14 @@ public class CreateCreatives {
                 HEADLINE.fill(attributeMap.get("Headline"));
                 DESCRIPTION.fill(attributeMap.get("Description"));
                 DISPLAY_URL.fill(attributeMap.get("DisplayURL"));
-                CLICKTHROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
+                CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 IAB_CATEGORY.fill(attributeMap.get("IAB"));
                 IAB_CATEGORY_VALUE.first().click();
                 break;
 
             case "Native Display":
                 CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ImageFile"));
-                CLICKTHROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
+                CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 DOMAIN_LANDING.fill(attributeMap.get("DomainLanding"));
                 IAB_CATEGORY.fill(attributeMap.get("IAB"));
                 IAB_CATEGORY_VALUE.first().click();
