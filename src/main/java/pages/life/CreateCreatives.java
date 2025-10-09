@@ -178,13 +178,6 @@ public class CreateCreatives {
                 }
                 clickClearAllButton();
                 break;
-            case "Creative Status":
-                selectDropdownAndFill(CREATIVE_STATUS, values);
-                for (String value : values) {
-                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
-                }
-                clickClearAllButton();
-                break;
             case "Associated Campaigns":
                 selectDropdownAndFill(SELECT_CAMPAIGN, values);
                 for (String value : values) {
@@ -192,7 +185,7 @@ public class CreateCreatives {
                 }
                 clickClearAllButton();
                 break;
-            case "Approval Status":
+            case "Creative Status":
                 selectDropdownAndFill(APPROVAL_STATUS, values);
                 for (String value : values) {
                     flag = page.locator(String.format("//span[contains(text(),'%s')]", value)).first().isVisible();
