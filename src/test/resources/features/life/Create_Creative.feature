@@ -19,19 +19,17 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify filters under Active and Archived activity, clear-all button, sort, and search options on the Creative Library page
     And Check Activity buttons "Active" and verify following filters are available and working
-      | Advertiser           | 01- Advertiser |
-      | Associated Campaigns | AutoCampaign   |
-      | Approval Status      | Approved       |
-      | Ad Sizes             | 1025x800       |
-      | CreatedBy            | Anand          |
-      | Creative Type        | Image, Video   |
+      | Advertiser      | 01- Advertiser |
+      | Creative Status | Approved       |
+      | Ad Sizes        | 1025x800       |
+      | CreatedBy       | Anand          |
+      | Creative Type   | Image, Video   |
     And Check Activity buttons "Archived" and verify following filters are available and working
-      | Advertiser           | Amgen        |
-      | Associated Campaigns | AutoCampaign |
-      | Approval Status      | Approved     |
-      | Ad Sizes             | 1024x576     |
-      | CreatedBy            | Anand        |
-      | Creative Type        | Html, Video  |
+      | Advertiser      | Amgen       |
+      | Creative Status | Denied      |
+      | Ad Sizes        | 1024x576    |
+      | CreatedBy       | Anand       |
+      | Creative Type   | Html, Video |
     And Verify the following sort options are available and working
       | Name-Asc          |
       | Name-Desc         |

@@ -62,6 +62,7 @@ public class CreateCreatives {
     private final Locator SPONSORED_BY;
     private final Locator PRODUCT_DESCRIPTION;
     private final Locator CREATIVE_NAME_TEXT;
+    private final Locator CREATIVE_STATUS;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<String> creativesList = new ArrayList<>();
     String imageTextLocator = "//span[contains(text(),'%s')]";
@@ -117,6 +118,7 @@ public class CreateCreatives {
         this.SPONSORED_BY = page.locator("//input[contains(@formcontrolname,'sponsoredText')]");
         this.PRODUCT_DESCRIPTION = page.locator("//textarea[contains(@formcontrolname,'productDescription')]");
         this.CREATIVE_NAME_TEXT = page.locator("//div[contains(@role,'alert')]");
+        this.CREATIVE_STATUS = page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
     }
 
     public String verifyCreativeLibraryPageTitle() {
@@ -171,6 +173,13 @@ public class CreateCreatives {
         switch (key) {
             case "Advertiser":
                 selectDropdownAndFill(SELECT_ADVERTISER, values);
+                for (String value : values) {
+                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
+                }
+                clickClearAllButton();
+                break;
+            case "Creative Status":
+                selectDropdownAndFill(CREATIVE_STATUS, values);
                 for (String value : values) {
                     flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
                 }

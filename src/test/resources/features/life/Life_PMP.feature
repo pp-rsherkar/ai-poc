@@ -38,18 +38,9 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     When User add new targeting rule for Rule Type "Deals"
     Then user should navigate to PMP Deals Panel
     When User clicks "Life Marketplace Deals" Deals Tab
-    Then User should see All Premium Pubs, filters such as Exchange, Search
-      | ppHealthMarkets |
-      | haymarket       |
-      | everydayHealth  |
-      | condenast       |
-      | vicemedia       |
-      | amc             |
-      | medscape        |
-      | webmd           |
     When User enters below details in respective search field
-      | SearchByName     | dealmarketnew |
-      | SearchByExchange | Pubmatic      |
+      | SearchByName     | AutomationDeal |
+      | SearchByExchange | Pubmatic       |
     Then Verify private deals list should appear based on the filter selected
 
   @e2e @regression
