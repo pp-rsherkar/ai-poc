@@ -306,6 +306,7 @@ public class PMP {
         return flag1;
     }
 
+    /* Premium Hub is no longer displayed on the Deals panel. This function is being retained in case the functionality is added again in the future. */
     public boolean verifyAllPremiumHubsOnMarketPlace(List<String> premiumHubsList) {
         waitUtility.waitForLocatorVisible(ALL_LIFE_MARKET_PLACE);
         for (int i = 0; i < ALL_PREMIUM_PUBS.count(); i++) {

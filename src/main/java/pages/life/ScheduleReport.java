@@ -234,7 +234,7 @@ public class ScheduleReport {
         DELIVERY_TO_USER.click();
         for (String user : userLists) {
             DELIVERY_TO_USER.getByRole(AriaRole.TEXTBOX).fill(user.trim());
-            page.getByText(user.trim()).click();
+            page.getByText(user.trim()).first().click();
         }
         page.keyboard().press("Escape");
     }

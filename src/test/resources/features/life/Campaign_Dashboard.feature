@@ -50,4 +50,4 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     Then Tool tip whether creative is assigned to the campaign or not should be reflected
     Examples:
       | Campaign ID          | COLOUR                     | RED BULLET                             |
-      | Auto_20250821_213314 | 24-note-table-provided.svg | 20-filter-applied.1e22619f2d75d737.svg |
+      | Auto_20251005_024613 | 24-note-table-provided.svg | 20-filter-applied.1e22619f2d75d737.svg |
