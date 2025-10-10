@@ -45,14 +45,14 @@ public class BulkCreativeUpload {
     private final Locator LANDING_PAGE_DOMAIN;
     private final Locator FILE_DROPDOWN;
     private final Locator FILE_DROPDOWN_VALUE;
-    private final Locator ADCHOICES_DROPDOWN;
+    private final Locator AD_CHOICES_DROPDOWN;
     private final Locator NOTES_DROPDOWN;
     private final Locator RICH_MEDIA_CHECKBOX;
     private final Locator DIRECTION_DROPDOWN;
     private final Locator DIRECTION_DROPDOWN_VALUE;
     private final Locator HTML_CREATIVE_NAME;
     private final Locator IAB_CATEGORY_DROPDOWN;
-    private final Locator CLICKTHROUGH_URL;
+    private final Locator CLICK_THROUGH_URL;
     private final Locator INLINE_VALIDATION_MESSAGE;
     private final Locator WIDTH_BOX;
     private final Locator HEIGHT_BOX;
@@ -91,14 +91,14 @@ public class BulkCreativeUpload {
         this.LANDING_PAGE_DOMAIN = page.locator("//input[@formcontrolname='landingDomain']");
         this.FILE_DROPDOWN = page.locator("//label[text()='File']/parent::div//div[contains(@class,'text')]");
         this.FILE_DROPDOWN_VALUE = page.locator("//label[text()='File']/following-sibling::div//div[contains(@class,'text')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
-        this.ADCHOICES_DROPDOWN = page.locator("//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
+        this.AD_CHOICES_DROPDOWN = page.locator("//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
         this.NOTES_DROPDOWN = page.locator("//span[contains(text(),'Notes Column')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
         this.RICH_MEDIA_CHECKBOX = page.locator("//sui-checkbox[@formcontrolname='expandable']");
         this.DIRECTION_DROPDOWN = page.locator("//div[contains(text(),'Direction')]");
         this.DIRECTION_DROPDOWN_VALUE = page.locator("//div[contains(text(),'Direction')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
         this.HTML_CREATIVE_NAME = page.locator("//input[@placeholder='Creative Name']");
         this.IAB_CATEGORY_DROPDOWN = page.locator("//sui-multi-select[contains(@placeholder,'Search Categories')]//input");
-        this.CLICKTHROUGH_URL = page.locator("//input[@formcontrolname='clickThruUrl']");
+        this.CLICK_THROUGH_URL = page.locator("//input[@formcontrolname='clickThruUrl']");
         this.INLINE_VALIDATION_MESSAGE = page.locator("//p[contains(@class,'ng-star-inserted')]");
         this.WIDTH_BOX = page.locator("//input[contains(@placeholder,'width')]");
         this.HEIGHT_BOX = page.locator("//input[contains(@placeholder, 'height')]");
@@ -315,7 +315,7 @@ public class BulkCreativeUpload {
     }
 
     public String fetchAdChoiceDefaultValue() {
-        return ADCHOICES_DROPDOWN.innerText();
+        return AD_CHOICES_DROPDOWN.innerText();
     }
 
     public String fetchNotesColumnDefaultValue() {
@@ -360,7 +360,7 @@ public class BulkCreativeUpload {
     }
 
     public void enterClickthroughURL(String validURL) {
-        CLICKTHROUGH_URL.fill(validURL);
+        CLICK_THROUGH_URL.fill(validURL);
     }
 
     public void isRemoveFileIconAvailable() {
@@ -410,7 +410,7 @@ public class BulkCreativeUpload {
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
-                if (CLICKTHROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
+                if (CLICK_THROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);

@@ -944,13 +944,6 @@ public class LifeSteps {
         Assert.assertEquals("Success!", pmp.verifyTacticIsSaved().trim());
     }
 
-
-    @Then("User should see All Premium Pubs, filters such as Exchange, Search")
-    public void userShouldSeeAllPremiumPubsFiltersSuchAsExchangeSearch(DataTable premiumHubs) {
-        List<String> premiumHubsList = premiumHubs.asList(String.class);
-        Assert.assertTrue("All premium Hubs are available and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
-    }
-
     /*Roshani Sherkar
      * 01-07-2025*/
     @Then("Verify targeting panel with all targeting under below categories")

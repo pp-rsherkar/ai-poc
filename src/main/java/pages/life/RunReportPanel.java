@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.SelectOption;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -13,10 +14,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
+
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class RunReportPanel {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator RUN_REPORT_PANEL_HEADER;
     private final Locator TEMPLATE_DROPDOWN;
@@ -40,7 +41,7 @@ public class RunReportPanel {
     private final Locator FETCHED_TEMPLATE_NAME;
     private final Locator FETCHED_ADVERTISER_NAME;
     private final Locator FETCHED_CAMPAIGN_NAME;
-    private final Locator FETCHED_LINEITEM_NAME;
+    private final Locator FETCHED_LINE_ITEM_NAME;
     private final Locator FETCHED_TACTIC_NAME;
     private final Locator FETCHED_CREATIVE_NAME;
     private final Locator SEARCH_REPORT;
@@ -61,6 +62,7 @@ public class RunReportPanel {
     private final Locator FLIGHT_DETAILS_DROPDOWN;
     private final Locator FLIGHT_DETAILS_DROPDOWN_VALUE;
     private final Locator FILE_BREAKDOWN_TYPE;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public RunReportPanel(Page page) {
         this.page = page;
@@ -86,7 +88,7 @@ public class RunReportPanel {
         this.FETCHED_TEMPLATE_NAME = page.locator("//label[text()='Template']//following-sibling::app-single-select-dropdown//input/following-sibling::span");
         this.FETCHED_ADVERTISER_NAME = page.locator("//sui-multi-select[@placeholder='Select Advertiser']//sui-multi-select-label//span[2]");
         this.FETCHED_CAMPAIGN_NAME = page.locator("//input[@name='campaignLookupInp']/following-sibling::a");
-        this.FETCHED_LINEITEM_NAME = page.locator("//input[@name='lineItemLookupInp']/following-sibling::a");
+        this.FETCHED_LINE_ITEM_NAME = page.locator("//input[@name='lineItemLookupInp']/following-sibling::a");
         this.FETCHED_TACTIC_NAME = page.locator("//input[@name='tacticLookupInp']/following-sibling::a");
         this.FETCHED_CREATIVE_NAME = page.locator("//input[@name='creativesLookupInp']/following-sibling::a");
         this.SEARCH_REPORT = page.locator("input.form-control.ng-untouched.ng-pristine.ng-valid");
@@ -154,8 +156,7 @@ public class RunReportPanel {
     }
 
     public boolean setDataGranularity(String dropdownValue) {
-        if (!DATA_GRANULARITY_DROPDOWN.getAttribute("class").contains("active visible"))
-            showDataGranularityOptions();
+        if (!DATA_GRANULARITY_DROPDOWN.getAttribute("class").contains("active visible")) showDataGranularityOptions();
         CommonUtils.selectAndClickElement(DATA_GRANULARITY_DROPDOWN_VALUES, Collections.singletonList(dropdownValue));
         return DATA_GRANULARITY_SELECTED_VALUE.innerText().equalsIgnoreCase(dropdownValue);
     }
@@ -169,7 +170,7 @@ public class RunReportPanel {
         waitUtility.waitForLocatorVisible(ADVERTISER_DROPDOWN_VALUES.first());
     }
 
-    public List<String> fetchAdvertisers(){
+    public List<String> fetchAdvertisers() {
         return ADVERTISER_DROPDOWN_VALUES.allInnerTexts();
     }
 
@@ -189,7 +190,7 @@ public class RunReportPanel {
     }
 
     public boolean isDropdownValueLoadedForInitials(String initials, String fieldName) {
-        Locator locator = page.locator(String.format("//label[text()='%s']/following-sibling::div//input[contains(@placeholder,'%s')]", fieldName,fieldName));
+        Locator locator = page.locator(String.format("//label[text()='%s']/following-sibling::div//input[contains(@placeholder,'%s')]", fieldName, fieldName));
         locator.click();
         locator.type(initials);
         try {
@@ -259,7 +260,7 @@ public class RunReportPanel {
 
     public void clickRunButton(String fileName) {
         RUN_BUTTON.click();
-        if(FILE_NAME_ERROR.isVisible()){
+        if (FILE_NAME_ERROR.isVisible()) {
             FILE_NAME_TEXTAREA.fill(fileName);
             RUN_BUTTON.click();
         }
@@ -274,12 +275,11 @@ public class RunReportPanel {
     public void clickModifyOption(String templateName) {
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
-        if(!templateName.contains("Custom Template")) {
+        if (!templateName.contains("Custom Template")) {
             SEARCH_REPORT.fill(templateName);
             SEARCH_BUTTON.click();
         }
-        Locator templateElements = page.locator(
-                String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
+        Locator templateElements = page.locator(String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
         templateElements.first().click();
         REPORT_MODIFY_OPTION.first().click();
         waitUtility.waitUntilSpinnerHidden();
@@ -296,14 +296,12 @@ public class RunReportPanel {
     }
 
     public List<String> fetchTemplateValue() {
-        if(!FETCHED_TEMPLATE_NAME.isVisible())
-            return Collections.singletonList(" ");
+        if (!FETCHED_TEMPLATE_NAME.isVisible()) return Collections.singletonList(" ");
         return extractInnerTextFromLocator(FETCHED_TEMPLATE_NAME);
     }
 
     public List<String> fetchDimensionAndMetricValues() {
-        if(!FETCHED_DIMENSIONS_AND_METRICS.first().isVisible())
-            return Collections.singletonList(" ");
+        if (!FETCHED_DIMENSIONS_AND_METRICS.first().isVisible()) return Collections.singletonList(" ");
         return extractInnerTextFromLocator(FETCHED_DIMENSIONS_AND_METRICS);
     }
 
@@ -316,7 +314,7 @@ public class RunReportPanel {
     }
 
     public List<String> fetchLineItemName() {
-        return extractInnerTextFromLocator(FETCHED_LINEITEM_NAME);
+        return extractInnerTextFromLocator(FETCHED_LINE_ITEM_NAME);
     }
 
     public List<String> fetchTacticName() {
@@ -376,15 +374,13 @@ public class RunReportPanel {
         }
     }
 
-    public String fetchStartTime(){
-        if(START_TIME.isVisible())
-            return START_TIME.inputValue();
+    public String fetchStartTime() {
+        if (START_TIME.isVisible()) return START_TIME.inputValue();
         return " ";
     }
 
-    public String fetchEndTime(){
-        if(END_TIME.isVisible())
-            return END_TIME.inputValue();
+    public String fetchEndTime() {
+        if (END_TIME.isVisible()) return END_TIME.inputValue();
         return " ";
     }
 
@@ -397,9 +393,8 @@ public class RunReportPanel {
         }
     }
 
-    public String fetchTimeZone(){
-        if(TIME_ZONE.isVisible())
-            return TIME_ZONE.locator("option:checked").textContent().trim();
+    public String fetchTimeZone() {
+        if (TIME_ZONE.isVisible()) return TIME_ZONE.locator("option:checked").textContent().trim();
         return " ";
     }
 
@@ -428,8 +423,8 @@ public class RunReportPanel {
 
     public List<String> verifyButtonsDisabledBeforeLineItemSelection() {
         List<String> disabledButtons = new ArrayList<>();
-        for(int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++){
-            if(REPORT_PERIOD_BUTTONS.nth(i).isDisabled())
+        for (int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++) {
+            if (REPORT_PERIOD_BUTTONS.nth(i).isDisabled())
                 disabledButtons.add(REPORT_PERIOD_BUTTONS.nth(i).innerText());
         }
         return disabledButtons;
@@ -453,11 +448,10 @@ public class RunReportPanel {
 
     public List<String> verifyButtonsEnabledAfterLineItemSelection() {
         List<String> enabledButtons = new ArrayList<>();
-        for(int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++){
+        for (int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++) {
             String disabledAttribute = REPORT_PERIOD_BUTTONS.nth(i).getAttribute("disabled");
             boolean isEnabled = (disabledAttribute == null || disabledAttribute.isEmpty());
-            if(isEnabled)
-                enabledButtons.add(REPORT_PERIOD_BUTTONS.nth(i).innerText());
+            if (isEnabled) enabledButtons.add(REPORT_PERIOD_BUTTONS.nth(i).innerText());
         }
         return enabledButtons;
     }
@@ -480,7 +474,7 @@ public class RunReportPanel {
         try {
             waitUtility.waitForLocatorVisible(DEFAULT_FLIGHT_DETAILS);
             return DEFAULT_FLIGHT_DETAILS.innerText();
-        }catch (Exception e){
+        } catch (Exception e) {
             return " ";
         }
     }
@@ -522,7 +516,7 @@ public class RunReportPanel {
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
     }
 
-    public String fetchFileName(){
+    public String fetchFileName() {
         return FILE_NAME_TEXTAREA.inputValue().trim();
     }
 }
