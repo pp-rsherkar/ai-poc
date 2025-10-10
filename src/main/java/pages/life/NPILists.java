@@ -91,6 +91,13 @@ public class NPILists {
         return containsLife && containsHCP;
     }
 
+    public boolean checkOnlyLIFEIsSelected() {
+        waitUtility.waitForLocatorVisible(AVAILABLE_IN_CONTAINER);
+        AVAILABLE_IN_CONTAINER.scrollIntoViewIfNeeded();
+        List<String> allTexts = AVAILABLE_IN_CHECKBOX.allInnerTexts();
+        return allTexts.size() == 1 && allTexts.stream().anyMatch(text -> text.contains("Life"));
+    }
+
     public void searchList(String listName) {
         waitUtility.waitForLocatorVisible(CREATE_NEW_LIST);
         SEARCH_BOX.first().fill(listName);

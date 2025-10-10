@@ -56,9 +56,9 @@ public class ExplorerWorkspace {
         this.WORKSPACE_NAME = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX).nth(1);
         this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
         this.DASHBOARD_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content"));
-        this.DASHBOARD_ELEMENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content")).locator("(//p[contains(@class,'TextBase-sc')])[1]");
+        this.DASHBOARD_ELEMENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("(//p[contains(@class,'TextBase-sc')])[1]");
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
-        this.ADD_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Add Filters"));
+        this.ADD_FILTER = WORKSPACE_FRAME.locator("//div[contains(text(),'Add Filter')]");
         this.SEARCH_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
         this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
@@ -73,17 +73,17 @@ public class ExplorerWorkspace {
         this.FROM_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-1']");
         this.REACHABLE_AUDIENCE = WORKSPACE_FRAME.locator("//input[@type='checkbox' and contains(@class,'PrivateSwitchBase-input')]");
         this.SELECT_DESELECT_ALL = WORKSPACE_FRAME.locator("//div[contains(text(),'Select/Deselect All')]");
-        this.AI_CONFIGURATOR_BTN = WORKSPACE_FRAME.locator("//span[text()='AI Configurator']");
+        this.AI_CONFIGURATOR_BTN = WORKSPACE_FRAME.locator("//p[contains(text(),'AI Configurator')]");
         this.AUDIENCE_DESCRIPTION_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@placeholder='Describe your Audience']");
         this.BUILD_AUDIENCE_BTN = WORKSPACE_FRAME.locator("//div[text()='Build Audience']");
-        this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//button[text()='Try another prompt']");
-        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//h4[contains(@class,'style__HeaderTitle')]");
+        this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//div[text()='Try another prompt']");
+        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@class, 'FilterTitleContainer')]");
         this.MAP_TOOL_TIP = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(@class,'MapTooltip')]/div/div/div[text()='Identified NPIs']/following-sibling::div");
         this.DELETE_FILTER = WORKSPACE_FRAME.locator("//button[contains(@class,'DeleteButton')]");
         this.CAMERA_CONTROL_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//button[@title='Map camera controls']");
         this.ZOOM_OUT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[@class='gmnoprint']//button[@title='Zoom out' and @class='gm-control-active']");
         this.MAP_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("div[aria-label='Dashboard Content']");
-        this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//h3[contains(text(),'Dashboard Filters')]");
+        this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
         this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
     }
@@ -130,7 +130,7 @@ public class ExplorerWorkspace {
                 break;
             case "Site", "Search":
                 for (String option : options) {
-                    WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option.trim())).click();
+                    WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]", option.trim())).click();
                 }
                 break;
             case "Graduation Year":

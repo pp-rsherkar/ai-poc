@@ -240,6 +240,11 @@ public class LifeSteps {
         Assert.assertTrue("NPI list is not available in LIFE", npiLists.availablePlatforms());
     }
 
+    @And("Verify the list should be available for LIFE platform by default")
+    public void verifyTheListShouldBeAvailableForLIFEPlatformByDefault() {
+        Assert.assertTrue("LIFE (only) is not selected as default", npiLists.checkOnlyLIFEIsSelected());
+    }
+
     @When("User clicks on Create New List")
     public void user_clicks_on_create_new_list() {
         npiLists.clickCreateNewList();
