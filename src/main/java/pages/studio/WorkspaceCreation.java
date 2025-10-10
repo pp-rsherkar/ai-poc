@@ -16,7 +16,7 @@ public class WorkspaceCreation {
     private final Locator HCP_EXPLORER;
     private final Locator HCP_EXPANSION;
     private final Locator BACK_TO_WORKSPACE_DASHBOARD;
-    private final Locator WORK_SPACECREATED_ALERT;
+    private final Locator WORKSPACE_CREATED_ALERT;
     private final Locator MENU_ICON;
     private final FrameLocator WORKSPACE_FRAME;
     private final Locator WORKSPACE_TYPE;
@@ -38,6 +38,8 @@ public class WorkspaceCreation {
     private final Locator DUPLICATE_WORKSPACE_ALERT;
     private final Locator DUPLICATE_WORKSPACE_NAME;
     private final Locator DASHBOARD_RELOAD_ICON;
+    private final Locator PAGINATION;
+    private final Locator DEPENDENT_WORKSPACE_TEXT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     int counter = 0;
 
@@ -48,7 +50,7 @@ public class WorkspaceCreation {
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
-        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
+        this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
         this.MENU_ICON = page.locator("//img[contains(@class,'menu-icon')]");
         this.WORKSPACE_TYPE = WORKSPACE_FRAME.locator("//p[text()='Workspace Type']");
         this.MORE_ACTION_DIALOG = WORKSPACE_FRAME.locator("//div[@role='dialog']");
@@ -67,8 +69,10 @@ public class WorkspaceCreation {
         this.DUPLICATE_WORKSPACE_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Duplicate Workspace')]");
         this.DUPLICATE_BUTTON_FROM_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Duplicate Workspace')]/parent::header/following-sibling::footer//div[contains(text(),'Duplicate')]");
         this.DUPLICATE_WORKSPACE_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace duplicated successfully')]");
-        this.DUPLICATE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//span/b[starts-with(text(), 'Copy of Explorer')]");
+        this.DUPLICATE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//span/b[starts-with(text(), 'Copy of')]");
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
+        this.PAGINATION = WORKSPACE_FRAME.locator("(//div[contains(@class, 'PaginationContainer')]//span)[1]");
+        this.DEPENDENT_WORKSPACE_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'Checking for dependent workspaces...')]");
     }
 
     public String studioDashboard() {
@@ -90,8 +94,8 @@ public class WorkspaceCreation {
     }
 
     public String verifyWorkspaceCreation() {
-        String text = WORK_SPACECREATED_ALERT.innerText();
-        waitUtility.waitForLocatorHidden(WORK_SPACECREATED_ALERT);
+        String text = WORKSPACE_CREATED_ALERT.innerText();
+        waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
         return text;
     }
 
@@ -160,8 +164,9 @@ public class WorkspaceCreation {
         }
     }
 
-    public void openMoreActionsForWorkspace(String workspaceName){
-        WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first().click();
+    public void clickMoreActionsMenu(String workspaceName){
+        if(WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first().isVisible())
+            WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first().click();
     }
 
     public void deleteWorkspace() {
@@ -171,7 +176,29 @@ public class WorkspaceCreation {
         REMOVAL_CONFIRMATION_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
+    public void performActionOnWorkspace(String actionName){
+        MORE_ACTION_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        switch(actionName){
+            case "Duplicate":
+                DUPLICATE_BUTTON.scrollIntoViewIfNeeded();
+                DUPLICATE_BUTTON.click();
+                DUPLICATE_WORKSPACE_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                break;
+            case "Delete":
+                DELETE_BUTTON.scrollIntoViewIfNeeded();
+                DELETE_BUTTON.click();
+                REMOVAL_CONFIRMATION_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                break;
+            case "Rename":
+                RENAME_BUTTON.scrollIntoViewIfNeeded();
+                RENAME_BUTTON.click();
+                RENAME_WORKSPACE_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                break;
+        }
+    }
+
     public String verifyDeletePopUp() {
+        waitUtility.waitForLocatorHidden(DEPENDENT_WORKSPACE_TEXT);
        return REMOVAL_CONFIRMATION_TEXT.innerText();
     }
 
@@ -183,15 +210,10 @@ public class WorkspaceCreation {
         return text;
     }
 
-    public void selectRenameWorkspaceFromOptions(){
-        MORE_ACTION_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        RENAME_BUTTON.scrollIntoViewIfNeeded();
-        RENAME_BUTTON.click();
-        RENAME_WORKSPACE_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-    }
-
     public String renameWorkspaceName(String oldWorkspaceName, String newWorkspace) {
-        WORKSPACE_FRAME.locator(String.format("//input[contains(@value,'%s')]", oldWorkspaceName)).fill(newWorkspace);
+        WORKSPACE_FRAME.locator(String.format("//h3[text()='Rename Workspace']/parent::header/following-sibling::div//input[@value='%s']", oldWorkspaceName)).fill(newWorkspace);
+        if(!UPDATE_BUTTON.isEnabled())
+            page.waitForTimeout(2000);
         UPDATE_BUTTON.click();
         String text = RENAME_WORKSPACE_ALERT.innerText();
         waitUtility.waitForLocatorHidden(RENAME_WORKSPACE_ALERT);
@@ -204,17 +226,14 @@ public class WorkspaceCreation {
            page.keyboard().press("Escape");
         }
         page.waitForCondition(() -> SEARCH_WORKSPACE.filter().count() == 1);
-        SEARCH_WORKSPACE.fill(workspaceName);
-        page.keyboard().press("Enter");
-        waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
-        return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
-    }
-
-    public void selectDuplicateWorkspaceFromOptions(){
-        MORE_ACTION_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        DUPLICATE_BUTTON.scrollIntoViewIfNeeded();
-        DUPLICATE_BUTTON.click();
-        DUPLICATE_WORKSPACE_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible()){
+            return true;
+        }else {
+            SEARCH_WORKSPACE.fill(workspaceName);
+            page.keyboard().press("Enter");
+            waitUtility.waitForLocatorVisible(PAGINATION);
+            return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
+        }
     }
 
     public String fetchDuplicateWorkspaceName(){

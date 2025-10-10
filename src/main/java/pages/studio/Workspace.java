@@ -25,7 +25,7 @@ public class Workspace {
     private final Locator SELECT_LIFE;
     private final Locator PUBLISH_BUTTON;
     private final FrameLocator WORKSPACE_FRAME;
-    private final Locator WORK_SPACECREATED_ALERT;
+    private final Locator WORKSPACE_CREATED_ALERT;
     private final Locator WEBHOOK_ICON;
     private final Locator WEBHOOK_TOGGLE_BUTTON;
     private final Locator WEBHOOK_PANEL_TITLE;
@@ -39,7 +39,7 @@ public class Workspace {
     private final Locator INLINE_ERROR_MESSAGE;
     private final Locator ERROR_ALERT;
     private final Locator CREATE_WORKSPACE;
-    private final Locator BEFORE_YOU_LEAVE_DAILOG;
+    private final Locator BEFORE_YOU_LEAVE_DIALOG;
     private final Locator EXIT_BUTTON;
     private final Locator BACK_ARROW;
     private final Locator DOWNLOAD_NPI_BUTTON;
@@ -60,7 +60,7 @@ public class Workspace {
         this.SELECT_HCP = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP365"));
         this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
-        this.WORK_SPACECREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
+        this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
         this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
         this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
         this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
@@ -74,7 +74,7 @@ public class Workspace {
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
         this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
-        this.BEFORE_YOU_LEAVE_DAILOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
+        this.BEFORE_YOU_LEAVE_DIALOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
         this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
         this.BACK_ARROW = WORKSPACE_FRAME.locator("//div[contains(@style,'cursor: pointer')]");
         this.DOWNLOAD_NPI_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Download NPIs')]");
@@ -114,7 +114,7 @@ public class Workspace {
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public String verifyPublishedNpi() {
@@ -122,7 +122,7 @@ public class Workspace {
     }
 
     public void waitTillWorkspaceAlertHide() {
-        WORK_SPACECREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void clickWebhookIcon() {
@@ -231,7 +231,7 @@ public class Workspace {
 
     public void goToWorkspaceList() {
         BACK_ARROW.click();
-        BEFORE_YOU_LEAVE_DAILOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        BEFORE_YOU_LEAVE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         EXIT_BUTTON.click();
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }

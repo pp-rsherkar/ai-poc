@@ -159,10 +159,10 @@ public class StudioSteps {
     }
 
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
-    public void user_adds_the_workspace_name_and_selects_the_advertiser(String workspaceName, String advertiser) {
+    public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
         workspace.waitTillWorkspaceAlertHide();
-        newWorkspaceName = workspaceName + '_' + randomNumber;
-        explorerWorkspace.enterWorkspaceName(newWorkspaceName);
+        workspaceName = wName + '_' + randomNumber;
+        explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
 
@@ -399,7 +399,7 @@ public class StudioSteps {
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
-        workspaceCreation.openMoreActionsForWorkspace(newWorkspaceName);
+        workspaceCreation.clickMoreActionsMenu(newWorkspaceName);
         workspaceCreation.deleteWorkspace();
     }
 
@@ -519,47 +519,27 @@ public class StudioSteps {
         }
     }
 
-    @And("Navigate to workspace dashboard and search the workspace created")
+    @And("Navigate to workspace dashboard")
     public void navigateToWorkspaceDashboardAndSearchTheWorkspaceCreated() {
         workspace.goToWorkspaceList();
-        workspaceCreation.openMoreActionsForWorkspace(newWorkspaceName);
     }
 
-    @And("User selects the Rename option by clicking More Actions button")
-    public void userSelectsTheRenameOptionByClickingThreeDotsButton() {
-        workspaceCreation.selectRenameWorkspaceFromOptions();
+    @And("User searches the workspace created to perform Actions from More menu")
+    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() {
+        workspaceCreation.searchWorkspaceName(workspaceName);
+        workspaceCreation.clickMoreActionsMenu(workspaceName);
+    }
+
+    @And("User selects the {string} option by clicking More Actions menu")
+    public void userSelectsTheDeleteOptionByClickingMoreActionsButton(String actionName) {
+        workspaceCreation.performActionOnWorkspace(actionName);
     }
 
     @And("Verify user is able to rename the workspace as {string}")
     public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
-        workspaceName = newWorkspace + randomNumber;
-        Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(newWorkspaceName, workspaceName));
-    }
-
-    @And("User is able to search the workspace with the new name")
-    public void userIsAbleToSearchTheWorkspaceWithTheNewName() {
-        Assert.assertTrue("Unable to search renamed workspace", workspaceCreation.searchWorkspaceName(workspaceName));
-    }
-
-    @And("User selects the Delete option by clicking More Actions button")
-    public void userSelectsTheDeleteOptionByClickingMoreActionsButton() {
-        workspaceCreation.deleteWorkspace();
-    }
-
-    @And("Verify user is able to delete the workspace")
-    public void verifyUserIsAbleToDeleteTheWorkspace() {
-        String text = workspaceCreation.verifyDeletePopUp();
-        Assert.assertTrue("Message is not displayed",
-                text.contains("You are trying to delete the workspace " + newWorkspaceName +".\n" +
-                        "\n" +
-                        "This action cannot be undone – all deleted data will be lost.\n" +
-                        "Do you want to proceed?"));
-        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
-    }
-
-    @And("User selects the Duplicate option by clicking More Actions button")
-    public void userSelectsTheDuplicateOptionByClickingMoreActionsButton() {
-        workspaceCreation.selectDuplicateWorkspaceFromOptions();
+        newWorkspaceName = newWorkspace + randomNumber;
+        Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName));
+        workspaceName = newWorkspaceName;
     }
 
     @And("Verify user is able to duplicate the workspace")
@@ -567,5 +547,24 @@ public class StudioSteps {
         workspaceName = workspaceCreation.fetchDuplicateWorkspaceName();
         Assert.assertEquals("Workspace duplicated successfully", workspaceCreation.clickDuplicateButton());
     }
+
+    @And("User is able to search the workspace after performing operation - {string}")
+    public void userIsAbleToSearchTheWorkspaceWithTheNewName(String operationName) {
+        Assert.assertTrue("Unable to search workspace after performing " + operationName + " operation", workspaceCreation.searchWorkspaceName(workspaceName));
+    }
+
+    @And("Verify user is able to delete the workspace")
+    public void verifyUserIsAbleToDeleteTheWorkspace() {
+        String text = workspaceCreation.verifyDeletePopUp().trim();
+        Assert.assertTrue("Message should contain warning about deleting workspace",
+                text.contains("You are trying to delete the workspace " + workspaceName));
+        Assert.assertTrue("Message should mention irreversible deletion",
+                text.contains("This action cannot be undone – all deleted data will be lost."));
+        Assert.assertTrue("Message should ask for confirmation",
+                text.contains("Do you want to proceed?"));
+        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+    }
+
+
 
 }

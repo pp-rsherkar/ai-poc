@@ -163,7 +163,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Abbvie     | Explorer       | Find doctors within certain age ranges, with specific professions, and narrow by wealth. | Profession      |
 
   @regression
-  Scenario Outline: Rename HCP Explorer workspace
+  Scenario Outline: Manage operations on Workspace - Rename, Duplication, and Delete on HCP Explorer workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
@@ -176,53 +176,18 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
-    And Navigate to workspace dashboard and search the workspace created
-    And User selects the Rename option by clicking More Actions button
+    And Navigate to workspace dashboard
+    And User searches the workspace created to perform Actions from More menu
+    And User selects the "Rename" option by clicking More Actions menu
     And Verify user is able to rename the workspace as "<NEW_WORKSPACE_NAME>"
-    And User is able to search the workspace with the new name
-    Examples:
-      | ADVERTISER | WORKSPACE_NAME | NEW_WORKSPACE_NAME |
-      | Abbvie     | Explorer       | New_Explorer       |
-
-  @regression
-  Scenario Outline: Delete HCP Explorer workspace
-    When User clicks on Create New Workspace
-    Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
-    And User applies the filter and selects option
-      | FilterName | Option                |
-      | NPI Age    | Below 25, 25 to 35,   |
-      | NPI Gender | Female, Male, Unknown |
-    And User clicks on Ok and closes the filter popup
-    Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
-    And Navigate to workspace dashboard and search the workspace created
-    And User selects the Delete option by clicking More Actions button
+    And User is able to search the workspace after performing operation - "Rename"
+    And User searches the workspace created to perform Actions from More menu
+    And User selects the "Duplicate" option by clicking More Actions menu
+    And Verify user is able to duplicate the workspace
+    And User is able to search the workspace after performing operation - "Duplicate"
+    And User searches the workspace created to perform Actions from More menu
+    And User selects the "Delete" option by clicking More Actions menu
     And Verify user is able to delete the workspace
     Examples:
-      | ADVERTISER | WORKSPACE_NAME |
-      | Abbvie     | Explorer       |
-
-  @regression
-  Scenario Outline: Duplicate HCP Explorer workspace
-    When User clicks on Create New Workspace
-    Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
-    And User applies the filter and selects option
-      | FilterName | Option                |
-      | NPI Age    | Below 25, 25 to 35,   |
-      | NPI Gender | Female, Male, Unknown |
-    And User clicks on Ok and closes the filter popup
-    Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
-    And Navigate to workspace dashboard and search the workspace created
-    And User selects the Duplicate option by clicking More Actions button
-    And Verify user is able to duplicate the workspace
-    And User is able to search the workspace with the new name
-    Examples:
-      | ADVERTISER | WORKSPACE_NAME |
-      | Abbvie     | Explorer       |
+      | ADVERTISER | WORKSPACE_NAME | NEW_WORKSPACE_NAME |
+      | Abbvie     | Explorer       | New_Explorer_      |
