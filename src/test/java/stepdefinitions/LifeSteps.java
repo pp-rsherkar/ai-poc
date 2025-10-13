@@ -240,6 +240,11 @@ public class LifeSteps {
         Assert.assertTrue("NPI list is not available in LIFE", npiLists.availablePlatforms());
     }
 
+    @And("Verify the list should be available for LIFE platform by default")
+    public void verifyTheListShouldBeAvailableForLIFEPlatformByDefault() {
+        Assert.assertTrue("LIFE (only) is not selected as default", npiLists.checkOnlyLIFEIsSelected());
+    }
+
     @When("User clicks on Create New List")
     public void user_clicks_on_create_new_list() {
         npiLists.clickCreateNewList();
@@ -937,13 +942,6 @@ public class LifeSteps {
     @Then("Deals should get assigned to the Tactic")
     public void dealsShouldGetAssignedToTheTactic() {
         Assert.assertEquals("Success!", pmp.verifyTacticIsSaved().trim());
-    }
-
-
-    @Then("User should see All Premium Pubs, filters such as Exchange, Search")
-    public void userShouldSeeAllPremiumPubsFiltersSuchAsExchangeSearch(DataTable premiumHubs) {
-        List<String> premiumHubsList = premiumHubs.asList(String.class);
-        Assert.assertTrue("All premium Hubs are available and clickable", pmp.verifyAllPremiumHubsOnMarketPlace(premiumHubsList));
     }
 
     /*Roshani Sherkar

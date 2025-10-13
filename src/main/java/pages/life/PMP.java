@@ -18,44 +18,44 @@ public class PMP {
     private final Locator SAVE_TACTIC_SETTINGS;
     private final Locator SEARCH_RULE_TYPE;
     private final Locator SELECT_RULE_TYPE;
-    private final Locator ALLDEALS_PANEL;
+    private final Locator ALL_DEALS_PANEL;
     private final Locator PRIVATE_DEALS_TAB;
     private final Locator PREMIUM_DEALS_TAB;
     private final Locator TOOLTIP_TEXT;
     private final Locator OK_BUTTON;
     private final Locator RULE_TYPE_CLOSE;
     private final Locator SUCCESS_ALERT;
-    private final Locator APPLIEDDEAL_PANELLIST;
+    private final Locator APPLIED_DEAL_PANEL_LIST;
     private final Locator DEALS_LIST;
-    private final Locator ADD_NEWDEAL_BUTTON;
-    private final Locator DEAL_SEARCHFILTER;
-    private final Locator EXCHANGE_SEARCHFILTER;
+    private final Locator ADD_NEW_DEAL_BUTTON;
+    private final Locator DEAL_SEARCH_FILTER;
+    private final Locator EXCHANGE_SEARCH_FILTER;
     private final Locator EXCHANGE_DROPDOWN;
-    private final Locator ENTER_DEALID;
-    private final Locator ENTER_DEALNAME;
-    private final Locator MEDIATYPE_DROPDOWN;
+    private final Locator ENTER_DEAL_ID;
+    private final Locator ENTER_DEAL_NAME;
+    private final Locator MEDIA_TYPE_DROPDOWN;
     private final Locator ENTER_PRICE;
-    private final Locator ADDNEWDEAL_LABEL;
-    private final Locator MEDIATYPE_VALUE;
+    private final Locator ADD_NEW_DEAL_LABEL;
+    private final Locator MEDIA_TYPE_VALUE;
     private final Locator DATE_PICKER;
-    private final Locator DATE_PICKER_APPLYBTN;
+    private final Locator DATE_PICKER_APPLY_BUTTON;
     private final Locator TARGET_APPLIED_DEAL_TOGGLE;
-    private final Locator NEWDEAL_SAVEBTN;
-    private final Locator TACTICSETTING_TAB;
+    private final Locator NEW_DEAL_SAVE_BUTTON;
+    private final Locator TACTIC_SETTING_TAB;
     private final Locator DELETE_ICON;
     private final Locator PRICING_STRATEGY_DROPDOWN;
     private final Locator PRICE_TEXT;
     private final Locator PERCENTAGE_TEXT;
-    private final Locator ADDDEAL_BUTTON;
-    private final Locator DEALPRICE_TYPE;
+    private final Locator ADD_DEAL_BUTTON;
+    private final Locator DEAL_PRICE_TYPE;
     private final Locator MORE_OPTION;
-    private final Locator DEAL_TYPE_COLNAME;
-    private final Locator BASE_BIDPRICE;
-    private final Locator MAX_BIDPRICE;
-    private final Locator SERVE_EVERYWHERE_DAILOG;
-    private final Locator SERVE_EVERYWHERE_OKBTN;
-    private final Locator ALL_LIFEMARKETPLACE;
-    private final Locator ALL_PREMIUMPUBS;
+    private final Locator DEAL_TYPE_COLUMN_NAME;
+    private final Locator BASE_BID_PRICE;
+    private final Locator MAX_BID_PRICE;
+    private final Locator SERVE_EVERYWHERE_DIALOG;
+    private final Locator SERVE_EVERYWHERE_OK_BUTTON;
+    private final Locator ALL_LIFE_MARKET_PLACE;
+    private final Locator ALL_PREMIUM_PUBS;
     private final Locator NO_DEAL_TEXT;
     private final Locator ADVERTISER;
     private final Locator ADVERTISER_VALUES;
@@ -68,7 +68,7 @@ public class PMP {
         this.ADD_TARGETING_RULE = page.locator("//span[text()='Add Targeting Rule']");
         this.NEW_TARGETING_RULE = page.locator("//span[text()='New Targeting Rule']");
         this.SEARCH_RULE_TYPE = page.locator("//input[@name='search']");
-        this.ALLDEALS_PANEL = page.locator("//div[@class='navbar']//a[contains(@class,'nav-item ui header pointer active')]");
+        this.ALL_DEALS_PANEL = page.locator("//div[@class='navbar']//a[contains(@class,'nav-item ui header pointer active')]");
         this.PRIVATE_DEALS_TAB = page.locator("//a[contains(text(),'Private Deals')]");
         this.TOOLTIP_TEXT = page.locator("//div[contains(@class,'ng-tooltip-show')]");
         this.PREMIUM_DEALS_TAB = page.locator("//a[contains(text(),'Life Marketplace Deals')]");
@@ -76,38 +76,38 @@ public class PMP {
         this.SAVE_TACTIC_SETTINGS = page.locator("//span[text()='Save']");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
         this.SELECT_RULE_TYPE = page.locator("(//a[@classname='target-tooltip'])[1]");
-        this.APPLIEDDEAL_PANELLIST = page.locator("//div[contains(@class,'appliedDealsList')]");
+        this.APPLIED_DEAL_PANEL_LIST = page.locator("//div[contains(@class,'appliedDealsList')]");
         this.RULE_TYPE_CLOSE = page.locator("//div[contains(@class,'close_icon')]");
         this.DEALS_LIST = page.locator("//span[contains(@class,'dealName')]");
-        this.ADD_NEWDEAL_BUTTON = page.locator("//div[contains(@class,'addNewDealBtn')]");
-        this.DEAL_SEARCHFILTER = page.locator("//input[contains(@class,'searchInp')]");
-        this.EXCHANGE_SEARCHFILTER = page.locator("//input[contains(@placeholder,'Any Exchange')]");
+        this.ADD_NEW_DEAL_BUTTON = page.locator("//div[contains(@class,'addNewDealBtn')]");
+        this.DEAL_SEARCH_FILTER = page.locator("//input[contains(@class,'searchInp')]");
+        this.EXCHANGE_SEARCH_FILTER = page.locator("//input[contains(@placeholder,'Any Exchange')]");
         this.EXCHANGE_DROPDOWN = page.locator("//app-single-select-dropdown[contains(@placeholder,'Select Exchange')]");
-        this.ENTER_DEALID = page.locator("//input[@formcontrolname='pubDealId']");
-        this.ENTER_DEALNAME = page.locator("//input[@formcontrolname='dealName']");
-        this.MEDIATYPE_DROPDOWN = page.locator("//app-multi-select-checkbox[@placeholder='Select Media Type']");
-        this.MEDIATYPE_VALUE = page.locator("//div[@class='item']/sui-checkbox/label");
+        this.ENTER_DEAL_ID = page.locator("//input[@formcontrolname='pubDealId']");
+        this.ENTER_DEAL_NAME = page.locator("//input[@formcontrolname='dealName']");
+        this.MEDIA_TYPE_DROPDOWN = page.locator("//app-multi-select-checkbox[@placeholder='Select Media Type']");
+        this.MEDIA_TYPE_VALUE = page.locator("//div[@class='item']/sui-checkbox/label");
         this.ENTER_PRICE = page.locator("//input[@id='price']");
-        this.ADDNEWDEAL_LABEL = page.locator("//div[@class='addNewDealLabel']");
+        this.ADD_NEW_DEAL_LABEL = page.locator("//div[@class='addNewDealLabel']");
         this.DATE_PICKER = page.locator("//div[contains(@class,'form-group')]/div[contains(@class,'forecast-datepicker')]");
-        this.DATE_PICKER_APPLYBTN = page.locator("//div[contains(@class,'custom-date')]//button[contains(@class,'applyBtn')]");
+        this.DATE_PICKER_APPLY_BUTTON = page.locator("//div[contains(@class,'custom-date')]//button[contains(@class,'applyBtn')]");
         this.TARGET_APPLIED_DEAL_TOGGLE = page.locator("//div[contains(@class,'appliedDeal')]/sui-checkbox");
-        this.NEWDEAL_SAVEBTN = page.locator("//div[contains(@class,'addDealFooter')]//button[contains(@class,'okButton')]");
-        this.TACTICSETTING_TAB = page.locator("//a[contains(@class,'gaTabSettings')]");
+        this.NEW_DEAL_SAVE_BUTTON = page.locator("//div[contains(@class,'addDealFooter')]//button[contains(@class,'okButton')]");
+        this.TACTIC_SETTING_TAB = page.locator("//a[contains(@class,'gaTabSettings')]");
         this.DELETE_ICON = page.locator("//div[contains(@title,'delete')]");
         this.PRICING_STRATEGY_DROPDOWN = page.locator("//div[contains(@class,'menu transition visible')]/div[contains(@class,'item')]");
         this.PRICE_TEXT = page.locator("//div[contains(@class,'pricingstrategy')]//input[contains(@placeholder,'Price')]");
         this.PERCENTAGE_TEXT = page.locator("//div[contains(@class,'pricingstrategy')]//input[contains(@placeholder,'percentage')]");
-        this.ADDDEAL_BUTTON = page.locator("//span[@class='add-action-new-deal']");
-        this.DEALPRICE_TYPE = page.locator("//button[@name='DealPriceType']");
+        this.ADD_DEAL_BUTTON = page.locator("//span[@class='add-action-new-deal']");
+        this.DEAL_PRICE_TYPE = page.locator("//button[@name='DealPriceType']");
         this.MORE_OPTION = page.locator("//label[contains(normalize-space(), 'Curated Markets and Deals')]/ancestor::div[contains(@class, 'target-item')]//div[contains(@class, 'rule-options-icon')]");
-        this.DEAL_TYPE_COLNAME = page.locator("//div[translate(normalize-space(text()), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'DEAL TYPE']");
-        this.BASE_BIDPRICE = page.locator("//input[contains(@placeholder,'Base Bid Price')]");
-        this.MAX_BIDPRICE = page.locator("//input[contains(@placeholder,'Max Bid Price')]");
-        this.SERVE_EVERYWHERE_DAILOG = page.locator("//div[contains(text(),'Serve Everywhere')]");
-        this.SERVE_EVERYWHERE_OKBTN = page.locator("//button[contains(text(),'OK')]");
-        this.ALL_LIFEMARKETPLACE = page.locator("//div[contains(@class,'allPremiumPubs')]");
-        this.ALL_PREMIUMPUBS = page.locator("//div[contains(@class,'premiumPub')]");
+        this.DEAL_TYPE_COLUMN_NAME = page.locator("//div[translate(normalize-space(text()), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'DEAL TYPE']");
+        this.BASE_BID_PRICE = page.locator("//input[contains(@placeholder,'Base Bid Price')]");
+        this.MAX_BID_PRICE = page.locator("//input[contains(@placeholder,'Max Bid Price')]");
+        this.SERVE_EVERYWHERE_DIALOG = page.locator("//div[contains(text(),'Serve Everywhere')]");
+        this.SERVE_EVERYWHERE_OK_BUTTON = page.locator("//button[contains(text(),'OK')]");
+        this.ALL_LIFE_MARKET_PLACE = page.locator("//div[contains(@class,'allPremiumPubs')]");
+        this.ALL_PREMIUM_PUBS = page.locator("//div[contains(@class,'premiumPub')]");
         this.NO_DEAL_TEXT = page.locator("//div[contains(@class,'noDealsTxt')]");
         this.ADVERTISER = page.locator("//app-multi-select[contains(@class,'dealAdvMultiSelect')]//input");
         this.ADVERTISER_VALUES = page.locator("//app-multi-select[contains(@class,'dealAdvMultiSelect')]//div[@suidropdownmenu]//span");
@@ -115,7 +115,7 @@ public class PMP {
 
     public void navigateToTacticSettingTab() {
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
-        TACTICSETTING_TAB.click();
+        TACTIC_SETTING_TAB.click();
     }
 
     public void verifyTacticSettingsText() {
@@ -138,8 +138,8 @@ public class PMP {
     }
 
     public String verifyPMPDealsPanel() {
-        waitUtility.waitForLocatorVisible(ALLDEALS_PANEL);
-        return ALLDEALS_PANEL.innerText();
+        waitUtility.waitForLocatorVisible(ALL_DEALS_PANEL);
+        return ALL_DEALS_PANEL.innerText();
     }
 
     public void clickDealsTab(String dealType) {
@@ -152,7 +152,7 @@ public class PMP {
     }
 
     public boolean verifyAsignedDealsList() {
-        return APPLIEDDEAL_PANELLIST.count() > 0;
+        return APPLIED_DEAL_PANEL_LIST.count() > 0;
     }
 
     public boolean verifyTargetAppliedDealsToggle(String toggleButton) {
@@ -160,8 +160,8 @@ public class PMP {
             flag1 = TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
         } else if (toggleButton.equalsIgnoreCase("OFF")) {
             TARGET_APPLIED_DEAL_TOGGLE.click();
-            waitUtility.waitForLocatorVisible(SERVE_EVERYWHERE_DAILOG);
-            SERVE_EVERYWHERE_OKBTN.click();
+            waitUtility.waitForLocatorVisible(SERVE_EVERYWHERE_DIALOG);
+            SERVE_EVERYWHERE_OK_BUTTON.click();
             flag1 = !TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
         }
         return flag1;
@@ -171,7 +171,7 @@ public class PMP {
         OK_BUTTON.click();
         if (RULE_TYPE_CLOSE.isVisible()) RULE_TYPE_CLOSE.click();
         waitUtility.waitUntilSpinnerHidden();
-        waitUtility.waitForLocatorVisible(TACTICSETTING_TAB);
+        waitUtility.waitForLocatorVisible(TACTIC_SETTING_TAB);
     }
 
     public boolean verifyAssignedDealsOnTactic(String dealName, String toggleButton) {
@@ -195,7 +195,7 @@ public class PMP {
     }
 
     public void selectDealFromListAndAssign(String dealName) {
-        DEAL_SEARCHFILTER.fill(dealName);
+        DEAL_SEARCH_FILTER.fill(dealName);
         waitUtility.waitForElementVisible(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName));
         String xpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/parent::div/preceding-sibling::span", dealName);
         page.locator(xpath).click();
@@ -205,23 +205,23 @@ public class PMP {
     }
 
     public boolean verifyPrivateDealsFilterPanel() {
-        if (ADD_NEWDEAL_BUTTON.isVisible() && ADD_NEWDEAL_BUTTON.isEnabled()) flag1 = true;
-        if (DEAL_SEARCHFILTER.isVisible() && EXCHANGE_SEARCHFILTER.isVisible()) flag2 = true;
+        if (ADD_NEW_DEAL_BUTTON.isVisible() && ADD_NEW_DEAL_BUTTON.isEnabled()) flag1 = true;
+        if (DEAL_SEARCH_FILTER.isVisible() && EXCHANGE_SEARCH_FILTER.isVisible()) flag2 = true;
         return flag1 && flag2;
     }
 
     public boolean applyFilter(String key, List<String> value) {
-        DEAL_SEARCHFILTER.clear();
-        EXCHANGE_SEARCHFILTER.clear();
+        DEAL_SEARCH_FILTER.clear();
+        EXCHANGE_SEARCH_FILTER.clear();
         switch (key) {
             case "SearchByName":
                 for (String val : value) {
-                    DEAL_SEARCHFILTER.fill(val);
+                    DEAL_SEARCH_FILTER.fill(val);
                 }
                 break;
             case "SearchByExchange":
                 for (String val : value) {
-                    EXCHANGE_SEARCHFILTER.fill(val);
+                    EXCHANGE_SEARCH_FILTER.fill(val);
                 }
                 break;
         }
@@ -230,27 +230,27 @@ public class PMP {
     }
 
     public void clickAddNewDeals() {
-        ADD_NEWDEAL_BUTTON.click();
-        waitUtility.waitForLocatorVisible(ADDNEWDEAL_LABEL);
+        ADD_NEW_DEAL_BUTTON.click();
+        waitUtility.waitForLocatorVisible(ADD_NEW_DEAL_LABEL);
         waitUtility.waitUntilSpinnerHidden();
     }
 
     public String addAndSaveNewDeals(String exchangeType, String dealID, String dealName, List<String> mediaType, String advertiser, String dealPriceType, String price) {
         EXCHANGE_DROPDOWN.click();
         page.locator(String.format("//div[@menutransition='slide up']/div[contains(text(),'%s')]", exchangeType)).click();
-        ENTER_DEALID.fill(dealID);
-        ENTER_DEALNAME.fill(dealName);
-        MEDIATYPE_DROPDOWN.click();
-        CommonUtils.selectAndClickElement(MEDIATYPE_VALUE, mediaType);
+        ENTER_DEAL_ID.fill(dealID);
+        ENTER_DEAL_NAME.fill(dealName);
+        MEDIA_TYPE_DROPDOWN.click();
+        CommonUtils.selectAndClickElement(MEDIA_TYPE_VALUE, mediaType);
         page.keyboard().press("Escape");
         ADVERTISER.click();
         CommonUtils.selectAndClickElement(ADVERTISER_VALUES, Collections.singletonList(advertiser));
         page.keyboard().press("Escape");
         DATE_PICKER.click();
-        DATE_PICKER_APPLYBTN.click();
-        DEALPRICE_TYPE.locator("text=" + dealPriceType).click();
+        DATE_PICKER_APPLY_BUTTON.click();
+        DEAL_PRICE_TYPE.locator("text=" + dealPriceType).click();
         ENTER_PRICE.fill(price);
-        NEWDEAL_SAVEBTN.click();
+        NEW_DEAL_SAVE_BUTTON.click();
         String text = SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return text;
@@ -272,7 +272,7 @@ public class PMP {
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
         String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]/div", dealName);
         page.locator(xpath).first().scrollIntoViewIfNeeded();
-        DEAL_TYPE_COLNAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
+        DEAL_TYPE_COLUMN_NAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
         page.locator(xpath).first().click();
         PRICING_STRATEGY_DROPDOWN.locator("text=" + key).click();
         if (key.equalsIgnoreCase("Flat")) {
@@ -286,7 +286,7 @@ public class PMP {
     }
 
     public boolean applyDealsFromDealsSection(String dealType, String exchangeType, String dealID, String dealName, List<String> mediaType, String advertiser, String dealPriceType, String price, String toggleButton) {
-        ADDDEAL_BUTTON.click();
+        ADD_DEAL_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
         clickDealsTab(dealType);
         clickAddNewDeals();
@@ -297,23 +297,24 @@ public class PMP {
     }
 
     public boolean verifyBaseAndMaxPriceIsEditable(String baseBidPrice, String maxBidPrice) {
-        BASE_BIDPRICE.scrollIntoViewIfNeeded();
-        if (BASE_BIDPRICE.isEditable() && MAX_BIDPRICE.isEditable()) {
-            BASE_BIDPRICE.fill(baseBidPrice);
-            MAX_BIDPRICE.fill(maxBidPrice);
+        BASE_BID_PRICE.scrollIntoViewIfNeeded();
+        if (BASE_BID_PRICE.isEditable() && MAX_BID_PRICE.isEditable()) {
+            BASE_BID_PRICE.fill(baseBidPrice);
+            MAX_BID_PRICE.fill(maxBidPrice);
             flag1 = true;
         }
         return flag1;
     }
 
+    /* Premium Hub is no longer displayed on the Deals panel. This function is being retained in case the functionality is added again in the future. */
     public boolean verifyAllPremiumHubsOnMarketPlace(List<String> premiumHubsList) {
-        waitUtility.waitForLocatorVisible(ALL_LIFEMARKETPLACE);
-        for (int i = 0; i < ALL_PREMIUMPUBS.count(); i++) {
-            String classAttr = ALL_PREMIUMPUBS.nth(i).getAttribute("class");
+        waitUtility.waitForLocatorVisible(ALL_LIFE_MARKET_PLACE);
+        for (int i = 0; i < ALL_PREMIUM_PUBS.count(); i++) {
+            String classAttr = ALL_PREMIUM_PUBS.nth(i).getAttribute("class");
             if (classAttr != null) {
                 for (String hub : premiumHubsList) {
                     if (classAttr.contains(hub)) {
-                        ALL_PREMIUMPUBS.nth(i).click();
+                        ALL_PREMIUM_PUBS.nth(i).click();
 
                         boolean dealVisible = false, noDealVisible = false;
                         try {

@@ -15,11 +15,11 @@ public class TargetingTemplate {
     private final Locator NEW_TEMPLATE_BUTTON;
     private final Locator SEARCH_BOX;
     private final Locator TEMPLATE_NAME_TEXT;
-    private final Locator LINE_ITEMTYPE_DROPDOWN;
-    private final Locator LINE_ITEMTYPE_VALUE;
+    private final Locator LINE_ITEM_TYPE_DROPDOWN;
+    private final Locator LINE_ITEM_TYPE_VALUE;
     private final Locator CHANNEL_DROPDOWN;
     private final Locator CHANNEL_VALUE;
-    private final Locator ADD_TARGETINGRULE_BUTTON;
+    private final Locator ADD_TARGETING_RULE_BUTTON;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_NAME_ERROR;
     private final Locator TARGETING_RULES_ERROR;
@@ -43,11 +43,11 @@ public class TargetingTemplate {
         this.NEW_TEMPLATE_BUTTON = page.locator("//span[contains(text(),'New Template')]");
         this.SEARCH_BOX = page.locator("//input[contains(@placeholder,'Search') and contains(@class,'search icon-pading')]");
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
-        this.LINE_ITEMTYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
-        this.LINE_ITEMTYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
+        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
+        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
         this.CHANNEL_VALUE = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
-        this.ADD_TARGETINGRULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
+        this.ADD_TARGETING_RULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.TEMPLATE_NAME_ERROR = page.locator("//div[contains(text(),'Template Name is required')]");
         this.TARGETING_RULES_ERROR = page.locator("//div[contains(text(),'Please select atleast one targeting')]");
@@ -71,19 +71,19 @@ public class TargetingTemplate {
 
     public boolean clickAndVerifyTargetingTemplate() {
         NEW_TEMPLATE_BUTTON.click();
-        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEMTYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETINGRULE_BUTTON.isVisible();
+        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEM_TYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETING_RULE_BUTTON.isVisible();
     }
 
     public Map<String, Map<String, String>> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
         Map<String, Map<String, String>> lineItemsToRuleCounts = new HashMap<>();
 
         for (String s : lineItemsList) {
-            LINE_ITEMTYPE_DROPDOWN.click();
-            for (int i = 0; i < LINE_ITEMTYPE_VALUE.count(); i++) {
-                LINE_ITEMTYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
-                String lineItemText = LINE_ITEMTYPE_VALUE.nth(i).innerText();
+            LINE_ITEM_TYPE_DROPDOWN.click();
+            for (int i = 0; i < LINE_ITEM_TYPE_VALUE.count(); i++) {
+                LINE_ITEM_TYPE_VALUE.nth(i).scrollIntoViewIfNeeded();
+                String lineItemText = LINE_ITEM_TYPE_VALUE.nth(i).innerText();
                 if (lineItemText.equalsIgnoreCase(s.trim())) {
-                    LINE_ITEMTYPE_VALUE.nth(i).click();
+                    LINE_ITEM_TYPE_VALUE.nth(i).click();
                     String templateNameWithTimestamp = lineItemText + "_" + templateName + "_" + CommonUtils.timeStampCalculation();
                     TEMPLATE_NAME_TEXT.fill(templateNameWithTimestamp);
                     selectChannel(channelList);
@@ -117,7 +117,7 @@ public class TargetingTemplate {
     }
 
     public void addTargetingRules(Map<String, List<String>> rulesMap) {
-        ADD_TARGETINGRULE_BUTTON.click();
+        ADD_TARGETING_RULE_BUTTON.click();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
@@ -148,7 +148,7 @@ public class TargetingTemplate {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
-        ADD_TARGETINGRULE_BUTTON.click();
+        ADD_TARGETING_RULE_BUTTON.click();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
         alert = TEMPLATE_NAME_ERROR.innerText().trim();
