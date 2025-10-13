@@ -44,7 +44,7 @@ public class SmartPixel {
 
     public void selectAssociatedCampaign() {
         waitUtility.waitUntilSpinnerHidden();
-        if (ASSOCIATED_CAMPAIGN.isVisible()) {
+        if (ASSOCIATED_CAMPAIGN.first().isVisible()) {
             ASSOCIATED_CAMPAIGN.first().click();
         } else {
             INACTIVE_CAMPAIGNS_BUTTON.click();
@@ -58,6 +58,7 @@ public class SmartPixel {
 
     public void clickAddSmartListButton() {
         ADD_SMARTLIST_BUTTON.click();
+        page.waitForTimeout(3000);
         waitUtility.waitUntilSpinnerHidden();
     }
 

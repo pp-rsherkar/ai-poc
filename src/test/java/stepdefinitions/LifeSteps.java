@@ -1710,14 +1710,14 @@ public class LifeSteps {
         pixels.savePixel();
     }
 
-    @Then("Verify the pixel is saved successfully and displayed in the pixel list")
+    @Then("Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifyPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
         assert pixels.verifySaveSuccess().contains("Success!");
         pixels.searchSavedPixel(newPixelName);
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
 
-    @Then("Verify the smart pixel is saved successfully and displayed in the pixel list")
+    @Then("Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
         assert pixels.verifySaveSuccess().contains("Success!");
         newPixelName = smartPixel.getPixelName();
@@ -2709,7 +2709,7 @@ public class LifeSteps {
         retargetingPixel.selectPixelType(pixelType);
     }
 
-    @When("User edits the created {string}")
+    @When("User edits the name of the created {string}")
     public void userEditsPixel(String pixelType) {
         pixelNameEdited = newPixelName + '_' + "Edited";
         switch (pixelType) {
@@ -2823,6 +2823,20 @@ public class LifeSteps {
         pixels.savePixel();
         Assert.assertEquals("Conversion Type is required", conversionPixel.pixelTypeOptionError());
         pixels.clickCancelButton();
+    }
+
+    @Then("Verify the removed pixel should not be displayed in the pixel list")
+    public void verifyRemovedPixelNotDisplayedInPixelList() {
+        pixels.searchSavedPixel(pixelNameEdited);
+        String noResultText = pixels.verifyDeletedPixel().toUpperCase();
+        Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
+    }
+
+    @Then("Verify the deactivated pixel should not be displayed in the pixel list")
+    public void verifyDeactivatedPixelNotDisplayedInPixelList() {
+        pixels.searchSavedPixel(pixelNameEdited);
+        String noResultText = pixels.verifyDeletedPixel().toUpperCase();
+        Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
     }
 
 }

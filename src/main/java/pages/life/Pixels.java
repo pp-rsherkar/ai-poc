@@ -25,6 +25,7 @@ public class Pixels {
     private final Locator REMOVE_PIXEL_BUTTON;
     private final Locator REMOVE_SUCCESS;
     private final Locator CANCEL_BUTTON;
+    private final Locator NO_RESULTS_FOUND;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Pixels(Page page) {
@@ -47,6 +48,7 @@ public class Pixels {
         this.REMOVE_PIXEL_BUTTON = page.locator("//span[text()='Remove']");
         this.REMOVE_SUCCESS = page.locator("//div[@role='alert' and text()='Pixel deleted successfully']");
         this.CANCEL_BUTTON = page.locator("//button[contains(@class,'cancel secondary button') and normalize-space(text())='Cancel']");
+        this.NO_RESULTS_FOUND = page.locator("//div[contains(text(),'Nothing found') or contains(text(),'Nothing Found')]");
     }
 
     public void clickPixelsMenuItem() {
@@ -161,5 +163,10 @@ public class Pixels {
         String pixelNameXpath = String.format("//div[contains(text(),'%s')]", pixelName);
         waitUtility.waitForLocatorVisible(page.locator(pixelNameXpath));
         page.locator(pixelNameXpath).click();
+    }
+
+    public String verifyDeletedPixel() {
+        waitUtility.waitForLocatorVisible(NO_RESULTS_FOUND);
+        return NO_RESULTS_FOUND.innerText();
     }
 }
