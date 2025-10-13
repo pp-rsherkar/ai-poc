@@ -39,7 +39,6 @@ public class ReportTemplates {
     private final Locator SELECT_TEMPLATE;
     private final Locator SELECT_TACTIC;
     private final Locator SELECT_LIFETIME;
-    //private final Locator SELECT_VALUE;
     private final Locator RUN_REPORT;
     private final Locator REPORT_DOWNLOAD_OPTION;
     private final Locator TEMPLATE_COLUMNS;
@@ -50,8 +49,10 @@ public class ReportTemplates {
     private final Locator DOWNLOAD_REPORT;
     private final Locator REPORT_PROGRESS_ICON;
     private final Locator TEMPLATE_PAGINATION;
+    private final Locator TREE_COLLAPSED_ICON;
+    private final Locator DIMENSION_AND_METRICS_LABELS;
+    private final Locator CANCEL_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    private String reportName;
 
     public ReportTemplates(Page page) {
         this.page = page;
@@ -86,6 +87,9 @@ public class ReportTemplates {
         this.SEARCH_BUTTON = page.locator("div.iconSprite.search1");
         this.DOWNLOAD_REPORT = page.locator("//span[text()='Download']");
         this.TEMPLATE_PAGINATION = page.locator("div.pagination-wrapper");
+        this.TREE_COLLAPSED_ICON = page.locator("//i[@class='icon_custom tree-collapsed']");
+        this.DIMENSION_AND_METRICS_LABELS = page.locator("//div[contains(@class,'checkbox-group-item')]//sui-checkbox//label");
+        this.CANCEL_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Cancel')]");
     }
 
     public void clickReportTemplatesLink() {
@@ -213,10 +217,10 @@ public class ReportTemplates {
         }
         waitUtility.waitForLocatorDetached(REPORT_PROGRESS_ICON);
         REPORT_DOWNLOAD_OPTION.click();
-        Download download = page.waitForDownload(() -> DOWNLOAD_REPORT.click());
-        reportName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        Download download = page.waitForDownload(DOWNLOAD_REPORT::click);
+        String REPORT_NAME = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String downloadPath = Paths.get(System.getProperty("user.home"), "Downloads").toString();
-        String filePath = Paths.get(downloadPath, "report_" + reportName + ".csv").toString();
+        String filePath = Paths.get(downloadPath, "report_" + REPORT_NAME + ".csv").toString();
         download.saveAs(Paths.get(filePath));
         return filePath;
     }
@@ -234,12 +238,18 @@ public class ReportTemplates {
         List<String> actualHeaders = rawActualHeaders.stream().map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize actual
                 .toList();
 
-        boolean allHeadersPresent = expectedHeaders.stream().allMatch(expected -> {
-            boolean matchFound = actualHeaders.stream().anyMatch(actual -> actual.contains(expected) || expected.contains(actual));
+        return expectedHeaders.stream().allMatch(expected -> actualHeaders.stream().anyMatch(actual -> actual.contains(expected) || expected.contains(actual)));
+    }
 
-            return matchFound;
-        });
+    public List<String> expandGroupsAndFetchDimensionsAndMetrics() {
+        while (TREE_COLLAPSED_ICON.count() > 0) {
+            TREE_COLLAPSED_ICON.first().scrollIntoViewIfNeeded();
+            TREE_COLLAPSED_ICON.first().click();
+        }
+        return DIMENSION_AND_METRICS_LABELS.allInnerTexts();
+    }
 
-        return allHeadersPresent;
+    public void clickCancelButton() {
+        CANCEL_BUTTON.click();
     }
 }

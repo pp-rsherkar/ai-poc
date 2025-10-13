@@ -10,8 +10,8 @@ public class DriverFactory {
     public static Page page;
     public static ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>(); //For Parallel execution
     public static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
-    private static Playwright playwright;
     public static Browser browser;
+    private static Playwright playwright;
 
     public static Playwright createPlaywright() {
         if (playwright == null) {

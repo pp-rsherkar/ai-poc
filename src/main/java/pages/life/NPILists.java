@@ -16,21 +16,22 @@ public class NPILists {
     private final Locator STATIC_LIST;
     private final Locator AVAILABLE_IN_CHECKBOX;
     private final Locator AVAILABLE_IN_CONTAINER;
-    private final Locator SEARCH_NPILISTS;
+    private final Locator SEARCH_NPI_LISTS;
     private final Locator PARENT_LIST_LABEL;
     private final Locator CREATE_NEW_LIST;
     private final Locator SEARCH_BOX;
     private final Locator SMART_LIST;
     private final Locator AUTO_IMPORTED_LIST;
+    private final Locator STUDIO_FILTER_LABEL;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPILists(Page page) {
         this.page = page;
-        this.NPI_LISTS = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("NPI Lists")).nth(3);
+        this.NPI_LISTS = page.locator("//div[contains(@class, 'menu') and contains(text(),'NPI Lists')]");
         this.NPI_LISTS_STG = page.getByText("NPI Lists");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
-        this.SEARCH_NPILISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
+        this.SEARCH_NPI_LISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.AVAILABLE_IN_CHECKBOX = page.locator("//input[contains(@class,'mat-checkbox-input') and @aria-checked='true']/ancestor::div/following-sibling::span");
         this.AVAILABLE_IN_CONTAINER = page.locator("//div[contains(@class,'npiGroupAvailableSettingContainer')]");
         this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
@@ -38,9 +39,11 @@ public class NPILists {
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.SMART_LIST = page.getByText("Dynamic list of NPI");
         this.AUTO_IMPORTED_LIST = page.locator("//app-npilisttype[@listtypename='Auto-Imported List']");
+        this.STUDIO_FILTER_LABEL = page.locator("//span[contains(@class,'studioLabel')]");
     }
 
     public void clickNPILists() {
+        waitUtility.waitForLocatorVisible(NPI_LISTS);
         NPI_LISTS.click();
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -55,6 +58,7 @@ public class NPILists {
     }
 
     public String verifyNPIListText() {
+        waitUtility.waitForLocatorVisible(CREATE_NPI_LIST);
         return CREATE_NPI_LIST.innerText();
     }
 
@@ -67,9 +71,9 @@ public class NPILists {
     }
 
     public void searchNPILists(String workspaceName) {
-        waitUtility.waitForLocatorVisible(SEARCH_NPILISTS);
-        SEARCH_NPILISTS.fill(workspaceName);
-        SEARCH_NPILISTS.press("Enter");
+        waitUtility.waitForLocatorVisible(SEARCH_NPI_LISTS);
+        SEARCH_NPI_LISTS.fill(workspaceName);
+        SEARCH_NPI_LISTS.press("Enter");
     }
 
     public void selectPublishedList(String listname) {
@@ -87,6 +91,13 @@ public class NPILists {
         return containsLife && containsHCP;
     }
 
+    public boolean checkOnlyLIFEIsSelected() {
+        waitUtility.waitForLocatorVisible(AVAILABLE_IN_CONTAINER);
+        AVAILABLE_IN_CONTAINER.scrollIntoViewIfNeeded();
+        List<String> allTexts = AVAILABLE_IN_CHECKBOX.allInnerTexts();
+        return allTexts.size() == 1 && allTexts.stream().anyMatch(text -> text.contains("Life"));
+    }
+
     public void searchList(String listName) {
         waitUtility.waitForLocatorVisible(CREATE_NEW_LIST);
         SEARCH_BOX.first().fill(listName);
@@ -102,5 +113,10 @@ public class NPILists {
 
     public void clickAutoImportedList() {
         AUTO_IMPORTED_LIST.click();
+    }
+
+    public List<String> verifyStudioFilterLabel() {
+        waitUtility.waitForLocatorVisible(STUDIO_FILTER_LABEL.first());
+        return STUDIO_FILTER_LABEL.allInnerTexts();
     }
 }

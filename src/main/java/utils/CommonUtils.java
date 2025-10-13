@@ -3,6 +3,7 @@ package utils;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.io.File;
@@ -42,6 +43,16 @@ public class CommonUtils {
         return list.stream()
                 .map(Object::toString)
                 .map(s -> s.replaceAll("\\s+", " ").trim())
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> parseCommaSeparatedString(String input) {
+        if (input == null || input.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(input.split(","))
+                .map(String::trim)
+                .filter(opt -> !opt.isEmpty())
                 .collect(Collectors.toList());
     }
 
@@ -110,8 +121,8 @@ public class CommonUtils {
         } else if (inputIndex < fileInputCount) {
             targetInput = fileInputs.nth(inputIndex);
         }
-        targetInput.setInputFiles(basePath);
         ElementHandle fileInputHandle = targetInput.elementHandle();
+        targetInput.setInputFiles(basePath);
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
         if (locatorValue.contains("%s")) {
             page.waitForSelector(String.format(locatorValue, fileName),
@@ -131,4 +142,66 @@ public class CommonUtils {
 
         return latest != null;
     }
+
+    public static void hoverAndClick(Page page, BoundingBox box, Locator tooltipLocator) {
+        int maxValue = -1;
+        double clickX = -1;
+        double clickY = -1;
+        long startTime = System.currentTimeMillis();
+        long maxTime = 60000;
+
+        int step = box.width > 500 ? 10 : 5;
+
+        for (int x = 0; x < box.width; x += step) {
+            for (int y = 0; y < box.height; y += step) {
+                if (System.currentTimeMillis() - startTime > maxTime) break;
+                double absX = box.x + x;
+                double absY = box.y + y;
+                page.mouse().move(absX, absY);
+                if (tooltipLocator.count() > 0 && tooltipLocator.first().isVisible()) {
+                    String tooltipText = tooltipLocator.first().innerText().trim();
+                    try {
+                        int value = Integer.parseInt(tooltipText.replace(",", ""));
+                        if (value > maxValue) {
+                            maxValue = value;
+                            clickX = absX;
+                            clickY = absY;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+
+        if (clickX >= 0 && clickY >= 0) {
+            page.mouse().click(clickX, clickY);
+        }
+    }
+
+    public static boolean scrollElementIntoView(Locator container, Locator targetList, int maxScrolls, int scrollStep, Page page) {
+        container.evaluate("el => el.scrollTop = 0");
+
+        for (int j = 0; j < maxScrolls; j++) {
+            for (int i = 0; i < targetList.count(); i++) {
+                BoundingBox targetBox = targetList.nth(i).boundingBox();
+                BoundingBox containerBox = container.boundingBox();
+
+                if (targetBox != null && containerBox != null &&
+                        targetBox.y >= containerBox.y &&
+                        targetBox.y <= (containerBox.y + containerBox.height)) {
+                    return true;
+                }else if(targetBox != null && containerBox != null &&
+                        targetBox.y < containerBox.y + containerBox.height &&
+                        targetBox.y + targetBox.height > containerBox.y){
+                    return true;
+                }else{
+                    container.evaluate("el => el.scrollBy(0, " + scrollStep + ")");
+                }
+            }
+            container.evaluate("el => el.scrollBy(0, " + scrollStep + ")");
+        }
+
+        return false;
+    }
+
 }

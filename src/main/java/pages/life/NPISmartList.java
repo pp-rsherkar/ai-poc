@@ -23,7 +23,7 @@ public class NPISmartList {
     private final Locator CLICK_NPI_GROUP;
     private final Locator CLICK_SPECIALTY;
     private final Locator CLICK_PROFESSION;
-    private final Locator CLICK_PRESCRIBEDDRUG;
+    private final Locator CLICK_PRESCRIBED_DRUG;
     private final Locator CLICK_DIAGNOSIS;
     private final Locator CLICK_MEDICAL_PROCEDURE;
     private final Locator CLICK_ENDEMIC_RESEARCH;
@@ -62,7 +62,7 @@ public class NPISmartList {
         this.CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE = page.getByText("Prescription Behavior Change", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SPECIALTY = page.getByText("Specialty", new Page.GetByTextOptions().setExact(true));
         this.CLICK_PROFESSION = page.getByText("Profession", new Page.GetByTextOptions().setExact(true));
-        this.CLICK_PRESCRIBEDDRUG = page.getByText("Prescribed Drug", new Page.GetByTextOptions().setExact(true));
+        this.CLICK_PRESCRIBED_DRUG = page.getByText("Prescribed Drug", new Page.GetByTextOptions().setExact(true));
         this.CLICK_DIAGNOSIS = page.getByText("Diagnosis", new Page.GetByTextOptions().setExact(true));
         this.CLICK_MEDICAL_PROCEDURE = page.getByText("Medical Procedure", new Page.GetByTextOptions().setExact(true));
         this.CLICK_ENDEMIC_RESEARCH = page.getByText("Endemic Research", new Page.GetByTextOptions().setExact(true));
@@ -155,7 +155,7 @@ public class NPISmartList {
     }
 
     public void clickPrescribedDrug() {
-        CLICK_PRESCRIBEDDRUG.click();
+        CLICK_PRESCRIBED_DRUG.click();
     }
 
     public void clickDiagnosis() {

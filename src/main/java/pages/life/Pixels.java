@@ -94,8 +94,8 @@ public class Pixels {
     }
 
     public String verifySaveSuccess() {
-        String successMessage = SAVE_SUCCESS.innerText();
-        waitUtility.waitForLocatorDetached(SAVE_SUCCESS);
+        String successMessage = SAVE_SUCCESS.first().innerText();
+        waitUtility.waitForLocatorDetached(SAVE_SUCCESS.first());
         return successMessage;
     }
 
