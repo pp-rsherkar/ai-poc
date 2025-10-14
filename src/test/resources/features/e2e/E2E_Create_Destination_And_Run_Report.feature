@@ -2,7 +2,6 @@ Feature: Create a Destination in Admin and run below report against it.
   1. Run a Report
   2. Schedule a Report
 
-
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"

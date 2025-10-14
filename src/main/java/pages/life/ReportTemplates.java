@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 public class ReportTemplates {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator REPORT_TEMPLATE_LINK;
     private final Locator VERIFY_TEMPLATES_TAB;
@@ -40,7 +39,6 @@ public class ReportTemplates {
     private final Locator SELECT_TEMPLATE;
     private final Locator SELECT_TACTIC;
     private final Locator SELECT_LIFETIME;
-    //private final Locator SELECT_VALUE;
     private final Locator RUN_REPORT;
     private final Locator REPORT_DOWNLOAD_OPTION;
     private final Locator TEMPLATE_COLUMNS;
@@ -54,7 +52,7 @@ public class ReportTemplates {
     private final Locator TREE_COLLAPSED_ICON;
     private final Locator DIMENSION_AND_METRICS_LABELS;
     private final Locator CANCEL_BUTTON;
-    private String reportName;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public ReportTemplates(Page page) {
         this.page = page;
@@ -219,10 +217,10 @@ public class ReportTemplates {
         }
         waitUtility.waitForLocatorDetached(REPORT_PROGRESS_ICON);
         REPORT_DOWNLOAD_OPTION.click();
-        Download download = page.waitForDownload(() -> DOWNLOAD_REPORT.click());
-        reportName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        Download download = page.waitForDownload(DOWNLOAD_REPORT::click);
+        String REPORT_NAME = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String downloadPath = Paths.get(System.getProperty("user.home"), "Downloads").toString();
-        String filePath = Paths.get(downloadPath, "report_" + reportName + ".csv").toString();
+        String filePath = Paths.get(downloadPath, "report_" + REPORT_NAME + ".csv").toString();
         download.saveAs(Paths.get(filePath));
         return filePath;
     }
@@ -240,13 +238,7 @@ public class ReportTemplates {
         List<String> actualHeaders = rawActualHeaders.stream().map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize actual
                 .toList();
 
-        boolean allHeadersPresent = expectedHeaders.stream().allMatch(expected -> {
-            boolean matchFound = actualHeaders.stream().anyMatch(actual -> actual.contains(expected) || expected.contains(actual));
-
-            return matchFound;
-        });
-
-        return allHeadersPresent;
+        return expectedHeaders.stream().allMatch(expected -> actualHeaders.stream().anyMatch(actual -> actual.contains(expected) || expected.contains(actual)));
     }
 
     public List<String> expandGroupsAndFetchDimensionsAndMetrics() {
@@ -257,7 +249,7 @@ public class ReportTemplates {
         return DIMENSION_AND_METRICS_LABELS.allInnerTexts();
     }
 
-    public void clickCancelButton(){
+    public void clickCancelButton() {
         CANCEL_BUTTON.click();
     }
 }

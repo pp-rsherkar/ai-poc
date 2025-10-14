@@ -15,7 +15,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     And User selects the "<PIXEL_TYPE>" type
     And User enters the pixel details as "<PIXEL_NAME>" "<ADVERTISER>"
     And User saves the pixel
-    Then Verify the pixel is saved successfully and displayed in the pixel list
+    Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
     And User navigates to Campaign Dashboard
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
@@ -44,7 +44,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     And User selects the "<PIXEL_TYPE>" type
     And User selects the "<ADVERTISER>" and the associated campaign
     And User saves the pixel
-    Then Verify the smart pixel is saved successfully and displayed in the pixel list
+    Then Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
     And User navigates to NPI Lists page
     When User clicks on Create New List
     And User selects Smart List to create NPI list
@@ -79,7 +79,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     And User selects the "<PIXEL_TYPE>" type
     And User enters the pixel details as "<PIXEL_NAME>" "<ADVERTISER>" "<SCOPE>" "<TYPE>"
     And User saves the pixel
-    Then Verify the pixel is saved successfully and displayed in the pixel list
+    Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
     And User navigates to Campaign Dashboard
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign

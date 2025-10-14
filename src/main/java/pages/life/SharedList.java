@@ -159,11 +159,7 @@ public class SharedList {
     }
 
     public String fetchCountFromLeftPanel(String listName) {
-        Locator locator = page.locator(String.format(
-                "(//div[contains(text(), '%s')]/parent::div/following-sibling::div//div | " +
-                        "//div[contains(text(), '%s')]/following-sibling::div//div | " +
-                        "//div[contains(text(), '%s')]/following-sibling::div[@class='list-item-counter'])",
-                listName, listName, listName));
+        Locator locator = page.locator(String.format("(//div[contains(text(), '%s')]/parent::div/following-sibling::div//div | " + "//div[contains(text(), '%s')]/following-sibling::div//div | " + "//div[contains(text(), '%s')]/following-sibling::div[@class='list-item-counter'])", listName, listName, listName));
         return locator.innerText();
     }
 

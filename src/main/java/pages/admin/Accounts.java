@@ -5,13 +5,13 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.WaitUtility;
+
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class Accounts {
     private final Page page;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Locator SUB_MENU;
     private final Locator ADMINISTRATION;
     private final Locator ACCOUNTS_TAB;
@@ -46,6 +46,7 @@ public class Accounts {
     private final Locator TEST_CONNECTION_LINK;
     private final Locator CONNECTION_CONFIRMATION_TEXT;
     private final Locator OK_BUTTON;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
         this.page = page;
@@ -146,24 +147,24 @@ public class Accounts {
         assertThat(STUDIO_MENU).isHidden();
     }
 
-    public void clickAdvertiserTab(){
+    public void clickAdvertiserTab() {
         ADVERTISER_TAB.click();
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
     }
 
-    public void selectAccount(String account){
+    public void selectAccount(String account) {
         ACCOUNT_DROPDOWN.click();
         ACCOUNT_DROPDOWN_TEXTAREA.fill(account);
         ACCOUNT_DROPDOWN.getByText(account).click();
         SEARCH_BUTTON.click();
     }
 
-    public List<String> fetchAdvertiserList(){
+    public List<String> fetchAdvertiserList() {
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
         return ADVERTISER_LIST.allInnerTexts();
     }
 
-    public boolean isReportingTabDisplayed(){
+    public boolean isReportingTabDisplayed() {
         return REPORTING_TAB.isVisible();
     }
 

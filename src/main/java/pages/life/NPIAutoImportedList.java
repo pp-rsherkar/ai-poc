@@ -19,7 +19,7 @@ import java.util.HashMap;
 public class NPIAutoImportedList {
 
     private final Page page;
-    private final Locator SETUP_IMPORTBUTTON;
+    private final Locator SETUP_IMPORT_BUTTON;
     private final Locator ERROR_MESSAGE;
     private final Locator IMPORT_SETTING_TITLE;
     private final Locator DESTINATION_DROPDOWN;
@@ -41,7 +41,7 @@ public class NPIAutoImportedList {
 
     public NPIAutoImportedList(Page page) {
         this.page = page;
-        this.SETUP_IMPORTBUTTON = page.locator("//span[contains(text(),'Setup Import')]");
+        this.SETUP_IMPORT_BUTTON = page.locator("//span[contains(text(),'Setup Import')]");
         this.ERROR_MESSAGE = page.locator("//div[@aria-label='Advertiser is required']");
         this.IMPORT_SETTING_TITLE = page.locator("//div[contains(text(),'Import Settings')]");
         this.DESTINATION_DROPDOWN = page.locator("//ng-select[@placeholder='Select Destination']");
@@ -61,8 +61,8 @@ public class NPIAutoImportedList {
     }
 
     public String verifyIfAutoImportPage() {
-        SETUP_IMPORTBUTTON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        return SETUP_IMPORTBUTTON.innerText().trim();
+        SETUP_IMPORT_BUTTON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        return SETUP_IMPORT_BUTTON.innerText().trim();
     }
 
     public String verifyErrorMessage() {
@@ -73,8 +73,8 @@ public class NPIAutoImportedList {
     }
 
     public void clickSetupImportButton() {
-        SETUP_IMPORTBUTTON.scrollIntoViewIfNeeded();
-        SETUP_IMPORTBUTTON.click();
+        SETUP_IMPORT_BUTTON.scrollIntoViewIfNeeded();
+        SETUP_IMPORT_BUTTON.click();
     }
 
     public void waitForImportSettingPanel() {

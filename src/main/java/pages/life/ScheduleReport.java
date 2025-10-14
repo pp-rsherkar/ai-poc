@@ -13,7 +13,6 @@ import java.util.List;
 
 public class ScheduleReport {
 
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator SCHEDULE_REPORT_BUTTON;
     private final Locator SCHEDULE_REPORT_PANEL_HEADER;
@@ -50,6 +49,13 @@ public class ScheduleReport {
     private final Locator SEARCH_ICON;
     private final Locator FETCHED_TEMPLATE_NAME;
     private final Locator SEND_ON_DROPDOWN;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    YearMonth currentMonth = YearMonth.now();
+    int maxDay = currentMonth.lengthOfMonth();
+    int today = LocalDate.now().getDayOfMonth();
+    int startDay;
+    int endDay;
+
 
     public ScheduleReport(Page page) {
         this.page = page;
@@ -150,7 +156,7 @@ public class ScheduleReport {
         }
     }
 
-    public boolean selectDataTimeZone(String timeZone){
+    public boolean selectDataTimeZone(String timeZone) {
         selectTimeZone(TIME_ZONE, timeZone);
         return DEFAULT_TIME_ZONE.innerText().contains(timeZone);
     }
@@ -202,8 +208,7 @@ public class ScheduleReport {
 
     public void clickDeliveryTab(String tabName) {
         for (int i = 0; i < DELIVERY_METHODS.count(); i++) {
-            if (DELIVERY_METHODS.nth(i).innerText().contains(tabName))
-                DELIVERY_METHODS.nth(i).click();
+            if (DELIVERY_METHODS.nth(i).innerText().contains(tabName)) DELIVERY_METHODS.nth(i).click();
         }
     }
 
@@ -215,7 +220,7 @@ public class ScheduleReport {
         DELIVERY_TO_USER.click();
         for (String user : userLists) {
             DELIVERY_TO_USER.getByRole(AriaRole.TEXTBOX).fill(user.trim());
-            page.getByText(user.trim()).click();
+            page.getByText(user.trim()).first().click();
         }
         page.keyboard().press("Escape");
     }
@@ -344,26 +349,22 @@ public class ScheduleReport {
     }
 
     public String fetchStartTime() {
-        if (SCHEDULE_START_TIME.isVisible())
-            return SCHEDULE_START_TIME.inputValue();
+        if (SCHEDULE_START_TIME.isVisible()) return SCHEDULE_START_TIME.inputValue();
         return " ";
     }
 
     public String fetchEndTime() {
-        if (SCHEDULE_END_TIME.isVisible())
-            return SCHEDULE_END_TIME.inputValue();
+        if (SCHEDULE_END_TIME.isVisible()) return SCHEDULE_END_TIME.inputValue();
         return " ";
     }
 
     public String fetchTimeZone() {
-        if (TIME_ZONE.isVisible())
-            return TIME_ZONE.locator("xpath=/div[@class='text']").innerText().trim();
+        if (TIME_ZONE.isVisible()) return TIME_ZONE.locator("xpath=/div[@class='text']").innerText().trim();
         return " ";
     }
 
     public String fetchSendAtTime() {
-        if (SEND_AT_TIME.isVisible())
-            return SEND_AT_TIME.inputValue();
+        if (SEND_AT_TIME.isVisible()) return SEND_AT_TIME.inputValue();
         return " ";
     }
 

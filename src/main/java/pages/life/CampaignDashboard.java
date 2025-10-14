@@ -14,29 +14,29 @@ import java.util.Objects;
 
 public class CampaignDashboard {
     private final Page page;
-    private final Locator CAMPAIGNPAGE_TEXT;
-    private final Locator CAMPAIGN_COMMENTBOX;
-    private final Locator LINEITEM_COMMENTBOX;
-    private final Locator TACTIC_NAME_COMMENTBOX;
+    private final Locator CAMPAIGN_PAGE_TEXT;
+    private final Locator CAMPAIGN_COMMENT_BOX;
+    private final Locator LINE_ITEM_COMMENT_BOX;
+    private final Locator TACTIC_NAME_COMMENT_BOX;
     private final Locator COMMENT_BOX;
-    private final Locator COMMENTBOX_OKBUTTON;
+    private final Locator COMMENT_BOX_OK_BUTTON;
     private final Locator COMMENT_SUCCESS_ALERT;
     private final Locator COMMENT_ICON;
     private final Locator TOOLTIP_TEXT;
-    private final Locator LINEITEM_TOGGLE_BUTTON;
+    private final Locator LINE_ITEM_TOGGLE_BUTTON;
     private final Locator TACTIC_TOGGLE_BUTTON;
     private final Locator BACK_TO_DASHBOARD;
-    private final Locator LINEITEM_NAME;
+    private final Locator LINE_ITEM_NAME;
     private final Locator TACTIC_NAME;
-    private final Locator CAMPAIGN_PAGETITLE;
-    private final Locator LINEITEM_PAGETITLE;
-    private final Locator TACTIC_PAGETITLE;
-    private final Locator DASHBOARD_MENUICON;
-    private final Locator SELECT_COLUMNS_FROMICON;
+    private final Locator CAMPAIGN_PAGE_TITLE;
+    private final Locator LINE_ITEM_PAGE_TITLE;
+    private final Locator TACTIC_PAGE_TITLE;
+    private final Locator DASHBOARD_MENU_ICON;
+    private final Locator SELECT_COLUMNS_FROM_ICON;
     private final Locator SHOW_ALL;
     private final Locator HIDE_ALL;
-    private final Locator DASHBOARD_MENUCOLUMNS;
-    private final Locator FILTER_OKBUTTON;
+    private final Locator DASHBOARD_MENU_COLUMNS;
+    private final Locator FILTER_OK_BUTTON;
     private final Locator SELECTED_FILTER;
     private final Locator RESET_FILTER_BUTTON;
     private final Locator FILTER_ICON;
@@ -51,11 +51,11 @@ public class CampaignDashboard {
     private final Locator CUSTOM_DATE_TEXTBOX;
     private final Locator INACTIVE_FLIGHTS;
     private final Locator SETTING_ICON;
-    private final Locator GROUPBYCAMPAIGN_RADIOBUTTON;
-    private final Locator GROUPBYADVERTISER_RADIOBUTTON;
-    private final Locator NOGROUP_RADIOBUTTON;
-    private final Locator ADVERTISER_COLUMNNAME;
-    private final Locator CAMPAIGN_COLUMNNAME;
+    private final Locator GROUP_BY_CAMPAIGN_RADIO_BUTTON;
+    private final Locator GROUP_BY_ADVERTISER_RADIO_BUTTON;
+    private final Locator NO_GROUP_RADIO_BUTTON;
+    private final Locator ADVERTISER_COLUMN_NAME;
+    private final Locator CAMPAIGN_COLUMN_NAME;
     private final Locator CREATIVE_TOOLTIP;
     private final Locator LIFE_TIME_FILTER;
     CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
@@ -65,29 +65,29 @@ public class CampaignDashboard {
 
     public CampaignDashboard(Page page) {
         this.page = page;
-        this.CAMPAIGNPAGE_TEXT = page.locator("//span[contains(text(),'Campaigns')]");
-        this.CAMPAIGN_COMMENTBOX = page.locator("//div[@class='camp-data']//span[@class='notesIconEmpty' or @class='notesIconProvided']");
-        this.LINEITEM_COMMENTBOX = page.locator("//div[contains(@class,'lineitem-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");
-        this.TACTIC_NAME_COMMENTBOX = page.locator("//div[contains(@class,'tactic-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");
+        this.CAMPAIGN_PAGE_TEXT = page.locator("//span[contains(text(),'Campaigns')]");
+        this.CAMPAIGN_COMMENT_BOX = page.locator("//div[@class='camp-data']//span[@class='notesIconEmpty' or @class='notesIconProvided']");
+        this.LINE_ITEM_COMMENT_BOX = page.locator("//div[contains(@class,'lineitem-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");
+        this.TACTIC_NAME_COMMENT_BOX = page.locator("//div[contains(@class,'tactic-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");
         this.COMMENT_BOX = page.locator("//textarea[@id='notesId']");
-        this.COMMENTBOX_OKBUTTON = page.locator("//button[@class='okButton']");
+        this.COMMENT_BOX_OK_BUTTON = page.locator("//button[@class='okButton']");
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
         this.COMMENT_ICON = page.locator("span.notesIconProvided");
         this.TOOLTIP_TEXT = page.locator("//span[@class='tooltip-text']");
-        this.LINEITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
+        this.LINE_ITEM_TOGGLE_BUTTON = page.locator("//div[contains(@class,'lineitem-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.TACTIC_TOGGLE_BUTTON = page.locator("//div[contains(@class,'tactic-data pointer')]//sui-checkbox[contains(@class,'ng-valid')]");
         this.BACK_TO_DASHBOARD = page.locator("//div[@class='logo-lists']/img");
-        this.LINEITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section')]");
-        this.LINEITEM_PAGETITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
-        this.CAMPAIGN_PAGETITLE = page.locator("//div[contains(@class,'campaign-name')]");
+        this.LINE_ITEM_NAME = page.locator("//span[contains(@class,'color-black lineitem-name-section')]");
+        this.LINE_ITEM_PAGE_TITLE = page.locator("//div[contains(@class,'left truncate lineitem-name')]");
+        this.CAMPAIGN_PAGE_TITLE = page.locator("//div[contains(@class,'campaign-name')]");
         this.TACTIC_NAME = page.locator("//span[contains(@class,'color-black tactic-name-section')]");
-        this.TACTIC_PAGETITLE = page.locator("//div[contains(@class,'left truncate tactic-name')]");
-        this.DASHBOARD_MENUICON = page.locator("//span[@class='icon-bars']");
-        this.SELECT_COLUMNS_FROMICON = page.locator("//sui-checkbox[contains(@class,'form-control')]/label");
+        this.TACTIC_PAGE_TITLE = page.locator("//div[contains(@class,'left truncate tactic-name')]");
+        this.DASHBOARD_MENU_ICON = page.locator("//span[@class='icon-bars']");
+        this.SELECT_COLUMNS_FROM_ICON = page.locator("//sui-checkbox[contains(@class,'form-control')]/label");
         this.SHOW_ALL = page.locator("//div[contains(@class,'menuButtons')]//div[@class='show-all']");
         this.HIDE_ALL = page.locator("//div[contains(@class,'menuButtons')]//div[@class='hide-all']");
-        this.DASHBOARD_MENUCOLUMNS = page.locator("//div[contains(@class,'data-table-header')]/div[contains(@id,'liHeader') or contains(@class,'align-left')]");
-        this.FILTER_OKBUTTON = page.locator("//button[contains(@class,'ui primary button')]");
+        this.DASHBOARD_MENU_COLUMNS = page.locator("//div[contains(@class,'data-table-header')]/div[contains(@id,'liHeader') or contains(@class,'align-left')]");
+        this.FILTER_OK_BUTTON = page.locator("//button[contains(@class,'ui primary button')]");
         this.SELECTED_FILTER = page.locator("//div[contains(@class,'selected-filters')]//label");
         this.RESET_FILTER_BUTTON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.FILTER_ICON = page.locator("//div[contains(@class,'filterApplied')]");
@@ -102,11 +102,11 @@ public class CampaignDashboard {
         this.INACTIVE_FLIGHTS = page.locator("//div[contains(text(),'inactive flight')]");
         this.CUSTOM_DATE_TEXTBOX = page.locator("//input[@name='customDateRange']");
         this.SETTING_ICON = page.locator("//div[contains(@class,'gaGroupingType')]/i");
-        this.GROUPBYCAMPAIGN_RADIOBUTTON = page.locator("//i[contains(@class,'gaGroupCampaigns')]");
-        this.GROUPBYADVERTISER_RADIOBUTTON = page.locator("//i[contains(@class,'gaGroupAdvertisers')]");
-        this.NOGROUP_RADIOBUTTON = page.locator("//i[contains(@class,'gaNoGrouping')]");
-        this.ADVERTISER_COLUMNNAME = page.locator("//div[contains(@id,'liHeaderAdvertiser')]");
-        this.CAMPAIGN_COLUMNNAME = page.locator("//div[contains(@class,'display-inline')]/span[contains(text(),'CAMPAIGN')]");
+        this.GROUP_BY_CAMPAIGN_RADIO_BUTTON = page.locator("//i[contains(@class,'gaGroupCampaigns')]");
+        this.GROUP_BY_ADVERTISER_RADIO_BUTTON = page.locator("//i[contains(@class,'gaGroupAdvertisers')]");
+        this.NO_GROUP_RADIO_BUTTON = page.locator("//i[contains(@class,'gaNoGrouping')]");
+        this.ADVERTISER_COLUMN_NAME = page.locator("//div[contains(@id,'liHeaderAdvertiser')]");
+        this.CAMPAIGN_COLUMN_NAME = page.locator("//div[contains(@class,'display-inline')]/span[contains(text(),'CAMPAIGN')]");
         this.CREATIVE_TOOLTIP = page.locator("//span[contains(@class,'statusTooltipBackgroundImage')]");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
     }
@@ -114,14 +114,13 @@ public class CampaignDashboard {
     public String verifyCampaignDashbaord(String text) {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitUntilPreLoaderHidden();
-        page.waitForCondition(() -> CAMPAIGNPAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
-        return CAMPAIGNPAGE_TEXT.innerText();
+        page.waitForCondition(() -> CAMPAIGN_PAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
+        return CAMPAIGN_PAGE_TEXT.innerText();
     }
 
     public String verifyCampaignDetails(String campaignID) {
         return page.locator(String.format("//span[contains(text(),'%s')]", campaignID)).innerText();
     }
-
 
     public String addCommentsToCampaign(String commentType, List<String> commentValues) {
         page.waitForLoadState(LoadState.LOAD);
@@ -129,22 +128,22 @@ public class CampaignDashboard {
         switch (commentType) {
             case "Campaign Name":
                 for (String val : commentValues) {
-                    CAMPAIGN_COMMENTBOX.isVisible();
-                    CAMPAIGN_COMMENTBOX.click();
+                    CAMPAIGN_COMMENT_BOX.isVisible();
+                    CAMPAIGN_COMMENT_BOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
             case "Line Item Name":
                 for (String val : commentValues) {
-                    LINEITEM_COMMENTBOX.isVisible();
-                    LINEITEM_COMMENTBOX.click();
+                    LINE_ITEM_COMMENT_BOX.isVisible();
+                    LINE_ITEM_COMMENT_BOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
             case "Tactic Name":
                 for (String val : commentValues) {
-                    TACTIC_NAME_COMMENTBOX.isVisible();
-                    TACTIC_NAME_COMMENTBOX.click();
+                    TACTIC_NAME_COMMENT_BOX.isVisible();
+                    TACTIC_NAME_COMMENT_BOX.click();
                     successAlertText = addComments(val);
                 }
                 break;
@@ -154,7 +153,7 @@ public class CampaignDashboard {
 
     public String addComments(String comment) {
         COMMENT_BOX.fill(comment);
-        COMMENTBOX_OKBUTTON.click();
+        COMMENT_BOX_OK_BUTTON.click();
         waitUtility.waitForLocatorVisible(COMMENT_SUCCESS_ALERT);
         String successAlertText = COMMENT_SUCCESS_ALERT.innerText();
         waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT);
@@ -181,13 +180,13 @@ public class CampaignDashboard {
     }
 
     public void clickLineAndTacticToggleButton() {
-        DASHBOARD_MENUICON.click();
+        DASHBOARD_MENU_ICON.click();
         SHOW_ALL.click();
         page.keyboard().press("Escape");
-        lineItemClassBeforeClick = LINEITEM_TOGGLE_BUTTON.getAttribute("class");
-        LINEITEM_TOGGLE_BUTTON.click();
+        lineItemClassBeforeClick = LINE_ITEM_TOGGLE_BUTTON.getAttribute("class");
+        LINE_ITEM_TOGGLE_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
-        lineItemClassAfterClick = LINEITEM_TOGGLE_BUTTON.getAttribute("class");
+        lineItemClassAfterClick = LINE_ITEM_TOGGLE_BUTTON.getAttribute("class");
 
         tacticClassBeforeClick = TACTIC_TOGGLE_BUTTON.getAttribute("class");
         TACTIC_TOGGLE_BUTTON.click();
@@ -201,20 +200,20 @@ public class CampaignDashboard {
 
     public void navigateToCampaignLIAndTactic(String campaignID) {
         page.locator(String.format("//span[contains(text(),'%s')]", campaignID)).click();
-        waitUtility.waitForLocatorVisible(CAMPAIGN_PAGETITLE);
-        if (CAMPAIGN_PAGETITLE.getAttribute("class").contains("campaign")) flag1 = true;
+        waitUtility.waitForLocatorVisible(CAMPAIGN_PAGE_TITLE);
+        if (CAMPAIGN_PAGE_TITLE.getAttribute("class").contains("campaign")) flag1 = true;
         BACK_TO_DASHBOARD.click();
         campaignListing.searchCreatedCampaign(campaignID);
         campaignListing.expandCreatedLineItem();
-        LINEITEM_NAME.click();
-        LINEITEM_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        if (LINEITEM_PAGETITLE.getAttribute("class").contains("lineitem")) flag2 = true;
+        LINE_ITEM_NAME.click();
+        LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if (LINE_ITEM_PAGE_TITLE.getAttribute("class").contains("lineitem")) flag2 = true;
         BACK_TO_DASHBOARD.click();
         campaignListing.searchCreatedCampaign(campaignID);
         campaignListing.expandCreatedLineItem();
         TACTIC_NAME.click();
-        waitUtility.waitForLocatorVisible(TACTIC_PAGETITLE);
-        if (TACTIC_PAGETITLE.getAttribute("class").contains("tactic-name")) flag3 = true;
+        waitUtility.waitForLocatorVisible(TACTIC_PAGE_TITLE);
+        if (TACTIC_PAGE_TITLE.getAttribute("class").contains("tactic-name")) flag3 = true;
         BACK_TO_DASHBOARD.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
@@ -224,29 +223,29 @@ public class CampaignDashboard {
     }
 
     public void clickMenuTransitionIcon(List<String> columnName) {
-        DASHBOARD_MENUICON.click();
+        DASHBOARD_MENU_ICON.click();
         HIDE_ALL.click();
-        CommonUtils.selectAndClickElement(SELECT_COLUMNS_FROMICON, columnName);
+        CommonUtils.selectAndClickElement(SELECT_COLUMNS_FROM_ICON, columnName);
         page.keyboard().press("Escape");
     }
 
     public List<String> fecthDashboardColumns() {
         List<String> columnNames = new ArrayList<>();
-        for (int i = 0; i < DASHBOARD_MENUCOLUMNS.count(); i++) {
-            columnNames.add(DASHBOARD_MENUCOLUMNS.nth(i).innerText());
+        for (int i = 0; i < DASHBOARD_MENU_COLUMNS.count(); i++) {
+            columnNames.add(DASHBOARD_MENU_COLUMNS.nth(i).innerText());
         }
         return columnNames;
     }
 
     public void clickHideAndShowAllOption() {
-        DASHBOARD_MENUICON.click();
+        DASHBOARD_MENU_ICON.click();
         HIDE_ALL.click();
         page.keyboard().press("Escape");
-        if (DASHBOARD_MENUCOLUMNS.count() == 0) flag1 = true;
-        DASHBOARD_MENUICON.click();
+        if (DASHBOARD_MENU_COLUMNS.count() == 0) flag1 = true;
+        DASHBOARD_MENU_ICON.click();
         SHOW_ALL.click();
         page.keyboard().press("Escape");
-        if (DASHBOARD_MENUCOLUMNS.count() > 0) flag2 = true;
+        if (DASHBOARD_MENU_COLUMNS.count() > 0) flag2 = true;
     }
 
     public boolean verifyColumnsCount() {
@@ -260,7 +259,7 @@ public class CampaignDashboard {
             String valueXpath = String.format("//app-overlay[@class='line-item-list-filter']//label[contains(text(),'%s')]", value);
             page.locator(valueXpath).click();
         }
-        FILTER_OKBUTTON.click();
+        FILTER_OK_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
@@ -334,17 +333,17 @@ public class CampaignDashboard {
 
     public boolean clickGroupByOptionsAndFilterDashboardData() {
         SETTING_ICON.click();
-        GROUPBYCAMPAIGN_RADIOBUTTON.click();
+        GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden(120000);
-        if (ADVERTISER_COLUMNNAME.isVisible()) flag1 = true;
+        if (ADVERTISER_COLUMN_NAME.isVisible()) flag1 = true;
         SETTING_ICON.click();
-        GROUPBYADVERTISER_RADIOBUTTON.click();
+        GROUP_BY_ADVERTISER_RADIO_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden(120000);
-        if (CAMPAIGN_COLUMNNAME.isVisible()) flag2 = true;
+        if (CAMPAIGN_COLUMN_NAME.isVisible()) flag2 = true;
         SETTING_ICON.click();
-        NOGROUP_RADIOBUTTON.click();
+        NO_GROUP_RADIO_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
-        if (ADVERTISER_COLUMNNAME.isVisible() && CAMPAIGN_COLUMNNAME.isVisible()) flag3 = true;
+        if (ADVERTISER_COLUMN_NAME.isVisible() && CAMPAIGN_COLUMN_NAME.isVisible()) flag3 = true;
         return flag1 && flag2 && flag3;
     }
 
@@ -363,8 +362,8 @@ public class CampaignDashboard {
     }
 
     public void navigateToLineItemDetails(String campaignID){
-        LINEITEM_NAME.click();
-        LINEITEM_PAGETITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        LINE_ITEM_NAME.click();
+        LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public void clickLifetimeFilter() {
