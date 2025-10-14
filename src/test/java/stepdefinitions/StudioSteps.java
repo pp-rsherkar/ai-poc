@@ -264,16 +264,16 @@ public class StudioSteps {
     public void userSelectsFileTypeAsAndClicksDownloadButton(String fileExtension) {
         workspace.selectFileExtension(fileExtension);
         workspace.clickDownloadButton();
-        Assert.assertEquals("Download completed successfully",workspace.checkNPIDownloadComplete());
+        Assert.assertEquals("Download completed successfully", workspace.checkNPIDownloadComplete());
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
         Path latestFile = FileActions.getLatestDownloadedFile(fileExtension.toLowerCase());
         int npiCountFromFile = 0;
-        if(fileExtension.equalsIgnoreCase("CSV")) 
+        if (fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(latestFile, npiHeader);
-        else if(fileExtension.equalsIgnoreCase("XLSX"))
+        else if (fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(latestFile, npiHeader);
         Assert.assertEquals("NPI count is not matching", Integer.parseInt(npiCount), npiCountFromFile);
     }
@@ -305,25 +305,25 @@ public class StudioSteps {
 
     @And("Check the Download icon is highlighted in green color")
     public void checkTheDownloadIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 114, 114)",workspace.checkBackgroundColorOfDownloadIcon());
+        Assert.assertEquals("rgb(0, 114, 114)", workspace.checkBackgroundColorOfDownloadIcon());
     }
 
     @And("Verify Webhook panel is disabled before applying filters")
     public void verifyWebhookPanelIsDisabledBeforeApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Disabled",workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Disabled", workspace.verifyWebhookToggleButton());
         workspace.closeWebhookPanel();
     }
 
     @Then("Verify Webhook panel is enabled after applying engagement filters")
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Enabled", workspace.verifyWebhookToggleButton());
     }
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
-        if(requestType.contains("POST"))
+        if (requestType.contains("POST"))
             workspace.clickWebhookIcon();
         workspace.clickRequestOrContentButton(requestType);
     }
@@ -393,7 +393,7 @@ public class StudioSteps {
 
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 136, 136)",workspace.checkBackgroundColorOfWebhookIcon());
+        Assert.assertEquals("rgb(0, 136, 136)", workspace.checkBackgroundColorOfWebhookIcon());
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
@@ -425,7 +425,7 @@ public class StudioSteps {
 
     @Then("Verify the filter is applied correctly {string}")
     public void verifyTheFilterIsAppliedCorrectly(String primaryFilter) {
-        if(flag){
+        if (flag) {
             List<String> appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
             List<String> expectedFilters = CommonUtils.parseCommaSeparatedString(primaryFilter);
 
@@ -435,7 +435,7 @@ public class StudioSteps {
                 Assert.assertTrue("The filter '" + expected + "' is not applied correctly", isFilterApplied);
             }
             isOverwritten = true;
-        }else{
+        } else {
             Assert.fail("AI is unable to build audience");
         }
     }
@@ -505,7 +505,7 @@ public class StudioSteps {
 
     @And("Verify that dashboard filters are displayed correctly in Filter section")
     public void verifyThatCrossFiltersAreDisplayedCorrectlyInFilterSection() {
-        Assert.assertTrue("Filters were not added",explorerWorkspace.verifyCrossFiltersDisplayed());
+        Assert.assertTrue("Filters were not added", explorerWorkspace.verifyCrossFiltersDisplayed());
         appliedFilterEntries = explorerWorkspace.fetchMergedFilters();
     }
 
@@ -565,6 +565,35 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
+    @When("Navigate to administration")
+    public void navigate_to_administration() {
+        accounts.verifyStudioMenu();
+        accounts.clickAdministration();
+    }
 
+    @When("Click on accounts tab")
+    public void click_on_accounts_tab() {
+        accounts.selectAccountsTab();
+    }
+
+    @When("Locate an account {string} with external user permission and select it")
+    public void locate_an_account_with_external_user_permission_and_select_it(String EXTERNAL_ACCOUNT) {
+        accounts.searchAccount(EXTERNAL_ACCOUNT);
+    }
+
+    @When("Go to users tab and search {string} and select studio tab")
+    public void go_to_users_tab_and_search_and_select_studio_tab(String string) {
+        //In progress by Pradeep- Will raise in next PR(15th Oct)
+    }
+
+    @Then("Turn on studio toggle for external users")
+    public void turn_on_studio_toggle_for_external_users() {
+        //In progress by Pradeep- Will raise in next PR(15th Oct)
+    }
+
+    @Then("Verify studio platform is enabled for {string}")
+    public void verify_studio_platform_is_enabled_for(String string) {
+        //In progress by Pradeep- Will raise in next PR(15th Oct)
+    }
 
 }
