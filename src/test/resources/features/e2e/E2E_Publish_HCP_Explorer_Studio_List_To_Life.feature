@@ -29,7 +29,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     #4
     And User clicks on Publish NPI List
     And User selects publish "<LIST_TYPE>"
-    And User select the system to publish the list
+    And User select the platform to publish the list
     Then Verify list is published
     #5
     And User navigates to NPI Lists page in LIFE

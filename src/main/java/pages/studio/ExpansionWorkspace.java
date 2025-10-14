@@ -23,9 +23,9 @@ public class ExpansionWorkspace {
     private final Locator OK_FILTER;
     private final Locator SAVE;
     private final Locator WORKSPACE_NAME;
-    private final Locator ENTER_MY_PLAYGROUNG;
+    private final Locator ENTER_MY_PLAYGROUND;
     private final Locator POPUP_CLOSE;
-    private final Locator DROPDOWN_CARETEAM;
+    private final Locator DROPDOWN_CARE_TEAM;
     private final Locator DROPDOWN_CARETEAM_VALUE;
 
     public ExpansionWorkspace(Page page) {
@@ -36,7 +36,7 @@ public class ExpansionWorkspace {
         this.SOURCE_AUDIENCE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Studio Workspace Extend"));
         this.NPILIST = page.locator("//div[@class='styles__StyledIcon-sc-d00f7j-2 QkzJU']");
         this.SELECT_SOURCE_AUDIENCE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("My playground");
-        this.ENTER_MY_PLAYGROUNG = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
+        this.ENTER_MY_PLAYGROUND = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
         this.EXPAND_CARE_TEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("Expand With Care Team");
         this.EXPAND_AFF_GRAPH = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("Expand With Affiliation Graph");
         this.ADD_FILTER = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Add Filters"));
@@ -46,7 +46,7 @@ public class ExpansionWorkspace {
         this.SAVE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator(".styles__StyledResetUpdate-sc-njp72g-0 > button:nth-child(2)");
         this.POPUP_CLOSE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
         this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX).nth(3);
-        this.DROPDOWN_CARETEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.COMPLEMENTARY).getByRole(AriaRole.COMBOBOX, new Locator.GetByRoleOptions().setName("undefined combobox")).getByRole(AriaRole.TEXTBOX);
+        this.DROPDOWN_CARE_TEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.COMPLEMENTARY).getByRole(AriaRole.COMBOBOX, new Locator.GetByRoleOptions().setName("undefined combobox")).getByRole(AriaRole.TEXTBOX);
         this.DROPDOWN_CARETEAM_VALUE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Basic"));
     }
 
@@ -60,7 +60,7 @@ public class ExpansionWorkspace {
         page.waitForLoadState();
         if (string.equals("Studio Workspace")) {
             SOURCE_AUDIENCE.click();
-            ENTER_MY_PLAYGROUNG.fill("My playground");
+            ENTER_MY_PLAYGROUND.fill("My playground");
             SELECT_SOURCE_AUDIENCE.click();
         } else {
             System.out.println("ok");
@@ -70,7 +70,7 @@ public class ExpansionWorkspace {
     public void selectExpandCareTeam() {
         page.waitForLoadState();
         EXPAND_CARE_TEAM.click();
-        DROPDOWN_CARETEAM.click();
+        DROPDOWN_CARE_TEAM.click();
         DROPDOWN_CARETEAM_VALUE.click();
     }
 

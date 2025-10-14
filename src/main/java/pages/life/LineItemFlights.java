@@ -5,16 +5,15 @@ import com.microsoft.playwright.Page;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LineItemFlights {
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     private final Page page;
     private final Locator FLIGHT_TAB;
     private final Locator FLIGHT_TABLE;
     private final Locator FLIGHTS_DATES;
     private final Locator FLIGHTS_DETAILS;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public LineItemFlights(Page page) {
         this.page = page;
@@ -24,18 +23,18 @@ public class LineItemFlights {
         this.FLIGHTS_DETAILS = page.locator("//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 4]/div");
     }
 
-    public void clickFlightTab(){
+    public void clickFlightTab() {
         FLIGHT_TAB.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public boolean isFlightTableDisplayed(){
+    public boolean isFlightTableDisplayed() {
         waitUtility.waitForLocatorVisible(FLIGHT_TABLE);
         return FLIGHT_TABLE.isVisible();
     }
 
-    public List<String> fetchFlightDates(){
-       return FLIGHTS_DATES.allInnerTexts();
+    public List<String> fetchFlightDates() {
+        return FLIGHTS_DATES.allInnerTexts();
     }
 
     public List<String> fetchFlightDetailsFromFlightTab(){

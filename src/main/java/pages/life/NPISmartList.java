@@ -23,7 +23,7 @@ public class NPISmartList {
     private final Locator CLICK_NPI_GROUP;
     private final Locator CLICK_SPECIALTY;
     private final Locator CLICK_PROFESSION;
-    private final Locator CLICK_PRESCRIBEDDRUG;
+    private final Locator CLICK_PRESCRIBED_DRUG;
     private final Locator CLICK_DIAGNOSIS;
     private final Locator CLICK_MEDICAL_PROCEDURE;
     private final Locator CLICK_ENDEMIC_RESEARCH;
@@ -50,7 +50,8 @@ public class NPISmartList {
     private final Locator PULSEPOINT_ICON;
     private final Locator CLICK_EXPAND_PRACTICE;
     private final Locator ADD_DRUG_BUTTON;
-    private final Locator SELECTED_SMART_PIXEL;
+    private final Locator SMART_PIXEL;
+    private final Locator ADVERTISER_NAME;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
@@ -61,7 +62,7 @@ public class NPISmartList {
         this.CLICK_PRESCRIPTION_BEHAVIOUR_CHANGE = page.getByText("Prescription Behavior Change", new Page.GetByTextOptions().setExact(true));
         this.CLICK_SPECIALTY = page.getByText("Specialty", new Page.GetByTextOptions().setExact(true));
         this.CLICK_PROFESSION = page.getByText("Profession", new Page.GetByTextOptions().setExact(true));
-        this.CLICK_PRESCRIBEDDRUG = page.getByText("Prescribed Drug", new Page.GetByTextOptions().setExact(true));
+        this.CLICK_PRESCRIBED_DRUG = page.getByText("Prescribed Drug", new Page.GetByTextOptions().setExact(true));
         this.CLICK_DIAGNOSIS = page.getByText("Diagnosis", new Page.GetByTextOptions().setExact(true));
         this.CLICK_MEDICAL_PROCEDURE = page.getByText("Medical Procedure", new Page.GetByTextOptions().setExact(true));
         this.CLICK_ENDEMIC_RESEARCH = page.getByText("Endemic Research", new Page.GetByTextOptions().setExact(true));
@@ -80,7 +81,7 @@ public class NPISmartList {
         this.INSERT_IGNORED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.INSERT_VISITED_URL = page.locator("#smartlistDetailsContainer").getByRole(AriaRole.TEXTBOX).nth(2);
         this.CLICK_NPI_GROUP = page.getByText("Select NPI Groups");
-        this.CLICK_LIFE_CHECKBOX = page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container");
+        this.CLICK_LIFE_CHECKBOX = page.locator("//span[contains(@class,'mat-checkbox-label') and contains(text(),'Life')]");
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
@@ -93,7 +94,8 @@ public class NPISmartList {
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
-        this.SELECTED_SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
+        this.SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
+        this.ADVERTISER_NAME = page.locator("//div[@class='chips']//span[contains(@class,'ng-value-label')]");
     }
 
     public void clickSmartList() {
@@ -153,7 +155,7 @@ public class NPISmartList {
     }
 
     public void clickPrescribedDrug() {
-        CLICK_PRESCRIBEDDRUG.click();
+        CLICK_PRESCRIBED_DRUG.click();
     }
 
     public void clickDiagnosis() {
@@ -243,6 +245,12 @@ public class NPISmartList {
     }
 
     public String verifySelectedSmartPixel() {
-        return SELECTED_SMART_PIXEL.innerText().trim();
+        waitUtility.waitUntilSpinnerHidden();
+        return SMART_PIXEL.innerText().trim();
+    }
+
+    public String verifySelectedAdvertiser() {
+        waitUtility.waitUntilSpinnerHidden();
+        return ADVERTISER_NAME.innerText().trim();
     }
 }
