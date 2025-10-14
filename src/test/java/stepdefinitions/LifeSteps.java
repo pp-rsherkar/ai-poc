@@ -228,12 +228,12 @@ public class LifeSteps {
 
     @And("User searches the workspace in LIFE and selects it")
     public void userSearchesTheInLIFEAndSelectsIt() {
-        npiLists.searchNPILists(StudioSteps.newWorkspaceName);
+        npiLists.searchNPILists(StudioSteps.workspaceName);
     }
 
     @And("User clicks on the published workspace")
     public void userClicksOnThePublished() {
-        npiLists.selectPublishedList(StudioSteps.newWorkspaceName);
+        npiLists.selectPublishedList(StudioSteps.workspaceName);
     }
 
     @Then("User Verify the list is displayed in the Life")
