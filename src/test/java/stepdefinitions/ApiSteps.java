@@ -26,7 +26,7 @@ public class ApiSteps {
     JsonNode jsonNode;
     String bearerToken;
     String modifiedName;
-    Path path = Paths.get("src/test/resources/apiRequest/request.json");
+    Path path = Paths.get("src/main/resources/apiRequest/request.json");
     ApiActions apiActions = new ApiActions();
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode data;
@@ -154,7 +154,7 @@ public class ApiSteps {
         JsonNode templateNode = fullPayload.path("addNPIToList");
         ArrayNode npiArray = mapper.createArrayNode();
         for (int i = 0; i < 2; i++) {
-            npiArray.add(CommonUtils.generateRandomNpi());
+            npiArray.add(CommonUtils.generateRandomNumber());
         }
         data = mapper.createArrayNode();
         data.addAll(npiArray);

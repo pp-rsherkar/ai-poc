@@ -29,7 +29,7 @@ public class CommonUtils {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
     }
 
-    public static String randomNumberGeneration(){
+    public static String generateRandomString(){
         return UUID.randomUUID().toString().substring(0, 10);
     }
 
@@ -38,7 +38,7 @@ public class CommonUtils {
         return String.format("%04d", number);      // pads with leading zeros
     }
 
-    public static String generateRandomNpi() {
+    public static String generateRandomNumber() {
         Random random = new Random();
         StringBuilder npi = new StringBuilder();
         for (int i = 0; i < 10; i++) {

@@ -28,7 +28,7 @@ Feature: Create a Destination in Admin and run below report against it.
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
     Then User should be able to select value from dropdown
     And User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic
-    And User should be able to select the template created from the dropdown
+    And User should be able to select the created template from the dropdown
     When User clicks on "Custom Destination" tab as Delivery Method
     Then User selects destination name created, and other details - "<FILE_PATH>", "<FILE_NAME>"
     And User should be able to generate the report
@@ -51,7 +51,7 @@ Feature: Create a Destination in Admin and run below report against it.
     When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
     Then User should be able to select value from dropdown
     And User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic
-    And User should be able to select the template created from the dropdown
+    And User should be able to select the created template from the dropdown
     And Verify Report Name field is available and accepts input "<REPORT_NAME>"
     And User clicks "<FREQUENCY_VALUE>" as frequency
     And Verify that user is able to select Schedule start date and Schedule end date

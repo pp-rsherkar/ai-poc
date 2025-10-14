@@ -143,7 +143,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + CommonUtils.randomNumberGeneration();
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.generateRandomString();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -159,7 +159,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.randomNumberGeneration();
+        tacticNameRandom = tacticName + '_' + CommonUtils.generateRandomString();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -2682,7 +2682,7 @@ public class LifeSteps {
         campaignDashboard.clickLifetimeFilter();
     }
 
-    @And("User should be able to select the template created from the dropdown")
+    @And("User should be able to select the created template from the dropdown")
     public void userShouldBeAbleToSelectTheTemplateCreatedFromTheDropdown() {
         runReportPanel.selectTemplateFromDropdown(templateNameRandom);
         templateNameRandom = runReportPanel.fetchTemplateValue().get(0);

@@ -50,7 +50,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
     Then Verify the Create NPI API with Attributes API response contains the same list name and a successful status code
     Examples:
       | USERNAME | PASSWORD | ACCOUNT_ID | LIST_NAME           |
-      | admin11  | ppadmin1 | 566607     | NPI_LIST_ATRRIBUTE_ |
+      | admin11  | ppadmin1 | 566607     | NPI_LIST_ATTRIBUTE_ |
 
   @API
   Scenario Outline: Verify Addition of NPIs to existing NPI List with "<LIST_TYPE>"
