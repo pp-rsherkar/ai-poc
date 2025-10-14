@@ -577,8 +577,11 @@ public class StudioSteps {
     }
 
     @When("Locate an account {string} with external user permission and select it")
-    public void locate_an_account_with_external_user_permission_and_select_it(String EXTERNAL_ACCOUNT) {
-        accounts.searchAccount(EXTERNAL_ACCOUNT);
+    public void locate_an_account_with_external_user_permission_and_select_it(String externalAccount) {
+        accounts.searchAccount(externalAccount);
+        page.waitForLoadState();
+        accounts.searchAccount();
+        accounts.EXTERNAL_ACCOUNT_STUDIO.click();
     }
 
     @When("Go to users tab and search {string} and select studio tab")

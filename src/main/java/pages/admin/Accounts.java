@@ -47,6 +47,7 @@ public class Accounts {
     private final Locator CONNECTION_CONFIRMATION_TEXT;
     private final Locator OK_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    public final Locator EXTERNAL_ACCOUNT_STUDIO;
 
     public Accounts(Page page) {
         this.page = page;
@@ -55,7 +56,8 @@ public class Accounts {
         this.ACCOUNTS_TAB = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Accounts"));
         this.SEARCH_ACCOUNT = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.SEARCH_ICON = page.locator(".ui > .iconSprite");
-        this.SELECT_ACCOUNT = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("100Plus"));
+        this.SELECT_ACCOUNT =  page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("ACCOUNT_NAME"));
+        this.EXTERNAL_ACCOUNT_STUDIO = page.locator("//*[@id=\"parentTable\"]/div[1]/table/tbody/tr[2]/td[1]/span[1]/div");
         this.STUDIO_SETTINGS_BUTTON = page.locator("div:nth-child(6) > .btn > .acc-toggle-wrapper > .icons-32-checkmark");
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
@@ -213,5 +215,10 @@ public class Accounts {
         OK_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(PULSEPOINT_ICON);
+    }
+
+    public void searchAccount(){
+        SEARCH_ICON.click();
+        SELECT_ACCOUNT.click();
     }
 }

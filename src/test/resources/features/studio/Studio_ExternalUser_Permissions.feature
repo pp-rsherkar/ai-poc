@@ -13,6 +13,6 @@ Feature: External user permission to enable or disable studio platform
 
     Examples:
       | EXTERNAL_ACCOUNT | EXTERNAL_USER |
-      | hmt demo         | hmtdemo       |
+      | HMT Demo         | hmtdemo       |
 
 
