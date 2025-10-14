@@ -399,7 +399,7 @@ public class StudioSteps {
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
-        workspaceCreation.clickMoreActionsMenu(newWorkspaceName);
+        workspaceCreation.clickMoreActionsMenu(workspaceName);
         workspaceCreation.deleteWorkspace();
     }
 
@@ -407,7 +407,7 @@ public class StudioSteps {
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         String actual = workspaceCreation.verifyDeletePopUp().replace("\r\n", "\n").trim();
         Assert.assertTrue("Message should contain warning about deleting workspace",
-                actual.contains("You are trying to delete the workspace " + newWorkspaceName));
+                actual.contains("You are trying to delete the workspace " + workspaceName));
         Assert.assertTrue("Message should mention webhook is enabled", actual.contains("Webhooks are enabled for this workspace."));
         Assert.assertTrue("Message should mention deletion is irreversible",
                 actual.contains("Deleting the workspace will delete the webhook as well. This action cannot be undone."));
