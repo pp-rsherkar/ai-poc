@@ -149,14 +149,11 @@ public class CommonUtils {
         }
     }
 
-    public static boolean isDownloadedFileAvailable(String fileName, String extension) {
-        File downloadDir = new File(System.getProperty("user.home") + "/Downloads");
-        File latest = Arrays.stream(Objects.requireNonNull(
-                                downloadDir.listFiles((dir, name) -> name.matches(fileName + "( \\(\\d+\\))?\\." + extension))))
-                .max(Comparator.comparingLong(File::lastModified))
-                .orElse(null);
-
-        return latest != null;
+    public static boolean isDownloadedFileAvailable(Path filePath, String expectedExtension) {
+        File file = filePath.toFile();
+        return file.exists()
+                && file.isFile()
+                && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
     }
 
     public static void hoverAndClick(Page page, BoundingBox box, Locator tooltipLocator) {

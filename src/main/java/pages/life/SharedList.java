@@ -1,11 +1,14 @@
 package pages.life;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,21 +70,23 @@ public class SharedList {
     }
 
     public boolean verifyIfSearchBoxIsPresent() {
+        waitUtility.waitUntilSpinnerHidden();
         return SEARCH_KEYWORD.isVisible();
     }
 
-    public boolean verifySubTabs(List<String> subTabsList) {
-        boolean flag1 = false, flag2 = false;
-        for (String subtabs : subTabsList) {
-            for (int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
-                if (SUB_TABS_BUTTON.nth(i).innerText().contains(subtabs)) {
-                    flag1 = true;
-                    if (SUB_TABS_BUTTON.nth(i).getAttribute("class").contains("active")) flag2 = true;
-                    break;
-                }
-            }
+    public boolean verifySubTabs(String tabName) {
+        for(int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
+            if (SUB_TABS_BUTTON.nth(i).innerText().trim().equalsIgnoreCase(tabName)) return true;
         }
-        return flag1 && flag2;
+        return false;
+    }
+
+    public boolean verifyDefaultSubTab(String tabName) {
+        for (int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
+            if (SUB_TABS_BUTTON.nth(i).innerText().trim().equalsIgnoreCase(tabName) && SUB_TABS_BUTTON.nth(i).getAttribute("class").contains("active"))
+                return true;
+        }
+        return false;
     }
 
     public void clickSubTab(String tabName) {
@@ -248,14 +253,11 @@ public class SharedList {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void downloadFile(String fileName) {
+    public Path downloadFile(String fileName) throws IOException {
         Locator locator = page.locator(String.format("//div[@title='%s']/following-sibling::div//img[contains(@src,'export.svg')]", fileName));
-        locator.click();
+        Download download = page.waitForDownload(locator::click);
         waitUtility.waitUntilSpinnerHidden();
-    }
-
-    public boolean verifyDownloadedFile(String fileName, String fileExtension) {
-        return CommonUtils.isDownloadedFileAvailable(fileName, fileExtension);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 
     public void deleteFile(String fileName) {

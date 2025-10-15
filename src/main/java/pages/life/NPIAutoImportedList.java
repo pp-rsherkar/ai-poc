@@ -94,7 +94,7 @@ public class NPIAutoImportedList {
     }
 
     public void enterColumnName(String npiColumn, String columnName) {
-        Locator locator = page.locator(String.format("//div[@class='selection' and contains(text(),'%s')]/parent::div", npiColumn));
+        Locator locator = page.locator(String.format("//div[@class='selection' and contains(text(),'%s')]/parent::button", npiColumn));
         if (!locator.getAttribute("class").contains("active")) locator.click();
         NPI_COLUMN.fill(columnName);
     }
