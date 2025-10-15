@@ -1,5 +1,6 @@
 package utils;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -133,14 +135,11 @@ public class CommonUtils {
         }
     }
 
-    public static boolean isDownloadedFileAvailable(String fileName, String extension) {
-        File downloadDir = new File(System.getProperty("user.home") + "/Downloads");
-        File latest = Arrays.stream(Objects.requireNonNull(
-                                downloadDir.listFiles((dir, name) -> name.matches(fileName + "( \\(\\d+\\))?\\." + extension))))
-                .max(Comparator.comparingLong(File::lastModified))
-                .orElse(null);
-
-        return latest != null;
+    public static boolean isDownloadedFileAvailable(Path filePath, String expectedExtension) {
+        File file = filePath.toFile();
+        return file.exists()
+                && file.isFile()
+                && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
     }
 
     public static void hoverAndClick(Page page, BoundingBox box, Locator tooltipLocator) {
@@ -204,4 +203,12 @@ public class CommonUtils {
         return false;
     }
 
+    public static Path downloadFileAndMoveToSystemFolder(Download download) throws IOException {
+        Path tempDownloadedFile = download.path();
+        String fileName = download.suggestedFilename();
+        Path downloadsFolder = Paths.get(System.getProperty("user.home"), "Downloads");
+        Path targetFile = downloadsFolder.resolve(fileName);
+        Files.move(tempDownloadedFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        return targetFile;
+    }
 }

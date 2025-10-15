@@ -1361,7 +1361,10 @@ public class LifeSteps {
     @And("Verify that the sub-tabs {string} on the left navigation panel are available and {string} is selected by default")
     public void verifyThatTheSubTabsOnTheLeftNavigationPanelAreAvailable(String subTabs, String defaultTabName) {
         List<String> subTabsList = CommonUtils.convertStringToList(subTabs);
-        Assert.assertTrue("Tabs are not present", sharedList.verifySubTabs(subTabsList));
+        for (String tab : subTabsList) {
+            Assert.assertTrue(tab + " Tab is not present", sharedList.verifySubTabs(tab));
+        }
+        Assert.assertTrue("Both tab is not selected by default", sharedList.verifyDefaultSubTab(defaultTabName));
     }
 
     @And("Verify that when the {string} tab is selected, only {string} lists are visible in the panel")
@@ -1593,11 +1596,9 @@ public class LifeSteps {
     }
 
     @And("Verify that user is able to download the uploaded file {string}, {string}")
-    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) {
-        sharedList.downloadFile(fileName1);
-        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains", "csv"));
-        sharedList.downloadFile(fileName2);
-        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains", "csv"));
+    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) throws IOException {
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(sharedList.downloadFile(fileName1), "csv"));
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(sharedList.downloadFile(fileName2), "csv"));
     }
 
     @And("Verify that the user is able to delete the uploaded file {string}")
@@ -1876,17 +1877,15 @@ public class LifeSteps {
         Assert.assertTrue(option2 + " is not available under " + sectionName, bulkCreativeUpload.isBrowseFileButtonVisible(option2));
     }
 
-    @And("User is able to download a blank template using the {string} option")
-    public void userIsAbleToDownloadABlankTemplateUsingTheOption(String arg0) {
-        bulkCreativeUpload.clickBlankTemplateDownloadButton();
-        Assert.assertTrue("Downloaded file is not available", bulkCreativeUpload.verifyDownloadedFile("DisplayBulkUploadTemplate", "xlsx"));
+    @And("User is able to download a blank template using the Download Blank Template option")
+    public void userIsAbleToDownloadABlankTemplateUsingTheOption() throws IOException {
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(bulkCreativeUpload.clickBlankTemplateDownloadButton(), "xlsx"));
     }
 
     @And("Verify user is able to upload images {string} to get a template with URLs")
-    public void userIsAbleToUploadImagesToGetATemplateWithURLsUsingTheOption(String imageFileName) {
+    public void userIsAbleToUploadImagesToGetATemplateWithURLsUsingTheOption(String imageFileName) throws IOException {
         bulkCreativeUpload.uploadImageFile(imageFileName);
-        bulkCreativeUpload.clickTemplateWithURLsLink();
-        Assert.assertTrue("Downloaded file is not available", bulkCreativeUpload.verifyDownloadedFile("DisplayBulkUploadTemplate", "xlsx"));
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(bulkCreativeUpload.clickTemplateWithURLsLink(), "xlsx"));
     }
 
     @And("Verify under the {string} section the fields {string}, {string}, {string} are available")
