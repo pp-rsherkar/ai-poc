@@ -50,12 +50,6 @@ public class ScheduleReport {
     private final Locator FETCHED_TEMPLATE_NAME;
     private final Locator SEND_ON_DROPDOWN;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    YearMonth currentMonth = YearMonth.now();
-    int maxDay = currentMonth.lengthOfMonth();
-    int today = LocalDate.now().getDayOfMonth();
-    int startDay;
-    int endDay;
-
 
     public ScheduleReport(Page page) {
         this.page = page;
