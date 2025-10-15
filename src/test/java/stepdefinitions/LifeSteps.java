@@ -144,7 +144,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + CommonUtils.randomNumberGeneration();
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.generateRandomString();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -160,7 +160,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.randomNumberGeneration();
+        tacticNameRandom = tacticName + '_' + CommonUtils.generateRandomString();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -229,12 +229,12 @@ public class LifeSteps {
 
     @And("User searches the workspace in LIFE and selects it")
     public void userSearchesTheInLIFEAndSelectsIt() {
-        npiLists.searchNPILists(StudioSteps.newWorkspaceName);
+        npiLists.searchNPILists(StudioSteps.workspaceName);
     }
 
     @And("User clicks on the published workspace")
     public void userClicksOnThePublished() {
-        npiLists.selectPublishedList(StudioSteps.newWorkspaceName);
+        npiLists.selectPublishedList(StudioSteps.workspaceName);
     }
 
     @Then("User Verify the list is displayed in the Life")
@@ -295,6 +295,7 @@ public class LifeSteps {
     @Given("User navigates to Report Templates page")
     public void user_navigates_to_report_templates_page() {
         navigation.clickSubMenu();
+        navigation.clickMenuAngle();
         reportTemplates.clickReportTemplatesLink();
     }
 
@@ -2840,4 +2841,11 @@ public class LifeSteps {
         Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
     }
 
+
+    @And("User should be able to select the created template from the dropdown")
+    public void userShouldBeAbleToSelectTheTemplateCreatedFromTheDropdown() {
+        runReportPanel.selectTemplateFromDropdown(templateNameRandom);
+        templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
+        nameList.add(templateNameRandom);
+    }
 }

@@ -6,11 +6,13 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
+import pages.life.CampaignListing;
 import utils.WaitUtility;
 
 public class Navigation {
 
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
@@ -107,6 +109,7 @@ public class Navigation {
             ACCOUNT_ITEM.click();
         }
         waitUtility.waitUntilSpinnerHidden();
+        campaignListing.verifyIfFiltersExist();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
@@ -115,8 +118,11 @@ public class Navigation {
     }
 
     public void clickMenuAngle(){
-        if(MENU_ANGLE.isVisible() && MENU_ANGLE.getAttribute("class").contains("fa-angle-left"))
-            MENU_ANGLE.click();
+        if(MENU_ANGLE.isVisible()) {
+            if (MENU_ANGLE.getAttribute("class").contains("fa-angle-left")) {
+                MENU_ANGLE.click();
+            }
+        }
     }
 
     public void clickRunReport() {

@@ -12,7 +12,6 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -335,13 +334,9 @@ public class RunReportPanel {
     }
 
     public boolean selectStartAndEndDate() {
-        YearMonth currentMonth = YearMonth.now();
-        int maxDay = currentMonth.lengthOfMonth();
-        int today = LocalDate.now().getDayOfMonth();
-        int startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
-        int endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
-        boolean startSelected = selectDate(START_DATE, startDay);
-        boolean endSelected = selectDate(END_DATE, endDay);
+        CommonUtils.generateScheduleDaysIfNeeded();
+        boolean startSelected = selectDate(START_DATE, CommonUtils.startDay);
+        boolean endSelected = selectDate(END_DATE, CommonUtils.endDay);
         return startSelected && endSelected;
     }
 

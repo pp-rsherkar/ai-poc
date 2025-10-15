@@ -15,24 +15,38 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class CommonUtils {
+    public static int startDay = 0;
+    public static int endDay = 0;
 
     public static String timeStampCalculation(){
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
     }
 
-    public static String randomNumberGeneration(){
+    public static String generateRandomString(){
         return UUID.randomUUID().toString().substring(0, 10);
     }
 
     public static String randomFourDigitNumber() {
         int number = (int)(Math.random() * 10000); // generates 0 to 9999
         return String.format("%04d", number);      // pads with leading zeros
+    }
+
+    public static String generateRandomNumber() {
+        Random random = new Random();
+        StringBuilder npi = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            npi.append(random.nextInt(10));
+        }
+        return npi.toString();
     }
 
     public static List<String> normalize(List<String> list) {
@@ -210,5 +224,26 @@ public class CommonUtils {
         Path targetFile = downloadsFolder.resolve(fileName);
         Files.move(tempDownloadedFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
         return targetFile;
+    }
+
+    public static void generateScheduleDaysIfNeeded() {
+        YearMonth currentMonth = YearMonth.now();
+        int maxDay = currentMonth.lengthOfMonth();
+        int today = LocalDate.now().getDayOfMonth();
+        int attempts = 0;
+        if (startDay != 0 && endDay != 0) {
+            return;
+        }
+        do {
+            if (today >= maxDay - 1) {
+                startDay = maxDay - 1;
+                endDay = maxDay;
+            } else {
+                startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
+                endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
+            }
+            attempts++;
+            if (attempts > 10) break;
+        } while (endDay <= startDay);
     }
 }

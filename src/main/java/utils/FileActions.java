@@ -28,21 +28,9 @@ public class FileActions {
         return allData;
     }
 
-    public static Path getLatestDownloadedFile(String fileExtension) throws IOException {
-        Path downloadsDir = Paths.get(System.getProperty("user.home"), "Downloads");
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(downloadsDir, "*." + fileExtension)) {
-            Optional<Path> latestFile = StreamSupport.stream(stream.spliterator(), false)
-                    .max(Comparator.comparingLong(p -> p.toFile().lastModified()));
-
-            return latestFile.orElseThrow(() ->
-                    new FileNotFoundException("No file is found in Downloads folder"));
-        }
-    }
-
-    public static int fetchColumnCountFromCSV(Path csvFile, String columnName) throws IOException {
+    public static int fetchColumnCountFromCSV(Path filePath, String columnName) throws IOException {
         int rowCount = 0;
-        try (BufferedReader br = Files.newBufferedReader(csvFile)) {
+        try (BufferedReader br = Files.newBufferedReader(filePath)) {
             String header = br.readLine();
             if (header == null) return 0;
             String[] headers = header.split(",");
@@ -54,7 +42,7 @@ public class FileActions {
                 }
             }
             if (index == -1) {
-                throw new IllegalStateException("Column '" + columnName + "' not found in " + csvFile.getFileName());
+                throw new IllegalStateException("Column '" + columnName + "' not found in " + filePath.getFileName());
             }
             String line;
             while ((line = br.readLine()) != null) {
@@ -68,8 +56,8 @@ public class FileActions {
     }
 
 
-    public static int fetchColumnCountFromExcel(Path latestFile, String columnName) throws IOException {
-        try (Workbook wb = new XSSFWorkbook(Files.newInputStream(latestFile))) {
+    public static int fetchColumnCountFromExcel(Path filePath, String columnName) throws IOException {
+        try (Workbook wb = new XSSFWorkbook(Files.newInputStream(filePath))) {
             Sheet sheet = wb.getSheetAt(0);
             if (sheet == null) return 0;
 
@@ -82,7 +70,7 @@ public class FileActions {
                     colIndex = c.getColumnIndex();
 
             if (colIndex == -1)
-                throw new IllegalStateException("Column '" + columnName + "' not found in " + latestFile.getFileName());
+                throw new IllegalStateException("Column '" + columnName + "' not found in " + filePath.getFileName());
 
             int count = 0;
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
