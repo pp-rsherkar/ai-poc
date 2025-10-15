@@ -271,7 +271,7 @@ public class StudioSteps {
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
         int npiCountFromFile = 0;
-        if(fileExtension.equalsIgnoreCase("CSV")) 
+        if(fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if(fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
@@ -567,6 +567,31 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
+    @When("Navigate to administration")
+    public void navigate_to_administration() {
+        accounts.verifyStudioMenu();
+        accounts.clickAdministration();
+    }
 
+    @When("Click on accounts tab")
+    public void click_on_accounts_tab() {
+        accounts.selectAccountsTab();
+    }
+
+    @When("Locate an account {string} with external user permission and select it")
+    public void locate_an_account_with_external_user_permission_and_select_it(String externalAccount) {
+        accounts.searchAccount(externalAccount);
+    }
+
+    @When("Go to users tab and search {string} and select studio tab")
+    public void go_to_users_tab_and_search_and_select_studio_tab(String selectUser) {
+        accounts.selectUserTab();
+        accounts.selectExternalUser(selectUser);
+    }
+
+    @Then("Turn on studio toggle for external users and verify that it is enabled")
+    public void turn_on_studio_toggle_for_external_users_and_verify() {
+        Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
+    }
 
 }

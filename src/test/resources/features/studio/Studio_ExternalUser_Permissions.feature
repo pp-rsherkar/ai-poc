@@ -8,11 +8,7 @@ Feature: External user permission to enable or disable studio platform
     And Click on accounts tab
     And Locate an account "<EXTERNAL_ACCOUNT>" with external user permission and select it
     And Go to users tab and search "<EXTERNAL_USER>" and select studio tab
-    Then Turn on studio toggle for external users
-    Then Verify studio platform is enabled for "External User"
-
+    Then Turn on studio toggle for external users and verify that it is enabled
     Examples:
       | EXTERNAL_ACCOUNT | EXTERNAL_USER |
       | HMT Demo         | hmtdemo       |
-
-

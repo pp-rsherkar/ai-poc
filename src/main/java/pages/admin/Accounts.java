@@ -46,8 +46,11 @@ public class Accounts {
     private final Locator TEST_CONNECTION_LINK;
     private final Locator CONNECTION_CONFIRMATION_TEXT;
     private final Locator OK_BUTTON;
+    private final Locator SELECT_USER_TAB;
+    private final Locator STUDIO_USER_TAB;
+    private final Locator STUDIO_TOGGLE_EXTERNAL_USER_ENABLED;
+    private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    public final Locator EXTERNAL_ACCOUNT_STUDIO;
 
     public Accounts(Page page) {
         this.page = page;
@@ -56,8 +59,11 @@ public class Accounts {
         this.ACCOUNTS_TAB = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Accounts"));
         this.SEARCH_ACCOUNT = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.SEARCH_ICON = page.locator(".ui > .iconSprite");
-        this.SELECT_ACCOUNT =  page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("ACCOUNT_NAME"));
-        this.EXTERNAL_ACCOUNT_STUDIO = page.locator("//*[@id=\"parentTable\"]/div[1]/table/tbody/tr[2]/td[1]/span[1]/div");
+        this.SELECT_ACCOUNT = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("ACCOUNT_NAME"));
+        this.SELECT_USER_TAB = page.locator("//a[@routerlink='users']");
+        this.STUDIO_USER_TAB = page.locator("//button[.//span[text()='Studio']]");
+        this.STUDIO_TOGGLE_EXTERNAL_USER_ENABLED = page.locator("//span[contains(@class,'icons-24-checkmark-green')]");
+        this.STUDIO_TOGGLE_EXTERNAL_USER_DISABLED = page.locator("//span[contains(@class,'icons-24-checkmark-white')]");
         this.STUDIO_SETTINGS_BUTTON = page.locator("div:nth-child(6) > .btn > .acc-toggle-wrapper > .icons-32-checkmark");
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
@@ -217,8 +223,32 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(PULSEPOINT_ICON);
     }
 
-    public void searchAccount(){
-        SEARCH_ICON.click();
-        SELECT_ACCOUNT.click();
+    public void selectUserTab() {
+        SELECT_USER_TAB.click();
+        page.waitForLoadState();
     }
+
+    public void selectExternalUser(String externalUser) {
+        Locator searchUser = page.locator("(//input[@placeholder='Search'])[2]");
+        searchUser.waitFor(new Locator.WaitForOptions().setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
+        searchUser.click();
+        searchUser.fill(externalUser);
+        SEARCH_ICON.click();
+        Locator externalUserVisibility = page.locator(String.format("//div[contains(text(),'%s')]", externalUser));
+        waitUtility.waitForLocatorVisible(externalUserVisibility);
+        STUDIO_USER_TAB.click();
+    }
+    
+    public boolean turnStudioToggleForExternalUser() {
+        page.waitForLoadState();
+        if (STUDIO_TOGGLE_EXTERNAL_USER_ENABLED.isVisible()) {
+            return true;
+        } else if (STUDIO_TOGGLE_EXTERNAL_USER_DISABLED.isVisible()) {
+            STUDIO_TOGGLE_EXTERNAL_USER_DISABLED.click();
+            waitUtility.waitForLocatorVisible(STUDIO_TOGGLE_EXTERNAL_USER_ENABLED);
+            return STUDIO_TOGGLE_EXTERNAL_USER_ENABLED.isVisible();
+        }
+        return false;
+    }
+
 }
