@@ -34,9 +34,9 @@ public class StudioSteps {
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
-    String randomNumber = CommonUtils.randomNumberGeneration();
     String npiCount;
     Path targetFilePath;
+    String randomNumber = CommonUtils.generateRandomString();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
