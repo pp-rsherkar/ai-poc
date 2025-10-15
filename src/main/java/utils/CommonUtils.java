@@ -1,5 +1,6 @@
 package utils;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -216,6 +218,15 @@ public class CommonUtils {
         }
 
         return false;
+    }
+
+    public static Path downloadFileAndMoveToSystemFolder(Download download) throws IOException {
+        Path tempDownloadedFile = download.path();
+        String fileName = download.suggestedFilename();
+        Path downloadsFolder = Paths.get(System.getProperty("user.home"), "Downloads");
+        Path targetFile = downloadsFolder.resolve(fileName);
+        Files.move(tempDownloadedFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        return targetFile;
     }
 
     public static void generateScheduleDaysIfNeeded() {
