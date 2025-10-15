@@ -36,6 +36,7 @@ public class StudioSteps {
     List<String> previousNpiDetails = null;
     String randomNumber = CommonUtils.randomNumberGeneration();
     String npiCount;
+    Path targetFilePath;
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -261,20 +262,19 @@ public class StudioSteps {
     }
 
     @And("User selects download format as {string} and clicks Download button")
-    public void userSelectsFileTypeAsAndClicksDownloadButton(String fileExtension) {
+    public void userSelectsFileTypeAsAndClicksDownloadButton(String fileExtension) throws IOException {
         workspace.selectFileExtension(fileExtension);
-        workspace.clickDownloadButton();
-        Assert.assertEquals("Download completed successfully", workspace.checkNPIDownloadComplete());
+        targetFilePath = workspace.clickDownloadButton();
+        Assert.assertEquals("Download completed successfully",workspace.checkNPIDownloadComplete());
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
-    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
-        Path latestFile = FileActions.getLatestDownloadedFile(fileExtension.toLowerCase());
+    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
         int npiCountFromFile = 0;
-        if (fileExtension.equalsIgnoreCase("CSV"))
-            npiCountFromFile = FileActions.fetchColumnCountFromCSV(latestFile, npiHeader);
-        else if (fileExtension.equalsIgnoreCase("XLSX"))
-            npiCountFromFile = FileActions.fetchColumnCountFromExcel(latestFile, npiHeader);
+        if(fileExtension.equalsIgnoreCase("CSV")) 
+            npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
+        else if(fileExtension.equalsIgnoreCase("XLSX"))
+            npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
         Assert.assertEquals("NPI count is not matching", Integer.parseInt(npiCount), npiCountFromFile);
     }
 
@@ -305,25 +305,25 @@ public class StudioSteps {
 
     @And("Check the Download icon is highlighted in green color")
     public void checkTheDownloadIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 114, 114)", workspace.checkBackgroundColorOfDownloadIcon());
+        Assert.assertEquals("rgb(0, 114, 114)",workspace.checkBackgroundColorOfDownloadIcon());
     }
 
     @And("Verify Webhook panel is disabled before applying filters")
     public void verifyWebhookPanelIsDisabledBeforeApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Disabled", workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Disabled",workspace.verifyWebhookToggleButton());
         workspace.closeWebhookPanel();
     }
 
     @Then("Verify Webhook panel is enabled after applying engagement filters")
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Enabled", workspace.verifyWebhookToggleButton());
+        Assert.assertEquals("Enabled",workspace.verifyWebhookToggleButton());
     }
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
-        if (requestType.contains("POST"))
+        if(requestType.contains("POST"))
             workspace.clickWebhookIcon();
         workspace.clickRequestOrContentButton(requestType);
     }
@@ -393,25 +393,27 @@ public class StudioSteps {
 
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 136, 136)", workspace.checkBackgroundColorOfWebhookIcon());
+        Assert.assertEquals("rgb(0, 136, 136)",workspace.checkBackgroundColorOfWebhookIcon());
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
-        workspaceCreation.clickMoreActionsMenu(newWorkspaceName);
+        workspaceCreation.clickMoreActionsMenu(workspaceName);
         workspaceCreation.deleteWorkspace();
     }
 
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
-        String actual = workspaceCreation.verifyDeletePopUp().replace("\r\n", "\n").trim();
-        Assert.assertTrue("Message should contain warning about deleting workspace",
-                actual.contains("You are trying to delete the workspace " + newWorkspaceName));
-        Assert.assertTrue("Message should mention webhook is enabled", actual.contains("Webhooks are enabled for this workspace."));
-        Assert.assertTrue("Message should mention deletion is irreversible",
+        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\\r\\n|\\r|\\n", "\n").replaceAll("\\s+", " ").trim();
+        Assert.assertTrue("Message should warn about deleting the workspace",
+                actual.contains("You are trying to delete the workspace " + workspaceName + "."));
+        Assert.assertTrue("Message should mention that webhooks are enabled",
+                actual.contains("Webhooks are enabled for this workspace."));
+        Assert.assertTrue("Message should mention that deletion is irreversible and will delete the webhook",
                 actual.contains("Deleting the workspace will delete the webhook as well. This action cannot be undone."));
-        Assert.assertTrue("Message should ask for confirmation", actual.contains("Do you want to proceed?"));
+        Assert.assertTrue("Message should confirm user wants to proceed",
+                actual.contains("Do you want to proceed?"));
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
@@ -425,7 +427,7 @@ public class StudioSteps {
 
     @Then("Verify the filter is applied correctly {string}")
     public void verifyTheFilterIsAppliedCorrectly(String primaryFilter) {
-        if (flag) {
+        if(flag){
             List<String> appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
             List<String> expectedFilters = CommonUtils.parseCommaSeparatedString(primaryFilter);
 
@@ -435,7 +437,7 @@ public class StudioSteps {
                 Assert.assertTrue("The filter '" + expected + "' is not applied correctly", isFilterApplied);
             }
             isOverwritten = true;
-        } else {
+        }else{
             Assert.fail("AI is unable to build audience");
         }
     }
@@ -505,7 +507,7 @@ public class StudioSteps {
 
     @And("Verify that dashboard filters are displayed correctly in Filter section")
     public void verifyThatCrossFiltersAreDisplayedCorrectlyInFilterSection() {
-        Assert.assertTrue("Filters were not added", explorerWorkspace.verifyCrossFiltersDisplayed());
+        Assert.assertTrue("Filters were not added",explorerWorkspace.verifyCrossFiltersDisplayed());
         appliedFilterEntries = explorerWorkspace.fetchMergedFilters();
     }
 
@@ -565,38 +567,6 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
-    @When("Navigate to administration")
-    public void navigate_to_administration() {
-        accounts.verifyStudioMenu();
-        accounts.clickAdministration();
-    }
 
-    @When("Click on accounts tab")
-    public void click_on_accounts_tab() {
-        accounts.selectAccountsTab();
-    }
-
-    @When("Locate an account {string} with external user permission and select it")
-    public void locate_an_account_with_external_user_permission_and_select_it(String externalAccount) {
-        accounts.searchAccount(externalAccount);
-        page.waitForLoadState();
-        accounts.searchAccount();
-        accounts.EXTERNAL_ACCOUNT_STUDIO.click();
-    }
-
-    @When("Go to users tab and search {string} and select studio tab")
-    public void go_to_users_tab_and_search_and_select_studio_tab(String string) {
-        //In progress by Pradeep- Will raise in next PR(15th Oct)
-    }
-
-    @Then("Turn on studio toggle for external users")
-    public void turn_on_studio_toggle_for_external_users() {
-        //In progress by Pradeep- Will raise in next PR(15th Oct)
-    }
-
-    @Then("Verify studio platform is enabled for {string}")
-    public void verify_studio_platform_is_enabled_for(String string) {
-        //In progress by Pradeep- Will raise in next PR(15th Oct)
-    }
 
 }

@@ -27,7 +27,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | State              | New                                                                                                                     |
       | Profession         | Physician                                                                                                               |
       | Specialty          | Foot & Ankle Surgery, Internal Medicine                                                                                 |
-      | NPI List Name      | Large file test                                                                                                         |
+      #| NPI List Name      | Large file test                                                                                                         |
       | Medical School     | New York College                                                                                                        |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
@@ -107,6 +107,13 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it
       | NPI Geographic Location    |
       | NPI Facilities Geography   |
+      | NPI Age Range              |
+      | NPI Gender                 |
+      | Patient Age Range          |
+      | Patient Gender             |
+      | Net Worth                  |
+      | Years Practiced            |
+      | Patient Distribution       |
       | Top 20 Market Areas        |
       | Top 20 Professions         |
       | Top 20 Specialties         |
@@ -116,13 +123,6 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Top 20 Procedures          |
       | Top 20 MeSH Categories     |
       | Top 20 IAB Categories      |
-      | NPI Age Range              |
-      | NPI Gender                 |
-      | Patient Age Range          |
-      | Patient Gender             |
-      | Net Worth                  |
-      | Years Practiced            |
-      | Patient Distribution       |
     And Verify that dashboard filters are displayed correctly in Filter section
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
