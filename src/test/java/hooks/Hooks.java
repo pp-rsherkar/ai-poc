@@ -65,7 +65,7 @@ public class Hooks {
             // Stop tracing even if test passed
             try {
                 DriverFactory.context.tracing().stop(
-                        new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_") + ".zip")));
+                        new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
             } catch (Exception e) {
                 logger.warning("Trace stop failed: " + e.getMessage());
             }
