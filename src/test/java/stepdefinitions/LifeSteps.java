@@ -209,6 +209,7 @@ public class LifeSteps {
         campaigns.navigateToCampaignListing();
         campaignListing.searchCreatedCampaign(campaignNameRandom);
         Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
+        campaignListing.expandCreatedLineItem();
         Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
@@ -2592,6 +2593,7 @@ public class LifeSteps {
     @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
         campaignListing.searchCreatedCampaign(campaignName);
+        campaignListing.expandCreatedLineItem();
         campaignDashboard.navigateToLineItemDetails(campaignName);
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
