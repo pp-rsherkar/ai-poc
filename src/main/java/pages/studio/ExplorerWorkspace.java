@@ -77,7 +77,7 @@ public class ExplorerWorkspace {
         this.AUDIENCE_DESCRIPTION_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@placeholder='Describe your Audience']");
         this.BUILD_AUDIENCE_BTN = WORKSPACE_FRAME.locator("//div[text()='Build Audience']");
         this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//div[text()='Try another prompt']");
-        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@class, 'FilterTitleContainer')]");
+        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id, 'filters-container')]");
         this.MAP_TOOL_TIP = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(@class,'MapTooltip')]/div/div/div[text()='Identified NPIs']/following-sibling::div");
         this.DELETE_FILTER = WORKSPACE_FRAME.locator("//button[contains(@class,'DeleteButton')]");
         this.CAMERA_CONTROL_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//button[@title='Map camera controls']");
@@ -110,11 +110,11 @@ public class ExplorerWorkspace {
 
     public void selectFilter(String filter, List<String> options) {
         SEARCH_FILTER.fill(filter);
-        WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).click();
+        WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).first().click();
         switch (filter) {
             case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name":
                 if (filter.equals("Specialty"))
-                    WORKSPACE_FRAME.locator("//span[contains(text(),'All Speciality')]").click();
+                    WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
                     Locator locator = WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
                     TAB_PANEL_SEARCH.fill(option.trim());
@@ -186,7 +186,7 @@ public class ExplorerWorkspace {
     public boolean describeAudience(String aiPrompt) {
         AUDIENCE_DESCRIPTION_TEXTAREA.fill(aiPrompt);
         BUILD_AUDIENCE_BTN.click();
-        TRY_ANOTHER_PROMPT_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        TRY_ANOTHER_PROMPT_BTN.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return FILTER_HEADER_TITLE.isVisible();
     }
 
@@ -205,7 +205,7 @@ public class ExplorerWorkspace {
             boolean isInView = false;
             switch (npiVisualList.get(i).trim()){
                case "NPI Geographic Location", "NPI Facilities Geography", "NPI ZIP Codes" :
-                   Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//section[contains(@aria-label,'%s')]//div[contains(@style,'z-index: 3;')]", visual));
+                   Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[contains(@style,'z-index: 3;')]", visual));
                    isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, CAMERA_CONTROL_ICON,1000,  100, page);
                    if (!isInView) {
                        continue;
@@ -221,7 +221,7 @@ public class ExplorerWorkspace {
                    break;
                case "Top 20 Market Areas","Top 20 Professions","Top 20 Specialties","Top 20 Insurance Providers", "Top 20 Prescriptions",
                     "Top 20 Diagnoses", "Top 20 Procedures", "Top 20 MeSH Categories", "Top 20 IAB Categories":
-                    Locator TOP_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//section[contains(@aria-label,'%s')]//div[@class='ag-center-cols-container']/div", visual));
+                    Locator TOP_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[@class='ag-center-cols-container']/div", visual));
                     isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, TOP_ENTITIES,1000,  100, page);
                     if (!isInView) {
                        continue;
@@ -231,7 +231,7 @@ public class ExplorerWorkspace {
                     }
                     break;
                case "NPI Age Range", "NPI Gender", "Patient Age Range", "Patient Gender","Net Worth", "Years Practiced", "Patient Distribution":
-                   Locator NPI_PATIENT_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//section[contains(@aria-label,'%s')]//*[name()='path' and contains(@class, 'highcharts-point')]", visual));
+                   Locator NPI_PATIENT_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//*[name()='path' and contains(@class, 'highcharts-point')]", visual));
                    isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, NPI_PATIENT_ENTITIES, 1000,  100, page);
                    if (!isInView) {
                        continue;

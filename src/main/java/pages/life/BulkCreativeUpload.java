@@ -1,11 +1,14 @@
 package pages.life;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -219,8 +222,9 @@ public class BulkCreativeUpload {
         return DOWNLOAD_BLANK_TEMPLATE.isVisible();
     }
 
-    public void clickBlankTemplateDownloadButton() {
-        DOWNLOAD_BLANK_TEMPLATE.click();
+    public Path clickBlankTemplateDownloadButton() throws IOException {
+        Download download = page.waitForDownload(DOWNLOAD_BLANK_TEMPLATE::click);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 
     public boolean isBrowseFileButtonVisible(String field) {
@@ -230,17 +234,14 @@ public class BulkCreativeUpload {
         return false;
     }
 
-    public boolean verifyDownloadedFile(String fileName, String fileExtension) {
-        return CommonUtils.isDownloadedFileAvailable(fileName, fileExtension);
-    }
-
     public void uploadImageFile(String imageFileName) {
         String locator = "//span[contains(@class,'reupload-image')]";
         CommonUtils.uploadFile(page, 0, locator, imageFileName);
     }
 
-    public void clickTemplateWithURLsLink() {
-        TEMPLATE_WITH_URL_LINK.click();
+    public Path clickTemplateWithURLsLink() throws IOException {
+        Download download = page.waitForDownload(TEMPLATE_WITH_URL_LINK::click);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 
     public boolean isCampaignToRestrictVisible() {

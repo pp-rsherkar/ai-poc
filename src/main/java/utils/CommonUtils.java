@@ -1,5 +1,6 @@
 package utils;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -13,24 +14,39 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class CommonUtils {
+    public static int startDay = 0;
+    public static int endDay = 0;
 
     public static String timeStampCalculation(){
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
     }
 
-    public static String randomNumberGeneration(){
+    public static String generateRandomString(){
         return UUID.randomUUID().toString().substring(0, 10);
     }
 
     public static String randomFourDigitNumber() {
         int number = (int)(Math.random() * 10000); // generates 0 to 9999
         return String.format("%04d", number);      // pads with leading zeros
+    }
+
+    public static String generateRandomNumber() {
+        Random random = new Random();
+        StringBuilder npi = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            npi.append(random.nextInt(10));
+        }
+        return npi.toString();
     }
 
     public static List<String> normalize(List<String> list) {
@@ -133,14 +149,11 @@ public class CommonUtils {
         }
     }
 
-    public static boolean isDownloadedFileAvailable(String fileName, String extension) {
-        File downloadDir = new File(System.getProperty("user.home") + "/Downloads");
-        File latest = Arrays.stream(Objects.requireNonNull(
-                                downloadDir.listFiles((dir, name) -> name.matches(fileName + "( \\(\\d+\\))?\\." + extension))))
-                .max(Comparator.comparingLong(File::lastModified))
-                .orElse(null);
-
-        return latest != null;
+    public static boolean isDownloadedFileAvailable(Path filePath, String expectedExtension) {
+        File file = filePath.toFile();
+        return file.exists()
+                && file.isFile()
+                && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
     }
 
     public static void hoverAndClick(Page page, BoundingBox box, Locator tooltipLocator) {
@@ -204,4 +217,33 @@ public class CommonUtils {
         return false;
     }
 
+    public static Path downloadFileAndMoveToSystemFolder(Download download) throws IOException {
+        Path tempDownloadedFile = download.path();
+        String fileName = download.suggestedFilename();
+        Path downloadsFolder = Paths.get(System.getProperty("user.home"), "Downloads");
+        Path targetFile = downloadsFolder.resolve(fileName);
+        Files.move(tempDownloadedFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        return targetFile;
+    }
+
+    public static void generateScheduleDaysIfNeeded() {
+        YearMonth currentMonth = YearMonth.now();
+        int maxDay = currentMonth.lengthOfMonth();
+        int today = LocalDate.now().getDayOfMonth();
+        int attempts = 0;
+        if (startDay != 0 && endDay != 0) {
+            return;
+        }
+        do {
+            if (today >= maxDay - 1) {
+                startDay = maxDay - 1;
+                endDay = maxDay;
+            } else {
+                startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
+                endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
+            }
+            attempts++;
+            if (attempts > 10) break;
+        } while (endDay <= startDay);
+    }
 }
