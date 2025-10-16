@@ -163,6 +163,8 @@ public class Navigation {
         waitUtility.waitForLocatorVisible(SUB_MENU);
     }
 
+    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
+    // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
     public void navigateBackToLife(){
         waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
