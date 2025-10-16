@@ -262,7 +262,7 @@ public class WorkspaceCreation {
         return WORKSPACE_FRAME.locator(String.format("//h1[contains(text(),'%s')]", workspace)).isVisible();
     }
 
-    public void selectMoreActionsMenu(String workspaceName){
+    public void selectMoreActionsMenu(String workspaceName) {
         Locator moreActionsButton = WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first();
         waitUtility.waitForLocatorVisible(moreActionsButton);
         moreActionsButton.click();
