@@ -2848,4 +2848,30 @@ public class LifeSteps {
         templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
         nameList.add(templateNameRandom);
     }
+
+    @When("User selects {string} as rule type and selects the published Studio list")
+    public void userSelectsRuleTypeAndSelectsThePublishedStudioList(String ruleType) {
+        itemCount = tacticSettings.selectRuleType(ruleType, StudioSteps.workspaceName);
+    }
+
+    @Then("Verify the selected targeting rule {string} and rule option")
+    public void verifyTheSelectedTargetingRuleAndRuleOption(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
+    }
+
+    @And("User navigates to {string} application")
+    public void userNavigatesToApplication(String application) {
+        switch (application.toLowerCase()) {
+            case "life":
+                navigation.navigateBackToLife();
+                break;
+            case "hcp":
+                navigation.navigateBackToHCP();
+                break;
+            case "studio":
+                navigation.navigateBackToStudio();
+                break;
+        }
+    }
 }
