@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import utils.WaitUtility;
@@ -9,6 +10,8 @@ import utils.WaitUtility;
 import java.util.*;
 
 public class TacticSettings {
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -24,8 +27,8 @@ public class TacticSettings {
     private final Locator RULE_DEVICE_BLOCK;
     private final Locator RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB;
     private final Locator VERIFY_NPI;
-    private final Locator FETCH_TARGET_RULE_TYPES;
-    private final Locator FETCH_TARGET_RULE_OPTIONS;
+    private final Locator FETCH_TARGET_RULETYPES;
+    private final Locator FETCH_TARGET_RULEOPTIONS;
     private final Locator TARGET_CATEGORY_NAME;
     private final Locator PERSON_TAB;
     private final Locator HOUSEHOLD_TAB;
@@ -38,7 +41,7 @@ public class TacticSettings {
     private final Locator GEO_TARGETS_TEXTBOX;
     private final Locator AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID;
     private final Locator RULE_APP_BUNDLES_LISTS_OPTION;
-    private final Locator VIEW_ABILITY_PERCENTAGE_BOX;
+    private final Locator VIEWABILITY_PERCENTAGE_BOX;
     private final Locator KEYWORDS_TEXTBOX;
     private final Locator GEO_RADIUS_ADD_POINT;
     private final Locator GEO_RADIUS_LAT;
@@ -53,7 +56,14 @@ public class TacticSettings {
     private final Locator TARGETING_RULES_PANEL_TITLE;
     private final Locator KEYWORD_CUSTOM_LIST;
     private final Locator KEYWORD_SELECTED_LIST;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    private final Locator SHOW_MORE_BUTTON;
+    private final Locator TARGETING_OPTIONS;
+    private final Locator SELECT_TARGETING;
+    private final Locator BLOCK_TARGETING;
+    private final Locator HOUSEHOLD_ICON;
+    public final Set<String> SELECTED_BEHAVIOUR_SEGMENTS = new HashSet<>();
+    public final Set<String> SAVED_BEHAVIOUR_SEGMENTS = new HashSet<>();
+
     List<Object> ruleTypes;
     List<Object> ruleOptions;
 
@@ -73,8 +83,8 @@ public class TacticSettings {
         this.RULE_DEVICE_BLOCK = page.locator("//sui-radio-button[contains(@class,'ui radio checkbox')]//label[text()='Block Selected']");
         this.RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
         this.VERIFY_NPI = page.locator("//label[normalize-space(text())='NPI']");
-        this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
-        this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
+        this.FETCH_TARGET_RULETYPES = page.locator("//label[contains(@class,'target-item__label')]");
+        this.FETCH_TARGET_RULEOPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
@@ -87,7 +97,7 @@ public class TacticSettings {
         this.GEO_TARGETS_TEXTBOX = page.locator("//textarea[@id='geotargetedItemsTA']");
         this.AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID = page.locator("//div[@class='input']/input[@type='text']");
         this.RULE_APP_BUNDLES_LISTS_OPTION = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'App Bundles Lists')]");
-        this.VIEW_ABILITY_PERCENTAGE_BOX = page.locator("//div[contains(@class, 'rightLabel')]//input[contains(@class, 'form-control-percent-mini-right')]");
+        this.VIEWABILITY_PERCENTAGE_BOX = page.locator("//div[contains(@class, 'rightLabel')]//input[contains(@class, 'form-control-percent-mini-right')]");
         this.KEYWORDS_TEXTBOX = page.locator("//div[contains(@class,'text-area-container')]//textarea");
         this.GEO_RADIUS_ADD_POINT = page.locator("//div[normalize-space()='Add Point' and contains(@class,'semi-bold')]");
         this.GEO_RADIUS_LAT = page.locator("//tr[contains(@class,'geopointRowInEdit')]//input[@formcontrolname='latitude']");
@@ -102,6 +112,12 @@ public class TacticSettings {
         this.TARGETING_RULES_PANEL_TITLE = page.locator("//div[text()='HCP Direct Match Targeting' or text()='Targeting Rule']");
         this.KEYWORD_CUSTOM_LIST = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Custom Lists')]");
         this.KEYWORD_SELECTED_LIST = page.locator("//span[contains(text(),'Custom Keyword')]/following-sibling::span[contains(text(),'Selected Only')]");
+        this.SHOW_MORE_BUTTON = page.locator("//button[@class='show-more-button']");
+        this.TARGETING_OPTIONS = page.locator("//span[contains(@class,'max-width')]");
+        //this.SELECT_TARGETING = page.locator("//span[contains(@class,'max-width')]/ancestor::div[contains(@class,'cliptext')]/preceding-sibling::div/div[contains(@class,'include-default')]");
+        this.SELECT_TARGETING = page.locator("//div[@title='Target']");
+        this.BLOCK_TARGETING = page.locator("//div[@title='Block']");
+        this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");;
     }
 
     public String verifyTacticSettingsText() {
@@ -117,9 +133,22 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
-        SELECT_OPTION.click();
+        HOUSEHOLD_IP_TAB.click();
+        SHOW_MORE_BUTTON.click();
+        SELECT_TARGETING.last().click();
+        String selected = TARGETING_OPTIONS.last().innerText();
+        this.SELECTED_BEHAVIOUR_SEGMENTS.add(selected);
+        SHOW_MORE_BUTTON.click();
+        BLOCK_TARGETING.last().click();
+        String blocked = TARGETING_OPTIONS.last().innerText();
+        this.SELECTED_BEHAVIOUR_SEGMENTS.add(blocked);
         clickOk();
         clickClose();
+        waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
+        String blockedTarget = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).innerText();
+        String savedTarget = page.locator(String.format("//span[contains(text(),'%s')]", selected)).innerText();
+        SAVED_BEHAVIOUR_SEGMENTS.add(blockedTarget);
+        SAVED_BEHAVIOUR_SEGMENTS.add(savedTarget);
     }
 
     public int selectRuleType(String ruleType, String ruleOption) {
@@ -161,7 +190,7 @@ public class TacticSettings {
     public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues) {
         SEARCH_RULE_TYPE.clear();
         SEARCH_RULE_TYPE.type(ruleType);
-        if (SELECT_RULE_TYPE.isVisible()) {
+        if(SELECT_RULE_TYPE.isVisible()){
             SELECT_RULE_TYPE.click();
             waitUtility.waitUntilSpinnerHidden();
 
@@ -343,7 +372,7 @@ public class TacticSettings {
                     break;
                 case "Viewability":
                     String percent = ruleValues.get(0);
-                    VIEW_ABILITY_PERCENTAGE_BOX.fill(percent);
+                    VIEWABILITY_PERCENTAGE_BOX.fill(percent);
                     clickRuleTypeOkButton();
                     break;
                 case "Legal Pages":
@@ -367,7 +396,7 @@ public class TacticSettings {
         }
     }
 
-    public void isElementVisible(String xpath) {
+    public void isElementVisible(String xpath){
         Locator locator = page.locator(xpath);
         boolean visible = false;
         for (int i = 0; i < 5; i++) {
@@ -385,8 +414,9 @@ public class TacticSettings {
         }
     }
 
-    public void clickRuleTypeOkButton() {
-        if (RULE_TYPE_OK_BUTTON.isEnabled()) RULE_TYPE_OK_BUTTON.click();
+    public void clickRuleTypeOkButton(){
+        if(RULE_TYPE_OK_BUTTON.isEnabled())
+            RULE_TYPE_OK_BUTTON.click();
         page.waitForLoadState(LoadState.LOAD);
     }
 
@@ -394,24 +424,24 @@ public class TacticSettings {
         RULE_TYPE_CLOSE.click();
     }
 
-    public List<Object> fetchRulesTypes() {
+    public List<Object> fetchRulesTypes(){
         ruleTypes = new ArrayList<>();
-        FETCH_TARGET_RULE_TYPES.first().waitFor();
-        for (int i = 0; i < FETCH_TARGET_RULE_TYPES.count(); i++) {
-            String text = FETCH_TARGET_RULE_TYPES.nth(i).innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
+        FETCH_TARGET_RULETYPES.first().waitFor();
+        for (int i = 0; i < FETCH_TARGET_RULETYPES.count(); i++) {
+            String text = FETCH_TARGET_RULETYPES.nth(i).innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
             ruleTypes.add(text);
         }
         return ruleTypes;
     }
 
     public void fetchRulesTypesCount(int expectedCount) {
-        FETCH_TARGET_RULE_TYPES.nth(expectedCount - 1).waitFor();
+        FETCH_TARGET_RULETYPES.nth(expectedCount - 1).waitFor();
     }
 
-    public List<Object> fetchRuleOptions() {
+    public List<Object> fetchRuleOptions(){
         ruleOptions = new ArrayList<>();
-        for (int i = 0; i < FETCH_TARGET_RULE_OPTIONS.count(); i++) {
-            String text = FETCH_TARGET_RULE_OPTIONS.nth(i).innerText();
+        for (int i = 0; i < FETCH_TARGET_RULEOPTIONS.count(); i++) {
+            String text = FETCH_TARGET_RULEOPTIONS.nth(i).innerText();
             text = text.replaceAll("≥", "").trim();
             ruleOptions.add(text);
         }
@@ -421,7 +451,7 @@ public class TacticSettings {
     public void selectTargetingRule(String ruleType, String listName) {
         SEARCH_RULE_TYPE.clear();
         SEARCH_RULE_TYPE.type(ruleType);
-        if (SELECT_RULE_TYPE.isVisible()) {
+        if(SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitForLocatorVisible(TARGETING_RULES_PANEL_TITLE);
             Map<String, Locator> ruleOptionMap = new HashMap<>();
@@ -433,7 +463,9 @@ public class TacticSettings {
                     break;
                 }
             }
-            Locator searchInput = listName.contains("Keyword") ? SEARCH_RULE_OPTION.nth(1) : SEARCH_RULE_OPTION;
+            Locator searchInput = listName.contains("Keyword")
+                    ? SEARCH_RULE_OPTION.nth(1)
+                    : SEARCH_RULE_OPTION;
             searchInput.fill(listName);
             page.waitForLoadState();
             searchInput.press("Enter");
@@ -441,7 +473,11 @@ public class TacticSettings {
     }
 
     public void clickTarget(String listName) {
-        Locator locator = page.locator(String.format("//div[@title='%s']/preceding-sibling::div/div[@title='Target'] | " + "//span[@title='%s']/ancestor::div/preceding-sibling::div/div[@title='Target'] | " + "//div[text()='%s']/ancestor::div/preceding-sibling::div/div[@title='Target']", listName, listName, listName));
+        Locator locator = page.locator(String.format(
+                "//div[@title='%s']/preceding-sibling::div/div[@title='Target'] | " +
+                "//span[@title='%s']/ancestor::div/preceding-sibling::div/div[@title='Target'] | " +
+                "//div[text()='%s']/ancestor::div/preceding-sibling::div/div[@title='Target']",
+                listName, listName, listName));
         locator.click();
     }
 
@@ -458,8 +494,8 @@ public class TacticSettings {
     }
 
     /*Roshani Sherkar
-     * 01-07-2025*/
-    public boolean fetchAndVerifyTargetCategoryName(List<String> targetCategoryList) {
+    * 01-07-2025*/
+    public boolean fetchAndVerifyTargetCategoryName(List<String> targetCategoryList){
         List<String> actualCategories = new ArrayList<>();
         int count = TARGET_CATEGORY_NAME.count();
         for (int i = 0; i < count; i++) {
@@ -490,12 +526,14 @@ public class TacticSettings {
     }
 
     /*Roshani Sherkar
-     * 20-08-2025
-     * Open NPI list created in new browser tab */
+    * 20-08-2025
+    * Open NPI list created in new browser tab */
     public String fetchTotalNPICountFromNewTab(String listName) {
         Page originalPage = DriverFactory.getPage();
         Page newTab = DriverFactory.context.waitForPage(() -> {
-            DriverFactory.getPage().locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName)).click();
+            DriverFactory.getPage()
+                    .locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName))
+                    .click();
         });
         newTab.bringToFront();
         DriverFactory.threadLocalDriver.set(newTab);
@@ -508,44 +546,48 @@ public class TacticSettings {
         return npiCount;
     }
 
-    public String fetchNPICountFromTargetingPanel() {
+    public String fetchNPICountFromTargetingPanel(){
         return TOTAL_NPI_COUNT.first().innerText().trim();
     }
 
     public boolean isListAvailableInTargetingPanel(String listName) {
-        Locator locator = page.locator(String.format("//span[@title='%s'] | //div[@title='%s'] | //div[contains(@class,'text-cls') and contains(text(),'%s')]", listName, listName, listName));
+        Locator locator = page.locator(String.format(
+                "//span[@title='%s'] | //div[@title='%s'] | //div[contains(@class,'text-cls') and contains(text(),'%s')]",
+                listName, listName, listName
+        ));
         locator.scrollIntoViewIfNeeded();
         return locator.isVisible();
     }
 
-    public int fetchSelectedListCountFromTargetingPanel() {
+    public int fetchSelectedListCountFromTargetingPanel(){
         Locator locator = SELECTED_LIST.count() > 1 ? KEYWORD_SELECTED_LIST : SELECTED_LIST;
         String text = locator.innerText();
         return Integer.parseInt(text.replaceAll("^.*\\((\\d+)\\).*$", "$1").trim());
     }
 
     public String verifyIfRuleIsAdded() {
-        return FETCH_TARGET_RULE_TYPES.innerText().trim();
+        return FETCH_TARGET_RULETYPES.innerText().trim();
     }
 
     public String fetchSelectedListCountFromTactic() {
-        Locator targetCount = FETCH_TARGET_RULE_TYPES.locator("xpath=./span[@class='target-item__count']");
+        Locator targetCount = FETCH_TARGET_RULETYPES.locator("xpath=./span[@class='target-item__count']");
         return targetCount.innerText().trim();
     }
 
     public boolean isSelectedListPresentInTactic(String npiName) {
-        FETCH_TARGET_RULE_OPTIONS.locator("text=" + npiName).scrollIntoViewIfNeeded();
-        return FETCH_TARGET_RULE_OPTIONS.locator("text=" + npiName).isVisible();
+        FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).scrollIntoViewIfNeeded();
+        return FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).isVisible();
     }
 
     public String fetchSelectedListItemCountFromTactic(String npiName) {
-        Locator targetCount = FETCH_TARGET_RULE_OPTIONS.locator("text=" + npiName).locator("xpath=./following-sibling::span");
-        if (!targetCount.isVisible()) return "";
+        Locator targetCount = FETCH_TARGET_RULEOPTIONS.locator("text="+npiName).locator("xpath=./following-sibling::span");
+        if(!targetCount.isVisible())
+            return "";
         return targetCount.innerText().trim();
     }
 
     public String fetchMatchedNPICountFromTargetingPanel() {
-        if (SHOW_MATCHED_NPI_BUTTON.isVisible()) {
+        if(SHOW_MATCHED_NPI_BUTTON.isVisible()) {
             SHOW_MATCHED_NPI_BUTTON.click();
             waitUtility.waitForLocatorVisible(MATCHED_NPI_COUNT);
         }
@@ -553,10 +595,10 @@ public class TacticSettings {
     }
 
     public String verifyRuleType() {
-        return FETCH_TARGET_RULE_TYPES.innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
+        return FETCH_TARGET_RULETYPES.innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
     }
 
     public String verifyRuleOption() {
-        return FETCH_TARGET_RULE_OPTIONS.innerText();
+        return FETCH_TARGET_RULEOPTIONS.innerText();
     }
 }
