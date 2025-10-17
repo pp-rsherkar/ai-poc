@@ -40,6 +40,9 @@ public class WorkspaceCreation {
     private final Locator DASHBOARD_RELOAD_ICON;
     private final Locator PAGINATION;
     private final Locator DEPENDENT_WORKSPACE_TEXT;
+    private final Locator REMOVE_WORKSPACE_BUTTON;
+    private final Locator DELETE_WORKSPACE_ERROR_ALERT_BOX;
+    private final Locator DELETE_WORKSPACE_ERROR_TEXT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     int counter = 0;
 
@@ -73,6 +76,9 @@ public class WorkspaceCreation {
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
         this.PAGINATION = WORKSPACE_FRAME.locator("(//div[contains(@class, 'PaginationContainer')]//span)[1]");
         this.DEPENDENT_WORKSPACE_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'Checking for dependent workspaces...')]");
+        this.REMOVE_WORKSPACE_BUTTON = WORKSPACE_FRAME.locator("//button/div[text()='Remove']");
+        this.DELETE_WORKSPACE_ERROR_ALERT_BOX = WORKSPACE_FRAME.locator("//h3[contains(text(),'Deleting workspace')]");
+        this.DELETE_WORKSPACE_ERROR_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),\"Deletion blocked by Life. Message: This list can't be deleted\")]");
     }
 
     public String studioDashboard() {
@@ -254,5 +260,23 @@ public class WorkspaceCreation {
     public boolean navigateToWorkspace(String workspace) {
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return WORKSPACE_FRAME.locator(String.format("//h1[contains(text(),'%s')]", workspace)).isVisible();
+    }
+
+    public void selectMoreActionsMenu(String workspaceName) {
+        Locator moreActionsButton = WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first();
+        waitUtility.waitForLocatorVisible(moreActionsButton);
+        moreActionsButton.click();
+    }
+
+    public void clickRemoveWorkspaceButton() {
+        REMOVE_WORKSPACE_BUTTON.click();
+    }
+
+    public String verifyDeleteWorkspaceErrorMessage() {
+        waitUtility.waitForLocatorVisible(DELETE_WORKSPACE_ERROR_ALERT_BOX);
+        waitUtility.waitForLocatorVisible(DELETE_WORKSPACE_ERROR_TEXT);
+        String errorText = DELETE_WORKSPACE_ERROR_TEXT.innerText();
+        waitUtility.waitForLocatorHidden(DELETE_WORKSPACE_ERROR_ALERT_BOX);
+        return errorText;
     }
 }

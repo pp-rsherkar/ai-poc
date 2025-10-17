@@ -567,6 +567,15 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
+    @And("User searches the created workspace")
+    public void userSearchesTheCreatedWorkspace() {
+        workspaceCreation.searchWorkspaceName(workspaceName);
+        workspaceCreation.selectMoreActionsMenu(workspaceName);
+    }
 
-
+    @Then("Verify that the workspace cannot be deleted and appropriate message is displayed to the user")
+    public void verifyThatTheWorkspaceCannotBeDeletedAndAppropriateMessageIsDisplayedToTheUser() {
+        workspaceCreation.clickRemoveWorkspaceButton();
+        Assert.assertTrue(workspaceCreation.verifyDeleteWorkspaceErrorMessage().contains("Deletion blocked by Life. Message: This list can't be deleted"));
+    }
 }
