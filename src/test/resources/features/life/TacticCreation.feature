@@ -9,20 +9,21 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
 
-  @regression
-  Scenario Outline: Create multiple tactic and verify its tabs and status
+  @regression @vp
+  Scenario Outline: Create multiple tactics and verify its tabs and status
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates new tactics and verifies it
-      | Audience Group tactic |
-      | Targeting Segment     |
-      | Health Populations    |
+      | Tactic Name          | Channel  | RuleType            |
+      | Audience Group tactic| Standard | Behavioral Segment   |
+      | Targeting Segment    | Email    | Health Population    |
+      | Health Populations   | EHR      | NPI                  |
     Then Verify that the tabs gets enabled only after saving tactics
-      |Settings|
-      |Creatives|
-      |Debugger |
+      | Settings  |
+      | Creatives |
+      | Debugger  |
     And Verify the status of saved tactic
 
 
@@ -41,7 +42,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible in new and existing tactic
       | Targeting Segment  |
-    #And User enters value in custom field and verifies if its not visible in other tactics
+    #And User enters value in custom field and verifies if it's not visible in other tactics
     Then User deletes the custom field
 
     Examples:
