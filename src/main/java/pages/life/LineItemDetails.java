@@ -63,7 +63,7 @@ public class LineItemDetails {
     private final Locator REMOVE_BUTTON;
     private final Locator MAIN_DETAILS_LABEL;
     private final Locator CAMPAIGN_HEADER;
-
+    private final Locator EXIT_BULK_EDIT_MODE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -114,7 +114,7 @@ public class LineItemDetails {
         this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']").last();
         this.CANCEL_TACTIC = page.locator("#lidcBody").getByText("Cancel");
         this.NEW_LINE_ITEM = page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
-        this.NOTES_ICON = page.locator("//span[@class='notes-icon-empty-dashboard']");
+        this.NOTES_ICON = page.locator("//div[contains(@class,'notes-dashboard')]//span");
         this.NOTES_TEXTAREA = page.locator("//textarea[@placeholder='Notes']");
         this.NOTES_OK_BUTTON = page.locator("//span[@class='okText']");
         this.NOTES_SUCCESS_ALERT = page.locator("//div[text()='Notes saved successfully.']");
@@ -133,6 +133,7 @@ public class LineItemDetails {
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
         this.MAIN_DETAILS_LABEL = page.locator("//div[@class='main-details']");
         this.CAMPAIGN_HEADER = page.locator("//div[@class='campaign-header']");
+        this.EXIT_BULK_EDIT_MODE = page.locator("//button[contains(text(),'Exit Bulk edit mode')]");
     }
 
     public String verifyLineItemText() {
@@ -295,7 +296,7 @@ public class LineItemDetails {
         return (value != null && !value.isEmpty()) ? value : "";
     }
 
-    public void navigateBackToLineItemDetails(String lineItemName){
+    public void navigateToLineItemDetails(String lineItemName){
         page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName)).click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
@@ -303,6 +304,11 @@ public class LineItemDetails {
 
     public void clickDetailsTab(){
         TAB_NAMES.locator("text=Details" ).click();
+        waitUtility.waitUntilPreLoaderHidden();
+    }
+
+    public void clickOverviewTab(){
+        TAB_NAMES.locator("text=Overview" ).click();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
@@ -340,15 +346,17 @@ public class LineItemDetails {
         return text;
     }
 
-    public void selectLineItemUsingBulkEdit() {
+    public void clickBulkEditMode() {
         BULK_EDIT_MODE.evaluate("el => { const container = el.closest('.tacticListContainer'); if (container) { container.scrollTop = el.offsetTop - container.offsetTop; } }");
         BULK_EDIT_MODE.click();
         waitUtility.waitForLocatorVisible(BULK_EDIT_CHECKBOX.first());
-        for (int i = 0; i < BULK_EDIT_CHECKBOX.count(); i++) {
-            if (!BULK_EDIT_CHECKBOX.nth(i).getAttribute("class").contains("checked")) {
-                BULK_EDIT_CHECKBOX.nth(i).click();
-                waitUtility.waitUntilSpinnerHidden();
-            }
+    }
+
+    public void selectLineItemUsingBulkEdit(String lineItemName) {
+        Locator lineItemXpath = page.locator(String.format("//div[@class='main-details' and text()='%s']/ancestor::div[contains(@class,'li-list item-list-wrapper')]/preceding-sibling::div/sui-checkbox", lineItemName));
+        if (!lineItemXpath.getAttribute("class").contains("checked")) {
+            lineItemXpath.click();
+            waitUtility.waitUntilSpinnerHidden();
         }
     }
 
@@ -402,5 +410,27 @@ public class LineItemDetails {
 
     public List<String> fetchLineItemName() {
         return MAIN_DETAILS_LABEL.allInnerTexts();
+    }
+
+    public void exitBulkEditMode() {
+        EXIT_BULK_EDIT_MODE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public boolean checkIfEachLineItemEnabledOrDisabled(String label) {
+        Locator xpath = page.locator(String.format("//label[contains(text(),'%s')]", label));
+        return xpath.innerText().trim().contains(label);
+    }
+
+    public String fetchLineItemNotes() {
+        NOTES_ICON.hover();
+        return TOOL_TIP.innerText().trim();
+    }
+
+    public List<String> fetchLineItemDetails() {
+        List<String> originalLineItemDetails = new ArrayList<>();
+        originalLineItemDetails.add(FLIGHT_START_DATE.inputValue());
+        originalLineItemDetails.add(FLIGHT_END_DATE.inputValue());
+        return originalLineItemDetails;
     }
 }

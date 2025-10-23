@@ -2600,7 +2600,7 @@ public class LifeSteps {
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
         campaignListing.searchCreatedCampaign(campaignName);
         campaignListing.expandCreatedLineItem();
-        campaignDashboard.navigateToLineItemDetails(campaignName);
+        campaignDashboard.navigateToLineItemDetails();
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         itemList = lineItemFlights.fetchFlightDates();
@@ -2981,7 +2981,7 @@ public class LifeSteps {
     @And("User fetches all the flight details added")
     public void userFetchesAllTheFlightDetailsAdded() {
         lineItemDetails.saveLineItem();
-        lineItemDetails.navigateBackToLineItemDetails(lineItemNameRandom);
+        lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
         lineItemDetails.clickDetailsTab();
         itemList = lineItemDetails.fetchFlightDetails();
     }
@@ -3028,7 +3028,7 @@ public class LifeSteps {
         List<String> lineItemTypeList = CommonUtils.convertStringToList(lineItemType);
         for (int i = 0; i < lineItemTypeList.size(); i++) {
             String lineItem = lineItemTypeList.get(i);
-            lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.randomNumberGeneration();
+            lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.generateRandomString();
             nameList.add(lineItemNameRandom);
             tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
             Assert.assertEquals("Success!", lineItemDetails.lineItemSuccess());
@@ -3045,32 +3045,67 @@ public class LifeSteps {
     @Then("User adds Comments or Notes {string} to each line item")
     public void userAddsCommentsOrNotesToEachLineItem(String notes) {
         for(String name : nameList){
-            lineItemDetails.navigateBackToLineItemDetails(name);
-            Assert.assertEquals("Notes saved successfully.", lineItemDetails.addNotesToLineItem(notes));
+            lineItemDetails.navigateToLineItemDetails(name);
+            String newNotes = name + " " + notes;
+            itemList.add(newNotes);
+            Assert.assertEquals("Notes saved successfully.", lineItemDetails.addNotesToLineItem(newNotes));
+        }
+    }
+
+    @And("Verify the notes added to each line item")
+    public void verifyTheNotesAddedToEachLineItem() {
+        for(String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            String notes = lineItemDetails.fetchLineItemNotes();
+            Assert.assertTrue("Note of '" + name + "' is not available",
+                    itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
         }
     }
 
     @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
     public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
-        lineItemDetails.selectLineItemUsingBulkEdit();
+        lineItemDetails.clickBulkEditMode();
+        for(String name : nameList) {
+            lineItemDetails.selectLineItemUsingBulkEdit(name);
+        }
         Assert.assertEquals("Lineitems status updated successfully" ,lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
+        lineItemDetails.exitBulkEditMode();
+    }
+
+    @And("Verify that each selected line item is {string}")
+    public void verifyThatEachSelectedLineItemIsDisabled(String label) {
+        for(String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
+        }
     }
 
     @And("Verify user is able to create a copy of the line items using {string} option")
     public void verifyUserIsAbleToCreateACopyOfTheLineItems(String lineItemOption) {
+        itemList.clear();
+        List<String> originalLineItemDetails;
+        List<String> copiedLineItemDetails;
         for(String name : nameList){
-            lineItemDetails.navigateBackToLineItemDetails(name);
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickDetailsTab();
+            originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
             lineItemDetails.clickLineItemOptions(lineItemOption);
             String lineItemName = "Copy of " + name;
+            itemList.add(lineItemName);
             Assert.assertEquals("Line Item copied successfully.", lineItemDetails.createACopyOfLineItem(lineItemName));
             Assert.assertTrue("Copied Line Item is not available", lineItemDetails.verifyLineItemAvailable(lineItemName));
+            lineItemDetails.navigateToLineItemDetails(lineItemName);
+            lineItemDetails.clickDetailsTab();
+            copiedLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickOverviewTab();
+            Assert.assertEquals("Line item details do not match after copy.", originalLineItemDetails, copiedLineItemDetails);
         }
     }
 
     @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
     public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
         for(String name : nameList) {
-            lineItemDetails.navigateBackToLineItemDetails(name);
+            lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.runReportFromLineItemPage();
             runReportPanel.selectTemplateFromDropdown(templateName);
@@ -3080,10 +3115,21 @@ public class LifeSteps {
         }
     }
 
+    @And("Verify that the reports generated on the Line Item page are available on the Generate Report page")
+    public void verifyThatTheReportsGeneratedOnTheLineItemPageAreAvailableOnTheGenerateReportPage() {
+        navigation.clickSubMenu();
+        navigation.clickMenuAngle();
+        navigation.clickGeneratedReport();
+        runReportPanel.clickSearchButton();
+        for(String name : nameList) {
+            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
+        }
+    }
+
     @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
     public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
-        for(String name : nameList) {
-            lineItemDetails.navigateBackToLineItemDetails(name);
+        for(String name : itemList) {
+            lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.performDeleteOperation();
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();

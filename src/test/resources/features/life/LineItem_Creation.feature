@@ -48,11 +48,15 @@ Feature: LIFE Regression - Line Item Management
   Scenario Outline: Create, modify, duplicate, delete, and toggle line items of different types using Bulk Edit Mode
     When User enters the line item details with different line types "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_TYPE>", enables the line item and saves the changes
     And Verify Bulk Edit Mode successfully "disables" multiple selected line items
+#    And Verify that each selected line item is "Disabled"
     And Verify Bulk Edit Mode successfully "enables" multiple selected line items
+    And Verify that each selected line item is "Enabled"
     Then User adds Comments or Notes "<LINE_ITEM_NOTE>" to each line item
+    And Verify the notes added to each line item
     And Verify user is able to create a copy of the line items using "Duplicate" option
-    And Verify "Generate Report" option opens the Run report screen for user and run the report for "<TEMPLATE>"
     And Verify "Delete" is available for each item, and deleted items are removed from the Left menu
+    And Verify "Generate Report" option opens the Run report screen for user and run the report for "<TEMPLATE>"
+    And Verify that the reports generated on the Line Item page are available on the Generate Report page
     Examples:
-      | LINE_NAME | LINE_BUDGET | LINE_TYPE                                                                   | LINE_ITEM_NOTE  | TEMPLATE |
-      | Line      | 500         | Display, Audio, Video, Native Display, Native Video, DOOH, Search Extension | Line Item Notes | Template_Automation                            |
+      | LINE_NAME | LINE_BUDGET | LINE_TYPE                                                                   | LINE_ITEM_NOTE | TEMPLATE            |
+      | Line      | 500         | Display, Audio, Video, Native Display, Native Video, DOOH, Search Extension | Notes          | Template_Automation |
