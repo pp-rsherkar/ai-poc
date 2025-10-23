@@ -1,9 +1,6 @@
 package utils;
 
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.ElementHandle;
-import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
@@ -88,6 +85,7 @@ public class CommonUtils {
 
     public static void selectAndClickElement(Locator locator, List<String> values){
         for (int i = 0; i < locator.count(); i++) {
+            locator.nth(i).scrollIntoViewIfNeeded();
             String text = locator.nth(i).innerText().trim();
             for (String value : values) {
                 if (text.equalsIgnoreCase(value.trim())){
@@ -246,4 +244,28 @@ public class CommonUtils {
             if (attempts > 10) break;
         } while (endDay <= startDay);
     }
+
+    public static void moveSliderToValue(Locator sliderHandle, int targetValue, Page page) {
+        int min = Integer.parseInt(sliderHandle.getAttribute("aria-valuemin"));
+        int max = Integer.parseInt(sliderHandle.getAttribute("aria-valuemax"));
+
+        targetValue = Math.max(min, Math.min(targetValue, max));
+        Locator sliderRoot = sliderHandle.locator("xpath=ancestor::ngx-slider[1]");
+        Locator sliderTrack = sliderRoot.locator("span.ngx-slider-bar-wrapper, span.ngx-slider-bar").first();
+
+        BoundingBox trackBox = sliderTrack.boundingBox();
+        BoundingBox handleBox = sliderHandle.boundingBox();
+        double ratio = (targetValue - min) / (double)(max - min);
+        double targetX = trackBox.x + ratio * trackBox.width;
+        double targetY = handleBox.y + (handleBox.height / 2);
+
+        sliderHandle.scrollIntoViewIfNeeded();
+        sliderHandle.hover();
+        page.mouse().move(handleBox.x + handleBox.width / 2, targetY);
+        page.mouse().down();
+        page.mouse().move(targetX, targetY, new Mouse.MoveOptions().setSteps(25));
+        page.mouse().up();
+    }
+
+
 }
