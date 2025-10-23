@@ -230,7 +230,7 @@ public class Accounts {
 
     public void selectExternalUser(String externalUser) {
         Locator searchUser = page.locator("(//input[@placeholder='Search'])[2]");
-        searchUser.waitFor(new Locator.WaitForOptions().setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(searchUser);
         searchUser.click();
         searchUser.fill(externalUser);
         SEARCH_ICON.click();
@@ -238,7 +238,7 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(externalUserVisibility);
         STUDIO_USER_TAB.click();
     }
-    
+
     public boolean turnStudioToggleForExternalUser() {
         page.waitForLoadState();
         if (STUDIO_TOGGLE_EXTERNAL_USER_ENABLED.isVisible()) {

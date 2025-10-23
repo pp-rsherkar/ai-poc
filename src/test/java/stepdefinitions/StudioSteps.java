@@ -567,14 +567,14 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
-    @When("Navigate to administration")
-    public void navigate_to_administration() {
+    @When("User navigates to administration tab")
+    public void user_navigates_to_administration_tab() {
         accounts.verifyStudioMenu();
         accounts.clickAdministration();
     }
 
-    @When("Click on accounts tab")
-    public void click_on_accounts_tab() {
+    @When("User clicks on accounts tab")
+    public void user_clicks_on_accounts_tab() {
         accounts.selectAccountsTab();
     }
 
@@ -589,8 +589,8 @@ public class StudioSteps {
         accounts.selectExternalUser(selectUser);
     }
 
-    @Then("Turn on studio toggle for external users and verify that it is enabled")
-    public void turn_on_studio_toggle_for_external_users_and_verify() {
+    @Then("User turns on studio toggle for external users and verifies that it is enabled")
+    public void user_turns_on_studio_toggle_for_external_users_and_verifies_that_it_is_enabled() {
         Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
     }
 
