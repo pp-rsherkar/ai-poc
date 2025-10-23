@@ -19,6 +19,10 @@ public class WaitUtility {
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
+    public void waitUntilSpinnerHidden(double timeout){
+        SPINNER.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
+    }
+
     public void waitUntilPreLoaderHidden(){
         PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }

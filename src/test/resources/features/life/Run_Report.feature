@@ -126,8 +126,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to generate the report
     And Confirms that the report panel retains the entered data
     Examples:
-      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME                       |
-      | Template_Automation | Multiple_Flight | Automation_Multiple_Flight_Campaign |
+      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME                           |
+      | Template_Automation | Multiple_Flight | Automation_Multiple_Flight_Campaign_New |
 
   @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report

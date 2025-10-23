@@ -34,9 +34,9 @@ public class StudioSteps {
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
-    String randomNumber = CommonUtils.randomNumberGeneration();
     String npiCount;
     Path targetFilePath;
+    String randomNumber = CommonUtils.generateRandomString();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -271,7 +271,7 @@ public class StudioSteps {
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
         int npiCountFromFile = 0;
-        if(fileExtension.equalsIgnoreCase("CSV"))
+        if(fileExtension.equalsIgnoreCase("CSV")) 
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if(fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
@@ -567,6 +567,11 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
+    @And("User searches the created workspace")
+    public void userSearchesTheCreatedWorkspace() {
+        workspaceCreation.searchWorkspaceName(workspaceName);
+        workspaceCreation.selectMoreActionsMenu(workspaceName);
+    }
     @When("User navigates to administration tab")
     public void user_navigates_to_administration_tab() {
         accounts.verifyStudioMenu();
@@ -578,6 +583,11 @@ public class StudioSteps {
         accounts.selectAccountsTab();
     }
 
+    @Then("Verify that the workspace cannot be deleted and appropriate message is displayed to the user")
+    public void verifyThatTheWorkspaceCannotBeDeletedAndAppropriateMessageIsDisplayedToTheUser() {
+        workspaceCreation.clickRemoveWorkspaceButton();
+        Assert.assertTrue(workspaceCreation.verifyDeleteWorkspaceErrorMessage().contains("Deletion blocked by Life. Message: This list can't be deleted"));
+    }
     @When("Locate an account {string} with external user permission and select it")
     public void locate_an_account_with_external_user_permission_and_select_it(String externalAccount) {
         accounts.searchAccount(externalAccount);

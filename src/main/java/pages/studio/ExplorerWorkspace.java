@@ -77,7 +77,7 @@ public class ExplorerWorkspace {
         this.AUDIENCE_DESCRIPTION_TEXTAREA = WORKSPACE_FRAME.locator("//textarea[@placeholder='Describe your Audience']");
         this.BUILD_AUDIENCE_BTN = WORKSPACE_FRAME.locator("//div[text()='Build Audience']");
         this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//div[text()='Try another prompt']");
-        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@class, 'FilterTitleContainer')]");
+        this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id, 'filters-container')]");
         this.MAP_TOOL_TIP = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(@class,'MapTooltip')]/div/div/div[text()='Identified NPIs']/following-sibling::div");
         this.DELETE_FILTER = WORKSPACE_FRAME.locator("//button[contains(@class,'DeleteButton')]");
         this.CAMERA_CONTROL_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//button[@title='Map camera controls']");
@@ -186,7 +186,7 @@ public class ExplorerWorkspace {
     public boolean describeAudience(String aiPrompt) {
         AUDIENCE_DESCRIPTION_TEXTAREA.fill(aiPrompt);
         BUILD_AUDIENCE_BTN.click();
-        TRY_ANOTHER_PROMPT_BTN.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        TRY_ANOTHER_PROMPT_BTN.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return FILTER_HEADER_TITLE.isVisible();
     }
 

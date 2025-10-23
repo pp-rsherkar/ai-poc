@@ -144,7 +144,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + CommonUtils.randomNumberGeneration();
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.generateRandomString();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -160,7 +160,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.randomNumberGeneration();
+        tacticNameRandom = tacticName + '_' + CommonUtils.generateRandomString();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -209,6 +209,7 @@ public class LifeSteps {
         campaigns.navigateToCampaignListing();
         campaignListing.searchCreatedCampaign(campaignNameRandom);
         Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
+        campaignListing.expandCreatedLineItem();
         Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
         campaignListing.expandCreatedLineItem();
         Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
@@ -294,6 +295,7 @@ public class LifeSteps {
     @Given("User navigates to Report Templates page")
     public void user_navigates_to_report_templates_page() {
         navigation.clickSubMenu();
+        navigation.clickMenuAngle();
         reportTemplates.clickReportTemplatesLink();
     }
 
@@ -1361,7 +1363,10 @@ public class LifeSteps {
     @And("Verify that the sub-tabs {string} on the left navigation panel are available and {string} is selected by default")
     public void verifyThatTheSubTabsOnTheLeftNavigationPanelAreAvailable(String subTabs, String defaultTabName) {
         List<String> subTabsList = CommonUtils.convertStringToList(subTabs);
-        Assert.assertTrue("Tabs are not present", sharedList.verifySubTabs(subTabsList));
+        for (String tab : subTabsList) {
+            Assert.assertTrue(tab + " Tab is not present", sharedList.verifySubTabs(tab));
+        }
+        Assert.assertTrue("Both tab is not selected by default", sharedList.verifyDefaultSubTab(defaultTabName));
     }
 
     @And("Verify that when the {string} tab is selected, only {string} lists are visible in the panel")
@@ -1593,11 +1598,9 @@ public class LifeSteps {
     }
 
     @And("Verify that user is able to download the uploaded file {string}, {string}")
-    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) {
-        sharedList.downloadFile(fileName1);
-        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains", "csv"));
-        sharedList.downloadFile(fileName2);
-        Assert.assertTrue("Downloaded file is not available", sharedList.verifyDownloadedFile("domains", "csv"));
+    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) throws IOException {
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(sharedList.downloadFile(fileName1), "csv"));
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(sharedList.downloadFile(fileName2), "csv"));
     }
 
     @And("Verify that the user is able to delete the uploaded file {string}")
@@ -1876,17 +1879,15 @@ public class LifeSteps {
         Assert.assertTrue(option2 + " is not available under " + sectionName, bulkCreativeUpload.isBrowseFileButtonVisible(option2));
     }
 
-    @And("User is able to download a blank template using the {string} option")
-    public void userIsAbleToDownloadABlankTemplateUsingTheOption(String arg0) {
-        bulkCreativeUpload.clickBlankTemplateDownloadButton();
-        Assert.assertTrue("Downloaded file is not available", bulkCreativeUpload.verifyDownloadedFile("DisplayBulkUploadTemplate", "xlsx"));
+    @And("User is able to download a blank template using the Download Blank Template option")
+    public void userIsAbleToDownloadABlankTemplateUsingTheOption() throws IOException {
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(bulkCreativeUpload.clickBlankTemplateDownloadButton(), "xlsx"));
     }
 
     @And("Verify user is able to upload images {string} to get a template with URLs")
-    public void userIsAbleToUploadImagesToGetATemplateWithURLsUsingTheOption(String imageFileName) {
+    public void userIsAbleToUploadImagesToGetATemplateWithURLsUsingTheOption(String imageFileName) throws IOException {
         bulkCreativeUpload.uploadImageFile(imageFileName);
-        bulkCreativeUpload.clickTemplateWithURLsLink();
-        Assert.assertTrue("Downloaded file is not available", bulkCreativeUpload.verifyDownloadedFile("DisplayBulkUploadTemplate", "xlsx"));
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(bulkCreativeUpload.clickTemplateWithURLsLink(), "xlsx"));
     }
 
     @And("Verify under the {string} section the fields {string}, {string}, {string} are available")
@@ -2593,6 +2594,7 @@ public class LifeSteps {
     @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
         campaignListing.searchCreatedCampaign(campaignName);
+        campaignListing.expandCreatedLineItem();
         campaignDashboard.navigateToLineItemDetails(campaignName);
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
@@ -2839,4 +2841,39 @@ public class LifeSteps {
         Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
     }
 
+
+    @And("User should be able to select the created template from the dropdown")
+    public void userShouldBeAbleToSelectTheTemplateCreatedFromTheDropdown() {
+        runReportPanel.selectTemplateFromDropdown(templateNameRandom);
+        templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
+        nameList.add(templateNameRandom);
+    }
+
+    @When("User selects {string} as rule type and selects the published Studio list")
+    public void userSelectsRuleTypeAndSelectsThePublishedStudioList(String ruleType) {
+        itemCount = tacticSettings.selectRuleType(ruleType, StudioSteps.workspaceName);
+    }
+
+    @Then("Verify the selected targeting rule {string} and rule option")
+    public void verifyTheSelectedTargetingRuleAndRuleOption(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
+    }
+
+    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
+    // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
+    @And("User navigates to {string} application")
+    public void userNavigatesToApplication(String application) {
+        switch (application.toLowerCase()) {
+            case "life":
+                navigation.navigateBackToLife();
+                break;
+            case "hcp":
+                navigation.navigateBackToHCP();
+                break;
+            case "studio":
+                navigation.navigateBackToStudio();
+                break;
+        }
+    }
 }
