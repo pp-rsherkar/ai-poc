@@ -2758,6 +2758,34 @@ public class LifeSteps {
         nameList.add(templateNameRandom);
     }
 
+    @When("User selects {string} as rule type and selects the published Studio list")
+    public void userSelectsRuleTypeAndSelectsThePublishedStudioList(String ruleType) {
+        itemCount = tacticSettings.selectRuleType(ruleType, StudioSteps.workspaceName);
+    }
+
+    @Then("Verify the selected targeting rule {string} and rule option")
+    public void verifyTheSelectedTargetingRuleAndRuleOption(String ruleType) {
+        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
+        Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
+    }
+
+    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
+    // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
+    @And("User navigates to {string} application")
+    public void userNavigatesToApplication(String application) {
+        switch (application.toLowerCase()) {
+            case "life":
+                navigation.navigateBackToLife();
+                break;
+            case "hcp":
+                navigation.navigateBackToHCP();
+                break;
+            case "studio":
+                navigation.navigateBackToStudio();
+                break;
+        }
+    }
+
     @Then("Verify Smart List Creation Panel should display the following List Population Options")
     public void verifySmartListCreationPanelShouldDisplayTheFollowingListPopulationOptions(DataTable dataTable) {
         List<String> listPopulationOptions = dataTable.asList(String.class);

@@ -5,7 +5,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
   4. Delete NPI
   5. Replace NPI
 
-  @API
+  @api
   Scenario Outline: Fetch NPI Lists for different list types - "<LIST_TYPE>"
     Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
     Then Verify the Token API response status and presence of a valid bearer token
@@ -17,9 +17,8 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
       | admin11  | ppadmin1 | ATTRIBUTE     | 43220   |
       | admin11  | ppadmin1 | AUTO_IMPORTED | 43264   |
       | admin11  | ppadmin1 | SMART         | 43224   |
-
-
-  @API
+    
+  @api
   Scenario Outline: Fetch NPI Lists using Account ID
     Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
     Then Verify the Token API response status and presence of a valid bearer token
@@ -29,7 +28,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
       | USERNAME | PASSWORD | ACCOUNT_ID |
       | admin11  | ppadmin1 | 566607     |
 
-  @API
+  @api
   Scenario Outline: Verify Create NPI API using Account ID
     Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
     Then Verify the Token API response status and presence of a valid bearer token
@@ -42,7 +41,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
       | admin11  | ppadmin1 | 566607     | NPI_LIST_     | 2342342342,2342342342,3453453456,3453453457                       | 200         |                                     |
       | admin11  | ppadmin1 | 566607     | NPI_LIST_     | 2342342342,3453453456,3453453457,1639137706,1639138019,1639138035 | 200         |                                     |
 
-  @API
+  @api
   Scenario Outline: Verify Create NPI API with Attributes using Account ID
     Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
     Then Verify the Token API response status and presence of a valid bearer token
@@ -52,7 +51,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
       | USERNAME | PASSWORD | ACCOUNT_ID | LIST_NAME           |
       | admin11  | ppadmin1 | 566607     | NPI_LIST_ATTRIBUTE_ |
 
-  @API
+  @api
   Scenario Outline: Verify Addition of NPIs to existing NPI List with "<LIST_TYPE>"
     Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
     Then Verify the Token API response status and presence of a valid bearer token
@@ -61,7 +60,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
     When User uses the token to call the GET NPI List API with list ID "<LIST_ID>"
     Then Verify the NPI block contains the newly added NPIs
     Examples:
-      | USERNAME | PASSWORD | LIST_TYPE     | LIST_ID |
-      | admin11  | ppadmin1 | STATIC        | 43323   |
-      | admin11  | ppadmin1 | ATTRIBUTE     | 43346   |
-      | admin11  | ppadmin1 | SMART         | 43224   |
+      | USERNAME | PASSWORD | LIST_TYPE | LIST_ID |
+      | admin11  | ppadmin1 | STATIC    | 43323   |
+      | admin11  | ppadmin1 | ATTRIBUTE | 43346   |
+      | admin11  | ppadmin1 | SMART     | 43224   |
