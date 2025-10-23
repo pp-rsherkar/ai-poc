@@ -129,7 +129,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Upload Creatives                |
       | Third Party Tracking Pixel/Tag  |
     And Verify under the "Spreadsheet Template and Images" section the options "Download Blank Template" and "Upload Images to Get Template With URLs" are available
-    And User is able to download a blank template using the "Download Blank Template" option
+    And User is able to download a blank template using the Download Blank Template option
     And Verify user is able to upload images "<IMAGE_FILENAME>" to get a template with URLs
     And Verify under the "Upload Creatives" section the fields "Campaign Restrict", "Spreadsheet", "Approval Status" are available
     And User is able to select a "<CAMPAIGN_NAME>" from the Campaign Restrict dropdown
@@ -182,7 +182,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Spreadsheet Template and Images |
       | Upload Creatives                |
     And Verify under the "Spreadsheet Template and Images" section the options "Download Blank Template" and "Upload Images to Get Template With URLs" are available
-    And User is able to download a blank template using the "Download Blank Template" option
+    And User is able to download a blank template using the Download Blank Template option
     And Verify user is able to upload images "<IMAGE_FILENAME>" to get a template with URLs
     And Verify under the "Upload Creatives" section the fields "Campaign Restrict", "Spreadsheet", "Approval Status" are available
     And Verify only valid Landing Domain "<LANDING_DOMAIN>" values should be permitted

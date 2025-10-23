@@ -87,8 +87,8 @@ public class TacticDetails {
             campaigns.campaignDashboard();
             //Campaign, Line Item and Tactic creation
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
-            createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
-            createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
+            createLineItem(lineItemName + "_" + CommonUtils.generateRandomString(), lineItemType.trim(), lineBudget);
+            createTactic(tacticName + "_" + CommonUtils.generateRandomString());
             Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
             labelCountMapList.add(labelCountMap);
             saveTacticDetails();
@@ -106,8 +106,8 @@ public class TacticDetails {
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
-            createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
-            createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
+            createLineItem(lineItemName + "_" + CommonUtils.generateRandomString(), lineItemType.trim(), lineBudget);
+            createTactic(tacticName + "_" + CommonUtils.generateRandomString());
 
             targetingTemplate.addTargetingRules(rulesMap);
             saveTacticDetails();
@@ -182,8 +182,8 @@ public class TacticDetails {
         campaigns.campaignDashboard();
 
         createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
-        createLineItem(lineItemName + "_" + CommonUtils.randomNumberGeneration(), lineItemType.trim(), lineBudget);
-        createTactic(tacticName + "_" + CommonUtils.randomNumberGeneration());
+        createLineItem(lineItemName + "_" + CommonUtils.generateRandomString(), lineItemType.trim(), lineBudget);
+        createTactic(tacticName + "_" + CommonUtils.generateRandomString());
 
         tacticCreatives.clickCreativeTab();
         tacticCreatives.clickAssignCreatives();

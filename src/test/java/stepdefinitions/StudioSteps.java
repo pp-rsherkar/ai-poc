@@ -34,8 +34,9 @@ public class StudioSteps {
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
-    String randomNumber = CommonUtils.randomNumberGeneration();
     String npiCount;
+    Path targetFilePath;
+    String randomNumber = CommonUtils.generateRandomString();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -261,20 +262,19 @@ public class StudioSteps {
     }
 
     @And("User selects download format as {string} and clicks Download button")
-    public void userSelectsFileTypeAsAndClicksDownloadButton(String fileExtension) {
+    public void userSelectsFileTypeAsAndClicksDownloadButton(String fileExtension) throws IOException {
         workspace.selectFileExtension(fileExtension);
-        workspace.clickDownloadButton();
+        targetFilePath = workspace.clickDownloadButton();
         Assert.assertEquals("Download completed successfully",workspace.checkNPIDownloadComplete());
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
-    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
-        Path latestFile = FileActions.getLatestDownloadedFile(fileExtension.toLowerCase());
+    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
         int npiCountFromFile = 0;
         if(fileExtension.equalsIgnoreCase("CSV")) 
-            npiCountFromFile = FileActions.fetchColumnCountFromCSV(latestFile, npiHeader);
+            npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if(fileExtension.equalsIgnoreCase("XLSX"))
-            npiCountFromFile = FileActions.fetchColumnCountFromExcel(latestFile, npiHeader);
+            npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
         Assert.assertEquals("NPI count is not matching", Integer.parseInt(npiCount), npiCountFromFile);
     }
 
@@ -399,19 +399,21 @@ public class StudioSteps {
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
     public void userDeletesTheWebhookFromTheWorkspaceList() {
         workspace.goToWorkspaceList();
-        workspaceCreation.clickMoreActionsMenu(newWorkspaceName);
+        workspaceCreation.clickMoreActionsMenu(workspaceName);
         workspaceCreation.deleteWorkspace();
     }
 
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
-        String actual = workspaceCreation.verifyDeletePopUp().replace("\r\n", "\n").trim();
-        Assert.assertTrue("Message should contain warning about deleting workspace",
-                actual.contains("You are trying to delete the workspace " + newWorkspaceName));
-        Assert.assertTrue("Message should mention webhook is enabled", actual.contains("Webhooks are enabled for this workspace."));
-        Assert.assertTrue("Message should mention deletion is irreversible",
+        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\\r\\n|\\r|\\n", "\n").replaceAll("\\s+", " ").trim();
+        Assert.assertTrue("Message should warn about deleting the workspace",
+                actual.contains("You are trying to delete the workspace " + workspaceName + "."));
+        Assert.assertTrue("Message should mention that webhooks are enabled",
+                actual.contains("Webhooks are enabled for this workspace."));
+        Assert.assertTrue("Message should mention that deletion is irreversible and will delete the webhook",
                 actual.contains("Deleting the workspace will delete the webhook as well. This action cannot be undone."));
-        Assert.assertTrue("Message should ask for confirmation", actual.contains("Do you want to proceed?"));
+        Assert.assertTrue("Message should confirm user wants to proceed",
+                actual.contains("Do you want to proceed?"));
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
@@ -565,6 +567,15 @@ public class StudioSteps {
         Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
+    @And("User searches the created workspace")
+    public void userSearchesTheCreatedWorkspace() {
+        workspaceCreation.searchWorkspaceName(workspaceName);
+        workspaceCreation.selectMoreActionsMenu(workspaceName);
+    }
 
-
+    @Then("Verify that the workspace cannot be deleted and appropriate message is displayed to the user")
+    public void verifyThatTheWorkspaceCannotBeDeletedAndAppropriateMessageIsDisplayedToTheUser() {
+        workspaceCreation.clickRemoveWorkspaceButton();
+        Assert.assertTrue(workspaceCreation.verifyDeleteWorkspaceErrorMessage().contains("Deletion blocked by Life. Message: This list can't be deleted"));
+    }
 }

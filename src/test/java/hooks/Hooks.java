@@ -17,7 +17,7 @@ public class Hooks {
     public DriverFactory driverFactory;
     public Page page;
 
-    @Before
+    @Before(value = "@e2e or @regression")
     public void launchBrowser(Scenario scenario) {
         try {
             double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
@@ -32,7 +32,7 @@ public class Hooks {
     }
 
     //After runs in reverse order so order=1 will run first
-    @After(order = 0)
+    @After(value = "@e2e or @regression", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
             if (page != null)
@@ -47,7 +47,7 @@ public class Hooks {
         }
     }
 
-    @After(order = 1)
+    @After(value = "@e2e or @regression", order = 1)
     public void takeScreenshotAndTrace(Scenario scenario) {
         if (scenario.isFailed()) {
             try {
@@ -65,7 +65,7 @@ public class Hooks {
             // Stop tracing even if test passed
             try {
                 DriverFactory.context.tracing().stop(
-                        new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_") + ".zip")));
+                        new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
             } catch (Exception e) {
                 logger.warning("Trace stop failed: " + e.getMessage());
             }

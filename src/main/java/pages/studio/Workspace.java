@@ -1,5 +1,6 @@
 package pages.studio;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -10,6 +11,7 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public class Workspace {
@@ -52,7 +54,7 @@ public class Workspace {
         this.page = page;
         this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
         this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
-        this.FLY_PAGE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button").first();
+        this.FLY_PAGE_BUTTON = WORKSPACE_FRAME.locator("//div[@role='group']/following-sibling::div//button").first();
         this.PUBLISH_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish NPI List"));
         this.PUBLISHED_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Published NPI List"));
         this.STATIC_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Static List"));
@@ -61,7 +63,7 @@ public class Workspace {
         this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
         this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
-        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//span[contains(text(),'Draft Workspace')]/ancestor::div[contains(@class,'FieldCheckbox')]/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
+        this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//div[@role='group']/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
         this.WEBHOOK_TOGGLE_BUTTON = WORKSPACE_FRAME.locator("//span[contains(@class,'MuiButtonBase-root')]");
         this.WEBHOOK_PANEL_TITLE = WORKSPACE_FRAME.locator("//h1[contains(text(),'Webhook')]");
         this.WEBHOOK_CANCEL_BUTTON = WORKSPACE_FRAME.locator("//button[@type='button']/div[contains(text(),'Cancel')]");
@@ -244,9 +246,10 @@ public class Workspace {
         WORKSPACE_FRAME.locator(String.format("//input/following-sibling::label[contains(text(),'%s')]", fileExtension)).click();
     }
 
-    public void clickDownloadButton() {
-        DOWNLOAD_BUTTON.click();
+    public Path clickDownloadButton() throws IOException {
+        Download download = page.waitForDownload(DOWNLOAD_BUTTON::click);
         waitUtility.waitForLocatorVisible(DOWNLOAD_SUCCESS_ALERT);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 
     public String checkNPIDownloadComplete(){

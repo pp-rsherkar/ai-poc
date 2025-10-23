@@ -13,7 +13,7 @@ public class CampaignListing {
     private final Locator CLICK_CAMPAIGN_SEARCH;
     private final Locator EXPAND_CREATED_LINE_ITEM;
     private final Locator VERIFY_CREATED_TACTIC;
-    private final Locator NOTE_ICON;
+    private final Locator CAMPAIGN_ENTRIES;
     private final Locator GROUP_BY_CAMPAIGN_RADIO_BUTTON;
     private final Locator SUB_TITLE_AFTER_CAMPAIGN_SEARCH;
     private final Locator FAVORITE_ONLY_CHECKBOX;
@@ -30,7 +30,7 @@ public class CampaignListing {
         this.CLICK_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.EXPAND_CREATED_LINE_ITEM = page.locator("//div[contains(@class,'campaignExpand')]/div[contains(@class,'collapsed-thin')]");
         this.VERIFY_CREATED_TACTIC = page.locator("//span[contains(@class,'tactic-name')]");
-        this.NOTE_ICON = page.locator("//div[contains(@class,'notes-icon-col')]");
+        this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'camp-data')]");
         this.GROUP_BY_CAMPAIGN_RADIO_BUTTON = page.locator("//i[contains(@class,'gaGroupCampaigns')]");
         this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'1 Line items, 1 Campaigns, 1 Advertisers')]");
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
@@ -71,7 +71,7 @@ public class CampaignListing {
     }
 
     public void searchCreatedCampaign(String createdCampaign) {
-        waitUtility.waitForLocatorVisible(NOTE_ICON.last());
+        waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         verifyCampaignRadioBtnChecked();
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
@@ -95,8 +95,10 @@ public class CampaignListing {
     }
 
     public void expandCreatedLineItem() {
-        EXPAND_CREATED_LINE_ITEM.click();
-        waitUtility.waitUntilPreLoaderHidden();
+        if (EXPAND_CREATED_LINE_ITEM.first().isVisible()) {
+            EXPAND_CREATED_LINE_ITEM.first().click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
     }
 
     public String verifyCreatedTactic() {

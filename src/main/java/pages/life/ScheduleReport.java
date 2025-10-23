@@ -7,11 +7,9 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class ScheduleReport {
 
@@ -52,11 +50,6 @@ public class ScheduleReport {
     private final Locator FETCHED_TEMPLATE_NAME;
     private final Locator SEND_ON_DROPDOWN;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    YearMonth currentMonth = YearMonth.now();
-    int maxDay = currentMonth.lengthOfMonth();
-    int today = LocalDate.now().getDayOfMonth();
-    int startDay;
-    int endDay;
 
     public ScheduleReport(Page page) {
         this.page = page;
@@ -127,27 +120,14 @@ public class ScheduleReport {
         return false;
     }
 
-    private void generateScheduleDaysIfNeeded() {
-        if (startDay != 0 && endDay != 0) {
-            return;
-        }
-        if (today >= maxDay - 1) {
-            startDay = maxDay - 1;
-            endDay = maxDay;
-        } else {
-            startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
-            endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
-        }
-    }
-
     public boolean selectScheduleStartDate() {
-        generateScheduleDaysIfNeeded();
-        return selectDate(SCHEDULE_START_DATE, startDay);
+        CommonUtils.generateScheduleDaysIfNeeded();
+        return selectDate(SCHEDULE_START_DATE, CommonUtils.startDay);
     }
 
     public boolean selectScheduleEndDate() {
-        generateScheduleDaysIfNeeded();
-        return selectDate(SCHEDULE_END_DATE, endDay);
+        CommonUtils.generateScheduleDaysIfNeeded();
+        return selectDate(SCHEDULE_END_DATE, CommonUtils.endDay);
     }
 
     private boolean selectDate(Locator input, int day) {
@@ -331,11 +311,11 @@ public class ScheduleReport {
     }
 
     public boolean selectStartDate() {
-        return selectDate(START_DATE, startDay);
+        return selectDate(START_DATE, CommonUtils.startDay);
     }
 
     public boolean selectEndDate() {
-        return selectDate(END_DATE, endDay);
+        return selectDate(END_DATE, CommonUtils.endDay);
     }
 
     public void clickScheduleButton() {
