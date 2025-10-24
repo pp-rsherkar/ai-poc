@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +85,8 @@ public class LifeSteps {
     String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
     int totalListCount = 0;
+    int flightStartDate = 0;
+    int flightEndDate = 0;
     APIResponse response;
     boolean flag = false;
 
@@ -142,7 +147,7 @@ public class LifeSteps {
 
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
-        assert campaigns.campaignSuccess().contains("Success!");
+        Assert.assertEquals("Success!", campaigns.campaignSuccess());
         Assert.assertEquals("New Line Item", lineItemDetails.verifyLineItemText());
     }
 
@@ -2681,7 +2686,7 @@ public class LifeSteps {
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
         campaignListing.searchCreatedCampaign(campaignName);
         campaignListing.expandCreatedLineItem();
-        campaignDashboard.navigateToLineItemDetails(campaignName);
+        campaignDashboard.navigateToLineItemDetails();
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         itemList = lineItemFlights.fetchFlightDates();
@@ -2961,5 +2966,263 @@ public class LifeSteps {
                 navigation.navigateBackToStudio();
                 break;
         }
+    }
+
+    @And("Verify Line Item page has below tabs")
+    public void verifyLineItemPageHasBelowTabs(DataTable dataTable) {
+        List<String> tabNames = dataTable.asList(String.class);
+        Assert.assertTrue("Line Item tabs are not available", lineItemDetails.verifyLineItemTabs(tabNames));
+    }
+
+    @And("Verify status of line item is Incomplete when there are no tactics under the line item")
+    public void verifyStatusOfLineItemIsIncompleteWhenThereAreNoTacticsUnderTheLineItem() {
+        Assert.assertEquals("Incomplete", lineItemDetails.verifyLineItemStatus());
+        Assert.assertEquals("Campaign is enabled . Tactic is Incomplete.", lineItemDetails.fetchIncompleteStatusToolTip());
+    }
+
+    @When("User fills in required details {string} except for flight information and save")
+    public void userFillsInRequiredDetailsExceptForFlightInformation(String lineItemName) {
+        lineItemNameRandom = lineItemName + timestamp;
+        lineItemDetails.enterLineItemName(lineItemNameRandom);
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User should see an error message to add flight details")
+    public void userShouldSeeAnErrorMessageToAddFlightDetails() {
+        Assert.assertEquals("LineItem Flight is required.", lineItemDetails.fetchErrorAlert());
+    }
+
+    @And("User clicks Add Flight button")
+    public void userClicksAddFlightButton() {
+        lineItemDetails.clickAddFlightButton();
+    }
+
+    @And("Verify if user enters flight budget that exceeds Campaign budget")
+    public void verifyIfUserEntersFlightBudgetThatExceedsCampaignBudget() {
+        String unaccountedBudget = lineItemDetails.fetchCampaignBudget();
+        String modifiedBudget = String.valueOf(Integer.parseInt(unaccountedBudget) + 1000);
+        lineItemDetails.enterLineItemBudget(modifiedBudget);
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User should see error message when tries to save line item page")
+    public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage() {
+        Assert.assertTrue("The total flight budget is exceeded", lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed"));
+    }
+
+    @And("User adds the flight details - Flight Start Date, Flight End Date, {string}")
+    public void userAddsTheFlightDetailsFlightStartDateFlightStartDate(String budget) {
+        lineItemDetails.enterLineItemBudget(budget);
+        flightStartDate = lineItemDetails.selectStartDateOfFlight();
+        flightEndDate = lineItemDetails.selectEndDateOfFlight();
+    }
+
+    @And("User adds new flight and enter overlapping flight details - Flight Start Date, Flight End Date, {string}")
+    public void userAddsOverlappingFlightDetailsFlightStartDateFlightStartDate(String budget) {
+        lineItemDetails.clickAddFlightButton();
+        lineItemDetails.enterLineItemBudget(budget);
+        lineItemDetails.selectOverlappingFlightDates(flightStartDate, flightEndDate);
+        lineItemDetails.saveLineItem();
+    }
+
+    @And("User should see error message when tries to save line item page and dates fields should get highlighted with inline error message")
+    public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPageAndDatesFieldsShouldGetHighlighted() {
+        Assert.assertTrue("LineItem flights overlap message is not displayed", lineItemDetails.fetchErrorAlert().contains("LineItem flights overlap."));
+        Assert.assertEquals("Flight overlap with other flights." , lineItemDetails.fetchInlineErrorMessage());
+    }
+
+    @When("User enters line item details {string}")
+    public void userEntersLineItemDetails(String lineItemName) {
+        lineItemNameRandom = lineItemName + timestamp;
+        lineItemDetails.enterLineItemName(lineItemNameRandom);
+    }
+
+    @And("User adds {string} flights, fills in the details with {string} for each flight section, and saves the line item")
+    public void userAddsMultipleFlightsAndFillsInDetailsForEachFlightSection(String noOfFlights, String budget) {
+        lineItemDetails.addMultipleFlights(noOfFlights, budget);
+    }
+
+    @And("User generates sequential flights for the line item using {string} and {string}")
+    public void userGeneratesSequentialFlightsToALineItem(String budget, String numberOfMonths) {
+        capturedDetails = lineItemDetails.generateSequentialFlights(budget, numberOfMonths);
+    }
+
+    @And("Verify that Sequential flights should be added based on the start month")
+    public void verifyThatSequentialFlightsShouldBeAddedBasedOnTheStartMonth() {
+        String[] parts = capturedDetails.get(0).split(" ");
+        Month startMonth = Month.valueOf(parts[0].toUpperCase(Locale.ENGLISH));
+        int startYear = Integer.parseInt(parts[1]);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        for (int i = 1; i < capturedDetails.size(); i++) {
+            String dateStr = capturedDetails.get(i);
+            LocalDate actualDate = LocalDate.parse(dateStr, formatter);
+            LocalDate expectedDate = LocalDate.of(startYear, startMonth, 1).plusMonths(i - 1);
+            if (actualDate.getMonthValue() != expectedDate.getMonthValue() ||
+                    actualDate.getYear() != expectedDate.getYear()) {
+                Assert.assertEquals("Flight date mismatch ", actualDate, expectedDate);
+            }
+        }
+    }
+
+    @And("User fetches all the flight details added")
+    public void userFetchesAllTheFlightDetailsAdded() {
+        lineItemDetails.saveLineItem();
+        lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
+        lineItemDetails.clickDetailsTab();
+        itemList = lineItemDetails.fetchFlightDetails();
+    }
+
+    @Then("User navigates to the Flights tab and verifies the flight details")
+    public void userNavigatesToTheFlightsTabAndVerifiesTheFlightDetails() {
+        List<String> flightDetails;
+        lineItemFlights.clickFlightTab();
+        Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
+        flightDetails = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        for (String expected : itemList) {
+            boolean matchFound = flightDetails.stream().anyMatch(actual -> actual.contains(expected));
+            Assert.assertTrue("Expected value not found in flight tab: " + expected, matchFound);
+        }
+        capturedDetails.clear();
+        capturedDetails = flightDetails;
+    }
+
+    @When("User deletes some flight entries")
+    public void userDeletesSomeFlightEntries() {
+        lineItemDetails.clickDetailsTab();
+        lineItemDetails.deleteFlightEntry();
+        lineItemDetails.saveLineItem();
+        itemList = lineItemDetails.fetchFlightDetails();
+    }
+
+    @Then("User should see the remaining flights listed under the Flights section")
+    public void userShouldSeeTheRemainingFlightsListedUnderTheFlightsSection() {
+        List<String> flightDetailsAfterDeletion;
+        lineItemFlights.clickFlightTab();
+        Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
+        flightDetailsAfterDeletion = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        for (String expected : itemList) {
+            boolean matchFound = flightDetailsAfterDeletion.stream().anyMatch(actual -> actual.contains(expected));
+            Assert.assertTrue("Expected value not found in flight tab after flight deletion: " + expected, matchFound);
+        }
+        Assert.assertNotEquals("Flight details did not change after deletion – deletion may have failed.",
+                capturedDetails, flightDetailsAfterDeletion);
+    }
+
+
+    @When("User enters the line item details with different line types {string} {string} {string}, enables the line item and saves the changes")
+    public void userEntersTheLineItemDetailsWithDifferentLineTypesEnablesTheLineItemAndSavesTheChanges(String lineItemName, String lineBudget, String lineItemType) {
+        List<String> lineItemTypeList = CommonUtils.convertStringToList(lineItemType);
+        for (int i = 0; i < lineItemTypeList.size(); i++) {
+            String lineItem = lineItemTypeList.get(i);
+            lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.generateRandomString();
+            nameList.add(lineItemNameRandom);
+            tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
+            Assert.assertEquals("Success!", lineItemDetails.lineItemSuccess());
+            List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available",
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
+            lineItemDetails.cancelTactic();
+            if (i < lineItemTypeList.size() - 1) {
+                lineItemDetails.selectNewLineItem();
+            }
+        }
+    }
+
+    @Then("User adds Comments or Notes {string} to each line item")
+    public void userAddsCommentsOrNotesToEachLineItem(String notes) {
+        for(String name : nameList){
+            lineItemDetails.navigateToLineItemDetails(name);
+            String newNotes = name + " " + notes;
+            itemList.add(newNotes);
+            Assert.assertEquals("Notes saved successfully.", lineItemDetails.addNotesToLineItem(newNotes));
+        }
+    }
+
+    @And("Verify the notes added to each line item")
+    public void verifyTheNotesAddedToEachLineItem() {
+        for(String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            String notes = lineItemDetails.fetchLineItemNotes();
+            Assert.assertTrue("Note of '" + name + "' is not available",
+                    itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
+        }
+    }
+
+    @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
+    public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
+        lineItemDetails.clickBulkEditMode();
+        for(String name : nameList) {
+            lineItemDetails.selectLineItemUsingBulkEdit(name);
+        }
+        Assert.assertEquals("Lineitems status updated successfully" ,lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
+        lineItemDetails.exitBulkEditMode();
+    }
+
+    @And("Verify that each selected line item is {string}")
+    public void verifyThatEachSelectedLineItemIsDisabled(String label) {
+        for(String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
+        }
+    }
+
+    @And("Verify user is able to create a copy of the line items using {string} option")
+    public void verifyUserIsAbleToCreateACopyOfTheLineItems(String lineItemOption) {
+        itemList.clear();
+        List<String> originalLineItemDetails;
+        List<String> copiedLineItemDetails;
+        for(String name : nameList){
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickDetailsTab();
+            originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            String lineItemName = "Copy of " + name;
+            itemList.add(lineItemName);
+            Assert.assertEquals("Line Item copied successfully.", lineItemDetails.createACopyOfLineItem(lineItemName));
+            Assert.assertTrue("Copied Line Item is not available", lineItemDetails.verifyLineItemAvailable(lineItemName));
+            lineItemDetails.navigateToLineItemDetails(lineItemName);
+            lineItemDetails.clickDetailsTab();
+            copiedLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickOverviewTab();
+            Assert.assertEquals("Line item details do not match after copy.", originalLineItemDetails, copiedLineItemDetails);
+        }
+    }
+
+    @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
+    public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
+        for(String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            lineItemDetails.runReportFromLineItemPage();
+            runReportPanel.selectTemplateFromDropdown(templateName);
+            String fileName = "Custom Report";
+            runReportPanel.clickRunButton(fileName);
+            Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+        }
+    }
+
+    @And("Verify that the reports generated on the Line Item page are available on the Generate Report page")
+    public void verifyThatTheReportsGeneratedOnTheLineItemPageAreAvailableOnTheGenerateReportPage() {
+        navigation.clickSubMenu();
+        navigation.clickMenuAngle();
+        navigation.clickGeneratedReport();
+        runReportPanel.clickSearchButton();
+        for(String name : nameList) {
+            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
+        }
+    }
+
+    @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
+    public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
+        for(String name : itemList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            lineItemDetails.performDeleteOperation();
+            List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation",
+                        lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
+
+        }
+
     }
 }

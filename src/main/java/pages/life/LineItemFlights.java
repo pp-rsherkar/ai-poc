@@ -12,6 +12,7 @@ public class LineItemFlights {
     private final Locator FLIGHT_TAB;
     private final Locator FLIGHT_TABLE;
     private final Locator FLIGHTS_DATES;
+    private final Locator FLIGHTS_DETAILS;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public LineItemFlights(Page page) {
@@ -19,10 +20,12 @@ public class LineItemFlights {
         this.FLIGHT_TAB = page.locator("//a[contains(@class,'gaTabFlights')]");
         this.FLIGHT_TABLE = page.locator("//div[contains(@id,'parentTable')]");
         this.FLIGHTS_DATES = page.locator("//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 2]/div");
+        this.FLIGHTS_DETAILS = page.locator("//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 4]/div");
     }
 
     public void clickFlightTab() {
         FLIGHT_TAB.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public boolean isFlightTableDisplayed() {
@@ -33,4 +36,9 @@ public class LineItemFlights {
     public List<String> fetchFlightDates() {
         return FLIGHTS_DATES.allInnerTexts();
     }
+
+    public List<String> fetchFlightDetailsFromFlightTab(){
+        return FLIGHTS_DETAILS.allInnerTexts();
+    }
+
 }

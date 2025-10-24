@@ -361,7 +361,7 @@ public class CampaignDashboard {
         return true;
     }
 
-    public void navigateToLineItemDetails(String campaignID){
+    public void navigateToLineItemDetails(){
         LINE_ITEM_NAME.click();
         LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
