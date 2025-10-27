@@ -41,6 +41,10 @@ public class LifeSteps {
     static String metricName;
     static String newPixelName;
     static String pixelNameEdited;
+    private String customFieldName;
+    private String uiCustomFieldName;
+
+
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -156,6 +160,88 @@ public class LifeSteps {
     public void verify_line_item_details_are_saved_and_user_is_navigated_to_tactic_page() {
         assert lineItemDetails.lineItemSuccess().contains("Success!");
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
+    }
+
+    @Then("User creates new tactics and verifies it")
+    public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
+        List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
+        List<String> expectedTactic = new ArrayList<>();
+            for (Map<String, String> tacticData : tactics) {
+                String tacticName = tacticData.get("Tactic Name");
+                String channel = tacticData.get("Channel");
+                String ruleType = tacticData.get("RuleType");
+                expectedTactic.add(tacticName);
+            // Enter tactic name
+            tacticDetails.enterTacticName(tacticName);
+            tacticDetails.saveTactic();
+
+            // Select channel and add targeting rules
+            tacticSettings.selectChannel(channel);
+            tacticDetails.TARGETTING_RULES_ICON.click();
+            tacticSettings.addTargettingRules(ruleType);
+
+            // Verify selected vs saved target rules
+//            Assert.assertEquals(
+//                    tacticSettings.SELECTED_TARGET_RULE.toString(),
+//                    tacticSettings.SAVED_TARGET_RULE,tacticName
+//            );
+
+            // Save and create new tactic
+            tacticSettings.saveTacticSettings();
+            tacticDetails.clickNewTactic();
+        }
+        List<String> actualTactics =   tacticDetails.getAllTactics();
+        // Using a HashSet to compare the lists regardless of their order of entries.
+        System.out.println("Saved tactics:" + actualTactics);
+        Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
+    }
+
+    @Then("Verify that the tabs gets enabled only after saving tactics")
+    public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
+        // tacticDetails.clickNewTactic();
+        tacticDetails.verifyDetailsTab();
+        List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
+        List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
+        Assert.assertEquals(tacticTabNames,disabledTabs);
+        tacticDetails.CLICK_FIRST_TACTIC();
+        List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
+        tacticTabNames.add("Details");
+        Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
+
+    }
+    @And("Verify the status of saved tactic")
+    public void verify_the_status_of_saved_tactic() {
+        tacticDetails.CLICK_FIRST_TACTIC();
+        String actualStatus = tacticDetails.verifyTacticState();
+        Assert.assertEquals("Incomplete",actualStatus);
+    }
+
+
+    @Then("User creates new custom field {string} and verifies the same")
+    public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
+        //tacticDetails.clickNewTactic();
+        String customFieldName = customField+"_"+CommonUtils.randomFourDigitNumber();
+        this.customFieldName = customFieldName;
+        tacticDetails.clickDetailsTab();
+        tacticDetails.addCustomField(customFieldName);
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0];// To remove unwanted space and text
+        Assert.assertEquals(customFieldName,actualName);
+        this.uiCustomFieldName=actualName;
+
+    }
+
+    @And("User verifies if new custom field is visible in new and existing tactic")
+    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
+        tacticDetails.clickNewTactic();
+        Assert.assertEquals(customFieldName,uiCustomFieldName);
+        tacticDetails.clickTactic();
+        Assert.assertEquals(customFieldName,uiCustomFieldName);
+    }
+
+    @Then("User deletes the custom field")
+    public void user_deletes_the_custom_field() {
+        tacticDetails.deleteCustomField(customFieldName);
     }
 
     @When("User enters the tactic details as {string} and saves the tactic")
