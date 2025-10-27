@@ -607,7 +607,7 @@ public class StudioSteps {
 
     @And("Verify the Retrofit checkbox is selected")
     public void verifyTheRetrofitCheckboxIsSelected() {
-        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.verifyRetrofitCheckboxSelected());
+        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.isRetrofitCheckboxSelected());
     }
 
     @And("User selects {string} as Keep NPIs on the list option")
