@@ -162,4 +162,27 @@ public class Navigation {
         PULSEPOINT_LOGO.click();
         waitUtility.waitForLocatorVisible(SUB_MENU);
     }
+
+    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
+    // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
+    public void navigateBackToLife(){
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+        SUB_MENU.click();
+        LIFE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        LIFE.click();
+    }
+
+    public void navigateBackToHCP(){
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+        SUB_MENU.click();
+        SIGNAL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SIGNAL.click();
+    }
+
+    public void navigateBackToStudio(){
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+        SUB_MENU.click();
+        STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        STUDIO.click();
+    }
 }
