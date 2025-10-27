@@ -604,4 +604,22 @@ public class StudioSteps {
         Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
     }
 
+
+    @And("Verify the Retrofit checkbox is selected")
+    public void verifyTheRetrofitCheckboxIsSelected() {
+        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.verifyRetrofitCheckboxSelected());
+    }
+
+    @And("User selects {string} as Keep NPIs on the list option")
+    public void userSelectsAsKeepNPIsOnTheList(String option) {
+        workspace.clickNPIRetentionOption(option);
+    }
+
+    @And("User clicks on Published button, verifies the {string} and {string} text are displayed")
+    public void userClicksOnPublishedButtonAndVerifiesThe(String listType, String engagingText) {
+        workspace.clickPublishedButton();
+        Assert.assertTrue(listType + " is not displayed", workspace.verifyListTypeAfterPublished(listType.toLowerCase()));
+        String text = workspace.verifyNPIsEngagingText();
+        Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
+    }
 }
