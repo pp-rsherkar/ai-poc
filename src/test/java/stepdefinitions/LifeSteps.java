@@ -176,28 +176,17 @@ public class LifeSteps {
                 String channel = tacticData.get("Channel");
                 String ruleType = tacticData.get("RuleType");
                 expectedTactic.add(tacticName);
-            // Enter tactic name
             tacticDetails.enterTacticName(tacticName);
             tacticDetails.saveTactic();
-
-            // Select channel and add targeting rules
             tacticSettings.selectChannel(channel);
             tacticDetails.TARGETTING_RULES_ICON.click();
-            tacticSettings.addTargettingRules(ruleType);
-
-            // Verify selected vs saved target rules
-//            Assert.assertEquals(
-//                    tacticSettings.SELECTED_TARGET_RULE.toString(),
-//                    tacticSettings.SAVED_TARGET_RULE,tacticName
-//            );
-
-            // Save and create new tactic
+            tacticSettings.addTargetingRules(ruleType);
             tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
         List<String> actualTactics =   tacticDetails.getAllTactics();
-        // Using a HashSet to compare the lists regardless of their order of entries.
         System.out.println("Saved tactics:" + actualTactics);
+        //verify all new tactics are visible under line item
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
     }
 

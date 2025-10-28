@@ -48,7 +48,7 @@ Feature: LIFE Regression - Line Item Management
   Scenario Outline: Create, modify, duplicate, delete, and toggle line items of different types using Bulk Edit Mode
     When User enters the line item details with different line types "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_TYPE>", enables the line item and saves the changes
     And Verify Bulk Edit Mode successfully "disables" multiple selected line items
-#    And Verify that each selected line item is "Disabled"
+    And Verify that each selected line item is "Disabled"
     And Verify Bulk Edit Mode successfully "enables" multiple selected line items
     And Verify that each selected line item is "Enabled"
     Then User adds Comments or Notes "<LINE_ITEM_NOTE>" to each line item

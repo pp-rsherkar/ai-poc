@@ -16,10 +16,11 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates new tactics and verifies it
-      | Tactic Name          | Channel  | RuleType            |
+      | Tactic Name        | Channel | RuleType          |
+      | Targeting Segment  | Email   | Health Population |
+      | Health Populations | EHR     | NPI               |
       | Audience Group tactic| Standard | Behavioral Segment   |
-      | Targeting Segment    | Email    | Health Population    |
-      | Health Populations   | EHR      | NPI                  |
+
     Then Verify that the tabs gets enabled only after saving tactics
       | Settings  |
       | Creatives |
