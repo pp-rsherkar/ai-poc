@@ -48,7 +48,6 @@ public class CreateCreatives {
     private final Locator CREATIVE_AD_SIZE;
     private final Locator CREATIVE_AD_SIZE_VALUE;
     private final Locator DOMAIN_LANDING;
-    private final Locator CLICK_THROUGH_URL;
     private final Locator DURATION;
     private final Locator URL;
     private final Locator VAST_XML_TEXTAREA;
@@ -63,6 +62,7 @@ public class CreateCreatives {
     private final Locator PRODUCT_DESCRIPTION;
     private final Locator CREATIVE_NAME_TEXT;
     private final Locator CREATIVE_STATUS;
+    public final Locator CLICK_THROUGH_URL;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<String> creativesList = new ArrayList<>();
     String imageTextLocator = "//span[contains(text(),'%s')]";
@@ -104,7 +104,6 @@ public class CreateCreatives {
         this.CREATIVE_AD_SIZE = page.locator("//app-single-select-dropdown//input[contains(@placeholder,'Select Ad Size')]");
         this.CREATIVE_AD_SIZE_VALUE = page.locator("//input[contains(@placeholder,'Select Ad Size')]/following-sibling::div/div");
         this.DOMAIN_LANDING = page.locator("//input[contains(@formcontrolname,'landingDomain')]");
-        this.CLICK_THROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
         this.DURATION = page.locator("//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");
         this.URL = page.locator("//input[contains(@placeholder,'url')]");
         this.VAST_XML_TEXTAREA = page.locator("//textarea[contains(@formcontrolname,'vastDoc') or contains(@formcontrolname,'vastAudioDoc')]");
@@ -119,6 +118,7 @@ public class CreateCreatives {
         this.PRODUCT_DESCRIPTION = page.locator("//textarea[contains(@formcontrolname,'productDescription')]");
         this.CREATIVE_NAME_TEXT = page.locator("//div[contains(@role,'alert')]");
         this.CREATIVE_STATUS = page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
+        this.CLICK_THROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
     }
 
     public String verifyCreativeLibraryPageTitle() {
