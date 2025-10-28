@@ -39,6 +39,9 @@ public class TacticDetails {
     private final Locator TACTIC_REMOVE_BUTTON;
     private final Locator TACTIC_TOGGLE_CLASS;
     private final Locator EXIT_BULK_MODE;
+    private final Locator ENABLE_TACTIC;
+    private final Locator TACTIC_SELECT;
+    private final Locator BULK_ACTION;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -75,6 +78,9 @@ public class TacticDetails {
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
         this.TACTIC_TOGGLE_CLASS = page.locator("(//div[@class='item-list-control-toggle toggle-enabled ng-star-inserted'])[2]");
+        this.ENABLE_TACTIC =page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
+        this.BULK_ACTION =page.locator(".pointer.inlineDiv.iconSprite").first();
+        this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
     }
 
     public String verifyTacticDetailsText() {
@@ -221,9 +227,9 @@ public class TacticDetails {
 
     public void BulkEnableTactics() {
 
-        page.locator(".pointer.inlineDiv.iconSprite").first().click();
-        page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox").click();
-        page.locator("//div[@class='bulk-icon addBulkOpActive']").first().click();
+        BULK_ACTION.click();
+        TACTIC_SELECT.click();
+        ENABLE_TACTIC.click();
         EXIT_BULK_MODE.click();
 
     }
