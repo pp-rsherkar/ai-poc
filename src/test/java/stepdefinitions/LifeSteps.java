@@ -2873,4 +2873,35 @@ public class LifeSteps {
                 break;
         }
     }
+
+    @Then("User creates a new tactic")
+    public void user_creates_a_new_tactics() {
+        String tacticName = "Targeting";
+        tacticDetails.enterTacticName(tacticName);
+
+        tacticDetails.saveTactic();
+        // Default value
+        String channel = "Email";
+        String ruleType = "Behavioral Segment";
+
+        tacticSettings.selectChannel(channel);
+        tacticDetails.TARGETTING_RULES_ICON.click();
+        tacticSettings.addTargettingRules(ruleType);
+        Assert.assertEquals(tacticSettings.SELECTED_TARGET_RULE, tacticSettings.SAVED_TARGET_RULE);
+        tacticSettings.saveTacticSettings();
+
+
+    }
+    @Then("User deletes the tactic and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it() {
+        tacticDetails.deleteTactic();
+        Assert.assertNotEquals("Targeting", tacticSettings.verifyTacticName());
+    }
+
+    @And("User enable all tactics through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        tacticDetails.BulkEnableTactics();
+        Assert.assertEquals("item-list-control-toggle toggle-enabled ng-star-inserted", tacticDetails.GetToggleClass());
+
+    }
 }

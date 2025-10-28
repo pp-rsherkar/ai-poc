@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
@@ -9,6 +10,7 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class TacticDetails {
     private final Page page;
@@ -30,6 +32,13 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
+    private final Locator CUSTOM_FIELD;
+    public final Locator TARGETTING_RULES_ICON;
+    private final Locator TACTIC_DELETE_OPTION;
+    private final Locator TACTIC_DELETE_BUTTON;
+    private final Locator TACTIC_REMOVE_BUTTON;
+    private final Locator TACTIC_TOGGLE_CLASS;
+    private final Locator EXIT_BULK_MODE;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -59,6 +68,13 @@ public class TacticDetails {
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
+        this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
+        this.TARGETTING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.TACTIC_DELETE_OPTION =  page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
+        this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
+        this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
+        this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
+        this.TACTIC_TOGGLE_CLASS = page.locator("(//div[@class='item-list-control-toggle toggle-enabled ng-star-inserted'])[2]");
     }
 
     public String verifyTacticDetailsText() {
@@ -176,6 +192,10 @@ public class TacticDetails {
         TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return templateName;
     }
+    public void saveTactic() {
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
+        SAVE_TACTIC_DETAILS.click();
+    }
 
     public boolean createTacticWithLineItemsAndAssignCreative(String lineItemType, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, String CreativeName) {
         npiSmartList.clickPulsepointIcon();
@@ -191,5 +211,25 @@ public class TacticDetails {
         saveTacticDetails();
         waitUtility.waitUntilSpinnerHidden();
         return tacticCreatives.verifyCreativeAssigned(CreativeName);
+    }
+    public void deleteTactic(){
+        TACTIC_DELETE_OPTION.click();
+        TACTIC_DELETE_BUTTON.click();
+        TACTIC_REMOVE_BUTTON.click();
+
+    }
+
+    public void BulkEnableTactics() {
+
+        page.locator(".pointer.inlineDiv.iconSprite").first().click();
+        page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox").click();
+        page.locator("//div[@class='bulk-icon addBulkOpActive']").first().click();
+        EXIT_BULK_MODE.click();
+
+    }
+
+    public String GetToggleClass() {
+        return TACTIC_TOGGLE_CLASS.getAttribute("class");
+
     }
 }
