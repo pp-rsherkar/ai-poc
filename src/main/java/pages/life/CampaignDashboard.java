@@ -380,7 +380,7 @@ public class CampaignDashboard {
         return true;
     }
 
-    public void navigateToLineItemDetails(){
+    public void navigateToLineItemDetails(String campaignName){
         LINE_ITEM_NAME.click();
         LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }

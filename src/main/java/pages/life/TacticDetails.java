@@ -47,6 +47,7 @@ public class TacticDetails {
     private final Locator CONFIRM_DELETE;
     private final Locator DELETE_SUCCESS;
     private final Locator CUSTOM_FIELD;
+    private final Locator TACTIC_TAB;
 
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
@@ -95,6 +96,7 @@ public class TacticDetails {
         this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
+        this.TACTIC_TAB = page.locator("//div[@class='tactic item-details']");
 
     }
     public void clickNewTactic(){
@@ -105,8 +107,6 @@ public class TacticDetails {
     }
     public void verifyDetailsTab(){
         DETAILS_TAB.isVisible();
-        System.out.println(DETAILS_TAB.innerText().trim());
-
     }
     public List<String> newTacticTabs(){
         return NEW_TACTIC_TABS.allInnerTexts();
@@ -141,10 +141,7 @@ public class TacticDetails {
     }
 
     public void clickTactic(){
-        //Locator tacticTab = page.locator(String.format("//div[contains(text(),'%s')]", tacticName));
-        Locator tacticTab = page.locator("//div[@class='tactic item-details']").last();
-        tacticTab.click();
-
+        TACTIC_TAB.last().click();
     }
 
     public void deleteCustomField (String customFieldName){

@@ -122,7 +122,6 @@ public class TacticSettings {
         this.SHOW_MORE_BUTTON = page.locator("//button[contains(@class,'show-more-button')]");
         this.SELECT_TARGETING = page.locator("//div[@title='Target'] | //button[@title='Target']");
         this.BLOCK_TARGETING = page.locator("//div[@title='Block'] | //button[@title='Block']");
-        //this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");
         this.PRACTICE_IP_ICON = page.locator("//span[contains(@class,'practiceIp')]");
         this.HOUSEHOLD_IP_ICON = page.locator("//span[contains(@class,'householdIp')]");
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
