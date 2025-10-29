@@ -42,6 +42,7 @@ public class TacticDetails {
     private final Locator ENABLE_TACTIC;
     private final Locator TACTIC_SELECT;
     private final Locator BULK_ACTION;
+    private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -80,6 +81,7 @@ public class TacticDetails {
         this.TACTIC_TOGGLE_CLASS = page.locator("(//div[@class='item-list-control-toggle toggle-enabled ng-star-inserted'])[2]");
         this.ENABLE_TACTIC =page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION =page.locator(".pointer.inlineDiv.iconSprite").first();
+        this.TACTIC_GLOBAL_SEARCH_TEXT =page.getByText("Nothing found...");
         this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
     }
 
@@ -223,6 +225,7 @@ public class TacticDetails {
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
 
+
     }
 
     public void BulkEnableTactics() {
@@ -236,6 +239,20 @@ public class TacticDetails {
 
     public String GetToggleClass() {
         return TACTIC_TOGGLE_CLASS.getAttribute("class");
+
+    }
+
+    public void globalSearchDeletedTactic(String targeting29102025) {
+        page.locator(".iconSprite").first().click();
+        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill("Targetting29102025");
+        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
+
+
+
+    }
+
+    public String GetSearchText() {
+        return TACTIC_GLOBAL_SEARCH_TEXT.innerText();
 
     }
 }

@@ -2876,7 +2876,7 @@ public class LifeSteps {
 
     @Then("User creates a new tactic")
     public void user_creates_a_new_tactics() {
-        String tacticName = "Targeting";
+        String tacticName = "Targeting29102025";
         tacticDetails.enterTacticName(tacticName);
 
         tacticDetails.saveTactic();
@@ -2895,7 +2895,10 @@ public class LifeSteps {
     @Then("User deletes the tactic and verifies it")
     public void user_deletes_the_tactic_and_verifies_it() {
         tacticDetails.deleteTactic();
-        Assert.assertNotEquals("Targeting", tacticSettings.verifyTacticName());
+        DriverFactory.getPage().reload();
+        Assert.assertNotEquals("Targeting29102025", tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic("Targeting29102025");
+        Assert.assertEquals("Nothing found...", tacticDetails.GetSearchText());
     }
 
     @And("User enable all tactics through bulk action and verifies the status")
