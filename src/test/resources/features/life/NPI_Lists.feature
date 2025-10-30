@@ -184,7 +184,7 @@ Feature: LIFE Regression - Create NPI List of following types:
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE      | HCP_SWITCH   | SPECIALITY                           |
       | 01- Advertiser | SMART_Pixel_NPI | Specialty | Include Only | Allergy & Immunology, Anesthesiology |
-      #| 01- Advertiser | SMART_Pixel_NPI | NPI List  | Exclude      | Allergy & Immunology            |
+      #| 01- Advertiser | SMART_Pixel_NPI | Specialty  | Exclude      | Allergy & Immunology            |
 
   @regression
   Scenario Outline: Validate the successful creation of a Smart List as a Profession
@@ -247,7 +247,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Diagnosis | Diagnosis.csv |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis without File upload
+  Scenario Outline: Validate the successful creation of a Smart List as a Medical Procedure without File upload
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -263,7 +263,7 @@ Feature: LIFE Regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure | Cardiac shunt imaging, Florbetaben f18 diagnostic |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis by uploading a File
+  Scenario Outline: Validate the successful creation of a Smart List as a Medical Procedure by uploading a File
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
