@@ -145,7 +145,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + timestamp;
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.timeStampCalculation();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -161,7 +161,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + timestamp;
+        tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -2596,7 +2596,7 @@ public class LifeSteps {
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
         campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.expandCreatedLineItem();
-        campaignDashboard.navigateToLineItemDetails(campaignName);
+        campaignDashboard.navigateToLineItemDetails();
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         itemList = lineItemFlights.fetchFlightDates();
