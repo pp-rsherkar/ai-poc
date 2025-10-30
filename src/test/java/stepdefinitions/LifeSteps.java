@@ -15,12 +15,14 @@ import pages.life.*;
 import utils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -43,6 +45,10 @@ public class LifeSteps {
     static String pixelNameEdited;
     private String customFieldName;
     private String uiCustomFieldName;
+    private BigDecimal tacticBaseBid;
+    private BigDecimal tacticMaxBid;
+    private BigDecimal campaignBaseBid;
+    private BigDecimal campaignMaxBid;
 
 
     List<Object> keyType = new ArrayList<>();
@@ -83,6 +89,7 @@ public class LifeSteps {
     int totalListCount = 0;
     APIResponse response;
     boolean flag = false;
+    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -2958,5 +2965,34 @@ public class LifeSteps {
                 navigation.navigateBackToStudio();
                 break;
         }
+    }
+    //* Rajyalaxmi - Tactic max bid and base bid verification
+    @When("User clicks on Campaign Settings")
+    public void user_clicks_on_campaign_settings() {
+        campaignSettings.campSettings();
+        campaignSettings.bidSettings();
+    }
+
+    @Then("Verify user is on default bid settings page")
+    public void verify_user_is_on_default_bid_settings_page() {
+        Assert.assertEquals("Default Bid Settings", campaignSettings.getDefaultSettings());
+    }
+
+    @Then("User gets Max Bid and Base Bid values")
+    public void user_gets_max_bid_and_base_bid_values() {
+        campaignBaseBid = new BigDecimal(campaignSettings.getBaseBidPrice());
+        campaignMaxBid = new BigDecimal(campaignSettings.getMaxBidPrice());
+    }
+
+    @When("User is on tactic settings page")
+    public void user_is_on_tactic_settings_page() {
+       tacticBaseBid = new BigDecimal(tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
+       tacticMaxBid = new BigDecimal(tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
+    }
+
+    @Then("Verify Max Bid and and Base Bid values on the tactic settings match with Campaign Settings values")
+    public void verify_max_bid_and_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values(){
+        Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
+        Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
 }

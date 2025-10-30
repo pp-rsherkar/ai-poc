@@ -157,6 +157,7 @@ public class TacticDetails {
 
 
     public String verifyTacticDetailsText() {
+        waitUtility.waitUntilSpinnerHidden();
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
     }
 
@@ -166,6 +167,7 @@ public class TacticDetails {
 
     public void saveTacticDetails() {
         SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
     public void saveTactic() {
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD);

@@ -9,6 +9,8 @@ import utils.WaitUtility;
 import java.util.*;
 
 public class TacticSettings {
+    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
+    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -61,9 +63,9 @@ public class TacticSettings {
     private final Locator HOUSEHOLD_ICON;
     private final Locator HOUSEHOLD_IP_ICON;
     private final Locator PRACTICE_IP_ICON;
-    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
-    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     private final Locator PRACTICE_IP;
+    private final Locator TACTIC_MAX_BID_PRICE;
+    private final Locator TACTIC_BASE_BID_PRICE;
 
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
@@ -123,6 +125,9 @@ public class TacticSettings {
         this.PRACTICE_IP_ICON = page.locator("//span[contains(@class,'practiceIp')]");
         this.HOUSEHOLD_IP_ICON = page.locator("//span[contains(@class,'householdIp')]");
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
+        this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
+        this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
+
     }
 
     public String verifyTacticSettingsText() {
@@ -174,6 +179,7 @@ public class TacticSettings {
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
     }
+
     public void addTargettingRules(String ruleType) {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
@@ -224,7 +230,7 @@ public class TacticSettings {
                 SAVED_TARGET_RULE.add(savedTarget_npi);
 
                 break;
-            case "Health Population" :
+            case "Health Population":
                 HOUSEHOLD_IP_TAB.click();
                 SELECT_TARGETING.first().click();
                 String selected_hp = TARGETING_OPTIONS.last().innerText();
@@ -242,6 +248,7 @@ public class TacticSettings {
                 break;
         }
     }
+
     public String tacticSettingsSuccess() {
         return TACTIC_SETTINGS_SUCCESS.innerText();
     }
@@ -647,4 +654,13 @@ public class TacticSettings {
     public String verifyRuleOption() {
         return FETCH_TARGET_RULE_OPTIONS.innerText();
     }
+
+    public String getTacticBaseBidPrice() {
+        return TACTIC_BASE_BID_PRICE.evaluate("el => el.value").toString();
+    }
+
+    public String getTacticMaxBidPrice() {
+        return TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString();
+    }
+
 }
