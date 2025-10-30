@@ -46,7 +46,15 @@ Feature: LIFE Regression - Line Item Management
 
   @regression
   Scenario Outline: Create, modify, duplicate, delete, and toggle line items of different types using Bulk Edit Mode
-    When User enters the line item details with different line types "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_TYPE>", enables the line item and saves the changes
+    When User creates line items with below line types and other details, enables the line item and saves the changes
+      | LINE_TYPE        | LINE_ITEM_DETAILS                                                                                                                          |
+      | Display          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60    |
+      | Audio            | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60           |
+      | Video            | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
+      | Native Display   | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Crossix AQ, PacingMode:Even, PacingPercentage:60        |
+      | Native Video     | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Ahead, PacingPercentage:60   |
+      | DOOH             | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60           |
+      | Search Extension | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
     And Verify Bulk Edit Mode successfully "disables" multiple selected line items
 #    And Verify that each selected line item is "Disabled"
     And Verify Bulk Edit Mode successfully "enables" multiple selected line items
@@ -58,5 +66,5 @@ Feature: LIFE Regression - Line Item Management
     And Verify "Generate Report" option opens the Run report screen for user and run the report for "<TEMPLATE>"
     And Verify that the reports generated on the Line Item page are available on the Generate Report page
     Examples:
-      | LINE_NAME | LINE_BUDGET | LINE_TYPE                                                                   | LINE_ITEM_NOTE | TEMPLATE            |
-      | Line      | 500         | Display, Audio, Video, Native Display, Native Video, DOOH, Search Extension | Notes          | Template_Automation |
+      | LINE_ITEM_NOTE | TEMPLATE            |
+      | Notes          | Template_Automation |

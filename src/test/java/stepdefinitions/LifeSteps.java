@@ -78,7 +78,6 @@ public class LifeSteps {
     ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
     Constants constants = new Constants();
-    String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
     int totalListCount = 0;
     int flightStartDate = 0;
@@ -133,7 +132,7 @@ public class LifeSteps {
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
     public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget) {
-        campaignNameRandom = campaign_name + '_' + timestamp;
+        campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
         campaigns.selectAdvertiser(advertiser);
         campaigns.enterCampaignName(campaignNameRandom);
         campaigns.setCampaignType(campaign_type);
@@ -280,7 +279,7 @@ public class LifeSteps {
 
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
@@ -313,7 +312,7 @@ public class LifeSteps {
 
     @Then("User enters the Smart NPI list details as {string} {string} for {string} with {string} {string} {string}")
     public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type, String professionValue, String smartPixelDropdownValue, String npiGroupValue) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
@@ -379,7 +378,7 @@ public class LifeSteps {
     public void user_enters_the_template_details_as(String templateName, String dimension, String metric) {
         dimensionName = dimension;
         metricName = metric;
-        templateNameRandom = templateName + '_' + timestamp;
+        templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         reportTemplates.enterTemplateName(templateNameRandom);
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
@@ -388,7 +387,7 @@ public class LifeSteps {
 
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
-        templateNameRandom = templateName + '_' + timestamp;
+        templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         reportTemplates.enterTemplateName(templateNameRandom);
         List<String> dimensionList = Arrays.asList(dimension.split(","));
 
@@ -519,7 +518,7 @@ public class LifeSteps {
 
     @Then("User enters the NPI list details as {string} {string}")
     public void user_enters_the_npi_list_details_as(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiSmartList.enterListName(npiName);
         npiSmartList.selectAdvertiser(advertiser);
     }
@@ -823,7 +822,7 @@ public class LifeSteps {
 
     @And("User enters the NPI Static list details as {string} {string}")
     public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
     }
@@ -838,7 +837,7 @@ public class LifeSteps {
         npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + timestamp;
+        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
@@ -1073,7 +1072,7 @@ public class LifeSteps {
 
     @And("User enters the Attributes list details as {string} {string}")
     public void userEntersTheAttributesListDetailsAs(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiAttributesList.enterListName(npiName);
         npiAttributesList.selectAdvertiser(advertiser);
     }
@@ -1094,7 +1093,7 @@ public class LifeSteps {
         npiAttributesList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + timestamp;
+        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
         npiAttributesList.editListName(npiNameEdited);
         npiAttributesList.saveList();
         assert npiAttributesList.updateListSuccess().contains("NPI list updated");
@@ -1258,7 +1257,7 @@ public class LifeSteps {
 
     @When("User enters the Auto-Imported list details as {string} {string}")
     public void userEntersTheAutoImportedListDetailsAs(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiAttributesList.enterListName(npiName);
         npiAttributesList.selectAdvertiser(advertiser);
     }
@@ -1693,14 +1692,14 @@ public class LifeSteps {
 
     @And("User enters the pixel details as {string} {string}")
     public void userEntersPixelDetails(String pixelName, String advertiser) {
-        newPixelName = pixelName + '_' + timestamp;
+        newPixelName = pixelName + '_' + CommonUtils.timeStampCalculation();
         retargetingPixel.enterPixelName(newPixelName);
         retargetingPixel.selectAdvertiser(advertiser);
     }
 
     @And("User enters the pixel details as {string} {string} {string} {string}")
     public void userEntersPixelDetails(String pixelName, String advertiser, String conversionPixelScope, String conversionPixelType) {
-        newPixelName = pixelName + '_' + timestamp;
+        newPixelName = pixelName + '_' + CommonUtils.timeStampCalculation();
         conversionPixel.enterPixelName(newPixelName);
         conversionPixel.selectAdvertiser(advertiser);
         conversionPixel.selectConversionPixelScope(conversionPixelScope);
@@ -1752,7 +1751,7 @@ public class LifeSteps {
 
     @And("User enters the Smart NPI list details as {string} {string} and selects the created Smart Pixel")
     public void userEntersTheSmartNPIListDetailsAndSelectsTheCreatedSmartPixel(String npiListName, String advertiser) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
@@ -2769,7 +2768,7 @@ public class LifeSteps {
     @And("User adds the associated Smart List and enters list details as {string}")
     public void addsAssociatedSmartList(String listName) {
         smartPixel.clickAddSmartListButton();
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
     }
 
@@ -2896,7 +2895,7 @@ public class LifeSteps {
 
     @When("User fills in required details {string} except for flight information and save")
     public void userFillsInRequiredDetailsExceptForFlightInformation(String lineItemName) {
-        lineItemNameRandom = lineItemName + timestamp;
+        lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         lineItemDetails.saveLineItem();
     }
@@ -2947,7 +2946,7 @@ public class LifeSteps {
 
     @When("User enters line item details {string}")
     public void userEntersLineItemDetails(String lineItemName) {
-        lineItemNameRandom = lineItemName + timestamp;
+        lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
     }
 
@@ -3022,23 +3021,31 @@ public class LifeSteps {
                 capturedDetails, flightDetailsAfterDeletion);
     }
 
-
-    @When("User enters the line item details with different line types {string} {string} {string}, enables the line item and saves the changes")
-    public void userEntersTheLineItemDetailsWithDifferentLineTypesEnablesTheLineItemAndSavesTheChanges(String lineItemName, String lineBudget, String lineItemType) {
-        List<String> lineItemTypeList = CommonUtils.convertStringToList(lineItemType);
-        for (int i = 0; i < lineItemTypeList.size(); i++) {
-            String lineItem = lineItemTypeList.get(i);
-            lineItemNameRandom = lineItemName + '_' + lineItem + '_' + CommonUtils.generateRandomString();
+    @When("User creates line items with below line types and other details, enables the line item and saves the changes")
+    public void userEntersTheLineItemDetailsWithDifferentLineTypesEnablesTheLineItemAndSavesTheChanges(DataTable dataTable) {
+        nameList.clear();
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        int currentRowIndex = 0;
+        int totalRows = rows.size();
+        for (Map<String, String> row : rows) {
+            String type = row.get("LINE_TYPE").trim();
+            String attributes = row.get("LINE_ITEM_DETAILS").trim();
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
             nameList.add(lineItemNameRandom);
-            tacticDetails.createLineItem(lineItemNameRandom, lineItem, lineBudget);
+            lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
             Assert.assertEquals("Success!", lineItemDetails.lineItemSuccess());
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
             Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available",
                     lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
             lineItemDetails.cancelTactic();
-            if (i < lineItemTypeList.size() - 1) {
+            if (currentRowIndex < totalRows - 1) {
                 lineItemDetails.selectNewLineItem();
             }
+            currentRowIndex++;
         }
     }
 
@@ -3137,6 +3144,5 @@ public class LifeSteps {
                         lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
 
         }
-
     }
 }
