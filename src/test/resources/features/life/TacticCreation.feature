@@ -7,7 +7,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-   # And User clicks on Create Campaign
 
   @regression @vp
   Scenario Outline: Create multiple tactics and verify its tabs and status
@@ -25,8 +24,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Creatives |
       | Debugger  |
     And Verify the status of saved tactic
-
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
