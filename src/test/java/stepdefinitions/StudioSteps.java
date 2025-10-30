@@ -36,7 +36,7 @@ public class StudioSteps {
     List<String> previousNpiDetails = null;
     String npiCount;
     Path targetFilePath;
-    String randomNumber = CommonUtils.generateRandomString();
+    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -81,7 +81,7 @@ public class StudioSteps {
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
-        workspaceName = string + CommonUtils.timeStampCalculation();
+        workspaceName = string + timeStamp;
         expansionWorkspace.renameExpansion(workspaceName);
     }
 
@@ -162,7 +162,7 @@ public class StudioSteps {
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
         workspace.waitTillWorkspaceAlertHide();
-        workspaceName = wName + '_' + randomNumber;
+        workspaceName = wName + '_' + timeStamp;
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
@@ -539,7 +539,7 @@ public class StudioSteps {
 
     @And("Verify user is able to rename the workspace as {string}")
     public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
-        newWorkspaceName = newWorkspace + randomNumber;
+        newWorkspaceName = newWorkspace + timeStamp;
         Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName));
         workspaceName = newWorkspaceName;
     }
@@ -572,10 +572,54 @@ public class StudioSteps {
         workspaceCreation.searchWorkspaceName(workspaceName);
         workspaceCreation.selectMoreActionsMenu(workspaceName);
     }
+    @When("User navigates to administration tab")
+    public void user_navigates_to_administration_tab() {
+        accounts.verifyStudioMenu();
+        accounts.clickAdministration();
+    }
+
+    @When("User clicks on accounts tab")
+    public void user_clicks_on_accounts_tab() {
+        accounts.selectAccountsTab();
+    }
 
     @Then("Verify that the workspace cannot be deleted and appropriate message is displayed to the user")
     public void verifyThatTheWorkspaceCannotBeDeletedAndAppropriateMessageIsDisplayedToTheUser() {
         workspaceCreation.clickRemoveWorkspaceButton();
         Assert.assertTrue(workspaceCreation.verifyDeleteWorkspaceErrorMessage().contains("Deletion blocked by Life. Message: This list can't be deleted"));
+    }
+    @When("Locate an account {string} with external user permission and select it")
+    public void locate_an_account_with_external_user_permission_and_select_it(String externalAccount) {
+        accounts.searchAccount(externalAccount);
+    }
+
+    @When("Go to users tab and search {string} and select studio tab")
+    public void go_to_users_tab_and_search_and_select_studio_tab(String selectUser) {
+        accounts.selectUserTab();
+        accounts.selectExternalUser(selectUser);
+    }
+
+    @Then("User turns on studio toggle for external users and verifies that it is enabled")
+    public void user_turns_on_studio_toggle_for_external_users_and_verifies_that_it_is_enabled() {
+        Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
+    }
+
+
+    @And("Verify the Retrofit checkbox is selected")
+    public void verifyTheRetrofitCheckboxIsSelected() {
+        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.isRetrofitCheckboxSelected());
+    }
+
+    @And("User selects {string} as Keep NPIs on the list option")
+    public void userSelectsAsKeepNPIsOnTheList(String option) {
+        workspace.clickNPIRetentionOption(option);
+    }
+
+    @And("User clicks on Published button, verifies the {string} and {string} text are displayed")
+    public void userClicksOnPublishedButtonAndVerifiesThe(String listType, String engagingText) {
+        workspace.clickPublishedButton();
+        Assert.assertTrue(listType + " is not displayed", workspace.verifyListTypeAfterPublished(listType.toLowerCase()));
+        String text = workspace.verifyNPIsEngagingText();
+        Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
     }
 }

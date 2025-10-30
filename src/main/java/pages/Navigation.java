@@ -2,17 +2,16 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-import pages.life.CampaignListing;
+import pages.life.CampaignDashboard;
 import utils.WaitUtility;
 
 public class Navigation {
 
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
+    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
@@ -109,7 +108,7 @@ public class Navigation {
             ACCOUNT_ITEM.click();
         }
         waitUtility.waitUntilSpinnerHidden();
-        campaignListing.verifyIfFiltersExist();
+        campaignDashboard.verifyIfFiltersExist();
         waitUtility.waitUntilPreLoaderHidden();
     }
 

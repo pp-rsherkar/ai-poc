@@ -56,7 +56,6 @@ public class LifeSteps {
     TacticDetails tacticDetails = new TacticDetails(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
     TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
@@ -99,7 +98,7 @@ public class LifeSteps {
     }
 
     @And("{string} application is logged in successfully with Account {string}")
-    public void life_application_is_loged_in_as(String application, String account) {
+    public void life_application_is_logged_in_as(String application, String account) {
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
@@ -124,8 +123,6 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
-        /*campaignListing.setGroupByFilter();
-        navigation.clickOnIcon(" Group By Campaign ");*/
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
@@ -148,7 +145,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + CommonUtils.generateRandomString();
+        lineItemNameRandom = lineItemName + '_' + timestamp;
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -164,7 +161,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.generateRandomString();
+        tacticNameRandom = tacticName + '_' + timestamp;
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -210,13 +207,13 @@ public class LifeSteps {
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
     public void verify_the_newly_created_campaign_details_in_the_campaign_list() {
-        campaigns.navigateToCampaignListing();
-        campaignListing.searchCreatedCampaign(campaignNameRandom);
-        Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
-        campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
-        campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
+        campaigns.navigateToCampaignDashboard();
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+        campaignDashboard.expandCreatedLineItem();
+        Assert.assertEquals(lineItemNameRandom, campaignDashboard.verifyCreatedLineItem(lineItemNameRandom));
+        campaignDashboard.expandCreatedLineItem();
+        Assert.assertEquals(tacticNameRandom, campaignDashboard.verifyCreatedTactic());
     }
 
     @Given("User navigates to NPI Lists page")
@@ -612,8 +609,8 @@ public class LifeSteps {
 
     @When("User enters {string} and click Search button")
     public void userEntersAndClickSearchButton(String campaignID) {
-        campaignListing.searchCreatedCampaign(campaignID);
-        campaignListing.expandCreatedLineItem();
+        campaignDashboard.searchCreatedCampaign(campaignID);
+        campaignDashboard.expandCreatedLineItem();
     }
 
     @Then("Verify Campaigns, line items, tactics names matching the {string} should display on Dashboard table")
@@ -1865,7 +1862,7 @@ public class LifeSteps {
         Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
     }
 
-    /*Dislay Creative Bulk Upload*/
+    /*Display Creative Bulk Upload*/
     @When("The advertiser {string} is selected for {string} creative the following sections are visible")
     public void theAdvertiserIsSelectedForCreativeTheFollowingSectionsAreVisible(String advertiser, String creativeType, DataTable dataTable) {
         bulkCreativeUpload.selectAndClickCreativeType(creativeType);
@@ -2597,9 +2594,9 @@ public class LifeSteps {
 
     @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
-        campaignListing.searchCreatedCampaign(campaignName);
-        campaignListing.expandCreatedLineItem();
-        campaignDashboard.navigateToLineItemDetails();
+        campaignDashboard.searchCreatedCampaign(campaignName);
+        campaignDashboard.expandCreatedLineItem();
+        campaignDashboard.navigateToLineItemDetails(campaignName);
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         itemList = lineItemFlights.fetchFlightDates();
