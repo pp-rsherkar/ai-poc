@@ -23,7 +23,7 @@ public class NPISmartList {
     private final Locator SELECT_ADVERTISER;
     private final Locator SEARCH_DRUG;
     private final Locator SELECT_DROPDOWN_VALUES;
-    private final Locator VERIFY_DRUG;
+    private final Locator SELECTED_DRUG;
     private final Locator LIFE_AVAILABLE_IN;
     private final Locator HCP365_AVAILABLE_IN;
     private final Locator PULSEPOINT_ICON;
@@ -83,7 +83,7 @@ public class NPISmartList {
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.SEARCH_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown')]//input");
         this.SELECT_DROPDOWN_VALUES = page.locator("//div[contains(@class,'dropdown-items') or contains(@class,'ng-option')]");
-        this.VERIFY_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown ')]//span[contains(@class,'ng-value-label')]");
+        this.SELECTED_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown ')]//span[contains(@class,'ng-value-label')]");
         this.LIFE_AVAILABLE_IN = page.locator("//span[contains(text(),'Life')]");
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
@@ -168,8 +168,8 @@ public class NPISmartList {
         SELECT_DROPDOWN_VALUES.nth(1).click();
     }
 
-    public String verifyDrug() {
-        return VERIFY_DRUG.innerText();
+    public String fetchDrugName() {
+        return SELECTED_DRUG.innerText();
     }
 
     public void selectProduct() {

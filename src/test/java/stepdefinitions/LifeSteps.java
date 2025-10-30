@@ -436,7 +436,7 @@ public class LifeSteps {
 
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
-        Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
+        Assert.assertEquals("Glynase", npiSmartList.fetchDrugName());
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
