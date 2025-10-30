@@ -48,8 +48,6 @@ public class TacticDetails {
     private final Locator DELETE_SUCCESS;
     private final Locator CUSTOM_FIELD;
     private final Locator TACTIC_TAB;
-
-
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -97,35 +95,41 @@ public class TacticDetails {
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
         this.TACTIC_TAB = page.locator("//div[@class='tactic item-details']");
-
     }
-    public void clickNewTactic(){
+
+    public void clickNewTactic() {
         NEW_TACTIC_BUTTON.click();
     }
-    public List<String> getAllTactics(){
+
+    public List<String> getAllTactics() {
         return SAVED_TACTICS.allInnerTexts();
     }
-    public void verifyDetailsTab(){
+
+    public void verifyDetailsTab() {
         DETAILS_TAB.isVisible();
     }
-    public List<String> newTacticTabs(){
+
+    public List<String> newTacticTabs() {
         return NEW_TACTIC_TABS.allInnerTexts();
     }
-    public void clickFirstTactic(){
+
+    public void clickFirstTactic() {
         SAVED_TACTICS.first().click();
     }
 
-    public List<String> savedTacticTabs(){
+    public List<String> savedTacticTabs() {
         return SAVED_TACTIC_TABS.allInnerTexts();
     }
 
-    public String verifyTacticState(){
+    public String verifyTacticState() {
         return TACTIC_STATUS.innerText();
     }
+
     public void clickDetailsTab() {
         TACTIC_DETAILS_TAB.click();
     }
-    public void addCustomField (String fieldName){
+
+    public void addCustomField(String fieldName) {
         ADD_CUSTOM_FIELD.click();
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
@@ -134,17 +138,17 @@ public class TacticDetails {
         SAVE_TACTIC_DETAILS.click();
     }
 
-    public String verifyCustomField(String fieldName){
+    public String verifyCustomField(String fieldName) {
         Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
         return customField.innerText().trim();
 
     }
 
-    public void clickTactic(){
+    public void clickTactic() {
         TACTIC_TAB.last().click();
     }
 
-    public void deleteCustomField (String customFieldName){
+    public void deleteCustomField(String customFieldName) {
         Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
@@ -155,6 +159,7 @@ public class TacticDetails {
     public void clickTargetingRuleIcon() {
         TARGETING_RULES_ICON.click();
     }
+
     public String verifyTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
     }
@@ -166,6 +171,7 @@ public class TacticDetails {
     public void saveTacticDetails() {
         SAVE_TACTIC_DETAILS.click();
     }
+
     public void saveTactic() {
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();

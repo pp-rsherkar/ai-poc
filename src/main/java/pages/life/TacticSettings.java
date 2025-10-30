@@ -66,12 +66,11 @@ public class TacticSettings {
     private final Locator BLOCKED_TARGET_HP;
     private final Locator TARGET;
     private final Locator BLOCK;
-
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
-    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
-    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
 
     public TacticSettings(Page page) {
         this.page = page;
@@ -182,33 +181,29 @@ public class TacticSettings {
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
     }
-    public void addTargetingRules(String ruleType) {
 
+    public void addTargetingRules(String ruleType) {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
 
         switch (ruleType) {
-
             case "Health Population":
                 HOUSEHOLD_IP_TAB.click();
                 break;
-
             case "NPI":
                 PRACTICE_IP.click();
                 SHOW_MORE_BUTTON.click();
                 SHOW_MORE_BUTTON.click();
                 break;
-
             case "Behavioral Segment":
                 HOUSEHOLD_IP_TAB.click();
                 SHOW_MORE_BUTTON.click();
                 break;
-
         }
-
         performTargetingActions(ruleType);
     }
+
     private void performTargetingActions(String ruleType) {
         SELECT_TARGETING.first().click();
         if (ruleType.equals("Behavioral Segment") || ruleType.equals("NPI")) {
@@ -229,9 +224,10 @@ public class TacticSettings {
                 .replaceAll("[\\r\\n]+", "")
                 .replaceAll("\\u00A0", "")
                 .trim();
-      ACTUAL_TARGET_RULE.add(blockedTargets);
-      ACTUAL_TARGET_RULE.add(selectedTargets);
+        ACTUAL_TARGET_RULE.add(blockedTargets);
+        ACTUAL_TARGET_RULE.add(selectedTargets);
     }
+
     public List<String> getExpectedTargetRules() {
         return new ArrayList<>(EXPECTED_TARGET_RULE);
     }

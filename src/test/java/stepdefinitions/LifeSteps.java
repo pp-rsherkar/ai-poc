@@ -196,33 +196,32 @@ public class LifeSteps {
         Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
 
     }
+
     @And("Verify the status of saved tactic")
     public void verify_the_status_of_saved_tactic() {
         tacticDetails.clickFirstTactic();
         String actualStatus = tacticDetails.verifyTacticState();
-        Assert.assertEquals("Incomplete",actualStatus);
+        Assert.assertEquals("Incomplete", actualStatus);
     }
-
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
-        String customFieldName = customField+"_"+CommonUtils.randomFourDigitNumber();
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
         this.customFieldName = customFieldName;
         tacticDetails.clickDetailsTab();
         tacticDetails.addCustomField(customFieldName);
         String raw = tacticDetails.verifyCustomField(customFieldName);
         String actualName = raw.split("\\R")[0];// To remove unwanted space and text
-        Assert.assertEquals(customFieldName,actualName);
-        this.uiCustomFieldName=actualName;
-
+        Assert.assertEquals(customFieldName, actualName);
+        this.uiCustomFieldName = actualName;
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
     public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
         tacticDetails.clickNewTactic();
-        Assert.assertEquals(customFieldName,uiCustomFieldName);
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
         tacticDetails.clickTactic();
-        Assert.assertEquals(customFieldName,uiCustomFieldName);
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
     }
 
     @Then("User deletes the custom field")
