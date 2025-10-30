@@ -16,12 +16,12 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates a new tactic
+    Then User creates a new tactic with details "<CHANNEL>" and "<RULE_TYPE>"
     Then User deletes the tactic and verifies it
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | RULE_TYPE          |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Behavioral Segment |
 
 
   @regression
@@ -30,10 +30,9 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates a new tactic
+    Then User creates a new tactic with details "<CHANNEL>" and "<RULE_TYPE>"
     And User enable all tactics through bulk action and verifies the status
 
-
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | RULE_TYPE          |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Behavioral Segment |

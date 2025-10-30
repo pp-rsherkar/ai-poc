@@ -2874,19 +2874,15 @@ public class LifeSteps {
         }
     }
 
-    @Then("User creates a new tactic")
-    public void user_creates_a_new_tactics() {
+    @Then("User creates a new tactic with details {string} and {string}")
+    public void user_creates_a_new_tactics(String channel, String ruleType) {
         String tacticName = "Targeting29102025";
         tacticDetails.enterTacticName(tacticName);
 
         tacticDetails.saveTactic();
-        // Default value
-        String channel = "Email";
-        String ruleType = "Behavioral Segment";
-
         tacticSettings.selectChannel(channel);
         tacticDetails.TARGETTING_RULES_ICON.click();
-        tacticSettings.addTargettingRules(ruleType);
+        tacticSettings.addTargettingToTactic(ruleType);
         Assert.assertEquals(tacticSettings.SELECTED_TARGET_RULE, tacticSettings.SAVED_TARGET_RULE);
         tacticSettings.saveTacticSettings();
 

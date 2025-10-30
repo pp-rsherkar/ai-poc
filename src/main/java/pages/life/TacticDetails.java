@@ -220,39 +220,31 @@ public class TacticDetails {
         waitUtility.waitUntilSpinnerHidden();
         return tacticCreatives.verifyCreativeAssigned(CreativeName);
     }
+
     public void deleteTactic(){
         TACTIC_DELETE_OPTION.click();
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
-
-
     }
 
     public void BulkEnableTactics() {
-
         BULK_ACTION.click();
         TACTIC_SELECT.click();
         ENABLE_TACTIC.click();
         EXIT_BULK_MODE.click();
-
     }
 
     public String GetToggleClass() {
         return TACTIC_TOGGLE_CLASS.getAttribute("class");
-
     }
 
     public void globalSearchDeletedTactic(String targeting29102025) {
         page.locator(".iconSprite").first().click();
         page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill("Targetting29102025");
         page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
-
-
-
     }
 
     public String GetSearchText() {
         return TACTIC_GLOBAL_SEARCH_TEXT.innerText();
-
     }
 }
