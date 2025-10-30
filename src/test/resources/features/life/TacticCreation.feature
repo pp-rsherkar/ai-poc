@@ -20,15 +20,12 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Targeting Segment     | Email    | Health Population  |
       | Health Populations    | EHR      | NPI                |
       | Audience Group tactic | Standard | Behavioral Segment |
-
     Then Verify that the tabs gets enabled only after saving tactics
       | Settings  |
       | Creatives |
       | Debugger  |
       | Details   |
     And Verify the status of saved tactic
-
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
@@ -46,7 +43,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Targeting Segment  |
     #And User enters value in custom field and verifies if it's not visible in other tactics
     Then User deletes the custom field
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CUSTOM_NAME |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Custom ID |
