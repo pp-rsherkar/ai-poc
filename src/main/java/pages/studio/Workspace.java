@@ -271,7 +271,7 @@ public class Workspace {
         return FLY_PAGE_BUTTON.evaluate("element => getComputedStyle(element).backgroundColor").toString();
     }
 
-    public boolean verifyRetrofitCheckboxSelected(){
+    public boolean isRetrofitCheckboxSelected(){
         if(!RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true"))
             RETROFIT_CHECKBOX.click();
         return RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true");

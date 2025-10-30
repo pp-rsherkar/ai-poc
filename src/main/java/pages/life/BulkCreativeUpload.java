@@ -55,11 +55,11 @@ public class BulkCreativeUpload {
     private final Locator DIRECTION_DROPDOWN_VALUE;
     private final Locator HTML_CREATIVE_NAME;
     private final Locator IAB_CATEGORY_DROPDOWN;
-    private final Locator CLICK_THROUGH_URL;
     private final Locator INLINE_VALIDATION_MESSAGE;
     private final Locator WIDTH_BOX;
     private final Locator HEIGHT_BOX;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
 
     public BulkCreativeUpload(Page page) {
         this.page = page;
@@ -101,7 +101,6 @@ public class BulkCreativeUpload {
         this.DIRECTION_DROPDOWN_VALUE = page.locator("//div[contains(text(),'Direction')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
         this.HTML_CREATIVE_NAME = page.locator("//input[@placeholder='Creative Name']");
         this.IAB_CATEGORY_DROPDOWN = page.locator("//sui-multi-select[contains(@placeholder,'Search Categories')]//input");
-        this.CLICK_THROUGH_URL = page.locator("//input[@formcontrolname='clickThruUrl']");
         this.INLINE_VALIDATION_MESSAGE = page.locator("//p[contains(@class,'ng-star-inserted')]");
         this.WIDTH_BOX = page.locator("//input[contains(@placeholder,'width')]");
         this.HEIGHT_BOX = page.locator("//input[contains(@placeholder, 'height')]");
@@ -361,7 +360,7 @@ public class BulkCreativeUpload {
     }
 
     public void enterClickthroughURL(String validURL) {
-        CLICK_THROUGH_URL.fill(validURL);
+        createCreatives.CLICK_THROUGH_URL.fill(validURL);
     }
 
     public void isRemoveFileIconAvailable() {
@@ -411,7 +410,7 @@ public class BulkCreativeUpload {
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
-                if (CLICK_THROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
+                if (createCreatives.CLICK_THROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);

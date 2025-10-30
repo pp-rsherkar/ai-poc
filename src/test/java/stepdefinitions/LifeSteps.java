@@ -57,7 +57,6 @@ public class LifeSteps {
     TacticDetails tacticDetails = new TacticDetails(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
     TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
@@ -99,7 +98,7 @@ public class LifeSteps {
     }
 
     @And("{string} application is logged in successfully with Account {string}")
-    public void life_application_is_loged_in_as(String application, String account) {
+    public void life_application_is_logged_in_as(String application, String account) {
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
@@ -124,8 +123,6 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
-        /*campaignListing.setGroupByFilter();
-        navigation.clickOnIcon(" Group By Campaign ");*/
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
@@ -148,7 +145,7 @@ public class LifeSteps {
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + CommonUtils.generateRandomString();
+        lineItemNameRandom = lineItemName + '_' + timestamp;
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -246,7 +243,7 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.generateRandomString();
+        tacticNameRandom = tacticName + '_' + timestamp;
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -292,13 +289,13 @@ public class LifeSteps {
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
     public void verify_the_newly_created_campaign_details_in_the_campaign_list() {
-        campaigns.navigateToCampaignListing();
-        campaignListing.searchCreatedCampaign(campaignNameRandom);
-        Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
-        campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
-        campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
+        campaigns.navigateToCampaignDashboard();
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+        campaignDashboard.expandCreatedLineItem();
+        Assert.assertEquals(lineItemNameRandom, campaignDashboard.verifyCreatedLineItem(lineItemNameRandom));
+        campaignDashboard.expandCreatedLineItem();
+        Assert.assertEquals(tacticNameRandom, campaignDashboard.verifyCreatedTactic());
     }
 
     @Given("User navigates to NPI Lists page")
@@ -694,8 +691,8 @@ public class LifeSteps {
 
     @When("User enters {string} and click Search button")
     public void userEntersAndClickSearchButton(String campaignID) {
-        campaignListing.searchCreatedCampaign(campaignID);
-        campaignListing.expandCreatedLineItem();
+        campaignDashboard.searchCreatedCampaign(campaignID);
+        campaignDashboard.expandCreatedLineItem();
     }
 
     @Then("Verify Campaigns, line items, tactics names matching the {string} should display on Dashboard table")
@@ -963,8 +960,8 @@ public class LifeSteps {
 
     @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}, {string}")
     public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price) {
-        dealIDRandom = dealID + CommonUtils.timeStampCalculation();
-        dealNameRandom = dealName + CommonUtils.timeStampCalculation();
+        dealIDRandom = dealID + timestamp;
+        dealNameRandom = dealName + timestamp;
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price));
     }
@@ -1012,8 +1009,8 @@ public class LifeSteps {
     @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
     public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String toggleButton) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
-        dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
-        dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
+        dealIDRandom = dealID + timestamp + "_01";
+        dealNameRandom = dealName + timestamp + "_01";
         Assert.assertTrue("Assigned Deals are not present under targeting and deals section",
                 pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, toggleButton));
     }
@@ -1275,7 +1272,7 @@ public class LifeSteps {
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
 
-            String newCreativeName = creativeType + "_" + creativeName + '_' + CommonUtils.timeStampCalculation();
+            String newCreativeName = creativeType + "_" + creativeName + '_' + timestamp;
             createCreatives.clickNewCreativeButton();
             createCreatives.enterCreativeDetails(advertiser, newCreativeName, advertiserDSA, financer);
             createCreatives.selectCreativeType(creativeType);
@@ -1473,7 +1470,7 @@ public class LifeSteps {
 
     @And("Verify that an error message is displayed when no listname {string} or {string} names are specified")
     public void verifyThatAnErrorMessageIsDisplayedWhenNoNamesAreSpecified(String listName, String listType) {
-        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        metricName = listName + "_" + timestamp;
         Assert.assertEquals("List Name is required", sharedList.validateErrorOnEmptyListNameInput(metricName));
         switch (listType) {
             case "Domains":
@@ -1598,7 +1595,7 @@ public class LifeSteps {
 
     @And("Verify that when enters {string} and upload file {string} option is selected, the text area to direct enter the names disappears")
     public void verifyThatWhenUploadFileOptionIsSelectedTheTextAreaToDirectEnterTheNamesDisappears(String listName, String fileName) {
-        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        metricName = listName + "_" + timestamp;
         npiName = metricName;
         sharedList.enterListName(metricName);
         Assert.assertTrue("Text area is not available", sharedList.verifyTextAreaIsVisibleBeforeFileUpload());
@@ -1864,7 +1861,7 @@ public class LifeSteps {
      * E2E Domain List creation and targeting it at tactic level*/
     @And("User enters {string} in the List Name field")
     public void userEntersInTheListNameField(String listName) {
-        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        metricName = listName + "_" + timestamp;
         sharedList.enterListName(metricName);
         npiName = metricName;
     }
@@ -1935,7 +1932,7 @@ public class LifeSteps {
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
         bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
         bulkCreativeUpload.clickPreviewButton();
-        metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
+        metricName = creativeType + "_" + timestamp;
         bulkCreativeUpload.updateCreativeName(metricName);
         nameList.clear();
         nameList.add(metricName);
@@ -1947,7 +1944,7 @@ public class LifeSteps {
         Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
     }
 
-    /*Dislay Creative Bulk Upload*/
+    /*Display Creative Bulk Upload*/
     @When("The advertiser {string} is selected for {string} creative the following sections are visible")
     public void theAdvertiserIsSelectedForCreativeTheFollowingSectionsAreVisible(String advertiser, String creativeType, DataTable dataTable) {
         bulkCreativeUpload.selectAndClickCreativeType(creativeType);
@@ -2124,7 +2121,7 @@ public class LifeSteps {
         for (Map<String, String> row : rows) {
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
-            String creativeName = creativeType + "_Creative_" + CommonUtils.timeStampCalculation();
+            String creativeName = creativeType + "_Creative_" + timestamp;
             Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
                     .map(String::trim)
                     .map(entry -> entry.split(":", 2))
@@ -2457,7 +2454,7 @@ public class LifeSteps {
     @And("Verify Report Name field is available and accepts input {string}")
     public void verifyReportNameFieldIsAvailableAndAcceptsInput(String name) {
         Assert.assertTrue("Report Name field is not available", scheduleReport.isReportNameAvailable());
-        metricName = name + "_" + CommonUtils.timeStampCalculation();
+        metricName = name + "_" + timestamp;
         scheduleReport.enterReportName(metricName);
         nameList.add(metricName);
     }
@@ -2679,8 +2676,8 @@ public class LifeSteps {
 
     @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
-        campaignListing.searchCreatedCampaign(campaignName);
-        campaignListing.expandCreatedLineItem();
+        campaignDashboard.searchCreatedCampaign(campaignName);
+        campaignDashboard.expandCreatedLineItem();
         campaignDashboard.navigateToLineItemDetails(campaignName);
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
@@ -2734,7 +2731,7 @@ public class LifeSteps {
 
     @And("User enters Destination details - {string}, {string}, {string}, {string}")
     public void userEntersDestinationDetails(String destinationName, String destinationType, String hostName, String port) throws Exception {
-        dimensionName = destinationName + CommonUtils.timeStampCalculation();
+        dimensionName = destinationName + timestamp;
         accounts.enterDestinationName(dimensionName);
         accounts.selectDestinationType(destinationType);
         accounts.enterHostName(hostName);

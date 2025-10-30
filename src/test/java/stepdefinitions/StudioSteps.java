@@ -36,7 +36,7 @@ public class StudioSteps {
     List<String> previousNpiDetails = null;
     String npiCount;
     Path targetFilePath;
-    String randomNumber = CommonUtils.generateRandomString();
+    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -81,7 +81,7 @@ public class StudioSteps {
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
-        workspaceName = string + CommonUtils.timeStampCalculation();
+        workspaceName = string + timeStamp;
         expansionWorkspace.renameExpansion(workspaceName);
     }
 
@@ -162,7 +162,7 @@ public class StudioSteps {
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
         workspace.waitTillWorkspaceAlertHide();
-        workspaceName = wName + '_' + randomNumber;
+        workspaceName = wName + '_' + timeStamp;
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
@@ -539,7 +539,7 @@ public class StudioSteps {
 
     @And("Verify user is able to rename the workspace as {string}")
     public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
-        newWorkspaceName = newWorkspace + randomNumber;
+        newWorkspaceName = newWorkspace + timeStamp;
         Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName));
         workspaceName = newWorkspaceName;
     }
@@ -607,7 +607,7 @@ public class StudioSteps {
 
     @And("Verify the Retrofit checkbox is selected")
     public void verifyTheRetrofitCheckboxIsSelected() {
-        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.verifyRetrofitCheckboxSelected());
+        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.isRetrofitCheckboxSelected());
     }
 
     @And("User selects {string} as Keep NPIs on the list option")
