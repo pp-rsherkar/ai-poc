@@ -6,7 +6,9 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +50,8 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_FILTER_TITLE;
     private final Locator MERGED_TEXT;
     private final Locator DASHBOARD_FILTERS;
+
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
 
     public ExplorerWorkspace(Page page) {
@@ -259,4 +263,50 @@ public class ExplorerWorkspace {
         }
         return mergeFilterName;
     }
+    public boolean verifyPermissionFilters(String permissions)
+    {
+        boolean isFilterVisible = true;
+        Locator Moments = WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='IAB']");
+        Locator IbHealth=WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='WebMD']");
+
+        switch (permissions)
+            {
+                case "MOMENTS":
+                    ADD_FILTER.click();
+                    waitUtility.waitForLocatorVisible(Moments);
+                    isFilterVisible=Moments.isVisible();
+                    FILTER_CLOSE_BUTTON.click();
+                    break;
+                    case "IB HEALTH":
+                        ADD_FILTER.click();
+                        waitUtility.waitForLocatorVisible(IbHealth);
+                        isFilterVisible=IbHealth.isVisible();
+                        FILTER_CLOSE_BUTTON.click();
+                        break;
+
+                case "CLAIMS DATA":
+                    System.out.println("CLAIMS DATA filters are not hidden even after enabling or disabling it");
+
+            }
+
+        return isFilterVisible;
+    }
+    public boolean verifyWidgets(String visualization)
+    {
+        boolean isWidgetVisible=true;
+        Locator momentWidget= WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
+        Locator claimsWidget= WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
+        switch (visualization)
+        {
+            case "MOMENTS","IB HEALTH":
+                waitUtility.waitForLocatorVisible(momentWidget);
+                isWidgetVisible=momentWidget.isVisible();
+                break;
+            case "CLAIMS DATA":
+                waitUtility.waitForLocatorVisible(claimsWidget);
+                isWidgetVisible=claimsWidget.isVisible();
+        }
+        return isWidgetVisible;
+    }
+
 }

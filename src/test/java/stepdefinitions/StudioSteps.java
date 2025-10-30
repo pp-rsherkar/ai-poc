@@ -2,6 +2,7 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -37,6 +38,9 @@ public class StudioSteps {
     String npiCount;
     Path targetFilePath;
     String timeStamp = CommonUtils.timeStampCalculation();
+    static String url;
+    static String username;
+    static String password;
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -271,7 +275,7 @@ public class StudioSteps {
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
         int npiCountFromFile = 0;
-        if(fileExtension.equalsIgnoreCase("CSV")) 
+        if(fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if(fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
@@ -622,4 +626,86 @@ public class StudioSteps {
         String text = workspace.verifyNPIsEngagingText();
         Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
     }
+    @And("User navigates to accounts page and selects the {string} account")
+    public void userNavigatesToAccountsPageAndSelectsTheAccount(String accountName)
+    {
+        navigation.clickSubMenu();
+        accounts.clickAdministration();
+        accounts.selectAccountsTab();
+        accounts.searchAccount(accountName);
+    }
+
+    @And("User navigates to advertisers page under the selected account")
+    public void userNavigatesToAdvertisersPageUnderTheSelectedAccount()
+    {
+        accounts.clickAccountAdvertiserTab();
+    }
+
+    @And("User enables the {string} permission for the {string} advertiser")
+    public void userEnablesThePermissionForTheAdvertiser(String advertiserPermissions, String advertiserName)
+    {
+        if(advertiserPermissions.isBlank())
+        {
+            System.out.println("Skipping step because example data is empty");
+            return;
+        }
+        
+        accounts.enableAdvertiserPermission(advertiserName,advertiserPermissions);
+
+
+    }
+
+    @And("User navigates to users page under the selected account")
+    public void userNavigatesToUsersPageUnderTheSelectedAccount()
+    {
+        accounts.navigateUserTab();
+    }
+
+    @And("User selects the {string} external user")
+    public void userSelectsTheExternalUser(String externalUser)
+    {
+        accounts.selectExternalUser(externalUser);
+    }
+
+    @And("User enables the {string} permission for the {string} for an external user")
+    public void userEnablesThePermissionForTheForAnExternalUser(String studioPermissions, String accountName)
+    {
+        accounts.externalUserPermissions(studioPermissions,accountName);
+        accounts.internalUserLogout();
+
+    }
+
+    @When("External user is logged in successfully in {string} application in the {string} environment")
+    public void externalUserIsLoggedInSuccessfullyInApplicationInTheEnvironment(String environment, String externalUser)
+    {
+            url = ConfigReader.getProperty("preReleaseURL");
+            username = ConfigReader.getProperty("preReleaseExternalUser");
+            password = ConfigReader.getProperty("preReleaseExternalPassword");
+            navigation.navigateToUrl(url);
+            navigation.enterUsername(username);
+            navigation.enterPassword(password);
+            navigation.clickLogin();
+            navigation.navigateToStudio();
+    }
+
+    @And("External user selects the workspace")
+    public void externalUserSelectsTheWorkspace()
+    {
+        workspace.selectExistingWorkspace();
+    }
+
+    @Then("External user should be able to see the {string} permission in the workspace")
+    public void externalUserShouldBeAbleToSeeThePermissionInTheWorkspace(String permissions)
+    {
+        if (permissions.equals("MOMENTS") || permissions.equals("IB HEALTH") || permissions.equals("CLAIMS DATA"))
+        {
+            Assert.assertTrue(explorerWorkspace.verifyPermissionFilters(permissions));
+            Assert.assertTrue(explorerWorkspace.verifyWidgets(permissions));
+        }
+        else
+        {
+            System.out.println("Other permissions check");
+        }
+    }
+
 }
