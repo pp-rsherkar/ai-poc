@@ -50,6 +50,8 @@ public class Accounts {
     private final Locator STUDIO_USER_TAB;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_ENABLED;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
+    private final Locator ACCOUNTS_ADVERTISER_TAB;
+    private final Locator SUCCESS_ALERT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
@@ -92,6 +94,8 @@ public class Accounts {
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
+        this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
+        this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
     }
 
     public void clickAdministration() {
@@ -187,7 +191,6 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(ENTER_DESTINATION_NAME.last());
     }
 
-
     public void enterDestinationName(String metricName) {
         ENTER_DESTINATION_NAME.last().fill(metricName);
     }
@@ -249,5 +252,49 @@ public class Accounts {
             return STUDIO_TOGGLE_EXTERNAL_USER_ENABLED.isVisible();
         }
         return false;
+    }
+
+    public boolean isAccountsAdvertiserTabDisplayed() {
+        return ACCOUNTS_ADVERTISER_TAB.isVisible();
+    }
+
+    public void clickAccountsAdvertiserTab() {
+        ACCOUNTS_ADVERTISER_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForElementVisible("//div[@class='advertiser-tabs']");
+    }
+
+    public void clickAdvertisersSubTab(String tabName) {
+        Locator tabXpath = page.locator(String.format("//div[@class='advertiser-tabs']//button[contains(normalize-space(text()),'%s')]", tabName));
+        tabXpath.click();
+    }
+
+    public boolean checkHCPPermissionForAdvertiser(String checkboxStatus, String advertiser) {
+        boolean flag;
+        Locator permissionXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox", advertiser));
+        Locator disabledTextXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]", advertiser));
+        flag = switch (checkboxStatus) {
+            case "Disabled" -> {
+                if (!disabledTextXpath.isVisible()) {
+                    permissionXpath.click();
+                }
+                yield true;
+            }
+            case "Enabled" -> {
+                if (disabledTextXpath.isVisible()) {
+                    permissionXpath.click();
+                }
+                yield true;
+            }
+            default -> false;
+        };
+        return flag;
+    }
+
+    public void saveAccountsAdvertiserTab(){
+        if(OK_BUTTON.isVisible()) {
+            OK_BUTTON.click();
+            waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+        }
     }
 }
