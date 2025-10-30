@@ -190,7 +190,7 @@ public class LifeSteps {
         String detailsTab = tacticTabNames.remove(tacticTabNames.size() - 1);
         List<String> disabledTabs = tacticDetails.newTacticTabs();
         Assert.assertEquals(tacticTabNames,disabledTabs);
-        tacticDetails.CLICK_FIRST_TACTIC();
+        tacticDetails.clickFirstTactic();
         List<String> enabledTabs = tacticDetails.savedTacticTabs();
         tacticTabNames.add(detailsTab);
         Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
@@ -198,7 +198,7 @@ public class LifeSteps {
     }
     @And("Verify the status of saved tactic")
     public void verify_the_status_of_saved_tactic() {
-        tacticDetails.CLICK_FIRST_TACTIC();
+        tacticDetails.clickFirstTactic();
         String actualStatus = tacticDetails.verifyTacticState();
         Assert.assertEquals("Incomplete",actualStatus);
     }

@@ -30,7 +30,7 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
-    public final Locator TARGETTING_RULES_ICON;
+    public final Locator TARGETING_RULES_ICON;
     private final Locator NEW_TACTIC_BUTTON;
     private final Locator SAVED_TACTICS;
     private final Locator DETAILS_TAB;
@@ -79,7 +79,7 @@ public class TacticDetails {
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
-        this.TARGETTING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.TARGETING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
         this.NEW_TACTIC_BUTTON = page.locator("//span[normalize-space(text())='New Tactic']");
         this.SAVED_TACTICS = page.locator("//div[contains(@class,'tactic-main-details')]");
         this.DETAILS_TAB = page.locator("//a[contains(text(),'Detail')]");
@@ -111,7 +111,7 @@ public class TacticDetails {
     public List<String> newTacticTabs(){
         return NEW_TACTIC_TABS.allInnerTexts();
     }
-    public void CLICK_FIRST_TACTIC(){
+    public void clickFirstTactic(){
         SAVED_TACTICS.first().click();
     }
 
@@ -130,7 +130,7 @@ public class TacticDetails {
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
-        CUSTOM_FIELD_TEXT.last().fill("CUST123");
+        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -152,10 +152,8 @@ public class TacticDetails {
         DELETE_SUCCESS.isVisible();
     }
 
-    public void clickTargetingRuleIcon(){
-
-        TARGETTING_RULES_ICON.click();
-
+    public void clickTargetingRuleIcon() {
+        TARGETING_RULES_ICON.click();
     }
     public String verifyTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
