@@ -171,14 +171,13 @@ public class LifeSteps {
             tacticDetails.enterTacticName(tacticName);
             tacticDetails.saveTactic();
             tacticSettings.selectChannel(channel);
-            tacticDetails.TARGETTING_RULES_ICON.click();
+            tacticDetails.clickTargetingRuleIcon();
             tacticSettings.addTargetingRules(ruleType);
             tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
         List<String> actualTactics =   tacticDetails.getAllTactics();
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
-        //Fetch all the targeting rules saved for each tactic and validate it
         List<String>expectedTarget = tacticSettings.getExpectedTargetRules();
         List<String>actualTarget = tacticSettings.getActualTargetRules();
         Assert.assertEquals(expectedTarget,actualTarget);
@@ -188,11 +187,12 @@ public class LifeSteps {
     public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
         tacticDetails.verifyDetailsTab();
         List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
-        List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
+        String detailsTab = tacticTabNames.remove(tacticTabNames.size() - 1);
+        List<String> disabledTabs = tacticDetails.newTacticTabs();
         Assert.assertEquals(tacticTabNames,disabledTabs);
         tacticDetails.CLICK_FIRST_TACTIC();
-        List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
-        tacticTabNames.add("Details");
+        List<String> enabledTabs = tacticDetails.savedTacticTabs();
+        tacticTabNames.add(detailsTab);
         Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
 
     }

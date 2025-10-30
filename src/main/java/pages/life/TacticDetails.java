@@ -152,7 +152,11 @@ public class TacticDetails {
         DELETE_SUCCESS.isVisible();
     }
 
+    public void clickTargetingRuleIcon(){
 
+        TARGETTING_RULES_ICON.click();
+
+    }
     public String verifyTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
     }

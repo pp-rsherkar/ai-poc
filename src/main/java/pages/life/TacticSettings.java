@@ -56,12 +56,9 @@ public class TacticSettings {
     private final Locator SHOW_MORE_BUTTON;
     private final Locator SELECT_TARGETING;
     private final Locator BLOCK_TARGETING;
-    //private final Locator HOUSEHOLD_ICON;
     private final Locator HOUSEHOLD_IP_ICON;
     private final Locator PRACTICE_IP_ICON;
     private final Locator SELECTED_ONLY_TAB;
-    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
-    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Locator PRACTICE_IP;
     private final Locator SELECTED_TARGET;
     private final Locator BLOCKED_TARGET;
@@ -73,6 +70,8 @@ public class TacticSettings {
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
 
     public TacticSettings(Page page) {
         this.page = page;
@@ -184,6 +183,7 @@ public class TacticSettings {
         SAVE_TACTIC_SETTINGS.click();
     }
     public void addTargetingRules(String ruleType) {
+
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();

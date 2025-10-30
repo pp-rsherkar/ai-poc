@@ -9,22 +9,23 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
 
-  @regression
+  @regression @vp
   Scenario Outline: Create multiple tactics and verify its tabs and status
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates new tactics and verifies it
-      | Tactic Name        | Channel | RuleType          |
-      | Targeting Segment  | Email   | Health Population |
-      | Health Populations | EHR     | NPI               |
-      | Audience Group tactic| Standard | Behavioral Segment   |
+      | Tactic Name           | Channel  | RuleType           |
+      | Targeting Segment     | Email    | Health Population  |
+      | Health Populations    | EHR      | NPI                |
+      | Audience Group tactic | Standard | Behavioral Segment |
 
     Then Verify that the tabs gets enabled only after saving tactics
       | Settings  |
       | Creatives |
       | Debugger  |
+      | Details   |
     And Verify the status of saved tactic
 
 
