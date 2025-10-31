@@ -58,6 +58,7 @@ public class BulkCreativeUpload {
     private final Locator INLINE_VALIDATION_MESSAGE;
     private final Locator WIDTH_BOX;
     private final Locator HEIGHT_BOX;
+    private final Locator UPLOAD_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
 
@@ -104,6 +105,7 @@ public class BulkCreativeUpload {
         this.INLINE_VALIDATION_MESSAGE = page.locator("//p[contains(@class,'ng-star-inserted')]");
         this.WIDTH_BOX = page.locator("//input[contains(@placeholder,'width')]");
         this.HEIGHT_BOX = page.locator("//input[contains(@placeholder, 'height')]");
+        this.UPLOAD_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Upload')]");
     }
 
     public void clickBulkUploadButton() {
@@ -169,7 +171,13 @@ public class BulkCreativeUpload {
     }
 
     public void clickPreviewButton() {
-        PREVIEW_BUTTON.click();
+        if(PREVIEW_BUTTON.isVisible())
+            PREVIEW_BUTTON.click();
+    }
+
+    public void clickUploadButton() {
+        if(UPLOAD_BUTTON.isVisible())
+            UPLOAD_BUTTON.click();
     }
 
     public String fetchErrorAlert() {
@@ -405,8 +413,9 @@ public class BulkCreativeUpload {
                 if (LANDING_PAGE_DOMAIN.isVisible()) enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
-                clickPreviewButton();
+                clickUploadButton();
                 updateCreativeName(updatedCreativeName);
+                clickOKButton();
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
@@ -415,6 +424,7 @@ public class BulkCreativeUpload {
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);
                 if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
+                clickUploadButton();
                 break;
         }
     }
