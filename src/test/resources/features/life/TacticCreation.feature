@@ -7,10 +7,10 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And User clicks on Create Campaign
 
   @regression
   Scenario Outline: Create multiple tactics and verify its tabs and status
+    When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -32,6 +32,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
   @regression
   Scenario Outline: Create new custom field in tactic and delete it
+    When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
