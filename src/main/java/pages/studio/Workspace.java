@@ -50,6 +50,7 @@ public class Workspace {
     private final Locator IDENTIFIED_NPI_COUNT;
     private final Locator RETROFIT_CHECKBOX;
     private final Locator NPI_ENGAGING_TEXT;
+    private final Locator PUBLISH_LOADER;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Workspace(Page page) {
@@ -87,6 +88,7 @@ public class Workspace {
         this.IDENTIFIED_NPI_COUNT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//h3[contains(text(),'Identified NPIs')]/ancestor::div[contains(@class,'SingleValueVisualization')]//span");
         this.RETROFIT_CHECKBOX = WORKSPACE_FRAME.locator("//span[contains(text(),'Retrofit NPIs')]/parent::label/preceding-sibling::div//input");
         this.NPI_ENGAGING_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'NPIs engaging on or')]");
+        this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
     }
 
     public void studio() {
@@ -95,6 +97,8 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if(PUBLISH_LOADER.isVisible())
+            waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         FLY_PAGE_BUTTON.click();
     }
 

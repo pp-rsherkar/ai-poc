@@ -2048,7 +2048,6 @@ public class LifeSteps {
             bulkCreativeUpload.selectAndClickCreativeType(creativeType);
             bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
             bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
-            bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
             nameList.add(creativeName);
         }
