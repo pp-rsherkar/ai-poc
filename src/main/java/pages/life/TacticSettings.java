@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class TacticSettings {
@@ -655,12 +656,12 @@ public class TacticSettings {
         return FETCH_TARGET_RULE_OPTIONS.innerText();
     }
 
-    public String getTacticBaseBidPrice() {
-        return TACTIC_BASE_BID_PRICE.evaluate("el => el.value").toString();
+    public BigDecimal getTacticBaseBidPrice() {
+        return new BigDecimal(TACTIC_BASE_BID_PRICE.evaluate("el => el.value").toString());
     }
 
-    public String getTacticMaxBidPrice() {
-        return TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString();
+    public BigDecimal getTacticMaxBidPrice() {
+        return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
 
 }

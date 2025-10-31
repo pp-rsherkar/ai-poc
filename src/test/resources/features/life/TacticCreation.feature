@@ -57,8 +57,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    When User is on tactic settings page
-    Then Verify Max Bid and and Base Bid values on the tactic settings match with Campaign Settings values
+    And  Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |

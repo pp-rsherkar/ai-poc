@@ -43,14 +43,6 @@ public class LifeSteps {
     static String metricName;
     static String newPixelName;
     static String pixelNameEdited;
-    private String customFieldName;
-    private String uiCustomFieldName;
-    private BigDecimal tacticBaseBid;
-    private BigDecimal tacticMaxBid;
-    private BigDecimal campaignBaseBid;
-    private BigDecimal campaignMaxBid;
-
-
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -90,6 +82,10 @@ public class LifeSteps {
     APIResponse response;
     boolean flag = false;
     CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
+    private String customFieldName;
+    private String uiCustomFieldName;
+    private BigDecimal campaignBaseBid;
+    private BigDecimal campaignMaxBid;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -170,11 +166,11 @@ public class LifeSteps {
     public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
-            for (Map<String, String> tacticData : tactics) {
-                String tacticName = tacticData.get("Tactic Name");
-                String channel = tacticData.get("Channel");
-                String ruleType = tacticData.get("RuleType");
-                expectedTactic.add(tacticName);
+        for (Map<String, String> tacticData : tactics) {
+            String tacticName = tacticData.get("Tactic Name");
+            String channel = tacticData.get("Channel");
+            String ruleType = tacticData.get("RuleType");
+            expectedTactic.add(tacticName);
             // Enter tactic name
             tacticDetails.enterTacticName(tacticName);
             tacticDetails.saveTactic();
@@ -194,7 +190,7 @@ public class LifeSteps {
             tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
-        List<String> actualTactics =   tacticDetails.getAllTactics();
+        List<String> actualTactics = tacticDetails.getAllTactics();
         // Using a HashSet to compare the lists regardless of their order of entries.
         System.out.println("Saved tactics:" + actualTactics);
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
@@ -206,41 +202,42 @@ public class LifeSteps {
         tacticDetails.verifyDetailsTab();
         List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
         List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
-        Assert.assertEquals(tacticTabNames,disabledTabs);
+        Assert.assertEquals(tacticTabNames, disabledTabs);
         tacticDetails.CLICK_FIRST_TACTIC();
         List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
         tacticTabNames.add("Details");
-        Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
+        Assert.assertEquals(new HashSet<>(tacticTabNames), new HashSet<>(enabledTabs));
 
     }
+
     @And("Verify the status of saved tactic")
     public void verify_the_status_of_saved_tactic() {
         tacticDetails.CLICK_FIRST_TACTIC();
         String actualStatus = tacticDetails.verifyTacticState();
-        Assert.assertEquals("Incomplete",actualStatus);
+        Assert.assertEquals("Incomplete", actualStatus);
     }
 
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
         //tacticDetails.clickNewTactic();
-        String customFieldName = customField+"_"+CommonUtils.randomFourDigitNumber();
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
         this.customFieldName = customFieldName;
         tacticDetails.clickDetailsTab();
         tacticDetails.addCustomField(customFieldName);
         String raw = tacticDetails.verifyCustomField(customFieldName);
         String actualName = raw.split("\\R")[0];// To remove unwanted space and text
-        Assert.assertEquals(customFieldName,actualName);
-        this.uiCustomFieldName=actualName;
+        Assert.assertEquals(customFieldName, actualName);
+        this.uiCustomFieldName = actualName;
 
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
     public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
         tacticDetails.clickNewTactic();
-        Assert.assertEquals(customFieldName,uiCustomFieldName);
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
         tacticDetails.clickTactic();
-        Assert.assertEquals(customFieldName,uiCustomFieldName);
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
     }
 
     @Then("User deletes the custom field")
@@ -2095,7 +2092,7 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
@@ -2238,7 +2235,7 @@ public class LifeSteps {
     }
 
     @When("Line Items of selected campaigns should load when user types line items initials {string} in {string} field")
-    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials,String fieldName) {
+    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials, String fieldName) {
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(lineItemInitials, fieldName));
     }
 
@@ -2260,7 +2257,7 @@ public class LifeSteps {
     @Then("{string} section should be visible with label {string} checkbox")
     public void checkboxShouldBeVisibleWithLabel(String filterReportSection, String checkboxLabel) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
             Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel));
     }
 
@@ -2281,7 +2278,7 @@ public class LifeSteps {
     }
 
     @And("User should be able to generate the report")
-    public void userShouldAbleToGenerateTheReport(){
+    public void userShouldAbleToGenerateTheReport() {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
@@ -2433,11 +2430,11 @@ public class LifeSteps {
     @Then("{string} section should be visible with label {string}, {string}, {string} checkbox")
     public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
             Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
             Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
             Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
     }
 
@@ -2513,8 +2510,8 @@ public class LifeSteps {
 
     @And("Verify default value of Send At fields - Start Time is {string} and Timezone is {string}")
     public void verifyDefaultValueOfSendAtFieldsStartTimeIsAndTimezoneIs(String defaultTime, String defaultTimezone) {
-        Assert.assertEquals("Default time "  + defaultTime+" is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
-        Assert.assertEquals("Default time "  + defaultTimezone+" is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
+        Assert.assertEquals("Default time " + defaultTime + " is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
+        Assert.assertEquals("Default time " + defaultTimezone + " is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
     }
 
     @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
@@ -2966,11 +2963,12 @@ public class LifeSteps {
                 break;
         }
     }
+
     //* Rajyalaxmi - Tactic max bid and base bid verification
     @When("User clicks on Campaign Settings")
     public void user_clicks_on_campaign_settings() {
-        campaignSettings.campSettings();
-        campaignSettings.bidSettings();
+        campaignSettings.campaignSettingsLink();
+        campaignSettings.bidSettingsTab();
     }
 
     @Then("Verify user is on default bid settings page")
@@ -2980,18 +2978,14 @@ public class LifeSteps {
 
     @Then("User gets Max Bid and Base Bid values")
     public void user_gets_max_bid_and_base_bid_values() {
-        campaignBaseBid = new BigDecimal(campaignSettings.getBaseBidPrice());
-        campaignMaxBid = new BigDecimal(campaignSettings.getMaxBidPrice());
+        campaignBaseBid = (campaignSettings.getBaseBidPrice());
+        campaignMaxBid = (campaignSettings.getMaxBidPrice());
     }
 
-    @When("User is on tactic settings page")
-    public void user_is_on_tactic_settings_page() {
-       tacticBaseBid = new BigDecimal(tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
-       tacticMaxBid = new BigDecimal(tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
-    }
-
-    @Then("Verify Max Bid and and Base Bid values on the tactic settings match with Campaign Settings values")
-    public void verify_max_bid_and_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values(){
+    @Then("Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values")
+    public void verify_max_bid_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values() {
+        BigDecimal tacticBaseBid = (tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
+        BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
