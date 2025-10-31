@@ -64,6 +64,11 @@ public class LineItemDetails {
     private final Locator MAIN_DETAILS_LABEL;
     private final Locator CAMPAIGN_HEADER;
     private final Locator EXIT_BULK_EDIT_MODE;
+    private final Locator COST_MODEL;
+    private final Locator BUDGET_DISTRIBUTION;
+    private final Locator PACING_MODE;
+    private final Locator FLAT_CPM;
+    private final Locator PACING_MODE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -134,6 +139,11 @@ public class LineItemDetails {
         this.MAIN_DETAILS_LABEL = page.locator("//div[@class='main-details']");
         this.CAMPAIGN_HEADER = page.locator("//div[@class='campaign-header']");
         this.EXIT_BULK_EDIT_MODE = page.locator("//button[contains(text(),'Exit Bulk edit mode')]");
+        this.COST_MODEL = page.locator("//div[@id='billingTypeDropdown']/parent::div");
+        this.BUDGET_DISTRIBUTION = page.locator("//label[contains(text(),'Budget Distribution')]/parent::div");
+        this.PACING_MODE = page.locator("//sui-select[@placeholder='PacingMode']");
+        this.FLAT_CPM = page.locator("//input[@formcontrolname='flatCPM']");
+        this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
     }
 
     public String verifyLineItemText() {
@@ -429,8 +439,59 @@ public class LineItemDetails {
 
     public List<String> fetchLineItemDetails() {
         List<String> originalLineItemDetails = new ArrayList<>();
+        originalLineItemDetails.add(COST_MODEL.locator("xpath=./descendant::div[contains(@class, 'text')]").textContent());
+        if(FLAT_CPM.isVisible())
+            originalLineItemDetails.add(FLAT_CPM.innerText());
+        Locator budgetXpath = BUDGET_DISTRIBUTION.locator("xpath=//button");
+        for (int i = 0; i < budgetXpath.count(); i++) {
+            if (budgetXpath.nth(i).getAttribute("class").contains("active")) {
+                originalLineItemDetails.add(budgetXpath.nth(i).innerText().trim().split(" ")[0]);
+                break;
+            }
+        }
         originalLineItemDetails.add(FLIGHT_START_DATE.inputValue());
         originalLineItemDetails.add(FLIGHT_END_DATE.inputValue());
+        originalLineItemDetails.add(PACING_MODE.locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]").textContent().trim());
+        if(PACING_MODE_INPUT.isVisible())
+            originalLineItemDetails.add(PACING_MODE_INPUT.innerText());
         return originalLineItemDetails;
+    }
+
+    public void createLineItem(String type, String lineItemName, Map<String, String> attributeMap) {
+        enterLineItemName(lineItemName);
+        selectLineItemType(type);
+        selectCostModel(attributeMap.get("CostModel"), attributeMap.get("CPMAmount"));
+        selectBudgetDistribution(attributeMap.get("BudgetDistribution"));
+        clickAddFlightButton();
+        enterLineItemBudget(attributeMap.get("LineBudget"));
+        selectPacingMode(attributeMap.get("PacingMode"), attributeMap.get("PacingPercentage"));
+        enableLineItem();
+        saveLineItem();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void selectCostModel(String costModel, String cpm){
+        String optionXPath = String.format("//div[contains(@class, 'gaCostType') and normalize-space(text())='%s']", costModel);
+        if(!COST_MODEL.getAttribute("class").contains("disabled")) {
+            COST_MODEL.click();
+            COST_MODEL.locator(optionXPath).click();
+            if(FLAT_CPM.isVisible())
+                FLAT_CPM.fill(cpm);
+        }
+    }
+
+    private void selectBudgetDistribution(String budgetDistribution) {
+        if(!BUDGET_DISTRIBUTION.getAttribute("class").contains("disabled")) {
+            Locator xpath = BUDGET_DISTRIBUTION.locator("xpath=//button[normalize-space(.)='" + budgetDistribution + "']");
+            xpath.click();
+        }
+    }
+
+    public void selectPacingMode(String pacingMode, String pacingPercentage){
+        PACING_MODE.click();
+        String optionXPath = String.format("//sui-select-option//span[text()='%s']", pacingMode);
+        PACING_MODE.locator(optionXPath).click();
+        if(PACING_MODE_INPUT.isVisible())
+            PACING_MODE_INPUT.fill(pacingPercentage);
     }
 }
