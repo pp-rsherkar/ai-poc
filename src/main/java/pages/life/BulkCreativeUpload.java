@@ -171,8 +171,7 @@ public class BulkCreativeUpload {
     }
 
     public void clickPreviewButton() {
-        if(PREVIEW_BUTTON.isVisible())
-            PREVIEW_BUTTON.click();
+        PREVIEW_BUTTON.click();
     }
 
     public void clickUploadButton() {
