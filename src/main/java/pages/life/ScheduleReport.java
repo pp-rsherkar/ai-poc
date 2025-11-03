@@ -196,7 +196,7 @@ public class ScheduleReport {
         return SEND_AT_TIMEZONE.locator("xpath=//div[@class='text']").innerText().contains(timeZone);
     }
 
-    public List<String> verifyDeliveryMethods() {
+    public List<String> getDeliveryMethods() {
         return DELIVERY_METHODS.allInnerTexts();
     }
 

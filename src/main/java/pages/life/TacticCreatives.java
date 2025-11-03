@@ -40,7 +40,7 @@ public class TacticCreatives {
         this.ASSIGN_EXISTING_CREATIVE = page.locator("//span[contains(text(),'Assign Existing Creatives')]");
     }
 
-    public String verifyTacticCreativesText() {
+    public String getTacticCreativesText() {
         return VERIFY_TACTIC_CREATIVES_PAGE.innerText();
     }
 
@@ -66,7 +66,7 @@ public class TacticCreatives {
         return TACTIC_CREATIVE_SUCCESS.innerText();
     }
 
-    public String verifyCampaignRunning() {
+    public String getCampaignRunningText() {
         return VERIFY_CAMPAIGN_RUNNING.innerText();
     }
 
@@ -82,7 +82,7 @@ public class TacticCreatives {
         ASSIGN_EXISTING_CREATIVE.click();
     }
 
-    public boolean verifyCreativeAssigned(String CreativeName) {
+    public boolean isCreativeAssigned(String CreativeName) {
         waitUtility.waitForElementVisible(String.format("//td[@title='%s']", CreativeName));
         return page.locator(String.format("//td[@title='%s']", CreativeName)).isVisible();
     }

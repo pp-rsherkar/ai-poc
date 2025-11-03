@@ -60,7 +60,7 @@ public class NPIAttributesList {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public String verifyFileUploadSuccess() {
+    public String getFileUploadSuccessText() {
         return FILE_UPLOAD_SUCCESS.innerText();
     }
 

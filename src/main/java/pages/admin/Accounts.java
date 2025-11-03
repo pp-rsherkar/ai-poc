@@ -144,7 +144,7 @@ public class Accounts {
         SWITCH_CLICK_ACCOUNT.click();
     }
 
-    public String verifyWorkspacePermission() {
+    public String getWorkspacePermissionText() {
         WORKSPACE_NAME.waitFor();
         return WORKSPACE_NAME.textContent();
     }

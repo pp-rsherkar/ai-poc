@@ -124,7 +124,7 @@ public class LifeSteps {
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
         campaigns.createCampaign();
-        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        Assert.assertEquals("Create New Campaign", campaigns.getCampaignText());
     }
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
@@ -140,7 +140,7 @@ public class LifeSteps {
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
         Assert.assertEquals("Success!", campaigns.campaignSuccess());
-        Assert.assertEquals("New Line Item", lineItemDetails.verifyLineItemText());
+        Assert.assertEquals("New Line Item", lineItemDetails.getLineItemText());
     }
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
@@ -156,7 +156,7 @@ public class LifeSteps {
     @Then("Verify line item details are saved and user is navigated to the tactic page")
     public void verify_line_item_details_are_saved_and_user_is_navigated_to_tactic_page() {
         assert lineItemDetails.lineItemSuccess().contains("Success!");
-        Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
+        Assert.assertEquals("New Tactic", tacticDetails.getTacticDetailsText());
     }
 
     @When("User enters the tactic details as {string} and saves the tactic")
@@ -169,7 +169,7 @@ public class LifeSteps {
     @Then("Verify tactic details are saved and user is navigated to the settings tab")
     public void verify_tactic_details_are_saved_and_user_is_navigated_to_settings_tab() {
         assert tacticDetails.tacticDetailsSuccess().contains("Success!");
-        Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
+        Assert.assertEquals("Bid Strategy", tacticSettings.getTacticSettingsText());
     }
 
     @When("User selects the {string} as channel")
@@ -187,7 +187,7 @@ public class LifeSteps {
     @Then("Verify settings details are saved and user is navigated to the creatives tab")
     public void verify_settings_details_are_saved_and_user_is_navigated_to_creatives_tab() {
         assert tacticSettings.tacticSettingsSuccess().contains("Success!");
-        Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
+        Assert.assertEquals("Creative(s)", tacticCreatives.getTacticCreativesText());
     }
 
     @Then("User assigns the existing creative named {string}, enables the tactic and saves the changes")
@@ -202,18 +202,18 @@ public class LifeSteps {
     public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
         assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
         tacticCreatives.navigateToCampaignDashboard();
-        Assert.assertEquals("Running", tacticCreatives.verifyCampaignRunning());
+        Assert.assertEquals("Running", tacticCreatives.getCampaignRunningText());
     }
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
     public void verify_the_newly_created_campaign_details_in_the_campaign_list() {
         campaigns.navigateToCampaignDashboard();
         campaignDashboard.searchCreatedCampaign(campaignNameRandom);
-        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.getCreatedCampaignText(campaignNameRandom));
         campaignDashboard.expandCreatedLineItem();
-        Assert.assertEquals(lineItemNameRandom, campaignDashboard.verifyCreatedLineItem(lineItemNameRandom));
+        Assert.assertEquals(lineItemNameRandom, campaignDashboard.getCreatedLineItemText(lineItemNameRandom));
         campaignDashboard.expandCreatedLineItem();
-        Assert.assertEquals(tacticNameRandom, campaignDashboard.verifyCreatedTactic());
+        Assert.assertEquals(tacticNameRandom, campaignDashboard.getCreatedTacticText());
     }
 
     @Given("User navigates to NPI Lists page")
@@ -266,7 +266,7 @@ public class LifeSteps {
 
     @Then("Verify creation of NPI List screen is displayed")
     public void verify_creation_of_npi_list_screen_is_displayed() {
-        Assert.assertEquals("Create New NPI List", npiLists.verifyNPIListText());
+        Assert.assertEquals("Create New NPI List", npiLists.getNPIListText());
     }
 
     @Then("User selects Static List")
@@ -302,9 +302,9 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Report Templates page")
     public void verify_the_tabs_displayed_on_the_report_templates_page() {
-        Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab().toUpperCase());
-        Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab().toUpperCase());
-        Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
+        Assert.assertEquals("TEMPLATES", reportTemplates.getTemplatesTabText().toUpperCase());
+        Assert.assertEquals("GENERATED REPORTS", reportTemplates.getGeneratedReportsTabText().toUpperCase());
+        Assert.assertEquals("SCHEDULING", reportTemplates.getSchedulingTabText().toUpperCase());
     }
 
     @Then("User enters the Smart NPI list details as {string} {string} for {string} with {string} {string} {string}")
@@ -367,8 +367,8 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Create New Template panel")
     public void verify_the_tabs_displayed_on_the_create_new_template_panel() {
-        Assert.assertEquals("DIMENSIONS", reportTemplates.verifyDimensionsTab().toUpperCase());
-        Assert.assertEquals("METRICS", reportTemplates.verifyMetricsTab().toUpperCase());
+        Assert.assertEquals("DIMENSIONS", reportTemplates.getDimensionsTabText().toUpperCase());
+        Assert.assertEquals("METRICS", reportTemplates.getMetricsTabText().toUpperCase());
     }
 
     @When("User enters the template details as {string} {string} {string}")
@@ -404,8 +404,8 @@ public class LifeSteps {
 
     @Then("Verify the selected dimensions and metrics under the Template Structure section")
     public void verify_the_selected_dimensions_and_metrics_under_the_template_structure_section() {
-        Assert.assertEquals(dimensionName, reportTemplates.verifySelectedDimensions());
-        Assert.assertEquals(metricName, reportTemplates.verifySelectedMetrics());
+        Assert.assertEquals(dimensionName, reportTemplates.getSelectedDimensionsText());
+        Assert.assertEquals(metricName, reportTemplates.getSelectedMetricsText());
     }
 
     @When("User saves the new template")
@@ -417,7 +417,7 @@ public class LifeSteps {
     public void verify_new_template_is_saved_and_displayed_in_the_template_list() {
         assert reportTemplates.reportTemplateSuccess().contains("Template created successfully");
         reportTemplates.searchCreatedReportTemplate(templateNameRandom);
-        Assert.assertEquals(templateNameRandom, reportTemplates.verifyCreatedReportTemplate(templateNameRandom));
+        Assert.assertEquals(templateNameRandom, reportTemplates.getCreatedReportTemplateText(templateNameRandom));
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
@@ -477,7 +477,7 @@ public class LifeSteps {
 
     @When("Targeting panel is opened on Tactic Settings tab")
     public void user_navigates_to_targeting_panel() {
-        pmp.verifyTacticSettingsText();
+        pmp.getTacticSettingsText();
         pmp.addNewTargetingRule();
     }
 
@@ -505,7 +505,7 @@ public class LifeSteps {
 
     @Then("Deals should be assigned")
     public void deals_are_assigned() {
-        pmp.verifyTacticIsSaved();
+        pmp.getTacticIsSavedText();
     }
 
     @Then("User selects Smart List")
@@ -528,7 +528,7 @@ public class LifeSteps {
 
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
-        Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
+        Assert.assertEquals("Glynase", npiSmartList.getDrugText());
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
@@ -544,8 +544,8 @@ public class LifeSteps {
 
     @Then("Verify list is targeted in the tactic successfully")
     public void verify_list_is_targeted_in_the_tactic_successfully() {
-        tacticSettings.verifyNPIRule();
-        Assert.assertTrue(tacticSettings.verifyNPIRule().contains("NPI"));
+        tacticSettings.getNPIRuleText();
+        Assert.assertTrue(tacticSettings.getNPIRuleText().contains("NPI"));
     }
 
     @Then("User saves the targeting")
@@ -577,8 +577,8 @@ public class LifeSteps {
 
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-        Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
-        Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
+        Assert.assertEquals(campaignNameRandom, reportTemplates.getAutopopulatedCampaignText(campaignNameRandom));
+        Assert.assertEquals(lineItemNameRandom, reportTemplates.getAutopopulatedLineitemText(lineItemNameRandom));
         reportTemplates.runReport();
     }
 
@@ -597,14 +597,14 @@ public class LifeSteps {
         navigation.clickSubMenu();
         navigation.clickMenuAngle();
         navigation.clickReportTemplate();
-        Assert.assertTrue("Report headers match expected values!", reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath));
+        Assert.assertTrue("Report headers match expected values!", reportTemplates.checkColumnsOfReport(templateNameRandom, filePath));
     }
 
     /*Roshani Sherkar - 18-06-2025
      * Campaign Dashbaord Features Start*/
     @And("Verify Campaign Dashboard is displayed with title {string}")
     public void verifyCampaignDashboardIsDisplayedWithTitle(String title) {
-        Assert.assertEquals(title, campaignDashboard.verifyCampaignDashbaord(title));
+        Assert.assertEquals(title, campaignDashboard.getCampaignDashbaordText(title));
     }
 
     @When("User enters {string} and click Search button")
@@ -615,7 +615,7 @@ public class LifeSteps {
 
     @Then("Verify Campaigns, line items, tactics names matching the {string} should display on Dashboard table")
     public void verifyCampaignsLineItemsTacticsNamesMatchingTheShouldDisplayOnDashboardTable(String campaignID) {
-        Assert.assertEquals(campaignID, campaignDashboard.verifyCampaignDetails(campaignID));
+        Assert.assertEquals(campaignID, campaignDashboard.getCampaignDetailsText(campaignID));
     }
 
     @When("User add and save comments to Campaign, Line Items and Tactics")
@@ -632,10 +632,10 @@ public class LifeSteps {
 
     @Then("Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(String colour) {
-        List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
+        List<String> backgroundImage = campaignDashboard.getCommentIconColor();
         Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
         List<String> expectedComments = normalize(Collections.singletonList(keyValues.toString()));
-        List<String> actualComments = normalize(Collections.singletonList(String.valueOf(campaignDashboard.verifyCommentIconText())));
+        List<String> actualComments = normalize(Collections.singletonList(String.valueOf(campaignDashboard.getCommentIconText())));
         Assert.assertEquals(expectedComments, actualComments);
     }
 
@@ -646,7 +646,7 @@ public class LifeSteps {
 
     @Then("Verify that Line Items and Tactics reflect the correct enabled or disabled state")
     public void verifyLineItemsAndTacticsAreEnabledDisabledAccordingly() {
-        Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.verifyLineTacticToggleStatus());
+        Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.isLineTacticToggleChanged());
     }
 
     @When("User clicks Campaign {string}, Line Item and Tactic")
@@ -656,7 +656,7 @@ public class LifeSteps {
 
     @Then("Verify user should navigate to Campaign, Line Item and Tactic")
     public void verifyUserShouldNavigateToRespectivePanel() {
-        Assert.assertTrue("Navigated to each panel successfully", campaignDashboard.verifyPanelTitleText());
+        Assert.assertTrue("Navigated to each panel successfully", campaignDashboard.isPanelTitleTextCorrect());
     }
 
     @When("User clicks Menu option and selects column names")
@@ -682,7 +682,7 @@ public class LifeSteps {
 
     @Then("Dashboard columns should be hidden and shown accordingly")
     public void dashboardColumnsShouldBeHiddenAndShownAccordingly() {
-        Assert.assertTrue("Columns are hidden and shown successfully", campaignDashboard.verifyColumnsCount());
+        Assert.assertTrue("Columns are hidden and shown successfully", campaignDashboard.isColumnsCountCorrect());
     }
 
     @When("Navigate to any Dashboard column, select the filter and apply")
@@ -698,7 +698,7 @@ public class LifeSteps {
 
     @Then("Verify the data should filter as per the selected filter values")
     public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
-        List<String> selectedFilter = campaignDashboard.verifySelectedFilter();
+        List<String> selectedFilter = campaignDashboard.getSelectedFilter();
         List<String> cleanedActual = selectedFilter.stream()
                 .map(s -> s.replaceAll(":$", ""))
                 .toList();
@@ -707,7 +707,7 @@ public class LifeSteps {
 
     @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
     public void filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(String iconColor) {
-        String filterIconColor = campaignDashboard.verifyFilterIcon();
+        String filterIconColor = campaignDashboard.getFilterIconText();
         Assert.assertEquals(iconColor, filterIconColor);
     }
 
@@ -718,7 +718,7 @@ public class LifeSteps {
 
     @Then("Verify the dashboard results should show only campaigns which are marked as favorite")
     public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
-        int count = campaignDashboard.verifyCampaignMarkedFavorite();
+        int count = campaignDashboard.getCampaignMarkedFavorite();
         String message = " ";
         if (count == 0) {
             message = "No campaigns matching filtering criteria found";
@@ -735,7 +735,7 @@ public class LifeSteps {
 
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
-        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.verifyHideFinishedCampaignList());
+        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.isHideFinishedCampaignList());
     }
 
     @When("User clicks Active Flights, Today and Yesterday filter option type")
@@ -783,7 +783,7 @@ public class LifeSteps {
 
     @Then("User should navigate to respective Tactic Setting tab")
     public void userShouldNavigateToRespectiveTacticSettingTab() {
-        pmp.verifyTacticSettingsText();
+        pmp.getTacticSettingsText();
     }
 
     @When("User add new targeting rule for Rule Type {string}")
@@ -794,7 +794,7 @@ public class LifeSteps {
 
     @Then("user should navigate to PMP Deals Panel")
     public void userShouldNavigateToPMPDealsPanel() {
-        Assert.assertEquals("All Deals ", pmp.verifyPMPDealsPanel());
+        Assert.assertEquals("All Deals ", pmp.getPMPDealsPanelText());
     }
 
     @When("User clicks {string} Deals Tab")
@@ -804,7 +804,7 @@ public class LifeSteps {
 
     @Then("User should see Add New Deal button, filters such as Exchange, Search")
     public void userShouldSeeButtonFiltersSuchAsExchangeAdvertiser() {
-        Assert.assertTrue("Button and Filters are not available", pmp.verifyPrivateDealsFilterPanel());
+        Assert.assertTrue("Button and Filters are not available", pmp.isPrivateDealsFilterPanelVisible());
     }
 
     @When("User tries to save the list without entering any details, an error message should be displayed")
@@ -891,12 +891,12 @@ public class LifeSteps {
 
     @Then("Selected Deals should appear in Applied Deals panel")
     public void selectedDealsShouldAppearInAppliedDealsPanel() {
-        Assert.assertTrue("Unable to assign deals", pmp.verifyAsignedDealsList());
+        Assert.assertTrue("Unable to assign deals", pmp.isAssignedDealsListVisible());
     }
 
     @And("Verify Target Applied Deals Toggle button is available with default value as {string}")
     public void verifyTargetAppliedDealsToggleButtonIsAvailableWithDefaultValueAsON(String toggleButton) {
-        Assert.assertTrue("Default value is " + toggleButton, pmp.verifyTargetAppliedDealsToggle(toggleButton));
+        Assert.assertTrue("Default value is " + toggleButton, pmp.isTargetAppliedDealsToggleEnabled(toggleButton));
     }
 
     @When("User clicks on OK button")
@@ -906,12 +906,12 @@ public class LifeSteps {
 
     @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button {string}")
     public void dealDetailsShouldAppearOnTacticSettingsTab(String toggleButton) {
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom, toggleButton));
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.isAssignedDealsOnTactic(dealNameRandom, toggleButton));
     }
 
     @And("Verify Delete icon is disabled and error message {string}")
     public void verifyDeleteIconIsDisabledAndOnHoverShowErrorMessage(String errorMessage) {
-        flag = pmp.verifyDeleteIconAndMessage(errorMessage);
+        flag = pmp.isDeleteIconAndMessageVisible(errorMessage);
         Assert.assertEquals("Go to the Curated Markets & Deals section to remove the market.", errorMessage);
     }
 
@@ -935,7 +935,7 @@ public class LifeSteps {
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
     public void verifyBaseBidPriceAndMaxBidPriceFieldsAreEditableWhenDealsAreTargeted(String baseBidPrice, String maxBidPrice) {
-        Assert.assertTrue("Base and Max Bid Price fields are editable", pmp.verifyBaseAndMaxPriceIsEditable(baseBidPrice, maxBidPrice));
+        Assert.assertTrue("Base and Max Bid Price fields are editable", pmp.isBaseAndMaxPriceEditable(baseBidPrice, maxBidPrice));
     }
 
     @When("User clicks Save button from Tactic Setting tab")
@@ -945,7 +945,7 @@ public class LifeSteps {
 
     @Then("Deals should get assigned to the Tactic")
     public void dealsShouldGetAssignedToTheTactic() {
-        Assert.assertEquals("Success!", pmp.verifyTacticIsSaved().trim());
+        Assert.assertEquals("Success!", pmp.getTacticIsSavedText().trim());
     }
 
     /*Roshani Sherkar
@@ -980,7 +980,7 @@ public class LifeSteps {
 
     @Then("Verify New Template button is present above the Search option")
     public void verifyNewTemplateButtonIsPresentAboveTheSearchOption() {
-        Assert.assertTrue("Targeting Button and Search Box are not displayed", targetingTemplate.verifyTargetingButtonAndSearchBox());
+        Assert.assertTrue("Targeting Button and Search Box are not displayed", targetingTemplate.isTargetingButtonAndSearchBoxVisible());
     }
 
     @And("Verify Targeting template section opens by clicking New Template button")
@@ -1004,12 +1004,12 @@ public class LifeSteps {
 
     @And("User tries to save the targeting template with targeting rule {string} and without specifying a template name")
     public void userTriesToSaveTheTargetingTemplateWithTargetingRuleAndWithoutSpecifyingATemplateName(String targetingRule) {
-        Assert.assertEquals("Template Name is required", targetingTemplate.verifyErrorMessageForTemplateName(targetingRule));
+        Assert.assertEquals("Template Name is required", targetingTemplate.getErrorMessageForTemplateNameText(targetingRule));
     }
 
     @And("User tries to save the targeting template with template name {string} without specifying any targeting")
     public void userTriesToSaveTheTargetingTemplateWithTemplateNameWithoutSpecifyingAnyTargeting(String templateName) {
-        Assert.assertEquals("Please select atleast one targeting", targetingTemplate.verifyErrorMessageForTargetingRules(templateName));
+        Assert.assertEquals("Please select atleast one targeting", targetingTemplate.getErrorMessageForTargetingRulesText(templateName));
     }
 
     @And("User clicks on Show Expression and verifies the query is displayed for the {string}")
@@ -1043,12 +1043,12 @@ public class LifeSteps {
     @And("User selects the Attributes List and uploads the file {string}")
     public void userSelectsTheAttributesListAndUploadsTheFile(String attributesFile) {
         npiAttributesList.uploadAttributesFile(attributesFile);
-        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded");
+        assert npiAttributesList.getFileUploadSuccessText().contains("Successfully uploaded");
     }
 
     @Then("Verify file {string} is uploaded successfully")
     public void verifyFileIsUploadedSuccessfully(String attributesFile) {
-        assert npiAttributesList.verifyFileUploadSuccess().contains("Successfully uploaded Excel file : " + attributesFile);
+        assert npiAttributesList.getFileUploadSuccessText().contains("Successfully uploaded Excel file : " + attributesFile);
     }
 
     @And("User selects the {string} column and clicks on Next")
@@ -1147,7 +1147,7 @@ public class LifeSteps {
 
     @Then("Verify Creative Library page is displayed")
     public void verifyCreativeLibraryPageIsDisplayed() {
-        Assert.assertEquals("Creatives", createCreatives.verifyCreativeLibraryPageTitle());
+        Assert.assertEquals("Creatives", createCreatives.getCreativeLibraryPageTitleText());
     }
 
     @And("Check Activity buttons {string} and verify following filters are available and working")
@@ -1155,10 +1155,10 @@ public class LifeSteps {
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(buttonType);
-        Assert.assertTrue("Activity " + buttonType + " button is not clicked", createCreatives.verifyArchiveUnarchiveButtonsPresent(buttonType));
+        Assert.assertTrue("Activity " + buttonType + " button is not clicked", createCreatives.isArchiveUnarchiveButtonsPresent(buttonType));
         Assert.assertTrue("Archive/Urachive buttons are not working", createCreatives.clickArchiveUnarchiveButtons());
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
-            flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
+            flag = createCreatives.checkFilterOptions(entry.getKey(), entry.getValue());
         }
     }
 
@@ -1166,7 +1166,7 @@ public class LifeSteps {
     @And("Verify the following sort options are available and working")
     public void verifyTheFollowingSortOptionsAreAvailableAndWorking(DataTable sortOptions) {
         List<String> sortOptionsList = sortOptions.asList(String.class);
-        Assert.assertTrue("Sort is not working", createCreatives.verifySortOptions(sortOptionsList));
+        Assert.assertTrue("Sort is not working", createCreatives.checkSortOptions(sortOptionsList));
     }
 
     @And("Verify Search Box is available and working")
@@ -1209,7 +1209,7 @@ public class LifeSteps {
     @Then("Verify the newly created creative is displayed in the Creative Library page")
     public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPage() {
         for (String name : nameList) {
-            Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.verifyCreativesInLibrary(name));
+            Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.isCreativeInLibrary(name));
         }
     }
 
@@ -1243,13 +1243,13 @@ public class LifeSteps {
 
     @And("Verify if user navigates to the Auto-Imported List page")
     public void verifyIfUserNavigatesToTheAutoImportedListPage() {
-        Assert.assertEquals("Setup Import", npiAutoImportedList.verifyIfAutoImportPage());
+        Assert.assertEquals("Setup Import", npiAutoImportedList.getIfAutoImportPageText());
     }
 
     @Then("User tries to save the Auto-Imported list without entering any details, an error message should be displayed")
     public void userTriesToSaveTheAutoImportedListWithoutEnteringAnyDetailsAnErrorMessageShouldBeDisplayed() {
         npiAutoImportedList.clickSetupImportButton();
-        Assert.assertEquals("Advertiser is required", npiAutoImportedList.verifyErrorMessage());
+        Assert.assertEquals("Advertiser is required", npiAutoImportedList.getErrorMessage());
     }
 
     @When("User enters the Auto-Imported list details as {string} {string}")
@@ -1333,7 +1333,7 @@ public class LifeSteps {
     @And("Verify Reload Now button is available and enabled")
     public void verifyReloadNowButtonIsAvailableAndEnabled() {
         npiAutoImportedList.verifyIfImportSettingButtonIsVisible();
-        Assert.assertTrue("Reload Now Button is not available", npiAutoImportedList.verifyReloadNowButton());
+        Assert.assertTrue("Reload Now Button is not available", npiAutoImportedList.isReloadNowButtonVisible());
     }
 
     @When("User clicks on Reload Now button")
@@ -1343,7 +1343,7 @@ public class LifeSteps {
 
     @Then("Verify the file is reloaded successfully")
     public void verifyTheFileIsReloadedSuccessfully() {
-        Assert.assertEquals("File is reloaded", npiAutoImportedList.verifyIfFileIsReloaded());
+        Assert.assertEquals("File is reloaded", npiAutoImportedList.getIfFileIsReloadedText());
     }
 
     /*Roshani Sherkar
@@ -1357,23 +1357,23 @@ public class LifeSteps {
 
     @And("Verify that the search option is present on the {string} tab")
     public void verifyThatTheSearchOptionIsPresentOnTheTab(String listName) {
-        Assert.assertEquals("Tab is not opened", listName.trim(), sharedList.verifyIfListPageIsOpen(listName.trim()));
-        Assert.assertTrue("Search Box is not available", sharedList.verifyIfSearchBoxIsPresent());
+        Assert.assertEquals("Tab is not opened", listName.trim(), sharedList.getIfListPageIsOpenText(listName.trim()));
+        Assert.assertTrue("Search Box is not available", sharedList.isSearchBoxIsPresent());
     }
 
     @And("Verify that the sub-tabs {string} on the left navigation panel are available and {string} is selected by default")
     public void verifyThatTheSubTabsOnTheLeftNavigationPanelAreAvailable(String subTabs, String defaultTabName) {
         List<String> subTabsList = CommonUtils.convertStringToList(subTabs);
         for (String tab : subTabsList) {
-            Assert.assertTrue(tab + " Tab is not present", sharedList.verifySubTabs(tab));
+            Assert.assertTrue(tab + " Tab is not present", sharedList.isSubTabs(tab));
         }
-        Assert.assertTrue("Both tab is not selected by default", sharedList.verifyDefaultSubTab(defaultTabName));
+        Assert.assertTrue("Both tab is not selected by default", sharedList.isDefaultSubTab(defaultTabName));
     }
 
     @And("Verify that when the {string} tab is selected, only {string} lists are visible in the panel")
     public void verifyThatWhenTheTabIsSelectedListsAreVisibleInThePanel(String tabName, String listName) {
         sharedList.clickSubTab(tabName);
-        Assert.assertTrue(tabName + " Tab list is not available", sharedList.verifyListIsAvailable(listName));
+        Assert.assertTrue(tabName + " Tab list is not available", sharedList.isListIsAvailable(listName));
     }
 
     @And("User selects the {string} radio button from create new list page")
@@ -1383,7 +1383,7 @@ public class LifeSteps {
 
     @Then("Verify that the Create New List screen is displayed")
     public void verifyThatTheCreateListScreenIsDisplayed() {
-        Assert.assertTrue("", sharedList.verifyNewListPage());
+        Assert.assertTrue("", sharedList.isNewListPage());
     }
 
     @And("Verify that an error message is displayed when no listname {string} or {string} names are specified")
@@ -1418,9 +1418,9 @@ public class LifeSteps {
     public void verifyThatWheNamesAreSpecifiedManuallyTheOptionToUploadAFileDisappears(String listType) {
         keyValues.clear();
         keyValues = new ArrayList<>(CommonUtils.convertStringToList(listType));
-        Assert.assertTrue("Upload section is not available", sharedList.verifyUploadSectionIsVisibleBeforeListInput());
+        Assert.assertTrue("Upload section is not available", sharedList.isUploadSectionIsVisibleBeforeListInput());
         sharedList.enterDomainNames(keyValues);
-        Assert.assertTrue("Upload section is available", sharedList.verifyUploadSectionIsVisibleAfterListInput());
+        Assert.assertTrue("Upload section is available", sharedList.isUploadSectionIsVisibleAfterListInput());
     }
 
     @And("Verify that the user is able to create a {string} list by specifying names manually")
@@ -1516,9 +1516,9 @@ public class LifeSteps {
         metricName = listName + "_" + CommonUtils.timeStampCalculation();
         npiName = metricName;
         sharedList.enterListName(metricName);
-        Assert.assertTrue("Text area is not available", sharedList.verifyTextAreaIsVisibleBeforeFileUpload());
+        Assert.assertTrue("Text area is not available", sharedList.isTextAreaIsVisibleBeforeFileUpload());
         sharedList.uploadDomainFile(fileName);
-        Assert.assertTrue("Text area is available", sharedList.verifyTextAreaIsVisibleAfterFileUpload());
+        Assert.assertTrue("Text area is available", sharedList.isTextAreaIsVisibleAfterFileUpload());
     }
 
     @And("Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file {string} is uploaded")
@@ -1561,7 +1561,7 @@ public class LifeSteps {
     @And("Verify that the user is able to edit an existing list by uploading same file {string} again and verify the changes")
     public void verifyThatTheUserIsAbleToEditAnExistingNameListByUploadingSameFileAgainAndVerifyTheChanges(String fileName) {
         sharedList.uploadDomainFile(fileName);
-        Assert.assertTrue("Different filename is displayed", sharedList.verifyIfDuplicateFileDialogIsDisplayed(fileName));
+        Assert.assertTrue("Different filename is displayed", sharedList.isDuplicateFileDialogIsDisplayed(fileName));
         sharedList.clickReplaceButton();
     }
 
@@ -1650,7 +1650,7 @@ public class LifeSteps {
 
     @Then("Verify that the {string} rule is added to the tactic and retrieve the count of selected lists")
     public void verifyThatTheNPIRuleIsAddedToTheTacticAndRetrieveTheCountOfSelectedLists(String ruleType) {
-        Assert.assertTrue("Unable to add Rule", tacticSettings.verifyIfRuleIsAdded().contains(ruleType));
+        Assert.assertTrue("Unable to add Rule", tacticSettings.getIfRuleIsAddedText().contains(ruleType));
         String text = tacticSettings.fetchSelectedListCountFromTactic();
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(itemCount)));
     }
@@ -1676,10 +1676,10 @@ public class LifeSteps {
 
     @Then("Verify the Create New Pixel panel and types of Pixel")
     public void verifyCreateNewPixelPanelAndTypesOfPixel() {
-        Assert.assertEquals("CREATE NEW PIXEL", pixels.verifyCreateNewPixelLabel().toUpperCase());
-        Assert.assertEquals("RETARGETING PIXEL", pixels.verifyRetargetingPixel().toUpperCase());
-        Assert.assertEquals("SMART PIXEL", pixels.verifySmartPixel().toUpperCase());
-        Assert.assertEquals("CONVERSION PIXEL", pixels.verifyConversionPixel().toUpperCase());
+        Assert.assertEquals("CREATE NEW PIXEL", pixels.getCreateNewPixelLabel().toUpperCase());
+        Assert.assertEquals("RETARGETING PIXEL", pixels.getRetargetingPixelText().toUpperCase());
+        Assert.assertEquals("SMART PIXEL", pixels.getSmartPixelText().toUpperCase());
+        Assert.assertEquals("CONVERSION PIXEL", pixels.getConversionPixelText().toUpperCase());
     }
 
     @And("User selects the {string} type")
@@ -1716,17 +1716,17 @@ public class LifeSteps {
 
     @Then("Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifyPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
-        assert pixels.verifySaveSuccess().contains("Success!");
+        assert pixels.getSaveSuccessText().contains("Success!");
         pixels.searchSavedPixel(newPixelName);
-        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
+        Assert.assertEquals(newPixelName, pixels.getCreatedPixelText(newPixelName));
     }
 
     @Then("Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
-        assert pixels.verifySaveSuccess().contains("Success!");
+        assert pixels.getSaveSuccessText().contains("Success!");
         newPixelName = smartPixel.getPixelName();
         pixels.searchSavedPixel(newPixelName);
-        Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
+        Assert.assertEquals(newPixelName, pixels.getCreatedPixelText(newPixelName));
     }
 
     @When("User selects {string} as rule type and selects the created pixel")
@@ -1736,14 +1736,14 @@ public class LifeSteps {
 
     @Then("Verify the selected targeting rule {string}")
     public void verifyTheSelectedTargetingRule(String ruleType) {
-        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
-        Assert.assertEquals(newPixelName, tacticSettings.verifyRuleOption());
+        Assert.assertEquals(ruleType, tacticSettings.getRuleTypeText());
+        Assert.assertEquals(newPixelName, tacticSettings.getRuleOptionText());
     }
 
     @Then("Verify the selected targeting rule {string} for Smart list")
     public void verifyTheSelectedTargetingRuleForSmartList(String ruleType) {
-        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
-        Assert.assertEquals(npiName, tacticSettings.verifyRuleOption());
+        Assert.assertEquals(ruleType, tacticSettings.getRuleTypeText());
+        Assert.assertEquals(npiName, tacticSettings.getRuleOptionText());
     }
 
     @And("User enters the Smart NPI list details as {string} {string} and selects the created Smart Pixel")
@@ -1759,7 +1759,7 @@ public class LifeSteps {
 
     @Then("Verify the selected Smart Pixel")
     public void verifyTheSelectedSmartPixel() {
-        Assert.assertEquals(newPixelName, npiSmartList.verifySelectedSmartPixel());
+        Assert.assertEquals(newPixelName, npiSmartList.getSelectedSmartPixelText());
     }
 
     @And("User selects {string} as rule type and selects the created Smart list")
@@ -2258,7 +2258,7 @@ public class LifeSteps {
 
     @And("Verify that {string} and {string} options are disabled until a Line Item is selected")
     public void verifyThatLifetimeAndFlightsOptionsAreDisabledUntilALineItemIsSelected(String lifeTime, String flights) {
-        List<String> disabledButtons = runReportPanel.verifyButtonsDisabledBeforeLineItemSelection();
+        List<String> disabledButtons = runReportPanel.getButtonsDisabledBeforeLineItemSelection();
         Assert.assertTrue("Expected disabled button missing: " + lifeTime, disabledButtons.contains(lifeTime));
         Assert.assertTrue("Expected disabled button missing: " + flights, disabledButtons.contains(flights));
     }
@@ -2276,7 +2276,7 @@ public class LifeSteps {
 
     @And("Verify that {string} and {string} options are enabled")
     public void verifyThatLifetimeAndFlightsOptionsAreEnabled(String lifeTime, String flights) {
-        List<String> enabledButtons = runReportPanel.verifyButtonsEnabledAfterLineItemSelection();
+        List<String> enabledButtons = runReportPanel.getButtonsEnabledAfterLineItemSelection();
         Assert.assertTrue("Expected " + lifeTime + " button to be enabled", enabledButtons.contains("Lifetime"));
         Assert.assertTrue("Expected " + flights + " button to be enabled", enabledButtons.contains("Flights"));
     }
@@ -2436,7 +2436,7 @@ public class LifeSteps {
 
     @And("Verify Delivery field has two methods - {string} and {string}")
     public void verifyDeliveryFieldHasTwoMethodsAnd(String email, String customDestination) {
-        List<String> methodNames = scheduleReport.verifyDeliveryMethods();
+        List<String> methodNames = scheduleReport.getDeliveryMethods();
         Assert.assertTrue("Methods are not available", methodNames.contains(email) && methodNames.contains(customDestination));
     }
 
@@ -2684,15 +2684,15 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Pixels page")
     public void verifyTabsDisplayedOnPixelsPage() {
-        Assert.assertEquals("RETARGETING", pixels.verifyRetargetingTab().toUpperCase());
-        Assert.assertEquals("SMART", pixels.verifySmartTab().toUpperCase());
-        Assert.assertEquals("CONVERSION", pixels.verifyConversionTab().toUpperCase());
+        Assert.assertEquals("RETARGETING", pixels.getRetargetingTabText().toUpperCase());
+        Assert.assertEquals("SMART", pixels.getSmartTabText().toUpperCase());
+        Assert.assertEquals("CONVERSION", pixels.getConversionTabText().toUpperCase());
     }
 
     @Then("Verify the Advertiser dropdown and search box are displayed on the Pixels page")
     public void verifyAdvertiserDropdownAndSearchBoxDisplayed() {
-        Assert.assertTrue("Advertiser Dropdown is not visible", pixels.verifyAdvertiserDropdown());
-        Assert.assertTrue("Search Box is not visible", pixels.verifySearchBox());
+        Assert.assertTrue("Advertiser Dropdown is not visible", pixels.isAdvertiserDropdownVisible());
+        Assert.assertTrue("Search Box is not visible", pixels.isSearchBoxVisible());
     }
 
     @When("User tries to save the Retargeting pixel without entering any details, an error message should be displayed")
@@ -2725,12 +2725,12 @@ public class LifeSteps {
     @Then("Verify the {string} gets updated successfully")
     public void verifyPixelUpdated(String pixelType) {
         if (pixelType.equals("Retargeting Pixel") || pixelType.equals("Conversion Pixel")) {
-            Assert.assertEquals("PIXEL UPDATED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
+            Assert.assertEquals("PIXEL UPDATED SUCCESSFULLY", pixels.getUpdateSuccessText().toUpperCase());
         } else if (pixelType.equals("Smart Pixel")) {
-            Assert.assertEquals("SAVED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
+            Assert.assertEquals("SAVED SUCCESSFULLY", pixels.getUpdateSuccessText().toUpperCase());
         }
         pixels.searchSavedPixel(pixelNameEdited);
-        Assert.assertEquals(pixelNameEdited, pixels.verifyCreatedPixel(pixelNameEdited));
+        Assert.assertEquals(pixelNameEdited, pixels.getCreatedPixelText(pixelNameEdited));
     }
 
     @When("User removes the created pixel")
@@ -2770,8 +2770,8 @@ public class LifeSteps {
 
     @Then("Verify the selected {string} and Smart Pixel")
     public void verifySelectedAdvertiserAndSmartPixel(String advertiser) {
-        Assert.assertEquals(advertiser, npiSmartList.verifySelectedAdvertiser());
-        Assert.assertEquals(newPixelName, npiSmartList.verifySelectedSmartPixel());
+        Assert.assertEquals(advertiser, npiSmartList.getSelectedAdvertiserText());
+        Assert.assertEquals(newPixelName, npiSmartList.getSelectedSmartPixelText());
         npiSmartList.clickLifeCheckbox();
     }
 
@@ -2785,19 +2785,19 @@ public class LifeSteps {
     @Then("Verify the selected Smart List should be reflected in the Associated Smartlists tab")
     public void verifySmartListReflectedInAssociatedTab() {
         smartPixel.clickAssociatedSmartListsTab();
-        Assert.assertEquals(npiName, smartPixel.verifyAssociatedSmartList(npiName));
+        Assert.assertEquals(npiName, smartPixel.getAssociatedSmartListText(npiName));
     }
 
     @And("User navigates to the Pixel Codes tab")
     public void userNavigatesToPixelCodesTab() {
         smartPixel.clickPixelCodesTab();
-        Assert.assertTrue(smartPixel.verifyPixelCodesTabIsSelected());
+        Assert.assertTrue(smartPixel.isPixelCodesTabSelected());
     }
 
     @Then("Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it")
     public void verifyUserCannotDeactivateSmartPixelWithAssociatedSmartList() {
         smartPixel.clickDeactivatePixelIcon();
-        Assert.assertEquals("PIXEL CAN'T BE DEACTIVATED", smartPixel.verifyDeactivateError().toUpperCase());
+        Assert.assertEquals("PIXEL CAN'T BE DEACTIVATED", smartPixel.getDeactivateError().toUpperCase());
     }
 
     @When("User deactivates the created pixel")
@@ -2830,14 +2830,14 @@ public class LifeSteps {
     @Then("Verify the removed pixel should not be displayed in the pixel list")
     public void verifyRemovedPixelNotDisplayedInPixelList() {
         pixels.searchSavedPixel(pixelNameEdited);
-        String noResultText = pixels.verifyDeletedPixel().toUpperCase();
+        String noResultText = pixels.getDeletedPixelText().toUpperCase();
         Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
     }
 
     @Then("Verify the deactivated pixel should not be displayed in the pixel list")
     public void verifyDeactivatedPixelNotDisplayedInPixelList() {
         pixels.searchSavedPixel(pixelNameEdited);
-        String noResultText = pixels.verifyDeletedPixel().toUpperCase();
+        String noResultText = pixels.getDeletedPixelText().toUpperCase();
         Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
     }
 
@@ -2856,8 +2856,8 @@ public class LifeSteps {
 
     @Then("Verify the selected targeting rule {string} and rule option")
     public void verifyTheSelectedTargetingRuleAndRuleOption(String ruleType) {
-        Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
-        Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
+        Assert.assertEquals(ruleType, tacticSettings.getRuleTypeText());
+        Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.getRuleOptionText());
     }
 
     // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
@@ -2880,12 +2880,12 @@ public class LifeSteps {
     @And("Verify Line Item page has below tabs")
     public void verifyLineItemPageHasBelowTabs(DataTable dataTable) {
         List<String> tabNames = dataTable.asList(String.class);
-        Assert.assertTrue("Line Item tabs are not available", lineItemDetails.verifyLineItemTabs(tabNames));
+        Assert.assertTrue("Line Item tabs are not available", lineItemDetails.checkLineItemTabs(tabNames));
     }
 
     @And("Verify status of line item is Incomplete when there are no tactics under the line item")
     public void verifyStatusOfLineItemIsIncompleteWhenThereAreNoTacticsUnderTheLineItem() {
-        Assert.assertEquals("Incomplete", lineItemDetails.verifyLineItemStatus());
+        Assert.assertEquals("Incomplete", lineItemDetails.getLineItemStatusText());
         Assert.assertEquals("Campaign is enabled . Tactic is Incomplete.", lineItemDetails.fetchIncompleteStatusToolTip());
     }
 
@@ -3096,7 +3096,7 @@ public class LifeSteps {
             String lineItemName = "Copy of " + name;
             itemList.add(lineItemName);
             Assert.assertEquals("Line Item copied successfully.", lineItemDetails.createACopyOfLineItem(lineItemName));
-            Assert.assertTrue("Copied Line Item is not available", lineItemDetails.verifyLineItemAvailable(lineItemName));
+            Assert.assertTrue("Copied Line Item is not available", lineItemDetails.isLineItemAvailable(lineItemName));
             lineItemDetails.navigateToLineItemDetails(lineItemName);
             lineItemDetails.clickDetailsTab();
             copiedLineItemDetails = lineItemDetails.fetchLineItemDetails();
@@ -3125,7 +3125,7 @@ public class LifeSteps {
         navigation.clickGeneratedReport();
         runReportPanel.clickSearchButton();
         for(String name : nameList) {
-            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
+            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.checkReportGeneratedFromLineItemPage(name));
         }
     }
 

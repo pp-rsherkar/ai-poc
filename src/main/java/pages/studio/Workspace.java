@@ -127,7 +127,7 @@ public class Workspace {
         WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public String verifyPublishedNpi() {
+    public String getPublishedNpiText() {
         return PUBLISHED_NPI.innerText();
     }
 
@@ -139,7 +139,7 @@ public class Workspace {
         WEBHOOK_ICON.click();
     }
 
-    public String verifyWebhookToggleButton() {
+    public String getWebhookToggleButtonText() {
         WEBHOOK_PANEL_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         if (WEBHOOK_TOGGLE_BUTTON.getAttribute("class").contains("Mui-disabled")) {
             return "Disabled";
@@ -169,7 +169,7 @@ public class Workspace {
         URL_TEXTAREA.fill(url);
     }
 
-    public String verifyMacrosAppendedToURL() {
+    public String getMacrosAppendedToURLText() {
         return URL_TEXTAREA.inputValue();
     }
 
@@ -198,13 +198,13 @@ public class Workspace {
         WEBHOOK_SAVE_BUTTON.click();
     }
 
-    public String verifyWebhookCreationIsSuccess() {
+    public String getWebhookCreationIsSuccessText() {
         String alert = WEBHOOK_SUCCESS_ALERT.innerText().trim();
         WEBHOOK_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return alert;
     }
 
-    public String verifyInlineErrorMessage(String invalidData) {
+    public String getInlineErrorMessage(String invalidData) {
         String error = " ";
         URL_TEXTAREA.fill(invalidData);
         if (BODY_TEXTAREA.isVisible()) BODY_TEXTAREA.fill(invalidData);
@@ -218,7 +218,7 @@ public class Workspace {
         return error.trim();
     }
 
-    public String verifyErrorMsgWhenAPIFailed(List<String> mediaTypeList) throws IOException {
+    public String getErrorMsgWhenAPIFailedText(List<String> mediaTypeList) throws IOException {
         String alert = " ";
         URL_TEXTAREA.fill(mediaTypeList.get(0));
         if (BODY_TEXTAREA.isVisible()) {
@@ -231,7 +231,7 @@ public class Workspace {
         return alert;
     }
 
-    public String verifyMacrosAppendedToBody() {
+    public String getMacrosAppendedToBodyText() {
         return BODY_TEXTAREA.inputValue();
     }
 
@@ -290,11 +290,11 @@ public class Workspace {
         PUBLISHED_NPI.click();
     }
 
-    public boolean verifyListTypeAfterPublished(String listType) {
+    public boolean checkListTypeAfterPublished(String listType) {
         return WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]",listType)).isVisible();
     }
 
-    public String verifyNPIsEngagingText() {
+    public String getNPIsEngagingText() {
         return NPI_ENGAGING_TEXT.innerText().trim();
     }
 }

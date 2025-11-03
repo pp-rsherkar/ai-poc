@@ -45,7 +45,7 @@ public class RetargetingPixel {
         SAVE_BUTTON.click();
     }
 
-    public String verifySaveSuccess() {
+    public String getSaveSuccessText() {
         String successMessage = SAVE_SUCCESS.innerText();
         SAVE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
         return successMessage;

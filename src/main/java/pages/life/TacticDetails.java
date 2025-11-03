@@ -61,7 +61,7 @@ public class TacticDetails {
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
     }
 
-    public String verifyTacticDetailsText() {
+    public String getTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
     }
 
@@ -119,7 +119,7 @@ public class TacticDetails {
 
     private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {
         campaigns.createCampaign();
-        campaigns.verifyCampaignText();
+        campaigns.getCampaignText();
         campaigns.selectAdvertiser(advertiser);
         campaigns.enterCampaignName(campaignName);
         campaigns.setCampaignType(campaignType);
@@ -168,7 +168,7 @@ public class TacticDetails {
         String templateName = lineItemType + "_Template_" + CommonUtils.timeStampCalculation();
         TACTIC_SETTINGS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
-        tacticSettings.verifyTacticSettingsText();
+        tacticSettings.getTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
         SAVE_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         TEMPLATE_NAME_TEXT.fill(templateName);
@@ -190,6 +190,6 @@ public class TacticDetails {
         tacticCreatives.assignCreatives(CreativeName);
         saveTacticDetails();
         waitUtility.waitUntilSpinnerHidden();
-        return tacticCreatives.verifyCreativeAssigned(CreativeName);
+        return tacticCreatives.isCreativeAssigned(CreativeName);
     }
 }

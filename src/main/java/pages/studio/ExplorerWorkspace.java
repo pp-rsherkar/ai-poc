@@ -159,12 +159,12 @@ public class ExplorerWorkspace {
         FILTER_CLOSE_BUTTON.click();
     }
 
-    public List<String> verifyAllSelectedFilters() {
+    public List<String> getAllSelectedFilters() {
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return APPLIED_FILTER.allInnerTexts();
     }
 
-    public List<String> verifyAllSelectedOptions() {
+    public List<String> getAllSelectedOptions() {
         return APPLIED_FILTER_OPTION.allInnerTexts();
     }
 
@@ -245,7 +245,7 @@ public class ExplorerWorkspace {
         }
     }
 
-    public boolean verifyCrossFiltersDisplayed() {
+    public boolean areCrossFiltersDisplayed() {
         return DASHBOARD_FILTER_TITLE.isVisible() && MERGED_TEXT.isVisible() && DASHBOARD_FILTERS.count() > 0;
     }
 

@@ -146,7 +146,7 @@ public class LineItemDetails {
         this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
     }
 
-    public String verifyLineItemText() {
+    public String getLineItemText() {
         return VERIFY_LINE_ITEM_PAGE.innerText();
     }
 
@@ -194,7 +194,7 @@ public class LineItemDetails {
         NEW_LINE_ITEM.click();
     }
 
-    public String verifyLineItemPanelName() {
+    public String getLineItemPanelNameText() {
         return LINE_ITEM_PANEL_NAME.innerText();
     }
 
@@ -202,7 +202,7 @@ public class LineItemDetails {
         ADD_FLIGHT_BUTTON.click();
     }
 
-    public boolean verifyLineItemTabs(List<String> tabNames) {
+    public boolean checkLineItemTabs(List<String> tabNames) {
         Set<String> actualTabs = new HashSet<>();
         for (int i = 0; i < TAB_NAMES.count(); i++) {
             actualTabs.add(TAB_NAMES.nth(i).innerText().trim().toLowerCase());
@@ -215,7 +215,7 @@ public class LineItemDetails {
         return true;
     }
 
-    public String verifyLineItemStatus() {
+    public String getLineItemStatusText() {
         String status = " ";
         if(TACTIC_ITEM_DETAILS.count() == 0){
             status = LINE_ITEM_STATUS.innerText();
@@ -400,7 +400,7 @@ public class LineItemDetails {
         return text;
     }
 
-    public boolean verifyLineItemAvailable(String lineItemName){
+    public boolean isLineItemAvailable(String lineItemName){
         Locator lineItem = page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName));
         lineItem.scrollIntoViewIfNeeded();
         return lineItem.isVisible();

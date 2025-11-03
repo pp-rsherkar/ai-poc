@@ -231,7 +231,7 @@ public class NPISmartList {
         SELECT_DRUG.click();
     }
 
-    public String verifyDrug() {
+    public String getDrugText() {
         return VERIFY_DRUG.innerText();
     }
 
@@ -244,12 +244,12 @@ public class NPISmartList {
         PULSEPOINT_ICON.click();
     }
 
-    public String verifySelectedSmartPixel() {
+    public String getSelectedSmartPixelText() {
         waitUtility.waitUntilSpinnerHidden();
         return SMART_PIXEL.innerText().trim();
     }
 
-    public String verifySelectedAdvertiser() {
+    public String getSelectedAdvertiserText() {
         waitUtility.waitUntilSpinnerHidden();
         return ADVERTISER_NAME.innerText().trim();
     }
