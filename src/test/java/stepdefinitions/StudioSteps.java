@@ -140,11 +140,6 @@ public class StudioSteps {
         workspaceCreation.createStudioWorkspace();
     }
 
-    @When("User clicks on Create New Workspace For Expansion")
-    public void user_clicks_on_create_new_workspace_for_expansion() {
-        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
-        workspaceCreation.createWorkspaceExpansion(flag);
-    }
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
@@ -298,8 +293,8 @@ public class StudioSteps {
     public void verify_list_is_published() {
         workspace.clickPublish();
         Assert.assertEquals("Workspace saved successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
-        //workspace.waitTillWorkspaceAlertHide();
-        //workspace.clickFlyOrPageButton();
+        workspace.waitTillWorkspaceAlertHide();
+        workspace.clickFlyOrPageButton();
         Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
     }
 

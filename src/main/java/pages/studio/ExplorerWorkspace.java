@@ -116,7 +116,7 @@ public class ExplorerWorkspace {
                 if (filter.equals("Specialty"))
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
-                    Locator locator = WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
+                    Locator locator = WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
                     TAB_PANEL_SEARCH.fill(option.trim());
                     locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     page.waitForTimeout(1000);
