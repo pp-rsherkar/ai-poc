@@ -96,15 +96,15 @@ public class ReportTemplates {
         REPORT_TEMPLATE_LINK.click();
     }
 
-    public String verifyTemplatesTab() {
+    public String getTemplatesTabText() {
         return VERIFY_TEMPLATES_TAB.innerText();
     }
 
-    public String verifyGeneratedReportsTab() {
+    public String getGeneratedReportsTabText() {
         return VERIFY_GENERATED_REPORTS_TAB.innerText();
     }
 
-    public String verifySchedulingTab() {
+    public String getSchedulingTabText() {
         return VERIFY_SCHEDULING_TAB.innerText();
     }
 
@@ -112,11 +112,11 @@ public class ReportTemplates {
         NEW_TEMPLATE.click();
     }
 
-    public String verifyDimensionsTab() {
+    public String getDimensionsTabText() {
         return REPORT_DIMENSIONS.innerText();
     }
 
-    public String verifyMetricsTab() {
+    public String getMetricsTabText() {
         return REPORT_METRICS.innerText();
     }
 
@@ -146,11 +146,11 @@ public class ReportTemplates {
         SEARCH_METRIC.clear();
     }
 
-    public String verifySelectedDimensions() {
+    public String getSelectedDimensionsText() {
         return VERIFY_DIMENSION.innerText();
     }
 
-    public String verifySelectedMetrics() {
+    public String getSelectedMetricsText() {
         return VERIFY_METRIC.innerText();
     }
 
@@ -170,7 +170,7 @@ public class ReportTemplates {
         CLICK_TEMPLATE_SEARCH.click(new Locator.ClickOptions().setForce(true));
     }
 
-    public String verifyCreatedReportTemplate(String createdReportTemplate) {
+    public String getCreatedReportTemplateText(String createdReportTemplate) {
         String templateNameXpath = String.format("//div[contains(text(),'%s')]", createdReportTemplate);
         waitUtility.waitForElementVisible(templateNameXpath);
         return page.locator(templateNameXpath).innerText();
@@ -194,11 +194,11 @@ public class ReportTemplates {
         SELECT_LIFETIME.click();
     }
 
-    public String verifyAutopopulatedCampaign(String createdCampaign) {
+    public String getAutopopulatedCampaignText(String createdCampaign) {
         return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdCampaign)).innerText();
     }
 
-    public String verifyAutopopulatedLineitem(String createdLineitem) {
+    public String getAutopopulatedLineitemText(String createdLineitem) {
         return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdLineitem)).innerText();
     }
 
@@ -225,7 +225,7 @@ public class ReportTemplates {
         return filePath;
     }
 
-    public boolean verifyColumnsOfReport(String templateNameRandom, String filePath) throws Exception {
+    public boolean checkColumnsOfReport(String templateNameRandom, String filePath) throws Exception {
         waitUtility.waitForLocatorVisible(TEMPLATE_PAGINATION);
         waitUtility.waitUntilPreLoaderHidden();
         SEARCH_TEMPLATE.fill(templateNameRandom);
@@ -253,7 +253,7 @@ public class ReportTemplates {
         CANCEL_BUTTON.click();
     }
 
-    public boolean verifyReportGeneratedFromLineItemPage(String reportName){
+    public boolean checkReportGeneratedFromLineItemPage(String reportName){
         Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]",reportName));
         return xpath.isVisible();
     }

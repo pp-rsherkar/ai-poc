@@ -59,19 +59,19 @@ public class Pixels {
         ADD_PIXEL_BUTTON.click();
     }
 
-    public String verifyCreateNewPixelLabel() {
+    public String getCreateNewPixelLabel() {
         return CREATE_NEW_PIXEL_LABEL.innerText();
     }
 
-    public String verifyRetargetingPixel() {
+    public String getRetargetingPixelText() {
         return RETARGETING_PIXEL.innerText();
     }
 
-    public String verifySmartPixel() {
+    public String getSmartPixelText() {
         return SMART_PIXEL.innerText();
     }
 
-    public String verifyConversionPixel() {
+    public String getConversionPixelText() {
         return CONVERSION_PIXEL.innerText();
     }
 
@@ -95,7 +95,7 @@ public class Pixels {
         SAVE_BUTTON.click();
     }
 
-    public String verifySaveSuccess() {
+    public String getSaveSuccessText() {
         String successMessage = SAVE_SUCCESS.first().innerText();
         waitUtility.waitForLocatorDetached(SAVE_SUCCESS.first());
         return successMessage;
@@ -107,35 +107,35 @@ public class Pixels {
         SEARCH_BOX.press("Enter");
     }
 
-    public String verifyCreatedPixel(String pixelName) {
+    public String getCreatedPixelText(String pixelName) {
         String createdPixelXpath = String.format("//div[contains(text(),'%s')]", pixelName);
         waitUtility.waitForLocatorVisible(page.locator(createdPixelXpath));
         return page.locator(createdPixelXpath).innerText();
     }
 
-    public String verifyRetargetingTab() {
+    public String getRetargetingTabText() {
         return RETARGETING_TAB.innerText();
     }
 
-    public String verifySmartTab() {
+    public String getSmartTabText() {
         return SMART_TAB.innerText();
     }
 
-    public String verifyConversionTab() {
+    public String getConversionTabText() {
         return CONVERSION_TAB.innerText();
     }
 
-    public Boolean verifyAdvertiserDropdown() {
+    public Boolean isAdvertiserDropdownVisible() {
         waitUtility.waitForLocatorVisible(ADVERTISER_DROPDOWN);
         return ADVERTISER_DROPDOWN.isVisible();
     }
 
-    public Boolean verifySearchBox() {
+    public Boolean isSearchBoxVisible() {
         waitUtility.waitForLocatorVisible(SEARCH_BOX);
         return SEARCH_BOX.isVisible();
     }
 
-    public String verifyUpdateSuccess() {
+    public String getUpdateSuccessText() {
         String updateSuccessMessage = UPDATE_SUCCESS.innerText();
         waitUtility.waitForLocatorDetached(UPDATE_SUCCESS);
         return updateSuccessMessage;
@@ -165,7 +165,7 @@ public class Pixels {
         page.locator(pixelNameXpath).click();
     }
 
-    public String verifyDeletedPixel() {
+    public String getDeletedPixelText() {
         waitUtility.waitForLocatorVisible(NO_RESULTS_FOUND);
         return NO_RESULTS_FOUND.innerText();
     }

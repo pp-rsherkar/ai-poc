@@ -62,26 +62,26 @@ public class SharedList {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public String verifyIfListPageIsOpen(String listName) {
+    public String getIfListPageIsOpenText(String listName) {
         String text = " ";
         Locator locator = page.locator(String.format("//a[contains(text(),'%s')]", listName));
         if (locator.getAttribute("class").contains("active")) text = fetchLocatorText(locator);
         return text;
     }
 
-    public boolean verifyIfSearchBoxIsPresent() {
+    public boolean isSearchBoxIsPresent() {
         waitUtility.waitUntilSpinnerHidden();
         return SEARCH_KEYWORD.isVisible();
     }
 
-    public boolean verifySubTabs(String tabName) {
+    public boolean isSubTabs(String tabName) {
         for(int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
             if (SUB_TABS_BUTTON.nth(i).innerText().trim().equalsIgnoreCase(tabName)) return true;
         }
         return false;
     }
 
-    public boolean verifyDefaultSubTab(String tabName) {
+    public boolean isDefaultSubTab(String tabName) {
         for (int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
             if (SUB_TABS_BUTTON.nth(i).innerText().trim().equalsIgnoreCase(tabName) && SUB_TABS_BUTTON.nth(i).getAttribute("class").contains("active"))
                 return true;
@@ -94,7 +94,7 @@ public class SharedList {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public boolean verifyListIsAvailable(String tabName) {
+    public boolean isListIsAvailable(String tabName) {
         int failed = 0;
         Locator locator = page.locator(String.format("//span/img[contains(translate(@src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '%s')]", tabName.toLowerCase(Locale.ROOT)));
         List<String> srcList = (List<String>) locator.evaluateAll("elements => elements.map(el => el.getAttribute('src'))");
@@ -106,7 +106,7 @@ public class SharedList {
         return failed == 0;
     }
 
-    public boolean verifyNewListPage() {
+    public boolean isNewListPage() {
         return LIST_CREATION_PAGE_TITLE.isVisible();
     }
 
@@ -135,7 +135,7 @@ public class SharedList {
         return text;
     }
 
-    public boolean verifyUploadSectionIsVisibleBeforeListInput() {
+    public boolean isUploadSectionIsVisibleBeforeListInput() {
         return UPLOAD_SECTION.first().isVisible();
     }
 
@@ -148,7 +148,7 @@ public class SharedList {
         }
     }
 
-    public boolean verifyUploadSectionIsVisibleAfterListInput() {
+    public boolean isUploadSectionIsVisibleAfterListInput() {
         return !UPLOAD_SECTION.isVisible();
     }
 
@@ -210,11 +210,11 @@ public class SharedList {
         LIST_NAME.fill(listName);
     }
 
-    public boolean verifyTextAreaIsVisibleBeforeFileUpload() {
+    public boolean isTextAreaIsVisibleBeforeFileUpload() {
         return LIST_TEXTAREA.isVisible();
     }
 
-    public boolean verifyTextAreaIsVisibleAfterFileUpload() {
+    public boolean isTextAreaIsVisibleAfterFileUpload() {
         return !LIST_TEXTAREA.isVisible();
     }
 
@@ -241,7 +241,7 @@ public class SharedList {
         return locator.isVisible();
     }
 
-    public boolean verifyIfDuplicateFileDialogIsDisplayed(String fileName) {
+    public boolean isDuplicateFileDialogIsDisplayed(String fileName) {
         DUPLICATE_FILE_DIALOG.isVisible();
         String text = fetchLocatorText(DUPLICATE_FILE_DIALOG_TEXT);
         return text.contains(fileName);

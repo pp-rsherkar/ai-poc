@@ -416,7 +416,7 @@ public class RunReportPanel {
         return TEXT_QUALIFIER_CHECKBOX.getAttribute("class").contains("checked");
     }
 
-    public List<String> verifyButtonsDisabledBeforeLineItemSelection() {
+    public List<String> getButtonsDisabledBeforeLineItemSelection() {
         List<String> disabledButtons = new ArrayList<>();
         for (int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++) {
             if (REPORT_PERIOD_BUTTONS.nth(i).isDisabled())
@@ -441,7 +441,7 @@ public class RunReportPanel {
         page.keyboard().press("Escape");
     }
 
-    public List<String> verifyButtonsEnabledAfterLineItemSelection() {
+    public List<String> getButtonsEnabledAfterLineItemSelection() {
         List<String> enabledButtons = new ArrayList<>();
         for (int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++) {
             String disabledAttribute = REPORT_PERIOD_BUTTONS.nth(i).getAttribute("disabled");

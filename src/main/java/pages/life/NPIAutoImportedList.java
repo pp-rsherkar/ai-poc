@@ -60,12 +60,12 @@ public class NPIAutoImportedList {
         this.NPI_ATTRIBUTE_GRIDVIEW = page.locator("//div[contains(@class,'npiattrsGridView')]");
     }
 
-    public String verifyIfAutoImportPage() {
+    public String getIfAutoImportPageText() {
         SETUP_IMPORT_BUTTON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return SETUP_IMPORT_BUTTON.innerText().trim();
     }
 
-    public String verifyErrorMessage() {
+    public String getErrorMessage() {
         String errorMessage = ERROR_MESSAGE.innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorHidden(ERROR_MESSAGE);
@@ -131,7 +131,7 @@ public class NPIAutoImportedList {
         return String.valueOf(count);
     }
 
-    public boolean verifyReloadNowButton() {
+    public boolean isReloadNowButtonVisible() {
         return RELOAD_NOW_BUTTON.isVisible();
     }
 
@@ -140,7 +140,7 @@ public class NPIAutoImportedList {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public String verifyIfFileIsReloaded() {
+    public String getIfFileIsReloadedText() {
         String text = RELOAD_SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(RELOAD_SUCCESS_ALERT);
         waitUtility.waitUntilSpinnerHidden();

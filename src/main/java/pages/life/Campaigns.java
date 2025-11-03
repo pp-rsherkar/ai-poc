@@ -48,7 +48,7 @@ public class Campaigns {
         return this.page.title();
     }
 
-    public String verifyCampaignText() {
+    public String getCampaignText() {
         return VERIFY_CAMPAIGN_PAGE.innerText();
     }
 

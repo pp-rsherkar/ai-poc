@@ -65,7 +65,7 @@ public class TargetingTemplate {
         this.SUCCESS_ALERT = page.locator("//div[contains(text(),'Target template created successfully')]");
     }
 
-    public boolean verifyTargetingButtonAndSearchBox() {
+    public boolean isTargetingButtonAndSearchBoxVisible() {
         return NEW_TEMPLATE_BUTTON.isVisible() && SEARCH_BOX.isVisible();
     }
 
@@ -144,7 +144,7 @@ public class TargetingTemplate {
         return flag;
     }
 
-    public String verifyErrorMessageForTemplateName(String targetingRule) {
+    public String getErrorMessageForTemplateNameText(String targetingRule) {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
@@ -156,7 +156,7 @@ public class TargetingTemplate {
         return alert;
     }
 
-    public String verifyErrorMessageForTargetingRules(String templateName) {
+    public String getErrorMessageForTargetingRulesText(String templateName) {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();

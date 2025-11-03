@@ -86,12 +86,12 @@ public class WorkspaceCreation {
         return this.page.title();
     }
 
-    public String verifyHCPExplorer() {
+    public String getHCPExplorerText() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return HCP_EXPLORER.innerText();
     }
 
-    public String verifyHCPAudienceExpansion() {
+    public String getHCPAudienceExpansionText() {
         return HCP_EXPANSION.innerText();
     }
 
@@ -99,7 +99,7 @@ public class WorkspaceCreation {
         HCP_EXPLORER.click();
     }
 
-    public String verifyWorkspaceCreation() {
+    public String getWorkspaceCreationText() {
         String text = WORKSPACE_CREATED_ALERT.innerText();
         waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
         return text;
@@ -203,7 +203,7 @@ public class WorkspaceCreation {
         }
     }
 
-    public String verifyDeletePopUp() {
+    public String getDeletePopUpText() {
         waitUtility.waitForLocatorHidden(DEPENDENT_WORKSPACE_TEXT);
        return REMOVAL_CONFIRMATION_TEXT.innerText();
     }
@@ -272,7 +272,7 @@ public class WorkspaceCreation {
         REMOVE_WORKSPACE_BUTTON.click();
     }
 
-    public String verifyDeleteWorkspaceErrorMessage() {
+    public String getDeleteWorkspaceErrorMessage() {
         waitUtility.waitForLocatorVisible(DELETE_WORKSPACE_ERROR_ALERT_BOX);
         waitUtility.waitForLocatorVisible(DELETE_WORKSPACE_ERROR_TEXT);
         String errorText = DELETE_WORKSPACE_ERROR_TEXT.innerText();

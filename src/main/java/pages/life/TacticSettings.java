@@ -104,7 +104,7 @@ public class TacticSettings {
         this.KEYWORD_SELECTED_LIST = page.locator("//span[contains(text(),'Custom Keyword')]/following-sibling::span[contains(text(),'Selected Only')]");
     }
 
-    public String verifyTacticSettingsText() {
+    public String getTacticSettingsText() {
         return VERIFY_TACTIC_SETTINGS_PAGE.innerText();
     }
 
@@ -453,7 +453,7 @@ public class TacticSettings {
         RULE_TYPE_CLOSE.click();
     }
 
-    public String verifyNPIRule() {
+    public String getNPIRuleText() {
         return VERIFY_NPI.innerText();
     }
 
@@ -524,7 +524,7 @@ public class TacticSettings {
         return Integer.parseInt(text.replaceAll("^.*\\((\\d+)\\).*$", "$1").trim());
     }
 
-    public String verifyIfRuleIsAdded() {
+    public String getIfRuleIsAddedText() {
         return FETCH_TARGET_RULE_TYPES.innerText().trim();
     }
 
@@ -552,11 +552,11 @@ public class TacticSettings {
         return MATCHED_NPI_COUNT.innerText().trim();
     }
 
-    public String verifyRuleType() {
+    public String getRuleTypeText() {
         return FETCH_TARGET_RULE_TYPES.innerText().replaceAll("\\s*\\(\\d+\\)", "").trim();
     }
 
-    public String verifyRuleOption() {
+    public String getRuleOptionText() {
         return FETCH_TARGET_RULE_OPTIONS.innerText();
     }
 }

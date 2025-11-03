@@ -130,14 +130,14 @@ public class CampaignDashboard {
         this.PRE_LOADER = page.locator("//div[@class='preloader']");
     }
 
-    public String verifyCampaignDashbaord(String text) {
+    public String getCampaignDashbaordText(String text) {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitUntilPreLoaderHidden();
         page.waitForCondition(() -> CAMPAIGN_PAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
         return CAMPAIGN_PAGE_TEXT.innerText();
     }
 
-    public String verifyCampaignDetails(String campaignID) {
+    public String getCampaignDetailsText(String campaignID) {
         return page.locator(String.format("//span[contains(text(),'%s')]", campaignID)).innerText();
     }
 
@@ -179,7 +179,7 @@ public class CampaignDashboard {
         return successAlertText;
     }
 
-    public List<String> verifyCommentIconColor() {
+    public List<String> getCommentIconColor() {
         List<String> backgroundImages = new ArrayList<>();
         for (int i = 0; i < COMMENT_ICON.count(); i++) {
             String bgImage = COMMENT_ICON.nth(i).evaluate("element => getComputedStyle(element).backgroundImage").toString();
@@ -188,7 +188,7 @@ public class CampaignDashboard {
         return backgroundImages;
     }
 
-    public List<String> verifyCommentIconText() {
+    public List<String> getCommentIconText() {
         List<String> returnValues = new ArrayList<>();
         for (int i = 0; i < COMMENT_ICON.count(); i++) {
             COMMENT_ICON.nth(i).hover();
@@ -213,7 +213,7 @@ public class CampaignDashboard {
         tacticClassAfterClick = TACTIC_TOGGLE_BUTTON.getAttribute("class");
     }
 
-    public boolean verifyLineTacticToggleStatus() {
+    public boolean isLineTacticToggleChanged() {
         return !Objects.equals(lineItemClassBeforeClick, lineItemClassAfterClick) && !Objects.equals(tacticClassBeforeClick, tacticClassAfterClick);
     }
 
@@ -237,7 +237,7 @@ public class CampaignDashboard {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public boolean verifyPanelTitleText() {
+    public boolean isPanelTitleTextCorrect() {
         return flag1 && flag2 && flag3;
     }
 
@@ -267,7 +267,7 @@ public class CampaignDashboard {
         if (DASHBOARD_MENU_COLUMNS.count() > 0) flag2 = true;
     }
 
-    public boolean verifyColumnsCount() {
+    public boolean isColumnsCountCorrect() {
         return flag1 && flag2;
     }
 
@@ -282,7 +282,7 @@ public class CampaignDashboard {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public List<String> verifySelectedFilter() {
+    public List<String> getSelectedFilter() {
         List<String> selectedFilter = new ArrayList<>();
         for (int i = 0; i < SELECTED_FILTER.count(); i++) {
             selectedFilter.add(SELECTED_FILTER.nth(i).innerText());
@@ -290,7 +290,7 @@ public class CampaignDashboard {
         return selectedFilter;
     }
 
-    public String verifyFilterIcon() {
+    public String getFilterIconText() {
         String bgImage = FILTER_ICON.evaluate("element => getComputedStyle(element).backgroundImage").toString();
         RESET_FILTER_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
@@ -304,7 +304,7 @@ public class CampaignDashboard {
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
-    public int verifyCampaignMarkedFavorite() {
+    public int getCampaignMarkedFavorite() {
         int flag = 0;
         if (!FAVORITE_CAMPAIGN_LIST.first().isVisible()) {
             return flag;
@@ -321,7 +321,7 @@ public class CampaignDashboard {
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
-    public boolean verifyHideFinishedCampaignList() {
+    public boolean isHideFinishedCampaignList() {
         for (int i = 0; i < HIDE_FINISHED_LIST.count(); i++) {
             String text = HIDE_FINISHED_LIST.nth(i).innerText().trim();
             if (text.equalsIgnoreCase("FINISHED")) {
@@ -432,13 +432,13 @@ public class CampaignDashboard {
         SUB_TITLE_AFTER_CAMPAIGN_SEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public String verifyCreatedCampaign(String createdCampaign) {
+    public String getCreatedCampaignText(String createdCampaign) {
         String campaignNameXpath = String.format("//span[contains(text(),'%s')]", createdCampaign);
         waitUtility.waitForLocatorVisible(page.locator(campaignNameXpath).first());
         return page.locator(campaignNameXpath).first().innerText();
     }
 
-    public String verifyCreatedLineItem(String lineItemNameRandom) {
+    public String getCreatedLineItemText(String lineItemNameRandom) {
         String lineItemNameXpath = String.format("//span[contains(text(),'%s')]", lineItemNameRandom);
         waitUtility.waitForElementVisible(lineItemNameXpath);
         return page.locator(lineItemNameXpath).innerText();
@@ -451,7 +451,7 @@ public class CampaignDashboard {
         }
     }
 
-    public String verifyCreatedTactic() {
+    public String getCreatedTacticText() {
         page.waitForLoadState();
         return VERIFY_CREATED_TACTIC.innerText();
     }

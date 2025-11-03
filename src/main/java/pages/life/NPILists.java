@@ -57,7 +57,7 @@ public class NPILists {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public String verifyNPIListText() {
+    public String getNPIListText() {
         waitUtility.waitForLocatorVisible(CREATE_NPI_LIST);
         return CREATE_NPI_LIST.innerText();
     }
@@ -115,7 +115,7 @@ public class NPILists {
         AUTO_IMPORTED_LIST.click();
     }
 
-    public List<String> verifyStudioFilterLabel() {
+    public List<String> getStudioFilterLabel() {
         waitUtility.waitForLocatorVisible(STUDIO_FILTER_LABEL.first());
         return STUDIO_FILTER_LABEL.allInnerTexts();
     }

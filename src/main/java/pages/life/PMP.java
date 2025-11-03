@@ -137,7 +137,7 @@ public class PMP {
         page.waitForLoadState(LoadState.LOAD);
     }
 
-    public String verifyPMPDealsPanel() {
+    public String getPMPDealsPanelText() {
         waitUtility.waitForLocatorVisible(ALL_DEALS_PANEL);
         return ALL_DEALS_PANEL.innerText();
     }
@@ -151,11 +151,11 @@ public class PMP {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
     }
 
-    public boolean verifyAsignedDealsList() {
+    public boolean isAssignedDealsListVisible() {
         return APPLIED_DEAL_PANEL_LIST.count() > 0;
     }
 
-    public boolean verifyTargetAppliedDealsToggle(String toggleButton) {
+    public boolean isTargetAppliedDealsToggleEnabled(String toggleButton) {
         if (toggleButton.equalsIgnoreCase("ON")) {
             flag1 = TARGET_APPLIED_DEAL_TOGGLE.getAttribute("class").contains("checked");
         } else if (toggleButton.equalsIgnoreCase("OFF")) {
@@ -174,7 +174,7 @@ public class PMP {
         waitUtility.waitForLocatorVisible(TACTIC_SETTING_TAB);
     }
 
-    public boolean verifyAssignedDealsOnTactic(String dealName, String toggleButton) {
+    public boolean isAssignedDealsOnTactic(String dealName, String toggleButton) {
         if (MORE_OPTION.isVisible()) MORE_OPTION.click();
         if (toggleButton.equalsIgnoreCase("ON")) {
             flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
@@ -190,7 +190,7 @@ public class PMP {
         SAVE_TACTIC_SETTINGS.click();
     }
 
-    public String verifyTacticIsSaved() {
+    public String getTacticIsSavedText() {
         return SUCCESS_ALERT.innerText();
     }
 
@@ -204,7 +204,7 @@ public class PMP {
         if (!page.locator(assignedDealXpath).isVisible()) page.locator(assignDealXpath).click();
     }
 
-    public boolean verifyPrivateDealsFilterPanel() {
+    public boolean isPrivateDealsFilterPanelVisible() {
         if (ADD_NEW_DEAL_BUTTON.isVisible() && ADD_NEW_DEAL_BUTTON.isEnabled()) flag1 = true;
         if (DEAL_SEARCH_FILTER.isVisible() && EXCHANGE_SEARCH_FILTER.isVisible()) flag2 = true;
         return flag1 && flag2;
@@ -256,7 +256,7 @@ public class PMP {
         return text;
     }
 
-    public boolean verifyDeleteIconAndMessage(String message) {
+    public boolean isDeleteIconAndMessageVisible(String message) {
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
                 flag1 = true;
@@ -281,7 +281,7 @@ public class PMP {
             PERCENTAGE_TEXT.fill(pricingStrategyType.get(0));
         }
         saveTacticSettings();
-        verifyTacticIsSaved();
+        getTacticIsSavedText();
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
     }
 
@@ -293,10 +293,10 @@ public class PMP {
         addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, advertiser, dealPriceType, price);
         selectDealFromListAndAssign(dealName);
         saveDealsAssigned();
-        return verifyAssignedDealsOnTactic(dealName, toggleButton);
+        return isAssignedDealsOnTactic(dealName, toggleButton);
     }
 
-    public boolean verifyBaseAndMaxPriceIsEditable(String baseBidPrice, String maxBidPrice) {
+    public boolean isBaseAndMaxPriceEditable(String baseBidPrice, String maxBidPrice) {
         BASE_BID_PRICE.scrollIntoViewIfNeeded();
         if (BASE_BID_PRICE.isEditable() && MAX_BID_PRICE.isEditable()) {
             BASE_BID_PRICE.fill(baseBidPrice);
@@ -307,7 +307,7 @@ public class PMP {
     }
 
     /* Premium Hub is no longer displayed on the Deals panel. This function is being retained in case the functionality is added again in the future. */
-    public boolean verifyAllPremiumHubsOnMarketPlace(List<String> premiumHubsList) {
+    public boolean areAllPremiumHubsOnMarketPlace(List<String> premiumHubsList) {
         waitUtility.waitForLocatorVisible(ALL_LIFE_MARKET_PLACE);
         for (int i = 0; i < ALL_PREMIUM_PUBS.count(); i++) {
             String classAttr = ALL_PREMIUM_PUBS.nth(i).getAttribute("class");

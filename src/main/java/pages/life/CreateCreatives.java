@@ -121,7 +121,7 @@ public class CreateCreatives {
         this.CLICK_THROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
     }
 
-    public String verifyCreativeLibraryPageTitle() {
+    public String getCreativeLibraryPageTitleText() {
         waitUtility.waitUntilPreLoaderHidden();
         return CREATIVE_PAGE_TITLE.innerText().trim();
     }
@@ -141,7 +141,7 @@ public class CreateCreatives {
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
 
-    public boolean verifyArchiveUnarchiveButtonsPresent(String buttonType) {
+    public boolean isArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
         if (buttonType.contains("Active") && ARCHIVED_BUTTON.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
@@ -168,7 +168,7 @@ public class CreateCreatives {
         return flag;
     }
 
-    public boolean verifyFilterOptions(String key, List<String> values) {
+    public boolean checkFilterOptions(String key, List<String> values) {
         boolean flag = false;
         switch (key) {
             case "Advertiser":
@@ -225,7 +225,7 @@ public class CreateCreatives {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public boolean verifySortOptions(List<String> sortOptionsList) {
+    public boolean checkSortOptions(List<String> sortOptionsList) {
         boolean flag = false;
         for (String sortOption : sortOptionsList) {
             SORT_DROPDOWN.click();
@@ -366,7 +366,7 @@ public class CreateCreatives {
         return creativesList;
     }
 
-    public boolean verifyCreativesInLibrary(String name) {
+    public boolean isCreativeInLibrary(String name) {
         searchCreative(name);
         Locator locator = page.locator(String.format("//div[@title='%s']", name));
         return locator.innerText().equalsIgnoreCase(name);
