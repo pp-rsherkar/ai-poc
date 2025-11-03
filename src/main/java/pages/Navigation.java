@@ -78,7 +78,7 @@ public class Navigation {
         this.page.getByText(iconName.trim()).click();
     }
 
-    public String verifyProfilePage() {
+    public String getProfilePageTitle() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }

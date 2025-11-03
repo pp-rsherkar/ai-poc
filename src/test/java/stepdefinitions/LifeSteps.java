@@ -103,7 +103,7 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
+        Assert.assertEquals("Admin Dashboard", navigation.getProfilePageTitle());
 
         switch (application) {
             case "Life":
@@ -1799,7 +1799,7 @@ public class LifeSteps {
     @And("Verify the availability of below Creative Type options and the Default option is {string}")
     public void verifyTheAvailabilityOfBelowCreativeTypeOptionsAndTheDefaultOptionIsDisplay(String defaultOption, DataTable dataTable) {
         List<String> creativeTypeOptions = dataTable.asList(String.class);
-        Assert.assertEquals("All creative type options are available.", bulkCreativeUpload.verifyCreativeTypeOptions(creativeTypeOptions));
+        Assert.assertEquals("All creative type options are available.", bulkCreativeUpload.checkCreativeOptionsAvailability(creativeTypeOptions));
         Assert.assertTrue("Expected 'Display' to be the default selected creative type.",
                 bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
     }
@@ -1869,7 +1869,7 @@ public class LifeSteps {
         bulkCreativeUpload.selectAdvertiser(advertiser);
         List<String> displayCreativeSections = dataTable.asList(String.class);
         for (String section : displayCreativeSections) {
-            boolean flag = bulkCreativeUpload.verifyDisplayCreativeSections(section);
+            boolean flag = bulkCreativeUpload.isDisplayCreativeSectionsVisible(section);
             Assert.assertTrue(section + " section is not available", flag);
         }
     }

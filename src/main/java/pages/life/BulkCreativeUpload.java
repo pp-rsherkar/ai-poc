@@ -121,7 +121,7 @@ public class BulkCreativeUpload {
         return ADVERTISER_DROPDOWN.isVisible();
     }
 
-    public String verifyCreativeTypeOptions(List<String> creativeTypeOptions) {
+    public String checkCreativeOptionsAvailability(List<String> creativeTypeOptions) {
         List<String> missingOptions = new ArrayList<>();
 
         for (String option : creativeTypeOptions) {
@@ -219,7 +219,7 @@ public class BulkCreativeUpload {
         OK_BUTTON.click();
     }
 
-    public boolean verifyDisplayCreativeSections(String section) {
+    public boolean isDisplayCreativeSectionsVisible(String section) {
         Locator locator = page.locator("//h3").locator("text=" + section);
         return locator.isVisible();
     }
