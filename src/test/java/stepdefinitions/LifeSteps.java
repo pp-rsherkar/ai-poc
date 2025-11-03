@@ -1822,6 +1822,7 @@ public class LifeSteps {
     public void userAttemptsToClickThePreviewButtonWithoutSelectingACreativeFile() {
         bulkCreativeUpload.isRemoveFileIconAvailable();
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickUploadButton();
         Assert.assertEquals("Atleast one creative should be selected", bulkCreativeUpload.fetchErrorAlert());
     }
 
@@ -1849,7 +1850,7 @@ public class LifeSteps {
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
         bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
-        bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickUploadButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
         bulkCreativeUpload.updateCreativeName(metricName);
         nameList.clear();
@@ -2008,7 +2009,7 @@ public class LifeSteps {
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
             if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
-            bulkCreativeUpload.clickOKButton();
+            bulkCreativeUpload.clickUploadButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
         }
     }
@@ -2233,7 +2234,7 @@ public class LifeSteps {
 
     @And("Verify that user is able to select Timezone field value {string}")
     public void verifyThatUserIsAbleToSelectTimezoneFieldValue(String timeZone) {
-        Assert.assertTrue("Unable to select time zone", runReportPanel.selectTimeZone(timeZone.trim()));
+        Assert.assertTrue("Unable to select time zone " + timeZone, runReportPanel.selectTimeZone(timeZone.trim()));
         nameList.add(timeZone);
     }
 
@@ -2607,13 +2608,19 @@ public class LifeSteps {
         SimpleDateFormat descFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
         SimpleDateFormat extractedFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         SimpleDateFormat compareFormat = new SimpleDateFormat("MM/dd/yyyy");
-        for (int i = 0; i < flightDescriptions.size(); i++) {
-            String desc = flightDescriptions.get(i).split(":")[1].split("-")[0].trim();
-            desc = desc.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
-            String expected = compareFormat.format(descFormat.parse(desc));
-            String actual = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
-            if (expected.equals(actual))
-                Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expected, actual);
+        for (int i = 0; i < flightDescriptions.size() && (i * 2 + 1) < itemList.size(); i++) {
+            String desc = flightDescriptions.get(i);
+            String[] dateParts = desc.split(":", 2)[1].split("-");
+            String startDate = dateParts[0].trim();
+            String endDate = dateParts[1].trim();
+            startDate = startDate.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            endDate = endDate.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            String actualStart = compareFormat.format(descFormat.parse(startDate));
+            String actualEnd = compareFormat.format(descFormat.parse(endDate));
+            String expectedStart = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
+            String expectedEnd = compareFormat.format(extractedFormat.parse(itemList.get(i * 2 + 1)));
+            Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expectedStart, actualStart);
+            Assert.assertEquals("End date mismatch for Flight #" + (i + 1), expectedEnd, actualEnd);
         }
     }
 

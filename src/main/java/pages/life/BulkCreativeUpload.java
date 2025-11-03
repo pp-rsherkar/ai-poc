@@ -74,7 +74,7 @@ public class BulkCreativeUpload {
         this.APPROVAL_STATUS_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
         this.PREVIEW_BUTTON = page.locator("//button[contains(text(),'Preview')]");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
-        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or " + "contains(@aria-label,'Select Advertiser') or " + "contains(@aria-label,'Landing Page Domain is required') or " + "contains(@aria-label, 'Landing Page Domain is not valid.') or " + "contains(@aria-label,'1 error')]");
+        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or contains(@aria-label,'Select Advertiser') or contains(@aria-label,'Landing Page Domain is required') or contains(@aria-label, 'Landing Page Domain is not valid.') or contains(@aria-label,'1 error')]");
         this.SUCCESS_ALERT = page.locator("//div[contains(text(),'BulkUpload created successfully.')]");
         this.BULK_UPLOAD_HEADER = page.locator("//div[contains(text(),'Bulk Upload')]");
         this.CREATIVE_NAME_FROM_TABLE = page.locator("//tbody//span/input");
@@ -171,21 +171,21 @@ public class BulkCreativeUpload {
     }
 
     public void clickPreviewButton() {
-        PREVIEW_BUTTON.click();
+        if(PREVIEW_BUTTON.isVisible()) PREVIEW_BUTTON.click();
     }
 
     public void clickUploadButton() {
-        if(UPLOAD_BUTTON.isVisible())
-            UPLOAD_BUTTON.click();
+        if(UPLOAD_BUTTON.isVisible()) UPLOAD_BUTTON.click();
     }
 
     public String fetchErrorAlert() {
         if (!ERROR_ALERT.isVisible()) {
             return "";
+        }else {
+            String text = ERROR_ALERT.innerText().trim();
+            waitUtility.waitForLocatorHidden(ERROR_ALERT);
+            return text;
         }
-        String text = ERROR_ALERT.innerText().trim();
-        waitUtility.waitForLocatorHidden(ERROR_ALERT);
-        return text;
     }
 
     public List<String> fetchInlineValidationMessage() {

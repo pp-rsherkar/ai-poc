@@ -99,7 +99,7 @@ public class WorkspaceCreation {
         HCP_EXPLORER.click();
     }
 
-    public String verifyWorkspaceCreation() {
+    public String isWorkspaceCreationAlertDisplayed() {
         String text = WORKSPACE_CREATED_ALERT.innerText();
         waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
         return text;
