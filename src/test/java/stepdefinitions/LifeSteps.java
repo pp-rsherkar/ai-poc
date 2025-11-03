@@ -477,7 +477,7 @@ public class LifeSteps {
 
     @When("Targeting panel is opened on Tactic Settings tab")
     public void user_navigates_to_targeting_panel() {
-        pmp.getTacticSettingsText();
+        pmp.getTacticSettings();
         pmp.addNewTargetingRule();
     }
 
@@ -783,7 +783,7 @@ public class LifeSteps {
 
     @Then("User should navigate to respective Tactic Setting tab")
     public void userShouldNavigateToRespectiveTacticSettingTab() {
-        pmp.getTacticSettingsText();
+        pmp.getTacticSettings();
     }
 
     @When("User add new targeting rule for Rule Type {string}")

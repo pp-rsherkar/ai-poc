@@ -118,7 +118,7 @@ public class PMP {
         TACTIC_SETTING_TAB.click();
     }
 
-    public void verifyTacticSettingsText() {
+    public void getTacticSettings() {
         VERIFY_TACTIC_SETTINGS_PAGE.innerText();
     }
 
