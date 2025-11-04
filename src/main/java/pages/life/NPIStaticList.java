@@ -1,5 +1,6 @@
 package pages.life;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -7,6 +8,9 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class NPIStaticList {
     private final Page page;
@@ -23,6 +27,7 @@ public class NPIStaticList {
     private final Locator DELETE_LIST_ICON;
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
+    private final Locator DOWNLOAD_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPIStaticList(Page page) {
@@ -40,6 +45,7 @@ public class NPIStaticList {
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
+        this.DOWNLOAD_ICON = page.locator("//span[contains(@class,'image download')]");
     }
 
     public void enterListName(String npiListName) {
@@ -100,5 +106,10 @@ public class NPIStaticList {
 
     public String deleteSuccess() {
         return DELETE_SUCCESS.innerText();
+    }
+
+    public Path clickDownloadIcon() throws IOException {
+        Download download = page.waitForDownload(DOWNLOAD_ICON.first()::click);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 }

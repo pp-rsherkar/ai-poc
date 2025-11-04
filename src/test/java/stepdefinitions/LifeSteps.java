@@ -3258,4 +3258,13 @@ public class LifeSteps {
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
+
+    @And("Verify that user is able to download the uploaded {string} list")
+    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String listType) throws IOException {
+        if (listType.equals("NPI")) {
+            Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(npiStaticList.clickDownloadIcon(), "csv"));
+        } else {
+            Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(sharedList.clickDownloadIcon(), "csv"));
+        }
+    }
 }

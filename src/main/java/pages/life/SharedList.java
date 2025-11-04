@@ -32,6 +32,7 @@ public class SharedList {
     private final Locator DUPLICATE_FILE_DIALOG;
     private final Locator DUPLICATE_FILE_DIALOG_TEXT;
     private final Locator REPLACE_BUTTON;
+    private final Locator DOWNLOAD_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SharedList(Page page) {
@@ -54,6 +55,7 @@ public class SharedList {
         this.DUPLICATE_FILE_DIALOG = page.locator(" //div[contains(text(),'Duplicating File Names')]");
         this.DUPLICATE_FILE_DIALOG_TEXT = page.locator(" //div[contains(text(),'Duplicating File Names')]/following-sibling::div[contains(@class,'confirm-modal')]/div");
         this.REPLACE_BUTTON = page.locator("//span[contains(text(),'Replace')]");
+        this.DOWNLOAD_ICON = page.locator("//img[contains(@src,'export.svg')]");
     }
 
     public void clickDomainListFromMenu(String pageName) {
@@ -273,5 +275,10 @@ public class SharedList {
     public void clickListTypeRadioButton(String listType) {
         Locator locator = page.locator(String.format("//label[contains(text(),'%s')]/parent::sui-radio-button", listType));
         locator.click();
+    }
+
+    public Path clickDownloadIcon() throws IOException {
+        Download download = page.waitForDownload(DOWNLOAD_ICON::click);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 }
