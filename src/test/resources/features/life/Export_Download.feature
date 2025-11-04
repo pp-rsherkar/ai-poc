@@ -1,4 +1,4 @@
-Feature: LIFE Regression - Export/Download
+Feature: LIFE Regression - This feature verifies the export/download functionality for various list types created through file uploads
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -51,7 +51,7 @@ Feature: LIFE Regression - Export/Download
       | AppBundle_FileUpload | AppBundleFile1.csv |
 
   @regression
-  Scenario Outline: Verify user is abe to export IP list created by uploading a file
+  Scenario Outline: Verify user is able to export IP list created by uploading a file
     And User navigates to the "IP Address Lists" page
     When User clicks on Create New List
     Then Verify that the Create New List screen is displayed
