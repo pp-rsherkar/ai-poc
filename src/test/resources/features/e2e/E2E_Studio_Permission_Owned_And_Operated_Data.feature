@@ -3,7 +3,6 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
   2. Create a new Workspace associated with that Advertiser
   3. Verify that the "Owned and Operated Data" filter option is present within the Cross-Filter section of the Workspace
 
-
   @e2e
   Scenario Outline: Verify Owned and Operated Data visibility within the Cross-Filter section of the Workspace when permission is "<PERMISSION_FLAG>" in Admin
     Given This scenario will be executed in the "Pre-release" environment as a "User"
