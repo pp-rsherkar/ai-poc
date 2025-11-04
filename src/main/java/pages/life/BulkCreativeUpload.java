@@ -216,7 +216,7 @@ public class BulkCreativeUpload {
     }
 
     public void clickOKButton() {
-        OK_BUTTON.click();
+        if(OK_BUTTON.isVisible()) OK_BUTTON.click();
     }
 
     public boolean verifyDisplayCreativeSections(String section) {
@@ -412,9 +412,11 @@ public class BulkCreativeUpload {
                 if (LANDING_PAGE_DOMAIN.isVisible()) enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
+                clickPreviewButton();
                 clickUploadButton();
                 updateCreativeName(updatedCreativeName);
                 clickOKButton();
+                clickUploadButton();
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
@@ -423,7 +425,9 @@ public class BulkCreativeUpload {
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);
                 if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
+                clickPreviewButton();
                 clickUploadButton();
+                clickOKButton();
                 break;
         }
     }
