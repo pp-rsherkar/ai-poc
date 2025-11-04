@@ -645,12 +645,17 @@ public class StudioSteps {
     }
 
     @And("Verify Owned And Operated section is {string} within the Cross-Filter section of the Workspace")
-    public void verifyOwnedAndOperatedSectionWithinTheCrossFilterSectionOfTheWorkspace(String isVisible) {
-        boolean flag;
-        flag = explorerWorkspace.isOwnedAndOperatedSectionAvailable();
-        if(!flag && isVisible.contains("Absent"))
-            Assert.assertFalse("Owned and Operated Section is not " + isVisible, false);
-        if(flag && isVisible.contains("Present"))
-            Assert.assertTrue("Owned and Operated Section is not " + isVisible, true);
+    public void verifyOwnedAndOperatedSectionWithinTheCrossFilterSectionOfTheWorkspace(String visibilityFlag) {
+        boolean flag = explorerWorkspace.isOwnedAndOperatedSectionAvailable();
+        switch (visibilityFlag.toLowerCase()) {
+            case "present":
+                Assert.assertTrue("Expected 'Owned and Operated' section to be present, but it was absent.", flag);
+                break;
+            case "absent":
+                Assert.assertFalse("Expected 'Owned and Operated' section to be absent, but it was present.", flag);
+                break;
+            default:
+                Assert.fail("Invalid input for visibility: " + visibilityFlag);
+        }
     }
 }
