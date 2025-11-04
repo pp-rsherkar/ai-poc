@@ -229,7 +229,7 @@ public class TacticDetails {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
+    public void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
         lineItemDetails.enterLineItemName(lineItemName);
         lineItemDetails.selectLineItemType(lineItemType);
         lineItemDetails.clickAddFlightButton();
