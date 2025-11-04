@@ -30,6 +30,25 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
+    public final Locator TARGETTING_RULES_ICON;
+    private final Locator NEW_TACTIC_BUTTON;
+    private final Locator SAVED_TACTICS;
+    private final Locator DETAILS_TAB;
+    private final Locator NEW_TACTIC_TABS;
+    private final Locator SAVED_TACTIC_TABS;
+    private final Locator TACTIC_STATUS;
+    private final Locator TACTIC_DETAILS_TAB;
+    private final Locator ADD_CUSTOM_FIELD;
+    private final Locator ADD_CUSTOM_FIELD_INPUT;
+    private final Locator SAVE_CUSTOM_FIELD_BUTTON;
+    private final Locator FIELD_CREATE_SUCCESS;
+    private final Locator CUSTOM_FIELD_TEXT;
+    private final Locator DELETE_BUTTON;
+    private final Locator CONFIRM_DELETE;
+    private final Locator DELETE_SUCCESS;
+    private final Locator CUSTOM_FIELD;
+
+
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -59,9 +78,86 @@ public class TacticDetails {
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
+        this.TARGETTING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.NEW_TACTIC_BUTTON = page.locator("//span[normalize-space(text())='New Tactic']");
+        this.SAVED_TACTICS = page.locator("//div[contains(@class,'tactic-main-details')]");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Detail')]");
+        this.NEW_TACTIC_TABS = page.locator("//a[@disabled='disabled']");
+        this.SAVED_TACTIC_TABS = page.locator("//a[contains(@class,'gaTab')]");
+        this.TACTIC_STATUS = page.locator("//span[contains(@class, 'status-label')]/span");
+        this.TACTIC_DETAILS_TAB = page.locator("//a[normalize-space()='Details']");
+        this.ADD_CUSTOM_FIELD = page.locator("//span[contains(text(),'Add Custom Field')]");
+        this.ADD_CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
+        this.SAVE_CUSTOM_FIELD_BUTTON = page.locator("//button[normalize-space()='Save']");
+        this.FIELD_CREATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
+        this.CUSTOM_FIELD_TEXT = page.locator("//input[contains(@class,'gaName')]");
+        this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]");
+        this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
+        this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
+        this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
+
+    }
+    public void clickNewTactic(){
+        NEW_TACTIC_BUTTON.click();
+    }
+    public List<String> getAllTactics(){
+        return SAVED_TACTICS.allInnerTexts();
+    }
+    public void verifyDetailsTab(){
+        DETAILS_TAB.isVisible();
+        System.out.println(DETAILS_TAB.innerText().trim());
+
+    }
+    public List<String> newTacticTabs(){
+        return NEW_TACTIC_TABS.allInnerTexts();
+    }
+    public void CLICK_FIRST_TACTIC(){
+        SAVED_TACTICS.first().click();
     }
 
+    public List<String> savedTacticTabs(){
+        return SAVED_TACTIC_TABS.allInnerTexts();
+    }
+
+    public String verifyTacticState(){
+        return TACTIC_STATUS.innerText();
+    }
+    public void clickDetailsTab() {
+        TACTIC_DETAILS_TAB.click();
+    }
+    public void addCustomField (String fieldName){
+        ADD_CUSTOM_FIELD.click();
+        ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
+        SAVE_CUSTOM_FIELD_BUTTON.click();
+        waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+        CUSTOM_FIELD_TEXT.last().fill("CUST123");
+        SAVE_TACTIC_DETAILS.click();
+    }
+
+    public String verifyCustomField(String fieldName){
+        Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
+        return customField.innerText().trim();
+
+    }
+
+    public void clickTactic(){
+        //Locator tacticTab = page.locator(String.format("//div[contains(text(),'%s')]", tacticName));
+        Locator tacticTab = page.locator("//div[@class='tactic item-details']").last();
+        tacticTab.click();
+
+    }
+
+    public void deleteCustomField (String customFieldName){
+        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
+        FIELD_OPTIONS.click();
+        DELETE_BUTTON.click();
+        CONFIRM_DELETE.click();
+        DELETE_SUCCESS.isVisible();
+    }
+
+
     public String verifyTacticDetailsText() {
+        waitUtility.waitUntilSpinnerHidden();
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
     }
 
@@ -70,6 +166,11 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
+        SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+    public void saveTactic() {
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();
     }
 
