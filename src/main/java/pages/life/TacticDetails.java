@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class TacticDetails {
+    public final Locator TARGETTING_RULES_ICON;
+    public final Locator TARGETING_RULES_ICON;
     private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -32,7 +34,6 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
-    public final Locator TARGETTING_RULES_ICON;
     private final Locator NEW_TACTIC_BUTTON;
     private final Locator SAVED_TACTICS;
     private final Locator DETAILS_TAB;
@@ -49,14 +50,12 @@ public class TacticDetails {
     private final Locator CONFIRM_DELETE;
     private final Locator DELETE_SUCCESS;
     private final Locator CUSTOM_FIELD;
-    public final Locator TARGETING_RULES_ICON;
     private final Locator THREE_DOT_ICON;
     private final Locator TACTIC_DELETE_BUTTON;
     private final Locator TACTIC_REMOVE_BUTTON;
     private final Locator TACTIC_TOGGLE_CLASS;
     private final Locator EXIT_BULK_MODE;
     private final Locator ENABLE_TACTIC;
-//    private final Locator TACTIC_SELECT;
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
 
@@ -108,47 +107,51 @@ public class TacticDetails {
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
         this.TARGETING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
-        this.THREE_DOT_ICON =  page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
+        this.THREE_DOT_ICON = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
         this.TACTIC_TOGGLE_CLASS = page.locator("(//div[@class='item-list-control-toggle toggle-enabled ng-star-inserted'])[2]");
-        this.ENABLE_TACTIC =page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
-        this.BULK_ACTION =page.locator(".pointer.inlineDiv.iconSprite").first();
-        this.TACTIC_GLOBAL_SEARCH_TEXT =page.getByText("Nothing found...");
-//        this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
-//        this.TACTIC_SELECT = page.locator("//*[contains(text(), 'Targetting29102025')]/ancestor::div[1]//sui-checkbox");
-
+        this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
+        this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
+        this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
     }
-    public void clickNewTactic(){
+
+    public void clickNewTactic() {
         NEW_TACTIC_BUTTON.click();
     }
-    public List<String> getAllTactics(){
+
+    public List<String> getAllTactics() {
         return SAVED_TACTICS.allInnerTexts();
     }
-    public void verifyDetailsTab(){
+
+    public void verifyDetailsTab() {
         DETAILS_TAB.isVisible();
         System.out.println(DETAILS_TAB.innerText().trim());
 
     }
-    public List<String> newTacticTabs(){
+
+    public List<String> newTacticTabs() {
         return NEW_TACTIC_TABS.allInnerTexts();
     }
-    public void CLICK_FIRST_TACTIC(){
+
+    public void CLICK_FIRST_TACTIC() {
         SAVED_TACTICS.first().click();
     }
 
-    public List<String> savedTacticTabs(){
+    public List<String> savedTacticTabs() {
         return SAVED_TACTIC_TABS.allInnerTexts();
     }
 
-    public String verifyTacticState(){
+    public String verifyTacticState() {
         return TACTIC_STATUS.innerText();
     }
+
     public void clickDetailsTab() {
         TACTIC_DETAILS_TAB.click();
     }
-    public void addCustomField (String fieldName){
+
+    public void addCustomField(String fieldName) {
         ADD_CUSTOM_FIELD.click();
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
@@ -157,19 +160,19 @@ public class TacticDetails {
         SAVE_TACTIC_DETAILS.click();
     }
 
-    public String verifyCustomField(String fieldName){
+    public String verifyCustomField(String fieldName) {
         Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
         return customField.innerText().trim();
     }
 
-    public void clickTactic(){
+    public void clickTactic() {
         //Locator tacticTab = page.locator(String.format("//div[contains(text(),'%s')]", tacticName));
         Locator tacticTab = page.locator("//div[@class='tactic item-details']").last();
         tacticTab.click();
 
     }
 
-    public void deleteCustomField (String customFieldName){
+    public void deleteCustomField(String customFieldName) {
         Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
@@ -190,6 +193,7 @@ public class TacticDetails {
         SAVE_TACTIC_DETAILS.click();
         waitUtility.waitUntilSpinnerHidden();
     }
+
     public void saveTactic() {
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();
@@ -298,10 +302,6 @@ public class TacticDetails {
         TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
         return templateName;
     }
-//    public void saveTactic() {
-//        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
-//        SAVE_TACTIC_DETAILS.click();
-//    }
 
     public boolean createTacticWithLineItemsAndAssignCreative(String lineItemType, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, String CreativeName) {
         npiSmartList.clickPulsepointIcon();
@@ -319,15 +319,15 @@ public class TacticDetails {
         return tacticCreatives.verifyCreativeAssigned(CreativeName);
     }
 
-    public void deleteTactic(){
+    public void deleteTactic() {
         THREE_DOT_ICON.click();
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
     }
 
     public void bulkEnableTactics(String tacticName) {
-        BULK_ACTION.click();
         Locator tacticNameXpath = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']/ancestor::div[contains(@class,'tactic-list')]/preceding-sibling::div/sui-checkbox", tacticName));
+        BULK_ACTION.click();
         tacticNameXpath.click();
         ENABLE_TACTIC.click();
         EXIT_BULK_MODE.click();
@@ -344,7 +344,7 @@ public class TacticDetails {
 
     public void globalSearchDeletedTactic(String tacticName) {
         page.locator(".iconSprite").first().click();
-        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill( tacticName);
+        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill(tacticName);
         page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
     }
 

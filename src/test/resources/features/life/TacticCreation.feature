@@ -65,6 +65,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
   @regression
   Scenario Outline: User delete tactic from a line item
+    When User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -73,11 +74,12 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User deletes the tactic "<TACTIC NAME>" and verifies it
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC NAME    |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC NAME     |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72839 |
 
   @regression
   Scenario Outline: Create tactic and enable those tactics through bulk action.
+    When User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -86,5 +88,5 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And User enables tactic "<TACTIC NAME>" through bulk action and verifies the status
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL  | TACTIC NAME    |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email    | Targeting-72838 |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC NAME     |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
