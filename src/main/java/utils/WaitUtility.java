@@ -24,11 +24,11 @@ public class WaitUtility {
     }
 
     public void waitUntilPreLoaderHidden(){
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        PRE_LOADER.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     public void waitUntilPreLoaderHidden(double timeout){
-        PRE_LOADER.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
+        PRE_LOADER.first().waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
     }
 
     public void waitForLocatorVisible(Locator locator){

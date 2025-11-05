@@ -514,5 +514,10 @@ public class RunReportPanel {
     public String fetchFileName() {
         return FILE_NAME_TEXTAREA.inputValue().trim();
     }
+
+    public void clickSearchButton(){
+        SEARCH_BUTTON.click();
+        waitUtility.waitUntilPreLoaderHidden();
+    }
 }
 

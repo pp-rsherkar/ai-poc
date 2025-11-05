@@ -50,6 +50,7 @@ public class Workspace {
     private final Locator IDENTIFIED_NPI_COUNT;
     private final Locator RETROFIT_CHECKBOX;
     private final Locator NPI_ENGAGING_TEXT;
+    private final Locator PUBLISH_LOADER;
     private final Locator HCP_WORKSPACE_FILTER_CHECKBOX;
     private final Locator EXISTING_WORKSPACE;
     private final Locator ADVERTISER_SELECTOR_DROPDOWN;
@@ -93,6 +94,7 @@ public class Workspace {
         this.HCP_WORKSPACE_FILTER_CHECKBOX = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP Explorer"));
         this.EXISTING_WORKSPACE=WORKSPACE_FRAME.locator("//tr[1]/td[1]//span");
         this.ADVERTISER_SELECTOR_DROPDOWN=WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("All Advertisers"));
+        this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
     }
 
     public void studio() {
@@ -101,6 +103,8 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if(PUBLISH_LOADER.isVisible())
+            waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         FLY_PAGE_BUTTON.click();
     }
 
