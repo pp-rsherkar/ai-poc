@@ -672,25 +672,5 @@ public class TacticSettings {
         return VERIFY_TACTIC_NAME.innerText();
     }
 
-    public void addTargettingToTactic(String ruleType) {
-        SEARCH_RULE_TYPE.fill(ruleType);
-        SEARCH_RULE_TYPE.press("Enter");
-        SELECT_RULE_TYPE.click();
-        HOUSEHOLD_IP_TAB.click();
-        SHOW_MORE_BUTTON.click();
-        SELECT_TARGETING.last().click();
-        String selected = TARGETING_OPTIONS.last().innerText();
-        this.SELECTED_TARGET_RULE.add(selected);
-        SHOW_MORE_BUTTON.click();
-        BLOCK_TARGETING.last().click();
-        String blocked = TARGETING_OPTIONS.last().innerText();
-        this.SELECTED_TARGET_RULE.add(blocked);
-        String blockedTarget = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).innerText();
-        SAVED_TARGET_RULE.add(blockedTarget);
-        clickOk();
-        clickClose();
-        waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
-        String savedTarget = page.locator(String.format("//span[contains(text(),'%s')]", selected)).innerText();
-        SAVED_TARGET_RULE.add(savedTarget);
-    }
+
 }

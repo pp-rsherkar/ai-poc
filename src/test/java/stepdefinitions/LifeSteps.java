@@ -3278,10 +3278,11 @@ public class LifeSteps {
         Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
     }
 
-    @And("User enables all tactics through bulk action and verifies the status")
-    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
-        tacticDetails.bulkEnableTactics();
-        Assert.assertEquals("item-list-control-toggle toggle-enabled ng-star-inserted", tacticDetails.getToggleClass());
+    @And("User enables tactic {string} through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
+        tacticDetails.bulkEnableTactics(tacticName);
+//        Assert.assertEquals("item-list-control-toggle toggle-enabled ng-star-inserted", tacticDetails.getToggleClass());
+        Assert.assertTrue(tacticDetails.getToggleClass());
 
     }
 }

@@ -56,7 +56,7 @@ public class TacticDetails {
     private final Locator TACTIC_TOGGLE_CLASS;
     private final Locator EXIT_BULK_MODE;
     private final Locator ENABLE_TACTIC;
-    private final Locator TACTIC_SELECT;
+//    private final Locator TACTIC_SELECT;
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
 
@@ -116,7 +116,7 @@ public class TacticDetails {
         this.ENABLE_TACTIC =page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION =page.locator(".pointer.inlineDiv.iconSprite").first();
         this.TACTIC_GLOBAL_SEARCH_TEXT =page.getByText("Nothing found...");
-        this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
+//        this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
 //        this.TACTIC_SELECT = page.locator("//*[contains(text(), 'Targetting29102025')]/ancestor::div[1]//sui-checkbox");
 
     }
@@ -325,15 +325,21 @@ public class TacticDetails {
         TACTIC_REMOVE_BUTTON.click();
     }
 
-    public void bulkEnableTactics() {
+    public void bulkEnableTactics(String tacticName) {
         BULK_ACTION.click();
-        TACTIC_SELECT.click();
+        Locator tacticNameXpath = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']/ancestor::div[contains(@class,'tactic-list')]/preceding-sibling::div/sui-checkbox", tacticName));
+        tacticNameXpath.click();
         ENABLE_TACTIC.click();
         EXIT_BULK_MODE.click();
     }
 
-    public String getToggleClass() {
-        return TACTIC_TOGGLE_CLASS.getAttribute("class");
+    public boolean getToggleClass() {
+        if (TACTIC_TOGGLE_CLASS.getAttribute("class")
+                .contains("item-list-control-toggle toggle-enabled ng-star-inserted")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void globalSearchDeletedTactic(String tacticName) {
