@@ -4,7 +4,7 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
   3. Verify that the "Owned and Operated Data" filter option is present within the Cross-Filter section of the Workspace
 
   @e2e
-  Scenario Outline: Verify Owned and Operated Data visibility within the Cross-Filter section of the Workspace when permission is "<PERMISSION_FLAG>" in Admin
+  Scenario Outline: Verify that the visibility of Owned and Operated Data in the Cross-Filter section of the Workspace is based on the Admin Permission - "<PERMISSION_FLAG>"
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User navigates to Administrative section and go to Accounts Tab
