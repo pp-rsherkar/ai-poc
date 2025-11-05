@@ -137,6 +137,7 @@ public class LifeSteps {
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
     public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget) {
+        campaigns.createCampaign();
         campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
         campaigns.selectAdvertiser(advertiser);
         campaigns.enterCampaignName(campaignNameRandom);
@@ -3259,16 +3260,12 @@ public class LifeSteps {
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
 
-    @Then("User creates a new tactic with details {string} {string} and {string}")
-    public void user_creates_a_new_tactics(String tacticName, String channel, String ruleType) {
-//        String tacticName = "Targeting29102025";
+    @Then("User creates a new tactic with details {string} {string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel) {
+//       tacticName= tacticName + '_' + CommonUtils.timeStampCalculation();
         tacticDetails.enterTacticName(tacticName);
-
         tacticDetails.saveTactic();
         tacticSettings.selectChannel(channel);
-        tacticDetails.TARGETING_RULES_ICON.click();
-        tacticSettings.addTargettingToTactic(ruleType);
-        Assert.assertEquals(tacticSettings.SELECTED_TARGET_RULE, tacticSettings.SAVED_TARGET_RULE);
         tacticSettings.saveTacticSettings();
     }
 

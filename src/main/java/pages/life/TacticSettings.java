@@ -54,14 +54,12 @@ public class TacticSettings {
     private final Locator SELECTED_LIST;
     private final Locator SHOW_MATCHED_NPI_BUTTON;
     private final Locator MATCHED_NPI_COUNT;
-    private final Locator TARGETING_OPTIONS;
     private final Locator TARGETING_RULES_PANEL_TITLE;
     private final Locator KEYWORD_CUSTOM_LIST;
     private final Locator KEYWORD_SELECTED_LIST;
     private final Locator SHOW_MORE_BUTTON;
     private final Locator TARGETING_OPTIONS_BS;
     private final Locator TARGETING_OPTIONS;
-    private final Locator SELECT_TARGETING;
     private final Locator BLOCK_TARGETING;
     private final Locator HOUSEHOLD_ICON;
     private final Locator HOUSEHOLD_IP_ICON;
@@ -69,14 +67,8 @@ public class TacticSettings {
     private final Locator PRACTICE_IP;
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
-
     private final Locator VERIFY_TACTIC_NAME;
-    private final Locator SHOW_MORE_BUTTON;
-    private final Locator BLOCK_TARGETING;
-    private final Locator HOUSEHOLD_ICON;
 
-    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
-    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -92,8 +84,6 @@ public class TacticSettings {
         this.RULE_TYPE_CLOSE = page.locator("//div[contains(@class,'close_icon')]");
         this.SAVE_TACTIC_SETTINGS = page.locator("//span[text()='Save']");
         this.TACTIC_SETTINGS_SUCCESS = page.locator("//div[@aria-label='Success!']");
-        this.SELECT_TARGETING = page.locator("//div[@title='Target']");
-        this.TARGETING_OPTIONS = page.locator("//span[contains(@class,'max-width')]");
         this.SEARCH_RULE_OPTION = page.locator("//input[contains(@placeholder,'Search') and contains(@class,'panel-search')]");
         this.RULE_POSTAL_CODES_TEXTBOX = page.locator("//div[@id='targetedItemsTA']");
         this.RULE_DEVICE_BLOCK = page.locator("//sui-radio-button[contains(@class,'ui radio checkbox')]//label[text()='Block Selected']");
@@ -139,11 +129,8 @@ public class TacticSettings {
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
         this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
         this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
-
         this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
-        this.SHOW_MORE_BUTTON = page.locator("//button[contains(@class,'show-more-button')]");
-        this.BLOCK_TARGETING = page.locator("//div[@title='Block']");
-        this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");
+
 
     }
 
