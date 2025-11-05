@@ -51,15 +51,16 @@ public class Accounts {
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_ENABLED;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
     private final Locator ACCOUNT_ADVERTISER_TAB;
-    private final Locator GLOBAL_SIGNAlS_TAB;
+    private final Locator GLOBAL_SIGNALS_TAB;
     private final Locator ADVERTISER_PERMISSION_SAVE_BUTTON;
     private final Locator ACCOUNT_USER_TAB;
-    private final Locator SEARCH_EXTERNAL_USER;
-    private final Locator SEARCH_EXTERNAL_USER_ICON;
     private final Locator USER_SIGNAL_TAB;
     private final Locator USER_PERMISSSIONS_SAVE_BUTTON;
     private final Locator USER_PROFILE_ICON;
     private final Locator LOGOUT_BUTTON;
+    private final Locator MOMENTS_CHECKBOX;
+    private final Locator IBHEALTH_CHECKBOX;
+    private final Locator CLAIMSDATA_CHECKBOX;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
@@ -103,15 +104,16 @@ public class Accounts {
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
         this.ACCOUNT_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
-        this.GLOBAL_SIGNAlS_TAB = page.locator("//button[@class='signal']");
+        this.GLOBAL_SIGNALS_TAB = page.locator("//button[@class='signal']");
         this.ADVERTISER_PERMISSION_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
         this.ACCOUNT_USER_TAB = page.locator("//a[@routerlink='users']");
-        this.SEARCH_EXTERNAL_USER = page.locator("//input[@class='form-control gaTableSearch ng-untouched ng-pristine ng-valid']");
-        this.SEARCH_EXTERNAL_USER_ICON = page.locator("//div[@class='iconSprite search1']");
         this.USER_SIGNAL_TAB = page.locator("//button[normalize-space(.)='Signal']");
         this.USER_PERMISSSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
         this.USER_PROFILE_ICON = page.locator("//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
         this.LOGOUT_BUTTON = page.locator("//div[@class='hovitems item last link']");
+        this.MOMENTS_CHECKBOX = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
+        this.IBHEALTH_CHECKBOX = page.locator("//*[@id='45_0' and not(contains(@class, 'checked'))]");
+        this.CLAIMSDATA_CHECKBOX = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
     }
 
     public void clickAdministration() {
@@ -274,20 +276,16 @@ public class Accounts {
     public void clickAccountAdvertiserTab() {
         ACCOUNT_ADVERTISER_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
-        GLOBAL_SIGNAlS_TAB.click();
+        GLOBAL_SIGNALS_TAB.click();
     }
 
-    public void enableAdvertiserPermission(String advertiserName, String advertiserPermission)
-    {
-
+    public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
         Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
         switch (advertiserPermission) {
 
-
-            case "MOMENTS","IB HEALTH", "CLAIMS DATA":
-                if(permissionCheckbox.isHidden())
-                {
-                    System.out.println("Permission already enabled");
+            case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
+                if (permissionCheckbox.isHidden()) {
+                    assertThat(permissionCheckbox).isHidden();
                     return;
                 } else {
                     permissionCheckbox.click();
@@ -302,36 +300,33 @@ public class Accounts {
         ACCOUNT_USER_TAB.click();
     }
 
-    public void externalUserPermissions(String studioPermissions, String accountName)
-    {
+    public void externalUserPermissions(String studioPermissions, String accountName) {
         switch (studioPermissions) {
             case "MOMENTS":
                 USER_SIGNAL_TAB.click();
-                Locator Moments_checkbox = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
-                if (Moments_checkbox.isHidden()) {
-                    System.out.println("Permission already enabled");
-                } else {
-                    Moments_checkbox.click();
-                    USER_PERMISSSIONS_SAVE_BUTTON.click();
+                if(MOMENTS_CHECKBOX.isHidden()) {
+                    assertThat(MOMENTS_CHECKBOX).isHidden();
                 }
+                else {MOMENTS_CHECKBOX.click();
+                USER_PERMISSSIONS_SAVE_BUTTON.click();}
                 break;
             case "IB HEALTH":
                 USER_SIGNAL_TAB.click();
-                Locator IBHealth_checkbox = page.locator("//*[@id='45_0' and not(contains(@class, 'checked'))]");
-                if (IBHealth_checkbox.isHidden()) {
-                    System.out.println("Permission already enabled");
+
+                if (IBHEALTH_CHECKBOX.isHidden()) {
+                    assertThat(IBHEALTH_CHECKBOX).isHidden();
                 } else {
-                    IBHealth_checkbox.click();
+                    IBHEALTH_CHECKBOX.click();
                     USER_PERMISSSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "CLAIMS DATA":
                 USER_SIGNAL_TAB.click();
-                Locator ClaimsData_checkbox = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
-                if (ClaimsData_checkbox.isHidden()) {
-                    System.out.println("Permission already enabled");
+
+                if (CLAIMSDATA_CHECKBOX.isHidden()) {
+                    assertThat(CLAIMSDATA_CHECKBOX).isHidden();
                 } else {
-                    ClaimsData_checkbox.click();
+                    CLAIMSDATA_CHECKBOX.click();
                     USER_PERMISSSIONS_SAVE_BUTTON.click();
                 }
                 break;

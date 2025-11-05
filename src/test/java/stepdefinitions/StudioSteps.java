@@ -646,7 +646,6 @@ public class StudioSteps {
     {
         if(advertiserPermissions.isBlank())
         {
-            System.out.println("Skipping step because example data is empty");
             return;
         }
         
@@ -701,10 +700,6 @@ public class StudioSteps {
         {
             Assert.assertTrue(explorerWorkspace.verifyPermissionFilters(permissions));
             Assert.assertTrue(explorerWorkspace.verifyWidgets(permissions));
-        }
-        else
-        {
-            System.out.println("Other permissions check");
         }
     }
 

@@ -50,6 +50,12 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_FILTER_TITLE;
     private final Locator MERGED_TEXT;
     private final Locator DASHBOARD_FILTERS;
+    private final Locator MOMENTS;
+    private final Locator IBHEALTH;
+    private final Locator MOMENTS_WIDGET ;
+    private final Locator CLAIMS_WIDGET;
+
+
 
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
@@ -90,6 +96,11 @@ public class ExplorerWorkspace {
         this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
         this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
+        this.MOMENTS= WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='IAB']");
+        this.IBHEALTH= WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='WebMD']");
+        this.MOMENTS_WIDGET= WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
+        this.CLAIMS_WIDGET= WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
+
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -207,44 +218,46 @@ public class ExplorerWorkspace {
         for (int i = 0; i < npiVisualList.size(); i++) {
             String visual = npiVisualList.get(i).trim();
             boolean isInView = false;
-            switch (npiVisualList.get(i).trim()){
-               case "NPI Geographic Location", "NPI Facilities Geography", "NPI ZIP Codes" :
-                   Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[contains(@style,'z-index: 3;')]", visual));
-                   isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, CAMERA_CONTROL_ICON,1000,  100, page);
-                   if (!isInView) {
-                       continue;
-                   }
-                   if (npiVisualList.get(i).contains("NPI Facilities Geography")) {
-                       ZOOM_OUT.first().click();
-                   } else if (npiVisualList.get(i).contains("NPI ZIP Codes")) {
-                       ZOOM_OUT.nth(1).click();
-                   }
-
-                   BoundingBox box = MAP_TILE.boundingBox();
-                   CommonUtils.hoverAndClick(page, box, MAP_TOOL_TIP);
-                   break;
-               case "Top 20 Market Areas","Top 20 Professions","Top 20 Specialties","Top 20 Insurance Providers", "Top 20 Prescriptions",
-                    "Top 20 Diagnoses", "Top 20 Procedures", "Top 20 MeSH Categories", "Top 20 IAB Categories":
-                    Locator TOP_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[@class='ag-center-cols-container']/div", visual));
-                    isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, TOP_ENTITIES,1000,  100, page);
+            switch (npiVisualList.get(i).trim()) {
+                case "NPI Geographic Location", "NPI Facilities Geography", "NPI ZIP Codes":
+                    Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[contains(@style,'z-index: 3;')]", visual));
+                    isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, CAMERA_CONTROL_ICON, 1000, 100, page);
                     if (!isInView) {
-                       continue;
+                        continue;
                     }
-                    if(TOP_ENTITIES.count() > 0){
-                       TOP_ENTITIES.first().click();
+                    if (npiVisualList.get(i).contains("NPI Facilities Geography")) {
+                        ZOOM_OUT.first().click();
+                    } else if (npiVisualList.get(i).contains("NPI ZIP Codes")) {
+                        ZOOM_OUT.nth(1).click();
+                    }
+
+                    BoundingBox box = MAP_TILE.boundingBox();
+                    CommonUtils.hoverAndClick(page, box, MAP_TOOL_TIP);
+                    break;
+                case "Top 20 Market Areas", "Top 20 Professions", "Top 20 Specialties", "Top 20 Insurance Providers",
+                     "Top 20 Prescriptions",
+                     "Top 20 Diagnoses", "Top 20 Procedures", "Top 20 MeSH Categories", "Top 20 IAB Categories":
+                    Locator TOP_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[@class='ag-center-cols-container']/div", visual));
+                    isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, TOP_ENTITIES, 1000, 100, page);
+                    if (!isInView) {
+                        continue;
+                    }
+                    if (TOP_ENTITIES.count() > 0) {
+                        TOP_ENTITIES.first().click();
                     }
                     break;
-               case "NPI Age Range", "NPI Gender", "Patient Age Range", "Patient Gender","Net Worth", "Years Practiced", "Patient Distribution":
-                   Locator NPI_PATIENT_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//*[name()='path' and contains(@class, 'highcharts-point')]", visual));
-                   isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, NPI_PATIENT_ENTITIES, 1000,  100, page);
-                   if (!isInView) {
-                       continue;
-                   }
-                   if(NPI_PATIENT_ENTITIES.count() > 0){
-                       NPI_PATIENT_ENTITIES.first().click();
-                   }
-                   break;
-           }
+                case "NPI Age Range", "NPI Gender", "Patient Age Range", "Patient Gender", "Net Worth",
+                     "Years Practiced", "Patient Distribution":
+                    Locator NPI_PATIENT_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//*[name()='path' and contains(@class, 'highcharts-point')]", visual));
+                    isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, NPI_PATIENT_ENTITIES, 1000, 100, page);
+                    if (!isInView) {
+                        continue;
+                    }
+                    if (NPI_PATIENT_ENTITIES.count() > 0) {
+                        NPI_PATIENT_ENTITIES.first().click();
+                    }
+                    break;
+            }
             DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setTimeout(240000).setState(WaitForSelectorState.VISIBLE));
         }
     }
@@ -255,7 +268,7 @@ public class ExplorerWorkspace {
 
     public List<String> fetchMergedFilters() {
         List<String> mergeFilterName = new ArrayList<>();
-        for(String dashboardFilter : DASHBOARD_FILTERS.allInnerTexts()) {
+        for (String dashboardFilter : DASHBOARD_FILTERS.allInnerTexts()) {
             String[] parts = dashboardFilter.split(":");
             if (parts.length > 0) {
                 mergeFilterName.add(parts[0].trim());  // Extract value before colon and trim whitespace
@@ -263,48 +276,37 @@ public class ExplorerWorkspace {
         }
         return mergeFilterName;
     }
-    public boolean verifyPermissionFilters(String permissions)
-    {
+
+    public boolean verifyPermissionFilters(String permissions) {
         boolean isFilterVisible = true;
-        Locator Moments = WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='IAB']");
-        Locator IbHealth=WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='WebMD']");
-
-        switch (permissions)
-            {
-                case "MOMENTS":
-                    ADD_FILTER.click();
-                    waitUtility.waitForLocatorVisible(Moments);
-                    isFilterVisible=Moments.isVisible();
-                    FILTER_CLOSE_BUTTON.click();
-                    break;
-                    case "IB HEALTH":
-                        ADD_FILTER.click();
-                        waitUtility.waitForLocatorVisible(IbHealth);
-                        isFilterVisible=IbHealth.isVisible();
-                        FILTER_CLOSE_BUTTON.click();
-                        break;
-
-                case "CLAIMS DATA":
-                    System.out.println("CLAIMS DATA filters are not hidden even after enabling or disabling it");
-
-            }
+        switch (permissions) {
+            case "MOMENTS":
+                ADD_FILTER.click();
+                waitUtility.waitForLocatorVisible(MOMENTS);
+                isFilterVisible = MOMENTS.isVisible();
+                FILTER_CLOSE_BUTTON.click();
+                break;
+            case "IB HEALTH":
+                ADD_FILTER.click();
+                waitUtility.waitForLocatorVisible(IBHEALTH);
+                isFilterVisible = IBHEALTH.isVisible();
+                FILTER_CLOSE_BUTTON.click();
+                break;
+        }
 
         return isFilterVisible;
     }
-    public boolean verifyWidgets(String visualization)
-    {
-        boolean isWidgetVisible=true;
-        Locator momentWidget= WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
-        Locator claimsWidget= WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
-        switch (visualization)
-        {
-            case "MOMENTS","IB HEALTH":
-                waitUtility.waitForLocatorVisible(momentWidget);
-                isWidgetVisible=momentWidget.isVisible();
+
+    public boolean verifyWidgets(String visualization) {
+        boolean isWidgetVisible = false;
+        switch (visualization) {
+            case "MOMENTS", "IB HEALTH":
+                waitUtility.waitForLocatorVisible(MOMENTS_WIDGET);
+                isWidgetVisible = MOMENTS_WIDGET.isVisible();
                 break;
             case "CLAIMS DATA":
-                waitUtility.waitForLocatorVisible(claimsWidget);
-                isWidgetVisible=claimsWidget.isVisible();
+                waitUtility.waitForLocatorVisible(CLAIMS_WIDGET);
+                isWidgetVisible = CLAIMS_WIDGET.isVisible();
         }
         return isWidgetVisible;
     }
