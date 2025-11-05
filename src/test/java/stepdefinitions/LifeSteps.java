@@ -2874,33 +2874,32 @@ public class LifeSteps {
         }
     }
 
-    @Then("User creates a new tactic with details {string} and {string}")
-    public void user_creates_a_new_tactics(String channel, String ruleType) {
-        String tacticName = "Targeting29102025";
+    @Then("User creates a new tactic with details {string} {string} and {string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel, String ruleType) {
+//        String tacticName = "Targeting29102025";
         tacticDetails.enterTacticName(tacticName);
 
         tacticDetails.saveTactic();
         tacticSettings.selectChannel(channel);
-        tacticDetails.TARGETTING_RULES_ICON.click();
+        tacticDetails.TARGETING_RULES_ICON.click();
         tacticSettings.addTargettingToTactic(ruleType);
         Assert.assertEquals(tacticSettings.SELECTED_TARGET_RULE, tacticSettings.SAVED_TARGET_RULE);
         tacticSettings.saveTacticSettings();
-
-
     }
-    @Then("User deletes the tactic and verifies it")
-    public void user_deletes_the_tactic_and_verifies_it() {
+
+    @Then("User deletes the tactic {string} and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
         tacticDetails.deleteTactic();
         DriverFactory.getPage().reload();
-        Assert.assertNotEquals("Targeting29102025", tacticSettings.verifyTacticName());
-        tacticDetails.globalSearchDeletedTactic("Targeting29102025");
-        Assert.assertEquals("Nothing found...", tacticDetails.GetSearchText());
+        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic(tacticName);
+        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
     }
 
-    @And("User enable all tactics through bulk action and verifies the status")
+    @And("User enables all tactics through bulk action and verifies the status")
     public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
-        tacticDetails.BulkEnableTactics();
-        Assert.assertEquals("item-list-control-toggle toggle-enabled ng-star-inserted", tacticDetails.GetToggleClass());
+        tacticDetails.bulkEnableTactics();
+        Assert.assertEquals("item-list-control-toggle toggle-enabled ng-star-inserted", tacticDetails.getToggleClass());
 
     }
 }

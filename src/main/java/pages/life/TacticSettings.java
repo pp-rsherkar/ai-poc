@@ -57,18 +57,11 @@ public class TacticSettings {
     private final Locator KEYWORD_SELECTED_LIST;
     private final Locator VERIFY_TACTIC_NAME;
     private final Locator SHOW_MORE_BUTTON;
-    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
-    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     private final Locator BLOCK_TARGETING;
     private final Locator HOUSEHOLD_ICON;
-    private final Locator PRACTICE_IP;
-    private final Locator NPI_TARGETING_OPTIONS;
-    private final Locator PRACTICE_IP_ICON;
-    private final Locator SELECT_TARGETING_BUTTON;
-    private final Locator BLOCK_TARGETING_HP;
-    private final Locator HOUSEHOLD_IP_ICON;
 
-
+    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
+    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -115,7 +108,6 @@ public class TacticSettings {
         this.GEO_RADIUS_SAVE = page.locator("(//div[@title='Save' and contains(@class,'saveGeoPtButton')])[1]");
         this.TOTAL_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']");
         this.SELECTED_LIST = page.locator("//span[contains(text(),'Selected Only')]");
-        this.BLOCK_TARGETING_HP = page.locator("//button[@title='Block']");
         this.SHOW_MATCHED_NPI_BUTTON = page.locator("//span[contains(text(),'show')]");
         this.MATCHED_NPI_COUNT = page.locator("//div[@class='supportedNPIsNumber']/span[@class='supportedNPIsNumber']");
         this.TARGETING_RULES_PANEL_TITLE = page.locator("//div[text()='HCP Direct Match Targeting' or text()='Targeting Rule']");
@@ -125,11 +117,6 @@ public class TacticSettings {
         this.SHOW_MORE_BUTTON = page.locator("//button[contains(@class,'show-more-button')]");
         this.BLOCK_TARGETING = page.locator("//div[@title='Block']");
         this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");
-        this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
-        this.NPI_TARGETING_OPTIONS = page.locator("//span[contains(@class,' d-block')]");
-        this.PRACTICE_IP_ICON = page.locator("//span[contains(@class,'practiceIp')]");
-        this.SELECT_TARGETING_BUTTON = page.locator("//button[@title='Target']");
-        this.HOUSEHOLD_IP_ICON = page.locator("//span[contains(@class,'householdIp')]");
 
     }
 
@@ -593,7 +580,6 @@ public class TacticSettings {
         return VERIFY_TACTIC_NAME.innerText();
     }
 
-
     public void addTargettingToTactic(String ruleType) {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
@@ -614,6 +600,5 @@ public class TacticSettings {
         waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
         String savedTarget = page.locator(String.format("//span[contains(text(),'%s')]", selected)).innerText();
         SAVED_TARGET_RULE.add(savedTarget);
-
     }
 }

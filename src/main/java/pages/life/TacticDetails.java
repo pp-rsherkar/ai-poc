@@ -33,8 +33,8 @@ public class TacticDetails {
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
     private final Locator CUSTOM_FIELD;
-    public final Locator TARGETTING_RULES_ICON;
-    private final Locator TACTIC_DELETE_OPTION;
+    public final Locator TARGETING_RULES_ICON;
+    private final Locator THREE_DOT_ICON;
     private final Locator TACTIC_DELETE_BUTTON;
     private final Locator TACTIC_REMOVE_BUTTON;
     private final Locator TACTIC_TOGGLE_CLASS;
@@ -73,8 +73,8 @@ public class TacticDetails {
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
-        this.TARGETTING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
-        this.TACTIC_DELETE_OPTION =  page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
+        this.TARGETING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.THREE_DOT_ICON =  page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
@@ -82,8 +82,10 @@ public class TacticDetails {
         this.ENABLE_TACTIC =page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION =page.locator(".pointer.inlineDiv.iconSprite").first();
         this.TACTIC_GLOBAL_SEARCH_TEXT =page.getByText("Nothing found...");
-        this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
+       this.TACTIC_SELECT =page.locator("//*[@id=\"lidcBody\"]/app-campaign-left-nav/div/div/div[3]/div[2]/div[2]/div[2]/div/div/div/div/div[1]/sui-checkbox");
+//        this.TACTIC_SELECT = page.locator("//*[contains(text(), 'Targetting29102025')]/ancestor::div[1]//sui-checkbox");
     }
+
 
     public String verifyTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
@@ -222,29 +224,29 @@ public class TacticDetails {
     }
 
     public void deleteTactic(){
-        TACTIC_DELETE_OPTION.click();
+        THREE_DOT_ICON.click();
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
     }
 
-    public void BulkEnableTactics() {
+    public void bulkEnableTactics() {
         BULK_ACTION.click();
         TACTIC_SELECT.click();
         ENABLE_TACTIC.click();
         EXIT_BULK_MODE.click();
     }
 
-    public String GetToggleClass() {
+    public String getToggleClass() {
         return TACTIC_TOGGLE_CLASS.getAttribute("class");
     }
 
-    public void globalSearchDeletedTactic(String targeting29102025) {
+    public void globalSearchDeletedTactic(String tacticName) {
         page.locator(".iconSprite").first().click();
-        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill("Targetting29102025");
+        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill( tacticName);
         page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
     }
 
-    public String GetSearchText() {
+    public String getSearchText() {
         return TACTIC_GLOBAL_SEARCH_TEXT.innerText();
     }
 }
