@@ -53,7 +53,6 @@ public class TacticDetails {
     private final Locator THREE_DOT_ICON;
     private final Locator TACTIC_DELETE_BUTTON;
     private final Locator TACTIC_REMOVE_BUTTON;
-    private final Locator TACTIC_TOGGLE_CLASS;
     private final Locator EXIT_BULK_MODE;
     private final Locator ENABLE_TACTIC;
     private final Locator BULK_ACTION;
@@ -111,7 +110,6 @@ public class TacticDetails {
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
-        this.TACTIC_TOGGLE_CLASS = page.locator("(//div[@class='item-list-control-toggle toggle-enabled ng-star-inserted'])[2]");
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
         this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
@@ -333,9 +331,11 @@ public class TacticDetails {
         EXIT_BULK_MODE.click();
     }
 
-    public boolean getToggleClass() {
-        if (TACTIC_TOGGLE_CLASS.getAttribute("class")
-                .contains("item-list-control-toggle toggle-enabled ng-star-inserted")) {
+    public boolean getToggleClass(String tacticName) {
+        Locator TACTIC_TOGGLE_CLASS1 = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), 'Targeting-72838')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
+        System.out.println(TACTIC_TOGGLE_CLASS1);
+        if (TACTIC_TOGGLE_CLASS1.getAttribute("class")
+                .contains("toggle-enabled")) {
             return true;
         } else {
             return false;

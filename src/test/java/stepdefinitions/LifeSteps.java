@@ -3279,7 +3279,7 @@ public class LifeSteps {
     @And("User enables tactic {string} through bulk action and verifies the status")
     public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
         tacticDetails.bulkEnableTactics(tacticName);
-        Assert.assertTrue(tacticDetails.getToggleClass());
+        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
 
     }
 
