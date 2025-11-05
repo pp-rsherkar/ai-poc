@@ -6,9 +6,12 @@ import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class TacticSettings {
+    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
+    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -55,6 +58,18 @@ public class TacticSettings {
     private final Locator TARGETING_RULES_PANEL_TITLE;
     private final Locator KEYWORD_CUSTOM_LIST;
     private final Locator KEYWORD_SELECTED_LIST;
+    private final Locator SHOW_MORE_BUTTON;
+    private final Locator TARGETING_OPTIONS_BS;
+    private final Locator TARGETING_OPTIONS;
+    private final Locator SELECT_TARGETING;
+    private final Locator BLOCK_TARGETING;
+    private final Locator HOUSEHOLD_ICON;
+    private final Locator HOUSEHOLD_IP_ICON;
+    private final Locator PRACTICE_IP_ICON;
+    private final Locator PRACTICE_IP;
+    private final Locator TACTIC_MAX_BID_PRICE;
+    private final Locator TACTIC_BASE_BID_PRICE;
+
     private final Locator VERIFY_TACTIC_NAME;
     private final Locator SHOW_MORE_BUTTON;
     private final Locator BLOCK_TARGETING;
@@ -113,6 +128,18 @@ public class TacticSettings {
         this.TARGETING_RULES_PANEL_TITLE = page.locator("//div[text()='HCP Direct Match Targeting' or text()='Targeting Rule']");
         this.KEYWORD_CUSTOM_LIST = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Custom Lists')]");
         this.KEYWORD_SELECTED_LIST = page.locator("//span[contains(text(),'Custom Keyword')]/following-sibling::span[contains(text(),'Selected Only')]");
+        this.SHOW_MORE_BUTTON = page.locator("//button[contains(@class,'show-more-button')]");
+        this.TARGETING_OPTIONS_BS = page.locator("//span[contains(@class,'max-width')]");
+        this.TARGETING_OPTIONS = page.locator("//span[contains(@class,'d-block')] | //span[contains(@class,'d-inline-block')]");
+        this.SELECT_TARGETING = page.locator("//div[@title='Target'] | //button[@title='Target']");
+        this.BLOCK_TARGETING = page.locator("//div[@title='Block'] | //button[@title='Block']");
+        this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");
+        this.PRACTICE_IP_ICON = page.locator("//span[contains(@class,'practiceIp')]");
+        this.HOUSEHOLD_IP_ICON = page.locator("//span[contains(@class,'householdIp')]");
+        this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
+        this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
+        this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
+
         this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
         this.SHOW_MORE_BUTTON = page.locator("//button[contains(@class,'show-more-button')]");
         this.BLOCK_TARGETING = page.locator("//div[@title='Block']");
@@ -168,6 +195,75 @@ public class TacticSettings {
 
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
+    }
+
+    public void addTargettingRules(String ruleType) {
+        SEARCH_RULE_TYPE.fill(ruleType);
+        SEARCH_RULE_TYPE.press("Enter");
+        SELECT_RULE_TYPE.click();
+
+        switch (ruleType) {
+
+            case "Behavioral Segment":
+
+                HOUSEHOLD_IP_TAB.click();
+                SHOW_MORE_BUTTON.click();
+                SELECT_TARGETING.last().click();
+                String selected = TARGETING_OPTIONS_BS.last().innerText();
+                this.SELECTED_TARGET_RULE.add(selected);
+                System.out.println(selected);
+                SHOW_MORE_BUTTON.click();
+                BLOCK_TARGETING.last().click();
+                String blocked = TARGETING_OPTIONS_BS.last().innerText();
+                this.SELECTED_TARGET_RULE.add(blocked);
+                System.out.println(blocked);
+
+                String blockedTarget = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).innerText();
+                SAVED_TARGET_RULE.add(blockedTarget);
+                clickOk();
+                clickClose();
+                waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
+                String savedTarget = page.locator(String.format("//span[contains(text(),'%s')]", selected)).innerText();
+                SAVED_TARGET_RULE.add(savedTarget);
+                break;
+
+            case "NPI":
+                PRACTICE_IP.click();
+                SHOW_MORE_BUTTON.click();
+                SHOW_MORE_BUTTON.click();
+                SELECT_TARGETING.last().click();
+                String selected_npi = TARGETING_OPTIONS.last().innerText();
+                this.SELECTED_TARGET_RULE.add(selected_npi);
+                SHOW_MORE_BUTTON.click();
+                BLOCK_TARGETING.last().click();
+                String blocked_npi = TARGETING_OPTIONS.last().innerText();
+                this.SELECTED_TARGET_RULE.add(blocked_npi);
+                String blockedTarget_npi = page.locator(String.format("//span[contains(text(),'%s')]", blocked_npi)).innerText();
+                SAVED_TARGET_RULE.add(blockedTarget_npi);
+                clickOk();
+                clickClose();
+                waitUtility.waitForLocatorVisible(PRACTICE_IP_ICON);
+                String savedTarget_npi = page.locator(String.format("//span[contains(text(),'%s')]", selected_npi)).innerText();
+                SAVED_TARGET_RULE.add(savedTarget_npi);
+
+                break;
+            case "Health Population":
+                HOUSEHOLD_IP_TAB.click();
+                SELECT_TARGETING.first().click();
+                String selected_hp = TARGETING_OPTIONS.last().innerText();
+                this.SELECTED_TARGET_RULE.add(selected_hp);
+                BLOCK_TARGETING.last().click();
+                String blocked_hp = TARGETING_OPTIONS.last().innerText();
+                this.SELECTED_TARGET_RULE.add(blocked_hp);
+                String blockedTarget_hp = page.locator(String.format("//span[contains(text(),'%s')]", blocked_hp)).innerText();
+                SAVED_TARGET_RULE.add(blockedTarget_hp);
+                clickOk();
+                clickClose();
+                waitUtility.waitForLocatorVisible(HOUSEHOLD_IP_ICON);
+                String savedTarget_hp = page.locator(String.format("//span[contains(text(),'%s')]", selected_hp)).innerText();
+                SAVED_TARGET_RULE.add(savedTarget_hp);
+                break;
+        }
     }
 
     public String tacticSettingsSuccess() {
@@ -575,6 +671,15 @@ public class TacticSettings {
     public String verifyRuleOption() {
         return FETCH_TARGET_RULE_OPTIONS.innerText();
     }
+
+    public BigDecimal getTacticBaseBidPrice() {
+        return new BigDecimal(TACTIC_BASE_BID_PRICE.evaluate("el => el.value").toString());
+    }
+
+    public BigDecimal getTacticMaxBidPrice() {
+        return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
+    }
+
 
     public String verifyTacticName() {
         return VERIFY_TACTIC_NAME.innerText();
