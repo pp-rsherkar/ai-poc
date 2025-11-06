@@ -59,6 +59,7 @@ public class ExplorerWorkspace {
 
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
+    private final Locator OWNED_AND_OPERATED_SECTION;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -101,6 +102,7 @@ public class ExplorerWorkspace {
         this.MOMENTS_WIDGET= WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
         this.CLAIMS_WIDGET= WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
 
+        this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -275,6 +277,10 @@ public class ExplorerWorkspace {
             }
         }
         return mergeFilterName;
+    }
+
+    public boolean isOwnedAndOperatedSectionAvailable() {
+        return OWNED_AND_OPERATED_SECTION.isVisible();
     }
 
     public boolean verifyPermissionFilters(String permissions) {
