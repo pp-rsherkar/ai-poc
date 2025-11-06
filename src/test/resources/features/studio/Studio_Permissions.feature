@@ -31,7 +31,8 @@ Feature: Enable Studio permissions for an account,advertiser and external users
     And User navigates to users page under the selected account
     And User selects the "<USER_NAME>" external user
     And User enables the "<STUDIO_PERMISSIONS>" permission for the "<ACCOUNT_NAME>" for an external user
-    When External user is logged in successfully in "Studio" application in the "Pre-release" environment
+    Given This scenario will be executed in the "Pre-release" environment as a "External User"
+    And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
     And  External user selects the workspace
     Then External user should be able to see the "<STUDIO_PERMISSIONS>" permission in the workspace
 

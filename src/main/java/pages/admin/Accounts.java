@@ -288,7 +288,6 @@ public class Accounts {
 
             case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
                 if (permissionCheckbox.isHidden()) {
-                    assertThat(permissionCheckbox).isHidden();
                     return;
                 } else {
                     permissionCheckbox.click();
@@ -308,7 +307,7 @@ public class Accounts {
             case "MOMENTS":
                 USER_SIGNAL_TAB.click();
                 if(MOMENTS_CHECKBOX.isHidden()) {
-                    assertThat(MOMENTS_CHECKBOX).isHidden();
+                    return;
                 }
                 else {MOMENTS_CHECKBOX.click();
                 USER_PERMISSSIONS_SAVE_BUTTON.click();}
@@ -317,7 +316,7 @@ public class Accounts {
                 USER_SIGNAL_TAB.click();
 
                 if (IBHEALTH_CHECKBOX.isHidden()) {
-                    assertThat(IBHEALTH_CHECKBOX).isHidden();
+                    return;
                 } else {
                     IBHEALTH_CHECKBOX.click();
                     USER_PERMISSSIONS_SAVE_BUTTON.click();
@@ -327,7 +326,7 @@ public class Accounts {
                 USER_SIGNAL_TAB.click();
 
                 if (CLAIMSDATA_CHECKBOX.isHidden()) {
-                    assertThat(CLAIMSDATA_CHECKBOX).isHidden();
+                   return;
                 } else {
                     CLAIMSDATA_CHECKBOX.click();
                     USER_PERMISSSIONS_SAVE_BUTTON.click();

@@ -674,18 +674,18 @@ public class StudioSteps {
 
     }
 
-    @When("External user is logged in successfully in {string} application in the {string} environment")
-    public void externalUserIsLoggedInSuccessfullyInApplicationInTheEnvironment(String environment, String externalUser)
-    {
-            url = ConfigReader.getProperty("preReleaseURL");
-            username = ConfigReader.getProperty("preReleaseExternalUser");
-            password = ConfigReader.getProperty("preReleaseExternalPassword");
-            navigation.navigateToUrl(url);
-            navigation.enterUsername(username);
-            navigation.enterPassword(password);
-            navigation.clickLogin();
-            navigation.navigateToStudio();
-    }
+//    @When("External user is logged in successfully in {string} application in the {string} environment")
+//    public void externalUserIsLoggedInSuccessfullyInApplicationInTheEnvironment()
+//    {
+//            url = ConfigReader.getProperty("preReleaseURL");
+//            username = ConfigReader.getProperty("preReleaseExternalUser");
+//            password = ConfigReader.getProperty("preReleaseExternalPassword");
+//            navigation.navigateToUrl(url);
+//            navigation.enterUsername(username);
+//            navigation.enterPassword(password);
+//            navigation.clickLogin();
+//            navigation.navigateToStudio();
+//    }
 
     @And("External user selects the workspace")
     public void externalUserSelectsTheWorkspace()
