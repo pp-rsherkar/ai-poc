@@ -36,7 +36,6 @@ public class StudioSteps {
     List<String> previousNpiDetails = null;
     String npiCount;
     Path targetFilePath;
-    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -81,7 +80,7 @@ public class StudioSteps {
 
     @Then("the user renames the workspace to {string}")
     public void the_user_renames_the_workspace_to_(String string) {
-        workspaceName = string + timeStamp;
+        workspaceName = string + CommonUtils.timeStampCalculation();
         expansionWorkspace.renameExpansion(workspaceName);
     }
 
@@ -162,7 +161,7 @@ public class StudioSteps {
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
         workspace.waitTillWorkspaceAlertHide();
-        workspaceName = wName + '_' + timeStamp;
+        workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
@@ -539,7 +538,7 @@ public class StudioSteps {
 
     @And("Verify user is able to rename the workspace as {string}")
     public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
-        newWorkspaceName = newWorkspace + timeStamp;
+        newWorkspaceName = newWorkspace + CommonUtils.timeStampCalculation();
         Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName));
         workspaceName = newWorkspaceName;
     }
@@ -621,5 +620,42 @@ public class StudioSteps {
         Assert.assertTrue(listType + " is not displayed", workspace.verifyListTypeAfterPublished(listType.toLowerCase()));
         String text = workspace.verifyNPIsEngagingText();
         Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
+    }
+
+    @And("User searches the account {string} for which permission to be checked")
+    public void userSearchesTheAccountForWhichPermissionToBeChecked(String account) {
+        accounts.searchAccount(account);
+        Assert.assertTrue("Advertiser Tab is not displayed", accounts.isAccountsAdvertiserTabDisplayed());
+    }
+
+    @And("User navigates to Advertisers tab")
+    public void userNavigatesToAdvertisersTab() {
+        accounts.clickAccountsAdvertiserTab();
+    }
+
+    @And("User clicks on {string} tab present under Advertisers tab")
+    public void userClicksToTabPresentUnderAdvertisersTab(String tabName) {
+        accounts.clickAdvertisersSubTab(tabName);
+    }
+
+    @And("User sets the HCP365 permission {string} for {string} and saves the changes")
+    public void userChecksTheHCPPermissionAndItFor(String checkboxStatus, String advertiser) {
+        Assert.assertTrue("HCP365 permission is not modified correctly", accounts.checkHCPPermissionForAdvertiser(checkboxStatus, advertiser));
+        accounts.saveAccountsAdvertiserTab();
+    }
+
+    @And("Verify Owned And Operated section is {string} within the Cross-Filter section of the Workspace")
+    public void verifyOwnedAndOperatedSectionWithinTheCrossFilterSectionOfTheWorkspace(String visibilityFlag) {
+        boolean flag = explorerWorkspace.isOwnedAndOperatedSectionAvailable();
+        switch (visibilityFlag.toLowerCase()) {
+            case "present":
+                Assert.assertTrue("Expected 'Owned and Operated' section to be present, but it was absent.", flag);
+                break;
+            case "absent":
+                Assert.assertFalse("Expected 'Owned and Operated' section to be absent, but it was present.", flag);
+                break;
+            default:
+                Assert.fail("Invalid input for visibility: " + visibilityFlag);
+        }
     }
 }
