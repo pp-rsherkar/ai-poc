@@ -266,6 +266,4 @@ public class CommonUtils {
         page.mouse().move(targetX, targetY, new Mouse.MoveOptions().setSteps(25));
         page.mouse().up();
     }
-
-
 }

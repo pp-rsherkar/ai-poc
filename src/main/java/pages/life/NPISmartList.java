@@ -517,7 +517,7 @@ public class NPISmartList {
                 selectDrug(detailsMap.get("Drug"));
                 break;
             case "Medical Procedure Code":
-               enterMedicalProcedure(detailsMap.get("Procedure"));
+                enterMedicalProcedure(detailsMap.get("Procedure"));
                 break;
             case "Profession":
                 selectProfession(detailsMap.get("Profession"));
