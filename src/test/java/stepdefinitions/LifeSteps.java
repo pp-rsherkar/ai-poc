@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static utils.CommonUtils.normalize;
@@ -2804,8 +2805,8 @@ public class LifeSteps {
     @And("User enters the Smart NPI list details as {string} {string}")
     public void userEntersTheSmartNPIListDetailsAsFor(String npiListName, String advertiser) {
         npiName = npiListName + '_' + timestamp;
-        npiStaticList.enterListName(npiName);
-        npiStaticList.selectAdvertiser(advertiser);
+        npiSmartList.enterListName(npiName);
+        npiSmartList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
     }
 
@@ -2847,10 +2848,36 @@ public class LifeSteps {
         }
     }
 
-    @And("The user saves the Smart List and verifies the successful creation of the list")
+    @And("User retrieves all the entered data before saving the list {string}")
+    public void userRetrievesAllTheEnteredDataBeforeSavingTheList(String listType) {
+        if(listType.contains(",")){
+            List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
+            for(String list : listTypes){
+                capturedDetails.addAll(npiSmartList.retrieveEnteredData(list));
+            }
+        }else {
+            capturedDetails = npiSmartList.retrieveEnteredData(listType);
+        }
+    }
+
+    @And("User saves the Smart List and verifies the successful creation of the list")
     public void theUserSavesTheSmartListAndVerifiesTheSuccessfulCreationOfTheList() {
         npiSmartList.clickSaveButton();
         Assert.assertEquals("NPI list created successfully", npiSmartList.fetchSuccessAlert());
+    }
+
+    @And("Verify that the retrieved data for the {string} list was saved correctly")
+    public void verifyThatTheRetrievedDataForTheListWasSavedCorrectly(String listType) {
+        List<String> onListSavedFetchData = new ArrayList<>();
+        if (listType.contains(",")) {
+            List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
+            for (String list : listTypes) {
+                onListSavedFetchData.addAll(npiSmartList.retrieveEnteredData(list));
+            }
+        } else {
+            onListSavedFetchData = npiSmartList.retrieveEnteredData(listType);
+        }
+        Assert.assertEquals("Data entered doesn't match after saving the list", capturedDetails, onListSavedFetchData);
     }
 
     @And("Verify {string} population option is disabled when Advertiser value is not selected")
@@ -2907,7 +2934,7 @@ public class LifeSteps {
 
     @And("User clicks Browse button to upload {string} file {string}")
     public void userClicksBrowseButtonToUploadDiagnosisFile(String type, String fileName) {
-        npiSmartList.browseDiagnosisFile(type, fileName);
+        npiSmartList.browseBulkUploadTemplate(type, fileName);
     }
 
 
@@ -3016,5 +3043,15 @@ public class LifeSteps {
         }
     }
 
-
+    @And("Verify Bulk Upload template {string} records count matches UI count post upload")
+    public void verifyBulkUploadTemplateEntryCountMatchesUICountPostUpload(String fileName) throws IOException {
+        int recordsCountFromFile = FileActions.countRecordsFromTextFile(fileName);
+        int recordsCountFromUI = 0;
+        if(fileName.contains("Diagnosis_BulkUpload")){
+            recordsCountFromUI = Integer.parseInt(npiSmartList.fetchDiagnosisCodesFromUI());
+        }else{
+            recordsCountFromUI = Integer.parseInt(npiSmartList.fetchMedicalProcedureCodesFromUI());
+        }
+        Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);
+    }
 }

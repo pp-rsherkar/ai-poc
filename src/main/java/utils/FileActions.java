@@ -80,4 +80,10 @@ public class FileActions {
             return count;
         }
     }
+
+    public static int countRecordsFromTextFile(String fileName) throws IOException {
+        Path basePath = Paths.get("src/main/resources/uploadfiles", fileName);
+        List<String> lines = Files.readAllLines(basePath);
+        return Math.toIntExact(lines.stream().filter(line -> !line.trim().isEmpty()).count());
+    }
 }

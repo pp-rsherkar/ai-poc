@@ -7,6 +7,7 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -73,12 +74,31 @@ public class NPISmartList {
     private final Locator MEDSCAPE_PRIMARY_CONCEPT;
     private final Locator WEBMD_PRIMARY_TOPIC;
     private final Locator ERROR_ALERT;
+    private final Locator FETCH_SELECTED_SMART_PIXEL;
+    private final Locator FETCH_SELECTED_ADVERTISER;
+    private final Locator FETCH_SELECTED_ENGAGEMENT_SWITCH;
+    private final Locator FETCH_SELECTED_RECENCY;
+    private final Locator FETCH_SELECTED_KEYWORD_FLAG;
+    private final Locator FETCH_SELECTED_AVAILABLE_IN;
+    private final Locator FETCH_SELECTED_NPI_LIST;
+    private final Locator FETCH_SELECTED_SPECIALTY;
+    private final Locator FETCH_SELECTED_DIAGNOSIS_CODE;
+    private final Locator DIAGNOSIS_CODE_FILE_DETAILS;
+    private final Locator FETCH_SELECTED_MEDICAL_PROCEDURE_CODE;
+    private final Locator MEDICAL_PROCEDURE_CODE_FILE_DETAILS;
+    private final Locator FETCH_SELECTED_PRESCRIPTION_DRUG;
+    private final Locator FETCH_SELECTED_TOP_DROPPER_PERCENT;
+    private final Locator FETCH_SELECTED_TIME_FRAME_MONTHS;
+    private final Locator ENDEMIC_RESEARCH_SECTION;
+    private final Locator FETCH_SELECTED_RECENCY_DAYS;
+    private final Locator FETCH_SELECTED_DRUG;
+    private final Locator FETCH_SELECTED_PROFESSION;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
         this.page = page;
         this.CLICK_LIFE_CHECKBOX = page.locator("//span[contains(@class,'mat-checkbox-label') and contains(text(),'Life')]");
-        this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
+        this.LIST_NAME = page.locator("//input[contains(@placeholder,'List Name')]");
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.SEARCH_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown')]//input");
@@ -137,6 +157,25 @@ public class NPISmartList {
         this.MEDSCAPE_PRIMARY_CONCEPT = page.locator("//div[contains(text(),'Select Medscape Primary Concept')]/following-sibling::div/input");
         this.WEBMD_PRIMARY_TOPIC = page.locator("//div[contains(text(),'Select WebMD Primary Topic')]/following-sibling::div/input");
         this.ERROR_ALERT = page.locator("//div[@role='alertdialog' and contains(text(),'Select one or more List Population Options')]");
+        this.FETCH_SELECTED_ADVERTISER = page.locator("//span[@class='ng-value-label']");
+        this.FETCH_SELECTED_SMART_PIXEL = page.locator("//span[contains(@class,'pixel-template-options')]");
+        this.FETCH_SELECTED_ENGAGEMENT_SWITCH = page.locator("//div[contains(text(),'Engagement')]//following-sibling::div//button");
+        this.FETCH_SELECTED_RECENCY = page.locator("//div[contains(text(),'Recency')]//following-sibling::div//mat-radio-button");
+        this.FETCH_SELECTED_KEYWORD_FLAG = page.locator("//div[contains(@class,'searchKeywordsSection')]//following-sibling::div//mat-radio-button");
+        this.FETCH_SELECTED_AVAILABLE_IN = page.locator("//div[contains(text(),'Available In ')]//following-sibling::div//mat-checkbox");
+        this.FETCH_SELECTED_NPI_LIST = page.locator("//div[@class='npilistFilter']//span[@class='ng-value-label']");
+        this.FETCH_SELECTED_SPECIALTY = page.locator("//div[@class='hcpSpecialtyFilter']//div[@class='ng-value-label']");
+        this.FETCH_SELECTED_DIAGNOSIS_CODE = page.locator("//div[contains(text(),'Select Diagnosis Code')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
+        this.DIAGNOSIS_CODE_FILE_DETAILS = page.locator("//div[contains(@class,'fileDetails')]//span[contains(normalize-space(.), 'names /') and contains(normalize-space(.), 'codes')]");
+        this.FETCH_SELECTED_MEDICAL_PROCEDURE_CODE = page.locator("//div[contains(text(),'Select Medical Procedure Code')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
+        this.MEDICAL_PROCEDURE_CODE_FILE_DETAILS = page.locator("//div[contains(@class,'fileDetails')]//a[contains(normalize-space(.), 'lines are ignored')]");
+        this.FETCH_SELECTED_PRESCRIPTION_DRUG = page.locator("//div[contains(text(), 'Select Drugs')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
+        this.FETCH_SELECTED_TOP_DROPPER_PERCENT = page.locator("//div[contains(@class,'topDroppersWrapper')]//div[contains(@class,'topDroppers-percent')]");
+        this.FETCH_SELECTED_TIME_FRAME_MONTHS = page.locator("//div[contains(@class,'timeframeWrapper')]//div[contains(@class,'timeFrame-months')]");
+        this.ENDEMIC_RESEARCH_SECTION = page.locator("//div[contains(@class,'endamicResearchContainer')]");
+        this.FETCH_SELECTED_RECENCY_DAYS = page.locator("//div[contains(@class,'recencyframeWrapper')]//div[contains(@class,'recency-days')]");
+        this.FETCH_SELECTED_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown')]//span[contains(@class,'ng-value-label')]");
+        this.FETCH_SELECTED_PROFESSION = page.locator("//div[contains(text(),'Select Professions')]/following-sibling::div//span[@class='ng-value-label']");
     }
 
     public void clickSmartPixelDropDownValue(String smartPixelDropdownValue) {
@@ -226,8 +265,8 @@ public class NPISmartList {
         for(String url : urls){
             ADD_VISITED_URL.scrollIntoViewIfNeeded();
             ADD_VISITED_URL.click();
-            waitUtility.waitForLocatorVisible(INSERT_VISITED_URL.last());
-            INSERT_VISITED_URL.last().fill(url);
+            waitUtility.waitForLocatorVisible(INSERT_VISITED_URL.first());
+            INSERT_VISITED_URL.first().fill(url);
         }
     }
 
@@ -235,8 +274,8 @@ public class NPISmartList {
         for(String url : urls){
             ADD_IGNORED_URL.scrollIntoViewIfNeeded();
             ADD_IGNORED_URL.click();
-            waitUtility.waitForLocatorVisible(INSERT_IGNORED_URL.last());
-            INSERT_IGNORED_URL.last().fill(url);
+            waitUtility.waitForLocatorVisible(INSERT_IGNORED_URL.first());
+            INSERT_IGNORED_URL.first().fill(url);
         }
     }
 
@@ -247,6 +286,7 @@ public class NPISmartList {
     public String fetchSuccessAlert() {
         String text = SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+        waitUtility.waitUntilSpinnerHidden();
         return text;
     }
 
@@ -323,8 +363,8 @@ public class NPISmartList {
     public String fetchRecency(String type) {
         return switch (type) {
             case "Prescribed Drug" -> PRESCRIBED_DRUG_RECENCY.first().inputValue();
-            case "Diagnosis" -> DIAGNOSIS_RECENCY.first().inputValue();
-            case "Medical Procedure" -> MEDICAL_PROCEDURE_RECENCY.first().inputValue();
+            case "Diagnosis Code" -> DIAGNOSIS_RECENCY.first().inputValue();
+            case "Medical Procedure Code" -> MEDICAL_PROCEDURE_RECENCY.first().inputValue();
             default -> "";
         };
     }
@@ -332,8 +372,8 @@ public class NPISmartList {
     public String fetchDecile(String type) {
         return switch (type) {
             case "Prescribed Drug" -> PRESCRIBED_DRUG_DECILE.first().innerText();
-            case "Diagnosis" -> DIAGNOSIS_DECILE.first().innerText();
-            case "Medical Procedure" -> MEDICAL_PROCEDURE_DECILE.first().innerText();
+            case "Diagnosis Code" -> DIAGNOSIS_DECILE.first().innerText();
+            case "Medical Procedure Code" -> MEDICAL_PROCEDURE_DECILE.first().innerText();
             default -> "";
         };
     }
@@ -343,10 +383,10 @@ public class NPISmartList {
             case "Prescribed Drug":
                 selectDrug(dropdownValue);
                 break;
-            case "Diagnosis":
+            case "Diagnosis Code":
                 enterDiagnosisDetails(dropdownValue);
                 break;
-            case "Medical Procedure":
+            case "Medical Procedure Code":
                 enterMedicalProcedure(dropdownValue);
                 break;
         }
@@ -358,21 +398,21 @@ public class NPISmartList {
                 ADD_DRUG_BUTTON.scrollIntoViewIfNeeded();
                 ADD_DRUG_BUTTON.click();
                 break;
-            case "Diagnosis":
+            case "Diagnosis Code":
                 ADD_DIAGNOSIS_BUTTON.scrollIntoViewIfNeeded();
                 ADD_DIAGNOSIS_BUTTON.click();
                 break;
-            case "Medical Procedure":
+            case "Medical Procedure Code":
                 ADD_MEDICAL_PROCEDURE_BUTTON.scrollIntoViewIfNeeded();
                 ADD_MEDICAL_PROCEDURE_BUTTON.click();
                 break;
         }
     }
 
-    public void browseDiagnosisFile(String type, String fileName) {
+    public void browseBulkUploadTemplate(String type, String fileName) {
         switch (type) {
-            case "Diagnosis" -> BROWSE_DIAGNOSIS_FILE.click();
-            case "Medical Procedure" -> BROWSE_MEDICAL_PROCEDURE_FILE.click();
+            case "Diagnosis Code" -> BROWSE_DIAGNOSIS_FILE.click();
+            case "Medical Procedure Code" -> BROWSE_MEDICAL_PROCEDURE_FILE.click();
         }
         String fileLocator = "//div[contains(text(),'%s')]";
         CommonUtils.uploadFile(page, 0, fileLocator, fileName);
@@ -476,7 +516,7 @@ public class NPISmartList {
             case "Prescribed Drug":
                 selectDrug(detailsMap.get("Drug"));
                 break;
-            case "Medical Procedure":
+            case "Medical Procedure Code":
                enterMedicalProcedure(detailsMap.get("Procedure"));
                 break;
             case "Profession":
@@ -497,5 +537,98 @@ public class NPISmartList {
                 CommonUtils.moveSliderToValue(RECENCY_SLIDER, Integer.parseInt(sliderValue), page);
                 break;
         }
+    }
+
+    public List<String> retrieveEnteredData(String listType) {
+        List<String> enteredData = new ArrayList<>();
+        enteredData.add(LIST_NAME.inputValue());
+        enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent());
+        getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
+        switch (listType) {
+            case "Smart Pixel" -> {
+                enteredData.add(FETCH_SELECTED_SMART_PIXEL.textContent());
+                getValuesByClassAttribute(FETCH_SELECTED_ENGAGEMENT_SWITCH, "active", "xpath=//div", enteredData);
+                getValuesByClassAttribute(FETCH_SELECTED_RECENCY, "mat-radio-checked", "xpath=//div[@class='mat-radio-label-content']", enteredData);
+                if(FETCH_SELECTED_KEYWORD_FLAG.first().isVisible()){
+                    getValuesByClassAttribute(FETCH_SELECTED_KEYWORD_FLAG, "mat-radio-checked", "xpath=//div[@class='mat-radio-label-content']", enteredData);
+                }
+                addLocatorData(INSERT_VISITED_URL, enteredData, true);
+                addLocatorData(INSERT_IGNORED_URL,enteredData, true);
+                if(SEARCH_KEYWORDS_TEXTAREA.isVisible())
+                    enteredData.add(SEARCH_KEYWORDS_TEXTAREA.inputValue().trim());
+            }
+            case "NPI List" -> {
+                Locator npiListLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button", listType));
+                getValuesByClassAttribute(npiListLocator, "active", "xpath=//div", enteredData);
+                enteredData.add(FETCH_SELECTED_NPI_LIST.textContent());
+            }
+            case "Specialty" ->{
+                Locator specialtyLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button", listType));
+                getValuesByClassAttribute(specialtyLocator, "active", "xpath=//div", enteredData);
+                addLocatorData(FETCH_SELECTED_SPECIALTY, enteredData, false);
+            }
+            case "Profession" -> addLocatorData(FETCH_SELECTED_PROFESSION, enteredData, false);
+            case "Prescribed Drug", "Diagnosis Code", "Medical Procedure Code" ->{
+                Locator prescribedDrugLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//div[contains(@class,'clinicalPopulationSwitch')]//button", listType));
+                getValuesByClassAttribute(prescribedDrugLocator, "active", "xpath=//div", enteredData);
+                fetchRecency(listType);
+                if(listType.contains("Prescribed Drug"))
+                    addLocatorData(FETCH_SELECTED_DRUG, enteredData, false);
+                if(listType.contains("Diagnosis Code") && FETCH_SELECTED_DIAGNOSIS_CODE.first().isVisible())
+                    addLocatorData(FETCH_SELECTED_DIAGNOSIS_CODE, enteredData, false);
+                if(listType.contains("Medical Procedure Code") && FETCH_SELECTED_MEDICAL_PROCEDURE_CODE.first().isVisible())
+                    addLocatorData(FETCH_SELECTED_MEDICAL_PROCEDURE_CODE, enteredData, false);
+                fetchDecile(listType);
+            }
+            case "Prescription Behavior Change" ->{
+                getValuesByClassAttribute(PRESCRIPTION_BEHAVIOUR_BUTTON, "active", "xpath=//parent::button", enteredData);
+                addLocatorData(FETCH_SELECTED_PRESCRIPTION_DRUG, enteredData, false);
+                if(FETCH_SELECTED_TOP_DROPPER_PERCENT.isVisible())
+                    enteredData.add(FETCH_SELECTED_TOP_DROPPER_PERCENT.textContent());
+                if(FETCH_SELECTED_TIME_FRAME_MONTHS.isVisible())
+                    enteredData.add(FETCH_SELECTED_TIME_FRAME_MONTHS.textContent());
+            }
+            case "Endemic Research" ->{
+                Locator buttonXpath = ENDEMIC_RESEARCH_SECTION.locator("xpath=//button");
+                getValuesByClassAttribute(buttonXpath, "active", "", enteredData);
+                Locator dropdownXpath = ENDEMIC_RESEARCH_SECTION.locator("xpath=//div[@placement='top']");
+                addLocatorData(dropdownXpath, enteredData, false);
+                enteredData.add(FETCH_SELECTED_RECENCY_DAYS.textContent());
+            }
+        }
+        return enteredData;
+    }
+
+
+    private void getValuesByClassAttribute(Locator locator, String classValue, String extendedLocator, List<String> dataList){
+        for (int i = 0; i < locator.count(); i++) {
+            String classAttribute = locator.nth(i).getAttribute("class");
+            if (classAttribute != null && classAttribute.contains(classValue)) {
+                String value = "";
+                if (!extendedLocator.isEmpty()) {
+                    value = locator.nth(i).locator(extendedLocator).textContent();
+                } else {
+                    value = locator.nth(i).textContent();
+                }
+                dataList.add(value.trim());
+            }
+        }
+    }
+
+    private void addLocatorData(Locator locator, List<String> dataList, boolean useInputValue) {
+        if(locator.first().isVisible()){
+            for (int i = 0; i < locator.count(); i++) {
+                String value = useInputValue ? locator.nth(i).inputValue() : locator.nth(i).textContent();
+                dataList.add(value.trim());
+            }
+        }
+    }
+
+    public String fetchDiagnosisCodesFromUI() {
+        return DIAGNOSIS_CODE_FILE_DETAILS.textContent().split(" ")[0];
+    }
+
+    public String fetchMedicalProcedureCodesFromUI() {
+        return MEDICAL_PROCEDURE_CODE_FILE_DETAILS.textContent().split(" ")[3];
     }
 }

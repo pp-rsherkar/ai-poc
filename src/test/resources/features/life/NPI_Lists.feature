@@ -128,8 +128,8 @@ Feature: LIFE Regression - Create NPI List of following types:
       | Profession                                        |
       | Prescribed Drug                                   |
       | Prescription Behavior Change                      |
-      | Diagnosis                                         |
-      | Medical Procedure                                 |
+      | Diagnosis Code                                    |
+      | Medical Procedure Code                            |
       | Endemic Research                                  |
       | Expand based on Practice and Hospital Affiliation |
 
@@ -146,7 +146,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects Smart NPI list as "<TYPE>"
     And User verifies the Smart Pixel dropdown displays all Smart Pixels for the selected advertiser and select the pixel
     And User selects Engagement Type "<ENGAGEMENT_TYPE>" and enter related details "<VISITED_URLS>", "<IGNORED_URLS>", "<KEYWORDS>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE        | ENGAGEMENT_TYPE    | VISITED_URLS                        | IGNORED_URLS                         | KEYWORDS                     |
       | 01- Advertiser | SMART_Pixel_NPI | Smart Pixel | Engaged on Site    | www.brooklyn.com, www.manhattan.com | www.cambridge.org, www.wikipedia.org |                              |
@@ -164,7 +166,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects Smart NPI list as "<TYPE>"
     And User selects the HCP switch "<HCP_SWITCH>"
     And User selects the NPI Group "<NPI_GROUP_NAME>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE     | HCP_SWITCH | NPI_GROUP_NAME |
       | 01- Advertiser | SMART_Pixel_NPI | NPI List | HCP From   | NPI_LIST_      |
@@ -180,7 +184,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects Smart NPI list as "<TYPE>"
     And User selects the HCP switch "<HCP_SWITCH>"
     And User selects the Speciality "<SPECIALITY>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE      | HCP_SWITCH   | SPECIALITY                           |
       | 01- Advertiser | SMART_Pixel_NPI | Specialty | Include Only | Allergy & Immunology, Anesthesiology |
@@ -195,7 +201,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
     And User selects Smart NPI list as "<TYPE>"
     And User selects the Profession "<PROFESSION>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE       | PROFESSION                     |
       | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner, Pharmacist |
@@ -211,13 +219,15 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects "<DRUG>" from "<TYPE>" dropdown
     And Verify that Recency is set to "365" by default for "<TYPE>"
     And verify that Decile is set to "1-10" by default for "<TYPE>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE            | DRUG                              |
       | 01- Advertiser | SMART_Pixel_NPI | Prescribed Drug | Glynase, L-Oral PARACETAMOL Syrup |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis without File upload
+  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis Code without File upload
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -227,13 +237,15 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects "<DIAGNOSIS>" from "<TYPE>" dropdown
     And Verify that Recency is set to "365" by default for "<TYPE>"
     And verify that Decile is set to "1-10" by default for "<TYPE>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
-      | ADVERTISER     | LIST_NAME       | TYPE      | DIAGNOSIS                                                              |
-      | 01- Advertiser | SMART_Pixel_NPI | Diagnosis | Other specified bacterial intestinal infections, Alcoholic fatty liver |
+      | ADVERTISER     | LIST_NAME       | TYPE           | DIAGNOSIS                                                              |
+      | 01- Advertiser | SMART_Pixel_NPI | Diagnosis Code | Other specified bacterial intestinal infections, Alcoholic fatty liver |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis by uploading a File
+  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis Code by uploading a File
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -241,10 +253,13 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
     And User selects Smart NPI list as "<TYPE>"
     And User clicks Browse button to upload "<TYPE>" file "<FILE_NAME>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And Verify Bulk Upload template "<FILE_NAME>" records count matches UI count post upload
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
-      | ADVERTISER     | LIST_NAME       | TYPE      | FILE_NAME     |
-      | 01- Advertiser | SMART_Pixel_NPI | Diagnosis | Diagnosis.csv |
+      | ADVERTISER     | LIST_NAME       | TYPE           | FILE_NAME                |
+      | 01- Advertiser | SMART_Pixel_NPI | Diagnosis Code | Diagnosis_BulkUpload.txt |
 
   @regression
   Scenario Outline: Validate the successful creation of a Smart List as a Medical Procedure without File upload
@@ -257,10 +272,12 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects "<MEDICAL_PROCEDURE>" from "<TYPE>" dropdown
     And Verify that Recency is set to "365" by default for "<TYPE>"
     And verify that Decile is set to "1-10" by default for "<TYPE>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
-      | ADVERTISER     | LIST_NAME       | TYPE              | MEDICAL_PROCEDURE                                 |
-      | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure | Cardiac shunt imaging, Florbetaben f18 diagnostic |
+      | ADVERTISER     | LIST_NAME       | TYPE                   | MEDICAL_PROCEDURE                                 |
+      | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure Code | Cardiac shunt imaging, Florbetaben f18 diagnostic |
 
   @regression
   Scenario Outline: Validate the successful creation of a Smart List as a Medical Procedure by uploading a File
@@ -271,10 +288,13 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
     And User selects Smart NPI list as "<TYPE>"
     And User clicks Browse button to upload "<TYPE>" file "<FILE_NAME>"
-    And The user saves the Smart List and verifies the successful creation of the list
+    And Verify Bulk Upload template "<FILE_NAME>" records count matches UI count post upload
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
-      | ADVERTISER     | LIST_NAME       | TYPE              | FILE_NAME            |
-      | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure | MedicalProcedure.csv |
+      | ADVERTISER     | LIST_NAME       | TYPE                   | FILE_NAME                       |
+      | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure Code | MedicalProcedure_BulkUpload.txt |
 
   @regression
   Scenario Outline: Validate the successful creation of a Smart List as a Prescription Behavior Change with Top Dropper option
@@ -293,7 +313,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects the "Top Dropper Percentage" value as "<TOP_DROPPER_PERCENT>" from the slider
     And Verify that Time Frame Selector slider should range from "6" to "12" months and should be set to "6 months" by default
     And User selects the "Time Frame Selector" value as "<TIME_FRAME_SELECTOR>" from the slider
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE                         | DRUG_NAME                   | TOP_DROPPER_PERCENT | TIME_FRAME_SELECTOR |
       | 01- Advertiser | SMART_Pixel_NPI | Prescription Behavior Change | Acne Reparatif, Parathyroid |  60                 |  10                 |
@@ -310,7 +332,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects the prescription drug name "<DRUG_NAME>"
     And Verify that Time Frame Selector slider should range from "6" to "12" months and should be set to "6 months" by default
     And User selects the "Time Frame Selector" value as "<TIME_FRAME_SELECTOR>" from the slider
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE                         | DRUG_NAME                   | TIME_FRAME_SELECTOR |
       | 01- Advertiser | SMART_Pixel_NPI | Prescription Behavior Change | Acne Reparatif, Parathyroid | 8                   |
@@ -328,7 +352,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify that Recency slider should range from "1" to "60" days and should be set to "1 day" by default
     And User selects the "Recency" value as "<RECENCY>" from the slider
     And User checks Prime list with historical data check box
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE             | ENGAGEMENT_TYPE | CONTEXTUAL_CATEGORY | MESH_CONDITION  | RECENCY |
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | IB Health       | MESH                | Animal Diseases | 55      |
@@ -347,7 +373,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify that Recency slider should range from "1" to "60" days and should be set to "1 day" by default
     And User selects the "Recency" value as "<RECENCY>" from the slider
     And User checks Prime list with historical data check box
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE             | ENGAGEMENT_TYPE | CONTEXTUAL_CATEGORY | MEDSCAPE_PRIMARY_CONCEPT | RECENCY |
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | IB Health       | Medscape            | Pacemaker, Arthritis     | 10      |
@@ -366,7 +394,9 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify that Recency slider should range from "1" to "60" days and should be set to "1 day" by default
     And User selects the "Recency" value as "<RECENCY>" from the slider
     And User checks Prime list with historical data check box
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE             | ENGAGEMENT_TYPE | CONTEXTUAL_CATEGORY | WEBMD_PRIMARY_TOPIC | RECENCY |
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | IB Health       | WebMD               | Knee Pain, Asthma   | 15      |
@@ -386,13 +416,15 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify that Recency slider should range from "1" to "60" days and should be set to "1 day" by default
     And User selects the "Recency" value as "<RECENCY>" from the slider
     And User checks Prime list with historical data check box
-    And The user saves the Smart List and verifies the successful creation of the list
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE             | ENGAGEMENT_TYPE | CONTEXTUAL_CATEGORY | MESH_CONDITION  | RECENCY |
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | Endemic Network | MESH                | Animal Diseases | 20      |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Expand based on Practice and Hospital Affiliation
+  Scenario Outline: Validate error message when saving Smart List as Expand based on Practice and Hospital Affiliation without selecting other Population options
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -412,11 +444,13 @@ Feature: LIFE Regression - Create NPI List of following types:
     And User selects Smart List
     And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
     And User selects Smart NPI list as below with mandatory details
-      | PopulationOption  | OptionDetails                   |
-      | Profession        | Profession:Nurse Practitioner   |
-      | Prescribed Drug   | Drug:Glynase                    |
-      | Medical Procedure | Procedure:Cardiac shunt imaging |
-    And The user saves the Smart List and verifies the successful creation of the list
+      | PopulationOption       | OptionDetails                   |
+      | Profession             | Profession:Nurse Practitioner   |
+      | Prescribed Drug        | Drug:Glynase                    |
+      | Medical Procedure Code | Procedure:Cardiac shunt imaging |
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
-      | ADVERTISER     | LIST_NAME       |
-      | 01- Advertiser | SMART_Pixel_NPI |
+      | ADVERTISER     | LIST_NAME       | TYPE                                                |
+      | 01- Advertiser | SMART_Pixel_NPI | Profession, Prescribed Drug, Medical Procedure Code |
