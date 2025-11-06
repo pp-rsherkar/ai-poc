@@ -332,9 +332,8 @@ public class TacticDetails {
     }
 
     public boolean getToggleClass(String tacticName) {
-        Locator TACTIC_TOGGLE_CLASS1 = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), 'Targeting-72838')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
-        System.out.println(TACTIC_TOGGLE_CLASS1);
-        if (TACTIC_TOGGLE_CLASS1.getAttribute("class")
+        Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
+        if (TACTIC_TOGGLE_CLASS.getAttribute("class")
                 .contains("toggle-enabled")) {
             return true;
         } else {

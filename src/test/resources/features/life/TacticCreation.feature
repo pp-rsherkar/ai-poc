@@ -75,7 +75,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC NAME     |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72839 |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72739 |
 
   @regression
   Scenario Outline: Create tactic and enable those tactics through bulk action.
