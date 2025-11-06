@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
@@ -9,9 +10,12 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class TacticDetails {
     private final Page page;
+    public final Locator TARGETTING_RULES_ICON;
+    public final Locator TARGETING_RULES_ICON;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
     private final Locator SAVE_TACTIC_DETAILS;
@@ -30,6 +34,31 @@ public class TacticDetails {
     private final Locator TEMPLATE_NAME_TEXT;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_SAVED_SUCCESS_ALERT;
+    private final Locator NEW_TACTIC_BUTTON;
+    private final Locator SAVED_TACTICS;
+    private final Locator DETAILS_TAB;
+    private final Locator NEW_TACTIC_TABS;
+    private final Locator SAVED_TACTIC_TABS;
+    private final Locator TACTIC_STATUS;
+    private final Locator TACTIC_DETAILS_TAB;
+    private final Locator ADD_CUSTOM_FIELD;
+    private final Locator ADD_CUSTOM_FIELD_INPUT;
+    private final Locator SAVE_CUSTOM_FIELD_BUTTON;
+    private final Locator FIELD_CREATE_SUCCESS;
+    private final Locator CUSTOM_FIELD_TEXT;
+    private final Locator DELETE_BUTTON;
+    private final Locator CONFIRM_DELETE;
+    private final Locator DELETE_SUCCESS;
+    private final Locator CUSTOM_FIELD;
+    private final Locator THREE_DOT_ICON;
+    private final Locator TACTIC_DELETE_BUTTON;
+    private final Locator TACTIC_REMOVE_BUTTON;
+    private final Locator EXIT_BULK_MODE;
+    private final Locator ENABLE_TACTIC;
+    private final Locator BULK_ACTION;
+    private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
+
+
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -59,7 +88,96 @@ public class TacticDetails {
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
+        this.TARGETTING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.NEW_TACTIC_BUTTON = page.locator("//span[normalize-space(text())='New Tactic']");
+        this.SAVED_TACTICS = page.locator("//div[contains(@class,'tactic-main-details')]");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Detail')]");
+        this.NEW_TACTIC_TABS = page.locator("//a[@disabled='disabled']");
+        this.SAVED_TACTIC_TABS = page.locator("//a[contains(@class,'gaTab')]");
+        this.TACTIC_STATUS = page.locator("//span[contains(@class, 'status-label')]/span");
+        this.TACTIC_DETAILS_TAB = page.locator("//a[normalize-space()='Details']");
+        this.ADD_CUSTOM_FIELD = page.locator("//span[contains(text(),'Add Custom Field')]");
+        this.ADD_CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
+        this.SAVE_CUSTOM_FIELD_BUTTON = page.locator("//button[normalize-space()='Save']");
+        this.FIELD_CREATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
+        this.CUSTOM_FIELD_TEXT = page.locator("//input[contains(@class,'gaName')]");
+        this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]");
+        this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
+        this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
+        this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
+        this.TARGETING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.THREE_DOT_ICON = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
+        this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
+        this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
+        this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
+        this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
+        this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
+        this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
     }
+
+    public void clickNewTactic() {
+        NEW_TACTIC_BUTTON.click();
+    }
+
+    public List<String> getAllTactics() {
+        return SAVED_TACTICS.allInnerTexts();
+    }
+
+    public void verifyDetailsTab() {
+        DETAILS_TAB.isVisible();
+        System.out.println(DETAILS_TAB.innerText().trim());
+
+    }
+
+    public List<String> newTacticTabs() {
+        return NEW_TACTIC_TABS.allInnerTexts();
+    }
+
+    public void CLICK_FIRST_TACTIC() {
+        SAVED_TACTICS.first().click();
+    }
+
+    public List<String> savedTacticTabs() {
+        return SAVED_TACTIC_TABS.allInnerTexts();
+    }
+
+    public String verifyTacticState() {
+        return TACTIC_STATUS.innerText();
+    }
+
+    public void clickDetailsTab() {
+        TACTIC_DETAILS_TAB.click();
+    }
+
+    public void addCustomField(String fieldName) {
+        ADD_CUSTOM_FIELD.click();
+        ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
+        SAVE_CUSTOM_FIELD_BUTTON.click();
+        waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+        CUSTOM_FIELD_TEXT.last().fill("CUST123");
+        SAVE_TACTIC_DETAILS.click();
+    }
+
+    public String verifyCustomField(String fieldName) {
+        Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
+        return customField.innerText().trim();
+    }
+
+    public void clickTactic() {
+        //Locator tacticTab = page.locator(String.format("//div[contains(text(),'%s')]", tacticName));
+        Locator tacticTab = page.locator("//div[@class='tactic item-details']").last();
+        tacticTab.click();
+
+    }
+
+    public void deleteCustomField(String customFieldName) {
+        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
+        FIELD_OPTIONS.click();
+        DELETE_BUTTON.click();
+        CONFIRM_DELETE.click();
+        DELETE_SUCCESS.isVisible();
+    }
+
 
     public String verifyTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
@@ -70,6 +188,12 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
+        SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void saveTactic() {
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -128,7 +252,7 @@ public class TacticDetails {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
+    private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
         lineItemDetails.enterLineItemName(lineItemName);
         lineItemDetails.selectLineItemType(lineItemType);
         lineItemDetails.clickAddFlightButton();
@@ -191,5 +315,39 @@ public class TacticDetails {
         saveTacticDetails();
         waitUtility.waitUntilSpinnerHidden();
         return tacticCreatives.verifyCreativeAssigned(CreativeName);
+    }
+
+    public void deleteTactic() {
+        THREE_DOT_ICON.click();
+        TACTIC_DELETE_BUTTON.click();
+        TACTIC_REMOVE_BUTTON.click();
+    }
+
+    public void bulkEnableTactics(String tacticName) {
+        Locator tacticNameXpath = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']/ancestor::div[contains(@class,'tactic-list')]/preceding-sibling::div/sui-checkbox", tacticName));
+        BULK_ACTION.click();
+        tacticNameXpath.click();
+        ENABLE_TACTIC.click();
+        EXIT_BULK_MODE.click();
+    }
+
+    public boolean getToggleClass(String tacticName) {
+        Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
+        if (TACTIC_TOGGLE_CLASS.getAttribute("class")
+                .contains("toggle-enabled")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void globalSearchDeletedTactic(String tacticName) {
+        page.locator(".iconSprite").first().click();
+        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill(tacticName);
+        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
+    }
+
+    public String getSearchText() {
+        return TACTIC_GLOBAL_SEARCH_TEXT.innerText();
     }
 }

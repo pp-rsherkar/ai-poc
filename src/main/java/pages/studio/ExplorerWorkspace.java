@@ -48,7 +48,7 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_FILTER_TITLE;
     private final Locator MERGED_TEXT;
     private final Locator DASHBOARD_FILTERS;
-
+    private final Locator OWNED_AND_OPERATED_SECTION;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -86,6 +86,7 @@ public class ExplorerWorkspace {
         this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
         this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
+        this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -258,5 +259,9 @@ public class ExplorerWorkspace {
             }
         }
         return mergeFilterName;
+    }
+
+    public boolean isOwnedAndOperatedSectionAvailable() {
+        return OWNED_AND_OPERATED_SECTION.isVisible();
     }
 }
