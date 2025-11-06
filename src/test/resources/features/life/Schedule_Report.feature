@@ -25,7 +25,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | Monthly |
     And Verify default value of the Frequency field is "Weekly"
     And Verify that user is able to select Schedule start date and Schedule end date
-    And Verify default value of Data Timezone is "(GMT-04:00) Eastern Time"
+    And Verify default value of Data Timezone is "(GMT-05:00) Eastern Time"
     And Verify that user is able to select Data Timezone field value "<TIME_ZONE>"
     And The Send On field should contain all days of the week when "Weekly" is selected as Frequency
       | Sun |
@@ -37,7 +37,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | Sat |
     And Verify default value of Send On is "Sun"
     And Verify Send At field is available with Start Time and Timezone fields
-    And Verify default value of Send At fields - Start Time is "06:00" and Timezone is "(GMT-04:00) Eastern Time"
+    And Verify default value of Send At fields - Start Time is "06:00" and Timezone is "(GMT-05:00) Eastern Time"
     And Verify user is able to select Time "10:00" and Timezone "<TIME_ZONE>" for Send At fields
     And Verify Delivery field has two methods - "Email" and "Custom Destination"
     Examples:
