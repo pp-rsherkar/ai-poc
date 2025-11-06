@@ -100,6 +100,8 @@ public class SmartPixel {
     }
 
     public String deactivateSuccess() {
-        return DEACTIVATE_SUCCESS.innerText();
+        String text = DEACTIVATE_SUCCESS.innerText();
+        waitUtility.waitUntilSpinnerHidden();
+        return text;
     }
 }
