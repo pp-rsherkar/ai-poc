@@ -130,11 +130,11 @@ public class TacticDetails {
         return NEW_TACTIC_TABS.allInnerTexts();
     }
 
-    public void clickFirstTactic() {
+    public void clickFirstTacticTab() {
         SAVED_TACTICS.first().click();
     }
 
-    public List<String> savedTacticTabs() {
+    public List<String> allTacticsUnderLI() {
         return SAVED_TACTIC_TABS.allInnerTexts();
     }
 

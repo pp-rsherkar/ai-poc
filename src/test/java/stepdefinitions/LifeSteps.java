@@ -167,7 +167,7 @@ public class LifeSteps {
     }
 
     @Then("User creates multiple tactics under same line item and verifies it")
-    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it (DataTable dataTable) {
+    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
@@ -193,25 +193,25 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @Then("Verify that the tabs gets enabled only after saving tactics")
-    public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
+    @Then("Verify that below tabs gets enabled only after saving tactics")
+    public void verify_that_below_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
         tacticDetails.verifyDetailsTab();
         List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
         String detailsTab = tacticTabNames.remove(tacticTabNames.size() - 1);
         List<String> disabledTabs = tacticDetails.newTacticTabs();
         Assert.assertEquals(tacticTabNames,disabledTabs);
-        tacticDetails.clickFirstTactic();
-        List<String> enabledTabs = tacticDetails.savedTacticTabs();
+        tacticDetails.clickFirstTacticTab();
+        List<String> enabledTabs = tacticDetails.allTacticsUnderLI();
         tacticTabNames.add(detailsTab);
         Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
 
     }
 
-    @And("Verify the status of saved tactic")
-    public void verify_the_status_of_saved_tactic() {
-        tacticDetails.clickFirstTactic();
+    @And("Verify the status of first tactic under line item is {string}")
+    public void verify_the_status_of_first_tactic_under_line_item_is (String ExpectedStatus) {
+        tacticDetails.clickFirstTacticTab();
         String actualStatus = tacticDetails.verifyTacticState();
-        Assert.assertEquals("Incomplete", actualStatus);
+        Assert.assertEquals(ExpectedStatus, actualStatus);
     }
 
     @Then("User creates new custom field {string} and verifies the same")
