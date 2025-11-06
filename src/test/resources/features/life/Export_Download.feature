@@ -1,4 +1,9 @@
-Feature: LIFE Regression - This feature verifies the export/download functionality for various list types created through file uploads
+Feature: LIFE Regression - This feature verifies the export/download functionality for various list types created through file uploads:
+  1. Keyword List
+  2. Domain List
+  3. App Bundle List
+  4. IP Address List
+  5. Static NPI List
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
