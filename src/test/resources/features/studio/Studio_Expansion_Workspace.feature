@@ -6,6 +6,7 @@ Feature: HCP Audience Workspace in Studio Application
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
     And User selects the Workspace Type as "HCP Audience Expansion"
     And User selects the advertiser as "<ADVERTISER>"
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
