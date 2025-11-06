@@ -3028,7 +3028,7 @@ public class LifeSteps {
     @And("User should see error message when tries to save line item page and dates fields should get highlighted with inline error message")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPageAndDatesFieldsShouldGetHighlighted() {
         Assert.assertTrue("LineItem flights overlap message is not displayed", lineItemDetails.fetchErrorAlert().contains("LineItem flights overlap."));
-        Assert.assertEquals("Flight overlap with other flights." , lineItemDetails.fetchInlineErrorMessage());
+        Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
     }
 
     @When("User enters line item details {string}")
@@ -3138,7 +3138,7 @@ public class LifeSteps {
 
     @Then("User adds Comments or Notes {string} to each line item")
     public void userAddsCommentsOrNotesToEachLineItem(String notes) {
-        for(String name : nameList){
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String newNotes = name + " " + notes;
             itemList.add(newNotes);
@@ -3148,7 +3148,7 @@ public class LifeSteps {
 
     @And("Verify the notes added to each line item")
     public void verifyTheNotesAddedToEachLineItem() {
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String notes = lineItemDetails.fetchLineItemNotes();
             Assert.assertTrue("Note of '" + name + "' is not available",
@@ -3159,16 +3159,16 @@ public class LifeSteps {
     @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
     public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
         lineItemDetails.clickBulkEditMode();
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.selectLineItemUsingBulkEdit(name);
         }
-        Assert.assertEquals("Lineitems status updated successfully" ,lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
+        Assert.assertEquals("Lineitems status updated successfully", lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
         lineItemDetails.exitBulkEditMode();
     }
 
     @And("Verify that each selected line item is {string}")
     public void verifyThatEachSelectedLineItemIsDisabled(String label) {
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
         }
@@ -3179,7 +3179,7 @@ public class LifeSteps {
         itemList.clear();
         List<String> originalLineItemDetails;
         List<String> copiedLineItemDetails;
-        for(String name : nameList){
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickDetailsTab();
             originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
@@ -3198,7 +3198,7 @@ public class LifeSteps {
 
     @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
     public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.runReportFromLineItemPage();
@@ -3215,20 +3215,20 @@ public class LifeSteps {
         navigation.clickMenuAngle();
         navigation.clickGeneratedReport();
         runReportPanel.clickSearchButton();
-        for(String name : nameList) {
+        for (String name : nameList) {
             Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
         }
     }
 
     @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
     public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
-        for(String name : itemList) {
+        for (String name : itemList) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.performDeleteOperation();
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
             Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation",
-                        lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
 
         }
     }
@@ -3257,5 +3257,34 @@ public class LifeSteps {
         BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @Then("User creates a new tactic with details {string} {string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel) {
+        tacticDetails.enterTacticName(tacticName);
+        tacticDetails.saveTactic();
+        tacticSettings.selectChannel(channel);
+        tacticSettings.saveTacticSettings();
+    }
+
+    @Then("User deletes the tactic {string} and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
+        tacticDetails.deleteTactic();
+        DriverFactory.getPage().reload();
+        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic(tacticName);
+        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+    }
+
+    @And("User enables tactic {string} through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
+        tacticDetails.bulkEnableTactics(tacticName);
+        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+
+    }
+
+    @When("User clicks on create new Campaign")
+    public void userClicksOnCreateNewCampaign() {
+        campaigns.createCampaign();
     }
 }

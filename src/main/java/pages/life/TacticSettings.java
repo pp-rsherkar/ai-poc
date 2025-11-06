@@ -17,6 +17,7 @@ public class TacticSettings {
     private final Locator SELECT_CHANNEL;
     private final Locator SEARCH_RULE_TYPE;
     private final Locator SELECT_RULE_TYPE;
+    private final Locator SELECT_TARGETING;
     private final Locator SELECT_OPTION;
     private final Locator RULE_TYPE_OK_BUTTON;
     private final Locator RULE_TYPE_CLOSE;
@@ -59,7 +60,6 @@ public class TacticSettings {
     private final Locator SHOW_MORE_BUTTON;
     private final Locator TARGETING_OPTIONS_BS;
     private final Locator TARGETING_OPTIONS;
-    private final Locator SELECT_TARGETING;
     private final Locator BLOCK_TARGETING;
     private final Locator HOUSEHOLD_ICON;
     private final Locator HOUSEHOLD_IP_ICON;
@@ -67,6 +67,7 @@ public class TacticSettings {
     private final Locator PRACTICE_IP;
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
+    private final Locator VERIFY_TACTIC_NAME;
 
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
@@ -128,6 +129,8 @@ public class TacticSettings {
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
         this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
         this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
+        this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
+
 
     }
 
@@ -663,5 +666,11 @@ public class TacticSettings {
     public BigDecimal getTacticMaxBidPrice() {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
+
+
+    public String verifyTacticName() {
+        return VERIFY_TACTIC_NAME.innerText();
+    }
+
 
 }
