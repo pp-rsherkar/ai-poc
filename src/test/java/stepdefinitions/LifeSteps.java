@@ -3220,7 +3220,7 @@ public class LifeSteps {
 
     @And("User enters the Smart NPI list details as {string} {string}")
     public void userEntersTheSmartNPIListDetailsAsFor(String npiListName, String advertiser) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiSmartList.enterListName(npiName);
         npiSmartList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
