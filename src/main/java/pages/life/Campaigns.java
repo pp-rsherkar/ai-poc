@@ -2,6 +2,9 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.LoadState;
+import factory.DriverFactory;
+import utils.WaitUtility;
 
 public class Campaigns {
     private final Page page;
@@ -14,30 +17,34 @@ public class Campaigns {
     private final Locator CAMPAIGN_TYPE_SEQUENTIAL;
     private final Locator BUDGET;
     private final Locator SAVE_CAMPAIGN;
+    private final Locator CAMPAIGN_DASHBOARD;
     private final Locator CAMPAIGN_SUCCESS;
-    private final Locator NAVIGATE_TO_CAMPAIGN_LISTING;
+    private final Locator LIFE_TIME_FILTER;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
         this.page = page;
         this.CREATE_CAMPAIGN = page.locator("//button[text()='Create a Campaign']");
         this.VERIFY_CAMPAIGN_PAGE = page.locator("//div[text()='Create New Campaign']");
-        this.SEARCH_ADVERTISER = page.locator("//sui-select//*[@class='search']");
-        this.SELECT_ADVERTISER = page.locator("//sui-select-option");
+        this.SEARCH_ADVERTISER = page.locator("(//input[@placeholder='Select Advertiser'])[1]");
+        this.SELECT_ADVERTISER = page.getByText("");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
         this.CAMPAIGN_TYPE_REGULAR = page.locator("//button[text()='Regular']");
         this.CAMPAIGN_TYPE_SEQUENTIAL = page.locator("//button[text()='Sequential']");
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
-        this.CAMPAIGN_SUCCESS = page.locator("//*[text()='Success!']");
-        this.NAVIGATE_TO_CAMPAIGN_LISTING = page.locator("//span[@class='breadCrumbRoot']");
+        this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
+        this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
     }
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String campaignDashboard() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
@@ -59,8 +66,6 @@ public class Campaigns {
             CAMPAIGN_TYPE_REGULAR.click();
         } else if ("Sequential".equals(campaignType)) {
             CAMPAIGN_TYPE_SEQUENTIAL.click();
-        } else {
-            System.out.println("Invalid campaign type");
         }
     }
 
@@ -73,11 +78,17 @@ public class Campaigns {
     }
 
     public String campaignSuccess() {
-        return CAMPAIGN_SUCCESS.innerText();
+        String successMessage = CAMPAIGN_SUCCESS.innerText().trim();
+        waitUtility.waitUntilSpinnerHidden();
+        return successMessage;
     }
 
-    public void navigateToCampaignListing() {
-        NAVIGATE_TO_CAMPAIGN_LISTING.click();
-        page.waitForLoadState();
+    public void navigateToCampaignDashboard() {
+        CAMPAIGN_DASHBOARD.click();
+        waitUtility.waitForLocatorVisible(CAMPAIGN_DASHBOARD);
+        if (LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
+            LIFE_TIME_FILTER.click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
     }
 }

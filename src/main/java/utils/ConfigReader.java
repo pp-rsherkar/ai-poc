@@ -1,19 +1,45 @@
 package utils;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigReader {
 
-    //This is used to raed from properties files and returns properties object
-    public Properties initProp() {
-        Properties properties = new Properties();
-        try {
-            FileInputStream fileInputStream = new FileInputStream("./src/test/resources/config/config.properties");
+    private static final Properties properties = new Properties();
+
+    static {
+        try (FileInputStream fileInputStream = new FileInputStream("./src/test/resources/config/config.properties")) {
             properties.load(fileInputStream);
-        } catch (Exception e) {
-            System.out.println("Unable to read Properties file.");
+        } catch (IOException e) {
+            System.err.println("Unable to load properties file: " + e.getMessage());
+            e.printStackTrace();
         }
-        return properties;
+    }
+
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    public static String getDbURL() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("dbURL"));
+    }
+
+    public static String getDbUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("dbUsername"));
+    }
+
+    public static String getDbPassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("dbPassword"));
+    }
+
+    public static String getCustomDestinationUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("customDestinationUserName"));
+    }
+
+    public static String getCustomDestinationPassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("customDestinationPassword"));
     }
 }
+
+

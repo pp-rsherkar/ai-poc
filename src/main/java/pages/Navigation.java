@@ -2,9 +2,16 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
+import pages.life.CampaignDashboard;
+import utils.WaitUtility;
 
 public class Navigation {
+
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
@@ -13,6 +20,19 @@ public class Navigation {
     private final Locator SIGNAL;
     private final Locator STUDIO;
     private final Locator SUB_MENU;
+    private final Locator RUN_REPORT;
+    private final Locator GENERATED_REPORT;
+    private final Locator SCHEDULED_REPORT;
+    private final Locator REPORT_TEMPLATE;
+    private final Locator ACCOUNT_NAME;
+    private final Locator ACCOUNT_SEARCH;
+    private final Locator ACCOUNT_ITEM;
+    private final Locator STUDIO_TITLE;
+    private final Locator TARGETING_TEMPLATE_ICON;
+    private final Locator CAMPAIGNS;
+    private final Locator CREATIVE_LIBRARY_ICON;
+    private final Locator MENU_ANGLE;
+    private final Locator PULSEPOINT_LOGO;
 
     public Navigation(Page page) {
         this.page = page;
@@ -21,8 +41,21 @@ public class Navigation {
         this.LOGIN_BUTTON = page.locator(".loginLabel");
         this.LIFE = page.getByText("Life");
         this.SIGNAL = page.getByText("Signal");
-        this.STUDIO = page.getByText("Studio");
-        this.SUB_MENU = page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("menu"));
+        this.STUDIO = page.locator("//div[contains(@class,'genomeMenuItem')]");
+        this.RUN_REPORT = page.getByText("Run a Report");
+        this.GENERATED_REPORT = page.locator("#megamenu").getByText("Generated Reports");
+        this.SCHEDULED_REPORT = page.locator("#megamenu").getByText("Scheduled Reports");
+        this.REPORT_TEMPLATE = page.locator("#megamenu").getByText("Report Templates");
+        this.SUB_MENU = page.locator("//img[contains(@alt,'menu')]");
+        this.ACCOUNT_NAME = page.locator("//div[@class='accountname']");
+        this.ACCOUNT_SEARCH = page.locator("//div[@id='accountSwitcher']/input[@placeholder='Search']");
+        this.ACCOUNT_ITEM = page.locator("//div[@id='accountSwitcher']//div[@class='item']");
+        this.STUDIO_TITLE = page.locator("//div[text()='Studio']");
+        this.TARGETING_TEMPLATE_ICON = page.locator("//div[contains(@class,'targetTemplateIcon')]");
+        this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
+        this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
+        this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
+        this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo");
     }
 
     public void navigateToUrl(String url) {
@@ -42,16 +75,17 @@ public class Navigation {
     }
 
     public void clickOnIcon(String iconName) {
-        this.page.getByText(iconName, new Page.GetByTextOptions().setExact(true)).click();  // Clicks on the Exact text
+        this.page.getByText(iconName.trim()).click();
     }
 
     public String verifyProfilePage() {
-        page.waitForLoadState();
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
     }
 
     public void navigateToLife() {
         LIFE.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void navigateToHCP() {
@@ -59,14 +93,95 @@ public class Navigation {
     }
 
     public void navigateToStudio() {
-        page.waitForLoadState();
+        waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
-        page.waitForLoadState();
+        STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
-        page.waitForLoadState();
+        waitUtility.waitForLocatorVisible(STUDIO_TITLE);
+    }
+
+    public void selectAccount(String account) {
+        if (ACCOUNT_NAME.innerText().contains("buyer2")) {
+            ACCOUNT_NAME.click();
+            ACCOUNT_SEARCH.fill(account);
+            page.waitForLoadState(LoadState.LOAD);
+            ACCOUNT_ITEM.click();
+        }
+        waitUtility.waitUntilSpinnerHidden();
+        campaignDashboard.verifyIfFiltersExist();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public void clickSubMenu() {
         SUB_MENU.click();
+    }
+
+    public void clickMenuAngle(){
+        if(MENU_ANGLE.isVisible()) {
+            if (MENU_ANGLE.getAttribute("class").contains("fa-angle-left")) {
+                MENU_ANGLE.click();
+            }
+        }
+    }
+
+    public void clickRunReport() {
+        RUN_REPORT.click();
+    }
+
+    public void clickGeneratedReport() {
+        page.waitForTimeout(5000);
+        GENERATED_REPORT.click();
+    }
+
+    public void clickScheduledReport() {
+        SCHEDULED_REPORT.click();
+
+    }
+
+    public void clickReportTemplate() {
+        REPORT_TEMPLATE.click();
+    }
+
+    public void clickTargetingTemplate() {
+        TARGETING_TEMPLATE_ICON.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickCampaigns() {
+        CAMPAIGNS.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickCreativeLibrary() {
+        CREATIVE_LIBRARY_ICON.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickPulsePointLogo(){
+        PULSEPOINT_LOGO.click();
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+    }
+
+    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
+    // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
+    public void navigateBackToLife(){
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+        SUB_MENU.click();
+        LIFE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        LIFE.click();
+    }
+
+    public void navigateBackToHCP(){
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+        SUB_MENU.click();
+        SIGNAL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        SIGNAL.click();
+    }
+
+    public void navigateBackToStudio(){
+        waitUtility.waitForLocatorVisible(SUB_MENU);
+        SUB_MENU.click();
+        STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        STUDIO.click();
     }
 }

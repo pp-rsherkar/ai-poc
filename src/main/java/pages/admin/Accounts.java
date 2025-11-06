@@ -3,6 +3,12 @@ package pages.admin;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import factory.DriverFactory;
+import utils.WaitUtility;
+
+import java.util.List;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class Accounts {
     private final Page page;
@@ -13,7 +19,6 @@ public class Accounts {
     private final Locator SEARCH_ICON;
     private final Locator SELECT_ACCOUNT;
     private final Locator STUDIO_SETTINGS_BUTTON;
-    private final Locator EXPLORER_TOGGLE;
     private final Locator EXPANSION_TOGGLE;
     private final Locator STUDIO_SETTINGS_SAVE;
     private final Locator STUDIO_MENU;
@@ -22,8 +27,32 @@ public class Accounts {
     private final Locator SWITCH_ACCOUNT;
     private final Locator SWITCH_SEARCH_ACCOUNT;
     private final Locator SWITCH_CLICK_ACCOUNT;
-    private final Locator STUDIO;
     private final Locator WORKSPACE_NAME;
+    private final Locator ACCOUNTS_TAB_TEXT;
+    private final Locator ADVERTISER_TAB;
+    private final Locator ACCOUNT_DROPDOWN;
+    private final Locator ACCOUNT_DROPDOWN_TEXTAREA;
+    private final Locator SEARCH_BUTTON;
+    private final Locator ADVERTISER_LIST;
+    private final Locator REPORTING_TAB;
+    private final Locator CUSTOM_DESTINATION_SECTION;
+    private final Locator ADD_DESTINATION_BUTTON;
+    private final Locator ENTER_DESTINATION_NAME;
+    private final Locator DESTINATION_TYPE_DROPDOWN;
+    private final Locator HOSTNAME;
+    private final Locator USERNAME;
+    private final Locator PASSWORD;
+    private final Locator PORT;
+    private final Locator TEST_CONNECTION_LINK;
+    private final Locator CONNECTION_CONFIRMATION_TEXT;
+    private final Locator OK_BUTTON;
+    private final Locator SELECT_USER_TAB;
+    private final Locator STUDIO_USER_TAB;
+    private final Locator STUDIO_TOGGLE_EXTERNAL_USER_ENABLED;
+    private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
+    private final Locator ACCOUNTS_ADVERTISER_TAB;
+    private final Locator SUCCESS_ALERT;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
         this.page = page;
@@ -31,87 +60,241 @@ public class Accounts {
         this.ADMINISTRATION = page.getByText("Administration", new Page.GetByTextOptions().setExact(true));
         this.ACCOUNTS_TAB = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Accounts"));
         this.SEARCH_ACCOUNT = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
-        this.SEARCH_ICON =page.locator(".ui > .iconSprite");
-        this.SELECT_ACCOUNT = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("100Plus"));
+        this.SEARCH_ICON = page.locator(".ui > .iconSprite");
+        this.SELECT_ACCOUNT = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName("ACCOUNT_NAME"));
+        this.SELECT_USER_TAB = page.locator("//a[@routerlink='users']");
+        this.STUDIO_USER_TAB = page.locator("//button[.//span[text()='Studio']]");
+        this.STUDIO_TOGGLE_EXTERNAL_USER_ENABLED = page.locator("//span[contains(@class,'icons-24-checkmark-green')]");
+        this.STUDIO_TOGGLE_EXTERNAL_USER_DISABLED = page.locator("//span[contains(@class,'icons-24-checkmark-white')]");
         this.STUDIO_SETTINGS_BUTTON = page.locator("div:nth-child(6) > .btn > .acc-toggle-wrapper > .icons-32-checkmark");
-        this.EXPLORER_TOGGLE = page.locator("app-rightside label").first();
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
-        this.STUDIO_SETTINGS_SAVE =page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
-        this.STUDIO_MENU=page.getByText("Studio").nth(4);
-        this.DISABLE_STUDIO_OK_BUTTON =page.locator("sui-dimmer div").filter(new Locator.FilterOptions().setHasText("Ok")).nth(4);
-        this.PULSEPOINT_ICON =page.locator(".ui > div:nth-child(6)").first();
-        this.SWITCH_ACCOUNT =page.locator(".left > div:nth-child(2)").first();
-        this.SWITCH_SEARCH_ACCOUNT =page.getByPlaceholder("Search");
-        this.SWITCH_CLICK_ACCOUNT =page.locator("#accountSwitcher").getByText("100Plus");
-        this.STUDIO=page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
-        this.WORKSPACE_NAME=page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
+        this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
+        this.STUDIO_MENU = page.getByText("Studio").nth(4);
+        this.DISABLE_STUDIO_OK_BUTTON = page.locator("sui-dimmer div").filter(new Locator.FilterOptions().setHasText("Ok")).nth(4);
+        this.PULSEPOINT_ICON = page.locator(".ui > div:nth-child(6)").first();
+        this.SWITCH_ACCOUNT = page.locator(".left > div:nth-child(2)").first();
+        this.SWITCH_SEARCH_ACCOUNT = page.getByPlaceholder("Search");
+        this.SWITCH_CLICK_ACCOUNT = page.locator("#accountSwitcher").getByText("100Plus");
+        this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
+        this.ACCOUNTS_TAB_TEXT = page.locator("//span[text()='Account Management']");
+        this.ADVERTISER_TAB = page.locator("//a[@routerlink='/advertisers/list']");
+        this.ACCOUNT_DROPDOWN = page.locator("//app-single-select-dropdown[@placeholder='Any Account']");
+        this.ACCOUNT_DROPDOWN_TEXTAREA = page.locator("//input[@placeholder='Any Account']");
+        this.SEARCH_BUTTON = page.locator("//span[text()='Search']");
+        this.ADVERTISER_LIST = page.locator("//td[contains(@class,'gaTableRow')]//div");
+        this.REPORTING_TAB = page.locator("//a[@routerlink='reporting']");
+        this.CUSTOM_DESTINATION_SECTION = page.locator("//div[@id='custom-destinations']");
+        this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']");
+        this.ENTER_DESTINATION_NAME = page.locator("//input[@placeholder='Enter Destination Name']");
+        this.DESTINATION_TYPE_DROPDOWN = page.locator("//label[text()='Destination Type']/following-sibling::select");
+        this.HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
+        this.USERNAME = page.locator("//input[@placeholder='Enter User Name']");
+        this.PASSWORD = page.locator("//input[@placeholder='Enter Password']");
+        this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
+        this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
+        this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
+        this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
+        this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
+        this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
     }
 
     public void clickAdministration() {
         ADMINISTRATION.click();
     }
 
-    public void selectAccountsTab()
-    {
+    public void selectAccountsTab() {
         page.waitForLoadState();
         ACCOUNTS_TAB.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public void searchAccount()
-    {
-        page.waitForLoadState();
-//        SEARCH_ACCOUNT.fill("100Plus");
-//        SEARCH_ICON.click();
-        SELECT_ACCOUNT.click();
+    public void searchAccount(String accountName) {
+        waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
+        SEARCH_ACCOUNT.fill(accountName);
+        SEARCH_ICON.click();
+        Locator selectAccount = page.locator(String.format("//div[@title='%s']", accountName));
+        waitUtility.waitForLocatorVisible(selectAccount);
+        selectAccount.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void enableStudio()
-    {
+    public void enableStudio() {
         STUDIO_SETTINGS_BUTTON.click();
     }
 
     public void workSpaceSettings() {
         EXPANSION_TOGGLE.click();
-        //EXPLORER_TOGGLE.click();
     }
 
-    public void saveStudioSettings()
-    {
+    public void saveStudioSettings() {
         STUDIO_SETTINGS_SAVE.click();
     }
 
-    public void disableStudioForAccount()
-    {
+    public void disableStudioForAccount(String accountName) {
         ADMINISTRATION.click();
         ACCOUNTS_TAB.click();
-        SEARCH_ACCOUNT.fill("100Plus");
+        waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
+        SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
         STUDIO_SETTINGS_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
+        page.reload();
     }
 
-    public void switchAccount()
-    {
+    public void switchAccount(String accountName) {
         SWITCH_ACCOUNT.click();
-        SWITCH_SEARCH_ACCOUNT.fill("100Plus");
+        SWITCH_SEARCH_ACCOUNT.fill(accountName);
         SWITCH_CLICK_ACCOUNT.click();
     }
 
-    public String verifyWorkspacePermission()
-    {
+    public String verifyWorkspacePermission() {
         WORKSPACE_NAME.waitFor();
         return WORKSPACE_NAME.textContent();
     }
 
-    public void verifyStudioMenu()
-    {
+    public void verifyStudioMenu() {
         PULSEPOINT_ICON.click();
         SUB_MENU.click();
-        boolean isVisible = STUDIO_MENU.isVisible();
-        if(!isVisible)
-        {
-            System.out.println("Studio Menu is not visible");
+        assertThat(STUDIO_MENU).isHidden();
+    }
+
+    public void clickAdvertiserTab() {
+        ADVERTISER_TAB.click();
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+    }
+
+    public void selectAccount(String account) {
+        ACCOUNT_DROPDOWN.click();
+        ACCOUNT_DROPDOWN_TEXTAREA.fill(account);
+        ACCOUNT_DROPDOWN.getByText(account).click();
+        SEARCH_BUTTON.click();
+    }
+
+    public List<String> fetchAdvertiserList() {
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+        return ADVERTISER_LIST.allInnerTexts();
+    }
+
+    public boolean isReportingTabDisplayed() {
+        return REPORTING_TAB.isVisible();
+    }
+
+    public void clickReportingTab() {
+        REPORTING_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CUSTOM_DESTINATION_SECTION);
+    }
+
+    public void clickAddDestination() {
+        ADD_DESTINATION_BUTTON.click();
+        waitUtility.waitForLocatorVisible(ENTER_DESTINATION_NAME.last());
+    }
+
+    public void enterDestinationName(String metricName) {
+        ENTER_DESTINATION_NAME.last().fill(metricName);
+    }
+
+    public void selectDestinationType(String destinationType) {
+        DESTINATION_TYPE_DROPDOWN.last().selectOption(destinationType);
+    }
+
+    public void enterHostName(String hostName) {
+        HOSTNAME.last().fill(hostName);
+    }
+
+    public void enterPortName(String port) {
+        PORT.last().fill(port);
+    }
+
+    public void enterUserName(String demoUser) {
+        USERNAME.last().fill(demoUser);
+    }
+
+    public void enterPassword(String demoPassword) {
+        PASSWORD.last().fill(demoPassword);
+    }
+
+    public void clickTestConnection() {
+        TEST_CONNECTION_LINK.last().click();
+        waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
+    }
+
+    public void clickOKButton() {
+        OK_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden(240000);
+        waitUtility.waitForLocatorVisible(PULSEPOINT_ICON);
+    }
+
+    public void selectUserTab() {
+        SELECT_USER_TAB.click();
+        page.waitForLoadState();
+    }
+
+    public void selectExternalUser(String externalUser) {
+        Locator searchUser = page.locator("(//input[@placeholder='Search'])[2]");
+        waitUtility.waitForLocatorVisible(searchUser);
+        searchUser.click();
+        searchUser.fill(externalUser);
+        SEARCH_ICON.click();
+        Locator externalUserVisibility = page.locator(String.format("//div[contains(text(),'%s')]", externalUser));
+        waitUtility.waitForLocatorVisible(externalUserVisibility);
+        STUDIO_USER_TAB.click();
+    }
+
+    public boolean turnStudioToggleForExternalUser() {
+        page.waitForLoadState();
+        if (STUDIO_TOGGLE_EXTERNAL_USER_ENABLED.isVisible()) {
+            return true;
+        } else if (STUDIO_TOGGLE_EXTERNAL_USER_DISABLED.isVisible()) {
+            STUDIO_TOGGLE_EXTERNAL_USER_DISABLED.click();
+            waitUtility.waitForLocatorVisible(STUDIO_TOGGLE_EXTERNAL_USER_ENABLED);
+            return STUDIO_TOGGLE_EXTERNAL_USER_ENABLED.isVisible();
+        }
+        return false;
+    }
+
+    public boolean isAccountsAdvertiserTabDisplayed() {
+        return ACCOUNTS_ADVERTISER_TAB.isVisible();
+    }
+
+    public void clickAccountsAdvertiserTab() {
+        ACCOUNTS_ADVERTISER_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForElementVisible("//div[@class='advertiser-tabs']");
+    }
+
+    public void clickAdvertisersSubTab(String tabName) {
+        Locator tabXpath = page.locator(String.format("//div[@class='advertiser-tabs']//button[contains(normalize-space(text()),'%s')]", tabName));
+        tabXpath.click();
+    }
+
+    public boolean checkHCPPermissionForAdvertiser(String checkboxStatus, String advertiser) {
+        boolean flag;
+        Locator permissionXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox", advertiser));
+        Locator disabledTextXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]", advertiser));
+        flag = switch (checkboxStatus) {
+            case "Disabled" -> {
+                if (!disabledTextXpath.isVisible()) {
+                    permissionXpath.click();
+                }
+                yield true;
+            }
+            case "Enabled" -> {
+                if (disabledTextXpath.isVisible()) {
+                    permissionXpath.click();
+                }
+                yield true;
+            }
+            default -> false;
+        };
+        return flag;
+    }
+
+    public void saveAccountsAdvertiserTab(){
+        if(OK_BUTTON.isVisible()) {
+            OK_BUTTON.click();
+            waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         }
     }
 }
