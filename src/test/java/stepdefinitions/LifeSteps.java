@@ -78,15 +78,14 @@ public class LifeSteps {
     Accounts accounts = new Accounts(DriverFactory.getPage());
     ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
+    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
     Constants constants = new Constants();
-    String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
     int totalListCount = 0;
     int flightStartDate = 0;
     int flightEndDate = 0;
     APIResponse response;
     boolean flag = false;
-    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
     private String customFieldName;
     private String uiCustomFieldName;
     private BigDecimal campaignBaseBid;

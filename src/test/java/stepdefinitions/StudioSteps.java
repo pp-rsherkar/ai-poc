@@ -79,8 +79,8 @@ public class StudioSteps {
     }
 
     @Then("the user renames the workspace to {string}")
-    public void the_user_renames_the_workspace_to_(String string) {
-        workspaceName = string + CommonUtils.timeStampCalculation();
+    public void the_user_renames_the_workspace_to_(String wName) {
+        workspaceName = wName + CommonUtils.timeStampCalculation();
         expansionWorkspace.renameExpansion(workspaceName);
     }
 
