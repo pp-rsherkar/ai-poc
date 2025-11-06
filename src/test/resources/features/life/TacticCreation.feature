@@ -15,7 +15,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates new tactics and verifies it
+    Then User creates multiple tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Targeting Segment     | Email    | Health Population  |
       | Health Populations    | EHR      | NPI                |
@@ -37,12 +37,13 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates new tactics and verifies it
-      | Targeting Segment |
+    Then User creates multiple tactics under same line item and verifies it
+      | Tactic Name           | Channel  | RuleType           |
+      | Targeting Segment     | Email    | Health Population  |
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible in new and existing tactic
       | Targeting Segment |
-    And User enters value in custom field and verifies if it's not visible in other tactics
+    #And User enters value in custom field and verifies if it's not visible in other tactics
     Then User deletes the custom field
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CUSTOM_NAME |

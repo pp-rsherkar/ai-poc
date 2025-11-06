@@ -130,7 +130,7 @@ public class TacticDetails {
         return NEW_TACTIC_TABS.allInnerTexts();
     }
 
-    public void CLICK_FIRST_TACTIC() {
+    public void clickFirstTactic() {
         SAVED_TACTICS.first().click();
     }
 

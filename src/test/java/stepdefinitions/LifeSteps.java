@@ -89,8 +89,6 @@ public class LifeSteps {
     APIResponse response;
     boolean flag = false;
     CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
-    private String customFieldName;
-    private String uiCustomFieldName;
     private BigDecimal campaignBaseBid;
     private BigDecimal campaignMaxBid;
 
@@ -169,8 +167,8 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
-    @Then("User creates new tactics and verifies it")
-    public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
+    @Then("User creates multiple tactics under same line item and verifies it")
+    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it (DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
