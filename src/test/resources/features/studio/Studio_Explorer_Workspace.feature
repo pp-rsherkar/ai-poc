@@ -37,7 +37,6 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | ADVERTISER | WORKSPACE_NAME |
       | Abbvie     | Explorer       |
 
-
   @regression
   Scenario Outline: Create and save HCP Explorer workspace by building audience using AI Configurator - <AI_PROMPT>
     When User clicks on Create New Workspace
@@ -63,7 +62,6 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Abbvie     | Explorer       | Create a mix of NPIs by choosing profession and specialties in heart and brain surgery.                                                      | Profession, Specialty Filter                     |
       | Abbvie     | Explorer       | Find doctors based on their years of experience, the states they work in, their wealth level, and how many patients they typically see.      | Clinical Recency, Profession, Years Practiced    |
       | Abbvie     | Explorer       | Pick the types of NPI lists you want, look for doctors who graduated during a specific period, and then target certain hospitals or clinics. | Graduation Year, Profession                      |
-
 
   @regression
   Scenario Outline: Create and save HCP Explorer workspace by applying filters one by one and validating NPI details are refined

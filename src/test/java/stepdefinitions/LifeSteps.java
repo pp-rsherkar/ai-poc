@@ -15,6 +15,7 @@ import pages.life.*;
 import utils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -79,12 +81,18 @@ public class LifeSteps {
     ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
     Constants constants = new Constants();
+    String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
     int totalListCount = 0;
     int flightStartDate = 0;
     int flightEndDate = 0;
     APIResponse response;
     boolean flag = false;
+    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
+    private String customFieldName;
+    private String uiCustomFieldName;
+    private BigDecimal campaignBaseBid;
+    private BigDecimal campaignMaxBid;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -165,11 +173,11 @@ public class LifeSteps {
     public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
-            for (Map<String, String> tacticData : tactics) {
-                String tacticName = tacticData.get("Tactic Name");
-                String channel = tacticData.get("Channel");
-                String ruleType = tacticData.get("RuleType");
-                expectedTactic.add(tacticName);
+        for (Map<String, String> tacticData : tactics) {
+            String tacticName = tacticData.get("Tactic Name");
+            String channel = tacticData.get("Channel");
+            String ruleType = tacticData.get("RuleType");
+            expectedTactic.add(tacticName);
             tacticDetails.enterTacticName(tacticName);
             tacticDetails.saveTactic();
             tacticSettings.selectChannel(channel);
@@ -178,7 +186,7 @@ public class LifeSteps {
             tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
-        List<String> actualTactics =   tacticDetails.getAllTactics();
+        List<String> actualTactics = tacticDetails.getAllTactics();
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
         List<String>expectedTarget = tacticSettings.getExpectedTargetRules();
         List<String>actualTarget = tacticSettings.getActualTargetRules();
@@ -2078,7 +2086,7 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
@@ -2120,7 +2128,6 @@ public class LifeSteps {
             bulkCreativeUpload.selectAndClickCreativeType(creativeType);
             bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
             bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
-            bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
             nameList.add(creativeName);
         }
@@ -2221,7 +2228,7 @@ public class LifeSteps {
     }
 
     @When("Line Items of selected campaigns should load when user types line items initials {string} in {string} field")
-    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials,String fieldName) {
+    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials, String fieldName) {
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(lineItemInitials, fieldName));
     }
 
@@ -2243,7 +2250,7 @@ public class LifeSteps {
     @Then("{string} section should be visible with label {string} checkbox")
     public void checkboxShouldBeVisibleWithLabel(String filterReportSection, String checkboxLabel) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
             Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel));
     }
 
@@ -2264,7 +2271,7 @@ public class LifeSteps {
     }
 
     @And("User should be able to generate the report")
-    public void userShouldAbleToGenerateTheReport(){
+    public void userShouldAbleToGenerateTheReport() {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
@@ -2416,11 +2423,11 @@ public class LifeSteps {
     @Then("{string} section should be visible with label {string}, {string}, {string} checkbox")
     public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
             Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
             Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
             Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
     }
 
@@ -2496,8 +2503,8 @@ public class LifeSteps {
 
     @And("Verify default value of Send At fields - Start Time is {string} and Timezone is {string}")
     public void verifyDefaultValueOfSendAtFieldsStartTimeIsAndTimezoneIs(String defaultTime, String defaultTimezone) {
-        Assert.assertEquals("Default time "  + defaultTime+" is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
-        Assert.assertEquals("Default time "  + defaultTimezone+" is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
+        Assert.assertEquals("Default time " + defaultTime + " is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
+        Assert.assertEquals("Default time " + defaultTimezone + " is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
     }
 
     @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
@@ -3010,7 +3017,7 @@ public class LifeSteps {
     @And("User should see error message when tries to save line item page and dates fields should get highlighted with inline error message")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPageAndDatesFieldsShouldGetHighlighted() {
         Assert.assertTrue("LineItem flights overlap message is not displayed", lineItemDetails.fetchErrorAlert().contains("LineItem flights overlap."));
-        Assert.assertEquals("Flight overlap with other flights." , lineItemDetails.fetchInlineErrorMessage());
+        Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
     }
 
     @When("User enters line item details {string}")
@@ -3120,7 +3127,7 @@ public class LifeSteps {
 
     @Then("User adds Comments or Notes {string} to each line item")
     public void userAddsCommentsOrNotesToEachLineItem(String notes) {
-        for(String name : nameList){
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String newNotes = name + " " + notes;
             itemList.add(newNotes);
@@ -3130,7 +3137,7 @@ public class LifeSteps {
 
     @And("Verify the notes added to each line item")
     public void verifyTheNotesAddedToEachLineItem() {
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String notes = lineItemDetails.fetchLineItemNotes();
             Assert.assertTrue("Note of '" + name + "' is not available",
@@ -3141,16 +3148,16 @@ public class LifeSteps {
     @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
     public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
         lineItemDetails.clickBulkEditMode();
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.selectLineItemUsingBulkEdit(name);
         }
-        Assert.assertEquals("Lineitems status updated successfully" ,lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
+        Assert.assertEquals("Lineitems status updated successfully", lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
         lineItemDetails.exitBulkEditMode();
     }
 
     @And("Verify that each selected line item is {string}")
     public void verifyThatEachSelectedLineItemIsDisabled(String label) {
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
         }
@@ -3161,7 +3168,7 @@ public class LifeSteps {
         itemList.clear();
         List<String> originalLineItemDetails;
         List<String> copiedLineItemDetails;
-        for(String name : nameList){
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickDetailsTab();
             originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
@@ -3180,7 +3187,7 @@ public class LifeSteps {
 
     @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
     public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
-        for(String name : nameList) {
+        for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.runReportFromLineItemPage();
@@ -3197,21 +3204,76 @@ public class LifeSteps {
         navigation.clickMenuAngle();
         navigation.clickGeneratedReport();
         runReportPanel.clickSearchButton();
-        for(String name : nameList) {
+        for (String name : nameList) {
             Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
         }
     }
 
     @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
     public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
-        for(String name : itemList) {
+        for (String name : itemList) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.performDeleteOperation();
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
             Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation",
-                        lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
 
         }
+    }
+
+    //* Rajyalaxmi - Tactic max bid and base bid verification
+    @When("User clicks on Campaign Settings")
+    public void user_clicks_on_campaign_settings() {
+        campaignSettings.campaignSettingsLink();
+        campaignSettings.bidSettingsTab();
+    }
+
+    @Then("Verify user is on default bid settings page")
+    public void verify_user_is_on_default_bid_settings_page() {
+        Assert.assertEquals("Default Bid Settings", campaignSettings.getDefaultSettings());
+    }
+
+    @Then("User gets Max Bid and Base Bid values")
+    public void user_gets_max_bid_and_base_bid_values() {
+        campaignBaseBid = (campaignSettings.getBaseBidPrice());
+        campaignMaxBid = (campaignSettings.getMaxBidPrice());
+    }
+
+    @Then("Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values")
+    public void verify_max_bid_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values() {
+        BigDecimal tacticBaseBid = (tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
+        BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
+        Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
+        Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @Then("User creates a new tactic with details {string} {string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel) {
+        tacticDetails.enterTacticName(tacticName);
+        tacticDetails.saveTactic();
+        tacticSettings.selectChannel(channel);
+        tacticSettings.saveTacticSettings();
+    }
+
+    @Then("User deletes the tactic {string} and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
+        tacticDetails.deleteTactic();
+        DriverFactory.getPage().reload();
+        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic(tacticName);
+        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+    }
+
+    @And("User enables tactic {string} through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
+        tacticDetails.bulkEnableTactics(tacticName);
+        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+
+    }
+
+    @When("User clicks on create new Campaign")
+    public void userClicksOnCreateNewCampaign() {
+        campaigns.createCampaign();
     }
 }

@@ -48,7 +48,7 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_FILTER_TITLE;
     private final Locator MERGED_TEXT;
     private final Locator DASHBOARD_FILTERS;
-
+    private final Locator OWNED_AND_OPERATED_SECTION;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -79,13 +79,14 @@ public class ExplorerWorkspace {
         this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//div[text()='Try another prompt']");
         this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id, 'filters-container')]");
         this.MAP_TOOL_TIP = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(@class,'MapTooltip')]/div/div/div[text()='Identified NPIs']/following-sibling::div");
-        this.DELETE_FILTER = WORKSPACE_FRAME.locator("//button[contains(@class,'DeleteButton')]");
+        this.DELETE_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class, 'FilterTitleContainer')]//button");
         this.CAMERA_CONTROL_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//button[@title='Map camera controls']");
         this.ZOOM_OUT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[@class='gmnoprint']//button[@title='Zoom out' and @class='gm-control-active']");
         this.MAP_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("div[aria-label='Dashboard Content']");
         this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
         this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
+        this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -258,5 +259,9 @@ public class ExplorerWorkspace {
             }
         }
         return mergeFilterName;
+    }
+
+    public boolean isOwnedAndOperatedSectionAvailable() {
+        return OWNED_AND_OPERATED_SECTION.isVisible();
     }
 }
