@@ -15,12 +15,17 @@ import pages.life.*;
 import utils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -53,7 +58,6 @@ public class LifeSteps {
     TacticDetails tacticDetails = new TacticDetails(DriverFactory.getPage());
     TacticSettings tacticSettings = new TacticSettings(DriverFactory.getPage());
     TacticCreatives tacticCreatives = new TacticCreatives(DriverFactory.getPage());
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
     NPILists npiLists = new NPILists(DriverFactory.getPage());
     NPIStaticList npiStaticList = new NPIStaticList(DriverFactory.getPage());
     ReportTemplates reportTemplates = new ReportTemplates(DriverFactory.getPage());
@@ -74,12 +78,18 @@ public class LifeSteps {
     Accounts accounts = new Accounts(DriverFactory.getPage());
     ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
+    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
     Constants constants = new Constants();
-    String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
     int totalListCount = 0;
+    int flightStartDate = 0;
+    int flightEndDate = 0;
     APIResponse response;
     boolean flag = false;
+    private String customFieldName;
+    private String uiCustomFieldName;
+    private BigDecimal campaignBaseBid;
+    private BigDecimal campaignMaxBid;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -95,7 +105,7 @@ public class LifeSteps {
     }
 
     @And("{string} application is logged in successfully with Account {string}")
-    public void life_application_is_loged_in_as(String application, String account) {
+    public void life_application_is_logged_in_as(String application, String account) {
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
@@ -120,15 +130,13 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         Assert.assertEquals("Life", campaigns.campaignDashboard());
-        /*campaignListing.setGroupByFilter();
-        navigation.clickOnIcon(" Group By Campaign ");*/
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
     public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget) {
-        campaignNameRandom = campaign_name + '_' + timestamp;
+        campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
         campaigns.selectAdvertiser(advertiser);
         campaigns.enterCampaignName(campaignNameRandom);
         campaigns.setCampaignType(campaign_type);
@@ -138,13 +146,13 @@ public class LifeSteps {
 
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
-        assert campaigns.campaignSuccess().contains("Success!");
+        Assert.assertEquals("Success!", campaigns.campaignSuccess());
         Assert.assertEquals("New Line Item", lineItemDetails.verifyLineItemText());
     }
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
-        lineItemNameRandom = lineItemName + '_' + CommonUtils.generateRandomString();
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.timeStampCalculation();
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
@@ -158,9 +166,92 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
+    @Then("User creates new tactics and verifies it")
+    public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
+        List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
+        List<String> expectedTactic = new ArrayList<>();
+        for (Map<String, String> tacticData : tactics) {
+            String tacticName = tacticData.get("Tactic Name");
+            String channel = tacticData.get("Channel");
+            String ruleType = tacticData.get("RuleType");
+            expectedTactic.add(tacticName);
+            // Enter tactic name
+            tacticDetails.enterTacticName(tacticName);
+            tacticDetails.saveTactic();
+
+            // Select channel and add targeting rules
+            tacticSettings.selectChannel(channel);
+            tacticDetails.TARGETTING_RULES_ICON.click();
+            tacticSettings.addTargettingRules(ruleType);
+
+            // Verify selected vs saved target rules
+//            Assert.assertEquals(
+//                    tacticSettings.SELECTED_TARGET_RULE.toString(),
+//                    tacticSettings.SAVED_TARGET_RULE,tacticName
+//            );
+
+            // Save and create new tactic
+            tacticSettings.saveTacticSettings();
+            tacticDetails.clickNewTactic();
+        }
+        List<String> actualTactics = tacticDetails.getAllTactics();
+        // Using a HashSet to compare the lists regardless of their order of entries.
+        System.out.println("Saved tactics:" + actualTactics);
+        Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
+    }
+
+    @Then("Verify that the tabs gets enabled only after saving tactics")
+    public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
+        // tacticDetails.clickNewTactic();
+        tacticDetails.verifyDetailsTab();
+        List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
+        List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
+        Assert.assertEquals(tacticTabNames, disabledTabs);
+        tacticDetails.CLICK_FIRST_TACTIC();
+        List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
+        tacticTabNames.add("Details");
+        Assert.assertEquals(new HashSet<>(tacticTabNames), new HashSet<>(enabledTabs));
+
+    }
+
+    @And("Verify the status of saved tactic")
+    public void verify_the_status_of_saved_tactic() {
+        tacticDetails.CLICK_FIRST_TACTIC();
+        String actualStatus = tacticDetails.verifyTacticState();
+        Assert.assertEquals("Incomplete", actualStatus);
+    }
+
+
+    @Then("User creates new custom field {string} and verifies the same")
+    public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
+        //tacticDetails.clickNewTactic();
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
+        this.customFieldName = customFieldName;
+        tacticDetails.clickDetailsTab();
+        tacticDetails.addCustomField(customFieldName);
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0];// To remove unwanted space and text
+        Assert.assertEquals(customFieldName, actualName);
+        this.uiCustomFieldName = actualName;
+
+    }
+
+    @And("User verifies if new custom field is visible in new and existing tactic")
+    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
+        tacticDetails.clickNewTactic();
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
+        tacticDetails.clickTactic();
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
+    }
+
+    @Then("User deletes the custom field")
+    public void user_deletes_the_custom_field() {
+        tacticDetails.deleteCustomField(customFieldName);
+    }
+
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.generateRandomString();
+        tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
         tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
     }
@@ -206,13 +297,13 @@ public class LifeSteps {
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
     public void verify_the_newly_created_campaign_details_in_the_campaign_list() {
-        campaigns.navigateToCampaignListing();
-        campaignListing.searchCreatedCampaign(campaignNameRandom);
-        Assert.assertEquals(campaignNameRandom, campaignListing.verifyCreatedCampaign(campaignNameRandom));
-        campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(lineItemNameRandom, campaignListing.verifyCreatedLineItem(lineItemNameRandom));
-        campaignListing.expandCreatedLineItem();
-        Assert.assertEquals(tacticNameRandom, campaignListing.verifyCreatedTactic());
+        campaigns.navigateToCampaignDashboard();
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+        campaignDashboard.expandCreatedLineItem();
+        Assert.assertEquals(lineItemNameRandom, campaignDashboard.verifyCreatedLineItem(lineItemNameRandom));
+        campaignDashboard.expandCreatedLineItem();
+        Assert.assertEquals(tacticNameRandom, campaignDashboard.verifyCreatedTactic());
     }
 
     @Given("User navigates to NPI Lists page")
@@ -270,7 +361,7 @@ public class LifeSteps {
 
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiStaticList.enterNPINumber(npiNumber);
@@ -316,7 +407,7 @@ public class LifeSteps {
     public void user_enters_the_template_details_as(String templateName, String dimension, String metric) {
         dimensionName = dimension;
         metricName = metric;
-        templateNameRandom = templateName + '_' + timestamp;
+        templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         reportTemplates.enterTemplateName(templateNameRandom);
         reportTemplates.selectDimension(dimension);
         reportTemplates.clickMetricsTab();
@@ -325,7 +416,7 @@ public class LifeSteps {
 
     @When("User enters the template details for end to end as {string} {string} {string}")
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
-        templateNameRandom = templateName + '_' + timestamp;
+        templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         reportTemplates.enterTemplateName(templateNameRandom);
         List<String> dimensionList = Arrays.asList(dimension.split(","));
 
@@ -423,7 +514,7 @@ public class LifeSteps {
 
     @Then("User enters the NPI list details as {string} {string}")
     public void user_enters_the_npi_list_details_as(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiSmartList.enterListName(npiName);
         npiSmartList.selectAdvertiser(advertiser);
     }
@@ -517,8 +608,8 @@ public class LifeSteps {
 
     @When("User enters {string} and click Search button")
     public void userEntersAndClickSearchButton(String campaignID) {
-        campaignListing.searchCreatedCampaign(campaignID);
-        campaignListing.expandCreatedLineItem();
+        campaignDashboard.searchCreatedCampaign(campaignID);
+        campaignDashboard.expandCreatedLineItem();
     }
 
     @Then("Verify Campaigns, line items, tactics names matching the {string} should display on Dashboard table")
@@ -727,7 +818,7 @@ public class LifeSteps {
 
     @And("User enters the NPI Static list details as {string} {string}")
     public void user_enters_npi_static_list_details(String npiListName, String advertiser) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
     }
@@ -742,7 +833,7 @@ public class LifeSteps {
         npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + timestamp;
+        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
         assert npiStaticList.saveListSuccess().contains("NPI list created");
@@ -977,7 +1068,7 @@ public class LifeSteps {
 
     @And("User enters the Attributes list details as {string} {string}")
     public void userEntersTheAttributesListDetailsAs(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiAttributesList.enterListName(npiName);
         npiAttributesList.selectAdvertiser(advertiser);
     }
@@ -998,7 +1089,7 @@ public class LifeSteps {
         npiAttributesList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + timestamp;
+        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
         npiAttributesList.editListName(npiNameEdited);
         npiAttributesList.saveList();
         assert npiAttributesList.updateListSuccess().contains("NPI list updated");
@@ -1162,7 +1253,7 @@ public class LifeSteps {
 
     @When("User enters the Auto-Imported list details as {string} {string}")
     public void userEntersTheAutoImportedListDetailsAs(String listName, String advertiser) {
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiAttributesList.enterListName(npiName);
         npiAttributesList.selectAdvertiser(advertiser);
     }
@@ -1597,14 +1688,14 @@ public class LifeSteps {
 
     @And("User enters the pixel details as {string} {string}")
     public void userEntersPixelDetails(String pixelName, String advertiser) {
-        newPixelName = pixelName + '_' + timestamp;
+        newPixelName = pixelName + '_' + CommonUtils.timeStampCalculation();
         retargetingPixel.enterPixelName(newPixelName);
         retargetingPixel.selectAdvertiser(advertiser);
     }
 
     @And("User enters the pixel details as {string} {string} {string} {string}")
     public void userEntersPixelDetails(String pixelName, String advertiser, String conversionPixelScope, String conversionPixelType) {
-        newPixelName = pixelName + '_' + timestamp;
+        newPixelName = pixelName + '_' + CommonUtils.timeStampCalculation();
         conversionPixel.enterPixelName(newPixelName);
         conversionPixel.selectAdvertiser(advertiser);
         conversionPixel.selectConversionPixelScope(conversionPixelScope);
@@ -1656,7 +1747,7 @@ public class LifeSteps {
 
     @And("User enters the Smart NPI list details as {string} {string} and selects the created {string}")
     public void userEntersTheSmartNPIListDetailsAndSelectsTheCreatedSmartPixel(String npiListName, String advertiser, String smartListType) {
-        npiName = npiListName + '_' + timestamp;
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
@@ -1730,6 +1821,7 @@ public class LifeSteps {
     public void userAttemptsToClickThePreviewButtonWithoutSelectingACreativeFile() {
         bulkCreativeUpload.isRemoveFileIconAvailable();
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickUploadButton();
         Assert.assertEquals("Atleast one creative should be selected", bulkCreativeUpload.fetchErrorAlert());
     }
 
@@ -1757,7 +1849,7 @@ public class LifeSteps {
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
         bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
-        bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickUploadButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
         bulkCreativeUpload.updateCreativeName(metricName);
         nameList.clear();
@@ -1770,7 +1862,7 @@ public class LifeSteps {
         Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
     }
 
-    /*Dislay Creative Bulk Upload*/
+    /*Display Creative Bulk Upload*/
     @When("The advertiser {string} is selected for {string} creative the following sections are visible")
     public void theAdvertiserIsSelectedForCreativeTheFollowingSectionsAreVisible(String advertiser, String creativeType, DataTable dataTable) {
         bulkCreativeUpload.selectAndClickCreativeType(creativeType);
@@ -1914,9 +2006,9 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if(bulkCreativeUpload.isWidthHeightVisibleAndBlank())
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
-            bulkCreativeUpload.clickOKButton();
+            bulkCreativeUpload.clickUploadButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
         }
     }
@@ -1956,7 +2048,6 @@ public class LifeSteps {
             bulkCreativeUpload.selectAndClickCreativeType(creativeType);
             bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
             bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
-            bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
             nameList.add(creativeName);
         }
@@ -2057,7 +2148,7 @@ public class LifeSteps {
     }
 
     @When("Line Items of selected campaigns should load when user types line items initials {string} in {string} field")
-    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials,String fieldName) {
+    public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials, String fieldName) {
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(lineItemInitials, fieldName));
     }
 
@@ -2079,7 +2170,7 @@ public class LifeSteps {
     @Then("{string} section should be visible with label {string} checkbox")
     public void checkboxShouldBeVisibleWithLabel(String filterReportSection, String checkboxLabel) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
             Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel));
     }
 
@@ -2100,7 +2191,7 @@ public class LifeSteps {
     }
 
     @And("User should be able to generate the report")
-    public void userShouldAbleToGenerateTheReport(){
+    public void userShouldAbleToGenerateTheReport() {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
@@ -2142,7 +2233,7 @@ public class LifeSteps {
 
     @And("Verify that user is able to select Timezone field value {string}")
     public void verifyThatUserIsAbleToSelectTimezoneFieldValue(String timeZone) {
-        Assert.assertTrue("Unable to select time zone", runReportPanel.selectTimeZone(timeZone.trim()));
+        Assert.assertTrue("Unable to select time zone " + timeZone, runReportPanel.selectTimeZone(timeZone.trim()));
         nameList.add(timeZone);
     }
 
@@ -2252,11 +2343,11 @@ public class LifeSteps {
     @Then("{string} section should be visible with label {string}, {string}, {string} checkbox")
     public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
             Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
             Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
-        if(runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
             Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
     }
 
@@ -2332,8 +2423,8 @@ public class LifeSteps {
 
     @And("Verify default value of Send At fields - Start Time is {string} and Timezone is {string}")
     public void verifyDefaultValueOfSendAtFieldsStartTimeIsAndTimezoneIs(String defaultTime, String defaultTimezone) {
-        Assert.assertEquals("Default time "  + defaultTime+" is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
-        Assert.assertEquals("Default time "  + defaultTimezone+" is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
+        Assert.assertEquals("Default time " + defaultTime + " is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
+        Assert.assertEquals("Default time " + defaultTimezone + " is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
     }
 
     @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
@@ -2502,9 +2593,9 @@ public class LifeSteps {
 
     @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
-        campaignListing.searchCreatedCampaign(campaignName);
-        campaignListing.expandCreatedLineItem();
-        campaignDashboard.navigateToLineItemDetails(campaignName);
+        campaignDashboard.searchCreatedCampaign(campaignName);
+        campaignDashboard.expandCreatedLineItem();
+        campaignDashboard.navigateToLineItemDetails();
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         itemList = lineItemFlights.fetchFlightDates();
@@ -2516,13 +2607,19 @@ public class LifeSteps {
         SimpleDateFormat descFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
         SimpleDateFormat extractedFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         SimpleDateFormat compareFormat = new SimpleDateFormat("MM/dd/yyyy");
-        for (int i = 0; i < flightDescriptions.size(); i++) {
-            String desc = flightDescriptions.get(i).split(":")[1].split("-")[0].trim();
-            desc = desc.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
-            String expected = compareFormat.format(descFormat.parse(desc));
-            String actual = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
-            if (expected.equals(actual))
-                Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expected, actual);
+        for (int i = 0; i < flightDescriptions.size() && (i * 2 + 1) < itemList.size(); i++) {
+            String desc = flightDescriptions.get(i);
+            String[] dateParts = desc.split(":", 2)[1].split("-");
+            String startDate = dateParts[0].trim();
+            String endDate = dateParts[1].trim();
+            startDate = startDate.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            endDate = endDate.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            String actualStart = compareFormat.format(descFormat.parse(startDate));
+            String actualEnd = compareFormat.format(descFormat.parse(endDate));
+            String expectedStart = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
+            String expectedEnd = compareFormat.format(extractedFormat.parse(itemList.get(i * 2 + 1)));
+            Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expectedStart, actualStart);
+            Assert.assertEquals("End date mismatch for Flight #" + (i + 1), expectedEnd, actualEnd);
         }
     }
 
@@ -2673,7 +2770,7 @@ public class LifeSteps {
     @And("User adds the associated Smart List and enters list details as {string}")
     public void addsAssociatedSmartList(String listName) {
         smartPixel.clickAddSmartListButton();
-        npiName = listName + '_' + timestamp;
+        npiName = listName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
     }
 
@@ -2784,6 +2881,326 @@ public class LifeSteps {
                 navigation.navigateBackToStudio();
                 break;
         }
+    }
+
+    @And("Verify Line Item page has below tabs")
+    public void verifyLineItemPageHasBelowTabs(DataTable dataTable) {
+        List<String> tabNames = dataTable.asList(String.class);
+        Assert.assertTrue("Line Item tabs are not available", lineItemDetails.verifyLineItemTabs(tabNames));
+    }
+
+    @And("Verify status of line item is Incomplete when there are no tactics under the line item")
+    public void verifyStatusOfLineItemIsIncompleteWhenThereAreNoTacticsUnderTheLineItem() {
+        Assert.assertEquals("Incomplete", lineItemDetails.verifyLineItemStatus());
+        Assert.assertEquals("Campaign is enabled . Tactic is Incomplete.", lineItemDetails.fetchIncompleteStatusToolTip());
+    }
+
+    @When("User fills in required details {string} except for flight information and save")
+    public void userFillsInRequiredDetailsExceptForFlightInformation(String lineItemName) {
+        lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
+        lineItemDetails.enterLineItemName(lineItemNameRandom);
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User should see an error message to add flight details")
+    public void userShouldSeeAnErrorMessageToAddFlightDetails() {
+        Assert.assertEquals("LineItem Flight is required.", lineItemDetails.fetchErrorAlert());
+    }
+
+    @And("User clicks Add Flight button")
+    public void userClicksAddFlightButton() {
+        lineItemDetails.clickAddFlightButton();
+    }
+
+    @And("Verify if user enters flight budget that exceeds Campaign budget")
+    public void verifyIfUserEntersFlightBudgetThatExceedsCampaignBudget() {
+        String unaccountedBudget = lineItemDetails.fetchCampaignBudget();
+        String modifiedBudget = String.valueOf(Integer.parseInt(unaccountedBudget) + 1000);
+        lineItemDetails.enterLineItemBudget(modifiedBudget);
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User should see error message when tries to save line item page")
+    public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage() {
+        Assert.assertTrue("The total flight budget is exceeded", lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed"));
+    }
+
+    @And("User adds the flight details - Flight Start Date, Flight End Date, {string}")
+    public void userAddsTheFlightDetailsFlightStartDateFlightStartDate(String budget) {
+        lineItemDetails.enterLineItemBudget(budget);
+        flightStartDate = lineItemDetails.selectStartDateOfFlight();
+        flightEndDate = lineItemDetails.selectEndDateOfFlight();
+    }
+
+    @And("User adds new flight and enter overlapping flight details - Flight Start Date, Flight End Date, {string}")
+    public void userAddsOverlappingFlightDetailsFlightStartDateFlightStartDate(String budget) {
+        lineItemDetails.clickAddFlightButton();
+        lineItemDetails.enterLineItemBudget(budget);
+        lineItemDetails.selectOverlappingFlightDates(flightStartDate, flightEndDate);
+        lineItemDetails.saveLineItem();
+    }
+
+    @And("User should see error message when tries to save line item page and dates fields should get highlighted with inline error message")
+    public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPageAndDatesFieldsShouldGetHighlighted() {
+        Assert.assertTrue("LineItem flights overlap message is not displayed", lineItemDetails.fetchErrorAlert().contains("LineItem flights overlap."));
+        Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
+    }
+
+    @When("User enters line item details {string}")
+    public void userEntersLineItemDetails(String lineItemName) {
+        lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
+        lineItemDetails.enterLineItemName(lineItemNameRandom);
+    }
+
+    @And("User adds {string} flights, fills in the details with {string} for each flight section, and saves the line item")
+    public void userAddsMultipleFlightsAndFillsInDetailsForEachFlightSection(String noOfFlights, String budget) {
+        lineItemDetails.addMultipleFlights(noOfFlights, budget);
+    }
+
+    @And("User generates sequential flights for the line item using {string} and {string}")
+    public void userGeneratesSequentialFlightsToALineItem(String budget, String numberOfMonths) {
+        capturedDetails = lineItemDetails.generateSequentialFlights(budget, numberOfMonths);
+    }
+
+    @And("Verify that Sequential flights should be added based on the start month")
+    public void verifyThatSequentialFlightsShouldBeAddedBasedOnTheStartMonth() {
+        String[] parts = capturedDetails.get(0).split(" ");
+        Month startMonth = Month.valueOf(parts[0].toUpperCase(Locale.ENGLISH));
+        int startYear = Integer.parseInt(parts[1]);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        for (int i = 1; i < capturedDetails.size(); i++) {
+            String dateStr = capturedDetails.get(i);
+            LocalDate actualDate = LocalDate.parse(dateStr, formatter);
+            LocalDate expectedDate = LocalDate.of(startYear, startMonth, 1).plusMonths(i - 1);
+            if (actualDate.getMonthValue() != expectedDate.getMonthValue() ||
+                    actualDate.getYear() != expectedDate.getYear()) {
+                Assert.assertEquals("Flight date mismatch ", actualDate, expectedDate);
+            }
+        }
+    }
+
+    @And("User fetches all the flight details added")
+    public void userFetchesAllTheFlightDetailsAdded() {
+        lineItemDetails.saveLineItem();
+        lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
+        lineItemDetails.clickDetailsTab();
+        itemList = lineItemDetails.fetchFlightDetails();
+    }
+
+    @Then("User navigates to the Flights tab and verifies the flight details")
+    public void userNavigatesToTheFlightsTabAndVerifiesTheFlightDetails() {
+        List<String> flightDetails;
+        lineItemFlights.clickFlightTab();
+        Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
+        flightDetails = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        for (String expected : itemList) {
+            boolean matchFound = flightDetails.stream().anyMatch(actual -> actual.contains(expected));
+            Assert.assertTrue("Expected value not found in flight tab: " + expected, matchFound);
+        }
+        capturedDetails.clear();
+        capturedDetails = flightDetails;
+    }
+
+    @When("User deletes some flight entries")
+    public void userDeletesSomeFlightEntries() {
+        lineItemDetails.clickDetailsTab();
+        lineItemDetails.deleteFlightEntry();
+        lineItemDetails.saveLineItem();
+        itemList = lineItemDetails.fetchFlightDetails();
+    }
+
+    @Then("User should see the remaining flights listed under the Flights section")
+    public void userShouldSeeTheRemainingFlightsListedUnderTheFlightsSection() {
+        List<String> flightDetailsAfterDeletion;
+        lineItemFlights.clickFlightTab();
+        Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
+        flightDetailsAfterDeletion = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        for (String expected : itemList) {
+            boolean matchFound = flightDetailsAfterDeletion.stream().anyMatch(actual -> actual.contains(expected));
+            Assert.assertTrue("Expected value not found in flight tab after flight deletion: " + expected, matchFound);
+        }
+        Assert.assertNotEquals("Flight details did not change after deletion – deletion may have failed.",
+                capturedDetails, flightDetailsAfterDeletion);
+    }
+
+    @When("User creates line items with below line types and other details, enables the line item and saves the changes")
+    public void userEntersTheLineItemDetailsWithDifferentLineTypesEnablesTheLineItemAndSavesTheChanges(DataTable dataTable) {
+        nameList.clear();
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        int currentRowIndex = 0;
+        int totalRows = rows.size();
+        for (Map<String, String> row : rows) {
+            String type = row.get("LINE_TYPE").trim();
+            String attributes = row.get("LINE_ITEM_DETAILS").trim();
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
+            nameList.add(lineItemNameRandom);
+            lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
+            Assert.assertEquals("Success!", lineItemDetails.lineItemSuccess());
+            List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available",
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
+            lineItemDetails.cancelTactic();
+            if (currentRowIndex < totalRows - 1) {
+                lineItemDetails.selectNewLineItem();
+            }
+            currentRowIndex++;
+        }
+    }
+
+    @Then("User adds Comments or Notes {string} to each line item")
+    public void userAddsCommentsOrNotesToEachLineItem(String notes) {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            String newNotes = name + " " + notes;
+            itemList.add(newNotes);
+            Assert.assertEquals("Notes saved successfully.", lineItemDetails.addNotesToLineItem(newNotes));
+        }
+    }
+
+    @And("Verify the notes added to each line item")
+    public void verifyTheNotesAddedToEachLineItem() {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            String notes = lineItemDetails.fetchLineItemNotes();
+            Assert.assertTrue("Note of '" + name + "' is not available",
+                    itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
+        }
+    }
+
+    @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
+    public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
+        lineItemDetails.clickBulkEditMode();
+        for (String name : nameList) {
+            lineItemDetails.selectLineItemUsingBulkEdit(name);
+        }
+        Assert.assertEquals("Lineitems status updated successfully", lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
+        lineItemDetails.exitBulkEditMode();
+    }
+
+    @And("Verify that each selected line item is {string}")
+    public void verifyThatEachSelectedLineItemIsDisabled(String label) {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
+        }
+    }
+
+    @And("Verify user is able to create a copy of the line items using {string} option")
+    public void verifyUserIsAbleToCreateACopyOfTheLineItems(String lineItemOption) {
+        itemList.clear();
+        List<String> originalLineItemDetails;
+        List<String> copiedLineItemDetails;
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickDetailsTab();
+            originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            String lineItemName = "Copy of " + name;
+            itemList.add(lineItemName);
+            Assert.assertEquals("Line Item copied successfully.", lineItemDetails.createACopyOfLineItem(lineItemName));
+            Assert.assertTrue("Copied Line Item is not available", lineItemDetails.verifyLineItemAvailable(lineItemName));
+            lineItemDetails.navigateToLineItemDetails(lineItemName);
+            lineItemDetails.clickDetailsTab();
+            copiedLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickOverviewTab();
+            Assert.assertEquals("Line item details do not match after copy.", originalLineItemDetails, copiedLineItemDetails);
+        }
+    }
+
+    @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
+    public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            lineItemDetails.runReportFromLineItemPage();
+            runReportPanel.selectTemplateFromDropdown(templateName);
+            String fileName = "Custom Report";
+            runReportPanel.clickRunButton(fileName);
+            Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+        }
+    }
+
+    @And("Verify that the reports generated on the Line Item page are available on the Generate Report page")
+    public void verifyThatTheReportsGeneratedOnTheLineItemPageAreAvailableOnTheGenerateReportPage() {
+        navigation.clickSubMenu();
+        navigation.clickMenuAngle();
+        navigation.clickGeneratedReport();
+        runReportPanel.clickSearchButton();
+        for (String name : nameList) {
+            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
+        }
+    }
+
+    @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
+    public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
+        for (String name : itemList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            lineItemDetails.performDeleteOperation();
+            List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation",
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
+
+        }
+    }
+
+    //* Rajyalaxmi - Tactic max bid and base bid verification
+    @When("User clicks on Campaign Settings")
+    public void user_clicks_on_campaign_settings() {
+        campaignSettings.campaignSettingsLink();
+        campaignSettings.bidSettingsTab();
+    }
+
+    @Then("Verify user is on default bid settings page")
+    public void verify_user_is_on_default_bid_settings_page() {
+        Assert.assertEquals("Default Bid Settings", campaignSettings.getDefaultSettings());
+    }
+
+    @Then("User gets Max Bid and Base Bid values")
+    public void user_gets_max_bid_and_base_bid_values() {
+        campaignBaseBid = (campaignSettings.getBaseBidPrice());
+        campaignMaxBid = (campaignSettings.getMaxBidPrice());
+    }
+
+    @Then("Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values")
+    public void verify_max_bid_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values() {
+        BigDecimal tacticBaseBid = (tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
+        BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
+        Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
+        Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @Then("User creates a new tactic with details {string} {string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel) {
+        tacticDetails.enterTacticName(tacticName);
+        tacticDetails.saveTactic();
+        tacticSettings.selectChannel(channel);
+        tacticSettings.saveTacticSettings();
+    }
+
+    @Then("User deletes the tactic {string} and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
+        tacticDetails.deleteTactic();
+        DriverFactory.getPage().reload();
+        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic(tacticName);
+        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+    }
+
+    @And("User enables tactic {string} through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
+        tacticDetails.bulkEnableTactics(tacticName);
+        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+
+    }
+
+    @When("User clicks on create new Campaign")
+    public void userClicksOnCreateNewCampaign() {
+        campaigns.createCampaign();
     }
 
     @Then("Verify Smart List Creation Panel should display the following List Population Options")

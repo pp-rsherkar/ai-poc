@@ -381,6 +381,7 @@ public class RunReportPanel {
 
     public boolean selectTimeZone(String timeZone) {
         try {
+            TIME_ZONE.scrollIntoViewIfNeeded();
             TIME_ZONE.selectOption(new SelectOption().setLabel(timeZone));
             return true;
         } catch (Exception e) {
@@ -419,8 +420,8 @@ public class RunReportPanel {
     public List<String> verifyButtonsDisabledBeforeLineItemSelection() {
         List<String> disabledButtons = new ArrayList<>();
         for (int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++) {
-            if (REPORT_PERIOD_BUTTONS.nth(i).isDisabled())
-                disabledButtons.add(REPORT_PERIOD_BUTTONS.nth(i).innerText());
+            if (REPORT_PERIOD_BUTTONS.nth(i).getAttribute("class").contains("inactive"))
+                disabledButtons.add(REPORT_PERIOD_BUTTONS.nth(i).textContent());
         }
         return disabledButtons;
     }
@@ -513,6 +514,11 @@ public class RunReportPanel {
 
     public String fetchFileName() {
         return FILE_NAME_TEXTAREA.inputValue().trim();
+    }
+
+    public void clickSearchButton(){
+        SEARCH_BUTTON.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 }
 

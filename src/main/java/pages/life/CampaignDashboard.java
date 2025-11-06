@@ -58,7 +58,16 @@ public class CampaignDashboard {
     private final Locator CAMPAIGN_COLUMN_NAME;
     private final Locator CREATIVE_TOOLTIP;
     private final Locator LIFE_TIME_FILTER;
-    CampaignListing campaignListing = new CampaignListing(DriverFactory.getPage());
+    private final Locator CLICK_SETTINGS;
+    private final Locator SEARCH_CAMPAIGN;
+    private final Locator CLICK_CAMPAIGN_SEARCH;
+    private final Locator EXPAND_CREATED_LINE_ITEM;
+    private final Locator VERIFY_CREATED_TACTIC;
+    private final Locator CAMPAIGN_ENTRIES;
+    private final Locator SUB_TITLE_AFTER_CAMPAIGN_SEARCH;
+    private final Locator FILTER_APPLIED_ICON;
+    private final Locator RESET_FILTER_ICON;
+    private final Locator PRE_LOADER;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
     boolean flag1, flag2, flag3 = false;
@@ -109,6 +118,16 @@ public class CampaignDashboard {
         this.CAMPAIGN_COLUMN_NAME = page.locator("//div[contains(@class,'display-inline')]/span[contains(text(),'CAMPAIGN')]");
         this.CREATIVE_TOOLTIP = page.locator("//span[contains(@class,'statusTooltipBackgroundImage')]");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
+        this.CLICK_SETTINGS = page.locator("//i[@class='icon gearIcon']");
+        this.SEARCH_CAMPAIGN = page.locator("//input[@placeholder='Search' and contains(@class, 'gaTableSearch')]");
+        this.CLICK_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
+        this.EXPAND_CREATED_LINE_ITEM = page.locator("//div[contains(@class,'campaignExpand')]/div[contains(@class,'collapsed-thin')]");
+        this.VERIFY_CREATED_TACTIC = page.locator("//span[contains(@class,'tactic-name')]");
+        this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'camp-data')]");
+        this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'1 Line items, 1 Campaigns, 1 Advertisers')]");
+        this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
+        this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
+        this.PRE_LOADER = page.locator("//div[@class='preloader']");
     }
 
     public String verifyCampaignDashbaord(String text) {
@@ -203,14 +222,14 @@ public class CampaignDashboard {
         waitUtility.waitForLocatorVisible(CAMPAIGN_PAGE_TITLE);
         if (CAMPAIGN_PAGE_TITLE.getAttribute("class").contains("campaign")) flag1 = true;
         BACK_TO_DASHBOARD.click();
-        campaignListing.searchCreatedCampaign(campaignID);
-        campaignListing.expandCreatedLineItem();
+        searchCreatedCampaign(campaignID);
+        expandCreatedLineItem();
         LINE_ITEM_NAME.click();
         LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         if (LINE_ITEM_PAGE_TITLE.getAttribute("class").contains("lineitem")) flag2 = true;
         BACK_TO_DASHBOARD.click();
-        campaignListing.searchCreatedCampaign(campaignID);
-        campaignListing.expandCreatedLineItem();
+        searchCreatedCampaign(campaignID);
+        expandCreatedLineItem();
         TACTIC_NAME.click();
         waitUtility.waitForLocatorVisible(TACTIC_PAGE_TITLE);
         if (TACTIC_PAGE_TITLE.getAttribute("class").contains("tactic-name")) flag3 = true;
@@ -279,8 +298,8 @@ public class CampaignDashboard {
     }
 
     public void clickFavoriteOnlyCheckbox() {
-        campaignListing.verifyCampaignRadioBtnChecked();
-        campaignListing.verifyFavoriteCheckbox();
+        verifyCampaignRadioBtnChecked();
+        verifyFavoriteCheckbox();
         FAVORITE_ONLY_CHECKBOX.click();
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
@@ -296,8 +315,8 @@ public class CampaignDashboard {
     }
 
     public void clickHideFinishedCheckbox() {
-        campaignListing.verifyCampaignRadioBtnChecked();
-        campaignListing.verifyHideFinishedCheckbox();
+        verifyCampaignRadioBtnChecked();
+        verifyHideFinishedCheckbox();
         HIDE_FINISHED_CHECKBOX.click();
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
@@ -349,7 +368,7 @@ public class CampaignDashboard {
 
     public boolean fetchCreativeToolTipText() {
         ACTIVE_FLIGHT_BUTTON.click();
-        campaignListing.verifyFavoriteCheckbox();
+        verifyFavoriteCheckbox();
         CREATIVE_TOOLTIP.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         int count = CREATIVE_TOOLTIP.count();
         for (int i = 0; i < count; i++) {
@@ -361,7 +380,7 @@ public class CampaignDashboard {
         return true;
     }
 
-    public void navigateToLineItemDetails(String campaignID){
+    public void navigateToLineItemDetails(){
         LINE_ITEM_NAME.click();
         LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
@@ -369,5 +388,71 @@ public class CampaignDashboard {
     public void clickLifetimeFilter() {
         LIFE_TIME_FILTER.click();
         waitUtility.waitUntilPreLoaderHidden();
+    }
+
+    public void verifyCampaignRadioBtnChecked() {
+        CLICK_SETTINGS.click();
+        if (!GROUP_BY_CAMPAIGN_RADIO_BUTTON.getAttribute("class").contains("groupingMenuRadioSelected")) {
+            GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
+    }
+
+    public void verifyFavoriteCheckbox() {
+        if (FAVORITE_ONLY_CHECKBOX.getAttribute("class").contains("checked")) {
+            FAVORITE_ONLY_CHECKBOX.click();
+            waitUtility.waitUntilPreLoaderHidden(120000);
+        }
+    }
+
+    public void verifyHideFinishedCheckbox() {
+        if (HIDE_FINISHED_CHECKBOX.getAttribute("class").contains("checked")) {
+            HIDE_FINISHED_CHECKBOX.click();
+            waitUtility.waitUntilPreLoaderHidden(120000);
+        }
+    }
+
+    public void verifyIfFiltersExist() {
+        if (FILTER_APPLIED_ICON.isVisible()) {
+            FILTER_APPLIED_ICON.click();
+            RESET_FILTER_ICON.click();
+            waitUtility.waitUntilPreLoaderHidden(120000);
+        }
+    }
+
+    public void searchCreatedCampaign(String createdCampaign) {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
+        verifyCampaignRadioBtnChecked();
+        verifyFavoriteCheckbox();
+        verifyHideFinishedCheckbox();
+        verifyIfFiltersExist();
+        SEARCH_CAMPAIGN.fill(createdCampaign);
+        if (PRE_LOADER.isVisible()) waitUtility.waitUntilPreLoaderHidden(120000);
+        CLICK_CAMPAIGN_SEARCH.click();
+        SUB_TITLE_AFTER_CAMPAIGN_SEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
+    public String verifyCreatedCampaign(String createdCampaign) {
+        String campaignNameXpath = String.format("//span[contains(text(),'%s')]", createdCampaign);
+        waitUtility.waitForLocatorVisible(page.locator(campaignNameXpath).first());
+        return page.locator(campaignNameXpath).first().innerText();
+    }
+
+    public String verifyCreatedLineItem(String lineItemNameRandom) {
+        String lineItemNameXpath = String.format("//span[contains(text(),'%s')]", lineItemNameRandom);
+        waitUtility.waitForElementVisible(lineItemNameXpath);
+        return page.locator(lineItemNameXpath).innerText();
+    }
+
+    public void expandCreatedLineItem() {
+        if (EXPAND_CREATED_LINE_ITEM.first().isVisible()) {
+            EXPAND_CREATED_LINE_ITEM.first().click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
+    }
+
+    public String verifyCreatedTactic() {
+        page.waitForLoadState();
+        return VERIFY_CREATED_TACTIC.innerText();
     }
 }

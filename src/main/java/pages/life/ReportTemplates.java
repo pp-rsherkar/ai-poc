@@ -70,7 +70,7 @@ public class ReportTemplates {
         this.SELECT_METRIC = page.locator("//label[text()='Impressions']");
         this.VERIFY_DIMENSION = page.locator("//sortable-item[contains(@class,'diemension')]");
         this.VERIFY_METRIC = page.locator("//sortable-item[contains(@class,'metric')]");
-        this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Ok']");
+        this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Save']");
         this.TEMPLATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
         this.CLICK_TEMPLATE_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
@@ -251,5 +251,10 @@ public class ReportTemplates {
 
     public void clickCancelButton() {
         CANCEL_BUTTON.click();
+    }
+
+    public boolean verifyReportGeneratedFromLineItemPage(String reportName){
+        Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]",reportName));
+        return xpath.isVisible();
     }
 }

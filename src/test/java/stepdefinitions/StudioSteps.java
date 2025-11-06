@@ -36,7 +36,6 @@ public class StudioSteps {
     List<String> previousNpiDetails = null;
     String npiCount;
     Path targetFilePath;
-    String randomNumber = CommonUtils.generateRandomString();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -80,8 +79,8 @@ public class StudioSteps {
     }
 
     @Then("the user renames the workspace to {string}")
-    public void the_user_renames_the_workspace_to_(String string) {
-        workspaceName = string + CommonUtils.timeStampCalculation();
+    public void the_user_renames_the_workspace_to_(String wName) {
+        workspaceName = wName + CommonUtils.timeStampCalculation();
         expansionWorkspace.renameExpansion(workspaceName);
     }
 
@@ -140,11 +139,6 @@ public class StudioSteps {
         workspaceCreation.createStudioWorkspace();
     }
 
-    @When("User clicks on Create New Workspace For Expansion")
-    public void user_clicks_on_create_new_workspace_for_expansion() {
-        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
-        workspaceCreation.createWorkspaceExpansion(flag);
-    }
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
@@ -156,13 +150,13 @@ public class StudioSteps {
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
         workspaceCreation.clickHCPExplorerWorkspace();
-        Assert.assertEquals("Workspace created successfully", workspaceCreation.verifyWorkspaceCreation());
+        Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
     }
 
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
     public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
         workspace.waitTillWorkspaceAlertHide();
-        workspaceName = wName + '_' + randomNumber;
+        workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
     }
@@ -208,7 +202,7 @@ public class StudioSteps {
 
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
-        String actualMessage = workspaceCreation.verifyWorkspaceCreation();
+        String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
 
         boolean isValid = actualMessage.equals("Workspace saved successfully") ||
                 actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
@@ -297,7 +291,7 @@ public class StudioSteps {
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspace.clickPublish();
-        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+        Assert.assertEquals("Workspace saved successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
         workspace.waitTillWorkspaceAlertHide();
         workspace.clickFlyOrPageButton();
         Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
@@ -539,7 +533,7 @@ public class StudioSteps {
 
     @And("Verify user is able to rename the workspace as {string}")
     public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
-        newWorkspaceName = newWorkspace + randomNumber;
+        newWorkspaceName = newWorkspace + CommonUtils.timeStampCalculation();
         Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName));
         workspaceName = newWorkspaceName;
     }
@@ -572,10 +566,91 @@ public class StudioSteps {
         workspaceCreation.searchWorkspaceName(workspaceName);
         workspaceCreation.selectMoreActionsMenu(workspaceName);
     }
+    @When("User navigates to administration tab")
+    public void user_navigates_to_administration_tab() {
+        accounts.verifyStudioMenu();
+        accounts.clickAdministration();
+    }
+
+    @When("User clicks on accounts tab")
+    public void user_clicks_on_accounts_tab() {
+        accounts.selectAccountsTab();
+    }
 
     @Then("Verify that the workspace cannot be deleted and appropriate message is displayed to the user")
     public void verifyThatTheWorkspaceCannotBeDeletedAndAppropriateMessageIsDisplayedToTheUser() {
         workspaceCreation.clickRemoveWorkspaceButton();
         Assert.assertTrue(workspaceCreation.verifyDeleteWorkspaceErrorMessage().contains("Deletion blocked by Life. Message: This list can't be deleted"));
+    }
+    @When("Locate an account {string} with external user permission and select it")
+    public void locate_an_account_with_external_user_permission_and_select_it(String externalAccount) {
+        accounts.searchAccount(externalAccount);
+    }
+
+    @When("Go to users tab and search {string} and select studio tab")
+    public void go_to_users_tab_and_search_and_select_studio_tab(String selectUser) {
+        accounts.selectUserTab();
+        accounts.selectExternalUser(selectUser);
+    }
+
+    @Then("User turns on studio toggle for external users and verifies that it is enabled")
+    public void user_turns_on_studio_toggle_for_external_users_and_verifies_that_it_is_enabled() {
+        Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
+    }
+
+
+    @And("Verify the Retrofit checkbox is selected")
+    public void verifyTheRetrofitCheckboxIsSelected() {
+        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.isRetrofitCheckboxSelected());
+    }
+
+    @And("User selects {string} as Keep NPIs on the list option")
+    public void userSelectsAsKeepNPIsOnTheList(String option) {
+        workspace.clickNPIRetentionOption(option);
+    }
+
+    @And("User clicks on Published button, verifies the {string} and {string} text are displayed")
+    public void userClicksOnPublishedButtonAndVerifiesThe(String listType, String engagingText) {
+        workspace.clickPublishedButton();
+        Assert.assertTrue(listType + " is not displayed", workspace.verifyListTypeAfterPublished(listType.toLowerCase()));
+        String text = workspace.verifyNPIsEngagingText();
+        Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
+    }
+
+    @And("User searches the account {string} for which permission to be checked")
+    public void userSearchesTheAccountForWhichPermissionToBeChecked(String account) {
+        accounts.searchAccount(account);
+        Assert.assertTrue("Advertiser Tab is not displayed", accounts.isAccountsAdvertiserTabDisplayed());
+    }
+
+    @And("User navigates to Advertisers tab")
+    public void userNavigatesToAdvertisersTab() {
+        accounts.clickAccountsAdvertiserTab();
+    }
+
+    @And("User clicks on {string} tab present under Advertisers tab")
+    public void userClicksToTabPresentUnderAdvertisersTab(String tabName) {
+        accounts.clickAdvertisersSubTab(tabName);
+    }
+
+    @And("User sets the HCP365 permission {string} for {string} and saves the changes")
+    public void userChecksTheHCPPermissionAndItFor(String checkboxStatus, String advertiser) {
+        Assert.assertTrue("HCP365 permission is not modified correctly", accounts.checkHCPPermissionForAdvertiser(checkboxStatus, advertiser));
+        accounts.saveAccountsAdvertiserTab();
+    }
+
+    @And("Verify Owned And Operated section is {string} within the Cross-Filter section of the Workspace")
+    public void verifyOwnedAndOperatedSectionWithinTheCrossFilterSectionOfTheWorkspace(String visibilityFlag) {
+        boolean flag = explorerWorkspace.isOwnedAndOperatedSectionAvailable();
+        switch (visibilityFlag.toLowerCase()) {
+            case "present":
+                Assert.assertTrue("Expected 'Owned and Operated' section to be present, but it was absent.", flag);
+                break;
+            case "absent":
+                Assert.assertFalse("Expected 'Owned and Operated' section to be absent, but it was present.", flag);
+                break;
+            default:
+                Assert.fail("Invalid input for visibility: " + visibilityFlag);
+        }
     }
 }

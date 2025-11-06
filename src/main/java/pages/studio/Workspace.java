@@ -48,6 +48,9 @@ public class Workspace {
     private final Locator DOWNLOAD_BUTTON;
     private final Locator DOWNLOAD_SUCCESS_ALERT;
     private final Locator IDENTIFIED_NPI_COUNT;
+    private final Locator RETROFIT_CHECKBOX;
+    private final Locator NPI_ENGAGING_TEXT;
+    private final Locator PUBLISH_LOADER;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Workspace(Page page) {
@@ -83,6 +86,9 @@ public class Workspace {
         this.DOWNLOAD_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Download']");
         this.DOWNLOAD_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//p[text()='Download completed successfully']");
         this.IDENTIFIED_NPI_COUNT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//h3[contains(text(),'Identified NPIs')]/ancestor::div[contains(@class,'SingleValueVisualization')]//span");
+        this.RETROFIT_CHECKBOX = WORKSPACE_FRAME.locator("//span[contains(text(),'Retrofit NPIs')]/parent::label/preceding-sibling::div//input");
+        this.NPI_ENGAGING_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'NPIs engaging on or')]");
+        this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
     }
 
     public void studio() {
@@ -91,6 +97,8 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if(PUBLISH_LOADER.isVisible())
+            waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         FLY_PAGE_BUTTON.click();
     }
 
@@ -116,7 +124,7 @@ public class Workspace {
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(WORKSPACE_CREATED_ALERT);
     }
 
     public String verifyPublishedNpi() {
@@ -265,5 +273,28 @@ public class Workspace {
 
     public String checkBackgroundColorOfDownloadIcon() {
         return FLY_PAGE_BUTTON.evaluate("element => getComputedStyle(element).backgroundColor").toString();
+    }
+
+    public boolean isRetrofitCheckboxSelected(){
+        if(!RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true"))
+            RETROFIT_CHECKBOX.click();
+        return RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true");
+    }
+
+    public void clickNPIRetentionOption(String option){
+        Locator retentionXpath = WORKSPACE_FRAME.locator(String.format("//button[contains(@value,'%s')]", option));
+        retentionXpath.click();
+    }
+
+    public void clickPublishedButton() {
+        PUBLISHED_NPI.click();
+    }
+
+    public boolean verifyListTypeAfterPublished(String listType) {
+        return WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]",listType)).isVisible();
+    }
+
+    public String verifyNPIsEngagingText() {
+        return NPI_ENGAGING_TEXT.innerText().trim();
     }
 }
