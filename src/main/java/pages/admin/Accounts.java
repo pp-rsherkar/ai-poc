@@ -55,7 +55,7 @@ public class Accounts {
     private final Locator ADVERTISER_PERMISSION_SAVE_BUTTON;
     private final Locator ACCOUNT_USER_TAB;
     private final Locator USER_SIGNAL_TAB;
-    private final Locator USER_PERMISSSIONS_SAVE_BUTTON;
+    private final Locator USER_PERMISSIONS_SAVE_BUTTON;
     private final Locator USER_PROFILE_ICON;
     private final Locator LOGOUT_BUTTON;
     private final Locator MOMENTS_CHECKBOX;
