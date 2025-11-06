@@ -166,8 +166,8 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
-    @Then("User creates new tactics and verifies it")
-    public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
+    @Then("User creates multiple tactics under same line item and verifies it")
+    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
@@ -181,50 +181,41 @@ public class LifeSteps {
 
             // Select channel and add targeting rules
             tacticSettings.selectChannel(channel);
-            tacticDetails.TARGETTING_RULES_ICON.click();
-            tacticSettings.addTargettingRules(ruleType);
-
-            // Verify selected vs saved target rules
-//            Assert.assertEquals(
-//                    tacticSettings.SELECTED_TARGET_RULE.toString(),
-//                    tacticSettings.SAVED_TARGET_RULE,tacticName
-//            );
-
-            // Save and create new tactic
+            tacticDetails.clickTargetingRuleIcon();
+            tacticSettings.addTargetingRules(ruleType);
             tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
         List<String> actualTactics = tacticDetails.getAllTactics();
-        // Using a HashSet to compare the lists regardless of their order of entries.
-        System.out.println("Saved tactics:" + actualTactics);
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
+        List<String>expectedTarget = tacticSettings.getExpectedTargetRules();
+        List<String>actualTarget = tacticSettings.getActualTargetRules();
+        Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @Then("Verify that the tabs gets enabled only after saving tactics")
-    public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
-        // tacticDetails.clickNewTactic();
+    @Then("Verify that below tabs gets enabled only after saving tactics")
+    public void verify_that_below_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
         tacticDetails.verifyDetailsTab();
         List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
-        List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
-        Assert.assertEquals(tacticTabNames, disabledTabs);
-        tacticDetails.CLICK_FIRST_TACTIC();
-        List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
-        tacticTabNames.add("Details");
-        Assert.assertEquals(new HashSet<>(tacticTabNames), new HashSet<>(enabledTabs));
+        String detailsTab = tacticTabNames.remove(tacticTabNames.size() - 1);
+        List<String> disabledTabs = tacticDetails.newTacticTabs();
+        Assert.assertEquals(tacticTabNames,disabledTabs);
+        tacticDetails.clickFirstTacticTab();
+        List<String> enabledTabs = tacticDetails.allTacticsUnderLI();
+        tacticTabNames.add(detailsTab);
+        Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
 
     }
 
-    @And("Verify the status of saved tactic")
-    public void verify_the_status_of_saved_tactic() {
-        tacticDetails.CLICK_FIRST_TACTIC();
+    @And("Verify the status of first tactic under line item is {string}")
+    public void verify_the_status_of_first_tactic_under_line_item_is (String ExpectedStatus) {
+        tacticDetails.clickFirstTacticTab();
         String actualStatus = tacticDetails.verifyTacticState();
-        Assert.assertEquals("Incomplete", actualStatus);
+        Assert.assertEquals(ExpectedStatus, actualStatus);
     }
-
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
-        //tacticDetails.clickNewTactic();
         String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
         this.customFieldName = customFieldName;
         tacticDetails.clickDetailsTab();
@@ -233,7 +224,6 @@ public class LifeSteps {
         String actualName = raw.split("\\R")[0];// To remove unwanted space and text
         Assert.assertEquals(customFieldName, actualName);
         this.uiCustomFieldName = actualName;
-
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")

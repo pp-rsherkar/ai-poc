@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 public class TacticDetails {
     private final Page page;
-    public final Locator TARGETTING_RULES_ICON;
     public final Locator TARGETING_RULES_ICON;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
@@ -57,7 +56,7 @@ public class TacticDetails {
     private final Locator ENABLE_TACTIC;
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
-
+    private final Locator TACTIC_TAB;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -88,7 +87,7 @@ public class TacticDetails {
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.TEMPLATE_SAVED_SUCCESS_ALERT = page.locator("//div[contains(text(),'Saved as Template Successfully')]");
-        this.TARGETTING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.TARGETING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
         this.NEW_TACTIC_BUTTON = page.locator("//span[normalize-space(text())='New Tactic']");
         this.SAVED_TACTICS = page.locator("//div[contains(@class,'tactic-main-details')]");
         this.DETAILS_TAB = page.locator("//a[contains(text(),'Detail')]");
@@ -105,7 +104,7 @@ public class TacticDetails {
         this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
-        this.TARGETING_RULES_ICON = page.locator("//span[contains(text(),'Targeting Rule')]");
+        this.TACTIC_TAB = page.locator("//div[@class='tactic item-details']");
         this.THREE_DOT_ICON = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
@@ -125,19 +124,17 @@ public class TacticDetails {
 
     public void verifyDetailsTab() {
         DETAILS_TAB.isVisible();
-        System.out.println(DETAILS_TAB.innerText().trim());
-
     }
 
     public List<String> newTacticTabs() {
         return NEW_TACTIC_TABS.allInnerTexts();
     }
 
-    public void CLICK_FIRST_TACTIC() {
+    public void clickFirstTacticTab() {
         SAVED_TACTICS.first().click();
     }
 
-    public List<String> savedTacticTabs() {
+    public List<String> allTacticsUnderLI() {
         return SAVED_TACTIC_TABS.allInnerTexts();
     }
 
@@ -154,7 +151,7 @@ public class TacticDetails {
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
-        CUSTOM_FIELD_TEXT.last().fill("CUST123");
+        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -164,10 +161,7 @@ public class TacticDetails {
     }
 
     public void clickTactic() {
-        //Locator tacticTab = page.locator(String.format("//div[contains(text(),'%s')]", tacticName));
-        Locator tacticTab = page.locator("//div[@class='tactic item-details']").last();
-        tacticTab.click();
-
+        TACTIC_TAB.last().click();
     }
 
     public void deleteCustomField(String customFieldName) {
@@ -178,6 +172,9 @@ public class TacticDetails {
         DELETE_SUCCESS.isVisible();
     }
 
+    public void clickTargetingRuleIcon() {
+        TARGETING_RULES_ICON.click();
+    }
 
     public String verifyTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
