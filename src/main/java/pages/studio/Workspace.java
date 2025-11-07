@@ -62,8 +62,8 @@ public class Workspace {
         this.PUBLISHED_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Published NPI List"));
         this.STATIC_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Static List"));
         this.LIVE_LIST = WORKSPACE_FRAME.getByRole(AriaRole.RADIO, new FrameLocator.GetByRoleOptions().setName("Live List"));
-        this.SELECT_HCP = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP365"));
-        this.SELECT_LIFE = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("Life"));
+        this.SELECT_HCP = WORKSPACE_FRAME.locator(" //span[contains(text(),'HCP')]/parent::label/preceding-sibling::div//input");
+        this.SELECT_LIFE = WORKSPACE_FRAME.locator(" //span[contains(text(),'Life')]/parent::label/preceding-sibling::div//input");
         this.PUBLISH_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish"));
         this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
         this.WEBHOOK_ICON = WORKSPACE_FRAME.locator("(//div[@role='group']/following-sibling::div//button)[3]"); //no unique identifier is available hence index needs to be provided
@@ -115,11 +115,13 @@ public class Workspace {
     }
 
     public void hcp() {
-        SELECT_HCP.click();
+        if(SELECT_HCP.getAttribute("aria-checked").contains("false"))
+            SELECT_HCP.click();
     }
 
     public void life() {
-        SELECT_LIFE.click();
+        if(SELECT_LIFE.getAttribute("aria-checked").contains("false"))
+            SELECT_LIFE.click();
     }
 
     public void clickPublish() {
