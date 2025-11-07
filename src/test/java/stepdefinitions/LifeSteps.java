@@ -162,7 +162,7 @@ public class LifeSteps {
 
     @Then("Verify line item details are saved and user is navigated to the tactic page")
     public void verify_line_item_details_are_saved_and_user_is_navigated_to_tactic_page() {
-        assert lineItemDetails.lineItemSuccess().contains("Success!");
+        Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
@@ -3029,7 +3029,7 @@ public class LifeSteps {
             lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
             nameList.add(lineItemNameRandom);
             lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
-            Assert.assertEquals("Success!", lineItemDetails.lineItemSuccess());
+            Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
             Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available",
                     lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));

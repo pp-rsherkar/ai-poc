@@ -85,7 +85,6 @@ public class CommonUtils {
 
     public static void selectAndClickElement(Locator locator, List<String> values){
         for (int i = 0; i < locator.count(); i++) {
-            locator.nth(i).scrollIntoViewIfNeeded();
             String text = locator.nth(i).innerText().trim();
             for (String value : values) {
                 if (text.equalsIgnoreCase(value.trim())){

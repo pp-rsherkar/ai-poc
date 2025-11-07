@@ -71,7 +71,7 @@ public class Accounts {
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
         this.DISABLE_STUDIO_OK_BUTTON = page.locator("sui-dimmer div").filter(new Locator.FilterOptions().setHasText("Ok")).nth(4);
-        this.PULSEPOINT_ICON = page.locator(".ui > div:nth-child(6)").first();
+        this.PULSEPOINT_ICON = page.locator("//app-buyer-logo/div[@class='logo-holder']");
         this.SWITCH_ACCOUNT = page.locator(".left > div:nth-child(2)").first();
         this.SWITCH_SEARCH_ACCOUNT = page.getByPlaceholder("Search");
         this.SWITCH_CLICK_ACCOUNT = page.locator("#accountSwitcher").getByText("100Plus");
