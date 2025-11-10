@@ -621,12 +621,9 @@ public class StudioSteps {
         String text = workspace.verifyNPIsEngagingText();
         Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
     }
-    @And("User navigates to accounts page and selects the {string} account")
-    public void userNavigatesToAccountsPageAndSelectsTheAccount(String accountName)
+    @And("User searches and selects the account {string}")
+    public void userSearchesAndSelectsTheAccount(String accountName)
     {
-        navigation.clickSubMenu();
-        accounts.clickAdministration();
-        accounts.selectAccountsTab();
         accounts.searchAccount(accountName);
     }
 
@@ -735,4 +732,6 @@ public class StudioSteps {
                 Assert.fail("Invalid input for visibility: " + visibilityFlag);
         }
     }
+
+
 }

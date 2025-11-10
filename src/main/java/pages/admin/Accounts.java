@@ -110,7 +110,7 @@ public class Accounts {
         this.ADVERTISER_PERMISSION_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
         this.ACCOUNT_USER_TAB = page.locator("//a[@routerlink='users']");
         this.USER_SIGNAL_TAB = page.locator("//button[normalize-space(.)='Signal']");
-        this.USER_PERMISSSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
+        this.USER_PERMISSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
         this.USER_PROFILE_ICON = page.locator("//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
         this.LOGOUT_BUTTON = page.locator("//div[@class='hovitems item last link']");
         this.MOMENTS_CHECKBOX = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
@@ -310,7 +310,7 @@ public class Accounts {
                     return;
                 }
                 else {MOMENTS_CHECKBOX.click();
-                USER_PERMISSSIONS_SAVE_BUTTON.click();}
+                USER_PERMISSIONS_SAVE_BUTTON.click();}
                 break;
             case "IB HEALTH":
                 USER_SIGNAL_TAB.click();
@@ -319,7 +319,7 @@ public class Accounts {
                     return;
                 } else {
                     IBHEALTH_CHECKBOX.click();
-                    USER_PERMISSSIONS_SAVE_BUTTON.click();
+                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "CLAIMS DATA":
@@ -329,7 +329,7 @@ public class Accounts {
                    return;
                 } else {
                     CLAIMSDATA_CHECKBOX.click();
-                    USER_PERMISSSIONS_SAVE_BUTTON.click();
+                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
 
