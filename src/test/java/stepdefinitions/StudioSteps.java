@@ -84,8 +84,8 @@ public class StudioSteps {
     }
 
     @Then("the user renames the workspace to {string}")
-    public void the_user_renames_the_workspace_to_(String string) {
-        workspaceName = string + CommonUtils.timeStampCalculation();
+    public void the_user_renames_the_workspace_to_(String wName) {
+        workspaceName = wName + CommonUtils.timeStampCalculation();
         expansionWorkspace.renameExpansion(workspaceName);
     }
 
@@ -144,11 +144,6 @@ public class StudioSteps {
         workspaceCreation.createStudioWorkspace();
     }
 
-    @When("User clicks on Create New Workspace For Expansion")
-    public void user_clicks_on_create_new_workspace_for_expansion() {
-        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
-        workspaceCreation.createWorkspaceExpansion(flag);
-    }
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
@@ -160,7 +155,7 @@ public class StudioSteps {
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
         workspaceCreation.clickHCPExplorerWorkspace();
-        Assert.assertEquals("Workspace created successfully", workspaceCreation.verifyWorkspaceCreation());
+        Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
     }
 
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
@@ -212,7 +207,7 @@ public class StudioSteps {
 
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
-        String actualMessage = workspaceCreation.verifyWorkspaceCreation();
+        String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
 
         boolean isValid = actualMessage.equals("Workspace saved successfully") ||
                 actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
@@ -301,7 +296,7 @@ public class StudioSteps {
     @Then("Verify list is published")
     public void verify_list_is_published() {
         workspace.clickPublish();
-        Assert.assertEquals("Workspace saved successfully", workspaceCreation.verifyWorkspaceCreation());
+        Assert.assertEquals("Workspace saved successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
         workspace.waitTillWorkspaceAlertHide();
         workspace.clickFlyOrPageButton();
         Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());

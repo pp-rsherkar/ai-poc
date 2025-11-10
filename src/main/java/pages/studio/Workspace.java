@@ -130,7 +130,7 @@ public class Workspace {
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(WORKSPACE_CREATED_ALERT);
     }
 
     public String verifyPublishedNpi() {

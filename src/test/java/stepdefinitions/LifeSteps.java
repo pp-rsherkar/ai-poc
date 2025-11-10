@@ -78,15 +78,14 @@ public class LifeSteps {
     Accounts accounts = new Accounts(DriverFactory.getPage());
     ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
+    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
     Constants constants = new Constants();
-    String timestamp = CommonUtils.timeStampCalculation();
     int itemCount = 0;
     int totalListCount = 0;
     int flightStartDate = 0;
     int flightEndDate = 0;
     APIResponse response;
     boolean flag = false;
-    CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
     private String customFieldName;
     private String uiCustomFieldName;
     private BigDecimal campaignBaseBid;
@@ -185,8 +184,8 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
-    @Then("User creates new tactics and verifies it")
-    public void user_creates_new_tactics_and_verifies_it(DataTable dataTable) {
+    @Then("User creates multiple tactics under same line item and verifies it")
+    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
@@ -200,50 +199,41 @@ public class LifeSteps {
 
             // Select channel and add targeting rules
             tacticSettings.selectChannel(channel);
-            tacticDetails.TARGETTING_RULES_ICON.click();
-            tacticSettings.addTargettingRules(ruleType);
-
-            // Verify selected vs saved target rules
-//            Assert.assertEquals(
-//                    tacticSettings.SELECTED_TARGET_RULE.toString(),
-//                    tacticSettings.SAVED_TARGET_RULE,tacticName
-//            );
-
-            // Save and create new tactic
+            tacticDetails.clickTargetingRuleIcon();
+            tacticSettings.addTargetingRules(ruleType);
             tacticSettings.saveTacticSettings();
             tacticDetails.clickNewTactic();
         }
         List<String> actualTactics = tacticDetails.getAllTactics();
-        // Using a HashSet to compare the lists regardless of their order of entries.
-        System.out.println("Saved tactics:" + actualTactics);
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
+        List<String>expectedTarget = tacticSettings.getExpectedTargetRules();
+        List<String>actualTarget = tacticSettings.getActualTargetRules();
+        Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @Then("Verify that the tabs gets enabled only after saving tactics")
-    public void verify_that_the_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
-        // tacticDetails.clickNewTactic();
+    @Then("Verify that below tabs gets enabled only after saving tactics")
+    public void verify_that_below_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
         tacticDetails.verifyDetailsTab();
         List<String> tacticTabNames = new ArrayList<>(dataTable.asList(String.class));
-        List<String> disabledTabs = tacticDetails.newTacticTabs(); // gives all the disabled tabs
-        Assert.assertEquals(tacticTabNames, disabledTabs);
-        tacticDetails.CLICK_FIRST_TACTIC();
-        List<String> enabledTabs = tacticDetails.savedTacticTabs(); // gives all the enabled tabs
-        tacticTabNames.add("Details");
-        Assert.assertEquals(new HashSet<>(tacticTabNames), new HashSet<>(enabledTabs));
+        String detailsTab = tacticTabNames.remove(tacticTabNames.size() - 1);
+        List<String> disabledTabs = tacticDetails.newTacticTabs();
+        Assert.assertEquals(tacticTabNames,disabledTabs);
+        tacticDetails.clickFirstTacticTab();
+        List<String> enabledTabs = tacticDetails.allTacticsUnderLI();
+        tacticTabNames.add(detailsTab);
+        Assert.assertEquals(new HashSet<>(tacticTabNames),new HashSet<>(enabledTabs));
 
     }
 
-    @And("Verify the status of saved tactic")
-    public void verify_the_status_of_saved_tactic() {
-        tacticDetails.CLICK_FIRST_TACTIC();
+    @And("Verify the status of first tactic under line item is {string}")
+    public void verify_the_status_of_first_tactic_under_line_item_is (String ExpectedStatus) {
+        tacticDetails.clickFirstTacticTab();
         String actualStatus = tacticDetails.verifyTacticState();
-        Assert.assertEquals("Incomplete", actualStatus);
+        Assert.assertEquals(ExpectedStatus, actualStatus);
     }
-
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
-        //tacticDetails.clickNewTactic();
         String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
         this.customFieldName = customFieldName;
         tacticDetails.clickDetailsTab();
@@ -252,7 +242,6 @@ public class LifeSteps {
         String actualName = raw.split("\\R")[0];// To remove unwanted space and text
         Assert.assertEquals(customFieldName, actualName);
         this.uiCustomFieldName = actualName;
-
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
@@ -1931,6 +1920,7 @@ public class LifeSteps {
     public void userAttemptsToClickThePreviewButtonWithoutSelectingACreativeFile() {
         bulkCreativeUpload.isRemoveFileIconAvailable();
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickUploadButton();
         Assert.assertEquals("Atleast one creative should be selected", bulkCreativeUpload.fetchErrorAlert());
     }
 
@@ -1958,7 +1948,7 @@ public class LifeSteps {
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
         bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
-        bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickUploadButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
         bulkCreativeUpload.updateCreativeName(metricName);
         nameList.clear();
@@ -2117,7 +2107,7 @@ public class LifeSteps {
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
             if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
-            bulkCreativeUpload.clickOKButton();
+            bulkCreativeUpload.clickUploadButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
         }
     }
@@ -2342,7 +2332,7 @@ public class LifeSteps {
 
     @And("Verify that user is able to select Timezone field value {string}")
     public void verifyThatUserIsAbleToSelectTimezoneFieldValue(String timeZone) {
-        Assert.assertTrue("Unable to select time zone", runReportPanel.selectTimeZone(timeZone.trim()));
+        Assert.assertTrue("Unable to select time zone " + timeZone, runReportPanel.selectTimeZone(timeZone.trim()));
         nameList.add(timeZone);
     }
 
@@ -2716,13 +2706,19 @@ public class LifeSteps {
         SimpleDateFormat descFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
         SimpleDateFormat extractedFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         SimpleDateFormat compareFormat = new SimpleDateFormat("MM/dd/yyyy");
-        for (int i = 0; i < flightDescriptions.size(); i++) {
-            String desc = flightDescriptions.get(i).split(":")[1].split("-")[0].trim();
-            desc = desc.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
-            String expected = compareFormat.format(descFormat.parse(desc));
-            String actual = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
-            if (expected.equals(actual))
-                Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expected, actual);
+        for (int i = 0; i < flightDescriptions.size() && (i * 2 + 1) < itemList.size(); i++) {
+            String desc = flightDescriptions.get(i);
+            String[] dateParts = desc.split(":", 2)[1].split("-");
+            String startDate = dateParts[0].trim();
+            String endDate = dateParts[1].trim();
+            startDate = startDate.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            endDate = endDate.replaceAll("(\\d+)(st|nd|rd|th)", "$1");
+            String actualStart = compareFormat.format(descFormat.parse(startDate));
+            String actualEnd = compareFormat.format(descFormat.parse(endDate));
+            String expectedStart = compareFormat.format(extractedFormat.parse(itemList.get(i * 2)));
+            String expectedEnd = compareFormat.format(extractedFormat.parse(itemList.get(i * 2 + 1)));
+            Assert.assertEquals("Start date mismatch for Flight #" + (i + 1), expectedStart, actualStart);
+            Assert.assertEquals("End date mismatch for Flight #" + (i + 1), expectedEnd, actualEnd);
         }
     }
 
