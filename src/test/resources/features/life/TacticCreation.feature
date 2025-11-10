@@ -15,7 +15,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Targeting Segment     | Email    | Health Population  |
       | Health Populations    | EHR      | NPI                |
@@ -37,7 +37,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Targeting Segment     | Email    | Health Population  |
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
@@ -94,3 +94,19 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
+
+
+  @regression
+  Scenario Outline: Verify user is able to add frequency cap for a tactic
+    When User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    Then User creates below tactics under same line item and verifies it
+      | Tactic Name           | Channel  | RuleType           |
+      | Targeting Segment     | Email    | Health Population  |
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         |
