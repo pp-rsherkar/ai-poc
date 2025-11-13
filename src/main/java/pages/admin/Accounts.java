@@ -310,7 +310,7 @@ public class Accounts {
                     return;
                 }
                 else {MOMENTS_CHECKBOX.click();
-                USER_PERMISSIONS_SAVE_BUTTON.click();}
+               }
                 break;
             case "IB HEALTH":
                 USER_SIGNAL_TAB.click();
@@ -319,7 +319,6 @@ public class Accounts {
                     return;
                 } else {
                     IBHEALTH_CHECKBOX.click();
-                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "CLAIMS DATA":
@@ -329,11 +328,11 @@ public class Accounts {
                    return;
                 } else {
                     CLAIMSDATA_CHECKBOX.click();
-                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
 
         }
+        USER_PERMISSIONS_SAVE_BUTTON.click();
 
     }
 
