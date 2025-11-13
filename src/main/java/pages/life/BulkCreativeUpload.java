@@ -413,7 +413,6 @@ public class BulkCreativeUpload {
                 if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 clickPreviewButton();
-                clickUploadButton();
                 updateCreativeName(updatedCreativeName);
                 clickOKButton();
                 clickUploadButton();

@@ -55,7 +55,7 @@ public class Navigation {
         this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
         this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
-        this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo");
+        this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo/div[@class='logo-holder']");
     }
 
     public void navigateToUrl(String url) {
@@ -157,7 +157,7 @@ public class Navigation {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void clickPulsePointLogo(){
+    public void clickPulsePointLogo() {
         PULSEPOINT_LOGO.click();
         waitUtility.waitForLocatorVisible(SUB_MENU);
     }

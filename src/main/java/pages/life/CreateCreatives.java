@@ -89,7 +89,7 @@ public class CreateCreatives {
         this.COPY_ICON = page.locator("//div[contains(@class,'approved')]/following-sibling::div/span[contains(@title,'copy')]");
         this.CREATIVE_HEADER = page.locator("//div[contains(@class,'rightPanelHeader1')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'okButton')]");
-        this.SUCCESS_ALERT = page.locator("//div[contains(@aria-label,'Success!')]");
+        this.SUCCESS_ALERT = page.locator("//div[contains(text(),'BulkUpload created successfully.')]");
         this.ARCHIVE_DIALOG = page.locator("//div[contains(text(),'Archive Creative?')]");
         this.ARCHIVE_BUTTON = page.locator("//div[contains(@class,'approveButtonText')]");
         this.NEW_CREATIVE_BUTTON = page.locator("//button[contains(text(),'New Creative')]");
@@ -259,7 +259,11 @@ public class CreateCreatives {
     public String copyCreative() {
         COPY_ICON.first().click();
         waitUtility.waitForLocatorVisible(CREATIVE_HEADER);
-        return saveCreative();
+        String creativeName = "Copy_Creative_" + CommonUtils.timeStampCalculation();
+        CREATIVE_NAME.fill(creativeName);
+        OK_BUTTON.click();
+        Locator successAlertXpath = page.locator(String.format("//div[contains(text(),'%s updated.')]", creativeName));
+        return successAlertXpath.innerText().trim();
     }
 
     public void clickNewCreativeButton() {

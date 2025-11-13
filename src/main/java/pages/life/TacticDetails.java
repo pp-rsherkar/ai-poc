@@ -194,9 +194,10 @@ public class TacticDetails {
         SAVE_TACTIC_DETAILS.click();
     }
 
-    public String tacticDetailsSuccess() {
-        String successMessage = TACTIC_DETAILS_SUCCESS.first().innerText().trim();
-        waitUtility.waitUntilSpinnerHidden();
+    public String tacticDetailsSuccess(String tacticName) {
+        Locator tacticSuccessAlert = page.locator(String.format("//div[contains(text(),'Tactic %s updated.')]", tacticName));
+        String successMessage = tacticSuccessAlert.innerText().trim();
+        waitUtility.waitForLocatorHidden(tacticSuccessAlert);
         return successMessage;
     }
 
