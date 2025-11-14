@@ -75,7 +75,7 @@ public class BulkCreativeUpload {
         this.PREVIEW_BUTTON = page.locator("//button[contains(text(),'Preview')]");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
         this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or contains(@aria-label,'Select Advertiser') or contains(@aria-label,'Landing Page Domain is required') or contains(@aria-label, 'Landing Page Domain is not valid.') or contains(@aria-label,'1 error')]");
-        this.SUCCESS_ALERT = page.locator("//div[contains(text(),'BulkUpload created successfully.')]");
+        this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
         this.BULK_UPLOAD_HEADER = page.locator("//div[contains(text(),'Bulk Upload')]");
         this.CREATIVE_NAME_FROM_TABLE = page.locator("//tbody//span/input");
         this.HEADER_MESSAGE = page.locator("//div[contains(@class,'appr-status-label')]/span");
@@ -197,6 +197,7 @@ public class BulkCreativeUpload {
 
     public String fetchSuccessAlert() {
         String text = SUCCESS_ALERT.innerText().trim();
+        System.out.println(text);
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return text;
     }

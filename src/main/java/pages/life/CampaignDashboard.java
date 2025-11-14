@@ -426,10 +426,10 @@ public class CampaignDashboard {
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
         verifyIfFiltersExist();
-        SEARCH_CAMPAIGN.fill(createdCampaign);
-        if (PRE_LOADER.isVisible()) waitUtility.waitUntilPreLoaderHidden(120000);
-        CLICK_CAMPAIGN_SEARCH.click();
-        SUB_TITLE_AFTER_CAMPAIGN_SEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
+            SEARCH_CAMPAIGN.fill(createdCampaign);
+            CLICK_CAMPAIGN_SEARCH.click();
+        }
     }
 
     public String verifyCreatedCampaign(String createdCampaign) {
