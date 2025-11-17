@@ -3,6 +3,7 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.SelectOption;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -95,7 +96,7 @@ public class PMP {
         this.NEW_DEAL_SAVE_BUTTON = page.locator("//div[contains(@class,'addDealFooter')]//button[contains(@class,'okButton')]");
         this.TACTIC_SETTING_TAB = page.locator("//a[contains(@class,'gaTabSettings')]");
         this.DELETE_ICON = page.locator("//div[contains(@title,'delete')]");
-        this.PRICING_STRATEGY_DROPDOWN = page.locator("//div[contains(@class,'menu transition visible')]/div[contains(@class,'item')]");
+        this.PRICING_STRATEGY_DROPDOWN = page.locator("//app-native-dropdown[contains(@cssclass,'pricing-dropdown')]//select[contains(@class, 'filter-dropdown')]");
         this.PRICE_TEXT = page.locator("//div[contains(@class,'pricingstrategy')]//input[contains(@placeholder,'Price')]");
         this.PERCENTAGE_TEXT = page.locator("//div[contains(@class,'pricingstrategy')]//input[contains(@placeholder,'percentage')]");
         this.ADD_DEAL_BUTTON = page.locator("//span[@class='add-action-new-deal']");
@@ -274,7 +275,7 @@ public class PMP {
         page.locator(xpath).first().scrollIntoViewIfNeeded();
         DEAL_TYPE_COLUMN_NAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
         page.locator(xpath).first().click();
-        PRICING_STRATEGY_DROPDOWN.locator("text=" + key).click();
+        PRICING_STRATEGY_DROPDOWN.selectOption(new SelectOption().setLabel(key));
         if (key.equalsIgnoreCase("Flat")) {
             PRICE_TEXT.fill(pricingStrategyType.get(0));
         } else if (key.equalsIgnoreCase("% above floor")) {

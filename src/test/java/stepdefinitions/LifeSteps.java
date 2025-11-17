@@ -129,7 +129,6 @@ public class LifeSteps {
 
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
-        Assert.assertEquals("Life", campaigns.campaignDashboard());
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
@@ -177,7 +176,7 @@ public class LifeSteps {
             expectedTactic.add(tacticName);
             // Enter tactic name
             tacticDetails.enterTacticName(tacticName);
-            tacticDetails.saveTactic();
+            tacticDetails.saveTacticDetails();
 
             // Select channel and add targeting rules
             tacticSettings.selectChannel(channel);
@@ -227,7 +226,7 @@ public class LifeSteps {
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
-    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
+    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic(DataTable dataTable) {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
         tacticDetails.clickTactic();
@@ -248,7 +247,7 @@ public class LifeSteps {
 
     @Then("Verify tactic details are saved and user is navigated to the settings tab")
     public void verify_tactic_details_are_saved_and_user_is_navigated_to_settings_tab() {
-        assert tacticDetails.tacticDetailsSuccess().contains("Success!");
+        Assert.assertEquals("Tactic " + tacticNameRandom + " updated.", tacticDetails.tacticDetailsSuccess());
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
@@ -529,6 +528,7 @@ public class LifeSteps {
     public void user_navigates_to_campaign_dashboard() {
         navigation.clickSubMenu();
         navigation.clickCampaigns();
+        Assert.assertEquals("Life", campaigns.campaignDashboard());
     }
 
     @Then("Verify list is targeted in the tactic successfully")
@@ -1167,7 +1167,7 @@ public class LifeSteps {
 
     @And("Verify Copy option is available and working")
     public void verifyCopyOptionIsAvailableAndWorking() {
-        Assert.assertEquals("Success!", createCreatives.copyCreative());
+        Assert.assertTrue("Copy option is not working properly", createCreatives.copyCreative().contains("updated."));
     }
 
 
@@ -1190,7 +1190,9 @@ public class LifeSteps {
                     .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
 
             createCreatives.fillAttributes(type, attributeMap);
-            Assert.assertEquals("Success!", createCreatives.saveCreative());
+            String actualMessage = createCreatives.saveCreative();
+            Assert.assertTrue("No message is displayed", actualMessage.contains("BulkUpload created successfully.") ||
+                    actualMessage.contains("Creative " + newCreativeName + " created."));
             nameList.addAll(createCreatives.fetchCreatives());
         }
     }
@@ -1839,9 +1841,11 @@ public class LifeSteps {
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
         bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
-        bulkCreativeUpload.clickUploadButton();
+        bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickOKButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
         bulkCreativeUpload.updateCreativeName(metricName);
+        bulkCreativeUpload.clickUploadButton();
         nameList.clear();
         nameList.add(metricName);
     }
@@ -1999,6 +2003,7 @@ public class LifeSteps {
             if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickUploadButton();
+            bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
         }
     }
@@ -2663,14 +2668,14 @@ public class LifeSteps {
         scheduleReport.enterCustomDestinationDetailsOnReportPanel(dimensionName, filePath, fileName);
     }
 
-    @And("User clicks PulsePoint icon to navigate back to Life")
-    public void userClicksPulsePointIconToNavigateBackToLife() {
-        navigation.clickPulsePointLogo();
-    }
-
     @And("User saves the custom destination")
     public void userSavesTheCustomDestination() {
         accounts.clickOKButton();
+    }
+
+    @And("User clicks PulsePoint icon to navigate back to Life")
+    public void userClicksPulsePointIconToNavigateBackToLife() {
+        navigation.clickPulsePointLogo();
     }
 
     @And("User clicks Lifetime filter")
@@ -3167,7 +3172,7 @@ public class LifeSteps {
     @Then("User creates a new tactic with details {string} {string}")
     public void user_creates_a_new_tactics(String tacticName, String channel) {
         tacticDetails.enterTacticName(tacticName);
-        tacticDetails.saveTactic();
+        tacticDetails.saveTacticDetails();
         tacticSettings.selectChannel(channel);
         tacticSettings.saveTacticSettings();
     }
@@ -3175,7 +3180,6 @@ public class LifeSteps {
     @Then("User deletes the tactic {string} and verifies it")
     public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
         tacticDetails.deleteTactic();
-        DriverFactory.getPage().reload();
         Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
         tacticDetails.globalSearchDeletedTactic(tacticName);
         Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());

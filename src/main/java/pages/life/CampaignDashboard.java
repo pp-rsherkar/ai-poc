@@ -394,21 +394,21 @@ public class CampaignDashboard {
         CLICK_SETTINGS.click();
         if (!GROUP_BY_CAMPAIGN_RADIO_BUTTON.getAttribute("class").contains("groupingMenuRadioSelected")) {
             GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
-            waitUtility.waitUntilPreLoaderHidden();
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
     public void verifyFavoriteCheckbox() {
         if (FAVORITE_ONLY_CHECKBOX.getAttribute("class").contains("checked")) {
             FAVORITE_ONLY_CHECKBOX.click();
-            waitUtility.waitUntilPreLoaderHidden(120000);
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
     public void verifyHideFinishedCheckbox() {
         if (HIDE_FINISHED_CHECKBOX.getAttribute("class").contains("checked")) {
             HIDE_FINISHED_CHECKBOX.click();
-            waitUtility.waitUntilPreLoaderHidden(120000);
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
@@ -416,7 +416,7 @@ public class CampaignDashboard {
         if (FILTER_APPLIED_ICON.isVisible()) {
             FILTER_APPLIED_ICON.click();
             RESET_FILTER_ICON.click();
-            waitUtility.waitUntilPreLoaderHidden(120000);
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
@@ -426,10 +426,10 @@ public class CampaignDashboard {
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
         verifyIfFiltersExist();
-        SEARCH_CAMPAIGN.fill(createdCampaign);
-        if (PRE_LOADER.isVisible()) waitUtility.waitUntilPreLoaderHidden(120000);
-        CLICK_CAMPAIGN_SEARCH.click();
-        SUB_TITLE_AFTER_CAMPAIGN_SEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
+            SEARCH_CAMPAIGN.fill(createdCampaign);
+            CLICK_CAMPAIGN_SEARCH.click();
+        }
     }
 
     public String verifyCreatedCampaign(String createdCampaign) {
