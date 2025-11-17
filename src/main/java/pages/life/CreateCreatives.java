@@ -89,7 +89,7 @@ public class CreateCreatives {
         this.COPY_ICON = page.locator("//div[contains(@class,'approved')]/following-sibling::div/span[contains(@title,'copy')]");
         this.CREATIVE_HEADER = page.locator("//div[contains(@class,'rightPanelHeader1')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'okButton')]");
-        this.SUCCESS_ALERT = page.locator("//div[contains(@aria-label,'Success!')]");
+        this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
         this.ARCHIVE_DIALOG = page.locator("//div[contains(text(),'Archive Creative?')]");
         this.ARCHIVE_BUTTON = page.locator("//div[contains(@class,'approveButtonText')]");
         this.NEW_CREATIVE_BUTTON = page.locator("//button[contains(text(),'New Creative')]");
@@ -128,11 +128,8 @@ public class CreateCreatives {
 
     public void clickActivityButton(String buttonType) {
         Locator button = page.locator(String.format("//div[contains(text(), '%s')]/parent::button", buttonType));
-        String classAttr = button.getAttribute("class");
-        if (classAttr == null || !classAttr.contains("active")) {
-            button.click();
-            waitUtility.waitUntilPreLoaderHidden();
-        }
+        button.click();
+        waitUtility.waitUntilPreLoaderHidden();
     }
 
     public void clickClearAllButton() {
@@ -258,8 +255,12 @@ public class CreateCreatives {
 
     public String copyCreative() {
         COPY_ICON.first().click();
+        waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(CREATIVE_HEADER);
-        return saveCreative();
+        String creativeName = "Copy_Creative_" + CommonUtils.timeStampCalculation();
+        CREATIVE_NAME.fill(creativeName);
+        OK_BUTTON.click();
+        return SUCCESS_ALERT.innerText().trim();
     }
 
     public void clickNewCreativeButton() {

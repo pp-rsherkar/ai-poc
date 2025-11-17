@@ -118,7 +118,7 @@ public class LineItemDetails {
         this.NUMBER_OF_MONTHS = page.locator("//label[text()='Number of Months']/following-sibling::div//sui-select");
         this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']").last();
         this.CANCEL_TACTIC = page.locator("#lidcBody").getByText("Cancel");
-        this.NEW_LINE_ITEM = page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
+        this.NEW_LINE_ITEM = page.locator("//app-icon-lable-link[@text='New Line Item']//div");
         this.NOTES_ICON = page.locator("//div[contains(@class,'notes-dashboard')]//span");
         this.NOTES_TEXTAREA = page.locator("//textarea[@placeholder='Notes']");
         this.NOTES_OK_BUTTON = page.locator("//span[@class='okText']");
@@ -191,7 +191,9 @@ public class LineItemDetails {
     }
 
     public void selectNewLineItem() {
+        waitUtility.waitForLocatorVisible(NEW_LINE_ITEM);
         NEW_LINE_ITEM.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String verifyLineItemPanelName() {

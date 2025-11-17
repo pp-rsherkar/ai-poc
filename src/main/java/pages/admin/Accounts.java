@@ -105,7 +105,7 @@ public class Accounts {
     public void selectAccountsTab() {
         page.waitForLoadState();
         ACCOUNTS_TAB.click();
-        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void searchAccount(String accountName) {
@@ -222,8 +222,10 @@ public class Accounts {
 
     public void clickOKButton() {
         OK_BUTTON.click();
-        waitUtility.waitUntilSpinnerHidden(240000);
-        waitUtility.waitForLocatorVisible(PULSEPOINT_ICON);
+        while(!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()){
+            page.waitForTimeout(5000);
+        }
+        page.waitForTimeout(10000); //needed this hard wait as page remains un-interactive even after element is visible
     }
 
     public void selectUserTab() {

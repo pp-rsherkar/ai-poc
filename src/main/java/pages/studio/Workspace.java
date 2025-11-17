@@ -51,11 +51,13 @@ public class Workspace {
     private final Locator RETROFIT_CHECKBOX;
     private final Locator NPI_ENGAGING_TEXT;
     private final Locator PUBLISH_LOADER;
+    private final Locator NPI_LIST_PULLOUT_MENU;
+    private final Locator OK_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Workspace(Page page) {
         this.page = page;
-        this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
+        this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
         this.FLY_PAGE_BUTTON = WORKSPACE_FRAME.locator("//div[@role='group']/following-sibling::div//button").first();
         this.PUBLISH_NPI = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Publish NPI List"));
@@ -89,6 +91,8 @@ public class Workspace {
         this.RETROFIT_CHECKBOX = WORKSPACE_FRAME.locator("//span[contains(text(),'Retrofit NPIs')]/parent::label/preceding-sibling::div//input");
         this.NPI_ENGAGING_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'NPIs engaging on or')]");
         this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
+        this.NPI_LIST_PULLOUT_MENU = WORKSPACE_FRAME.locator("//ul[@data-tour-id='npi-list-pullout-menu']");
+        this.OK_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'OK')]");
     }
 
     public void studio() {
@@ -99,7 +103,11 @@ public class Workspace {
     public void clickFlyOrPageButton() {
         if(PUBLISH_LOADER.isVisible())
             waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
-        FLY_PAGE_BUTTON.click();
+        if(NPI_LIST_PULLOUT_MENU.isVisible()) {
+            OK_BUTTON.click();
+        }else{
+            FLY_PAGE_BUTTON.click();
+        }
     }
 
     public void clickPublishNPI() {
@@ -126,7 +134,9 @@ public class Workspace {
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        waitUtility.waitForLocatorVisible(WORKSPACE_CREATED_ALERT);
+        while(!WORKSPACE_CREATED_ALERT.isVisible()){
+            page.waitForTimeout(5000);
+        }
     }
 
     public String verifyPublishedNpi() {
