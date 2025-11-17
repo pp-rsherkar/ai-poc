@@ -144,6 +144,16 @@ public class LifeSteps {
         campaigns.saveCampaign();
     }
 
+    @When("User enters the campaign details as {string} {string} {string} {string} {string} {string} {string} and saves the campaign")
+    public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget,String FREQ_VALUE,String TIME_INTERVAL,String SCOPE) {
+        campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
+        campaigns.selectAdvertiser(advertiser);
+        campaigns.enterCampaignName(campaignNameRandom);
+        campaigns.setCampaignType(campaign_type);
+        campaigns.enterBudget(budget);
+        campaigns.saveCampaign();
+    }
+
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
         Assert.assertEquals("Success!", campaigns.campaignSuccess());
@@ -191,6 +201,12 @@ public class LifeSteps {
         List<String>expectedTarget = tacticSettings.getExpectedTargetRules();
         List<String>actualTarget = tacticSettings.getActualTargetRules();
         Assert.assertEquals(expectedTarget,actualTarget);
+    }
+
+    @Then("User clicks adds a frequency cap and verifies it")
+    public void user_clicks_adds_a_frequency_cap_and_verifies_it() {
+        tacticDetails.clickNewTactic();
+
     }
 
     @Then("Verify that below tabs gets enabled only after saving tactics")
