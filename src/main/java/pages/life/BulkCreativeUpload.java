@@ -197,7 +197,6 @@ public class BulkCreativeUpload {
 
     public String fetchSuccessAlert() {
         String text = SUCCESS_ALERT.innerText().trim();
-        System.out.println(text);
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return text;
     }
