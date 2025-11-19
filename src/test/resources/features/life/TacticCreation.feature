@@ -68,7 +68,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
 
   @regression
-  Scenario Outline: User delete tactic from a line item
+  Scenario Outline: Verify deletion of Tactic from a Line Item
     When User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -76,7 +76,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>"
     Then User deletes the tactic "<TACTIC_NAME>" and verifies it
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72739 |
@@ -90,7 +89,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>"
     And User enables tactic "<TACTIC_NAME>" through bulk action and verifies the status
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |

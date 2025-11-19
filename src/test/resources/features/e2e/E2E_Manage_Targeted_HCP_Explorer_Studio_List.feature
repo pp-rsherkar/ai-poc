@@ -32,7 +32,9 @@ Feature: E2E Workflow for Targeting a Studio HCP Explorer List in LIFE at the Ta
     Then User Verify the list is displayed in the Life
     And Navigate to Campaign Dashboard and clicks on Create Campaign
     And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
     And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
     And User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     And User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the published Studio list

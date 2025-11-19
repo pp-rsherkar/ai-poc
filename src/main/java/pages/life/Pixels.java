@@ -5,6 +5,8 @@ import com.microsoft.playwright.Page;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.util.List;
+
 public class Pixels {
     private final Page page;
     private final Locator PIXELS_MENU_ITEM;
@@ -26,6 +28,7 @@ public class Pixels {
     private final Locator REMOVE_SUCCESS;
     private final Locator CANCEL_BUTTON;
     private final Locator NO_RESULTS_FOUND;
+    private final Locator PIXEL_LIST;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Pixels(Page page) {
@@ -49,6 +52,7 @@ public class Pixels {
         this.REMOVE_SUCCESS = page.locator("//div[@role='alert' and text()='Pixel deleted successfully']");
         this.CANCEL_BUTTON = page.locator("//button[contains(@class,'cancel secondary button') and normalize-space(text())='Cancel']");
         this.NO_RESULTS_FOUND = page.locator("//div[contains(text(),'Nothing found') or contains(text(),'Nothing Found')]");
+        this.PIXEL_LIST = page.locator("//div[contains(@class,'pixel-list-wrapper')]//div[contains(@class,'main-details')]");
     }
 
     public void clickPixelsMenuItem() {
@@ -157,6 +161,7 @@ public class Pixels {
 
     public void selectSmartPixelTab() {
         SMART_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void openSearchedPixel(String pixelName) {
@@ -168,5 +173,16 @@ public class Pixels {
     public String verifyDeletedPixel() {
         waitUtility.waitForLocatorVisible(NO_RESULTS_FOUND);
         return NO_RESULTS_FOUND.innerText();
+    }
+
+    public void selectAdvertiser(String advertiser){
+        ADVERTISER_DROPDOWN.click();
+        ADVERTISER_DROPDOWN.locator("xpath=//span[contains(text(),'" + advertiser + "')]").click();
+        page.keyboard().press("Escape");
+        waitUtility.waitForLocatorVisible(PIXEL_LIST.last());
+    }
+
+    public List<String> fetchPixelsList() {
+       return PIXEL_LIST.allInnerTexts();
     }
 }

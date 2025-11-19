@@ -72,7 +72,7 @@ public class TacticDetails {
         this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
         this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
-        this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Tactic')]");
         this.IMPORT_TEMPLATE_ICON = page.locator("//app-icon-lable-link[contains(@text,'Import Template')]/div");
         this.IMPORT_TEMPLATE_DIALOG = page.locator("//div[contains(text(),'Import Template')]");
         this.TEMPLATE_SEARCH_BOX = page.locator("//input[contains(@placeholder,'type in to search...')]");
@@ -182,22 +182,18 @@ public class TacticDetails {
     }
 
     public void enterTacticName(String tacticName) {
+        waitUtility.waitForLocatorVisible(ADD_CUSTOM_FIELD);
         TACTIC_NAME.fill(tacticName);
     }
 
     public void saveTacticDetails() {
         SAVE_TACTIC_DETAILS.click();
-        waitUtility.waitUntilSpinnerHidden();
-    }
-
-    public void saveTactic() {
-        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
-        SAVE_TACTIC_DETAILS.click();
     }
 
     public String tacticDetailsSuccess() {
-        String successMessage = TACTIC_DETAILS_SUCCESS.first().innerText().trim();
+        String successMessage = TACTIC_DETAILS_SUCCESS.innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorHidden(TACTIC_DETAILS_SUCCESS);
         return successMessage;
     }
 
@@ -209,8 +205,8 @@ public class TacticDetails {
             campaigns.campaignDashboard();
             //Campaign, Line Item and Tactic creation
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
-            createLineItem(lineItemName + "_" + CommonUtils.generateRandomString(), lineItemType.trim(), lineBudget);
-            createTactic(tacticName + "_" + CommonUtils.generateRandomString());
+            createLineItem(lineItemName + "_" + CommonUtils.timeStampCalculation(), lineItemType.trim(), lineBudget);
+            createTactic(tacticName + "_" + CommonUtils.timeStampCalculation());
             Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
             labelCountMapList.add(labelCountMap);
             saveTacticDetails();
@@ -228,8 +224,8 @@ public class TacticDetails {
             campaigns.campaignDashboard();
 
             createCampaign(advertiser, campaignName + "_" + CommonUtils.timeStampCalculation(), campaignType, budget);
-            createLineItem(lineItemName + "_" + CommonUtils.generateRandomString(), lineItemType.trim(), lineBudget);
-            createTactic(tacticName + "_" + CommonUtils.generateRandomString());
+            createLineItem(lineItemName + "_" + CommonUtils.timeStampCalculation(), lineItemType.trim(), lineBudget);
+            createTactic(tacticName + "_" + CommonUtils.timeStampCalculation());
 
             targetingTemplate.addTargetingRules(rulesMap);
             saveTacticDetails();
