@@ -116,7 +116,7 @@ public class TacticDetails {
 
     public void clickNewTactic() {
         NEW_TACTIC_BUTTON.click();
-        TACTIC_SETTINGS_TAB.click();
+        //TACTIC_SETTINGS_TAB.click();
     }
 
     public List<String> getAllTactics() {

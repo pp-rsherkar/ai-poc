@@ -21,6 +21,12 @@ public class Campaigns {
     private final Locator CAMPAIGN_SUCCESS;
     private final Locator LIFE_TIME_FILTER;
     private final Locator CAMPAIGN_ENTRIES;
+    private final Locator SELECT_CAMPAIGN;
+    private final Locator Frequency_CAP_ENABLE;
+    private final Locator DETAILS_TAB;
+    private final Locator TIMES_PER_DROPDOWN;
+    private final Locator SCOPE_DROPDOWN;
+    private final Locator FREQUENCY_CAP_VALUE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -38,12 +44,36 @@ public class Campaigns {
         this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
+        this.SELECT_CAMPAIGN = page.locator("//div[@class='item-details']");
+        this.Frequency_CAP_ENABLE = page.locator("//div[@class='ui input form-control']");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
+        this.TIMES_PER_DROPDOWN = page.locator("//div[@class='ui dropdown selection form-control']");
+        this.SCOPE_DROPDOWN = page.locator("//div[contains(@class,'crossDevice-dropdown')]");
+        this.FREQUENCY_CAP_VALUE = page.locator("//input[contains(@class,'small ng-touched ng-pristine ng-valid')]");
     }
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
     }
+
+    public void selectCampaign() {
+        SELECT_CAMPAIGN.first().click();
+    }
+    public void addFrequencyCap(String TIMES_PER, String SCOPE, String FREQ_VALUE) {
+        Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", TIMES_PER));
+        Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", SCOPE));
+        DETAILS_TAB.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        Frequency_CAP_ENABLE.click();
+        TIMES_PER_DROPDOWN.click();
+        TIMES_PER_OPTION.click();
+        SCOPE_DROPDOWN.click();
+        FREQUENCY_CAP_SCOPE.click();
+        FREQUENCY_CAP_VALUE.fill(FREQ_VALUE);
+        SAVE_CAMPAIGN.click();
+    }
+
 
     public String campaignDashboard() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);

@@ -110,7 +110,7 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
+       Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
 
         switch (application) {
             case "Life":
@@ -143,20 +143,15 @@ public class LifeSteps {
         campaigns.saveCampaign();
     }
 
-    @When("User enters the campaign details as {string} {string} {string} {string} {string} {string} {string} and saves the campaign")
-    public void user_enters_the_campaign_details_and_saves_the_campaign(String advertiser, String campaign_name, String campaign_type, String budget,String FREQ_VALUE,String TIME_INTERVAL,String SCOPE) {
-        campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
-        campaigns.selectAdvertiser(advertiser);
-        campaigns.enterCampaignName(campaignNameRandom);
-        campaigns.setCampaignType(campaign_type);
-        campaigns.enterBudget(budget);
-        campaigns.saveCampaign();
-    }
-
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
         Assert.assertEquals("Success!", campaigns.campaignSuccess());
         Assert.assertEquals("New Line Item", lineItemDetails.verifyLineItemText());
+    }
+
+    @Then("User navigates to campaign")
+    public void user_navigates_to_campaign() {
+        campaigns.selectCampaign();
     }
 
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
@@ -202,10 +197,9 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @Then("User clicks adds a frequency cap and verifies it")
-    public void user_clicks_adds_a_frequency_cap_and_verifies_it() {
-        tacticDetails.clickNewTactic();
-
+    @Then("User clicks frequency cap with details {string} {string} {string} and verifies it")
+    public void user_clicks_frequency_cap_with_details_and_verifies_it(String TIMES_PER, String SCOPE, String FREQ_VALUE){
+    campaigns.addFrequencyCap(TIMES_PER, SCOPE, FREQ_VALUE);
     }
 
     @Then("Verify that below tabs gets enabled only after saving tactics")

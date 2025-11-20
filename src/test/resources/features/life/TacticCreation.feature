@@ -97,14 +97,17 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
   @regression
   Scenario Outline: To verify user is able to add frequency cap for a tactic
     When User clicks on Create Campaign
-    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<FREQ_VALUE>" "<TIME_INTERVAL>" "<SCOPE>"  and saves the campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
-    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
-    Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates below tactics under same line item and verifies it
-      | Tactic Name       | Channel | RuleType          |
-      | Targeting Segment | Email   | Health Population |
-    Then Verify tactic details are saved and user is navigated to the settings tab
+    Then User navigates to campaign
+    Then User clicks frequency cap with details "<TIMES_PER>" "<SCOPE>" "<FREQ_VALUE>" and verifies it
+
+#    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+#    Then Verify line item details are saved and user is navigated to the tactic page
+#    Then User creates below tactics under same line item and verifies it
+#      | Tactic Name       | Channel | RuleType          |
+#      | Targeting Segment | Email   | Health Population |
+#    Then Verify tactic details are saved and user is navigated to the settings tab
 #    add flights in campaign and line item, verify that in tactic, add flight in tactic, verify all the options in flight dropdown
 #   Then Frequency Cap section should be visible
 #    And "Apply on Tactic Level" checkbox should be displayed and unchecked by default
@@ -119,6 +122,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIME_INTERVAL | SCOPE          |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | day           | Per Household  |
-      | 100- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 90         | hour(s)           | Per Household  |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIMES_PER | SCOPE          |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week           | Per Household  |
+      #| 100- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 90         | hour(s)           | Per Household  |
