@@ -198,7 +198,7 @@ public class LifeSteps {
     }
 
     @Then("User clicks frequency cap with details {string} {string} {string} and verifies it")
-    public void user_clicks_frequency_cap_with_details_and_verifies_it(String TIMES_PER, String SCOPE, String FREQ_VALUE){
+    public void user_clicks_frequency_cap_with_details_and_verifies_it(String TIMES_PER, String SCOPE, String FREQ_VALUE) throws InterruptedException {
     campaigns.addFrequencyCap(TIMES_PER, SCOPE, FREQ_VALUE);
     }
 

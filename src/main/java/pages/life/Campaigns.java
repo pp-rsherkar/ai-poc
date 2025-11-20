@@ -4,7 +4,10 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
+import utils.CommonUtils;
 import utils.WaitUtility;
+
+import java.beans.Visibility;
 
 public class Campaigns {
     private final Page page;
@@ -49,7 +52,7 @@ public class Campaigns {
         this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
         this.TIMES_PER_DROPDOWN = page.locator("//div[@class='ui dropdown selection form-control']");
         this.SCOPE_DROPDOWN = page.locator("//div[contains(@class,'crossDevice-dropdown')]");
-        this.FREQUENCY_CAP_VALUE = page.locator("//input[contains(@class,'small ng-touched ng-pristine ng-valid')]");
+        this.FREQUENCY_CAP_VALUE = page.locator("//input[contains(@class,'small ng-untouched ng-pristine ng-valid')]");
     }
 
     public void createCampaign() {
@@ -60,11 +63,12 @@ public class Campaigns {
     public void selectCampaign() {
         SELECT_CAMPAIGN.first().click();
     }
-    public void addFrequencyCap(String TIMES_PER, String SCOPE, String FREQ_VALUE) {
+
+    public void addFrequencyCap(String TIMES_PER, String SCOPE, String FREQ_VALUE) throws InterruptedException {
         Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", TIMES_PER));
         Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", SCOPE));
         DETAILS_TAB.click();
-        waitUtility.waitUntilPreLoaderHidden();
+        Thread.sleep(1000); //first elements gets loaded(click is performed), then loader appears and script breaks
         Frequency_CAP_ENABLE.click();
         TIMES_PER_DROPDOWN.click();
         TIMES_PER_OPTION.click();
