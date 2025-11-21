@@ -17,7 +17,7 @@ public class Hooks {
     public DriverFactory driverFactory;
     public Page page;
 
-    @Before(value = "@e2e or @regression or @rs")
+    @Before(value = "@e2e or @regression")
     public void launchBrowser(Scenario scenario) {
         try {
             double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
@@ -32,7 +32,7 @@ public class Hooks {
     }
 
     //After runs in reverse order so order=1 will run first
-    @After(value = "@e2e or @regression or @rs", order = 0)
+    @After(value = "@e2e or @regression", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
             if (page != null)
@@ -47,7 +47,7 @@ public class Hooks {
         }
     }
 
-    @After(value = "@e2e or @regression or @rs", order = 1)
+    @After(value = "@e2e or @regression", order = 1)
     public void takeScreenshotAndTrace(Scenario scenario) {
         if (scenario.isFailed()) {
             try {
