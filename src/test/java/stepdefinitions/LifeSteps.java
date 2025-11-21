@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -3464,4 +3463,115 @@ public class LifeSteps {
         }
         Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);
     }
+
+    @And("User navigates to Administrative section and fetches the advertisers and client value for the account {string}")
+    public void userNavigatesToAdministrativeSectionAndFetchesTheAdvertisersAndClientValueForTheAccount(String account) {
+        navigation.clickSubMenu();
+        accounts.clickAdministration();
+        accounts.clickAdvertiserTab();
+        accounts.selectAccount(account);
+        itemList = CommonUtils.normalize(accounts.fetchAdvertiserList());
+        accounts.selectAccountsTab();
+        accounts.searchAccount(account);
+        metricName = accounts.fetchClientValue();
+        navigation.clickPulsePointLogo();
+    }
+
+    @Then("Verify Advertiser dropdown should show values which are mapped to the account")
+    public void verifyAdvertiserDropdownShouldShowValuesWhichAreMappedToTheAccount() {
+        List<String> actualAdvertiserList = CommonUtils.normalize(campaigns.fetchAdvertiserList());
+        Assert.assertEquals("Advertisers list is not matched", actualAdvertiserList, itemList);
+    }
+
+    @And("Verify that an error message is displayed when no Advertiser is selected")
+    public void verifyThatAnErrorMessageIsDisplayedWhenNoAdvertiserIsSelected() {
+        campaigns.saveCampaign();
+        List<String> errorList = campaigns.fetchMandatoryFieldsError();
+        Assert.assertTrue("Mandatory field error message is not displayed", errorList.contains("Select Advertiser"));
+    }
+
+    @And("Verify that Campaign Type default value is set to {string}")
+    public void verifyThatCampaignTypeDefaultValueIsSetTo(String campaignType) {
+        Assert.assertEquals("Campaign Type default value is not set to " + campaignType, campaignType, campaigns.fetchDefaultCampaignType());
+    }
+
+    @And("Verify that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {string}")
+    public void verifyThatIfTheAccountHasAClientValueSetTheClientFieldIsDisabledAndAutoPopulatedOtherwiseItRemainsEnabledForUserSelection(String clientName) {
+        boolean isEnabled = metricName.equalsIgnoreCase("None");
+        String actualState = campaigns.verifyClientFieldEnabledOrDisabledBasedOnAccount(clientName);
+        if (isEnabled) {
+            Assert.assertEquals("Enabled", actualState);
+        } else {
+            Assert.assertEquals("Disabled", actualState);
+        }
+    }
+
+    @And("Verify that user is able to enter and select the drug {string}")
+    public void verifyThatUserIsAbleToEnterAndSelectTheDrug(String drugName) {
+        campaigns.selectDrug(drugName);
+    }
+
+    @And("Verify that Campaign Budget accepts only numeric values {string}")
+    public void verifyThatCampaignBudgetAcceptsOnlyNumericValues(String budget) {
+        Assert.assertEquals("Campaign Budget accepts invalid values", "", campaigns.validateCampaignBudgetNumericInput(budget));
+    }
+
+    @And("Verify that user is able to enter the data {string} in the Description field")
+    public void verifyThatUserIsAbleToEnterTheDataInTheDescriptionField(String campaignDescription) {
+        campaigns.enterCampaignDescription(campaignDescription);
+    }
+
+    @And("Verify that Budget Status has the below options, and the default status is {string}")
+    public void verifyThatBudgetStatusHasTheOptionsAndAndTheDefaultStatusIs(String defaultButton, DataTable dataTable) {
+        Assert.assertEquals("Budget status has different options", campaigns.fetchBudgetStatus(), dataTable.asList(String.class));
+        Assert.assertEquals(defaultButton + "button is not set as default", defaultButton, campaigns.fetchDefaultBudgetStatus());
+    }
+
+    @And("Verify the availability of the Management Fee checkbox and when clicked, below options should be displayed")
+    public void verifyTheAvailabilityOfTheManagementFeeCheckboxAndWhenClickedTheOptionsAndShouldBeDisplayed(DataTable dataTable) {
+        Assert.assertTrue("Management Fee checkbox is not available", campaigns.isManagementFeeAvailable());
+        campaigns.clickManagementFee();
+        Assert.assertEquals("Budget status has different options", dataTable.asList(String.class), campaigns.fetchManagementFeeOptions());
+    }
+
+    @And("Verify that the user is able to enter data in the selected Management Fee option - {string}, {string}, {string}")
+    public void verifyThatTheUserIsAbleToEnterDataInTheSelectedManagementFeeOption(String managementFeeOption, String percent, String amount) {
+        campaigns.clickManagementFeeOptionAndEnterData(managementFeeOption, percent, amount);
+    }
+
+    @And("User clicks the three-dot menu and verifies that {string} is enabled and {string} is disabled")
+    public void userClicksTheThreeDotMenuAndVerifiesThatIsEnabledAndIsDisabled(String reportOption, String deleteOption) {
+        campaigns.clickActionItemMenu();
+        Assert.assertTrue("Generate Report option is not available and enabled", campaigns.isGenerateReportOptionAvailable(reportOption));
+        Assert.assertTrue("Delete option is not available and disabled", campaigns.isDeleteOptionAvailable(deleteOption));
+    }
+
+
+    @And("User enters other campaign details {string} {string} {string} {string}")
+    public void userEntersOtherCampaignDetails(String advertiser, String campaign_name, String campaign_type, String budget) {
+        campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
+        campaigns.selectAdvertiser(advertiser);
+        campaigns.enterCampaignName(campaignNameRandom);
+        campaigns.setCampaignType(campaign_type);
+        campaigns.enterBudget(budget);
+    }
+
+    @And("User retrieves all the entered data, saves the Campaign and verifies successful creation")
+    public void userRetrievesAllTheEnteredDataSavesTheCampaignAndVerifiesSuccessfulCreation() {
+        capturedDetails.clear();
+        capturedDetails = campaigns.fetchCampaignDetails();
+        campaigns.saveCampaign();
+        Assert.assertEquals("Success!", campaigns.campaignSuccess());
+    }
+
+    @And("Verify that the saved Campaign data matches the entered data")
+    public void verifyThatTheSavedCampaignDataMatchesTheEnteredData() {
+        campaigns.clickSavedCampaign(campaignNameRandom);
+        campaigns.clickCampaignDetailsTab();
+        List<String> fetchedData = campaigns.fetchCampaignDetails();
+        Assert.assertEquals("The saved Campaign data doesn't match the entered data", capturedDetails, fetchedData);
+    }
+
+
+
 }
