@@ -14,7 +14,7 @@ Feature: Create a Destination in Admin and run below report against it.
     And User saves the custom destination
     And User clicks PulsePoint icon to navigate back to Life
 
-  @e2e
+  @e2e @rs
   Scenario Outline: End to End Workflow of create a Destination in Admin and run a Run Report against it
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
@@ -36,7 +36,7 @@ Feature: Create a Destination in Admin and run below report against it.
       | FILE_PATH                      | FILE_NAME                  | TACTIC_INITIALS | TEMPLATE NAME | DIMENSIONS                    | METRICS            |
       | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | Multiple_Flight | Template      | Advertiser Name,Campaign Name | Impressions,Clicks |
 
-  @e2e
+  @e2e @rs
   Scenario Outline: End to End Workflow of create a Destination in Admin and run a Schedule Report against it
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
