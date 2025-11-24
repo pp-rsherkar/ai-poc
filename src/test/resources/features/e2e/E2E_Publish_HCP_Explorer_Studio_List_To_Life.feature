@@ -40,7 +40,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
       | ADVERTISER | WORKSPACE_NAME | LIST_TYPE |
       | Abbvie     | Explorer       | Static    |
 
-  @e2e
+  @e2e @rs
   Scenario Outline: Create and save HCP Explorer workspace with Engagement filters and verify the Retrofit feature when the Live List is selected with NPI Retention option - "<NPI_RETENTION_OPTION>"
     #1
     When User clicks on Create New Workspace
