@@ -3546,7 +3546,6 @@ public class LifeSteps {
         Assert.assertTrue("Delete option is not available and disabled", campaigns.isDeleteOptionAvailable(deleteOption));
     }
 
-
     @And("User enters other campaign details {string} {string} {string} {string}")
     public void userEntersOtherCampaignDetails(String advertiser, String campaign_name, String campaign_type, String budget) {
         campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();

@@ -19,8 +19,6 @@ public class Campaigns {
     private final Locator SELECT_ADVERTISER;
     private final Locator CAMPAIGN_NAME;
     private final Locator CAMPAIGN_TYPE;
-    private final Locator CAMPAIGN_TYPE_REGULAR;
-    private final Locator CAMPAIGN_TYPE_SEQUENTIAL;
     private final Locator BUDGET;
     private final Locator SAVE_CAMPAIGN;
     private final Locator CAMPAIGN_DASHBOARD;
@@ -53,8 +51,6 @@ public class Campaigns {
         this.SELECT_ADVERTISER = page.getByText("");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
         this.CAMPAIGN_TYPE = page.locator("//label[contains(text(),'Campaign Type')]/following-sibling::div//button");
-        this.CAMPAIGN_TYPE_REGULAR = page.locator("//button[text()='Regular']");
-        this.CAMPAIGN_TYPE_SEQUENTIAL = page.locator("//button[text()='Sequential']");
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
         this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']"); //div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Campaign')]
@@ -104,11 +100,6 @@ public class Campaigns {
 
     public void setCampaignType(String campaignType) {
         CAMPAIGN_TYPE.locator("text = " + campaignType).click();
-//        if ("Regular".equals(campaignType)) {
-//            CAMPAIGN_TYPE_REGULAR.click();
-//        } else if ("Sequential".equals(campaignType)) {
-//            CAMPAIGN_TYPE_SEQUENTIAL.click();
-//        }
     }
 
     public void enterBudget(String budget) {
