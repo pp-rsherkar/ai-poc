@@ -3572,5 +3572,74 @@ public class LifeSteps {
     }
 
 
+    @And("User verifies if Add Custom Field button is available")
+    public void userVerifiesIfAddCustomFieldButtonIsAvailable() {
+        Assert.assertTrue("Add Custom Field Button is not available", campaigns.isAddCustomFieldButtonAvailable());
+    }
 
+    @When("User adds a custom field with {string} on the campaign creation page successfully")
+    public void userAddsACustomFieldWithOnTheCampaignCreationPage(String fieldName) {
+        customFieldName = fieldName + '_' + CommonUtils.randomFourDigitNumber();
+        campaigns.clickAddCustomFieldButton();
+        campaigns.enterCustomFieldName(customFieldName);
+        campaigns.saveCustomField();
+        Assert.assertEquals("Successfully created custom Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+    }
+
+    @Then("Verify that the custom field is added on the campaign creation page")
+    public void verifyThatTheCustomFieldIsAddedOnTheCampaignCreationPage() {
+        Assert.assertTrue(customFieldName + " Custom Field is not available", campaigns.isAddedCustomFieldAvailable(customFieldName));
+    }
+
+    @When("User modifies the custom field label to new label {string}")
+    public void userModifiesTheCustomFieldToNewLabel(String newFieldName) {
+        uiCustomFieldName = newFieldName + '_' + CommonUtils.randomFourDigitNumber();
+        campaigns.clickCustomFieldLabel(customFieldName);
+        campaigns.enterCustomFieldName(uiCustomFieldName);
+        campaigns.saveCustomField();
+        Assert.assertEquals("Successfully updated custom Field : " + uiCustomFieldName , campaigns.fetchCustomFieldSuccessAlert());
+    }
+
+    @Then("Verify that the custom field is updated with new label")
+    public void verifyThatTheCustomFieldIsUpdatedWithNewLabel() {
+        Assert.assertTrue(customFieldName + " Custom Field label is not updated with " + uiCustomFieldName, campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
+    }
+
+    @And("User enters data {string} in the custom field")
+    public void userEntersDataInTheCustomField(String customFieldData) {
+        campaigns.enterCustomFieldData(uiCustomFieldName, customFieldData);
+    }
+
+    @Then("Verify that the custom field value {string} is saved and displayed in the campaign details page")
+    public void verifyThatTheCustomFieldValueIsSavedAndDisplayedInTheCampaignDetailsPage(String customFieldData) {
+        campaigns.navigateToCampaign(campaignNameRandom);
+        campaigns.clickCampaignDetailsTab();
+        Assert.assertEquals(customFieldData, campaigns.fetchCustomFieldData(uiCustomFieldName));
+    }
+
+    @And("User verifies if the added custom field is available on New Campaign creation page")
+    public void userVerifiesIfTheAddedCustomFieldIsAvailableOnNewCampaignCreationPage() {
+        campaigns.navigateToCampaignDashboard();
+        campaigns.createCampaign();
+        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        Assert.assertTrue(uiCustomFieldName + " Custom Field is not available", campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
+    }
+
+    @When("User deletes the custom field from the campaign creation page")
+    public void userDeletesTheCustomFieldFromTheCampaignCreationPage() {
+        campaigns.deleteCustomField(uiCustomFieldName);
+    }
+
+    @Then("Verify that the custom field is deleted successfully")
+    public void verifyThatTheCustomFieldIsDeletedSuccessfully() {
+        Assert.assertEquals("Successfully deleted custom Field : " + uiCustomFieldName , campaigns.fetchCustomFieldSuccessAlert());
+    }
+
+    @And("User verifies if the deleted custom field is available on New Campaign creation page")
+    public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() {
+        campaigns.navigateToCampaignDashboard();
+        campaigns.createCampaign();
+        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        Assert.assertFalse(uiCustomFieldName + " Custom Field is available", campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
+    }
 }

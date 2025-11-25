@@ -41,6 +41,13 @@ public class Campaigns {
     private final Locator CLIENT_DROPDOWN;
     private final Locator CLIENT_DROPDOWN_VALUE;
     private final Locator SELECTED_CLIENT_VALUE;
+    private final Locator ADD_CUSTOM_FIELD_BUTTON;
+    private final Locator CUSTOM_FIELD_INPUT;
+    private final Locator SAVE_CUSTOM_FIELD;
+    private final Locator CUSTOM_FIELD_SUCCESS_ALERT;
+    private final Locator CUSTOM_FIELD_DELETE_ICON;
+    private final Locator CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP;
+    private final Locator CUSTOM_FIELD_DELETE_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -73,6 +80,13 @@ public class Campaigns {
         this.CLIENT_DROPDOWN = page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]");
         this.CLIENT_DROPDOWN_VALUE = page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]//div[@class='menu transition visible']/div");
         this.SELECTED_CLIENT_VALUE = page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]//div[@class='text']");
+        this.ADD_CUSTOM_FIELD_BUTTON = page.locator("//span[text()='Add Custom Field']");
+        this.CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
+        this.SAVE_CUSTOM_FIELD = page.locator("//button[normalize-space()='Save']");
+        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator("//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted custom Field :')]");
+        this.CUSTOM_FIELD_DELETE_ICON = page.locator("//div[contains(@class,'campaign-height-popover')]//app-icon-lable-link[@text='Delete']");
+        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted')]");
+        this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field')]");
     }
 
     public void createCampaign() {
@@ -254,5 +268,58 @@ public class Campaigns {
             state = "Disabled";
         }
         return state;
+    }
+
+    public boolean isAddCustomFieldButtonAvailable() {
+        return ADD_CUSTOM_FIELD_BUTTON.isVisible();
+    }
+
+    public void clickAddCustomFieldButton() {
+        ADD_CUSTOM_FIELD_BUTTON.click();
+    }
+
+    public void enterCustomFieldName(String metricName) {
+        CUSTOM_FIELD_INPUT.fill(metricName);
+    }
+
+    public void saveCustomField() {
+        SAVE_CUSTOM_FIELD.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String fetchCustomFieldSuccessAlert() {
+        String text =  CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
+        waitUtility.waitForLocatorHidden(CUSTOM_FIELD_SUCCESS_ALERT);
+        return text;
+    }
+
+    public boolean isAddedCustomFieldAvailable(String metricName) {
+        return page.locator(String.format("//label[normalize-space(text())='%s']", metricName)).isVisible();
+    }
+
+    public void clickCustomFieldLabel(String metricName) {
+        page.locator(String.format("//label[normalize-space(text())='%s']//img", metricName)).click();
+    }
+
+    public void enterCustomFieldData(String customFieldName, String customFieldData) {
+        page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName)).fill(customFieldData);
+    }
+
+    public void navigateToCampaign(String campaignName) {
+        page.locator(String.format("//div[normalize-space(text())='%s']", campaignName)).click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String fetchCustomFieldData(String customFieldName) {
+        return page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName)).inputValue();
+    }
+
+    public void deleteCustomField(String customFieldName) {
+        page.locator(String.format("//label[normalize-space(text())='%s']//img", customFieldName)).click();
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_ICON);
+        CUSTOM_FIELD_DELETE_ICON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP);
+        CUSTOM_FIELD_DELETE_BUTTON.click();
     }
 }

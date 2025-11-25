@@ -170,6 +170,25 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | MANAGEMENT_FEE | DRUG_NAME | INVALID_CP_BUDGET | DESCRIPTION     | PERCENT | AMOUNT | CP_CLIENT   |
       | 01- Advertiser | Campaign | Regular | 50000     | % + CPM        | Glynase   | Test              | Automation test | 35      | 300    | PHM Chicago |
 
+  @regression @rs
+  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence    And User clicks on Create Campaign
+    And User clicks on Create Campaign
+    And User verifies if Add Custom Field button is available
+    When User adds a custom field with "<FIELD_NAME>" on the campaign creation page successfully
+    Then Verify that the custom field is added on the campaign creation page
+    When User modifies the custom field label to new label "<NEW_FIELD_NAME>"
+    Then Verify that the custom field is updated with new label
+    And User enters data "<CUSTOM_FIELD_VALUE>" in the custom field
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    Then Verify that the custom field value "<CUSTOM_FIELD_VALUE>" is saved and displayed in the campaign details page
+    And User verifies if the added custom field is available on New Campaign creation page
+    When User deletes the custom field from the campaign creation page
+    Then Verify that the custom field is deleted successfully
+    And User verifies if the deleted custom field is available on New Campaign creation page
+    Examples:
+      | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER    | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
+      | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000    | Test               |
 
 #  @regression
 #  Scenario Outline: API Sample Test
