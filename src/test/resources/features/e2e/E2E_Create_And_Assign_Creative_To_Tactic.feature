@@ -11,7 +11,7 @@ Feature: End to End Workflow of Creative Creation and its assignment To Tactic
   3. Verify Creatives on the Creative Library page
   4. Assign the created Creative to a Tactic
 
-  @e2e @rs
+  @e2e
   Scenario Outline: End to End Workflow of Creative Creation with all the creative types and Assignment To Tactic
     # 1
     Given This scenario will be executed in the "Demo" environment as a "User"
