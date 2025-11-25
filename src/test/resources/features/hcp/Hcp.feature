@@ -1,6 +1,5 @@
 Feature: HCP365 Regression - Dashboard data Validation and Permission
 
-  @regression
   Scenario Outline: Verify Overview Tabs and its Sub Tabs availability on Dashboard on HCP 365
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -10,7 +9,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify Site Tabs and its Sub Tabs availability on Dashboard on HCP 365
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -20,7 +18,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify Search Tabs and its Sub Tabs availability on Dashboard on HCP 365
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -30,7 +27,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify Media Tabs and its Sub Tabs availability on Dashboard on HCP 365
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -40,7 +36,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify Email Tabs and its Sub Tabs availability on Dashboard on HCP 365
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -50,7 +45,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify Social Tabs and its Sub Tabs availability on Dashboard on HCP 365
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -60,7 +54,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify user access modification of Dashboard on HCP 365 in all tab.
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu
@@ -70,7 +63,6 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
-  @regression
   Scenario Outline: Verify data after modification of filters in Dashboard on HCP 365 in all tab.
     Given Life application is logged in as "<USER>"
     And User clicks on HCP 365 module from main menu

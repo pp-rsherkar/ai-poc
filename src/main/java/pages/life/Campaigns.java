@@ -20,6 +20,7 @@ public class Campaigns {
     private final Locator CAMPAIGN_DASHBOARD;
     private final Locator CAMPAIGN_SUCCESS;
     private final Locator LIFE_TIME_FILTER;
+    private final Locator CAMPAIGN_ENTRIES;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -36,6 +37,7 @@ public class Campaigns {
         this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
+        this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
     }
 
     public void createCampaign() {
@@ -88,7 +90,7 @@ public class Campaigns {
         waitUtility.waitForLocatorVisible(CAMPAIGN_DASHBOARD);
         if (LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
             LIFE_TIME_FILTER.click();
-            waitUtility.waitUntilPreLoaderHidden();
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 }

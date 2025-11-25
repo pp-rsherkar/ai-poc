@@ -22,7 +22,6 @@ public class NPILists {
     private final Locator SEARCH_BOX;
     private final Locator SMART_LIST;
     private final Locator AUTO_IMPORTED_LIST;
-    private final Locator STUDIO_FILTER_LABEL;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPILists(Page page) {
@@ -39,7 +38,6 @@ public class NPILists {
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.SMART_LIST = page.getByText("Dynamic list of NPI");
         this.AUTO_IMPORTED_LIST = page.locator("//app-npilisttype[@listtypename='Auto-Imported List']");
-        this.STUDIO_FILTER_LABEL = page.locator("//span[contains(@class,'studioLabel')]");
     }
 
     public void clickNPILists() {
@@ -68,6 +66,7 @@ public class NPILists {
 
     public void clickSmartList() {
         SMART_LIST.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void searchNPILists(String workspaceName) {
@@ -113,10 +112,5 @@ public class NPILists {
 
     public void clickAutoImportedList() {
         AUTO_IMPORTED_LIST.click();
-    }
-
-    public List<String> getStudioFilterLabel() {
-        waitUtility.waitForLocatorVisible(STUDIO_FILTER_LABEL.first());
-        return STUDIO_FILTER_LABEL.allInnerTexts();
     }
 }

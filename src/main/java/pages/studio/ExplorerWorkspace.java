@@ -48,11 +48,11 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_FILTER_TITLE;
     private final Locator MERGED_TEXT;
     private final Locator DASHBOARD_FILTERS;
-
+    private final Locator OWNED_AND_OPERATED_SECTION;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
-        this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
+        this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.WORKSPACE_NAME = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX).nth(1);
         this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
         this.DASHBOARD_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content"));
@@ -86,6 +86,7 @@ public class ExplorerWorkspace {
         this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
         this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
+        this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -116,7 +117,7 @@ public class ExplorerWorkspace {
                 if (filter.equals("Specialty"))
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
-                    Locator locator = WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
+                    Locator locator = WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
                     TAB_PANEL_SEARCH.fill(option.trim());
                     locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     page.waitForTimeout(1000);
@@ -258,5 +259,9 @@ public class ExplorerWorkspace {
             }
         }
         return mergeFilterName;
+    }
+
+    public boolean isOwnedAndOperatedSectionAvailable() {
+        return OWNED_AND_OPERATED_SECTION.isVisible();
     }
 }
