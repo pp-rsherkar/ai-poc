@@ -197,9 +197,35 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @Then("User clicks frequency cap with details {string} {string} {string} and verifies it")
-    public void user_clicks_frequency_cap_with_details_and_verifies_it(String TIMES_PER, String SCOPE, String FREQ_VALUE) throws InterruptedException {
-    campaigns.addFrequencyCap(TIMES_PER, SCOPE, FREQ_VALUE);
+    @Then("User adds frequency cap with details {string} {string} {string}")
+    public void user_adds_frequency_cap_with_details(String FREQ_VALUE, String TIMES_PER, String SCOPE) {
+    campaigns.addFrequencyCap(FREQ_VALUE, TIMES_PER, SCOPE );
+    }
+
+    @Then("User verified Frequency Cap is in disabled states by default")
+    public void userVerifiedFrequencyCapIsInDisabledStatesByDefault() {
+       boolean fc_checkbox_state= Campaigns.isFrequencyCapDisabled();
+       Assert.assertFalse(fc_checkbox_state);
+
+    }
+
+    @Then("User navigates to LineItem and clicks on details tab")
+    public void userNavigatesToLineItemAndClicksOnDetailsTab() {
+        Campaigns.LineItemDetailsTab();
+    }
+
+    @Then("User verifies if frequency cap is saved with details {string} {string} {string} {string}")
+    public void userVerifiesIfFrequencyCapIsSavedWithDetailsOnCampaignLevel(String freqValue, String timesPer, String scope, String level) {
+        String actualFrequencyCapText = Campaigns.getSavedFrequencyCap(level);
+        System.out.println(actualFrequencyCapText);
+        String expectedFrequencyCapText = String.format("%s x %s x %s %s", freqValue, timesPer, scope, level);
+        Assert.assertEquals(expectedFrequencyCapText,actualFrequencyCapText );
+    }
+    @Then("User navigates to Tactic and clicks on settings tab")
+    public void user_navigates_to_tactic_and_clicks_on_settings_tab() {
+        tacticDetails.clickFirstTacticTab();
+        tacticDetails.clickSettingsTab();
+
     }
 
     @Then("Verify that below tabs gets enabled only after saving tactics")

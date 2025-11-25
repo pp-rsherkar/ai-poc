@@ -94,13 +94,27 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
 
 
-  @regression
+  @regression @vp
   Scenario Outline: To verify user is able to add frequency cap for a tactic
     When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    Then User creates below tactics under same line item and verifies it
+      | Tactic Name           | Channel  | RuleType           |
+      | Audience Group tactic | Standard | Behavioral Segment |
+
     Then User navigates to campaign
-    Then User clicks frequency cap with details "<TIMES_PER>" "<SCOPE>" "<FREQ_VALUE>" and verifies it
+    Then User verified Frequency Cap is in disabled states by default
+    Then User adds frequency cap with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to LineItem and clicks on details tab
+    Then User verifies if frequency cap is saved with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
+    Then User verified Frequency Cap is in disabled states by default
+    Then User adds frequency cap with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to Tactic and clicks on settings tab
+    Then User verifies if frequency cap is saved with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_LI_LEVEL>"
+
 
 #    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
 #    Then Verify line item details are saved and user is navigated to the tactic page
@@ -122,6 +136,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIMES_PER | SCOPE          |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week           | Per Household  |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week      | Per Household | on Campaign Level | on Line item level  |
       #| 100- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 90         | hour(s)           | Per Household  |
