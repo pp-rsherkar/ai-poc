@@ -170,7 +170,7 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | MANAGEMENT_FEE | DRUG_NAME | INVALID_CP_BUDGET | DESCRIPTION     | PERCENT | AMOUNT | CP_CLIENT   |
       | 01- Advertiser | Campaign | Regular | 50000     | % + CPM        | Glynase   | Test              | Automation test | 35      | 300    | PHM Chicago |
 
-  @regression @rs
+  @regression
   Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence    And User clicks on Create Campaign
     And User clicks on Create Campaign
     And User verifies if Add Custom Field button is available
