@@ -56,7 +56,7 @@ Feature: LIFE Regression - Line Item Management
       | DOOH             | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60           |
       | Search Extension | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
     And Verify Bulk Edit Mode successfully "disables" multiple selected line items
-#    And Verify that each selected line item is "Disabled"
+    And Verify that each selected line item is "Disabled"
     And Verify Bulk Edit Mode successfully "enables" multiple selected line items
     And Verify that each selected line item is "Enabled"
     Then User adds Comments or Notes "<LINE_ITEM_NOTE>" to each line item

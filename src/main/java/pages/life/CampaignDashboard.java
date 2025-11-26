@@ -123,7 +123,7 @@ public class CampaignDashboard {
         this.CLICK_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.EXPAND_CREATED_LINE_ITEM = page.locator("//div[contains(@class,'campaignExpand')]/div[contains(@class,'collapsed-thin')]");
         this.VERIFY_CREATED_TACTIC = page.locator("//span[contains(@class,'tactic-name')]");
-        this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'camp-data')]");
+        this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
         this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'1 Line items, 1 Campaigns, 1 Advertisers')]");
         this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
         this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
@@ -394,21 +394,21 @@ public class CampaignDashboard {
         CLICK_SETTINGS.click();
         if (!GROUP_BY_CAMPAIGN_RADIO_BUTTON.getAttribute("class").contains("groupingMenuRadioSelected")) {
             GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
-            waitUtility.waitUntilPreLoaderHidden();
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
     public void verifyFavoriteCheckbox() {
         if (FAVORITE_ONLY_CHECKBOX.getAttribute("class").contains("checked")) {
             FAVORITE_ONLY_CHECKBOX.click();
-            waitUtility.waitUntilPreLoaderHidden(120000);
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
     public void verifyHideFinishedCheckbox() {
         if (HIDE_FINISHED_CHECKBOX.getAttribute("class").contains("checked")) {
             HIDE_FINISHED_CHECKBOX.click();
-            waitUtility.waitUntilPreLoaderHidden(120000);
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
@@ -416,7 +416,7 @@ public class CampaignDashboard {
         if (FILTER_APPLIED_ICON.isVisible()) {
             FILTER_APPLIED_ICON.click();
             RESET_FILTER_ICON.click();
-            waitUtility.waitUntilPreLoaderHidden(120000);
+            waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
@@ -426,10 +426,10 @@ public class CampaignDashboard {
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
         verifyIfFiltersExist();
-        SEARCH_CAMPAIGN.fill(createdCampaign);
-        if (PRE_LOADER.isVisible()) waitUtility.waitUntilPreLoaderHidden(120000);
-        CLICK_CAMPAIGN_SEARCH.click();
-        SUB_TITLE_AFTER_CAMPAIGN_SEARCH.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
+            SEARCH_CAMPAIGN.fill(createdCampaign);
+            CLICK_CAMPAIGN_SEARCH.click();
+        }
     }
 
     public String verifyCreatedCampaign(String createdCampaign) {

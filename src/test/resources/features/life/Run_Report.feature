@@ -109,7 +109,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Confirms that the report panel retains the entered data
     Examples:
       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | DIMENSIONS                                                 | METRICS             | TIME_ZONE                |
-      | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT-05:00) Central Time |
+      | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT-06:00) Central Time |
 
   @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report by entering Tactic and Flight option from Run Now
@@ -127,7 +127,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Confirms that the report panel retains the entered data
     Examples:
       | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME                           |
-      | Template_Automation | Multiple_Flight | Automation_Multiple_Flight_Campaign_New |
+      | Template_Automation | Tactic Name New | Automation_Multiple_Flight_Campaign_New |
 
   @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report
