@@ -147,7 +147,6 @@ public class LifeSteps {
 
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
-        Assert.assertEquals("Life", campaigns.campaignDashboard());
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
@@ -180,7 +179,7 @@ public class LifeSteps {
 
     @Then("Verify line item details are saved and user is navigated to the tactic page")
     public void verify_line_item_details_are_saved_and_user_is_navigated_to_tactic_page() {
-        assert lineItemDetails.lineItemSuccess().contains("Success!");
+        Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
@@ -195,7 +194,7 @@ public class LifeSteps {
             expectedTactic.add(tacticName);
             // Enter tactic name
             tacticDetails.enterTacticName(tacticName);
-            tacticDetails.saveTactic();
+            tacticDetails.saveTacticDetails();
 
             // Select channel and add targeting rules
             tacticSettings.selectChannel(channel);
@@ -245,7 +244,7 @@ public class LifeSteps {
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
-    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
+    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic(DataTable dataTable) {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
         tacticDetails.clickTactic();
@@ -266,7 +265,7 @@ public class LifeSteps {
 
     @Then("Verify tactic details are saved and user is navigated to the settings tab")
     public void verify_tactic_details_are_saved_and_user_is_navigated_to_settings_tab() {
-        assert tacticDetails.tacticDetailsSuccess().contains("Success!");
+        Assert.assertEquals("Tactic " + tacticNameRandom + " updated.", tacticDetails.tacticDetailsSuccess());
         Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
     }
 
@@ -351,11 +350,6 @@ public class LifeSteps {
         npiLists.clickCreateNewList();
     }
 
-    @Then("User selects Smart List to create NPI list")
-    public void user_selects_smart_list_to_create_npi_list() {
-        npiLists.clickSmartList();
-    }
-
     @Then("Save and Verify the list gets saved successfully")
     public void verify_smart_list_gets_saved_successfully() {
         npiStaticList.saveList();
@@ -403,59 +397,6 @@ public class LifeSteps {
         Assert.assertEquals("TEMPLATES", reportTemplates.verifyTemplatesTab().toUpperCase());
         Assert.assertEquals("GENERATED REPORTS", reportTemplates.verifyGeneratedReportsTab().toUpperCase());
         Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
-    }
-
-    @Then("User enters the Smart NPI list details as {string} {string} for {string} with {string} {string} {string}")
-    public void user_enters_the_smart_npi_list_details_as_for_type(String npiListName, String advertiser, String type, String professionValue, String smartPixelDropdownValue, String npiGroupValue) {
-        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
-        npiStaticList.enterListName(npiName);
-        npiStaticList.selectAdvertiser(advertiser);
-        npiSmartList.clickLifeCheckbox();
-        switch (type.trim()) {
-            case "Smart Pixel":
-                npiSmartList.clickSmartPixel();
-                npiSmartList.clickSmartPixelDropDown();
-                npiSmartList.clickSmartPixelDropDownValue(smartPixelDropdownValue);
-                break;
-            case "NPI List":
-                npiSmartList.clickNPIList();
-                npiSmartList.clickNPIGroup();
-                npiSmartList.clickNPIGroupValue(npiGroupValue);
-                break;
-            case "Specialty":
-                npiSmartList.clickSpecialty();
-                npiSmartList.clickSpecialtyDropdown();
-                npiSmartList.selectSpecialtyValue();
-                break;
-            case "Profession":
-                npiSmartList.clickProfession();
-                npiSmartList.clickProfessionDropdown();
-                npiSmartList.selectProfessionValue(professionValue);
-                break;
-            case "Prescribed Drug":
-                npiSmartList.clickPrescribedDrug();
-                break;
-            case "Prescription Behaviour Change":
-                npiSmartList.clickPrescriptionBehaviorChange();
-                npiSmartList.SelectPrescriptionBehaviorDetails();
-                break;
-            case "Diagnosis":
-                npiSmartList.clickDiagnosis();
-                break;
-            case "Medical Procedure":
-                npiSmartList.clickMedicalProcedure();
-                break;
-            case "Endemic Research":
-                npiSmartList.clickEndemicResearch();
-                npiSmartList.SelectEndemicDetails();
-                break;
-            case "Expand":
-                npiSmartList.clickNPIList();
-                npiSmartList.clickNPIGroup();
-                npiSmartList.clickNPIGroupValue(npiGroupValue);
-                npiSmartList.clickExpandPractice();
-                break;
-        }
     }
 
     @When("User clicks on New Template")
@@ -573,42 +514,9 @@ public class LifeSteps {
         }
     }
 
-    @When("Targeting panel is opened on Tactic Settings tab")
-    public void user_navigates_to_targeting_panel() {
-        pmp.verifyTacticSettingsText();
-        pmp.addNewTargetingRule();
-    }
-
-    @And("User clicks on {string} Targeting")
-    public void deals_targeting_navigation(String Deals) {
-        pmp.searchTargetingRuleAndSelect(Deals);
-    }
-
-    @And("User assigns premium deals")
-    public void user_assigns_premium_deals() {
-    }
-
-    @And("User clicks on OK button of PMP Modal")
-    public void user_clicks_on_OK_PMP_Modal() {
-    }
-
-    @And("User assigns private deals")
-    public void user_assigns_private_deals() {
-    }
-
-    @And("User saves the changes")
-    public void users_saves_deal_changes() {
-        pmp.saveTacticSettings();
-    }
-
-    @Then("Deals should be assigned")
-    public void deals_are_assigned() {
-        pmp.verifyTacticIsSaved();
-    }
-
     @Then("User selects Smart List")
     public void user_selects_smart_list() {
-        npiSmartList.clickSmartList();
+        npiLists.clickSmartList();
     }
 
     @Then("User enters the NPI list details as {string} {string}")
@@ -618,15 +526,15 @@ public class LifeSteps {
         npiSmartList.selectAdvertiser(advertiser);
     }
 
-    @When("User clicks on Prescribed Drug and enters the drug details {string}")
-    public void user_clicks_on_prescribed_drug_and_enters_the_drug_details(String drugName) {
-        npiSmartList.selectPrescribedDrug();
+    @When("User clicks on {string} and enters the drug details {string}")
+    public void user_clicks_on_prescribed_drug_and_enters_the_drug_details(String smartListType, String drugName) {
+        npiSmartList.selectSmartNPIListType(smartListType);
         npiSmartList.selectDrug(drugName);
     }
 
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
-        Assert.assertEquals("Glynase", npiSmartList.verifyDrug());
+        Assert.assertEquals("Glynase", npiSmartList.fetchDrugName());
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
@@ -638,6 +546,7 @@ public class LifeSteps {
     public void user_navigates_to_campaign_dashboard() {
         navigation.clickSubMenu();
         navigation.clickCampaigns();
+        Assert.assertEquals("Life", campaigns.campaignDashboard());
     }
 
     @Then("Verify list is targeted in the tactic successfully")
@@ -1276,7 +1185,7 @@ public class LifeSteps {
 
     @And("Verify Copy option is available and working")
     public void verifyCopyOptionIsAvailableAndWorking() {
-        Assert.assertEquals("Success!", createCreatives.copyCreative());
+        Assert.assertTrue("Copy option is not working properly", createCreatives.copyCreative().contains("updated."));
     }
 
 
@@ -1299,7 +1208,9 @@ public class LifeSteps {
                     .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
 
             createCreatives.fillAttributes(type, attributeMap);
-            Assert.assertEquals("Success!", createCreatives.saveCreative());
+            String actualMessage = createCreatives.saveCreative();
+            Assert.assertTrue("No message is displayed", actualMessage.contains("BulkUpload created successfully.") ||
+                    actualMessage.contains("Creative " + newCreativeName + " created."));
             nameList.addAll(createCreatives.fetchCreatives());
         }
     }
@@ -1844,13 +1755,13 @@ public class LifeSteps {
         Assert.assertEquals(npiName, tacticSettings.verifyRuleOption());
     }
 
-    @And("User enters the Smart NPI list details as {string} {string} and selects the created Smart Pixel")
-    public void userEntersTheSmartNPIListDetailsAndSelectsTheCreatedSmartPixel(String npiListName, String advertiser) {
+    @And("User enters the Smart NPI list details as {string} {string} and selects the created {string}")
+    public void userEntersTheSmartNPIListDetailsAndSelectsTheCreatedSmartPixel(String npiListName, String advertiser, String smartListType) {
         npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
         npiStaticList.enterListName(npiName);
         npiStaticList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
-        npiSmartList.clickSmartPixel();
+        npiSmartList.selectSmartNPIListType(smartListType);
         npiSmartList.clickSmartPixelDropDown();
         npiSmartList.clickSmartPixelDropDownValue(newPixelName);
     }
@@ -1948,9 +1859,11 @@ public class LifeSteps {
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) {
         bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
-        bulkCreativeUpload.clickUploadButton();
+        bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickOKButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
         bulkCreativeUpload.updateCreativeName(metricName);
+        bulkCreativeUpload.clickUploadButton();
         nameList.clear();
         nameList.add(metricName);
     }
@@ -2108,6 +2021,7 @@ public class LifeSteps {
             if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
                 bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickUploadButton();
+            bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
         }
     }
@@ -2772,14 +2686,14 @@ public class LifeSteps {
         scheduleReport.enterCustomDestinationDetailsOnReportPanel(dimensionName, filePath, fileName);
     }
 
-    @And("User clicks PulsePoint icon to navigate back to Life")
-    public void userClicksPulsePointIconToNavigateBackToLife() {
-        navigation.clickPulsePointLogo();
-    }
-
     @And("User saves the custom destination")
     public void userSavesTheCustomDestination() {
         accounts.clickOKButton();
+    }
+
+    @And("User clicks PulsePoint icon to navigate back to Life")
+    public void userClicksPulsePointIconToNavigateBackToLife() {
+        navigation.clickPulsePointLogo();
     }
 
     @And("User clicks Lifetime filter")
@@ -2966,3 +2880,465 @@ public class LifeSteps {
     }
 }
 
+
+    @Then("User should see the remaining flights listed under the Flights section")
+    public void userShouldSeeTheRemainingFlightsListedUnderTheFlightsSection() {
+        List<String> flightDetailsAfterDeletion;
+        lineItemFlights.clickFlightTab();
+        Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
+        flightDetailsAfterDeletion = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        for (String expected : itemList) {
+            boolean matchFound = flightDetailsAfterDeletion.stream().anyMatch(actual -> actual.contains(expected));
+            Assert.assertTrue("Expected value not found in flight tab after flight deletion: " + expected, matchFound);
+        }
+        Assert.assertNotEquals("Flight details did not change after deletion – deletion may have failed.",
+                capturedDetails, flightDetailsAfterDeletion);
+    }
+
+    @When("User creates line items with below line types and other details, enables the line item and saves the changes")
+    public void userEntersTheLineItemDetailsWithDifferentLineTypesEnablesTheLineItemAndSavesTheChanges(DataTable dataTable) {
+        nameList.clear();
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        int currentRowIndex = 0;
+        int totalRows = rows.size();
+        for (Map<String, String> row : rows) {
+            String type = row.get("LINE_TYPE").trim();
+            String attributes = row.get("LINE_ITEM_DETAILS").trim();
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
+            nameList.add(lineItemNameRandom);
+            lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
+            Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
+            List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available",
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
+            lineItemDetails.cancelTactic();
+            if (currentRowIndex < totalRows - 1) {
+                lineItemDetails.selectNewLineItem();
+            }
+            currentRowIndex++;
+        }
+    }
+
+    @Then("User adds Comments or Notes {string} to each line item")
+    public void userAddsCommentsOrNotesToEachLineItem(String notes) {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            String newNotes = name + " " + notes;
+            itemList.add(newNotes);
+            Assert.assertEquals("Notes saved successfully.", lineItemDetails.addNotesToLineItem(newNotes));
+        }
+    }
+
+    @And("Verify the notes added to each line item")
+    public void verifyTheNotesAddedToEachLineItem() {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            String notes = lineItemDetails.fetchLineItemNotes();
+            Assert.assertTrue("Note of '" + name + "' is not available",
+                    itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
+        }
+    }
+
+    @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
+    public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
+        lineItemDetails.clickBulkEditMode();
+        for (String name : nameList) {
+            lineItemDetails.selectLineItemUsingBulkEdit(name);
+        }
+        Assert.assertEquals("Lineitems status updated successfully", lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
+        lineItemDetails.exitBulkEditMode();
+    }
+
+    @And("Verify that each selected line item is {string}")
+    public void verifyThatEachSelectedLineItemIsDisabled(String label) {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
+        }
+    }
+
+    @And("Verify user is able to create a copy of the line items using {string} option")
+    public void verifyUserIsAbleToCreateACopyOfTheLineItems(String lineItemOption) {
+        itemList.clear();
+        List<String> originalLineItemDetails;
+        List<String> copiedLineItemDetails;
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickDetailsTab();
+            originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            String lineItemName = "Copy of " + name;
+            itemList.add(lineItemName);
+            Assert.assertEquals("Line Item copied successfully.", lineItemDetails.createACopyOfLineItem(lineItemName));
+            Assert.assertTrue("Copied Line Item is not available", lineItemDetails.verifyLineItemAvailable(lineItemName));
+            lineItemDetails.navigateToLineItemDetails(lineItemName);
+            lineItemDetails.clickDetailsTab();
+            copiedLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.clickOverviewTab();
+            Assert.assertEquals("Line item details do not match after copy.", originalLineItemDetails, copiedLineItemDetails);
+        }
+    }
+
+    @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
+    public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
+        for (String name : nameList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            lineItemDetails.runReportFromLineItemPage();
+            runReportPanel.selectTemplateFromDropdown(templateName);
+            String fileName = "Custom Report";
+            runReportPanel.clickRunButton(fileName);
+            Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+        }
+    }
+
+    @And("Verify that the reports generated on the Line Item page are available on the Generate Report page")
+    public void verifyThatTheReportsGeneratedOnTheLineItemPageAreAvailableOnTheGenerateReportPage() {
+        navigation.clickSubMenu();
+        navigation.clickMenuAngle();
+        navigation.clickGeneratedReport();
+        runReportPanel.clickSearchButton();
+        for (String name : nameList) {
+            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
+        }
+    }
+
+    @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
+    public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
+        for (String name : itemList) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickLineItemOptions(lineItemOption);
+            lineItemDetails.performDeleteOperation();
+            List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation",
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
+
+        }
+    }
+
+    //* Rajyalaxmi - Tactic max bid and base bid verification
+    @When("User clicks on Campaign Settings")
+    public void user_clicks_on_campaign_settings() {
+        campaignSettings.campaignSettingsLink();
+        campaignSettings.bidSettingsTab();
+    }
+
+    @Then("Verify user is on default bid settings page")
+    public void verify_user_is_on_default_bid_settings_page() {
+        Assert.assertEquals("Default Bid Settings", campaignSettings.getDefaultSettings());
+    }
+
+    @Then("User gets Max Bid and Base Bid values")
+    public void user_gets_max_bid_and_base_bid_values() {
+        campaignBaseBid = (campaignSettings.getBaseBidPrice());
+        campaignMaxBid = (campaignSettings.getMaxBidPrice());
+    }
+
+    @Then("Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values")
+    public void verify_max_bid_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values() {
+        BigDecimal tacticBaseBid = (tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
+        BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
+        Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
+        Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @Then("User creates a new tactic with details {string} {string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel) {
+        tacticDetails.enterTacticName(tacticName);
+        tacticDetails.saveTacticDetails();
+        tacticSettings.selectChannel(channel);
+        tacticSettings.saveTacticSettings();
+    }
+
+    @Then("User deletes the tactic {string} and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
+        tacticDetails.deleteTactic();
+        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic(tacticName);
+        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+    }
+
+    @And("User enables tactic {string} through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
+        tacticDetails.bulkEnableTactics(tacticName);
+        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+
+    }
+
+    @When("User clicks on create new Campaign")
+    public void userClicksOnCreateNewCampaign() {
+        campaigns.createCampaign();
+    }
+
+    @Then("Verify Smart List Creation Panel should display the following List Population Options")
+    public void verifySmartListCreationPanelShouldDisplayTheFollowingListPopulationOptions(DataTable dataTable) {
+        List<String> listPopulationOptions = dataTable.asList(String.class);
+        for(String option : listPopulationOptions){
+            Assert.assertTrue("List Population Option - " + option + " is not available in Smart List Container", npiSmartList.verifyListPopulationOptions(option.trim()));
+        }
+    }
+
+    @And("User selects the {string} and fetches Smart pixel list")
+    public void userSelectsTheAndFetchesSmartPixelList(String advertiser) {
+        pixels.selectSmartPixelTab();
+        pixels.selectAdvertiser(advertiser);
+        itemList = pixels.fetchPixelsList();
+    }
+
+    @And("User enters the Smart NPI list details as {string} {string}")
+    public void userEntersTheSmartNPIListDetailsAsFor(String npiListName, String advertiser) {
+        npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
+        npiSmartList.enterListName(npiName);
+        npiSmartList.selectAdvertiser(advertiser);
+        npiSmartList.clickLifeCheckbox();
+    }
+
+    @And("User selects Smart NPI list as {string}")
+    public void userSelectsSmartNPIList(String smartListType) {
+        npiSmartList.selectSmartNPIListType(smartListType);
+    }
+
+    @And("User verifies the Smart Pixel dropdown displays all Smart Pixels for the selected advertiser and select the pixel")
+    public void userVerifiesTheSmartPixelDropdownDisplaysAllSmartPixelsForTheSelectedAdvertiser() {
+        npiSmartList.clickSmartPixelDropDown();
+        List<String> list = npiSmartList.fetchSmartPixelDropdownValue();
+        Assert.assertTrue("Pixel list doesn't match", itemList.retainAll(list));
+        npiSmartList.selectSmartPixelDropdownValue();
+    }
+
+    @And("User selects Engagement Type {string} and enter related details {string}, {string}, {string}")
+    public void userSelectsEngagementType(String engagementType, String visitedURL, String ignoredURL, String keywords) {
+        List<String> visitedUrlList = CommonUtils.parseCommaSeparatedString(visitedURL);
+        List<String> ignoredUrlList = CommonUtils.parseCommaSeparatedString(ignoredURL);
+        List<String> keywordList = CommonUtils.parseCommaSeparatedString(keywords);
+
+        npiSmartList.selectEngagementType(engagementType);
+        switch(engagementType){
+            case "Engaged on Site":
+                npiSmartList.addVisitedURL(visitedUrlList);
+                npiSmartList.addIgnoredURL(ignoredUrlList);
+                break;
+            case "Engaged via Search":
+                npiSmartList.clickSearchKeywordsCheckbox();
+                npiSmartList.enterSearchKeywords(keywordList);
+                break;
+            case "Engaged Anywhere":
+                npiSmartList.addVisitedURL(visitedUrlList);
+                npiSmartList.addIgnoredURL(ignoredUrlList);
+                npiSmartList.clickSearchKeywordsCheckbox();
+                npiSmartList.enterSearchKeywords(keywordList);
+                break;
+        }
+    }
+
+    @And("User retrieves all the entered data before saving the list {string}")
+    public void userRetrievesAllTheEnteredDataBeforeSavingTheList(String listType) {
+        if(listType.contains(",")){
+            List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
+            for(String list : listTypes){
+                capturedDetails.addAll(npiSmartList.retrieveEnteredData(list));
+            }
+        }else {
+            capturedDetails = npiSmartList.retrieveEnteredData(listType);
+        }
+    }
+
+    @And("User saves the Smart List and verifies the successful creation of the list")
+    public void theUserSavesTheSmartListAndVerifiesTheSuccessfulCreationOfTheList() {
+        npiSmartList.clickSaveButton();
+        Assert.assertEquals("NPI list created successfully", npiSmartList.fetchSuccessAlert());
+    }
+
+    @And("Verify that the retrieved data for the {string} list was saved correctly")
+    public void verifyThatTheRetrievedDataForTheListWasSavedCorrectly(String listType) {
+        List<String> onListSavedFetchData = new ArrayList<>();
+        if (listType.contains(",")) {
+            List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
+            for (String list : listTypes) {
+                onListSavedFetchData.addAll(npiSmartList.retrieveEnteredData(list));
+            }
+        } else {
+            onListSavedFetchData = npiSmartList.retrieveEnteredData(listType);
+        }
+        Assert.assertEquals("Data entered doesn't match after saving the list", capturedDetails, onListSavedFetchData);
+    }
+
+    @And("Verify {string} population option is disabled when Advertiser value is not selected")
+    public void verifyNPIListPopulationOptionIsDisabledWhenAdvertiserValueIsNotSelected(String smartListType) {
+        Assert.assertTrue("NPI List is not disabled", npiSmartList.verifyNPIListDisabled(smartListType));
+    }
+
+    @And("User selects the HCP switch {string}")
+    public void userSelectsTheHCPSwitch(String hcpSwitch) {
+        npiSmartList.selectHCPSwitch(hcpSwitch);
+    }
+
+    @And("User selects the NPI Group {string}")
+    public void userSelectsTheNPIGroup(String npiList) {
+        npiSmartList.selectNPIGroup(npiList);
+    }
+
+    @And("User selects the Speciality {string}")
+    public void userSelectsTheSpeciality(String specialities) {
+        List<String> specialityList = CommonUtils.parseCommaSeparatedString(specialities);
+        for(String speciality : specialityList) {
+            npiSmartList.selectSpeciality(speciality);
+        }
+    }
+
+    @And("User selects the Profession {string}")
+    public void userSelectsTheProfession(String professions) {
+        List<String> professionList = CommonUtils.parseCommaSeparatedString(professions);
+        for(String profession : professionList){
+            npiSmartList.selectProfession(profession);
+        }
+    }
+
+    @And("Verify that Recency is set to {string} by default for {string}")
+    public void verifyThatRecencyIsSetToByDefault(String recency, String type) {
+        Assert.assertEquals(recency, npiSmartList.fetchRecency(type));
+    }
+
+    @And("verify that Decile is set to {string} by default for {string}")
+    public void verifyThatDecileIsSetToByDefault(String decile, String type) {
+        Assert.assertEquals(decile + " decile", npiSmartList.fetchDecile(type));
+    }
+
+    @And("User selects {string} from {string} dropdown")
+    public void userSelectsTheDiagnosis(String options, String type) {
+        List<String> optionList = CommonUtils.parseCommaSeparatedString(options);
+        for (int i = 0; i < optionList.size(); i++) {
+            npiSmartList.selectValueFromClinicalDropdown(optionList.get(i), type);
+            if (i < optionList.size() - 1) {
+                npiSmartList.clickAddButton(type);
+            }
+        }
+    }
+
+    @And("User clicks Browse button to upload {string} file {string}")
+    public void userClicksBrowseButtonToUploadDiagnosisFile(String type, String fileName) {
+        npiSmartList.browseBulkUploadTemplate(type, fileName);
+    }
+
+
+    @And("Verify that Prescribed Behavior Change should display below tabs")
+    public void verifyThatPrescribedBehaviorChangeShouldDisplayDroppersAndNewPrescribersTabs(DataTable dataTable) {
+        List<String> tabList = dataTable.asList(String.class);
+        for(String tabName : tabList) {
+            Assert.assertTrue(tabName + " is not available", npiSmartList.fetchPrescriptionBehaviourTab(tabName));
+        }
+    }
+
+    @And("Verify that {string} tab should be selected by default")
+    public void verifyThatDroppersTabShouldBeSelectedByDefault(String defaultTabName) {
+        Assert.assertTrue("Droppers is not a default selection", npiSmartList.fetchDefaultPrescriptionBehaviourTab(defaultTabName));
+    }
+
+    @And("Verify that Top Droppers percentage slider should range from {string} to {string} and should be set to {string} by default")
+    public void topDroppersPercentageSliderShouldRangeFromToAndShouldBeSetToByDefault(String topDropperMin, String topDropperMax, String topDropperDefault) {
+        Assert.assertTrue("Top Dropper range is not set from 1 to 100%", npiSmartList.fetchTopDropperMinAndMaxValues(topDropperMin, topDropperMax));
+        Assert.assertEquals(topDropperDefault, npiSmartList.fetchTopDropperDefaultValue());
+    }
+
+    @And("User selects the {string} value as {string} from the slider")
+    public void userSelectsTheValueFromTheSlider(String sliderType, String sliderValue) {
+        npiSmartList.selectDropperValueFromSlider(sliderType, sliderValue);
+    }
+
+    @And("Verify that Time Frame Selector slider should range from {string} to {string} months and should be set to {string} by default")
+    public void verifyThatTimeFrameSelectorSliderShouldRangeFromToMonthsAndShouldBeSetToByDefault(String timeframeSelectorMin, String timeframeSelectorMax, String timeframeSelectorDefault) {
+        Assert.assertTrue("Time Frame Selector range is not set from 6 to 12 months", npiSmartList.fetchTimeframeSelectorMinAndMaxValues(timeframeSelectorMin, timeframeSelectorMax));
+        Assert.assertEquals(timeframeSelectorDefault, npiSmartList.fetchTimeframeSelectorDefaultValue());
+    }
+
+    @And("User selects the prescription drug name {string}")
+    public void userSelectsThePrescriptionDrugName(String drugNames) {
+        List<String> drugList = CommonUtils.parseCommaSeparatedString(drugNames);
+        for(String drug : drugList){
+            npiSmartList.selectPrescriptionDrug(drug);
+        }
+    }
+
+    @And("User selects the {string} tab under Prescription Behavior Change")
+    public void userSelectsTheTabUnderPrescriptionBehaviorChange(String tabName) {
+        npiSmartList.clickPrescriptionBehaviourTab(tabName);
+    }
+
+    @And("User selects Engagement Type {string} and contextual category {string}")
+    public void userSelectsEngagementTypeAndContextualCategory(String engagementType, String contextualCategory) {
+        npiSmartList.selectEngagementTypeAndContextualCategory(engagementType, contextualCategory);
+    }
+
+    @And("User clicks MESH dropdown, enters {string} and selects it")
+    public void userClicksMESHDropdownEntersAndSelectsIt(String meshCondition) {
+        npiSmartList.selectMESHCondition(meshCondition);
+    }
+
+    @And("Verify that Recency slider should range from {string} to {string} days and should be set to {string} by default")
+    public void verifyThatRecencySliderShouldRangeFromToDaysAndShouldBeSetToByDefault(String recencyMin, String recencyMax, String recencyDefault) {
+        Assert.assertTrue("Recency range is not set from 1 to 60 days", npiSmartList.fetchRecencyMinAndMaxValues(recencyMin, recencyMax));
+        Assert.assertEquals(recencyDefault, npiSmartList.fetchRecencyDefaultValue());
+    }
+
+    @And("User checks Prime list with historical data check box")
+    public void userChecksPrimeListWithHistoricalDataCheckBox() {
+        npiSmartList.selectPrimeListWithHistoricalDataCheckbox();
+    }
+
+    @And("User hovers over the {string} question icon and fetches tool-tip {string}")
+    public void userHoversOverTheMedscapeQuestionIconAndFetchesToolTipFor(String contextualCategory, String tooltip) {
+        Assert.assertEquals(tooltip, npiSmartList.hoverAndFetchTooltip(contextualCategory));
+    }
+
+    @And("User clicks {string} primary concept dropdown, enters {string} and selects it")
+    public void userClicksMedscapePrimaryConceptDropdownEntersAndSelectsIt(String contextualCategory, String primaryConcept) {
+        List<String> primaryConceptList = CommonUtils.parseCommaSeparatedString(primaryConcept);
+        for(String concept : primaryConceptList){
+            npiSmartList.selectMedscapePrimaryConcept(contextualCategory, concept);
+        }
+    }
+
+    @And("Verify that {string} is disabled under Endemic Network")
+    public void verifyThatIsDisabledUnderEndemicNetwork(String contextualCategory) {
+        Assert.assertTrue(contextualCategory + "is not disabled", npiSmartList.verifyMedscapeAndWebMDAreDisabled(contextualCategory));
+    }
+
+    @And("The user saves the Smart List without selecting any other Population options and verifies error message")
+    public void theUserSavesTheSmartListWithoutSelectingAnyOtherPopulationOptionsAndVerifiesErrorMessage() {
+        npiSmartList.clickSaveButton();
+        Assert.assertEquals("Select one or more List Population Options", npiSmartList.fetchErrorAlert());
+    }
+
+    @And("User selects Smart NPI list as below with mandatory details")
+    public void userSelectsSmartNPIListAsBelowWithMandatoryDetails(DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> row : rows) {
+            String option = row.get("PopulationOption").trim();
+            String details = row.get("OptionDetails").trim();
+            npiSmartList.selectSmartNPIListType(option);
+            Map<String, String> attributeMap = Arrays.stream(details.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+
+            npiSmartList.enterPopulationOptionsDetail(option, attributeMap);
+        }
+    }
+
+    @And("Verify Bulk Upload template {string} records count matches UI count post upload")
+    public void verifyBulkUploadTemplateEntryCountMatchesUICountPostUpload(String fileName) throws IOException {
+        int recordsCountFromFile = FileActions.countRecordsFromTextFile(fileName);
+        int recordsCountFromUI = 0;
+        if(fileName.contains("Diagnosis_BulkUpload")){
+            recordsCountFromUI = Integer.parseInt(npiSmartList.fetchDiagnosisCodesFromUI());
+        }else{
+            recordsCountFromUI = Integer.parseInt(npiSmartList.fetchMedicalProcedureCodesFromUI());
+        }
+        Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);
+    }
+}

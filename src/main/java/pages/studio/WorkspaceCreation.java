@@ -48,7 +48,7 @@ public class WorkspaceCreation {
 
     public WorkspaceCreation(Page page) {
         this.page = page;
-        this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
+        this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
@@ -62,7 +62,7 @@ public class WorkspaceCreation {
         this.REMOVAL_CONFIRMATION_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'You are trying to delete the workspace')]");
         this.REMOVE_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Remove']");
         this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace deleted successfully')]");
-        this.OUTER_FRAME = page.frameLocator("iframe#iframe0").locator("//div[@data-testid='chatty-frame']");
+        this.OUTER_FRAME = page.frameLocator("iframe").locator("//section[@id='main-content']");
         this.RENAME_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Rename')]");
         this.RENAME_WORKSPACE_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Rename Workspace')]");
         this.UPDATE_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Update')]");
