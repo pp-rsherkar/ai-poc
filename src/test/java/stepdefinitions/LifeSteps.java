@@ -3513,7 +3513,7 @@ public class LifeSteps {
 
     @And("Verify that Campaign Budget accepts only numeric values {string}")
     public void verifyThatCampaignBudgetAcceptsOnlyNumericValues(String budget) {
-        Assert.assertEquals("Campaign Budget accepts invalid values", "", campaigns.validateCampaignBudgetNumericInput(budget));
+        Assert.assertEquals("Campaign Budget accepts invalid values", "", campaigns.fetchCampaignBudget(budget));
     }
 
     @And("Verify that user is able to enter the data {string} in the Description field")
@@ -3524,14 +3524,14 @@ public class LifeSteps {
     @And("Verify that Budget Status has the below options, and the default status is {string}")
     public void verifyThatBudgetStatusHasTheOptionsAndAndTheDefaultStatusIs(String defaultButton, DataTable dataTable) {
         Assert.assertEquals("Budget status has different options", campaigns.fetchBudgetStatus(), dataTable.asList(String.class));
-        Assert.assertEquals(defaultButton + "button is not set as default", defaultButton, campaigns.fetchDefaultBudgetStatus());
+        Assert.assertEquals(defaultButton + " button is not set as default", defaultButton, campaigns.fetchDefaultBudgetStatus());
     }
 
     @And("Verify the availability of the Management Fee checkbox and when clicked, below options should be displayed")
     public void verifyTheAvailabilityOfTheManagementFeeCheckboxAndWhenClickedTheOptionsAndShouldBeDisplayed(DataTable dataTable) {
         Assert.assertTrue("Management Fee checkbox is not available", campaigns.isManagementFeeAvailable());
         campaigns.clickManagementFee();
-        Assert.assertEquals("Budget status has different options", dataTable.asList(String.class), campaigns.fetchManagementFeeOptions());
+        Assert.assertEquals("Management Fee has different options", dataTable.asList(String.class), campaigns.fetchManagementFeeOptions());
     }
 
     @And("Verify that the user is able to enter data in the selected Management Fee option - {string}, {string}, {string}")

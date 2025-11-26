@@ -4,11 +4,9 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
-import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Campaigns {
@@ -113,7 +111,7 @@ public class Campaigns {
     }
 
     public void setCampaignType(String campaignType) {
-        CAMPAIGN_TYPE.locator("text = " + campaignType).click();
+        CAMPAIGN_TYPE.locator("text=" + campaignType).click();
     }
 
     public void enterBudget(String budget) {
@@ -162,7 +160,7 @@ public class Campaigns {
         option.first().click();
     }
 
-    public String validateCampaignBudgetNumericInput(String budget) {
+    public String fetchCampaignBudget(String budget) {
         enterBudget(budget);
         page.keyboard().press("Tab");
         return BUDGET.innerText();
