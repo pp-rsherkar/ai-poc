@@ -37,9 +37,6 @@ public class StudioSteps {
     String npiCount;
     Path targetFilePath;
     String timeStamp = CommonUtils.timeStampCalculation();
-    static String url;
-    static String username;
-    static String password;
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -664,19 +661,6 @@ public class StudioSteps {
         accounts.internalUserLogout();
 
     }
-
-//    @When("External user is logged in successfully in {string} application in the {string} environment")
-//    public void externalUserIsLoggedInSuccessfullyInApplicationInTheEnvironment()
-//    {
-//            url = ConfigReader.getProperty("preReleaseURL");
-//            username = ConfigReader.getProperty("preReleaseExternalUser");
-//            password = ConfigReader.getProperty("preReleaseExternalPassword");
-//            navigation.navigateToUrl(url);
-//            navigation.enterUsername(username);
-//            navigation.enterPassword(password);
-//            navigation.clickLogin();
-//            navigation.navigateToStudio();
-//    }
 
     @And("External user selects the workspace")
     public void externalUserSelectsTheWorkspace()

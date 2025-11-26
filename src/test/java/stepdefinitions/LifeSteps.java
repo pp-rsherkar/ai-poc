@@ -2878,9 +2878,6 @@ public class LifeSteps {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
     }
-}
-
-
     @Then("User should see the remaining flights listed under the Flights section")
     public void userShouldSeeTheRemainingFlightsListedUnderTheFlightsSection() {
         List<String> flightDetailsAfterDeletion;
@@ -3342,3 +3339,4 @@ public class LifeSteps {
         Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);
     }
 }
+
