@@ -30,6 +30,7 @@ public class Campaigns {
     private final Locator GET_FREQUENCY_CAP_TEXT;
     private final Locator SELECT_LINE_ITEM;
     private final Locator FREQUENCY_CAP;
+    private final Locator TIMES_PER_HRS_VALUE;
     static WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -56,7 +57,7 @@ public class Campaigns {
         this.GET_FREQUENCY_CAP_TEXT = page.locator("//p[contains(@class,'display-block')]");
         this.SELECT_LINE_ITEM = page.locator("//div[contains(@class,'listitembox')]");
         this.FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
-
+        this.TIMES_PER_HRS_VALUE = page.locator("//input[@formcontrolname='hour']");
     }
 
     public void createCampaign() {
@@ -92,6 +93,9 @@ public class Campaigns {
         FREQUENCY_CAP_VALUE.fill(FREQ_VALUE);
         TIMES_PER_DROPDOWN.click();
         TIMES_PER_OPTION.first().click();
+        if(TIMES_PER.contains("hour(s)")){
+            TIMES_PER_HRS_VALUE.fill(FREQ_VALUE);
+        }
         SCOPE_DROPDOWN.click();
         FREQUENCY_CAP_SCOPE.click();
         SAVE_CAMPAIGN.click();
