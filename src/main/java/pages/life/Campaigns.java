@@ -60,7 +60,7 @@ public class Campaigns {
         this.CAMPAIGN_TYPE = page.locator("//label[contains(text(),'Campaign Type')]/following-sibling::div//button");
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
-        this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']"); //div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Campaign')]
+        this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Campaign')]");
         this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
@@ -252,8 +252,9 @@ public class Campaigns {
     public void clickCampaignDetailsTab() {
         waitUtility.waitForLocatorVisible(CAMPAIGN_DETAILS_TAB);
         CAMPAIGN_DETAILS_TAB.click();
-        waitUtility.waitUntilSpinnerHidden();
-        waitUtility.waitForLocatorVisible(SELECTED_ADVERTISER);
+        while(!SELECTED_ADVERTISER.isVisible()){
+            page.waitForTimeout(1000);
+        }
     }
 
     public String verifyClientFieldEnabledOrDisabledBasedOnAccount(String clientName) {
