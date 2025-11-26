@@ -31,7 +31,7 @@ public class Campaigns {
     private final Locator SELECT_LINE_ITEM;
     private final Locator FREQUENCY_CAP;
     private final Locator TIMES_PER_HRS_VALUE;
-    static WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
         this.page = page;
@@ -83,18 +83,20 @@ public class Campaigns {
         DETAILS_TAB.click();
     }
 
-    public void addFrequencyCap(String level, String FREQ_VALUE,String TIMES_PER, String SCOPE)  {
-        Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", TIMES_PER));
-        Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", SCOPE));
-        if(level.contains("Campaign") | level.contains("Line Item")){
-        waitUtility.waitForLocatorVisible(CUSTOM_FIELD.first());}
-        if(!FREQUENCY_CAP.getAttribute("class").contains("checked")){
-        FREQUENCY_CAP.click();}
-        FREQUENCY_CAP_VALUE.fill(FREQ_VALUE);
+    public void addFrequencyCap(String level, String frequencyValue, String timesPer, String scope) {
+        Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", timesPer));
+        Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", scope));
+        if (level.contains("Campaign") | level.contains("Line Item")) {
+            waitUtility.waitForLocatorVisible(CUSTOM_FIELD.first());
+        }
+        if (!FREQUENCY_CAP.getAttribute("class").contains("checked")) {
+            FREQUENCY_CAP.click();
+        }
+        FREQUENCY_CAP_VALUE.fill(frequencyValue);
         TIMES_PER_DROPDOWN.click();
         TIMES_PER_OPTION.first().click();
-        if(TIMES_PER.contains("hour(s)")){
-            TIMES_PER_HRS_VALUE.fill(FREQ_VALUE);
+        if (timesPer.contains("hour(s)")) {
+            TIMES_PER_HRS_VALUE.fill(frequencyValue);
         }
         SCOPE_DROPDOWN.click();
         FREQUENCY_CAP_SCOPE.click();
@@ -102,7 +104,7 @@ public class Campaigns {
         waitUtility.waitForElementVisible("//div[@role='alert']");
     }
 
-    public boolean getFrequencyCapState(){
+    public boolean getFrequencyCapState() {
         return FREQUENCY_CAP.first().getAttribute("class").contains("checked");
     }
 
