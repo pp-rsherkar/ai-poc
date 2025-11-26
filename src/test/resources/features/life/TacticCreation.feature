@@ -124,4 +124,4 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL        | ON_TACTIC_LEVEL |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10         | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level  |
