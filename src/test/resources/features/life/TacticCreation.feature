@@ -95,7 +95,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
 
   @regression @vp
-  Scenario Outline: To verify user is able to add frequency cap for a tactic
+  Scenario Outline: To verify user is able to add frequency cap in campaign, line item and tactic levels
     When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -104,38 +104,23 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Audience Group tactic | Standard | Behavioral Segment |
-
     Then User navigates to campaign
+    Then User clicks on details tab
     Then User verified Frequency Cap is in disabled states by default
-    Then User adds frequency cap with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
-    Then User navigates to LineItem and clicks on details tab
+    Then User adds frequency cap with details "<ON_CAMPAIGN_LEVEL>" "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to LineItem
+    Then User clicks on details tab
     Then User verifies if frequency cap is saved with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
     Then User verified Frequency Cap is in disabled states by default
-    Then User adds frequency cap with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User adds frequency cap with details "<ON_LI_LEVEL>" "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
     Then User navigates to Tactic and clicks on settings tab
+    Then User verifies if frequency cap is saved with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
     Then User verifies if frequency cap is saved with details "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_LI_LEVEL>"
-
-
-#    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
-#    Then Verify line item details are saved and user is navigated to the tactic page
-#    Then User creates below tactics under same line item and verifies it
-#      | Tactic Name       | Channel | RuleType          |
-#      | Targeting Segment | Email   | Health Population |
-#    Then Verify tactic details are saved and user is navigated to the settings tab
-#    add flights in campaign and line item, verify that in tactic, add flight in tactic, verify all the options in flight dropdown
-#   Then Frequency Cap section should be visible
-#    And "Apply on Tactic Level" checkbox should be displayed and unchecked by default
-#    And Frequency value input field should not be visible
-#    Then User checks the "Apply on Tactic Level" checkbox
-#    And User checks the "Apply on Tactic Level" checkbox
-#    And User enters frequency values and clicks on Save button
-#    Then Frequency cap values should be saved successfully
-#    need to consider different liner item types ?
-#    300 x day x Per Person on Campaign Level
-#    600 x Time Per 1 hour Per Person on Line Item Level
-
-
+    Then User verified Frequency Cap is in disabled states by default
+    Then User adds frequency cap with details "<ON_TACTIC_LEVEL>" "<FREQ_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to LineItem
+    Then User navigates to Tactic and clicks on settings tab
+    Then Verify that frequency cap is saved in tactic
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week      | Per Household | on Campaign Level | on Line item level  |
-      #| 100- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 90         | hour(s)           | Per Household  |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQ_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL        | ON_TACTIC_LEVEL |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |

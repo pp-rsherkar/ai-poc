@@ -22,14 +22,14 @@ public class Campaigns {
     private final Locator LIFE_TIME_FILTER;
     private final Locator CAMPAIGN_ENTRIES;
     private final Locator SELECT_CAMPAIGN;
-    private static Locator DETAILS_TAB;
+    private final Locator DETAILS_TAB;
     private final Locator TIMES_PER_DROPDOWN;
     private final Locator SCOPE_DROPDOWN;
     private final Locator FREQUENCY_CAP_VALUE;
     private final Locator CUSTOM_FIELD;
-    private static Locator getFrequencyCapText;
-    private static Locator SELECT_LINE_ITEM;
-    private static Locator FREQUENCY_CAP;
+    private final Locator GET_FREQUENCY_CAP_TEXT;
+    private final Locator SELECT_LINE_ITEM;
+    private final Locator FREQUENCY_CAP;
     static WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -49,13 +49,13 @@ public class Campaigns {
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
         this.SELECT_CAMPAIGN = page.locator("//div[@class='item-details']");
         this.CUSTOM_FIELD = page.locator("//label[contains(@class,'cmp-form-label')]");
-        DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
         this.TIMES_PER_DROPDOWN = page.locator("//div[contains(@class,'dropdown-wrapper ui field noMargin')]");
         this.SCOPE_DROPDOWN = page.locator("//div[contains(@class,'crossDevice-dropdown')]");
-        this.FREQUENCY_CAP_VALUE = page.locator("//input[@id='windowLimit']");
-        getFrequencyCapText = page.locator("//p[contains(@class,'display-block')]");
-        SELECT_LINE_ITEM = page.locator("//div[contains(@class,'listitembox')]");
-        FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
+        this.FREQUENCY_CAP_VALUE = page.locator("//input[@id='windowLimit' or @id='freqWindowLimit']");
+        this.GET_FREQUENCY_CAP_TEXT = page.locator("//p[contains(@class,'display-block')]");
+        this.SELECT_LINE_ITEM = page.locator("//div[contains(@class,'listitembox')]");
+        this.FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
 
     }
 
@@ -70,41 +70,45 @@ public class Campaigns {
 
     }
 
-    public static void LineItemDetailsTab()  {
+    public  void clickLineItem()  {
         SELECT_LINE_ITEM.first().click();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
-        DETAILS_TAB.click();
     }
 
-    public static boolean isFrequencyCapDisabled() {
-        DETAILS_TAB.click();
+    public  boolean isFrequencyCapDisabled() {
         return FREQUENCY_CAP.getAttribute("class").contains("checked");
     }
 
-    public void addFrequencyCap(String FREQ_VALUE,String TIMES_PER, String SCOPE)  {
+    public void clickDetailsTab() {
+        DETAILS_TAB.click();
+    }
+
+    public void addFrequencyCap(String level, String FREQ_VALUE,String TIMES_PER, String SCOPE)  {
         Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", TIMES_PER));
         Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", SCOPE));
-        DETAILS_TAB.click();
-        waitUtility.waitForLocatorVisible(CUSTOM_FIELD.first());
-//       if(!FREQUENCY_CAP.getAttribute("class").contains("checked"))
-        FREQUENCY_CAP.click();
+        if(level.contains("Campaign") | level.contains("Line Item")){
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD.first());}
+        if(!FREQUENCY_CAP.getAttribute("class").contains("checked")){
+        FREQUENCY_CAP.click();}
         FREQUENCY_CAP_VALUE.fill(FREQ_VALUE);
         TIMES_PER_DROPDOWN.click();
-        TIMES_PER_OPTION.click();
+        TIMES_PER_OPTION.first().click();
         SCOPE_DROPDOWN.click();
         FREQUENCY_CAP_SCOPE.click();
         SAVE_CAMPAIGN.click();
-        //Thread.sleep(1000); //first elements gets loaded(click is performed), then loader appears and script breaks
-
-
+        waitUtility.waitForElementVisible("//div[@role='alert']");
     }
 
-    public static String getSavedFrequencyCap(String level) {
-        String frequencyCapValue = getFrequencyCapText.first().innerText().trim();
-        if (level.contains("Line item")) {
-            frequencyCapValue = getFrequencyCapText.nth(2).innerText().trim();
-        }
+    public boolean getFrequencyCapState(){
+        return FREQUENCY_CAP.first().getAttribute("class").contains("checked");
+    }
 
+
+    public String getSavedFrequencyCap(String level) {
+        String frequencyCapValue = GET_FREQUENCY_CAP_TEXT.first().innerText().trim().toUpperCase();
+        if (level.contains("Line Item")) {
+            frequencyCapValue = GET_FREQUENCY_CAP_TEXT.filter(new Locator.FilterOptions().setHasText("Line item")).innerText().trim().toUpperCase();
+        }
         return frequencyCapValue;
     }
 

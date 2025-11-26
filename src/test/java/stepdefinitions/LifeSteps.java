@@ -197,35 +197,44 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @Then("User adds frequency cap with details {string} {string} {string}")
-    public void user_adds_frequency_cap_with_details(String FREQ_VALUE, String TIMES_PER, String SCOPE) {
-    campaigns.addFrequencyCap(FREQ_VALUE, TIMES_PER, SCOPE );
+    @Then("User adds frequency cap with details {string} {string} {string} {string}")
+    public void user_adds_frequency_cap_with_details(String level, String FREQ_VALUE, String TIMES_PER, String SCOPE) {
+        campaigns.addFrequencyCap(level, FREQ_VALUE, TIMES_PER, SCOPE);
+    }
+
+    @Then("User clicks on details tab")
+    public void user_clicks_on_details_tab() {
+        campaigns.clickDetailsTab();
     }
 
     @Then("User verified Frequency Cap is in disabled states by default")
     public void userVerifiedFrequencyCapIsInDisabledStatesByDefault() {
-       boolean fc_checkbox_state= Campaigns.isFrequencyCapDisabled();
-       Assert.assertFalse(fc_checkbox_state);
-
+        boolean fc_checkbox_state = campaigns.isFrequencyCapDisabled();
+        Assert.assertFalse(fc_checkbox_state);
     }
 
-    @Then("User navigates to LineItem and clicks on details tab")
-    public void userNavigatesToLineItemAndClicksOnDetailsTab() {
-        Campaigns.LineItemDetailsTab();
+    @Then("User navigates to LineItem")
+    public void userNavigatesToLineItem() {
+        campaigns.clickLineItem();
     }
 
     @Then("User verifies if frequency cap is saved with details {string} {string} {string} {string}")
     public void userVerifiesIfFrequencyCapIsSavedWithDetailsOnCampaignLevel(String freqValue, String timesPer, String scope, String level) {
-        String actualFrequencyCapText = Campaigns.getSavedFrequencyCap(level);
-        System.out.println(actualFrequencyCapText);
-        String expectedFrequencyCapText = String.format("%s x %s x %s %s", freqValue, timesPer, scope, level);
-        Assert.assertEquals(expectedFrequencyCapText,actualFrequencyCapText );
+        String actualFrequencyCapText = campaigns.getSavedFrequencyCap(level);
+        String expectedFrequencyCapText = String.format("%s x %s x %s %s", freqValue, timesPer, scope, level).toUpperCase();
+        Assert.assertEquals(expectedFrequencyCapText, actualFrequencyCapText);
     }
+
     @Then("User navigates to Tactic and clicks on settings tab")
     public void user_navigates_to_tactic_and_clicks_on_settings_tab() {
         tacticDetails.clickFirstTacticTab();
         tacticDetails.clickSettingsTab();
+    }
 
+    @Then("Verify that frequency cap is saved in tactic")
+    public void verify_that_frequency_cap_is_saved_in_tactic() {
+        boolean frequencyCapState = campaigns.getFrequencyCapState();
+        Assert.assertTrue(frequencyCapState);
     }
 
     @Then("Verify that below tabs gets enabled only after saving tactics")
