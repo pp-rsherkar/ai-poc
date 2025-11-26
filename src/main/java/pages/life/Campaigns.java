@@ -67,7 +67,6 @@ public class Campaigns {
     public void selectCampaign() {
         SELECT_CAMPAIGN.first().click();
         waitUtility.waitUntilSpinnerHidden();
-
     }
 
     public  void clickLineItem()  {
