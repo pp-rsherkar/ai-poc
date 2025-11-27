@@ -46,7 +46,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     #confirm if user is not allowed to delete custom field used in a tactic
     #clear the custom field
     #And User enters value in custom field and verifies if it's not visible in other tactics
-    Then User clicks on first tactic
+   # Then User clicks on first tactic
     Then User deletes the custom field
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CUSTOM_NAME |
@@ -97,7 +97,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
 
 
-  @regression
+  @regression @vp
   Scenario Outline: To verify user is able to add frequency cap in campaign, line item and tactic levels
     When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
@@ -126,5 +126,5 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify that frequency cap is saved in tactic
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQUENCY_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL        | ON_TACTIC_LEVEL |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10         | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80         | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level  |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10              | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80              | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |
