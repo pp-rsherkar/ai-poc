@@ -122,14 +122,9 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        String ActualTitle = navigation.verifyProfilePage();
-        Assert.assertTrue("Expected one of the titles: Admin Dashboard, Life, HCP365, Studio",
-                ActualTitle.equals("Admin Dashboard") ||
-                        ActualTitle.equals("Life") ||
-                        ActualTitle.equals("HCP365") ||
-                        ActualTitle.equals("Studio "));
-        //Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
-
+        if(navigation.isLifeVisible()) {
+            Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
+        }
         switch (application) {
             case "Life":
                 navigation.navigateToLife();
@@ -138,8 +133,12 @@ public class LifeSteps {
                 navigation.navigateToHCP();
                 break;
             case "Studio":
-                navigation.navigateToLife();
-                navigation.navigateToStudio();
+                if (navigation.isLifeVisible()) {
+                    navigation.navigateToLife();
+                    navigation.navigateToStudio();
+                } else {
+                    navigation.navigateToStudio();
+                }
                 break;
         }
         navigation.selectAccount(account);
