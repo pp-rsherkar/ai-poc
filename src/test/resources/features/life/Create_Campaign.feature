@@ -3,10 +3,10 @@ Feature: LIFE Regression - Create a Campaign
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And User clicks on Create Campaign
 
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
+    And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -26,6 +26,7 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic
+    And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -53,6 +54,7 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Create a Campaign and add and verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings
+    And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -82,6 +84,7 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Verify all Targeting Rules under categories and Create a campaign by adding all Targeting Rules
+    And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
@@ -137,6 +140,55 @@ Feature: LIFE Regression - Create a Campaign
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Auto_Creative |
+
+  @regression
+  Scenario Outline: Verify campaign creation, check field-level validation and default values of the fields
+    And User navigates to Administrative section and fetches the advertisers and client value for the account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    Then Verify Advertiser dropdown should show values which are mapped to the account
+    And Verify that an error message is displayed when no Advertiser is selected
+    And Verify that Campaign Type default value is set to "Regular"
+    And Verify that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection "<CP_CLIENT>"
+    And Verify that user is able to enter and select the drug "<DRUG_NAME>"
+    And Verify that Campaign Budget accepts only numeric values "<INVALID_CP_BUDGET>"
+    And Verify that user is able to enter the data "<DESCRIPTION>" in the Description field
+    And Verify that Budget Status has the below options, and the default status is "Approved"
+    | Pending Approval |
+    | Approved         |
+    | Denied           |
+    And Verify the availability of the Management Fee checkbox and when clicked, below options should be displayed
+    | Percentage |
+    | CPM        |
+    | % + CPM    |
+    | Fixed CPM  |
+    And Verify that the user is able to enter data in the selected Management Fee option - "<MANAGEMENT_FEE>", "<PERCENT>", "<AMOUNT>"
+    And User clicks the three-dot menu and verifies that "Generate Report" is enabled and "Delete" is disabled
+    And User enters other campaign details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+    And User retrieves all the entered data, saves the Campaign and verifies successful creation
+    And Verify that the saved Campaign data matches the entered data
+    Examples:
+      | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | MANAGEMENT_FEE | DRUG_NAME | INVALID_CP_BUDGET | DESCRIPTION     | PERCENT | AMOUNT | CP_CLIENT   |
+      | 01- Advertiser | Campaign | Regular | 50000     | % + CPM        | Glynase   | Test              | Automation test | 35      | 300    | PHM Chicago |
+
+  @regression
+  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence    And User clicks on Create Campaign
+    And User clicks on Create Campaign
+    And User verifies if Add Custom Field button is available
+    When User adds a custom field with "<FIELD_NAME>" on the campaign creation page successfully
+    Then Verify that the custom field is added on the campaign creation page
+    When User modifies the custom field label to new label "<NEW_FIELD_NAME>"
+    Then Verify that the custom field is updated with new label
+    And User enters data "<CUSTOM_FIELD_VALUE>" in the custom field
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    Then Verify that the custom field value "<CUSTOM_FIELD_VALUE>" is saved and displayed in the campaign details page
+    And User verifies if the added custom field is available on New Campaign creation page
+    When User deletes the custom field from the campaign creation page
+    Then Verify that the custom field is deleted successfully
+    And User verifies if the deleted custom field is available on New Campaign creation page
+    Examples:
+      | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER    | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
+      | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000    | Test               |
 
 #  @regression
 #  Scenario Outline: API Sample Test
