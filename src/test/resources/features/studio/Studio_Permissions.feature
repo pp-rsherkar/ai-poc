@@ -21,11 +21,12 @@ Feature: Enable Studio permissions for an account,advertiser and external users
       | ACCOUNT_NAME |
       | 100Plus      |
 
-  @np
+  @regression
   Scenario Outline: Enable Studio permissions for an External User
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And User navigates to accounts page and selects the "<ACCOUNT_NAME>" account
+    When User navigates to Administrative section and go to Accounts Tab
+    And User searches and selects the account "<ACCOUNT_NAME>"
     And User navigates to advertisers page under the selected account
     And User enables the "<ADVERTISER_PERMISSIONS>" permission for the "<ADVERTISER_NAME>" advertiser
     And User navigates to users page under the selected account
