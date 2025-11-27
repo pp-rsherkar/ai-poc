@@ -52,6 +52,7 @@ public class Accounts {
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
     private final Locator ACCOUNTS_ADVERTISER_TAB;
     private final Locator SUCCESS_ALERT;
+    private final Locator CLIENT_VALUE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
@@ -96,6 +97,7 @@ public class Accounts {
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
+        this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
     }
 
     public void clickAdministration() {
@@ -172,7 +174,7 @@ public class Accounts {
     }
 
     public List<String> fetchAdvertiserList() {
-        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.last());
         return ADVERTISER_LIST.allInnerTexts();
     }
 
@@ -298,5 +300,10 @@ public class Accounts {
             OK_BUTTON.click();
             waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         }
+    }
+
+    public String fetchClientValue() {
+        waitUtility.waitForLocatorVisible(CLIENT_VALUE);
+        return CLIENT_VALUE.textContent().trim();
     }
 }
