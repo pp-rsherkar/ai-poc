@@ -40,10 +40,9 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User creates below tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
-    Then User clicks on first tactic and go to details tab
+    Then User clicks on first tactic and goes to details tab
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible and empty in new tactic
-      | Targeting Segment |
     Then User clears the custom field text
     Then User deletes the custom field
     Examples:

@@ -275,14 +275,13 @@ public class LifeSteps {
     }
 
     @And("User verifies if new custom field is visible and empty in new tactic")
-    public void user_verifies_if_new_custom_field_is_visible_and_empty_in_new_tactic(DataTable dataTable) {
+    public void user_verifies_if_new_custom_field_is_visible_and_empty_in_new_tactic() {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
-        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
-        Assert.assertTrue(FIELD_OPTIONS.inputValue().isEmpty());
+        Assert.assertTrue(tacticDetails.isCustomFieldEmpty(customFieldName).inputValue().isEmpty());
         tacticDetails.clickTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
-        Assert.assertFalse(FIELD_OPTIONS.inputValue().isEmpty());
+        Assert.assertFalse(tacticDetails.isCustomFieldEmpty(customFieldName).inputValue().isEmpty());
     }
 
     @Then("User deletes the custom field")
@@ -321,15 +320,15 @@ public class LifeSteps {
         Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
     }
 
-    @Then("User clicks on first tactic and go to details tab")
-    public void user_clicks_on_first_tactic_and_go_to_details_tab() {
+    @Then("User clicks on first tactic and goes to details tab")
+    public void user_clicks_on_first_tactic_and_goes_to_details_tab() {
         tacticDetails.clickFirstTacticTab();
         tacticDetails.clickDetailsTab();
     }
 
     @Then("User clears the custom field text")
     public void user_clears_the_custom_field_text() {
-        tacticDetails.clearsCustomFieldText(customFieldName);
+        tacticDetails.clearCustomFieldText(customFieldName);
     }
 
     @Then("User assigns the existing creative named {string}, enables the tactic and saves the changes")
