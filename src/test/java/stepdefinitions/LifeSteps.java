@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.Locator;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -25,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static factory.DriverFactory.page;
 import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
@@ -207,8 +209,8 @@ public class LifeSteps {
         campaigns.clickDetailsTab();
     }
 
-    @Then("User verified Frequency Cap is in disabled states by default")
-    public void userVerifiedFrequencyCapIsInDisabledStatesByDefault() {
+    @Then("User verifies if Frequency Cap is in disabled state by default")
+    public void userVerifiesIfFrequencyCapIsInDisabledStateByDefault() {
         boolean fc_checkbox_state = campaigns.isFrequencyCapDisabled();
         Assert.assertFalse(fc_checkbox_state);
     }
@@ -265,7 +267,6 @@ public class LifeSteps {
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
         String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
         this.customFieldName = customFieldName;
-        tacticDetails.clickDetailsTab();
         tacticDetails.addCustomField(customFieldName);
         String raw = tacticDetails.verifyCustomField(customFieldName);
         String actualName = raw.split("\\R")[0];// To remove unwanted space and text
@@ -273,12 +274,15 @@ public class LifeSteps {
         this.uiCustomFieldName = actualName;
     }
 
-    @And("User verifies if new custom field is visible in new and existing tactic")
-    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic(DataTable dataTable) {
+    @And("User verifies if new custom field is visible and empty in new tactic")
+    public void user_verifies_if_new_custom_field_is_visible_and_empty_in_new_tactic(DataTable dataTable) {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
+        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+        Assert.assertTrue(FIELD_OPTIONS.inputValue().isEmpty());
         tacticDetails.clickTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
+        Assert.assertFalse(FIELD_OPTIONS.inputValue().isEmpty());
     }
 
     @Then("User deletes the custom field")
@@ -315,6 +319,17 @@ public class LifeSteps {
     public void verify_settings_details_are_saved_and_user_is_navigated_to_creatives_tab() {
         assert tacticSettings.tacticSettingsSuccess().contains("Success!");
         Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
+    }
+
+    @Then("User clicks on first tactic and go to details tab")
+    public void user_clicks_on_first_tactic_and_go_to_details_tab() {
+        tacticDetails.clickFirstTacticTab();
+        tacticDetails.clickDetailsTab();
+    }
+
+    @Then("User clears the custom field text")
+    public void user_clears_the_custom_field_text() {
+        tacticDetails.clearsCustomFieldText(customFieldName);
     }
 
     @Then("User assigns the existing creative named {string}, enables the tactic and saves the changes")

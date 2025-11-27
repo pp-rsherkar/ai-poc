@@ -134,6 +134,12 @@ public class TacticDetails {
         SAVED_TACTICS.first().click();
     }
 
+    public void clearsCustomFieldText(String customFieldName) {
+        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+        FIELD_OPTIONS.clear();
+        SAVE_TACTIC_DETAILS.click();
+    }
+
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
     }
@@ -153,6 +159,7 @@ public class TacticDetails {
     public void addCustomField(String fieldName) {
         ADD_CUSTOM_FIELD.click();
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
+        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
         CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
@@ -190,6 +197,7 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
+        waitUtility.waitForLocatorVisible(ADD_CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();
     }
 
