@@ -58,17 +58,23 @@ public class TacticSettings {
     private final Locator KEYWORD_CUSTOM_LIST;
     private final Locator KEYWORD_SELECTED_LIST;
     private final Locator SHOW_MORE_BUTTON;
-    private final Locator TARGETING_OPTIONS_BS;
-    private final Locator TARGETING_OPTIONS;
     private final Locator BLOCK_TARGETING;
-    private final Locator HOUSEHOLD_ICON;
     private final Locator HOUSEHOLD_IP_ICON;
     private final Locator PRACTICE_IP_ICON;
+    private final Locator SELECTED_ONLY_TAB;
     private final Locator PRACTICE_IP;
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
     private final Locator VERIFY_TACTIC_NAME;
 
+    private final Locator SELECTED_TARGET;
+    private final Locator BLOCKED_TARGET;
+    private final Locator SELECTED_TARGET_HP;
+    private final Locator BLOCKED_TARGET_HP;
+    private final Locator TARGET;
+    private final Locator BLOCK;
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -119,11 +125,8 @@ public class TacticSettings {
         this.KEYWORD_CUSTOM_LIST = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Custom Lists')]");
         this.KEYWORD_SELECTED_LIST = page.locator("//span[contains(text(),'Custom Keyword')]/following-sibling::span[contains(text(),'Selected Only')]");
         this.SHOW_MORE_BUTTON = page.locator("//button[contains(@class,'show-more-button')]");
-        this.TARGETING_OPTIONS_BS = page.locator("//span[contains(@class,'max-width')]");
-        this.TARGETING_OPTIONS = page.locator("//span[contains(@class,'d-block')] | //span[contains(@class,'d-inline-block')]");
         this.SELECT_TARGETING = page.locator("//div[@title='Target'] | //button[@title='Target']");
         this.BLOCK_TARGETING = page.locator("//div[@title='Block'] | //button[@title='Block']");
-        this.HOUSEHOLD_ICON = page.locator("//span[contains(@class,'householdIpBh')]");
         this.PRACTICE_IP_ICON = page.locator("//span[contains(@class,'practiceIp')]");
         this.HOUSEHOLD_IP_ICON = page.locator("//span[contains(@class,'householdIp')]");
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
@@ -131,7 +134,13 @@ public class TacticSettings {
         this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
         this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
 
-
+        this.SELECTED_ONLY_TAB = page.locator("//span[contains(text(),'Selected Only')]");
+        this.BLOCKED_TARGET = page.locator("//div[contains(@class,'danger')]");
+        this.SELECTED_TARGET = page.locator("//div[contains(@class,'success')]");
+        this.SELECTED_TARGET_HP = page.locator("//div[contains(@class,'targetGreen')]");
+        this.BLOCKED_TARGET_HP = page.locator("//div[contains(@class,'targetRed')]");
+        this.TARGET = page.locator("//div[contains(@class,'text-target')]");
+        this.BLOCK = page.locator("//div[contains(@class,'text-block')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -139,8 +148,10 @@ public class TacticSettings {
     }
 
     public void selectChannel(String channel) {
-        SELECT_CHANNEL.click();
-        SELECT_CHANNEL.locator("text=" + channel).first().click();
+        if(SELECT_CHANNEL.isVisible()){
+            SELECT_CHANNEL.click();
+            SELECT_CHANNEL.locator("text=" + channel).first().click();
+        }
     }
 
     public void selectRuleType(String ruleType) {
@@ -184,73 +195,58 @@ public class TacticSettings {
         SAVE_TACTIC_SETTINGS.click();
     }
 
-    public void addTargettingRules(String ruleType) {
+    public void addTargetingRules(String ruleType) {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
 
         switch (ruleType) {
-
-            case "Behavioral Segment":
-
+            case "Health Population":
                 HOUSEHOLD_IP_TAB.click();
-                SHOW_MORE_BUTTON.click();
-                SELECT_TARGETING.last().click();
-                String selected = TARGETING_OPTIONS_BS.last().innerText();
-                this.SELECTED_TARGET_RULE.add(selected);
-                System.out.println(selected);
-                SHOW_MORE_BUTTON.click();
-                BLOCK_TARGETING.last().click();
-                String blocked = TARGETING_OPTIONS_BS.last().innerText();
-                this.SELECTED_TARGET_RULE.add(blocked);
-                System.out.println(blocked);
-
-                String blockedTarget = page.locator(String.format("//span[contains(text(),'%s')]", blocked)).innerText();
-                SAVED_TARGET_RULE.add(blockedTarget);
-                clickOk();
-                clickClose();
-                waitUtility.waitForLocatorVisible(HOUSEHOLD_ICON);
-                String savedTarget = page.locator(String.format("//span[contains(text(),'%s')]", selected)).innerText();
-                SAVED_TARGET_RULE.add(savedTarget);
                 break;
-
             case "NPI":
                 PRACTICE_IP.click();
                 SHOW_MORE_BUTTON.click();
                 SHOW_MORE_BUTTON.click();
-                SELECT_TARGETING.last().click();
-                String selected_npi = TARGETING_OPTIONS.last().innerText();
-                this.SELECTED_TARGET_RULE.add(selected_npi);
-                SHOW_MORE_BUTTON.click();
-                BLOCK_TARGETING.last().click();
-                String blocked_npi = TARGETING_OPTIONS.last().innerText();
-                this.SELECTED_TARGET_RULE.add(blocked_npi);
-                String blockedTarget_npi = page.locator(String.format("//span[contains(text(),'%s')]", blocked_npi)).innerText();
-                SAVED_TARGET_RULE.add(blockedTarget_npi);
-                clickOk();
-                clickClose();
-                waitUtility.waitForLocatorVisible(PRACTICE_IP_ICON);
-                String savedTarget_npi = page.locator(String.format("//span[contains(text(),'%s')]", selected_npi)).innerText();
-                SAVED_TARGET_RULE.add(savedTarget_npi);
-
                 break;
-            case "Health Population":
+            case "Behavioral Segment":
                 HOUSEHOLD_IP_TAB.click();
-                SELECT_TARGETING.first().click();
-                String selected_hp = TARGETING_OPTIONS.last().innerText();
-                this.SELECTED_TARGET_RULE.add(selected_hp);
-                BLOCK_TARGETING.last().click();
-                String blocked_hp = TARGETING_OPTIONS.last().innerText();
-                this.SELECTED_TARGET_RULE.add(blocked_hp);
-                String blockedTarget_hp = page.locator(String.format("//span[contains(text(),'%s')]", blocked_hp)).innerText();
-                SAVED_TARGET_RULE.add(blockedTarget_hp);
-                clickOk();
-                clickClose();
-                waitUtility.waitForLocatorVisible(HOUSEHOLD_IP_ICON);
-                String savedTarget_hp = page.locator(String.format("//span[contains(text(),'%s')]", selected_hp)).innerText();
-                SAVED_TARGET_RULE.add(savedTarget_hp);
+                SHOW_MORE_BUTTON.click();
                 break;
         }
+        performTargetingActions(ruleType);
+    }
+
+    private void performTargetingActions(String ruleType) {
+        SELECT_TARGETING.first().click();
+        if (ruleType.equals("Behavioral Segment") || ruleType.equals("NPI")) {
+            SHOW_MORE_BUTTON.click();
+        }
+        BLOCK_TARGETING.last().click();
+        SELECTED_ONLY_TAB.click();
+        EXPECTED_TARGET_RULE.add((ruleType.equals("Health Population") ? SELECTED_TARGET_HP : SELECTED_TARGET.last()).innerText());
+        EXPECTED_TARGET_RULE.add((ruleType.equals("Health Population") ? BLOCKED_TARGET_HP : BLOCKED_TARGET.last()).innerText());
+        clickOk();
+        clickClose();
+        waitUtility.waitForLocatorVisible(ruleType.equals("NPI") ? PRACTICE_IP_ICON : HOUSEHOLD_IP_ICON);
+        String selectedTargets = TARGET.first().innerText().replaceAll("\\s*\\(\\d+\\)\\s*", "")
+                .replaceAll("[\\r\\n]+", "")
+                .replaceAll("\\u00A0", "")
+                .trim();
+        String blockedTargets = BLOCK.first().innerText().trim().replaceAll("\\s*\\(\\d+\\)\\s*", "")
+                .replaceAll("[\\r\\n]+", "")
+                .replaceAll("\\u00A0", "")
+                .trim();
+        ACTUAL_TARGET_RULE.add(blockedTargets);
+        ACTUAL_TARGET_RULE.add(selectedTargets);
+    }
+
+    public List<String> getExpectedTargetRules() {
+        return new ArrayList<>(EXPECTED_TARGET_RULE);
+    }
+
+    public List<String> getActualTargetRules() {
+        return new ArrayList<>(ACTUAL_TARGET_RULE);
     }
 
     public String tacticSettingsSuccess() {

@@ -19,7 +19,7 @@ Feature: End to End Workflow of NPI Lists.
     Then Verify creation of NPI List screen is displayed
     And User selects Smart List
     And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>"
-    When User clicks on Prescribed Drug and enters the drug details "<DRUG_NAME>"
+    When User clicks on "Prescribed Drug" and enters the drug details "<DRUG_NAME>"
     Then Verify drug details are added
     When User makes list available in LIFE, HCP365 and saves the list
     Then Verify list gets saved successfully

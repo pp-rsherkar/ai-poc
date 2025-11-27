@@ -90,7 +90,7 @@ public class LineItemDetails {
         this.LINE_ITEM_BUDGET = page.locator("//input[contains(@class,'gaFlightBudget')]");
         this.ENABLE_LINE_ITEM = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_LINE_ITEM = page.locator("//span[text()='Save']");
-        this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']");
+        this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Lineitem')]");
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
         this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
@@ -118,7 +118,7 @@ public class LineItemDetails {
         this.NUMBER_OF_MONTHS = page.locator("//label[text()='Number of Months']/following-sibling::div//sui-select");
         this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']").last();
         this.CANCEL_TACTIC = page.locator("#lidcBody").getByText("Cancel");
-        this.NEW_LINE_ITEM = page.locator("span").filter(new Locator.FilterOptions().setHasText("New Line Item"));
+        this.NEW_LINE_ITEM = page.locator("//app-icon-lable-link[@text='New Line Item']//div");
         this.NOTES_ICON = page.locator("//div[contains(@class,'notes-dashboard')]//span");
         this.NOTES_TEXTAREA = page.locator("//textarea[@placeholder='Notes']");
         this.NOTES_OK_BUTTON = page.locator("//span[@class='okText']");
@@ -191,7 +191,9 @@ public class LineItemDetails {
     }
 
     public void selectNewLineItem() {
+        waitUtility.waitForLocatorVisible(NEW_LINE_ITEM);
         NEW_LINE_ITEM.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String verifyLineItemPanelName() {
