@@ -48,7 +48,7 @@ public class WorkspaceCreation {
 
     public WorkspaceCreation(Page page) {
         this.page = page;
-        this.WORKSPACE_FRAME = page.frameLocator("iframe#iframe0").frameLocator("iframe");
+        this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
@@ -62,7 +62,7 @@ public class WorkspaceCreation {
         this.REMOVAL_CONFIRMATION_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'You are trying to delete the workspace')]");
         this.REMOVE_BUTTON = WORKSPACE_FRAME.locator("//div[text()='Remove']");
         this.WORKSPACE_ARCHIVAL_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace deleted successfully')]");
-        this.OUTER_FRAME = page.frameLocator("iframe#iframe0").locator("//div[@data-testid='chatty-frame']");
+        this.OUTER_FRAME = page.frameLocator("iframe").locator("//section[@id='main-content']");
         this.RENAME_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Rename')]");
         this.RENAME_WORKSPACE_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Rename Workspace')]");
         this.UPDATE_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Update')]");
@@ -74,7 +74,7 @@ public class WorkspaceCreation {
         this.DUPLICATE_WORKSPACE_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace duplicated successfully')]");
         this.DUPLICATE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//span/b[starts-with(text(), 'Copy of')]");
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
-        this.PAGINATION = WORKSPACE_FRAME.locator("(//div[contains(@class, 'PaginationContainer')]//span)[1]");
+        this.PAGINATION = WORKSPACE_FRAME.locator("//div[contains(@class, 'StyledTableContainer')]/following-sibling::div//span");
         this.DEPENDENT_WORKSPACE_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'Checking for dependent workspaces...')]");
         this.REMOVE_WORKSPACE_BUTTON = WORKSPACE_FRAME.locator("//button/div[text()='Remove']");
         this.DELETE_WORKSPACE_ERROR_ALERT_BOX = WORKSPACE_FRAME.locator("//h3[contains(text(),'Deleting workspace')]");
@@ -99,7 +99,7 @@ public class WorkspaceCreation {
         HCP_EXPLORER.click();
     }
 
-    public String verifyWorkspaceCreation() {
+    public String isWorkspaceCreationAlertDisplayed() {
         String text = WORKSPACE_CREATED_ALERT.innerText();
         waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
         return text;
@@ -138,32 +138,6 @@ public class WorkspaceCreation {
 //                }
             } else {
                 counter++;
-                BACK_TO_WORKSPACE_DASHBOARD.click();
-                page.waitForLoadState();
-            }
-        }
-    }
-
-    public void createWorkspaceExpansion(Boolean expansionFlag) {
-        while (counter < 3) {
-            retryCreateWorkspaceExpansion(expansionFlag);
-        }
-    }
-
-    public void retryCreateWorkspaceExpansion(boolean expansionFlag) {
-        {
-            CREATE_WORKSPACE.click();
-            page.waitForLoadState();
-            if (HCP_EXPANSION.isVisible()) {
-
-                page.waitForLoadState();
-                counter = 4;
-                if (expansionFlag) {
-                    HCP_EXPANSION.click();
-                }
-            } else {
-                counter++;
-                //page.waitForTimeout(3000);
                 BACK_TO_WORKSPACE_DASHBOARD.click();
                 page.waitForLoadState();
             }
@@ -237,7 +211,7 @@ public class WorkspaceCreation {
         }else {
             SEARCH_WORKSPACE.fill(workspaceName);
             page.keyboard().press("Enter");
-            waitUtility.waitForLocatorVisible(PAGINATION);
+            waitUtility.waitForLocatorVisible(PAGINATION.first());
             return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
         }
     }

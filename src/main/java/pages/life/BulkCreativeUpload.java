@@ -74,8 +74,8 @@ public class BulkCreativeUpload {
         this.APPROVAL_STATUS_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
         this.PREVIEW_BUTTON = page.locator("//button[contains(text(),'Preview')]");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
-        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or " + "contains(@aria-label,'Select Advertiser') or " + "contains(@aria-label,'Landing Page Domain is required') or " + "contains(@aria-label, 'Landing Page Domain is not valid.') or " + "contains(@aria-label,'1 error')]");
-        this.SUCCESS_ALERT = page.locator("//div[contains(text(),'BulkUpload created successfully.')]");
+        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or contains(@aria-label,'Select Advertiser') or contains(@aria-label,'Landing Page Domain is required') or contains(@aria-label, 'Landing Page Domain is not valid.') or contains(@aria-label,'1 error')]");
+        this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
         this.BULK_UPLOAD_HEADER = page.locator("//div[contains(text(),'Bulk Upload')]");
         this.CREATIVE_NAME_FROM_TABLE = page.locator("//tbody//span/input");
         this.HEADER_MESSAGE = page.locator("//div[contains(@class,'appr-status-label')]/span");
@@ -171,21 +171,21 @@ public class BulkCreativeUpload {
     }
 
     public void clickPreviewButton() {
-        PREVIEW_BUTTON.click();
+        if(PREVIEW_BUTTON.isVisible()) PREVIEW_BUTTON.click();
     }
 
     public void clickUploadButton() {
-        if(UPLOAD_BUTTON.isVisible())
-            UPLOAD_BUTTON.click();
+        if(UPLOAD_BUTTON.isVisible()) UPLOAD_BUTTON.click();
     }
 
     public String fetchErrorAlert() {
         if (!ERROR_ALERT.isVisible()) {
             return "";
+        }else {
+            String text = ERROR_ALERT.innerText().trim();
+            waitUtility.waitForLocatorHidden(ERROR_ALERT);
+            return text;
         }
-        String text = ERROR_ALERT.innerText().trim();
-        waitUtility.waitForLocatorHidden(ERROR_ALERT);
-        return text;
     }
 
     public List<String> fetchInlineValidationMessage() {
@@ -216,7 +216,7 @@ public class BulkCreativeUpload {
     }
 
     public void clickOKButton() {
-        OK_BUTTON.click();
+        if(OK_BUTTON.isVisible()) OK_BUTTON.click();
     }
 
     public boolean verifyDisplayCreativeSections(String section) {
@@ -412,9 +412,10 @@ public class BulkCreativeUpload {
                 if (LANDING_PAGE_DOMAIN.isVisible()) enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
-                clickUploadButton();
+                clickPreviewButton();
                 updateCreativeName(updatedCreativeName);
                 clickOKButton();
+                clickUploadButton();
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
@@ -423,7 +424,9 @@ public class BulkCreativeUpload {
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);
                 if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
+                clickPreviewButton();
                 clickUploadButton();
+                clickOKButton();
                 break;
         }
     }

@@ -47,8 +47,8 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     Then Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
     And User navigates to NPI Lists page
     When User clicks on Create New List
-    And User selects Smart List to create NPI list
-    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" and selects the created Smart Pixel
+    And User selects Smart List
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" and selects the created "Smart Pixel"
     Then Verify the selected Smart Pixel
     Then Save and Verify the list gets saved successfully
     And User navigates to Campaign Dashboard
