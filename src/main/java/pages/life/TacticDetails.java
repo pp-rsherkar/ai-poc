@@ -118,7 +118,7 @@ public class TacticDetails {
         NEW_TACTIC_BUTTON.click();
     }
 
-    public Locator isCustomFieldEmpty(String customFieldName) {
+    public Locator customFieldValue(String customFieldName) {
         return page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
     }
     public List<String> getAllTactics() {
@@ -162,7 +162,6 @@ public class TacticDetails {
     public void addCustomField(String fieldName) {
         ADD_CUSTOM_FIELD.click();
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
-        //CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
         CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());

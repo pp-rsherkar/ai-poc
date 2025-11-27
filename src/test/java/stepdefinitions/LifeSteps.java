@@ -1,7 +1,6 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
-import com.microsoft.playwright.Locator;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -26,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static factory.DriverFactory.page;
 import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
@@ -278,10 +276,10 @@ public class LifeSteps {
     public void user_verifies_if_new_custom_field_is_visible_and_empty_in_new_tactic() {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
-        Assert.assertTrue(tacticDetails.isCustomFieldEmpty(customFieldName).inputValue().isEmpty());
+        Assert.assertTrue(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
         tacticDetails.clickTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
-        Assert.assertFalse(tacticDetails.isCustomFieldEmpty(customFieldName).inputValue().isEmpty());
+        Assert.assertFalse(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
     }
 
     @Then("User deletes the custom field")
