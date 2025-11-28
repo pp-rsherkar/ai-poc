@@ -197,6 +197,30 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
+    @When("User opens the first created tactic")
+    public void userOpensTheFirstCreatedTactic() {
+    }
+
+    @When("User clicks the comments icon in the tactic header section")
+    public void userClicksTheCommentsIconInTheTacticHeaderSection() {
+    }
+
+    @When("User specifies the comment {string}")
+    public void userSpecifiesTheComment(String headerComment) {
+    }
+
+    @When("User clicks the {string} option in the triggered dialogue box")
+    public void userClicksTheOptionInTheTriggeredDialogueBox(String option) {
+    }
+
+    @When("Verify the comments icon turns bluish green")
+    public void verifyTheCommentsIconTurnsBluishGreen() {
+    }
+
+    @When("Verify confirmation message {string} is displayed in green color")
+    public void verifyConfirmationMessageIsDisplayedInGreenColor(String confirmationMessage) {
+    }
+
     @Then("User adds frequency cap with details {string} {string} {string} {string}")
     public void user_adds_frequency_cap_with_details(String level, String FREQ_VALUE, String TIMES_PER, String SCOPE) {
         campaigns.addFrequencyCap(level, FREQ_VALUE, TIMES_PER, SCOPE);

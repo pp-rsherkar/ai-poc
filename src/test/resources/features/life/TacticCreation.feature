@@ -37,10 +37,10 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates below tactics under same line item and verifies it
+    When User creates below tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
-    Then User clicks on first tactic and goes to details tab
+    When User clicks on first tactic and goes to details tab
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible and empty in new tactic
     Then User clears the custom field text
@@ -125,3 +125,31 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQUENCY_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL        | ON_TACTIC_LEVEL |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10              | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80              | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |
+
+  @regression @vp
+  Scenario Outline: Add and Verify Notes on New Tactic from Header and Navigation
+    When User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User creates below tactics under same line item and verifies it
+      | Tactic Name       | Channel | RuleType          |
+      | Targeting Segment | Email   | Health Population |
+    When User opens the first created tactic
+    And User clicks the comments icon in the tactic header section
+    And User specifies the comment "<HEADER_COMMENT>"
+    Then User clicks the "OK" option in the triggered dialogue box
+    Then Verify the comments icon turns bluish green
+    Then Verify confirmation message "Notes saved successfully." is displayed in green color
+
+#    #Add Comment via Left Navigation Panel
+#    When User clicks the comments icon in the left hand side navigation panel
+#    And User specifies the comment "<NAV_COMMENT>"
+#    Then User clicks the "OK" option in the triggered dialogue box
+#    Then Verify the comments icon turns bluish green
+#    Then Verify confirmation message "Notes saved successfully." is displayed in green color
+
+    Examples:
+      | ADVERTISER   | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
+      | Advertiser A | Auto_CP | Regular | 50000     | Auto_LI   | 1000        | Test Note from Header | Test Note from Nav Panel |
