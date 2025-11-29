@@ -5,7 +5,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
   4. Verify Active, Today, Yesterday, Favorite and Hide Finished filters
 
   @regression
-  Scenario Outline: Verify Campaign Dashboard's features
+  Scenario Outline:  Verify comments addition on Campaign Dashboard and validate it on Campaign, Line Item and Tactic pages
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -17,10 +17,34 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | Line Item Name | This is Line Item Name comment box |
       | Tactic Name    | This is Tactic Name comment box    |
     Then Verify comments, icon should display in bluish-green color "<COLOUR>" and comments should available on individual panel
+    And User navigates to campaign, line item and tactic using "<Campaign ID>" and verifies that the comments are displayed in the respective tile comment boxes
+    And User verifies the comments in the campaign, line item, and tactic dashboard's comment boxes
+    Examples:
+      | Campaign ID          | COLOUR                     |
+      | Auto_20251005_024613 | 24-note-table-provided.svg |
+
+  @regression
+  Scenario Outline: Verify toggle functionality for Line Item and Tactic on Campaign Dashboard and validate it on Line Item and Tactic pages
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    When User enters "<Campaign ID>" and click Search button
+    Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
     When User toggles the Enabled button for Line Items and Tactics
     Then Verify that Line Items and Tactics reflect the correct enabled or disabled state
-    When User clicks Campaign "<Campaign ID>", Line Item and Tactic
-    Then Verify user should navigate to Campaign, Line Item and Tactic
+    And User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using "<Campaign ID>" and verifies the same status in the respective Line Item and Tactic pages
+    Examples:
+      | Campaign ID          |
+      | Auto_20251005_024613 |
+
+  @regression
+  Scenario Outline: Verify filtering and column customization on Campaign Dashboard
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    And User removes all the filters applied on the Dashboard
     When User clicks Menu option and selects column names
       | ADVERTISER    |
       | STATUS        |
@@ -33,21 +57,89 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     When Navigate to any Dashboard column, select the filter and apply
       | Status  | Incomplete, Pending Approval |
       | Enabled | Enabled                      |
-      | Type    | Audio, Native Display        |
-    Then Verify the data should filter as per the selected filter values
+      | Type    | Audio, Display               |
+    Then Verify the filter list displays only the selected filter values
+    And Verify the Campaign Dashboard data should filter as per the selected filter values
     And Filter icon should display in the column header to which filter is applied and a red bullet "<RED BULLET>" on the filter icon present next to global search
-    When User clicks Active Flights, Today and Yesterday filter option type
-    Then Verify only Active Flights should render on the Dashboard
-    #When User clicks Custom filter option type and selects date
-    #Then Not clear on verification point
-    When User clicks the Settings icon and selects the following group by options
-    Then Verify the Dashboard data is grouped by the selected options
-    When User clicks Favorite star icon on few campaigns and checks Favorite Only checkbox
+    And User removes all the filters applied on the Dashboard and verifies the data is reset to default state
+    Examples:
+      | RED BULLET                             |
+      | 20-filter-applied.1e22619f2d75d737.svg |
+
+  @regression
+  Scenario: Verify Campaign Dashboard displays correct data based on Filters selection
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User removes all the filters applied on the Dashboard
+    And User clicks Lifetime filter
+    And User verifies that the campaigns displayed on the Dashboard include all past and current flights
+    And User clicks "Today" filter
+    #Then Verify only Today's Flights should render on the Dashboard
+    Then Verify only Current Month's Flights should render on the Dashboard
+    And User clicks "Yesterday" filter
+    Then Verify only Current Month's Flights should render on the Dashboard
+    And User clicks "Active Flight" filter
+    Then Verify only Current Month's Flights should render on the Dashboard
+    And User clicks "Custom" filter
+    And User enters the custom date range from "07/01/2025" to "07/16/2025" and applies the filter
+    And Verify only Custom date range Flights from "07/01/2025" to "07/16/2025" should render on the Dashboard if available
+
+  @regression
+  Scenario: Verify Campaign Dashboard displays correct data based on Group By Options selection
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks the Settings icon and selects the following group by options and verify dashboard data is grouped accordingly
+      | Group By Campaign   |
+      | Group By Advertiser |
+      | No Grouping         |
+
+  @regression
+  Scenario: Verify Campaign Dashboard displays correct data based Favourite and Hide Finished checkbox selection
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    And User removes all the filters applied on the Dashboard
+    When User clicks Favorite Only checkbox
     Then Verify the dashboard results should show only campaigns which are marked as favorite
+    And User unchecks Favorite Only checkbox
+    And Verify the dashboard results should show campaigns which are marked as favorite and nonfavorite
     When User clicks Hide Finished checkbox
     Then Verify the dashboard data should not reflect campaigns with Finished status
-    When User hover on the image icon for creative in red color
-    Then Tool tip whether creative is assigned to the campaign or not should be reflected
+    And User unchecks Hide Finished checkbox
+    And Verify the dashboard data should reflect campaigns with Finished status
+
+
+  @regression
+  Scenario Outline: Verify navigation to Campaign, Line Item and Tactic pages one by one from Campaign Dashboard
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    When User enters "<Campaign ID>" and click Search button
+    Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+    When User clicks Campaign "<Campaign ID>", Line Item and Tactic and verify navigation to respective pages
     Examples:
-      | Campaign ID          | COLOUR                     | RED BULLET                             |
-      | Auto_20251005_024613 | 24-note-table-provided.svg | 20-filter-applied.1e22619f2d75d737.svg |
+      | Campaign ID          |
+      | Auto_20251005_024613 |
+
+  @rs
+  Scenario Outline: Verify navigation to Tactic, assign Creatives of "<STATUS>" and check the creative assignment on Campaign Dashboard
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    When User enters "<Campaign ID>" and click Search button
+    Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+    Then User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
+    When User navigates to Tactic and assigns creative of status "<STATUS>" to the Tactic
+    And User navigates to Campaign Dashboard
+    When User enters "<Campaign ID>" and click Search button
+    And User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
+    Examples:
+      | Campaign ID          | STATUS       |
+#      | Auto_20251101_024109 | Approved     |
+#      | Auto_20251101_032528 | Pending Appr |
+      | Auto_20251103_024348 | Denied       |

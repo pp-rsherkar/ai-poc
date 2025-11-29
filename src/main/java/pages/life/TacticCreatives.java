@@ -20,6 +20,7 @@ public class TacticCreatives {
     private final Locator ASSIGN_CREATIVE_TITLE;
     private final Locator CREATIVE_TAB;
     private final Locator ASSIGN_EXISTING_CREATIVE;
+    private final Locator SHOW_MORE_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public TacticCreatives(Page page) {
@@ -36,6 +37,7 @@ public class TacticCreatives {
         this.ASSIGN_CREATIVE_TITLE = page.locator("//div[contains(text(),'Assign Creatives')]");
         this.CREATIVE_TAB = page.locator("//a[contains(text(),'Creatives')]");
         this.ASSIGN_EXISTING_CREATIVE = page.locator("//span[contains(text(),'Assign Existing Creatives')]");
+        this.SHOW_MORE_BUTTON = page.locator("//button[contains(text(),'Show More')]");
     }
 
     public String verifyTacticCreativesText() {
@@ -85,5 +87,18 @@ public class TacticCreatives {
     public boolean verifyCreativeAssigned(String CreativeName) {
         waitUtility.waitForElementVisible(String.format("//td[@title='%s']", CreativeName));
         return page.locator(String.format("//td[@title='%s']", CreativeName)).isVisible();
+    }
+
+    public void selectAndAssignCreativeByStatus(String status) {
+        Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
+        while(!statusLocator.first().isVisible()){
+            SHOW_MORE_BUTTON.scrollIntoViewIfNeeded();
+            SHOW_MORE_BUTTON.click();
+            waitUtility.waitForLocatorVisible(SEARCH_CREATIVE);
+        }
+        int rowIndex = (int) statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
+        Locator selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
+        selectCreative.click();
+        ASSIGN_CREATIVE_OK_BUTTON.click();
     }
 }

@@ -615,7 +615,7 @@ public class LifeSteps {
         for (Map.Entry<String, List<String>> entry : commentMap.entrySet()) {
             keyValues.addAll(entry.getValue());
             String successAlertText = campaignDashboard.addCommentsToCampaign(entry.getKey(), entry.getValue());
-            Assert.assertEquals("Success!", successAlertText);
+            Assert.assertEquals("Notes saved successfully.", successAlertText);
         }
     }
 
@@ -628,6 +628,30 @@ public class LifeSteps {
         Assert.assertEquals(expectedComments, actualComments);
     }
 
+    @And("User navigates to campaign, line item and tactic using {string} and verifies that the comments are displayed in the respective tile comment boxes")
+    public void userNavigatesToCampaignLineItemAndTacticToVerifyTheCommentsAreDisplayedInRespectiveCommentSections(String campaignId) {
+        List<String> actualComments = new ArrayList<>();
+        campaignDashboard.navigateToCampaign(campaignId);
+        actualComments.add(campaigns.fetchCommentFromCampaignLineItemTacticPanel());
+        campaigns.clickLineItemTile();
+        actualComments.add(campaigns.fetchCommentFromCampaignLineItemTacticPanel());
+        campaigns.clickTacticTile();
+        actualComments.add(campaigns.fetchCommentFromCampaignLineItemTacticPanel());
+        Assert.assertEquals(keyValues, actualComments);
+    }
+
+    @And("User verifies the comments in the campaign, line item, and tactic dashboard's comment boxes")
+    public void userVerifiesTheCommentsInTheCampaignLineItemAndTacticDashboardSCommentBoxes() {
+        List<String> actualComments = new ArrayList<>();
+        campaigns.clickCampaignTile();
+        actualComments.add(campaigns.fetchCommentFromCampaignLineItemTacticDashboard());
+        campaigns.clickLineItemTile();
+        actualComments.add(campaigns.fetchCommentFromCampaignLineItemTacticDashboard());
+        campaigns.clickTacticTile();
+        actualComments.add(campaigns.fetchCommentFromCampaignLineItemTacticDashboard());
+        Assert.assertEquals(keyValues, actualComments);
+    }
+
     @When("User toggles the Enabled button for Line Items and Tactics")
     public void userTogglesEnabledButtonForLineItemsAndTacticFromDashboard() {
         campaignDashboard.clickLineAndTacticToggleButton();
@@ -638,14 +662,34 @@ public class LifeSteps {
         Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.verifyLineTacticToggleStatus());
     }
 
-    @When("User clicks Campaign {string}, Line Item and Tactic")
-    public void userClicksCampaignLineItemAndTacticOneByOne(String campaignID) {
-        campaignDashboard.navigateToCampaignLIAndTactic(campaignID);
+    @And("User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using {string} and verifies the same status in the respective Line Item and Tactic pages")
+    public void userFetchesTheLineItemsAndTacticsEnabledDisabledStatusFromCampaignDashboardAndVerifiesTheSameStatusInTheRespectiveLineItemAndTacticPages(String campaignID) {
+        List<String> expectedStatus = campaignDashboard.fetchLineAndTacticToggleStatus();
+        List<String> actualStatus = new ArrayList<>();
+        campaignDashboard.navigateToCampaign(campaignID);
+        campaigns.clickLineItemTile();
+        actualStatus.add(campaigns.fetchToggleStatus());
+        campaigns.clickTacticTile();
+        actualStatus.add(campaigns.fetchToggleStatus());
+        Assert.assertEquals(expectedStatus, actualStatus);
     }
 
-    @Then("Verify user should navigate to Campaign, Line Item and Tactic")
-    public void verifyUserShouldNavigateToRespectivePanel() {
-        Assert.assertTrue("Navigated to each panel successfully", campaignDashboard.verifyPanelTitleText());
+    @When("User clicks Campaign {string}, Line Item and Tactic and verify navigation to respective pages")
+    public void userClicksCampaignLineItemAndTacticOneByOne(String campaignID) {
+        campaignDashboard.navigateToCampaign(campaignID);
+        Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
+        campaigns.navigateToCampaignDashboard();
+        campaignDashboard.searchCreatedCampaign(campaignID);
+        campaignDashboard.expandCreatedLineItem();
+
+        campaignDashboard.navigateToLineItemDetails();
+        Assert.assertTrue("Navigation to Line Item details page is not successful", campaignDashboard.isLineItemPageDisplayed());
+        campaigns.navigateToCampaignDashboard();
+        campaignDashboard.searchCreatedCampaign(campaignID);
+        campaignDashboard.expandCreatedLineItem();
+
+        campaignDashboard.navigateToTacticDetails();
+        Assert.assertTrue("Navigation to Tactic details page is not successful", campaignDashboard.isTacticPageDisplayed());
     }
 
     @When("User clicks Menu option and selects column names")
@@ -679,19 +723,37 @@ public class LifeSteps {
         Map<String, String> rawMap = filterNames.asMap(String.class, String.class);
         Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
         keyValues.clear();
+        keyType.clear();
         for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            keyValues.add(entry.getKey());
+            keyType.add(entry.getKey());
+            keyValues.addAll(entry.getValue());
             campaignDashboard.applyFilterOnSelectedColumns(entry.getKey(), entry.getValue());
         }
     }
 
-    @Then("Verify the data should filter as per the selected filter values")
-    public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
-        List<String> selectedFilter = campaignDashboard.verifySelectedFilter();
-        List<String> cleanedActual = selectedFilter.stream()
+    @And("Verify the filter list displays only the selected filter values")
+    public void verifyTheFilterListDisplaysOnlyTheSelectedFilterValues() {
+        List<String> selectedFilterLabels = campaignDashboard.fetchSelectedFilterLabels();
+        List<String> cleanedActual = selectedFilterLabels.stream()
                 .map(s -> s.replaceAll(":$", ""))
                 .toList();
-        Assert.assertEquals(keyValues, cleanedActual);
+        Assert.assertEquals(keyType, cleanedActual);
+
+
+        List<String> normalizedExpected = keyValues.stream()
+                .map(obj -> obj.toString().toLowerCase().trim())
+                .toList();
+        List<String> normalizedActual = campaignDashboard.fetchSelectedFilterValues().stream()
+                .map(s -> s.trim().toLowerCase())
+                .toList();
+        Assert.assertEquals(normalizedExpected, normalizedActual);
+    }
+
+    @Then("Verify the Campaign Dashboard data should filter as per the selected filter values")
+    public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
+        for (Object o : keyType) {
+            Assert.assertTrue("Campaign Dashboard data is not filtered as per the selected filter values", campaignDashboard.isCampaignDataFilteredAccordingToSelectedFilters(o.toString(), keyValues));
+        }
     }
 
     @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
@@ -700,21 +762,40 @@ public class LifeSteps {
         Assert.assertEquals(iconColor, filterIconColor);
     }
 
-    @When("User clicks Favorite star icon on few campaigns and checks Favorite Only checkbox")
-    public void userClicksFavoriteStarIconOnFewCampaignsAndChecksFavoriteOnlyCheckbox() {
+    @And("User removes all the filters applied on the Dashboard and verifies the data is reset to default state")
+    public void userRemovesAllTheFiltersAppliedOnTheDashboardAndVerifiesTheDataIsResetToDefaultState() {
+        String campaignCountBeforeFilterRemoval = campaignDashboard.fetchCampaignDataCountFromPagination();
+        campaignDashboard.clickResetAllFilters();
+        String campaignCountAfterFilterRemoval = campaignDashboard.fetchCampaignDataCountFromPagination();
+        Assert.assertNotEquals(campaignCountBeforeFilterRemoval, campaignCountAfterFilterRemoval);
+    }
+
+    @And("User verifies that the campaigns displayed on the Dashboard include all past and current flights")
+    public void userVerifiesThatTheCampaignsDisplayedOnTheDashboardIncludeAllPastAndCurrentFlights() {
+        List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
+        LocalDate monthEnd = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+        boolean allDatesValid = dates.stream().noneMatch(date -> date.isAfter(monthEnd));
+        Assert.assertTrue("Campaigns include all past and current flights", allDatesValid);
+    }
+
+    @When("User clicks Favorite Only checkbox")
+    public void userClicksFavoriteOnlyCheckbox() {
         campaignDashboard.clickFavoriteOnlyCheckbox();
     }
 
     @Then("Verify the dashboard results should show only campaigns which are marked as favorite")
     public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
-        int count = campaignDashboard.verifyCampaignMarkedFavorite();
-        String message = " ";
-        if (count == 0) {
-            message = "No campaigns matching filtering criteria found";
-        } else {
-            message = "Campaigns matching filtering criteria found";
-        }
-        Assert.assertTrue(message, true);
+        Assert.assertTrue("Dashboard data has campaign details marked as favorite", campaignDashboard.isFavoriteCampaignShown());
+    }
+
+    @And("User unchecks Favorite Only checkbox")
+    public void userUnchecksFavoriteOnlyCheckbox() {
+        campaignDashboard.isFavoriteCheckboxSelected();
+    }
+
+    @And("Verify the dashboard results should show campaigns which are marked as favorite and nonfavorite")
+    public void verifyTheDashboardResultsShouldShowCampaignsWhichAreMarkedAsFavoriteAndNonfavorite() {
+        Assert.assertTrue("Dashboard data has campaign details marked as favorite", campaignDashboard.isFavoriteNonFavoriteCampaignAvailable());
     }
 
     @When("User clicks Hide Finished checkbox")
@@ -724,42 +805,85 @@ public class LifeSteps {
 
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
-        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.verifyHideFinishedCampaignList());
+        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.isFinishedCampaignListHidden());
     }
 
-    @When("User clicks Active Flights, Today and Yesterday filter option type")
-    public void userClicksActiveFlightsTodayAndYesterdayFilterOptionType() {
-        flag = campaignDashboard.clickAndVerifyFilterOptionTypeButton();
+    @And("User unchecks Hide Finished checkbox")
+    public void userUnchecksHideFinishedCheckbox() {
+        campaignDashboard.isHideFinishedCheckboxSelected();
     }
 
-    @Then("Verify only Active Flights should render on the Dashboard")
+    @And("Verify the dashboard data should reflect campaigns with Finished status")
+    public void verifyTheDashboardDataShouldReflectCampaignsWithFinishedStatus() {
+        Assert.assertTrue("Campaigns with Finished Status are hidden", campaignDashboard.isFinishedCampaignListShownWithOtherStatus());
+    }
+
+    @And("User clicks {string} filter")
+    public void userClicksFilter(String filterType) {
+        campaignDashboard.clickFilterTypeButton(filterType);
+    }
+
+    @Then("Verify only Current Month's Flights should render on the Dashboard")
     public void verifyOnlyActiveFlightsShouldRenderOnTheDashboard() {
-        Assert.assertTrue("Only Active flights are visible", flag);
+        Assert.assertTrue("Inactive flights are not present", campaignDashboard.ifInactiveFlightPresent());
+        List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
+        LocalDate now = LocalDate.now();
+        LocalDate monthStart = now.withDayOfMonth(1);
+        LocalDate monthEnd = now.withDayOfMonth(now.lengthOfMonth());
+        boolean allDatesInCurrentMonth = dates.stream().noneMatch(date -> date.isBefore(monthStart) || date.isAfter(monthEnd));
+        Assert.assertTrue("Only Active flights (current month's flights) should be visible on the Dashboard", allDatesInCurrentMonth);
     }
 
-    @When("User clicks Custom filter option type and selects date")
-    public void userClicksCustomFilterOptionTypeAndSelectsDate() {
-        campaignDashboard.clickAndVerifyCustomFilterOption();
+    @Then("Verify only Today's Flights should render on the Dashboard")
+    public void verifyOnlyTodaySFlightsShouldRenderOnTheDashboard() {
+        List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
+        LocalDate today = LocalDate.now();
+        boolean allDatesToday = dates.stream().allMatch(date -> date.isEqual(today));
+        Assert.assertTrue("Only today's flights should be visible on the Dashboard", allDatesToday);
     }
 
-    @When("User clicks the Settings icon and selects the following group by options")
-    public void userClicksTheSettingsIconAndSelectsTheFollowingGroupByOptions() {
-        flag = campaignDashboard.clickGroupByOptionsAndFilterDashboardData();
+    @And("User enters the custom date range from {string} to {string} and applies the filter")
+    public void userEntersTheCustomDateRangeFromToAndAppliesTheFilter(String startDate, String endDate) {
+        campaignDashboard.enterCustomDateRange(startDate, endDate);
     }
 
-    @Then("Verify the Dashboard data is grouped by the selected options")
-    public void verifyTheDashboardDataIsGroupedByTheSelectedOptions() {
-        Assert.assertTrue("Dashboard data is grouped by the selected options", flag);
+    @And("Verify only Custom date range Flights from {string} to {string} should render on the Dashboard if available")
+    public void verifyOnlyCustomDateRangeFlightsShouldRenderOnTheDashboardIfAvailable(String startDate, String endDate) {
+        boolean flag = campaignDashboard.isCampaignDataAvailableInCustomDateRange();
+        if(flag)
+            Assert.assertTrue("No campaign data is available", true);
+        else{
+            List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            LocalDate start = LocalDate.parse(startDate, inputFormatter);
+            LocalDate end = LocalDate.parse(endDate, inputFormatter);
+            boolean allDatesInCurrentMonth = dates.stream().noneMatch(date -> date.isBefore(start) || date.isAfter(end));
+            Assert.assertTrue("Only flights within the selected date range should be visible on the Dashboard", allDatesInCurrentMonth);
+        }
     }
 
-    @When("User hover on the image icon for creative in red color")
+    @When("User clicks the Settings icon and selects the following group by options and verify dashboard data is grouped accordingly")
+    public void userClicksTheSettingsIconAndSelectsTheFollowingGroupByOptions(DataTable dataTable) {
+        List<String> groupByOption = dataTable.asList(String.class);
+        for(String option : groupByOption){
+            campaignDashboard.clickSettingIcon();
+            Assert.assertTrue("Dashboard data is not grouped by the selected options - " + option, campaignDashboard.clickGroupByOptionsAndCheckDashboardData(option));
+        }
+    }
+
+    @When("User hover on the image icon for creative in red color and check whether creative is assigned to the campaign")
     public void userHoverOnTheImageIconForCreativeInRedColor() {
-        flag = campaignDashboard.fetchCreativeToolTipText();
+        String creativeStatus = campaignDashboard.fetchCreativeToolTipText();
+        Assert.assertTrue("No status has been displayed", creativeStatus.contains("No creative assigned") || creativeStatus.contains("are pending approval") || creativeStatus.contains("are denied") || creativeStatus.contains("Creative assigned and approved"));
     }
 
-    @Then("Tool tip whether creative is assigned to the campaign or not should be reflected")
-    public void toolTipWhetherCreativeIsAssignedToTheCampaignOrNotShouldBeReflected() {
-        Assert.assertTrue("Tool Tip text is available", flag);
+    @When("User navigates to Tactic and assigns creative of status {string} to the Tactic")
+    public void userNavigatesToTacticAndAssignsCreativeToTheTactic(String status) {
+        campaignDashboard.navigateToTacticDetails();
+        tacticCreatives.clickCreativeTab();
+        tacticCreatives.clickAssignCreatives();
+        tacticCreatives.selectAndAssignCreativeByStatus(status);
+        tacticCreatives.saveTacticCreatives();
     }
 
     /* Roshani Sherkar
@@ -2683,6 +2807,14 @@ public class LifeSteps {
         campaignDashboard.clickLifetimeFilter();
     }
 
+    @And("User removes all the filters applied on the Dashboard")
+    public void userRemovesAllTheFiltersAppliedOnTheDashboard() {
+        campaignDashboard.isCampaignRadioBtnSelected();
+        campaignDashboard.isFavoriteCheckboxSelected();
+        campaignDashboard.isHideFinishedCheckboxSelected();
+        campaignDashboard.isFiltersApplied();
+    }
+
     @Then("Verify the tabs displayed on the Pixels page")
     public void verifyTabsDisplayedOnPixelsPage() {
         Assert.assertEquals("RETARGETING", pixels.verifyRetargetingTab().toUpperCase());
@@ -3464,4 +3596,5 @@ public class LifeSteps {
         }
         Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);
     }
+
 }

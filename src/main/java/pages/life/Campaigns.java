@@ -6,6 +6,9 @@ import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Campaigns {
     private final Page page;
     private final Locator CREATE_CAMPAIGN;
@@ -21,6 +24,13 @@ public class Campaigns {
     private final Locator CAMPAIGN_SUCCESS;
     private final Locator LIFE_TIME_FILTER;
     private final Locator CAMPAIGN_ENTRIES;
+    private final Locator COMMENT_BOX_FROM_TITLE;
+    private final Locator COMMENT_BOX_FROM_DASHBOARD;
+    private final Locator LINE_ITEM_TILE;
+    private final Locator TACTIC_TILE;
+    private final Locator CAMPAIGN_TILE;
+    private final Locator TOOL_TIP;
+    private final Locator TOGGLE_STATUS;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -38,6 +48,13 @@ public class Campaigns {
         this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
+        this.COMMENT_BOX_FROM_TITLE = page.locator("//span[@class='notes-dark-icon-provided']");
+        this.COMMENT_BOX_FROM_DASHBOARD = page.locator("//span[contains(@class,'notes-icon-provided-dashboard')]");
+        this.LINE_ITEM_TILE = page.locator("//div[contains(@class,'listitembox')]");
+        this.TACTIC_TILE = page.locator("//div[contains(@class,'tactic-container')]");
+        this.CAMPAIGN_TILE = page.locator("//div[contains(@class,'campaign-tile')]");
+        this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
+        this.TOGGLE_STATUS = page.locator("//span[contains(@class,'gaEnable ')]//label");
     }
 
     public void createCampaign() {
@@ -92,5 +109,37 @@ public class Campaigns {
             LIFE_TIME_FILTER.click();
             waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
+    }
+
+    public void clickCampaignTile(){
+        CAMPAIGN_TILE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickLineItemTile(){
+        LINE_ITEM_TILE.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public void clickTacticTile() {
+        TACTIC_TILE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String fetchCommentFromCampaignLineItemTacticPanel() {
+        COMMENT_BOX_FROM_TITLE.hover();
+        return TOOL_TIP.innerText();
+    }
+
+    public String fetchCommentFromCampaignLineItemTacticDashboard() {
+        do {
+            COMMENT_BOX_FROM_DASHBOARD.hover();
+        } while (!TOOL_TIP.isVisible());
+        return TOOL_TIP.innerText();
+    }
+
+    public String fetchToggleStatus() {
+        return TOGGLE_STATUS.textContent().trim();
     }
 }
