@@ -838,7 +838,7 @@ public class LifeSteps {
 
     @And("User unchecks Favorite Only checkbox")
     public void userUnchecksFavoriteOnlyCheckbox() {
-        campaignDashboard.isFavoriteCheckboxSelected();
+        campaignDashboard.unselectFavoriteCheckboxIfSelected();
     }
 
     @And("Verify the dashboard results should show campaigns which are marked as favorite and nonfavorite")
@@ -858,7 +858,7 @@ public class LifeSteps {
 
     @And("User unchecks Hide Finished checkbox")
     public void userUnchecksHideFinishedCheckbox() {
-        campaignDashboard.isHideFinishedCheckboxSelected();
+        campaignDashboard.unselectHideFinishedCheckboxIfSelected();
     }
 
     @And("Verify the dashboard data should reflect campaigns with Finished status")
@@ -2857,10 +2857,10 @@ public class LifeSteps {
 
     @And("User removes all the filters applied on the Dashboard")
     public void userRemovesAllTheFiltersAppliedOnTheDashboard() {
-        campaignDashboard.isCampaignRadioBtnSelected();
-        campaignDashboard.isFavoriteCheckboxSelected();
-        campaignDashboard.isHideFinishedCheckboxSelected();
-        campaignDashboard.isFiltersApplied();
+        campaignDashboard.ensureCampaignRadioBtnSelected();
+        campaignDashboard.unselectFavoriteCheckboxIfSelected();
+        campaignDashboard.unselectHideFinishedCheckboxIfSelected();
+        campaignDashboard.resetFiltersIfApplied();
     }
 
     @Then("Verify the tabs displayed on the Pixels page")

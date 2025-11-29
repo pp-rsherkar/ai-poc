@@ -339,7 +339,7 @@ public class CampaignDashboard {
     }
 
     public void clickFavoriteOnlyCheckbox() {
-        isFavoriteCheckboxSelected();
+        unselectFavoriteCheckboxIfSelected();
         FAVORITE_ONLY_CHECKBOX.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
@@ -363,7 +363,7 @@ public class CampaignDashboard {
     }
 
     public void clickHideFinishedCheckbox() {
-        isHideFinishedCheckboxSelected();
+        unselectHideFinishedCheckboxIfSelected();
         HIDE_FINISHED_CHECKBOX.click();
         waitUtility.waitUntilPreLoaderHidden(120000);
     }
@@ -475,7 +475,7 @@ public class CampaignDashboard {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public void isCampaignRadioBtnSelected() {
+    public void ensureCampaignRadioBtnSelected() {
         CLICK_SETTINGS.click();
         if (!GROUP_BY_CAMPAIGN_RADIO_BUTTON.getAttribute("class").contains("groupingMenuRadioSelected")) {
             GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
@@ -486,21 +486,21 @@ public class CampaignDashboard {
         }
     }
 
-    public void isFavoriteCheckboxSelected() {
+    public void unselectFavoriteCheckboxIfSelected() {
         if (FAVORITE_ONLY_CHECKBOX.getAttribute("class").contains("checked")) {
             FAVORITE_ONLY_CHECKBOX.click();
             waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
-    public void isHideFinishedCheckboxSelected() {
+    public void unselectHideFinishedCheckboxIfSelected() {
         if (HIDE_FINISHED_CHECKBOX.getAttribute("class").contains("checked")) {
             HIDE_FINISHED_CHECKBOX.click();
             waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
         }
     }
 
-    public void isFiltersApplied() {
+    public void resetFiltersIfApplied() {
         if (FILTER_APPLIED_ICON.isVisible()) {
             FILTER_APPLIED_ICON.click();
             RESET_FILTER_ICON.click();
@@ -510,10 +510,10 @@ public class CampaignDashboard {
 
     public void searchCreatedCampaign(String createdCampaign) {
         waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
-        isCampaignRadioBtnSelected();
-        isFavoriteCheckboxSelected();
-        isHideFinishedCheckboxSelected();
-        isFiltersApplied();
+        ensureCampaignRadioBtnSelected();
+        unselectFavoriteCheckboxIfSelected();
+        unselectHideFinishedCheckboxIfSelected();
+        resetFiltersIfApplied();
         while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
             SEARCH_CAMPAIGN.fill(createdCampaign);
             CLICK_CAMPAIGN_SEARCH.click();

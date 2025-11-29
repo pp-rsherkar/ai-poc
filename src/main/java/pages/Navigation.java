@@ -110,7 +110,7 @@ public class Navigation {
             ACCOUNT_ITEM.click();
         }
         waitUtility.waitUntilSpinnerHidden();
-        campaignDashboard.isFiltersApplied();
+        campaignDashboard.resetFiltersIfApplied();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
