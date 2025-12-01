@@ -544,39 +544,6 @@ public class LifeSteps {
         }
     }
 
-    @When("Targeting panel is opened on Tactic Settings tab")
-    public void user_navigates_to_targeting_panel() {
-        pmp.getTacticSettings();
-        pmp.addNewTargetingRule();
-    }
-
-    @And("User clicks on {string} Targeting")
-    public void deals_targeting_navigation(String Deals) {
-        pmp.searchTargetingRuleAndSelect(Deals);
-    }
-
-    @And("User assigns premium deals")
-    public void user_assigns_premium_deals() {
-    }
-
-    @And("User clicks on OK button of PMP Modal")
-    public void user_clicks_on_OK_PMP_Modal() {
-    }
-
-    @And("User assigns private deals")
-    public void user_assigns_private_deals() {
-    }
-
-    @And("User saves the changes")
-    public void users_saves_deal_changes() {
-        pmp.saveTacticSettings();
-    }
-
-    @Then("Deals should be assigned")
-    public void deals_are_assigned() {
-        pmp.getTacticIsSavedText();
-    }
-
     @Then("User selects Smart List")
     public void user_selects_smart_list() {
         npiLists.clickSmartList();
