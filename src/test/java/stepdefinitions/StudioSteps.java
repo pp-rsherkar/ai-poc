@@ -299,7 +299,7 @@ public class StudioSteps {
 
     @And("Check the Download icon is highlighted in green color")
     public void checkTheDownloadIconIsHighlightedInGreenColor() {
-        Assert.assertEquals("rgb(0, 114, 114)",workspace.checkBackgroundColorOfDownloadIcon());
+        Assert.assertEquals("rgb(0, 136, 136)",workspace.checkBackgroundColorOfDownloadIcon());
     }
 
     @And("Verify Webhook panel is disabled before applying filters")
