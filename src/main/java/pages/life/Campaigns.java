@@ -23,6 +23,16 @@ public class Campaigns {
     private final Locator CAMPAIGN_SUCCESS;
     private final Locator LIFE_TIME_FILTER;
     private final Locator CAMPAIGN_ENTRIES;
+    private final Locator CAMPAIGN_TAB;
+    private final Locator DETAILS_TAB;
+    private final Locator TIMES_PER_DROPDOWN;
+    private final Locator SCOPE_DROPDOWN;
+    private final Locator FREQUENCY_CAP_VALUE;
+    private final Locator CUSTOM_FIELD;
+    private final Locator GET_FREQUENCY_CAP_TEXT;
+    private final Locator LINE_ITEM_TAB;
+    private final Locator FREQUENCY_CAP;
+    private final Locator TIMES_PER_HOURS_VALUE;
     private final Locator ADVERTISER_DROPDOWN_VALUES;
     private final Locator MANDATORY_FIELD_ERROR;
     private final Locator SEARCH_DRUG;
@@ -62,6 +72,16 @@ public class Campaigns {
         this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
+        this.CAMPAIGN_TAB = page.locator("//div[@class='item-details']");
+        this.CUSTOM_FIELD = page.locator("//label[contains(@class,'cmp-form-label')]");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
+        this.TIMES_PER_DROPDOWN = page.locator("//div[contains(@class,'dropdown-wrapper ui field noMargin')]");
+        this.SCOPE_DROPDOWN = page.locator("//div[contains(@class,'crossDevice-dropdown')]");
+        this.FREQUENCY_CAP_VALUE = page.locator("//input[@id='windowLimit' or @id='freqWindowLimit']");
+        this.GET_FREQUENCY_CAP_TEXT = page.locator("//p[contains(@class,'display-block')]");
+        this.LINE_ITEM_TAB = page.locator("//div[contains(@class,'listitembox')]");
+        this.FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
+        this.TIMES_PER_HOURS_VALUE = page.locator("//input[@formcontrolname='hour']");
         this.ADVERTISER_DROPDOWN_VALUES = page.locator("//input[@placeholder='Select Advertiser']/following-sibling::div[@class='menu transition visible']//div");
         this.MANDATORY_FIELD_ERROR = page.locator("//div[contains(@class,'errorsWrapper')]//p");
         this.CAMPAIGN_DESCRIPTION = page.locator("//textarea[@placeholder='Description']");
@@ -91,6 +111,58 @@ public class Campaigns {
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
     }
+
+    public void selectCampaign() {
+        CAMPAIGN_TAB.first().click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public  void clickLineItem()  {
+        LINE_ITEM_TAB.first().click();
+        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public  boolean isFrequencyCapDisabled() {
+        return FREQUENCY_CAP.getAttribute("class").contains("checked");
+    }
+
+    public void clickDetailsTab() {
+        DETAILS_TAB.click();
+    }
+
+    public void addFrequencyCap(String level, String frequencyValue, String timesPer, String scope) {
+        Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", timesPer));
+        Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", scope));
+        if (level.contains("Campaign") | level.contains("Line Item")) {
+            waitUtility.waitForLocatorVisible(CUSTOM_FIELD.first());
+        }
+        if (!FREQUENCY_CAP.getAttribute("class").contains("checked")) {
+            FREQUENCY_CAP.click();
+        }
+        FREQUENCY_CAP_VALUE.fill(frequencyValue);
+        TIMES_PER_DROPDOWN.click();
+        TIMES_PER_OPTION.first().click();
+        if (timesPer.contains("hour(s)")) {
+            TIMES_PER_HOURS_VALUE.fill(frequencyValue);
+        }
+        SCOPE_DROPDOWN.click();
+        FREQUENCY_CAP_SCOPE.click();
+        SAVE_CAMPAIGN.click();
+        waitUtility.waitForElementVisible("//div[@role='alert']");
+    }
+
+    public boolean getFrequencyCapState() {
+        return FREQUENCY_CAP.first().getAttribute("class").contains("checked");
+    }
+
+    public String getSavedFrequencyCap(String level) {
+        String frequencyCapValue = GET_FREQUENCY_CAP_TEXT.first().innerText().trim().toUpperCase();
+        if (level.contains("Line Item")) {
+            frequencyCapValue = GET_FREQUENCY_CAP_TEXT.filter(new Locator.FilterOptions().setHasText("Line item")).innerText().trim().toUpperCase();
+        }
+        return frequencyCapValue;
+    }
+
 
     public String campaignDashboard() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);

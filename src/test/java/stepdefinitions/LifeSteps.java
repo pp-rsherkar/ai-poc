@@ -148,6 +148,11 @@ public class LifeSteps {
         Assert.assertEquals("New Line Item", lineItemDetails.verifyLineItemText());
     }
 
+    @Then("User navigates to campaign")
+    public void user_navigates_to_campaign() {
+        campaigns.selectCampaign();
+    }
+
     @When("User enters the line item details as {string} {string}, enables the line item and saves the changes")
     public void user_enters_the_line_item_details_enables_the_line_item_and_saves_the_changes(String lineItemName, String lineBudget) {
         lineItemNameRandom = lineItemName + '_' + CommonUtils.timeStampCalculation();
@@ -164,8 +169,8 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
-    @Then("User creates multiple tactics under same line item and verifies it")
-    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
+    @Then("User creates below tactics under same line item and verifies it")
+    public void user_creates_below_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
