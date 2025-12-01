@@ -3669,7 +3669,7 @@ public class LifeSteps {
     public void userVerifiesIfTheAddedCustomFieldIsAvailableOnNewCampaignCreationPage() {
         campaigns.navigateToCampaignDashboard();
         campaigns.createCampaign();
-        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        Assert.assertEquals("Create New Campaign", campaigns.getCampaignText());
         Assert.assertTrue(uiCustomFieldName + " Custom Field is not available", campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
     }
 
@@ -3693,7 +3693,7 @@ public class LifeSteps {
     public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() {
         navigation.clickPulsePointLogo();
         campaigns.createCampaign();
-        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        Assert.assertEquals("Create New Campaign", campaigns.getCampaignText());
         Assert.assertFalse(customFieldName + " Custom Field is available", campaigns.isAddedCustomFieldAvailable(customFieldName));
     }
 }
