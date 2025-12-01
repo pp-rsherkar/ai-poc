@@ -57,6 +57,10 @@ public class TacticDetails {
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
     private final Locator TACTIC_TAB;
+    private final Locator HEADER_COMMENT;
+    private final Locator NAVIGATION_COMMENT;
+    private final Locator COMMENT_TEXT_BOX;
+    private final Locator COMMENT_SUCCESS_ALERT;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -112,6 +116,10 @@ public class TacticDetails {
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
         this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
+        this.HEADER_COMMENT = page.locator("//div[@class='notes-dashboard left']");
+        this.NAVIGATION_COMMENT = page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
+        this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
+        this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
     }
 
     public void clickNewTactic() {
@@ -145,6 +153,30 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public void addComment(String entryPoint, String comment) {
+        if (entryPoint.contains("header")) {
+            HEADER_COMMENT.click();
+        } else if (entryPoint.contains("navigation")) {
+            NAVIGATION_COMMENT.click();
+        }
+        COMMENT_TEXT_BOX.fill(comment);
+        SAVE_BUTTON.click();
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT);
+        waitUtility.waitForElementVisible("//span[@class='notes-icon-provided-dashboard']");
+    }
+
+    public void clearComment(String entryPoint) {
+        if (entryPoint.contains("header")) {
+            HEADER_COMMENT.click();
+        } else if (entryPoint.contains("navigation")) {
+            NAVIGATION_COMMENT.click();
+        }
+        COMMENT_TEXT_BOX.clear();
+        SAVE_BUTTON.click();
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT.first());
+        waitUtility.waitForElementVisible("//span[@class='notes-icon-empty-dashboard']");
     }
 
     public List<String> allTacticsUnderLI() {

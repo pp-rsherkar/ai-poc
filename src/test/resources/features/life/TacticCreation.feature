@@ -136,12 +136,13 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User creates below tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
-    When User opens the first created tactic
-    And User clicks the comments icon in the tactic header section
-    And User specifies the comment "<HEADER_COMMENT>"
-    Then User clicks the "OK" option in the triggered dialogue box
-    Then Verify the comments icon turns bluish green
-    Then Verify confirmation message "Notes saved successfully." is displayed in green color
+    Then User navigates to Tactic and clicks on settings tab
+    And User clicks the comments icon in the tactic "header" section and add "<HEADER_COMMENT>"
+    #Then User validates the comment added in "header"
+    Then User clears the comment in "header" section
+    And User clicks the comments icon in the tactic "navigation" section and add "<NAV_COMMENT>"
+    Then User clears the comment in "navigation" section
+    #Then User validates the comment added in "navigation"
 
 #    #Add Comment via Left Navigation Panel
 #    When User clicks the comments icon in the left hand side navigation panel
@@ -151,5 +152,5 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 #    Then Verify confirmation message "Notes saved successfully." is displayed in green color
 
     Examples:
-      | ADVERTISER   | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
-      | Advertiser A | Auto_CP | Regular | 50000     | Auto_LI   | 1000        | Test Note from Header | Test Note from Nav Panel |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel |

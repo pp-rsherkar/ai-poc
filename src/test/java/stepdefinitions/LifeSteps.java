@@ -197,20 +197,14 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
-    @When("User opens the first created tactic")
-    public void userOpensTheFirstCreatedTactic() {
+    @When("User clicks the comments icon in the tactic {string} section and add {string}")
+    public void userClicksTheCommentsIconInTheTacticSection(String entryPoint, String comment) {
+        tacticDetails.addComment(entryPoint, comment);
     }
 
-    @When("User clicks the comments icon in the tactic header section")
-    public void userClicksTheCommentsIconInTheTacticHeaderSection() {
-    }
-
-    @When("User specifies the comment {string}")
-    public void userSpecifiesTheComment(String headerComment) {
-    }
-
-    @When("User clicks the {string} option in the triggered dialogue box")
-    public void userClicksTheOptionInTheTriggeredDialogueBox(String option) {
+    @When("User clears the comment in {string} section")
+    public void user_clears_the_comment_in_section(String entryPoint) {
+        tacticDetails.clearComment(entryPoint);
     }
 
     @When("Verify the comments icon turns bluish green")
