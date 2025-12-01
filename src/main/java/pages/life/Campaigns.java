@@ -91,10 +91,10 @@ public class Campaigns {
         this.ADD_CUSTOM_FIELD_BUTTON = page.locator("//span[text()='Add Custom Field']");
         this.CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
         this.SAVE_CUSTOM_FIELD = page.locator("//button[normalize-space()='Save']");
-        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator("//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted custom Field :')]");
+        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator("//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted the Field :')]");
         this.CUSTOM_FIELD_DELETE_ICON = page.locator("//div[contains(@class,'campaign-height-popover')]//app-icon-lable-link[@text='Delete']");
-        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted')]");
-        this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field')]");
+        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted') or normalize-space(text())=\"Custom Field Can't Be Removed\"]");
+        this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field') or contains(text(),'Ok')]");
         this.CAMPAIGN_TAB = page.locator("//div[@class='item-details']");
         this.CUSTOM_FIELD = page.locator("//label[contains(@class,'cmp-form-label')]");
         this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
@@ -384,12 +384,14 @@ public class Campaigns {
         return page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName)).inputValue();
     }
 
-    public void deleteCustomField(String customFieldName) {
+    public String deleteCustomField(String customFieldName) {
         page.locator(String.format("//label[normalize-space(text())='%s']//img", customFieldName)).click();
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_ICON);
         CUSTOM_FIELD_DELETE_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP);
+        String text = CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP.textContent().trim();
         CUSTOM_FIELD_DELETE_BUTTON.click();
+        return text;
     }
 }

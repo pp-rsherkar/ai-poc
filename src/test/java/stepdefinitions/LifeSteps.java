@@ -145,7 +145,7 @@ public class LifeSteps {
 
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
-        Assert.assertEquals("Success!", campaigns.campaignSuccess());
+        Assert.assertEquals("Campaign " + campaignNameRandom + " created.", campaigns.campaignSuccess());
         Assert.assertEquals("New Line Item", lineItemDetails.verifyLineItemText());
     }
 
@@ -3608,7 +3608,7 @@ public class LifeSteps {
         capturedDetails.clear();
         capturedDetails = campaigns.fetchCampaignDetails();
         campaigns.saveCampaign();
-        Assert.assertEquals("Success!", campaigns.campaignSuccess());
+        Assert.assertEquals("Campaign " + campaignNameRandom + " created.", campaigns.campaignSuccess());
     }
 
     @And("Verify that the saved Campaign data matches the entered data")
@@ -3673,21 +3673,27 @@ public class LifeSteps {
         Assert.assertTrue(uiCustomFieldName + " Custom Field is not available", campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
     }
 
-    @When("User deletes the custom field from the campaign creation page")
+    @When("User deletes the custom field for which campaign is created and verifies if it is deleted")
     public void userDeletesTheCustomFieldFromTheCampaignCreationPage() {
-        campaigns.deleteCustomField(uiCustomFieldName);
+        Assert.assertEquals("Custom Field Can't Be Removed", campaigns.deleteCustomField(uiCustomFieldName));
     }
 
-    @Then("Verify that the custom field is deleted successfully")
-    public void verifyThatTheCustomFieldIsDeletedSuccessfully() {
-        Assert.assertEquals("Successfully deleted custom Field : " + uiCustomFieldName , campaigns.fetchCustomFieldSuccessAlert());
+    @And("User deletes the custom field for which campaign is not created and verifies if it is deleted")
+    public void userDeletesTheCustomFieldForWhichCampaignIsNotCreatedAndVerifiesIfItIsDeleted() {
+        customFieldName = "Test" + '_' + uiCustomFieldName;
+        campaigns.clickAddCustomFieldButton();
+        campaigns.enterCustomFieldName(customFieldName);
+        campaigns.saveCustomField();
+        Assert.assertEquals("Successfully created custom Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        campaigns.deleteCustomField(customFieldName);
+        Assert.assertEquals("Successfully deleted the Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
     }
 
     @And("User verifies if the deleted custom field is available on New Campaign creation page")
     public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() {
-        campaigns.navigateToCampaignDashboard();
+        navigation.clickPulsePointLogo();
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
-        Assert.assertFalse(uiCustomFieldName + " Custom Field is available", campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
+        Assert.assertFalse(customFieldName + " Custom Field is available", campaigns.isAddedCustomFieldAvailable(customFieldName));
     }
 }

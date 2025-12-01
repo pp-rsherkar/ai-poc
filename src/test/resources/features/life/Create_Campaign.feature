@@ -183,8 +183,8 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     Then Verify that the custom field value "<CUSTOM_FIELD_VALUE>" is saved and displayed in the campaign details page
     And User verifies if the added custom field is available on New Campaign creation page
-    When User deletes the custom field from the campaign creation page
-    Then Verify that the custom field is deleted successfully
+    When User deletes the custom field for which campaign is created and verifies if it is deleted
+    And User deletes the custom field for which campaign is not created and verifies if it is deleted
     And User verifies if the deleted custom field is available on New Campaign creation page
     Examples:
       | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER    | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
