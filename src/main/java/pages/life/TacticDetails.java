@@ -180,7 +180,7 @@ public class TacticDetails {
         TARGETING_RULES_ICON.click();
     }
 
-    public String getTacticDetailsText() {;
+    public String getTacticDetailsText() {
         return VERIFY_TACTIC_DETAILS_PAGE.innerText();
     }
 
