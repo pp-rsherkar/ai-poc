@@ -756,14 +756,14 @@ public class LifeSteps {
                 columnName.stream().map(String::toLowerCase).collect(Collectors.toSet()));
     }
 
-    @When("User clicks HideAll and ShowAll options from Menu")
+    @And("User clicks HideAll option from Menu and verifies Dashboard columns are hidden accordingly")
     public void userClicksHideAllAndShowAllOptionsFromMenu() {
-        campaignDashboard.clickHideAndShowAllOption();
+        Assert.assertTrue("Columns are not hidden successfully", campaignDashboard.clickHideAllOption());
     }
 
-    @Then("Dashboard columns should be hidden and shown accordingly")
-    public void dashboardColumnsShouldBeHiddenAndShownAccordingly() {
-        Assert.assertTrue("Columns are hidden and shown successfully", campaignDashboard.verifyColumnsCount());
+    @And("User clicks ShowAll option from Menu and verifies Dashboard columns are shown accordingly")
+    public void userClicksShowAllOptionFromMenuAndVerifiesDashboardColumnsAreShownAccordingly() {
+        Assert.assertTrue("Columns are not shown successfully", campaignDashboard.clickShowAllOption());
     }
 
     @When("Navigate to any Dashboard column, select the filter and apply")

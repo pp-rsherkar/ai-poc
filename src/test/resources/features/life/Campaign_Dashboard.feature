@@ -52,8 +52,8 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | ACTIVE FLIGHT |
       | TYPE          |
     Then Verify dashboard is customized and only selected columns are displayed
-    When User clicks HideAll and ShowAll options from Menu
-    Then Dashboard columns should be hidden and shown accordingly
+    And User clicks HideAll option from Menu and verifies Dashboard columns are hidden accordingly
+    And User clicks ShowAll option from Menu and verifies Dashboard columns are shown accordingly
     When Navigate to any Dashboard column, select the filter and apply
       | Status  | Incomplete, Pending Approval |
       | Enabled | Enabled                      |

@@ -71,7 +71,6 @@ public class CampaignDashboard {
     private final Locator NO_CAMPAIGN_AVAILABLE_TEXT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
-    boolean flag1, flag2, flag3 = false;
 
     public CampaignDashboard(Page page) {
         this.page = page;
@@ -260,19 +259,18 @@ public class CampaignDashboard {
         return columnNames;
     }
 
-    public void clickHideAndShowAllOption() {
+    public boolean clickHideAllOption() {
         DASHBOARD_MENU_ICON.click();
         HIDE_ALL.click();
         page.keyboard().press("Escape");
-        if (DASHBOARD_MENU_COLUMNS.count() == 0) flag1 = true;
+        return DASHBOARD_MENU_COLUMNS.count() == 0;
+    }
+
+    public boolean clickShowAllOption() {
         DASHBOARD_MENU_ICON.click();
         SHOW_ALL.click();
         page.keyboard().press("Escape");
-        if (DASHBOARD_MENU_COLUMNS.count() > 0) flag2 = true;
-    }
-
-    public boolean verifyColumnsCount() {
-        return flag1 && flag2;
+        return DASHBOARD_MENU_COLUMNS.count() > 0;
     }
 
     public void applyFilterOnSelectedColumns(String filterName, List<String> filterValues) {
