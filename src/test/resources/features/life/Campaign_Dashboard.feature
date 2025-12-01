@@ -5,7 +5,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
   4. Verify Active, Today, Yesterday, Favorite and Hide Finished filters
 
   @regression
-  Scenario Outline:  Verify comments addition on Campaign Dashboard and validate it on Campaign, Line Item and Tactic pages
+  Scenario Outline: Verify comments addition on Campaign Dashboard and validate it on Campaign, Line Item and Tactic pages
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -125,7 +125,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | Campaign ID          |
       | Auto_20251005_024613 |
 
-  @rs
+  @regression
   Scenario Outline: Verify navigation to Tactic, assign Creatives of "<STATUS>" and check the creative assignment on Campaign Dashboard
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -140,6 +140,6 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
     Examples:
       | Campaign ID          | STATUS       |
-#      | Auto_20251101_024109 | Approved     |
-#      | Auto_20251101_032528 | Pending Appr |
+      | Auto_20251101_024109 | Approved     |
+      | Auto_20251101_032528 | Pending Appr |
       | Auto_20251103_024348 | Denied       |

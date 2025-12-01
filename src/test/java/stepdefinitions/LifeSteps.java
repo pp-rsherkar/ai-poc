@@ -641,7 +641,7 @@ public class LifeSteps {
      * Campaign Dashbaord Features Start*/
     @And("Verify Campaign Dashboard is displayed with title {string}")
     public void verifyCampaignDashboardIsDisplayedWithTitle(String title) {
-        Assert.assertEquals(title, campaignDashboard.verifyCampaignDashbaord(title));
+        Assert.assertEquals(title, campaignDashboard.isCampaignDashboardVisibleWithTitle(title));
     }
 
     @When("User enters {string} and click Search button")
@@ -750,7 +750,7 @@ public class LifeSteps {
 
     @Then("Verify dashboard is customized and only selected columns are displayed")
     public void verifyDashboardIsCustomizedAndOnlySelectedColumnsAreDisplayed() {
-        List<String> columnName = campaignDashboard.fecthDashboardColumns();
+        List<String> columnName = campaignDashboard.fetchDashboardColumns();
         Assert.assertEquals(
                 keyValues.stream().map(o -> ((String) o).toLowerCase()).collect(Collectors.toSet()),
                 columnName.stream().map(String::toLowerCase).collect(Collectors.toSet()));
