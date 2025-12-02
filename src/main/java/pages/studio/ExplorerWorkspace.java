@@ -54,12 +54,8 @@ public class ExplorerWorkspace {
     private final Locator IBHEALTH;
     private final Locator MOMENTS_WIDGET ;
     private final Locator CLAIMS_WIDGET;
-
-
-
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-
     private final Locator OWNED_AND_OPERATED_SECTION;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public ExplorerWorkspace(Page page) {
         this.page = page;

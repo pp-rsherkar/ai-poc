@@ -283,9 +283,12 @@ public class Accounts {
     public void clickAccountAdvertiserTab() {
         ACCOUNT_ADVERTISER_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
-        GLOBAL_SIGNALS_TAB.click();
     }
 
+    public void clickGlobalSignalsTab() {
+        GLOBAL_SIGNALS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
     public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
         Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
         switch (advertiserPermission) {
@@ -302,7 +305,7 @@ public class Accounts {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void navigateUserTab() {
+    public void navigateToUserTab() {
         ACCOUNT_USER_TAB.click();
     }
 
@@ -310,11 +313,11 @@ public class Accounts {
         switch (studioPermissions) {
             case "MOMENTS":
                 USER_SIGNAL_TAB.click();
-                if(MOMENTS_CHECKBOX.isHidden()) {
+                if (MOMENTS_CHECKBOX.isHidden()) {
                     return;
+                } else {
+                    MOMENTS_CHECKBOX.click();
                 }
-                else {MOMENTS_CHECKBOX.click();
-               }
                 break;
             case "IB HEALTH":
                 USER_SIGNAL_TAB.click();
@@ -329,7 +332,7 @@ public class Accounts {
                 USER_SIGNAL_TAB.click();
 
                 if (CLAIMSDATA_CHECKBOX.isHidden()) {
-                   return;
+                    return;
                 } else {
                     CLAIMSDATA_CHECKBOX.click();
                 }

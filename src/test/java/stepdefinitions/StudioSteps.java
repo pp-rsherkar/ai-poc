@@ -624,9 +624,9 @@ public class StudioSteps {
     }
 
     @And("User navigates to advertisers page under the selected account")
-    public void userNavigatesToAdvertisersPageUnderTheSelectedAccount()
-    {
+    public void userNavigatesToAdvertisersPageUnderTheSelectedAccount() {
         accounts.clickAccountAdvertiserTab();
+        accounts.clickGlobalSignalsTab();
     }
 
     @And("User enables the {string} permission for the {string} advertiser")
@@ -645,7 +645,7 @@ public class StudioSteps {
     @And("User navigates to users page under the selected account")
     public void userNavigatesToUsersPageUnderTheSelectedAccount()
     {
-        accounts.navigateUserTab();
+        accounts.navigateToUserTab();
     }
 
     @And("User selects the {string} external user")
@@ -669,10 +669,8 @@ public class StudioSteps {
     }
 
     @Then("External user should be able to see the {string} permission in the workspace")
-    public void externalUserShouldBeAbleToSeeThePermissionInTheWorkspace(String permissions)
-    {
-        if (permissions.equals("MOMENTS") || permissions.equals("IB HEALTH") || permissions.equals("CLAIMS DATA"))
-        {
+    public void externalUserShouldBeAbleToSeeThePermissionInTheWorkspace(String permissions) {
+        if (permissions.equals("MOMENTS") || permissions.equals("IB HEALTH") || permissions.equals("CLAIMS DATA")) {
             Assert.assertTrue(explorerWorkspace.verifyPermissionFilters(permissions));
             Assert.assertTrue(explorerWorkspace.verifyWidgets(permissions));
         }
