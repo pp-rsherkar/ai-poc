@@ -134,6 +134,10 @@ public class TacticDetails {
         SAVED_TACTICS.first().click();
     }
 
+    public void clickSettingsTab() {
+        TACTIC_SETTINGS_TAB.click();
+    }
+
     public List<String> allTacticsUnderLI() {
         return SAVED_TACTIC_TABS.allInnerTexts();
     }

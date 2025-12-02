@@ -63,6 +63,7 @@ public class Accounts {
     private final Locator CLAIMSDATA_CHECKBOX;
     private final Locator ACCOUNTS_ADVERTISER_TAB;
     private final Locator SUCCESS_ALERT;
+    private final Locator CLIENT_VALUE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
@@ -118,6 +119,7 @@ public class Accounts {
         this.CLAIMSDATA_CHECKBOX = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
+        this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
     }
 
     public void clickAdministration() {
@@ -194,7 +196,7 @@ public class Accounts {
     }
 
     public List<String> fetchAdvertiserList() {
-        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.last());
         return ADVERTISER_LIST.allInnerTexts();
     }
 
@@ -385,5 +387,10 @@ public class Accounts {
             OK_BUTTON.click();
             waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         }
+    }
+
+    public String fetchClientValue() {
+        waitUtility.waitForLocatorVisible(CLIENT_VALUE);
+        return CLIENT_VALUE.textContent().trim();
     }
 }
