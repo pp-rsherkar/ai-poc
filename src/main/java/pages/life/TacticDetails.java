@@ -151,6 +151,20 @@ public class TacticDetails {
         SAVE_TACTIC_DETAILS.click();
     }
 
+    public String validateComment(String entryPoint) {
+        if (entryPoint.contains("header")) {
+            HEADER_COMMENT.click();
+        } else if (entryPoint.contains("navigation")) {
+            NAVIGATION_COMMENT.click();
+        }
+        String actualComment = COMMENT_TEXT_BOX.inputValue();
+        COMMENT_TEXT_BOX.clear();
+        SAVE_BUTTON.click();
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT.first());
+        waitUtility.waitForElementVisible("//span[@class='notes-icon-empty-dashboard']");
+        return actualComment;
+    }
+
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
     }
@@ -163,20 +177,8 @@ public class TacticDetails {
         }
         COMMENT_TEXT_BOX.fill(comment);
         SAVE_BUTTON.click();
-        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT);
-        waitUtility.waitForElementVisible("//span[@class='notes-icon-provided-dashboard']");
-    }
-
-    public void clearComment(String entryPoint) {
-        if (entryPoint.contains("header")) {
-            HEADER_COMMENT.click();
-        } else if (entryPoint.contains("navigation")) {
-            NAVIGATION_COMMENT.click();
-        }
-        COMMENT_TEXT_BOX.clear();
-        SAVE_BUTTON.click();
         waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT.first());
-        waitUtility.waitForElementVisible("//span[@class='notes-icon-empty-dashboard']");
+        waitUtility.waitForElementVisible("//span[@class='notes-icon-provided-dashboard']");
     }
 
     public List<String> allTacticsUnderLI() {

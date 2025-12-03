@@ -202,9 +202,10 @@ public class LifeSteps {
         tacticDetails.addComment(entryPoint, comment);
     }
 
-    @When("User clears the comment in {string} section")
-    public void user_clears_the_comment_in_section(String entryPoint) {
-        tacticDetails.clearComment(entryPoint);
+    @When("User validates the comment added in {string} is {string} then clear it")
+    public void user_validates_the_comment_added_then_clear_it(String entryPoint, String expectedComment) {
+        String actualComment = tacticDetails.validateComment(entryPoint);
+        Assert.assertEquals(expectedComment, actualComment);
     }
 
     @When("Verify the comments icon turns bluish green")
@@ -246,7 +247,7 @@ public class LifeSteps {
         Assert.assertEquals(expectedFrequencyCapText, actualFrequencyCapText);
     }
 
-    @Then("User navigates to Tactic and clicks on settings tab")
+    @When("User navigates to Tactic and clicks on settings tab")
     public void user_navigates_to_tactic_and_clicks_on_settings_tab() {
         tacticDetails.clickFirstTacticTab();
         tacticDetails.clickSettingsTab();

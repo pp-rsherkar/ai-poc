@@ -127,7 +127,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80              | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |
 
   @regression @vp
-  Scenario Outline: Add and Verify Notes on New Tactic from Header and Navigation
+  Scenario Outline: Add and Verify Comment/notes on New Tactic from Header and Navigation
     When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -136,21 +136,12 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User creates below tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
-    Then User navigates to Tactic and clicks on settings tab
+    When User navigates to Tactic and clicks on settings tab
     And User clicks the comments icon in the tactic "header" section and add "<HEADER_COMMENT>"
-    #Then User validates the comment added in "header"
-    Then User clears the comment in "header" section
+    Then User validates the comment added in "header" is "<HEADER_COMMENT>" then clear it
     And User clicks the comments icon in the tactic "navigation" section and add "<NAV_COMMENT>"
-    Then User clears the comment in "navigation" section
-    #Then User validates the comment added in "navigation"
-
-#    #Add Comment via Left Navigation Panel
-#    When User clicks the comments icon in the left hand side navigation panel
-#    And User specifies the comment "<NAV_COMMENT>"
-#    Then User clicks the "OK" option in the triggered dialogue box
-#    Then Verify the comments icon turns bluish green
-#    Then Verify confirmation message "Notes saved successfully." is displayed in green color
+    Then User validates the comment added in "navigation" is "<NAV_COMMENT>" then clear it
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              | COLOUR |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel | 24-note-table-provided.svg|
