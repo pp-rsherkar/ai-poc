@@ -630,16 +630,11 @@ public class StudioSteps {
     }
 
     @And("User enables the {string} permission for the {string} advertiser")
-    public void userEnablesThePermissionForTheAdvertiser(String advertiserPermissions, String advertiserName)
-    {
-        if(advertiserPermissions.isBlank())
-        {
+    public void userEnablesThePermissionForTheAdvertiser(String advertiserPermissions, String advertiserName) {
+        if (advertiserPermissions.isBlank()) {
             return;
         }
-
-        accounts.enableAdvertiserPermission(advertiserName,advertiserPermissions);
-
-
+        accounts.enableAdvertiserPermission(advertiserName, advertiserPermissions);
     }
 
     @And("User navigates to users page under the selected account")
@@ -655,11 +650,9 @@ public class StudioSteps {
     }
 
     @And("User enables the {string} permission for the {string} for an external user")
-    public void userEnablesThePermissionForTheForAnExternalUser(String studioPermissions, String accountName)
-    {
-        accounts.externalUserPermissions(studioPermissions,accountName);
+    public void userEnablesThePermissionForTheForAnExternalUser(String studioPermissions, String accountName) {
+        accounts.externalUserPermissions(studioPermissions, accountName);
         accounts.internalUserLogout();
-
     }
 
     @And("External user selects the workspace")

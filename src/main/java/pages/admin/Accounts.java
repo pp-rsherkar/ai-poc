@@ -292,7 +292,6 @@ public class Accounts {
     public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
         Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
         switch (advertiserPermission) {
-
             case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
                 if (permissionCheckbox.isHidden()) {
                     return;

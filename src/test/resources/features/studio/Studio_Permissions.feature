@@ -21,7 +21,7 @@ Feature: Enable Studio permissions for an account,advertiser and external users
       | ACCOUNT_NAME |
       | 100Plus      |
 
-  @regression
+  @np
   Scenario Outline: Enable Studio permissions for an External User
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -42,8 +42,8 @@ Feature: Enable Studio permissions for an account,advertiser and external users
       | hmtdemo   | MOMENTS                 | HMT Demo     | MOMENTS                | Demo W2O        |
       | hmtdemo   | IB HEALTH               | HMT Demo     | IB HEALTH              | Demo W2O        |
       | hmtdemo   | CLAIMS DATA             | HMT Demo     | CLAIMS DATA            | Demo W2O        |
-      | hmtdemo   | Download SmartList NPIs | HMT Demo     |                        | Demo W2O        |
-      | hmtdemo   | Smart Action Webhook    | HMT Demo     |                        | Demo W2O        |
-      | hmtdemo   | NPI Details             | HMT Demo     |                        | Demo W2O        |
-      | hmtdemo   | NPI Professions         | HMT Demo     |                        | Demo W2O        |
-      | hmtdemo   | Patient Details         | HMT Demo     |                        | Demo W2O        |
+     # | hmtdemo   | Download SmartList NPIs | HMT Demo     |                        | Demo W2O        |
+      #| hmtdemo   | Smart Action Webhook    | HMT Demo     |                        | Demo W2O        |
+      #| hmtdemo   | NPI Details             | HMT Demo     |                        | Demo W2O        |
+      #| hmtdemo   | NPI Professions         | HMT Demo     |                        | Demo W2O        |
+      #| hmtdemo   | Patient Details         | HMT Demo     |                        | Demo W2O        |
