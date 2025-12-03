@@ -126,7 +126,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10              | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80              | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |
 
-  @regression @vp
+  @regression
   Scenario Outline: Add and Verify Comment/notes on New Tactic from Header and Navigation
     When User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
