@@ -36,14 +36,9 @@ Feature: Enable Studio permissions for an account,advertiser and external users
     And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
     And  External user selects the workspace
     Then External user should be able to see the "<STUDIO_PERMISSIONS>" permission in the workspace
-
     Examples:
-      | USER_NAME | STUDIO_PERMISSIONS      | ACCOUNT_NAME | ADVERTISER_PERMISSIONS | ADVERTISER_NAME |
-      | hmtdemo   | MOMENTS                 | HMT Demo     | MOMENTS                | Demo W2O        |
-      | hmtdemo   | IB HEALTH               | HMT Demo     | IB HEALTH              | Demo W2O        |
-      | hmtdemo   | CLAIMS DATA             | HMT Demo     | CLAIMS DATA            | Demo W2O        |
-     # | hmtdemo   | Download SmartList NPIs | HMT Demo     |                        | Demo W2O        |
-      #| hmtdemo   | Smart Action Webhook    | HMT Demo     |                        | Demo W2O        |
-      #| hmtdemo   | NPI Details             | HMT Demo     |                        | Demo W2O        |
-      #| hmtdemo   | NPI Professions         | HMT Demo     |                        | Demo W2O        |
-      #| hmtdemo   | Patient Details         | HMT Demo     |                        | Demo W2O        |
+      | USER_NAME | STUDIO_PERMISSIONS | ACCOUNT_NAME | ADVERTISER_PERMISSIONS | ADVERTISER_NAME |
+      | hmtdemo   | MOMENTS            | HMT Demo     | MOMENTS                | Demo W2O        |
+      | hmtdemo   | IB HEALTH          | HMT Demo     | IB HEALTH              | Demo W2O        |
+      | hmtdemo   | CLAIMS DATA        | HMT Demo     | CLAIMS DATA            | Demo W2O        |
+
