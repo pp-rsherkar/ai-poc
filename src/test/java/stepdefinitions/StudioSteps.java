@@ -34,6 +34,8 @@ public class StudioSteps {
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
+    List<String> metricNames = new ArrayList<>();
+    List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
 
@@ -142,13 +144,14 @@ public class StudioSteps {
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
-        Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
-        // As confirmed by Nikhil - for GA, permissions have been set up like-wise. This is HCP Explorer test-case and in permission feature we can handled this.
-        // Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
+        fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
+        Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
+        if (fetchedMetricNames.contains("HCP Explorer"))
+            Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
         workspaceCreation.clickHCPExplorerWorkspace();
         Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
     }
@@ -209,6 +212,11 @@ public class StudioSteps {
 
         Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
+    }
+
+    @And("Verify that advertiser field is disabled and displayed in {string} after saving the workspace")
+    public void verifyIfAdvertiserIsDisabledAfterSavingTheWorkspace(String textColor) {
+        Assert.assertEquals(textColor, explorerWorkspace.isAdvertiserDisabled());
     }
 
     @Then("verify the file content")
@@ -653,4 +661,20 @@ public class StudioSteps {
                 Assert.fail("Invalid input for visibility: " + visibilityFlag);
         }
     }
+
+    @And("User searches the account {string} and checks Studio permissions")
+    public void userSearchesTheAccountInWhichPermissionToBeChecked(String account) {
+        accounts.searchAccount(account);
+        Assert.assertTrue("Studio permissions setting icon is not displayed", accounts.isStudioSettingsButtonVisible());
+        accounts.clickStudioSettingsButton();
+        metricNames = accounts.fetchWorkspacesWithPermission();
+        accounts.clickCancelButtonFromSettingsPanel();
+    }
+
+    @And("User navigates to Studio application")
+    public void userNavigatesToStudioApplication() {
+        navigation.navigateToStudio();
+    }
+
+
 }

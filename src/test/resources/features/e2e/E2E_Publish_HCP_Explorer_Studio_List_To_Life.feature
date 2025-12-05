@@ -6,6 +6,10 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
   Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+    When User navigates to Administrative section and go to Accounts Tab
+    And User searches the account "PP engineering test" and checks Studio permissions
+    And User clicks PulsePoint icon to navigate back to Life
+    And User navigates to Studio application
 
   @e2e @regression
   Scenario Outline: Create and save HCP Explorer workspace with specific filters
@@ -14,6 +18,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     #2
     And User applies the filter and selects option
       | FilterName         | Option                                                                                                                  |
@@ -47,6 +52,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     #2
     When User applies the filter and selects option
       | FilterName | Option             |

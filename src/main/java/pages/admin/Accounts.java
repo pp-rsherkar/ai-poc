@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -18,7 +19,7 @@ public class Accounts {
     private final Locator SEARCH_ACCOUNT;
     private final Locator SEARCH_ICON;
     private final Locator SELECT_ACCOUNT;
-    private final Locator STUDIO_SETTINGS_BUTTON;
+    private final Locator STUDIO_TOGGLE_BUTTON;
     private final Locator EXPANSION_TOGGLE;
     private final Locator STUDIO_SETTINGS_SAVE;
     private final Locator STUDIO_MENU;
@@ -53,6 +54,10 @@ public class Accounts {
     private final Locator ACCOUNTS_ADVERTISER_TAB;
     private final Locator SUCCESS_ALERT;
     private final Locator CLIENT_VALUE;
+    private final Locator STUDIO_SETTINGS_ICON;
+    private final Locator STUDIO_SETTINGS_PANEL;
+    private final Locator WORKSPACE_PERMISSION_TOGGLE_BUTTON;
+    private final Locator SETTINGS_PANEL_CANCEL_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Accounts(Page page) {
@@ -67,7 +72,7 @@ public class Accounts {
         this.STUDIO_USER_TAB = page.locator("//button[.//span[text()='Studio']]");
         this.STUDIO_TOGGLE_EXTERNAL_USER_ENABLED = page.locator("//span[contains(@class,'icons-24-checkmark-green')]");
         this.STUDIO_TOGGLE_EXTERNAL_USER_DISABLED = page.locator("//span[contains(@class,'icons-24-checkmark-white')]");
-        this.STUDIO_SETTINGS_BUTTON = page.locator("div:nth-child(6) > .btn > .acc-toggle-wrapper > .icons-32-checkmark");
+        this.STUDIO_TOGGLE_BUTTON = page.locator("//span[@class='btn-label' and text()='Studio']/following-sibling::span//span");
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
@@ -98,6 +103,10 @@ public class Accounts {
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
         this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
+        this.STUDIO_SETTINGS_ICON = page.locator("//span[@class='header-name' and text()='Studio']/following-sibling::span");
+        this.STUDIO_SETTINGS_PANEL = page.locator("//div[@class='bsHeaderContainer']//div[contains(text(),'Studio Settings')]");
+        this.WORKSPACE_PERMISSION_TOGGLE_BUTTON = page.locator("//div[@class='secondtablewrapper']//div[contains(@class,'toggle-wrapper-withLabel')]//sui-checkbox");
+        this.SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
     }
 
     public void clickAdministration() {
@@ -121,7 +130,7 @@ public class Accounts {
     }
 
     public void enableStudio() {
-        STUDIO_SETTINGS_BUTTON.click();
+        STUDIO_TOGGLE_BUTTON.click();
     }
 
     public void workSpaceSettings() {
@@ -139,7 +148,7 @@ public class Accounts {
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
-        STUDIO_SETTINGS_BUTTON.click();
+        STUDIO_TOGGLE_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
         page.reload();
     }
@@ -306,4 +315,31 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(CLIENT_VALUE);
         return CLIENT_VALUE.textContent().trim();
     }
+
+    public boolean isStudioSettingsButtonVisible() {
+        return STUDIO_SETTINGS_ICON.isVisible();
+    }
+
+    public void clickStudioSettingsButton() {
+        STUDIO_SETTINGS_ICON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(STUDIO_SETTINGS_PANEL);
+    }
+
+    public List<String> fetchWorkspacesWithPermission() {
+        List<String> workspaceNameList = new ArrayList<>();
+        for (int i = 0; i < WORKSPACE_PERMISSION_TOGGLE_BUTTON.count(); i++) {
+            if(WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
+                int rowIndex = (int) WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).evaluate("(el) => Array.from(el.closest('tbody').children).indexOf(el.closest('tr')) + 1");
+                Locator workspaceNameLocator = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//div", rowIndex));
+                workspaceNameList.add(workspaceNameLocator.textContent().trim());
+            }
+        }
+        return workspaceNameList;
+    }
+
+    public void clickCancelButtonFromSettingsPanel(){
+        SETTINGS_PANEL_CANCEL_BUTTON.click();
+    }
+
 }

@@ -21,7 +21,7 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_RELOAD_ICON;
     private final Locator ADD_FILTER;
     private final Locator SEARCH_FILTER;
-    private final Locator SELECT_FILTER;
+    private final Locator ADVERTISER_SELECTED;
     private final Locator FILTER_OK_BUTTON;
     private final Locator FILTER_CLOSE_BUTTON;
     private final Locator APPLIED_FILTER;
@@ -60,7 +60,7 @@ public class ExplorerWorkspace {
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
         this.ADD_FILTER = WORKSPACE_FRAME.locator("//div[contains(text(),'Add Filter')]");
         this.SEARCH_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
+        this.ADVERTISER_SELECTED = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspace-back-button']/following-sibling::div//p[contains(text(),'Advertiser:')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("//h1[contains(text(),'Select Filter')]/following-sibling::button");
         this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitleContainer-sc-')]");
@@ -263,5 +263,9 @@ public class ExplorerWorkspace {
 
     public boolean isOwnedAndOperatedSectionAvailable() {
         return OWNED_AND_OPERATED_SECTION.isVisible();
+    }
+
+    public String isAdvertiserDisabled() {
+        return ADVERTISER_SELECTED.evaluate("el => getComputedStyle(el).color").toString();
     }
 }

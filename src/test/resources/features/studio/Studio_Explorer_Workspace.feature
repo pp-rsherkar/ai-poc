@@ -5,6 +5,10 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+    When User navigates to Administrative section and go to Accounts Tab
+    And User searches the account "PP engineering test" and checks Studio permissions
+    And User clicks PulsePoint icon to navigate back to Life
+    And User navigates to Studio application
 
   @regression
   Scenario Outline: Create and save HCP Explorer workspace with specific filters
@@ -12,6 +16,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName         | Option                                                                                                                  |
       | NPI Age            | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
@@ -43,6 +48,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User clicks on AI Configurator and build audience using the AIPrompt "<AI_PROMPT>"
     Then Verify the filter is applied correctly "<PRIMARY_FILTERS>"
 #    And User saves the workspace
@@ -69,6 +75,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the following filters one by one and checks that NPI details are refined after each filter:
       | FilterName         | Option                                                                                                                  |
       | NPI Age            | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
@@ -96,6 +103,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName | Option                                                        |
       | NPI Age    | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
@@ -136,6 +144,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName | Option                                                        |
       | NPI Age    | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
@@ -160,12 +169,13 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | ADVERTISER | WORKSPACE_NAME | AI_PROMPT                                                                                | PRIMARY_FILTERS |
       | Abbvie     | Explorer       | Find doctors within certain age ranges, with specific professions, and narrow by wealth. | Profession      |
 
-  @regression
+  @regression @rs
   Scenario Outline: Manage operations on Workspace - Rename, Duplication, and Delete on HCP Explorer workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName | Option                |
       | NPI Age    | Below 25, 25 to 35,   |
