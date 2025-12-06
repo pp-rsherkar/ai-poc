@@ -1755,15 +1755,15 @@ public class LifeSteps {
 
     @Then("Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifyPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
-        assert pixels.verifySaveSuccess().contains("Success!");
+        Assert.assertTrue("Unable to save pixel", pixels.verifySaveSuccess().contains("Success!"));
         pixels.searchSavedPixel(newPixelName);
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
 
     @Then("Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
-        assert pixels.verifySaveSuccess().contains("Success!");
-        newPixelName = smartPixel.getPixelName();
+        Assert.assertTrue("Unable to save Smart Pixel",  pixels.verifySaveSuccess().contains("Success!"));
+        newPixelName = smartPixel.getPixelNameFromHeader();
         pixels.searchSavedPixel(newPixelName);
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
     }
@@ -2799,7 +2799,7 @@ public class LifeSteps {
 
     @Then("Verify the Smart Pixel name is auto populated with {string} and Smart Pixel text")
     public void verifySmartPixelNameIsAutoPopulated(String advertiser) {
-        String pixelName = smartPixel.getPixelName();
+        String pixelName = smartPixel.getPixelNameFromHeader();
         String expectedPixelName = advertiser + ' ' + "Smart Pixel";
         String regex = "\\Q" + expectedPixelName + "\\E" + "\\s*\\d+$";
         Assert.assertTrue(pixelName.matches(regex));

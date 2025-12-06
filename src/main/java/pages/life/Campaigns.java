@@ -183,7 +183,8 @@ public class Campaigns {
     }
 
     public void setCampaignType(String campaignType) {
-        CAMPAIGN_TYPE.locator("text=" + campaignType).click();
+        Locator campaignTypeButton = CAMPAIGN_TYPE.filter(new Locator.FilterOptions().setHasText(campaignType));
+        campaignTypeButton.click();
     }
 
     public void enterBudget(String budget) {

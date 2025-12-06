@@ -429,6 +429,7 @@ public class CampaignDashboard {
         while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
             SEARCH_CAMPAIGN.fill(createdCampaign);
             CLICK_CAMPAIGN_SEARCH.click();
+            waitUtility.waitUntilPreLoaderHidden();
         }
     }
 

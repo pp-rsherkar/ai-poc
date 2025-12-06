@@ -94,7 +94,7 @@ public class Accounts {
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
-        this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
+        this.OK_BUTTON = page.locator("//button[contains(@class, 'okButton') or contains(text(),'Save')]");
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
         this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
@@ -118,6 +118,7 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(selectAccount);
         selectAccount.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CLIENT_VALUE);
     }
 
     public void enableStudio() {
@@ -277,6 +278,7 @@ public class Accounts {
         boolean flag;
         Locator permissionXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox", advertiser));
         Locator disabledTextXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]", advertiser));
+        waitUtility.waitForLocatorVisible(permissionXpath);
         flag = switch (checkboxStatus) {
             case "Disabled" -> {
                 if (!disabledTextXpath.isVisible()) {
