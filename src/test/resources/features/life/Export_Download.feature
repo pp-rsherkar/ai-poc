@@ -73,7 +73,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | LIST_NAME            | UPLOAD_FILENAME1   |
       | IPAddress_FileUpload | IPAddressFile1.csv |
 
-  @regression @ps25
+  @regression
   Scenario Outline: Verify user is able to export the Regular NPI list created by uploading a file
     And User navigates to NPI Lists page
     When User clicks on Create New List
