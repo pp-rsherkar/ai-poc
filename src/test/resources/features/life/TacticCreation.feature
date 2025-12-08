@@ -141,7 +141,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User validates the comment added in "header" is "<HEADER_COMMENT>" then clear it
     And User clicks the comments icon in the tactic "navigation" section and add "<NAV_COMMENT>"
     Then User validates the comment added in "navigation" is "<NAV_COMMENT>" then clear it
-
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              | COLOUR |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel | 24-note-table-provided.svg|
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel |

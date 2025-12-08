@@ -208,14 +208,6 @@ public class LifeSteps {
         Assert.assertEquals(expectedComment, actualComment);
     }
 
-    @When("Verify the comments icon turns bluish green")
-    public void verifyTheCommentsIconTurnsBluishGreen() {
-    }
-
-    @When("Verify confirmation message {string} is displayed in green color")
-    public void verifyConfirmationMessageIsDisplayedInGreenColor(String confirmationMessage) {
-    }
-
     @Then("User adds frequency cap with details {string} {string} {string} {string}")
     public void user_adds_frequency_cap_with_details(String level, String FREQ_VALUE, String TIMES_PER, String SCOPE) {
         campaigns.addFrequencyCap(level, FREQ_VALUE, TIMES_PER, SCOPE);
