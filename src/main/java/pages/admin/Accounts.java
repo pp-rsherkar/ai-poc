@@ -293,9 +293,7 @@ public class Accounts {
         Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
         switch (advertiserPermission) {
             case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
-                if (permissionCheckbox.isHidden()) {
-                    return;
-                } else {
+                if (!permissionCheckbox.isHidden()) {
                     permissionCheckbox.click();
                     ADVERTISER_PERMISSION_SAVE_BUTTON.click();
                 }
@@ -314,22 +312,25 @@ public class Accounts {
                 USER_SIGNAL_TAB.click();
                 if (!MOMENTS_CHECKBOX.isHidden()) {
                     MOMENTS_CHECKBOX.click();
+                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "IB HEALTH":
                 USER_SIGNAL_TAB.click();
                 if (!IBHEALTH_CHECKBOX.isHidden()) {
                     IBHEALTH_CHECKBOX.click();
+                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "CLAIMS DATA":
                 USER_SIGNAL_TAB.click();
                 if (!CLAIMSDATA_CHECKBOX.isHidden()) {
                     CLAIMSDATA_CHECKBOX.click();
+                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
         }
-        USER_PERMISSIONS_SAVE_BUTTON.click();
+
     }
 
     public void internalUserLogout() {
