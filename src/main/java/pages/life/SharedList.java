@@ -33,6 +33,7 @@ public class SharedList {
     private final Locator DUPLICATE_FILE_DIALOG_TEXT;
     private final Locator REPLACE_BUTTON;
     private final Locator DOWNLOAD_ICON;
+    private final Locator ITEM_COUNT_UI;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SharedList(Page page) {
@@ -56,6 +57,7 @@ public class SharedList {
         this.DUPLICATE_FILE_DIALOG_TEXT = page.locator(" //div[contains(text(),'Duplicating File Names')]/following-sibling::div[contains(@class,'confirm-modal')]/div");
         this.REPLACE_BUTTON = page.locator("//span[contains(text(),'Replace')]");
         this.DOWNLOAD_ICON = page.locator("//img[contains(@src,'export.svg')]");
+        this.ITEM_COUNT_UI = page.locator("//div[contains(@class,'fileDetails')]/div");
     }
 
     public void clickDomainListFromMenu(String pageName) {
@@ -280,5 +282,10 @@ public class SharedList {
     public Path clickDownloadIcon() throws IOException {
         Download download = page.waitForDownload(DOWNLOAD_ICON::click);
         return CommonUtils.downloadFileAndMoveToSystemFolder(download);
+    }
+
+    public String fetchSharedListCountFromUI() {
+        String itemCountText = ITEM_COUNT_UI.first().innerText().trim();
+        return itemCountText.replaceAll("[^0-9]", "");
     }
 }

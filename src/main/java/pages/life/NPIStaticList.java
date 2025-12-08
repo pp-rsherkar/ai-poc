@@ -28,6 +28,7 @@ public class NPIStaticList {
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
     private final Locator DOWNLOAD_ICON;
+    private final Locator ITEM_COUNT_UI;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPIStaticList(Page page) {
@@ -46,6 +47,7 @@ public class NPIStaticList {
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
         this.DOWNLOAD_ICON = page.locator("//span[contains(@class,'image download')]");
+        this.ITEM_COUNT_UI = page.locator("//span[text()='Total NPI']/preceding-sibling::span[1]");
     }
 
     public void enterListName(String npiListName) {
@@ -111,5 +113,10 @@ public class NPIStaticList {
     public Path clickDownloadIcon() throws IOException {
         Download download = page.waitForDownload(DOWNLOAD_ICON.first()::click);
         return CommonUtils.downloadFileAndMoveToSystemFolder(download);
+    }
+
+    public String fetchSharedListCountFromUI() {
+        String itemCountText = ITEM_COUNT_UI.first().innerText().trim();
+        return itemCountText.replaceAll("[^0-9]", "");
     }
 }

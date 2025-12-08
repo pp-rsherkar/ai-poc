@@ -20,6 +20,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "Keywords" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "Keyword" list
+    And Verify the count of items in the downloaded "Keyword" list
     Examples:
       | LIST_NAME          | UPLOAD_FILENAME1  |
       | Keyword_FileUpload | KeywordsFile1.csv |
@@ -35,6 +36,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "Domains" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "Domain" list
+    And Verify the count of items in the downloaded "Domain" list
     Examples:
       | LIST_NAME         | UPLOAD_FILENAME1    |
       | Domain_FileUpload | DomainNameFile1.csv |
@@ -51,6 +53,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "AppBundle" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "App Bundle" list
+    And Verify the count of items in the downloaded "App Bundle" list
     Examples:
       | LIST_NAME            | UPLOAD_FILENAME1   |
       | AppBundle_FileUpload | AppBundleFile1.csv |
@@ -65,11 +68,12 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "IP Address" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "IP" list
+    And Verify the count of items in the downloaded "IP" list
     Examples:
       | LIST_NAME            | UPLOAD_FILENAME1   |
       | IPAddress_FileUpload | IPAddressFile1.csv |
 
-  @regression
+  @regression @ps25
   Scenario Outline: Verify user is able to export the Regular NPI list created by uploading a file
     And User navigates to NPI Lists page
     When User clicks on Create New List
@@ -80,6 +84,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     When User makes list available in LIFE and saves the list
     Then Verify list gets saved successfully
     And Verify that user is able to download the uploaded "NPI" list
+    And Verify the count of items in the downloaded "NPI" list
     Examples:
       | LIST_NAME  | ADVERTISER     | FILE_NAME          |
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |

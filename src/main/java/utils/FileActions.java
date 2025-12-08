@@ -55,7 +55,6 @@ public class FileActions {
         return rowCount;
     }
 
-
     public static int fetchColumnCountFromExcel(Path filePath, String columnName) throws IOException {
         try (Workbook wb = new XSSFWorkbook(Files.newInputStream(filePath))) {
             Sheet sheet = wb.getSheetAt(0);
@@ -85,5 +84,18 @@ public class FileActions {
         Path basePath = Paths.get("src/main/resources/uploadfiles", fileName);
         List<String> lines = Files.readAllLines(basePath);
         return Math.toIntExact(lines.stream().filter(line -> !line.trim().isEmpty()).count());
+    }
+
+    public static int fetchRowCountFromCSV(Path filePath) throws IOException {
+        int rowCount = 0;
+        try (BufferedReader br = Files.newBufferedReader(filePath)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    rowCount++;
+                }
+            }
+        }
+        return rowCount;
     }
 }
