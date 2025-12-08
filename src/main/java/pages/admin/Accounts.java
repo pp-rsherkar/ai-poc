@@ -312,34 +312,24 @@ public class Accounts {
         switch (studioPermissions) {
             case "MOMENTS":
                 USER_SIGNAL_TAB.click();
-                if (MOMENTS_CHECKBOX.isHidden()) {
-                    return;
-                } else {
+                if (!MOMENTS_CHECKBOX.isHidden()) {
                     MOMENTS_CHECKBOX.click();
                 }
                 break;
             case "IB HEALTH":
                 USER_SIGNAL_TAB.click();
-
-                if (IBHEALTH_CHECKBOX.isHidden()) {
-                    return;
-                } else {
+                if (!IBHEALTH_CHECKBOX.isHidden()) {
                     IBHEALTH_CHECKBOX.click();
                 }
                 break;
             case "CLAIMS DATA":
                 USER_SIGNAL_TAB.click();
-
-                if (CLAIMSDATA_CHECKBOX.isHidden()) {
-                    return;
-                } else {
+                if (!CLAIMSDATA_CHECKBOX.isHidden()) {
                     CLAIMSDATA_CHECKBOX.click();
                 }
                 break;
-
         }
         USER_PERMISSIONS_SAVE_BUTTON.click();
-
     }
 
     public void internalUserLogout() {
