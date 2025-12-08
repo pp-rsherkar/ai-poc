@@ -51,6 +51,9 @@ public class Workspace {
     private final Locator RETROFIT_CHECKBOX;
     private final Locator NPI_ENGAGING_TEXT;
     private final Locator PUBLISH_LOADER;
+    private final Locator HCP_WORKSPACE_FILTER_CHECKBOX;
+    private final Locator EXISTING_WORKSPACE;
+    private final Locator ADVERTISER_SELECTOR_DROPDOWN;
     private final Locator NPI_LIST_PULLOUT_MENU;
     private final Locator OK_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
@@ -90,6 +93,9 @@ public class Workspace {
         this.IDENTIFIED_NPI_COUNT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//h3[contains(text(),'Identified NPIs')]/ancestor::div[contains(@class,'SingleValueVisualization')]//span");
         this.RETROFIT_CHECKBOX = WORKSPACE_FRAME.locator("//span[contains(text(),'Retrofit NPIs')]/parent::label/preceding-sibling::div//input");
         this.NPI_ENGAGING_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'NPIs engaging on or')]");
+        this.HCP_WORKSPACE_FILTER_CHECKBOX = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP Explorer"));
+        this.EXISTING_WORKSPACE=WORKSPACE_FRAME.locator("//tr[1]/td[1]//span");
+        this.ADVERTISER_SELECTOR_DROPDOWN=WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("All Advertisers"));
         this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
         this.NPI_LIST_PULLOUT_MENU = WORKSPACE_FRAME.locator("//ul[@data-tour-id='npi-list-pullout-menu']");
         this.OK_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'OK')]");
@@ -308,5 +314,15 @@ public class Workspace {
 
     public String verifyNPIsEngagingText() {
         return NPI_ENGAGING_TEXT.innerText().trim();
+    }
+    public void selectExistingWorkspace()
+    {
+        waitUtility.waitForLocatorVisible(HCP_WORKSPACE_FILTER_CHECKBOX);
+        HCP_WORKSPACE_FILTER_CHECKBOX.click();
+        ADVERTISER_SELECTOR_DROPDOWN.click();
+        Locator advertiser=WORKSPACE_FRAME.getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Demo W2O"));
+        advertiser.click();
+        waitUtility.waitForLocatorVisible(EXISTING_WORKSPACE);
+        EXISTING_WORKSPACE.click();
     }
 }

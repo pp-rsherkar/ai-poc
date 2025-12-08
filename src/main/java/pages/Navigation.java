@@ -40,7 +40,7 @@ public class Navigation {
         this.USERNAME = page.locator("#UserName");
         this.PASSWORD = page.locator("#Password");
         this.LOGIN_BUTTON = page.locator(".loginLabel");
-        this.LIFE = page.getByText("Life");
+        this.LIFE = page.locator("//span[contains(@class,'buyerPortalLink')]");
         this.SIGNAL = page.getByText("Signal");
         this.STUDIO = page.locator("//div[contains(@class,'genomeMenuItem')]");
         this.RUN_REPORT = page.getByText("Run a Report");
@@ -83,6 +83,10 @@ public class Navigation {
     public String verifyProfilePage() {
         waitUtility.waitForLocatorVisible(ADMIN_DASHBOARD_TITLE);
         return ADMIN_DASHBOARD_TITLE.innerText().trim();
+    }
+
+    public boolean isLifeVisible() {
+        return LIFE.isVisible();
     }
 
     public void navigateToLife() {
