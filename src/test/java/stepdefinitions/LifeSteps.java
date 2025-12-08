@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -94,12 +95,24 @@ public class LifeSteps {
     public void set_environment(String environment, String user) {
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");
-            username = ConfigReader.getProperty("demoUser");
-            password = ConfigReader.getProperty("demoPassword");
+            // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
+            if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
+                username = ConfigReader.getProperty("demoExternalUser");
+                password = ConfigReader.getProperty("demoExternalPassword");
+            } else {
+                username = ConfigReader.getProperty("demoUser");
+                password = ConfigReader.getProperty("demoPassword");
+            }
         } else if (environment.equals("Pre-release")) {
             url = ConfigReader.getProperty("preReleaseURL");
-            username = ConfigReader.getProperty("preReleaseUser");
-            password = ConfigReader.getProperty("preReleasePassword");
+            // If the test is for an external user, use the pre-release external credentials
+            if (user != null && user.toLowerCase().contains("external")) {
+                username = ConfigReader.getProperty("preReleaseExternalUser");
+                password = ConfigReader.getProperty("preReleaseExternalPassword");
+            } else {
+                username = ConfigReader.getProperty("preReleaseUser");
+                password = ConfigReader.getProperty("preReleasePassword");
+            }
         }
     }
 
@@ -109,8 +122,9 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
-
+        if(navigation.isLifeVisible()) {
+            Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
+        }
         switch (application) {
             case "Life":
                 navigation.navigateToLife();
@@ -119,8 +133,12 @@ public class LifeSteps {
                 navigation.navigateToHCP();
                 break;
             case "Studio":
-                navigation.navigateToLife();
-                navigation.navigateToStudio();
+                if (navigation.isLifeVisible()) {
+                    navigation.navigateToLife();
+                    navigation.navigateToStudio();
+                } else {
+                    navigation.navigateToStudio();
+                }
                 break;
         }
         navigation.selectAccount(account);
@@ -2383,8 +2401,8 @@ public class LifeSteps {
 
     @And("Verify that user is able to select Schedule start date and Schedule end date")
     public void verifyThatUserIsAbleToSelectScheduleStartDateAndScheduleEndDate() {
-        Assert.assertTrue("Unable to select start date from date picker", scheduleReport.selectScheduleStartDate());
-        Assert.assertTrue("Unable to select end date from date picker", scheduleReport.selectScheduleEndDate());
+        Assert.assertTrue("Unable to select date from date picker", scheduleReport.selectScheduleStartDate());
+        Assert.assertTrue("Unable to select date from date picker", scheduleReport.selectScheduleEndDate());
     }
 
     @And("Verify default value of Data Timezone is {string}")

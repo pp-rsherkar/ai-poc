@@ -36,6 +36,7 @@ public class StudioSteps {
     List<String> previousNpiDetails = null;
     String npiCount;
     Path targetFilePath;
+    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -265,7 +266,7 @@ public class StudioSteps {
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
         int npiCountFromFile = 0;
-        if(fileExtension.equalsIgnoreCase("CSV")) 
+        if(fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if(fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
@@ -616,6 +617,57 @@ public class StudioSteps {
         String text = workspace.verifyNPIsEngagingText();
         Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
     }
+    @And("User searches and selects the account {string}")
+    public void userSearchesAndSelectsTheAccount(String accountName)
+    {
+        accounts.searchAccount(accountName);
+    }
+
+    @And("User navigates to advertisers page under the selected account")
+    public void userNavigatesToAdvertisersPageUnderTheSelectedAccount() {
+        accounts.clickAccountAdvertiserTab();
+        accounts.clickGlobalSignalsTab();
+    }
+
+    @And("User enables the {string} permission for the {string} advertiser")
+    public void userEnablesThePermissionForTheAdvertiser(String advertiserPermissions, String advertiserName) {
+        if (!advertiserPermissions.isBlank()) {
+            accounts.enableAdvertiserPermission(advertiserName, advertiserPermissions);
+        }
+    }
+
+    @And("User navigates to users page under the selected account")
+    public void userNavigatesToUsersPageUnderTheSelectedAccount()
+    {
+        accounts.navigateToUserTab();
+    }
+
+    @And("User selects the {string} external user")
+    public void userSelectsTheExternalUser(String externalUser)
+    {
+        accounts.selectExternalUser(externalUser);
+    }
+
+    @And("User enables the {string} permission for the {string} for an external user")
+    public void userEnablesThePermissionForTheForAnExternalUser(String studioPermissions, String accountName) {
+        accounts.externalUserPermissions(studioPermissions, accountName);
+        accounts.internalUserLogout();
+    }
+
+    @And("External user selects the workspace")
+    public void externalUserSelectsTheWorkspace()
+    {
+        workspace.selectExistingWorkspace();
+    }
+
+    @Then("External user should be able to see the {string} permission in the workspace")
+    public void externalUserShouldBeAbleToSeeThePermissionInTheWorkspace(String permissions) {
+        if (permissions.equals("MOMENTS") || permissions.equals("IB HEALTH") || permissions.equals("CLAIMS DATA")) {
+            Assert.assertTrue(explorerWorkspace.verifyPermissionFilters(permissions));
+            Assert.assertTrue(explorerWorkspace.verifyWidgets(permissions));
+        }
+    }
+
 
     @And("User searches the account {string} for which permission to be checked")
     public void userSearchesTheAccountForWhichPermissionToBeChecked(String account) {
@@ -653,4 +705,6 @@ public class StudioSteps {
                 Assert.fail("Invalid input for visibility: " + visibilityFlag);
         }
     }
+
+
 }
