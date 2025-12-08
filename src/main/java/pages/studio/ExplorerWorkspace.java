@@ -300,17 +300,17 @@ public class ExplorerWorkspace {
     }
 
     public boolean verifyWidgets(String visualization) {
-        boolean isWidgetVisible = false;
-        switch (visualization) {
-            case "MOMENTS", "IB HEALTH":
+        return switch (visualization) {
+            case "MOMENTS", "IB HEALTH" -> {
                 waitUtility.waitForLocatorVisible(MOMENTS_WIDGET);
-                isWidgetVisible = MOMENTS_WIDGET.isVisible();
-                break;
-            case "CLAIMS DATA":
+                yield MOMENTS_WIDGET.isVisible();
+            }
+            case "CLAIMS DATA" -> {
                 waitUtility.waitForLocatorVisible(CLAIMS_WIDGET);
-                isWidgetVisible = CLAIMS_WIDGET.isVisible();
-        }
-        return isWidgetVisible;
+                yield CLAIMS_WIDGET.isVisible();
+            }
+            default -> false;
+        };
     }
 
 }

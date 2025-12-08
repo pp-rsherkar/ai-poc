@@ -304,33 +304,32 @@ public class Accounts {
 
     public void navigateToUserTab() {
         ACCOUNT_USER_TAB.click();
+        waitUtility.waitForLocatorVisible(USER_SIGNAL_TAB);
     }
 
     public void externalUserPermissions(String studioPermissions, String accountName) {
+        USER_SIGNAL_TAB.click();
         switch (studioPermissions) {
             case "MOMENTS":
-                USER_SIGNAL_TAB.click();
                 if (!MOMENTS_CHECKBOX.isHidden()) {
                     MOMENTS_CHECKBOX.click();
-                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "IB HEALTH":
-                USER_SIGNAL_TAB.click();
                 if (!IBHEALTH_CHECKBOX.isHidden()) {
                     IBHEALTH_CHECKBOX.click();
-                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
             case "CLAIMS DATA":
-                USER_SIGNAL_TAB.click();
                 if (!CLAIMSDATA_CHECKBOX.isHidden()) {
                     CLAIMSDATA_CHECKBOX.click();
-                    USER_PERMISSIONS_SAVE_BUTTON.click();
                 }
                 break;
         }
-
+        if(USER_PERMISSIONS_SAVE_BUTTON.isVisible())
+        {
+            USER_PERMISSIONS_SAVE_BUTTON.click();
+        }
     }
 
     public void internalUserLogout() {

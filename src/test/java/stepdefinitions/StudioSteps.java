@@ -631,10 +631,9 @@ public class StudioSteps {
 
     @And("User enables the {string} permission for the {string} advertiser")
     public void userEnablesThePermissionForTheAdvertiser(String advertiserPermissions, String advertiserName) {
-        if (advertiserPermissions.isBlank()) {
-            return;
+        if (!advertiserPermissions.isBlank()) {
+            accounts.enableAdvertiserPermission(advertiserName, advertiserPermissions);
         }
-        accounts.enableAdvertiserPermission(advertiserName, advertiserPermissions);
     }
 
     @And("User navigates to users page under the selected account")
