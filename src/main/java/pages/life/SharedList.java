@@ -79,7 +79,7 @@ public class SharedList {
     }
 
     public boolean verifySubTabs(String tabName) {
-        for(int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
+        for (int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
             if (SUB_TABS_BUTTON.nth(i).innerText().trim().equalsIgnoreCase(tabName)) return true;
         }
         return false;

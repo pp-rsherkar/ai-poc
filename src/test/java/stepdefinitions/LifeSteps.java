@@ -124,7 +124,7 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        if(navigation.isLifeVisible()) {
+        if (navigation.isLifeVisible()) {
             Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
         }
         switch (application) {
@@ -206,9 +206,9 @@ public class LifeSteps {
         }
         List<String> actualTactics = tacticDetails.getAllTactics();
         Assert.assertEquals(new HashSet<>(expectedTactic), new HashSet<>(actualTactics));
-        List<String>expectedTarget = tacticSettings.getExpectedTargetRules();
-        List<String>actualTarget = tacticSettings.getActualTargetRules();
-        Assert.assertEquals(expectedTarget,actualTarget);
+        List<String> expectedTarget = tacticSettings.getExpectedTargetRules();
+        List<String> actualTarget = tacticSettings.getActualTargetRules();
+        Assert.assertEquals(expectedTarget, actualTarget);
     }
 
     @Then("User adds frequency cap with details {string} {string} {string} {string}")
@@ -263,7 +263,7 @@ public class LifeSteps {
     }
 
     @And("Verify the status of first tactic under line item is {string}")
-    public void verify_the_status_of_first_tactic_under_line_item_is (String ExpectedStatus) {
+    public void verify_the_status_of_first_tactic_under_line_item_is(String ExpectedStatus) {
         tacticDetails.clickFirstTacticTab();
         String actualStatus = tacticDetails.verifyTacticState();
         Assert.assertEquals(ExpectedStatus, actualStatus);
@@ -463,7 +463,7 @@ public class LifeSteps {
     public void user_enters_the_template_for_end_to_end_details_as(String templateName, String dimension, String metric) {
         templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         reportTemplates.enterTemplateName(templateNameRandom);
-        List<String> dimensionList = Arrays.asList(dimension.split(","));
+        String[] dimensionList = dimension.split(",");
 
         for (String dimensionValue : dimensionList) {
             dimensionValue = dimensionValue.trim();
@@ -471,7 +471,7 @@ public class LifeSteps {
         }
 
         reportTemplates.clickMetricsTab();
-        List<String> metricsList = Arrays.asList(metric.split(","));
+        String[] metricsList = metric.split(",");
 
         for (String metricValue : metricsList) {
             metricValue = metricValue.trim();
@@ -531,8 +531,7 @@ public class LifeSteps {
 
         Assert.assertEquals("Rule types mismatch", expectedUniqueAndSorted, actualUniqueAndSorted);
         for (String expectedOption : expectedNormalizedRuleOptions) {
-            boolean matchFound = actualNormalizedRuleOptions.stream()
-                    .anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
+            boolean matchFound = actualNormalizedRuleOptions.stream().anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
             Assert.assertTrue("Expected rule option not found: " + expectedOption, matchFound);
         }
     }
@@ -715,9 +714,7 @@ public class LifeSteps {
     @Then("Verify dashboard is customized and only selected columns are displayed")
     public void verifyDashboardIsCustomizedAndOnlySelectedColumnsAreDisplayed() {
         List<String> columnName = campaignDashboard.fecthDashboardColumns();
-        Assert.assertEquals(
-                keyValues.stream().map(o -> ((String) o).toLowerCase()).collect(Collectors.toSet()),
-                columnName.stream().map(String::toLowerCase).collect(Collectors.toSet()));
+        Assert.assertEquals(keyValues.stream().map(o -> ((String) o).toLowerCase()).collect(Collectors.toSet()), columnName.stream().map(String::toLowerCase).collect(Collectors.toSet()));
     }
 
     @When("User clicks HideAll and ShowAll options from Menu")
@@ -744,9 +741,7 @@ public class LifeSteps {
     @Then("Verify the data should filter as per the selected filter values")
     public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
         List<String> selectedFilter = campaignDashboard.verifySelectedFilter();
-        List<String> cleanedActual = selectedFilter.stream()
-                .map(s -> s.replaceAll(":$", ""))
-                .toList();
+        List<String> cleanedActual = selectedFilter.stream().map(s -> s.replaceAll(":$", "")).toList();
         Assert.assertEquals(keyValues, cleanedActual);
     }
 
@@ -974,8 +969,7 @@ public class LifeSteps {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
         dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section",
-                pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, toggleButton));
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, toggleButton));
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
@@ -1166,9 +1160,7 @@ public class LifeSteps {
     public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName, DataTable ruleTypeAndOptions) {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
-        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
-                .map(String::trim)
-                .toList();
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).map(String::trim).toList();
         List<String> templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
         for (String templateName : templateNameList) {
             keyValueMap.put(templateName, new HashMap<>());
@@ -1240,15 +1232,11 @@ public class LifeSteps {
             createCreatives.enterCreativeDetails(advertiser, newCreativeName, advertiserDSA, financer);
             createCreatives.selectCreativeType(creativeType);
 
-            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
-                    .map(String::trim)
-                    .map(entry -> entry.split(":", 2))
-                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
 
             createCreatives.fillAttributes(type, attributeMap);
             String actualMessage = createCreatives.saveCreative();
-            Assert.assertTrue("No message is displayed", actualMessage.contains("BulkUpload created successfully.") ||
-                    actualMessage.contains("Creative " + newCreativeName + " created."));
+            Assert.assertTrue("No message is displayed", actualMessage.contains("BulkUpload created successfully.") || actualMessage.contains("Creative " + newCreativeName + " created."));
             nameList.addAll(createCreatives.fetchCreatives());
         }
     }
@@ -1262,9 +1250,7 @@ public class LifeSteps {
 
     @And("Create and verify a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and assign the created creatives to it")
     public void createATacticWithLineItemsAndOtherDetailsAndAssignTheCreatedCreativesToIt(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
-        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(","))
-                .map(String::trim)
-                .toList();
+        List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).map(String::trim).toList();
         for (String creativeName : nameList) {
             String creativeType = creativeName.replaceAll("_Creative_\\d+_\\d+", "").trim();
             String matchedLineItemType;
@@ -1847,8 +1833,7 @@ public class LifeSteps {
     public void verifyTheAvailabilityOfBelowCreativeTypeOptionsAndTheDefaultOptionIsDisplay(String defaultOption, DataTable dataTable) {
         List<String> creativeTypeOptions = dataTable.asList(String.class);
         Assert.assertEquals("All creative type options are available.", bulkCreativeUpload.verifyCreativeTypeOptions(creativeTypeOptions));
-        Assert.assertTrue("Expected 'Display' to be the default selected creative type.",
-                bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
+        Assert.assertTrue("Expected 'Display' to be the default selected creative type.", bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
     }
 
     @And("Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account")
@@ -2056,8 +2041,7 @@ public class LifeSteps {
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank())
-                bulkCreativeUpload.enterWidthHeight("800x250");
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight("800x250");
             bulkCreativeUpload.clickUploadButton();
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
@@ -2072,9 +2056,7 @@ public class LifeSteps {
     @And("Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
         bulkCreativeUpload.clickOKButton();
-        List<String> expectedMessages = Arrays.asList(
-                "Clickthrough URL is required",
-                "Landing Page Domain is required");
+        List<String> expectedMessages = Arrays.asList("Clickthrough URL is required", "Landing Page Domain is required");
         Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
     }
 
@@ -2091,10 +2073,7 @@ public class LifeSteps {
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
             String creativeName = creativeType + "_Creative_" + CommonUtils.timeStampCalculation();
-            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
-                    .map(String::trim)
-                    .map(entry -> entry.split(":", 2))
-                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
             bulkCreativeUpload.clickBulkUploadButton();
             bulkCreativeUpload.selectAndClickCreativeType(creativeType);
             bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
@@ -3070,8 +3049,7 @@ public class LifeSteps {
             boolean matchFound = flightDetailsAfterDeletion.stream().anyMatch(actual -> actual.contains(expected));
             Assert.assertTrue("Expected value not found in flight tab after flight deletion: " + expected, matchFound);
         }
-        Assert.assertNotEquals("Flight details did not change after deletion – deletion may have failed.",
-                capturedDetails, flightDetailsAfterDeletion);
+        Assert.assertNotEquals("Flight details did not change after deletion – deletion may have failed.", capturedDetails, flightDetailsAfterDeletion);
     }
 
     @When("User creates line items with below line types and other details, enables the line item and saves the changes")
@@ -3083,17 +3061,13 @@ public class LifeSteps {
         for (Map<String, String> row : rows) {
             String type = row.get("LINE_TYPE").trim();
             String attributes = row.get("LINE_ITEM_DETAILS").trim();
-            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
-                    .map(String::trim)
-                    .map(entry -> entry.split(":", 2))
-                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
             lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
             nameList.add(lineItemNameRandom);
             lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
             Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
-            Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available",
-                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
+            Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available", lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
             lineItemDetails.cancelTactic();
             if (currentRowIndex < totalRows - 1) {
                 lineItemDetails.selectNewLineItem();
@@ -3117,8 +3091,7 @@ public class LifeSteps {
         for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String notes = lineItemDetails.fetchLineItemNotes();
-            Assert.assertTrue("Note of '" + name + "' is not available",
-                    itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
+            Assert.assertTrue("Note of '" + name + "' is not available", itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
         }
     }
 
@@ -3193,8 +3166,7 @@ public class LifeSteps {
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.performDeleteOperation();
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
-            Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation",
-                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
+            Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation", lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
 
         }
     }
@@ -3256,7 +3228,7 @@ public class LifeSteps {
     @Then("Verify Smart List Creation Panel should display the following List Population Options")
     public void verifySmartListCreationPanelShouldDisplayTheFollowingListPopulationOptions(DataTable dataTable) {
         List<String> listPopulationOptions = dataTable.asList(String.class);
-        for(String option : listPopulationOptions){
+        for (String option : listPopulationOptions) {
             Assert.assertTrue("List Population Option - " + option + " is not available in Smart List Container", npiSmartList.verifyListPopulationOptions(option.trim()));
         }
     }
@@ -3296,7 +3268,7 @@ public class LifeSteps {
         List<String> keywordList = CommonUtils.parseCommaSeparatedString(keywords);
 
         npiSmartList.selectEngagementType(engagementType);
-        switch(engagementType){
+        switch (engagementType) {
             case "Engaged on Site":
                 npiSmartList.addVisitedURL(visitedUrlList);
                 npiSmartList.addIgnoredURL(ignoredUrlList);
@@ -3316,12 +3288,12 @@ public class LifeSteps {
 
     @And("User retrieves all the entered data before saving the list {string}")
     public void userRetrievesAllTheEnteredDataBeforeSavingTheList(String listType) {
-        if(listType.contains(",")){
+        if (listType.contains(",")) {
             List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
-            for(String list : listTypes){
+            for (String list : listTypes) {
                 capturedDetails.addAll(npiSmartList.retrieveEnteredData(list));
             }
-        }else {
+        } else {
             capturedDetails = npiSmartList.retrieveEnteredData(listType);
         }
     }
@@ -3364,7 +3336,7 @@ public class LifeSteps {
     @And("User selects the Speciality {string}")
     public void userSelectsTheSpeciality(String specialities) {
         List<String> specialityList = CommonUtils.parseCommaSeparatedString(specialities);
-        for(String speciality : specialityList) {
+        for (String speciality : specialityList) {
             npiSmartList.selectSpeciality(speciality);
         }
     }
@@ -3372,7 +3344,7 @@ public class LifeSteps {
     @And("User selects the Profession {string}")
     public void userSelectsTheProfession(String professions) {
         List<String> professionList = CommonUtils.parseCommaSeparatedString(professions);
-        for(String profession : professionList){
+        for (String profession : professionList) {
             npiSmartList.selectProfession(profession);
         }
     }
@@ -3407,7 +3379,7 @@ public class LifeSteps {
     @And("Verify that Prescribed Behavior Change should display below tabs")
     public void verifyThatPrescribedBehaviorChangeShouldDisplayDroppersAndNewPrescribersTabs(DataTable dataTable) {
         List<String> tabList = dataTable.asList(String.class);
-        for(String tabName : tabList) {
+        for (String tabName : tabList) {
             Assert.assertTrue(tabName + " is not available", npiSmartList.fetchPrescriptionBehaviourTab(tabName));
         }
     }
@@ -3437,7 +3409,7 @@ public class LifeSteps {
     @And("User selects the prescription drug name {string}")
     public void userSelectsThePrescriptionDrugName(String drugNames) {
         List<String> drugList = CommonUtils.parseCommaSeparatedString(drugNames);
-        for(String drug : drugList){
+        for (String drug : drugList) {
             npiSmartList.selectPrescriptionDrug(drug);
         }
     }
@@ -3476,7 +3448,7 @@ public class LifeSteps {
     @And("User clicks {string} primary concept dropdown, enters {string} and selects it")
     public void userClicksMedscapePrimaryConceptDropdownEntersAndSelectsIt(String contextualCategory, String primaryConcept) {
         List<String> primaryConceptList = CommonUtils.parseCommaSeparatedString(primaryConcept);
-        for(String concept : primaryConceptList){
+        for (String concept : primaryConceptList) {
             npiSmartList.selectMedscapePrimaryConcept(contextualCategory, concept);
         }
     }
@@ -3500,10 +3472,7 @@ public class LifeSteps {
             String option = row.get("PopulationOption").trim();
             String details = row.get("OptionDetails").trim();
             npiSmartList.selectSmartNPIListType(option);
-            Map<String, String> attributeMap = Arrays.stream(details.split(","))
-                    .map(String::trim)
-                    .map(entry -> entry.split(":", 2))
-                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(details.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
 
             npiSmartList.enterPopulationOptionsDetail(option, attributeMap);
         }
@@ -3513,9 +3482,9 @@ public class LifeSteps {
     public void verifyBulkUploadTemplateEntryCountMatchesUICountPostUpload(String fileName) throws IOException {
         int recordsCountFromFile = FileActions.countRecordsFromTextFile(fileName);
         int recordsCountFromUI = 0;
-        if(fileName.contains("Diagnosis_BulkUpload")){
+        if (fileName.contains("Diagnosis_BulkUpload")) {
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchDiagnosisCodesFromUI());
-        }else{
+        } else {
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchMedicalProcedureCodesFromUI());
         }
         Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);

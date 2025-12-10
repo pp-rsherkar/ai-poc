@@ -15,39 +15,39 @@ public class WaitUtility {
         this.PRE_LOADER = page.locator("//div[contains(@class,'preloader')]");
     }
 
-    public void waitUntilSpinnerHidden(){
+    public void waitUntilSpinnerHidden() {
         SPINNER.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitUntilSpinnerHidden(double timeout){
+    public void waitUntilSpinnerHidden(double timeout) {
         SPINNER.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitUntilPreLoaderHidden(){
+    public void waitUntilPreLoaderHidden() {
         PRE_LOADER.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitUntilPreLoaderHidden(double timeout){
+    public void waitUntilPreLoaderHidden(double timeout) {
         PRE_LOADER.first().waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitForLocatorVisible(Locator locator){
+    public void waitForLocatorVisible(Locator locator) {
         locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void waitForLocatorVisible(Locator locator, double timeout){
+    public void waitForLocatorVisible(Locator locator, double timeout) {
         locator.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void waitForLocatorHidden(Locator locator){
+    public void waitForLocatorHidden(Locator locator) {
         locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitForLocatorHidden(Locator locator, double timeout){
+    public void waitForLocatorHidden(Locator locator, double timeout) {
         locator.waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitForLocatorDetached(Locator locator){
+    public void waitForLocatorDetached(Locator locator) {
         locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
     }
 
@@ -63,7 +63,7 @@ public class WaitUtility {
         page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
-    public void waitForElementDetached(String xpath){
+    public void waitForElementDetached(String xpath) {
         page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.DETACHED));
     }
 }

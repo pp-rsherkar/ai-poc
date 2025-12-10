@@ -117,12 +117,12 @@ public class Campaigns {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public  void clickLineItem()  {
+    public void clickLineItem() {
         LINE_ITEM_TAB.first().click();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
     }
 
-    public  boolean isFrequencyCapDisabled() {
+    public boolean isFrequencyCapDisabled() {
         return FREQUENCY_CAP.getAttribute("class").contains("checked");
     }
 
@@ -250,8 +250,8 @@ public class Campaigns {
     }
 
     public String fetchDefaultValue(Locator locator) {
-        for(int i = 0; i< locator.count(); i++){
-            if(locator.nth(i).getAttribute("class") != null && locator.nth(i).getAttribute("class").contains("active"))
+        for (int i = 0; i < locator.count(); i++) {
+            if (locator.nth(i).getAttribute("class") != null && locator.nth(i).getAttribute("class").contains("active"))
                 return locator.nth(i).textContent().trim();
         }
         return "";
@@ -271,10 +271,8 @@ public class Campaigns {
 
     public void clickManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount) {
         MANAGEMENT_FEE_OPTIONS.locator("text=" + managementFeeOption).click();
-        if(PERCENT_TYPE_FEE_INPUT.isVisible())
-            PERCENT_TYPE_FEE_INPUT.fill(percent);
-        if(DOLLAR_TYPE_FEE_INPUT.isVisible())
-            DOLLAR_TYPE_FEE_INPUT.fill(amount);
+        if (PERCENT_TYPE_FEE_INPUT.isVisible()) PERCENT_TYPE_FEE_INPUT.fill(percent);
+        if (DOLLAR_TYPE_FEE_INPUT.isVisible()) DOLLAR_TYPE_FEE_INPUT.fill(amount);
     }
 
     public void clickActionItemMenu() {
@@ -305,10 +303,8 @@ public class Campaigns {
         enteredData.add(CAMPAIGN_DESCRIPTION.inputValue());
         enteredData.add(fetchDefaultValue(BUDGET_STATUS));
         enteredData.add(fetchDefaultValue(MANAGEMENT_FEE_OPTIONS));
-        if(PERCENT_TYPE_FEE_INPUT.isVisible())
-            enteredData.add(PERCENT_TYPE_FEE_INPUT.inputValue());
-        if(DOLLAR_TYPE_FEE_INPUT.isVisible())
-            enteredData.add(DOLLAR_TYPE_FEE_INPUT.inputValue());
+        if (PERCENT_TYPE_FEE_INPUT.isVisible()) enteredData.add(PERCENT_TYPE_FEE_INPUT.inputValue());
+        if (DOLLAR_TYPE_FEE_INPUT.isVisible()) enteredData.add(DOLLAR_TYPE_FEE_INPUT.inputValue());
         return enteredData;
     }
 
@@ -321,7 +317,7 @@ public class Campaigns {
     public void clickCampaignDetailsTab() {
         waitUtility.waitForLocatorVisible(CAMPAIGN_DETAILS_TAB);
         CAMPAIGN_DETAILS_TAB.click();
-        while(!SELECTED_ADVERTISER.isVisible()){
+        while (!SELECTED_ADVERTISER.isVisible()) {
             page.waitForTimeout(1000);
         }
     }
@@ -358,7 +354,7 @@ public class Campaigns {
     }
 
     public String fetchCustomFieldSuccessAlert() {
-        String text =  CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
+        String text = CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
         waitUtility.waitForLocatorHidden(CUSTOM_FIELD_SUCCESS_ALERT);
         return text;
     }

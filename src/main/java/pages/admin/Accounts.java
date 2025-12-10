@@ -246,7 +246,7 @@ public class Accounts {
 
     public void clickOKButton() {
         OK_BUTTON.click();
-        while(!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()){
+        while (!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()) {
             page.waitForTimeout(5000);
         }
         page.waitForTimeout(10000); //needed this hard wait as page remains un-interactive even after element is visible
@@ -289,6 +289,7 @@ public class Accounts {
         GLOBAL_SIGNALS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
     }
+
     public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
         Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
         switch (advertiserPermission) {
@@ -326,8 +327,7 @@ public class Accounts {
                 }
                 break;
         }
-        if(USER_PERMISSIONS_SAVE_BUTTON.isVisible())
-        {
+        if (USER_PERMISSIONS_SAVE_BUTTON.isVisible()) {
             USER_PERMISSIONS_SAVE_BUTTON.click();
         }
     }
@@ -374,8 +374,8 @@ public class Accounts {
         return flag;
     }
 
-    public void saveAccountsAdvertiserTab(){
-        if(OK_BUTTON.isVisible()) {
+    public void saveAccountsAdvertiserTab() {
+        if (OK_BUTTON.isVisible()) {
             OK_BUTTON.click();
             waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         }

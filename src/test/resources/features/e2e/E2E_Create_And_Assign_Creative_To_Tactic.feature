@@ -1,12 +1,12 @@
 Feature: End to End Workflow of Creative Creation and its assignment To Tactic
   It covers below points -
   1. Creating creatives via UI for the following types:
-    a.  Display
-    b.  Audio
-    c.  Video
-    d.  Native Display
-    e.  Native Video
-    f.  Search Extension
+  a.  Display
+  b.  Audio
+  c.  Video
+  d.  Native Display
+  e.  Native Video
+  f.  Search Extension
   2. Bulk uploading creatives for supported types - Display, HTML, Video, Native
   3. Verify Creatives on the Creative Library page
   4. Assign the created Creative to a Tactic
@@ -61,7 +61,7 @@ Feature: End to End Workflow of Creative Creation and its assignment To Tactic
       | CreativeType | CreativeAttributes                                                                                                                                                |
       | Video        | FileType: DCM File, FileName:DCM_VIDEO_E2E_BulkUpload.xlsx, Status:Denied, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, Size:800x250 |
     When User creates and saves "Native" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                                               |
+      | CreativeType | CreativeAttributes                                                                                                                                           |
       | Native       | FileName:NativeBulkUploadTemplate.xlsx, Status:Approved, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, IAB:Profane, Size:800x250 |
     #2
     Then Verify the newly created creative is displayed in the Creative Library page
