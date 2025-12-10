@@ -132,7 +132,6 @@ public class TacticSettings {
         this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
         this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
         this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
-
         this.SELECTED_ONLY_TAB = page.locator("//span[contains(text(),'Selected Only')]");
         this.BLOCKED_TARGET = page.locator("//div[contains(@class,'danger')]");
         this.SELECTED_TARGET = page.locator("//div[contains(@class,'success')]");

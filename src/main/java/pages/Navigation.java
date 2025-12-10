@@ -114,7 +114,7 @@ public class Navigation {
             ACCOUNT_ITEM.click();
         }
         waitUtility.waitUntilSpinnerHidden();
-        campaignDashboard.verifyIfFiltersExist();
+        campaignDashboard.resetFiltersIfApplied();
         waitUtility.waitUntilPreLoaderHidden();
     }
 

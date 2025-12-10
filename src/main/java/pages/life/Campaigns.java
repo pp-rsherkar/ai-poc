@@ -46,6 +46,13 @@ public class Campaigns {
     private final Locator CUSTOM_FIELD_DELETE_ICON;
     private final Locator CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP;
     private final Locator CUSTOM_FIELD_DELETE_BUTTON;
+    private final Locator COMMENT_BOX_FROM_TITLE;
+    private final Locator COMMENT_BOX_FROM_DASHBOARD;
+    private final Locator LINE_ITEM_TILE;
+    private final Locator TACTIC_TILE;
+    private final Locator CAMPAIGN_TILE;
+    private final Locator TOOL_TIP;
+    private final Locator TOGGLE_STATUS;
     private final Locator CAMPAIGN_TAB;
     private final Locator DETAILS_TAB;
     private final Locator TIMES_PER_DROPDOWN;
@@ -95,6 +102,13 @@ public class Campaigns {
         this.CUSTOM_FIELD_DELETE_ICON = page.locator("//div[contains(@class,'campaign-height-popover')]//app-icon-lable-link[@text='Delete']");
         this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted') or normalize-space(text())=\"Custom Field Can't Be Removed\"]");
         this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field') or contains(text(),'Ok')]");
+        this.COMMENT_BOX_FROM_TITLE = page.locator("//span[@class='notes-dark-icon-provided']");
+        this.COMMENT_BOX_FROM_DASHBOARD = page.locator("//span[contains(@class,'notes-icon-provided-dashboard')]");
+        this.LINE_ITEM_TILE = page.locator("//div[contains(@class,'listitembox')]");
+        this.TACTIC_TILE = page.locator("//div[contains(@class,'tactic-container')]");
+        this.CAMPAIGN_TILE = page.locator("//div[contains(@class,'campaign-tile')]");
+        this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
+        this.TOGGLE_STATUS = page.locator("//span[contains(@class,'gaEnable ')]//label");
         this.CAMPAIGN_TAB = page.locator("//div[@class='item-details']");
         this.CUSTOM_FIELD = page.locator("//label[contains(@class,'cmp-form-label')]");
         this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
@@ -389,5 +403,37 @@ public class Campaigns {
         String text = CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP.textContent().trim();
         CUSTOM_FIELD_DELETE_BUTTON.click();
         return text;
+    }
+
+    public void clickCampaignTile(){
+        CAMPAIGN_TILE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickLineItemTile(){
+        LINE_ITEM_TILE.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public void clickTacticTile() {
+        TACTIC_TILE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String fetchCommentFromCampaignLineItemTacticPanel() {
+        COMMENT_BOX_FROM_TITLE.hover();
+        return TOOL_TIP.innerText();
+    }
+
+    public String fetchCommentFromCampaignLineItemTacticDashboard() {
+        do {
+            COMMENT_BOX_FROM_DASHBOARD.hover();
+        } while (!TOOL_TIP.isVisible());
+        return TOOL_TIP.innerText();
+    }
+
+    public String fetchToggleStatus() {
+        return TOGGLE_STATUS.textContent().trim();
     }
 }
