@@ -1,20 +1,24 @@
 package utils;
-import com.opencsv.*;
-import org.apache.poi.ss.usermodel.*;
+
+import com.opencsv.CSVReader;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
-import java.nio.file.DirectoryStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.StreamSupport;
+import java.util.List;
 
 public class FileActions {
 
     public static List<String[]> readAllDataAtOnce(String file) {
-        List<String[]> allData=null;
+        List<String[]> allData = null;
         try {
             FileReader filereader = new FileReader(file);
             CSVReader csvReader = new CSVReader(filereader);
@@ -66,8 +70,7 @@ public class FileActions {
 
             int colIndex = -1;
             for (Cell c : header)
-                if (c.getStringCellValue().trim().equalsIgnoreCase(columnName))
-                    colIndex = c.getColumnIndex();
+                if (c.getStringCellValue().trim().equalsIgnoreCase(columnName)) colIndex = c.getColumnIndex();
 
             if (colIndex == -1)
                 throw new IllegalStateException("Column '" + columnName + "' not found in " + filePath.getFileName());

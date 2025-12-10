@@ -219,7 +219,7 @@ public class LineItemDetails {
 
     public String verifyLineItemStatus() {
         String status = " ";
-        if(TACTIC_ITEM_DETAILS.count() == 0){
+        if (TACTIC_ITEM_DETAILS.count() == 0) {
             status = LINE_ITEM_STATUS.innerText();
         }
         return status;
@@ -236,7 +236,7 @@ public class LineItemDetails {
         return text;
     }
 
-    public String fetchCampaignBudget(){
+    public String fetchCampaignBudget() {
         String fullText = UNACCOUNTED_BUDGET.textContent();
         String number = fullText.replaceAll("[^0-9]", "");
         number = number.substring(0, number.length() - 2);
@@ -255,13 +255,12 @@ public class LineItemDetails {
         return endDay;
     }
 
-    public void selectFlightDates(Locator locator, int day){
+    public void selectFlightDates(Locator locator, int day) {
         locator.click();
         while (CALENDER_TITLE.first().isVisible() && !CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear))) {
             CALENDER_TITLE.first().click();
         }
-        if(CALENDER_CURRENT_MONTH.isVisible())
-            CALENDER_CURRENT_MONTH.click();
+        if (CALENDER_CURRENT_MONTH.isVisible()) CALENDER_CURRENT_MONTH.click();
         if (!CALENDER_DATE.locator("text = " + day).first().isVisible()) {
             CALENDER_NEXT_BUTTON.click();
         }
@@ -271,7 +270,7 @@ public class LineItemDetails {
     public void selectOverlappingFlightDates(int flightStartDate, int flightEndDate) {
         startDay = flightStartDate + 1;
         endDay = flightEndDate - 1;
-        if(FLIGHT_CONTAINER.count() > 1){
+        if (FLIGHT_CONTAINER.count() > 1) {
             selectFlightDates(FLIGHT_START_DATE.nth(1), startDay);
             selectFlightDates(FLIGHT_END_DATE.nth(1), endDay);
             waitUtility.waitForLocatorHidden(CALENDER_DATE.first());
@@ -308,19 +307,19 @@ public class LineItemDetails {
         return (value != null && !value.isEmpty()) ? value : "";
     }
 
-    public void navigateToLineItemDetails(String lineItemName){
+    public void navigateToLineItemDetails(String lineItemName) {
         page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName)).click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
     }
 
-    public void clickDetailsTab(){
-        TAB_NAMES.locator("text=Details" ).click();
+    public void clickDetailsTab() {
+        TAB_NAMES.locator("text=Details").click();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public void clickOverviewTab(){
-        TAB_NAMES.locator("text=Overview" ).click();
+    public void clickOverviewTab() {
+        TAB_NAMES.locator("text=Overview").click();
         waitUtility.waitUntilPreLoaderHidden();
     }
 
@@ -330,9 +329,9 @@ public class LineItemDetails {
 
     public List<String> generateSequentialFlights(String budget, String numberOfMonths) {
         List<String> sequentialFlights = new ArrayList<>();
-        int initialFlightCount  = FLIGHT_CONTAINER.count();
+        int initialFlightCount = FLIGHT_CONTAINER.count();
         GENERATE_SEQUENTIAL_FLIGHT.click();
-        String startMonthValue  = SEQUENTIAL_START_MONTH.evaluate("el => el.value").toString();
+        String startMonthValue = SEQUENTIAL_START_MONTH.evaluate("el => el.value").toString();
         sequentialFlights.add(startMonthValue);
         NUMBER_OF_MONTHS.click();
         page.locator(String.format("//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']", numberOfMonths)).click();
@@ -340,9 +339,7 @@ public class LineItemDetails {
         GENERATE_FLIGHTS.click();
         int totalFlightCount = FLIGHT_CONTAINER.count();
         for (int i = initialFlightCount + 1; i <= totalFlightCount; i++) {
-            String flightStartDate = page
-                    .locator(String.format("//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightStartDate')]", i))
-                    .evaluate("el => el.value").toString();
+            String flightStartDate = page.locator(String.format("//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightStartDate')]", i)).evaluate("el => el.value").toString();
             sequentialFlights.add(flightStartDate);
         }
         return sequentialFlights;
@@ -373,10 +370,10 @@ public class LineItemDetails {
     }
 
     public String performBulkModeOperationsOnLineItems(String bulkOperations) {
-        if(bulkOperations.equalsIgnoreCase("Disables")){
+        if (bulkOperations.equalsIgnoreCase("Disables")) {
             waitUtility.waitForLocatorVisible(BULK_DISABLE_LINE_ITEM);
             BULK_DISABLE_LINE_ITEM.click();
-        }else if(bulkOperations.equalsIgnoreCase("Enables")){
+        } else if (bulkOperations.equalsIgnoreCase("Enables")) {
             waitUtility.waitForLocatorVisible(BULK_ENABLE_LINE_ITEM);
             BULK_ENABLE_LINE_ITEM.click();
         }
@@ -385,7 +382,7 @@ public class LineItemDetails {
         return text;
     }
 
-    public void clickLineItemOptions(String option){
+    public void clickLineItemOptions(String option) {
         LINE_ITEMS_OPTIONS.scrollIntoViewIfNeeded();
         LINE_ITEMS_OPTIONS.click();
         Locator optionXpath = page.locator(String.format("//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
@@ -402,7 +399,7 @@ public class LineItemDetails {
         return text;
     }
 
-    public boolean verifyLineItemAvailable(String lineItemName){
+    public boolean verifyLineItemAvailable(String lineItemName) {
         Locator lineItem = page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName));
         lineItem.scrollIntoViewIfNeeded();
         return lineItem.isVisible();
@@ -442,8 +439,7 @@ public class LineItemDetails {
     public List<String> fetchLineItemDetails() {
         List<String> originalLineItemDetails = new ArrayList<>();
         originalLineItemDetails.add(COST_MODEL.locator("xpath=./descendant::div[contains(@class, 'text')]").textContent());
-        if(FLAT_CPM.isVisible())
-            originalLineItemDetails.add(FLAT_CPM.innerText());
+        if (FLAT_CPM.isVisible()) originalLineItemDetails.add(FLAT_CPM.innerText());
         Locator budgetXpath = BUDGET_DISTRIBUTION.locator("xpath=//button");
         for (int i = 0; i < budgetXpath.count(); i++) {
             if (budgetXpath.nth(i).getAttribute("class").contains("active")) {
@@ -454,8 +450,7 @@ public class LineItemDetails {
         originalLineItemDetails.add(FLIGHT_START_DATE.inputValue());
         originalLineItemDetails.add(FLIGHT_END_DATE.inputValue());
         originalLineItemDetails.add(PACING_MODE.locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]").textContent().trim());
-        if(PACING_MODE_INPUT.isVisible())
-            originalLineItemDetails.add(PACING_MODE_INPUT.innerText());
+        if (PACING_MODE_INPUT.isVisible()) originalLineItemDetails.add(PACING_MODE_INPUT.innerText());
         return originalLineItemDetails;
     }
 
@@ -472,28 +467,26 @@ public class LineItemDetails {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void selectCostModel(String costModel, String cpm){
+    public void selectCostModel(String costModel, String cpm) {
         String optionXPath = String.format("//div[contains(@class, 'gaCostType') and normalize-space(text())='%s']", costModel);
-        if(!COST_MODEL.getAttribute("class").contains("disabled")) {
+        if (!COST_MODEL.getAttribute("class").contains("disabled")) {
             COST_MODEL.click();
             COST_MODEL.locator(optionXPath).click();
-            if(FLAT_CPM.isVisible())
-                FLAT_CPM.fill(cpm);
+            if (FLAT_CPM.isVisible()) FLAT_CPM.fill(cpm);
         }
     }
 
     private void selectBudgetDistribution(String budgetDistribution) {
-        if(!BUDGET_DISTRIBUTION.getAttribute("class").contains("disabled")) {
+        if (!BUDGET_DISTRIBUTION.getAttribute("class").contains("disabled")) {
             Locator xpath = BUDGET_DISTRIBUTION.locator("xpath=//button[normalize-space(.)='" + budgetDistribution + "']");
             xpath.click();
         }
     }
 
-    public void selectPacingMode(String pacingMode, String pacingPercentage){
+    public void selectPacingMode(String pacingMode, String pacingPercentage) {
         PACING_MODE.click();
         String optionXPath = String.format("//sui-select-option//span[text()='%s']", pacingMode);
         PACING_MODE.locator(optionXPath).click();
-        if(PACING_MODE_INPUT.isVisible())
-            PACING_MODE_INPUT.fill(pacingPercentage);
+        if (PACING_MODE_INPUT.isVisible()) PACING_MODE_INPUT.fill(pacingPercentage);
     }
 }

@@ -253,8 +253,8 @@ public class ReportTemplates {
         CANCEL_BUTTON.click();
     }
 
-    public boolean verifyReportGeneratedFromLineItemPage(String reportName){
-        Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]",reportName));
+    public boolean verifyReportGeneratedFromLineItemPage(String reportName) {
+        Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]", reportName));
         return xpath.isVisible();
     }
 }

@@ -425,7 +425,7 @@ public class CampaignDashboard {
         return text;
     }
 
-    public void navigateToLineItemDetails(){
+    public void navigateToLineItemDetails() {
         LINE_ITEM_NAME.click();
         LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }

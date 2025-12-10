@@ -45,14 +45,13 @@ public class TacticCreatives {
     }
 
     public void assignCreatives(String creative) {
-        Locator selectCreative = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td/sui-checkbox",creative));
+        Locator selectCreative = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td/sui-checkbox", creative));
         ASSIGN_CREATIVE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CREATIVE.fill(creative);
         CLICK_SEARCH.click();
         waitUtility.waitForLocatorVisible(selectCreative.first(), 5000);
         selectCreative.first().scrollIntoViewIfNeeded();
-        if(!selectCreative.first().getAttribute("class").contains("checked"))
-            selectCreative.first().click();
+        if (!selectCreative.first().getAttribute("class").contains("checked")) selectCreative.first().click();
         ASSIGN_CREATIVE_OK_BUTTON.click();
     }
 

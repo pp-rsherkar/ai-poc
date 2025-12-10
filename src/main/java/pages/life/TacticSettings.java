@@ -12,6 +12,8 @@ import java.util.*;
 public class TacticSettings {
     public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
     public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -72,8 +74,6 @@ public class TacticSettings {
     private final Locator BLOCKED_TARGET_HP;
     private final Locator TARGET;
     private final Locator BLOCK;
-    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
-    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -146,7 +146,7 @@ public class TacticSettings {
     }
 
     public void selectChannel(String channel) {
-        if(SELECT_CHANNEL.isVisible()){
+        if (SELECT_CHANNEL.isVisible()) {
             SELECT_CHANNEL.click();
             SELECT_CHANNEL.locator("text=" + channel).first().click();
         }
@@ -227,14 +227,8 @@ public class TacticSettings {
         clickOk();
         clickClose();
         waitUtility.waitForLocatorVisible(ruleType.equals("NPI") ? PRACTICE_IP_ICON : HOUSEHOLD_IP_ICON);
-        String selectedTargets = TARGET.first().innerText().replaceAll("\\s*\\(\\d+\\)\\s*", "")
-                .replaceAll("[\\r\\n]+", "")
-                .replaceAll("\\u00A0", "")
-                .trim();
-        String blockedTargets = BLOCK.first().innerText().trim().replaceAll("\\s*\\(\\d+\\)\\s*", "")
-                .replaceAll("[\\r\\n]+", "")
-                .replaceAll("\\u00A0", "")
-                .trim();
+        String selectedTargets = TARGET.first().innerText().replaceAll("\\s*\\(\\d+\\)\\s*", "").replaceAll("[\\r\\n]+", "").replaceAll("\\u00A0", "").trim();
+        String blockedTargets = BLOCK.first().innerText().trim().replaceAll("\\s*\\(\\d+\\)\\s*", "").replaceAll("[\\r\\n]+", "").replaceAll("\\u00A0", "").trim();
         ACTUAL_TARGET_RULE.add(blockedTargets);
         ACTUAL_TARGET_RULE.add(selectedTargets);
     }
