@@ -211,6 +211,43 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget,actualTarget);
     }
 
+    @Then("User adds frequency cap with details {string} {string} {string} {string}")
+    public void user_adds_frequency_cap_with_details(String level, String FREQ_VALUE, String TIMES_PER, String SCOPE) {
+        campaigns.addFrequencyCap(level, FREQ_VALUE, TIMES_PER, SCOPE);
+    }
+    @Then("User clicks on details tab")
+    public void user_clicks_on_details_tab() {
+        campaigns.clickDetailsTab();
+    }
+    @Then("User verified Frequency Cap is in disabled states by default")
+    public void userVerifiedFrequencyCapIsInDisabledStatesByDefault() {
+        boolean fc_checkbox_state = campaigns.isFrequencyCapDisabled();
+        Assert.assertFalse(fc_checkbox_state);
+    }
+    @Then("User navigates to LineItem")
+    public void userNavigatesToLineItem() {
+        campaigns.clickLineItem();
+    }
+    @Then("User verifies if frequency cap is saved with details {string} {string} {string} {string}")
+    public void userVerifiesIfFrequencyCapIsSavedWithDetailsOnCampaignLevel(String freqValue, String timesPer, String scope, String level) {
+        String actualFrequencyCapText = campaigns.getSavedFrequencyCap(level);
+        String expectedFrequencyCapText = String.format("%s x %s x %s %s", freqValue, timesPer, scope, level).toUpperCase();
+        if(timesPer.contains("hour")){
+            expectedFrequencyCapText = String.format("%s x Time Per %s hour %s %s", freqValue, freqValue, scope, level).toUpperCase();
+        }
+        Assert.assertEquals(expectedFrequencyCapText, actualFrequencyCapText);
+    }
+    @Then("User navigates to Tactic and clicks on settings tab")
+    public void user_navigates_to_tactic_and_clicks_on_settings_tab() {
+        tacticDetails.clickFirstTacticTab();
+        tacticDetails.clickSettingsTab();
+    }
+    @Then("Verify that frequency cap is saved in tactic")
+    public void verify_that_frequency_cap_is_saved_in_tactic() {
+        boolean frequencyCapState = campaigns.getFrequencyCapState();
+        Assert.assertTrue(frequencyCapState);
+    }
+
     @Then("Verify that below tabs gets enabled only after saving tactics")
     public void verify_that_below_tabs_gets_enabled_only_after_saving_tactics(DataTable dataTable) {
         tacticDetails.verifyDetailsTab();
@@ -2403,8 +2440,8 @@ public class LifeSteps {
 
     @And("Verify that user is able to select Schedule start date and Schedule end date")
     public void verifyThatUserIsAbleToSelectScheduleStartDateAndScheduleEndDate() {
-        Assert.assertTrue("Unable to select date from date picker", scheduleReport.selectScheduleStartDate());
-        Assert.assertTrue("Unable to select date from date picker", scheduleReport.selectScheduleEndDate());
+        Assert.assertTrue("Unable to select start date from date picker", scheduleReport.selectScheduleStartDate());
+        Assert.assertTrue("Unable to select end date from date picker", scheduleReport.selectScheduleEndDate());
     }
 
     @And("Verify default value of Data Timezone is {string}")
