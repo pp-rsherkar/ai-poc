@@ -16,6 +16,7 @@ import utils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -89,6 +91,7 @@ public class LifeSteps {
     private String uiCustomFieldName;
     private BigDecimal campaignBaseBid;
     private BigDecimal campaignMaxBid;
+    Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
@@ -3809,5 +3812,53 @@ public class LifeSteps {
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
         Assert.assertFalse(customFieldName + " Custom Field is available", campaigns.isAddedCustomFieldAvailable(customFieldName));
+    }
+
+    @And("Verify that user is able to download the uploaded {string} list")
+    public void verifyThatUserIsAbleToDownloadTheUploadedFile(String listType) throws IOException {
+        if (listType.equals("NPI")) {
+            targetFilePath = npiStaticList.clickDownloadIcon();
+        } else {
+            targetFilePath = sharedList.clickDownloadIcon();
+        }
+
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
+    }
+
+    @And("Verify the count of items in the downloaded {string} list")
+    public void verifyTheCountOfItemsInTheDownloadedList(String listType) throws IOException {
+        String header = null;
+        int recordsCountFromFile = 0;
+        String recordsCountFromUI;
+
+        switch (listType) {
+            case "Keyword":
+                header = "\ufeffKeywords";
+                break;
+            case "Domain":
+                header = "\ufeffdomains";
+                break;
+            case "App Bundle":
+                header = "\ufeffApp Bundles";
+                break;
+            case "IP":
+                recordsCountFromFile = FileActions.fetchRowCountFromCSV(targetFilePath);
+                break;
+            case "NPI":
+                header = "NPI";
+                break;
+        }
+
+        if (header != null) {
+            recordsCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, header);
+        }
+
+        if (listType.equals("NPI")) {
+            recordsCountFromUI = npiStaticList.fetchSharedListCountFromUI();
+        } else {
+            recordsCountFromUI = sharedList.fetchSharedListCountFromUI();
+        }
+
+        Assert.assertEquals("Downloaded list count doesn't match with UI count", recordsCountFromFile, Integer.parseInt(recordsCountFromUI));
     }
 }
