@@ -12,7 +12,6 @@ import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ExplorerWorkspace {
     private final Page page;
@@ -52,7 +51,7 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_FILTERS;
     private final Locator MOMENTS;
     private final Locator IBHEALTH;
-    private final Locator MOMENTS_WIDGET ;
+    private final Locator MOMENTS_WIDGET;
     private final Locator CLAIMS_WIDGET;
     private final Locator OWNED_AND_OPERATED_SECTION;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
@@ -93,10 +92,10 @@ public class ExplorerWorkspace {
         this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
         this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
-        this.MOMENTS= WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='IAB']");
-        this.IBHEALTH= WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='WebMD']");
-        this.MOMENTS_WIDGET= WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
-        this.CLAIMS_WIDGET= WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
+        this.MOMENTS = WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='IAB']");
+        this.IBHEALTH = WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='WebMD']");
+        this.MOMENTS_WIDGET = WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
+        this.CLAIMS_WIDGET = WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
 
         this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
     }
@@ -233,8 +232,8 @@ public class ExplorerWorkspace {
                     CommonUtils.hoverAndClick(page, box, MAP_TOOL_TIP);
                     break;
                 case "Top 20 Market Areas", "Top 20 Professions", "Top 20 Specialties", "Top 20 Insurance Providers",
-                     "Top 20 Prescriptions",
-                     "Top 20 Diagnoses", "Top 20 Procedures", "Top 20 MeSH Categories", "Top 20 IAB Categories":
+                     "Top 20 Prescriptions", "Top 20 Diagnoses", "Top 20 Procedures", "Top 20 MeSH Categories",
+                     "Top 20 IAB Categories":
                     Locator TOP_ENTITIES = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[@class='ag-center-cols-container']/div", visual));
                     isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, TOP_ENTITIES, 1000, 100, page);
                     if (!isInView) {

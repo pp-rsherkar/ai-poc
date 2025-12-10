@@ -10,8 +10,6 @@ import utils.WaitUtility;
 
 public class Navigation {
 
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     public final Locator USERNAME;
     private final Locator PASSWORD;
     private final Locator LOGIN_BUTTON;
@@ -34,6 +32,8 @@ public class Navigation {
     private final Locator MENU_ANGLE;
     private final Locator PULSEPOINT_LOGO;
     private final Locator ADMIN_DASHBOARD_TITLE;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
 
     public Navigation(Page page) {
         this.page = page;
@@ -122,8 +122,8 @@ public class Navigation {
         SUB_MENU.click();
     }
 
-    public void clickMenuAngle(){
-        if(MENU_ANGLE.isVisible()) {
+    public void clickMenuAngle() {
+        if (MENU_ANGLE.isVisible()) {
             if (MENU_ANGLE.getAttribute("class").contains("fa-angle-left")) {
                 MENU_ANGLE.click();
             }
@@ -170,21 +170,21 @@ public class Navigation {
 
     // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
     // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
-    public void navigateBackToLife(){
+    public void navigateBackToLife() {
         waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
         LIFE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         LIFE.click();
     }
 
-    public void navigateBackToHCP(){
+    public void navigateBackToHCP() {
         waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
         SIGNAL.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SIGNAL.click();
     }
 
-    public void navigateBackToStudio(){
+    public void navigateBackToStudio() {
         waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));

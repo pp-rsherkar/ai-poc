@@ -17,7 +17,7 @@ Feature: Fetch, Create, Add, Delete and Replace NPI List using below APIs
       | admin11  | ppadmin1 | ATTRIBUTE     | 43220   |
       | admin11  | ppadmin1 | AUTO_IMPORTED | 43264   |
       | admin11  | ppadmin1 | SMART         | 43224   |
-    
+
   @api
   Scenario Outline: Fetch NPI Lists using Account ID
     Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication

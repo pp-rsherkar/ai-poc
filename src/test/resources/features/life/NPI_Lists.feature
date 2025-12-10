@@ -318,7 +318,7 @@ Feature: LIFE Regression - Create NPI List of following types:
     And Verify that the retrieved data for the "<TYPE>" list was saved correctly
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE                         | DRUG_NAME                   | TOP_DROPPER_PERCENT | TIME_FRAME_SELECTOR |
-      | 01- Advertiser | SMART_Pixel_NPI | Prescription Behavior Change | Acne Reparatif, Parathyroid |  60                 |  10                 |
+      | 01- Advertiser | SMART_Pixel_NPI | Prescription Behavior Change | Acne Reparatif, Parathyroid | 60                  | 10                  |
 
   @regression
   Scenario Outline: Validate the successful creation of a Smart List as a Prescription Behavior Change with New Prescribers option

@@ -171,17 +171,17 @@ public class BulkCreativeUpload {
     }
 
     public void clickPreviewButton() {
-        if(PREVIEW_BUTTON.isVisible()) PREVIEW_BUTTON.click();
+        if (PREVIEW_BUTTON.isVisible()) PREVIEW_BUTTON.click();
     }
 
     public void clickUploadButton() {
-        if(UPLOAD_BUTTON.isVisible()) UPLOAD_BUTTON.click();
+        if (UPLOAD_BUTTON.isVisible()) UPLOAD_BUTTON.click();
     }
 
     public String fetchErrorAlert() {
         if (!ERROR_ALERT.isVisible()) {
             return "";
-        }else {
+        } else {
             String text = ERROR_ALERT.innerText().trim();
             waitUtility.waitForLocatorHidden(ERROR_ALERT);
             return text;
@@ -216,7 +216,7 @@ public class BulkCreativeUpload {
     }
 
     public void clickOKButton() {
-        if(OK_BUTTON.isVisible()) OK_BUTTON.click();
+        if (OK_BUTTON.isVisible()) OK_BUTTON.click();
     }
 
     public boolean verifyDisplayCreativeSections(String section) {
@@ -419,7 +419,8 @@ public class BulkCreativeUpload {
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
-                if (createCreatives.CLICK_THROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
+                if (createCreatives.CLICK_THROUGH_URL.isVisible())
+                    enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);

@@ -380,7 +380,7 @@ public class CampaignDashboard {
         return true;
     }
 
-    public void navigateToLineItemDetails(){
+    public void navigateToLineItemDetails() {
         LINE_ITEM_NAME.click();
         LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
@@ -426,7 +426,7 @@ public class CampaignDashboard {
         verifyFavoriteCheckbox();
         verifyHideFinishedCheckbox();
         verifyIfFiltersExist();
-        while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
+        while (!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()) {
             SEARCH_CAMPAIGN.fill(createdCampaign);
             CLICK_CAMPAIGN_SEARCH.click();
         }
