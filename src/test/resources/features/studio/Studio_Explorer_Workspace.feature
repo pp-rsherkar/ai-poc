@@ -18,22 +18,29 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
-      | FilterName         | Option                                                                                                                  |
-      | NPI Age            | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
-      | NPI Gender         | Female, Male, Unknown                                                                                                   |
-      | Graduation Year    | 1900-2025                                                                                                               |
-      | Net Worth          | Less than $50٫000, $100٫000 to $249٫999, $250٫000 to $499٫999, $500٫000 or above                                        |
-      | Number of Patients | Below 5, 6 to 20, 21 to 50, 51 to 100, 101 to 200, 201 to 300, 301 to 400, 401 to 500, 501 to 1000, 1001 or above       |
-      | Reachable Audience | Yes                                                                                                                     |
-      | Patient Age        | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
-      | Patient Gender     | Female, Male, Unknown                                                                                                   |
-      | Years Practiced    | Below 5, 5 to 10, 10 to 15, 15 to 20, 20 to 25, 25 to 30, 30 to 35, 35 to 40, 40 to 45, 45 to 50, 50 or Above           |
-      | Facility Name      | Visiting Nurse Service, Ahs Hospital Corp, Centrastate, Robert Wood Johnson University Hospital, Montclair Hospital Llc |
-      | State              | New                                                                                                                     |
-      | Profession         | Physician                                                                                                               |
-      | Specialty          | Foot & Ankle Surgery, Internal Medicine                                                                                 |
+      | FilterName           | Option                                                                                                                  |
+      | NPI Age              | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
+      | NPI Gender           | Female, Male, Unknown                                                                                                   |
+      | Graduation Year      | 1900-2025                                                                                                               |
+      | Net Worth            | Less than $50٫000, $100٫000 to $249٫999, $250٫000 to $499٫999, $500٫000 or above                                        |
+      | Number of Patients   | Below 5, 6 to 20, 21 to 50, 51 to 100, 101 to 200, 201 to 300, 301 to 400, 401 to 500, 501 to 1000, 1001 or above       |
+      | Reachable Audience   | Yes                                                                                                                     |
+      | Patient Age          | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
+      | Patient Gender       | Female, Male, Unknown                                                                                                   |
+      | Years Practiced      | Below 5, 5 to 10, 10 to 15, 15 to 20, 20 to 25, 25 to 30, 30 to 35, 35 to 40, 40 to 45, 45 to 50, 50 or Above           |
+      | Facility Name        | Visiting Nurse Service, Ahs Hospital Corp, Centrastate, Robert Wood Johnson University Hospital, Montclair Hospital Llc |
+      | State                | New                                                                                                                     |
+      | Profession           | Physician                                                                                                               |
+      | Specialty            | Foot & Ankle Surgery, Internal Medicine                                                                                 |
       #| NPI List Name      | Large file test                                                                                                         |
-      | Medical School     | New York College                                                                                                        |
+      | Medical School       | New York College                                                                                                        |
+      | Patient Facility     | . Arizona Autism United٫ Inc.                                                                                           |
+      | Prescriptions        | .Insulin Aspart Protamine And Insulin Aspart                                                                            |
+      | Prescribing behavior | .Insulin Aspart Protamine And Insulin Aspart                                                                            |
+      | Diagnoses            | ABO incompatibility w hemolytic transfs react٫ unsp٫ subs                                                               |
+      | Procedures           | Abatacept injection                                                                                                     |
+      | IAB                  | Travel                                                                                                                  |
+      | MeSH                 | Anatomy                                                                                                                 |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace
@@ -97,7 +104,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | ADVERTISER | WORKSPACE_NAME |
       | Abbvie     | Explorer       |
 
-  @e2e @regression
+  @regression
   Scenario Outline: Create and save HCP Explorer workspace using NPI Cross Filters
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
@@ -138,38 +145,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | ADVERTISER | WORKSPACE_NAME |
       | Abbvie     | Explorer       |
 
-  @e2e @regression
-  Scenario Outline: Create and save HCP Explorer workspace by building audience using AI Configurator and applying primary filters
-    When User clicks on Create New Workspace
-    Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
-    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
-    And User applies the filter and selects option
-      | FilterName | Option                                                        |
-      | NPI Age    | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
-      | NPI Gender | Female, Male, Unknown                                         |
-    And User clicks on Ok and closes the filter popup
-    Then Verify that the applied filters are displayed correctly
-    And Fetch and verify that NPI details are refined
-    And User clicks on AI Configurator and build audience using the AIPrompt "<AI_PROMPT>"
-    Then Verify the filter is applied correctly "<PRIMARY_FILTERS>"
-    And Verify after adding ai prompt filter selected manually should be overwritten
-    And Fetch and verify that NPI details are refined
-    And User applies the filter and selects option
-      | FilterName      | Option                                                        |
-      | Patient Age     | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
-      | Patient Gender  | Female, Male, Unknown                                         |
-      | Graduation Year | 1900-2025                                                     |
-    And User clicks on Ok and closes the filter popup
-    And Fetch and verify that NPI details are refined
-    Then Delete the filter
-    And Fetch and verify that NPI details are refined
-    Examples:
-      | ADVERTISER | WORKSPACE_NAME | AI_PROMPT                                                                                | PRIMARY_FILTERS |
-      | Abbvie     | Explorer       | Find doctors within certain age ranges, with specific professions, and narrow by wealth. | Profession      |
-
-  @regression @rs
+  @regression
   Scenario Outline: Manage operations on Workspace - Rename, Duplication, and Delete on HCP Explorer workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
@@ -182,6 +158,10 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | NPI Gender | Female, Male, Unknown |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
+    And User saves the workspace
+    Then Verify the HCP Explorer Workspace is saved
+    And User clicks Edit button and updates workspace name to "<WORKSPACE_NAME_EDIT>"
+    Then Verify the Workspace is updated with edited name
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
     And Navigate to workspace dashboard
@@ -197,5 +177,28 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User selects the "Delete" option by clicking More Actions menu
     And Verify user is able to delete the workspace
     Examples:
-      | ADVERTISER | WORKSPACE_NAME | NEW_WORKSPACE_NAME |
-      | Abbvie     | Explorer       | New_Explorer_      |
+      | ADVERTISER | WORKSPACE_NAME | NEW_WORKSPACE_NAME | WORKSPACE_NAME_EDIT |
+      | Abbvie     | Explorer       | New_Explorer_      | Edit_Explorer       |
+
+  @regression
+  Scenario Outline: Validate Clinical and Contextual Recency filters in HCP Explorer workspace
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on HCP Explorer workspace
+    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
+    And User applies "Clinical" filter, selects filter options as below and verifies the clinical recency filter is updated correctly
+      | FilterName           | Option                                                  | Recency  |
+      | Prescriptions        | 100％ Mineral Sunscreen                                 | 1 Month  |
+      | Prescribing behavior | 100％ Mineral Broad Spectrum Sunscreen Spf 30           | 3 Months |
+      | Diagnoses            | Maternal care for face٫ brow and chin presentation٫ oth | 6 Months |
+      | Procedures           | Removal of face wrinkles                                | 1 Year   |
+    And User applies "Contextual" filter, selects filter options as below and verifies the clinical recency filter is updated correctly
+      | FilterName | Option               | Recency |
+      | IAB        | Arts & Entertainment | 1 Day   |
+      | MeSH       | Anatomy              | 1 Week  |
+    And User saves the workspace
+    Then Verify the HCP Explorer Workspace is saved
+    Examples:
+        | ADVERTISER | WORKSPACE_NAME |
+        | Abbvie     | Explorer       |

@@ -6,11 +6,12 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import factory.DriverFactory;
 import utils.CommonUtils;
+import utils.WaitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ExplorerWorkspace {
     private final Page page;
@@ -49,6 +50,9 @@ public class ExplorerWorkspace {
     private final Locator MERGED_TEXT;
     private final Locator DASHBOARD_FILTERS;
     private final Locator OWNED_AND_OPERATED_SECTION;
+    private final Locator WORKSPACE_EDIT_BUTTON;
+    private final Locator WORKSPACE_HEADER;
+    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
@@ -63,11 +67,11 @@ public class ExplorerWorkspace {
         this.ADVERTISER_SELECTED = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspace-back-button']/following-sibling::div//p[contains(text(),'Advertiser:')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("//h1[contains(text(),'Select Filter')]/following-sibling::button");
-        this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterTitleContainer-sc-')]");
+        this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'filters-container')]//button/preceding-sibling::p");
         this.APPLIED_FILTER_OPTION = WORKSPACE_FRAME.locator("//div[contains(@class,'style__FilterExpression-sc')]");
-        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledContainer')]//div[contains(text(),'Save')]");
+        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@data-tour-id,'save-workspace-button')]//div[contains(text(),'Save')]");
         this.EXPLORER_WORKSPACE_SUCCESS = WORKSPACE_FRAME.locator("[id=\"\\32 \"] div").filter(new Locator.FilterOptions().setHasText("Workspace managementWorkspace")).nth(2);
-        this.SAVE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__DashboardContainer')]//div[contains(text(),'Save')]");
+        this.SAVE_WORKSPACE_NAME = WORKSPACE_FRAME.locator("//button[contains(@data-tour-id,'save-workspace-details-button')]//div[contains(text(),'Save')]");
         this.TAB_PANEL_SEARCH = WORKSPACE_FRAME.locator("//div[@role='tabpanel']//input[@placeholder='Search']");
         this.TO_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-0']");
         this.FROM_YEAR = WORKSPACE_FRAME.locator("//input[@data-testid='bi-slider-input-1']");
@@ -79,14 +83,16 @@ public class ExplorerWorkspace {
         this.TRY_ANOTHER_PROMPT_BTN = WORKSPACE_FRAME.locator("//div[text()='Try another prompt']");
         this.FILTER_HEADER_TITLE = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id, 'filters-container')]");
         this.MAP_TOOL_TIP = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(@class,'MapTooltip')]/div/div/div[text()='Identified NPIs']/following-sibling::div");
-        this.DELETE_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class, 'FilterTitleContainer')]//button");
+        this.DELETE_FILTER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id, 'filters-container')]//button");
         this.CAMERA_CONTROL_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//button[@title='Map camera controls']");
         this.ZOOM_OUT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[@class='gmnoprint']//button[@title='Zoom out' and @class='gm-control-active']");
         this.MAP_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("div[aria-label='Dashboard Content']");
         this.DASHBOARD_FILTER_TITLE = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]");
         this.MERGED_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'Merged with Primary after Save')]");
-        this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//div[contains(@class,'style__PillContainer')]");
+        this.DASHBOARD_FILTERS = WORKSPACE_FRAME.locator("//p[contains(text(),'Dashboard Filters')]/ancestor::div/following-sibling::div//p");
         this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
+        this.WORKSPACE_EDIT_BUTTON = WORKSPACE_FRAME.locator("//button//div[text()='Edit']");
+        this.WORKSPACE_HEADER = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspace-back-button']/following-sibling::div//h1");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -99,6 +105,9 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.fill(advertiser);
         SEARCH_ADVERTISER.press("ArrowDown");
         SEARCH_ADVERTISER.press("Enter");
+    }
+
+    public void saveWorkspaceName() {
         SAVE_WORKSPACE_NAME.click();
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -110,10 +119,11 @@ public class ExplorerWorkspace {
     }
 
     public void selectFilter(String filter, List<String> options) {
+        SEARCH_FILTER.clear();
         SEARCH_FILTER.fill(filter);
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).first().click();
         switch (filter) {
-            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name":
+            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name", "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
                 if (filter.equals("Specialty"))
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
@@ -121,7 +131,10 @@ public class ExplorerWorkspace {
                     TAB_PANEL_SEARCH.fill(option.trim());
                     locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     page.waitForTimeout(1000);
-                    SELECT_DESELECT_ALL.click();
+                    if(SELECT_DESELECT_ALL.isVisible())
+                        SELECT_DESELECT_ALL.click();
+                    else
+                        locator.first().click();
                 }
                 break;
             case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
@@ -152,8 +165,10 @@ public class ExplorerWorkspace {
                 REACHABLE_AUDIENCE.click();
                 break;
         }
+    }
+
+    public void clickFilterOKButton(){
         FILTER_OK_BUTTON.click();
-        SEARCH_FILTER.clear();
     }
 
     public void applyFilter() {
@@ -267,5 +282,23 @@ public class ExplorerWorkspace {
 
     public String isAdvertiserDisabled() {
         return ADVERTISER_SELECTED.evaluate("el => getComputedStyle(el).color").toString();
+    }
+
+    public void clickEditWorkspace() {
+        WORKSPACE_EDIT_BUTTON.click();
+        waitUtility.waitForLocatorVisible(WORKSPACE_NAME);
+    }
+
+    public String fetchWorkspaceHeader() {
+        return WORKSPACE_HEADER.textContent().trim();
+    }
+
+    public void selectRecency(String recency) {
+        WORKSPACE_FRAME.locator("//p[normalize-space()='Recency']/following-sibling::div//label[normalize-space()='" + recency + "']").click();
+    }
+
+    public String fetchRecencyValue(String filterType) {
+        Locator recencyLocator = WORKSPACE_FRAME.locator(String.format("//p[normalize-space()='%s Recency']/parent::div//following-sibling::div//p", filterType));
+        return recencyLocator.textContent().trim();
     }
 }

@@ -31,7 +31,7 @@ public class HcpSteps {
 
     @Then("Verify smart action creation page is displayed")
     public void verify_smart_action_creation_page_is_displayed() {
-        Assert.assertEquals("Smart Action Properties", smartActions.getSmartAction());
+        Assert.assertEquals("New Smart Action", smartActions.getSmartAction());
     }
 
     @Then("User enters smart action details as {string} {string}")
