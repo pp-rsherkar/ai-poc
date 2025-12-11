@@ -156,11 +156,13 @@ public class ReportTemplates {
 
     public void saveReportTemplate() {
         SAVE_TEMPLATE.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String reportTemplateSuccess() {
         String message = TEMPLATE_SUCCESS.innerText();
         TEMPLATE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitUntilPreLoaderHidden();
         return message;
     }
 

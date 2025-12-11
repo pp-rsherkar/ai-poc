@@ -110,8 +110,8 @@ public class PMP {
         this.ALL_LIFE_MARKET_PLACE = page.locator("//div[contains(@class,'allPremiumPubs')]");
         this.ALL_PREMIUM_PUBS = page.locator("//div[contains(@class,'premiumPub')]");
         this.NO_DEAL_TEXT = page.locator("//div[contains(@class,'noDealsTxt')]");
-        this.ADVERTISER = page.locator("//app-multi-select[contains(@class,'dealAdvMultiSelect')]//input");
-        this.ADVERTISER_VALUES = page.locator("//app-multi-select[contains(@class,'dealAdvMultiSelect')]//div[@suidropdownmenu]//span");
+        this.ADVERTISER = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::div//sui-select");
+        this.ADVERTISER_VALUES = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::div//sui-select//sui-select-option/span[2]");  //need to give index as 2 "span" tags have been defined with no attributes
     }
 
     public void navigateToTacticSettingTab() {
@@ -259,11 +259,11 @@ public class PMP {
 
     public boolean verifyDeleteIconAndMessage(String message) {
         for (int i = 0; i < DELETE_ICON.count(); i++) {
+            DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
                 flag1 = true;
-                DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
                 DELETE_ICON.nth(i).click(new Locator.ClickOptions().setForce(true));
-                String tooltipText = TOOLTIP_TEXT.innerText();
+                String tooltipText = TOOLTIP_TEXT.textContent();
                 if (message.equals(tooltipText)) flag2 = true;
             }
         }

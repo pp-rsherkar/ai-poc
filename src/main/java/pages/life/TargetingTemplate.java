@@ -43,8 +43,8 @@ public class TargetingTemplate {
         this.NEW_TEMPLATE_BUTTON = page.locator("//span[contains(text(),'New Template')]");
         this.SEARCH_BOX = page.locator("//input[contains(@placeholder,'Search') and contains(@class,'search icon-pading')]");
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
-        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
-        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
+        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[@class='section-name' and contains(text(),'Line Item Type')]/following-sibling::div//div[contains(@id,'lineItemTypeDropdown')]");
+        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@id,'lineItemTypeDropdown')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
         this.CHANNEL_VALUE = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
         this.ADD_TARGETING_RULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");

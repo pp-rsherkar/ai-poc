@@ -51,15 +51,16 @@ public class Hooks {
                 String screenshotName = scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
-                DriverFactory.context.tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/" + screenshotName + ".zip")));
-            } catch (Exception e) {
+                DriverFactory.context.tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
+            }
+            catch (Exception e) {
                 handleError("Error capturing screenshot or trace", e, scenario);
                 throw new RuntimeException("Error during failure capture: ", e);
             }
         } else {
             // Stop tracing even if test passed
             try {
-                DriverFactory.context.tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
+                DriverFactory.context.tracing().stop();
             } catch (Exception e) {
                 logger.warning("Trace stop failed: " + e.getMessage());
             }

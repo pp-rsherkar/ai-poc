@@ -4,6 +4,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import utils.CommonUtils;
+import java.util.Collections;
 
 public class SmartActions {
 
@@ -36,10 +38,10 @@ public class SmartActions {
         this.page = page;
         this.SMART_ACTIONS = page.locator("#megamenu").getByText("Smart Actions");
         this.ADD_SMART_ACTION = page.getByText("Add Smart Action");
-        this.VERIFY_SMART_ACTION = page.getByText("Smart Action Properties");
+        this.VERIFY_SMART_ACTION = page.locator("//div[contains(@class,'trigger-header') and (contains(text(),'New Smart Action'))]");
         this.SMART_ACTION_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Smart Action Name"));
-        this.ADVERTISER = page.locator("//*[@id='triggerControlsContainer']/form/div[2]/div/ng-select");
-        this.SELECT_ADVERTISER = page.getByText("Z_Automation");
+        this.ADVERTISER = page.locator("//ng-select[contains(@placeholder,'Select Advertiser')]");
+        this.SELECT_ADVERTISER = page.locator("//ng-select[contains(@placeholder,'Select Advertiser')]//ng-dropdown-panel//div[@role='option']");
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.SMART_ACTION_SUCCESS = page.getByText("new Smart Action created successfully");
         this.AUDIENCE_TAB = page.locator("//div[@class='col-sm nav-tab selected']");
@@ -82,7 +84,7 @@ public class SmartActions {
 
     public void enterAdvertiser(String advertiser) {
         ADVERTISER.click();
-        SELECT_ADVERTISER.click();
+        CommonUtils.selectAndClickElement(SELECT_ADVERTISER, Collections.singletonList(advertiser));
     }
 
     public void saveSmartAction() {

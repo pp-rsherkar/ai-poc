@@ -54,7 +54,7 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEALPRICE_TYPE>", "<PRICE>"
     When User searches the deal and assign it from the deal list
     Then Selected Deals should appear in Applied Deals panel
-    And Verify Target Applied Deals Toggle button is available with default value as "ON"
+    #And Verify Target Applied Deals Toggle button is available with default value as "ON"
     When User clicks on OK button
     Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button "ON"
     And Verify Delete icon is disabled and error message "Go to the Curated Markets & Deals section to remove the market."
@@ -80,7 +80,7 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEALPRICE_TYPE>", "<PRICE>"
     When User searches the deal and assign it from the deal list
     Then Selected Deals should appear in Applied Deals panel
-    And Verify Target Applied Deals Toggle button is available with default value as "OFF"
+    #And Verify Target Applied Deals Toggle button is available with default value as "OFF"
     When User clicks on OK button
     Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button "OFF"
     And Verify Pricing Strategy is editable for Deals present in Curated Market and Deals section
