@@ -39,7 +39,6 @@ public class HcpSteps {
         smartActionName = smartActionName + '_' + timestamp;
         smartActions.enterSmartActionName(smartActionName);
         smartActions.enterAdvertiser(advertiser);
-
     }
 
     @When("User saves the smart action")
@@ -99,6 +98,4 @@ public class HcpSteps {
     public void verify_response_data_is_saved_successfully() {
         Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage().trim());
     }
-
-
 }

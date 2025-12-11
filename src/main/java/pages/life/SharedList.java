@@ -32,6 +32,8 @@ public class SharedList {
     private final Locator DUPLICATE_FILE_DIALOG;
     private final Locator DUPLICATE_FILE_DIALOG_TEXT;
     private final Locator REPLACE_BUTTON;
+    private final Locator DOWNLOAD_ICON;
+    private final Locator ITEM_COUNT_UI;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SharedList(Page page) {
@@ -54,6 +56,8 @@ public class SharedList {
         this.DUPLICATE_FILE_DIALOG = page.locator(" //div[contains(text(),'Duplicating File Names')]");
         this.DUPLICATE_FILE_DIALOG_TEXT = page.locator(" //div[contains(text(),'Duplicating File Names')]/following-sibling::div[contains(@class,'confirm-modal')]/div");
         this.REPLACE_BUTTON = page.locator("//span[contains(text(),'Replace')]");
+        this.DOWNLOAD_ICON = page.locator("//img[contains(@src,'export.svg')]");
+        this.ITEM_COUNT_UI = page.locator("//div[contains(@class,'fileDetails')]/div");
     }
 
     public void clickDomainListFromMenu(String pageName) {
@@ -75,7 +79,7 @@ public class SharedList {
     }
 
     public boolean verifySubTabs(String tabName) {
-        for(int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
+        for (int i = 0; i < SUB_TABS_BUTTON.count(); i++) {
             if (SUB_TABS_BUTTON.nth(i).innerText().trim().equalsIgnoreCase(tabName)) return true;
         }
         return false;
@@ -273,5 +277,15 @@ public class SharedList {
     public void clickListTypeRadioButton(String listType) {
         Locator locator = page.locator(String.format("//label[contains(text(),'%s')]/parent::sui-radio-button", listType));
         locator.click();
+    }
+
+    public Path clickDownloadIcon() throws IOException {
+        Download download = page.waitForDownload(DOWNLOAD_ICON::click);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
+    }
+
+    public String fetchSharedListCountFromUI() {
+        String itemCountText = ITEM_COUNT_UI.first().innerText().trim();
+        return itemCountText.replaceAll("[^0-9]", "");
     }
 }

@@ -119,15 +119,15 @@ public class WorkspaceCreation {
     }
 
     public void createStudioWorkspace() {
-       while(!CREATE_WORKSPACE.first().isEnabled()){
-                MENU_ICON.click();
-                page.keyboard().press("Escape");
-       }
-       CREATE_WORKSPACE.first().click();
-       page.waitForCondition(() -> WORKSPACE_TYPE.filter(new Locator.FilterOptions().setHasText("Workspace Type")).count() == 1);
+        while (!CREATE_WORKSPACE.first().isEnabled()) {
+            MENU_ICON.click();
+            page.keyboard().press("Escape");
+        }
+        CREATE_WORKSPACE.first().click();
+        page.waitForCondition(() -> WORKSPACE_TYPE.filter(new Locator.FilterOptions().setHasText("Workspace Type")).count() == 1);
     }
 
-    public void verifyStudioWorkspaceFrame(){
+    public void verifyStudioWorkspaceFrame() {
         OUTER_FRAME.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
@@ -151,9 +151,9 @@ public class WorkspaceCreation {
         }
     }
 
-    public void clickMoreActionsMenu(String workspaceName){
-        if(WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first().isVisible())
-            WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first().click();
+    public void clickMoreActionsMenu(String workspaceName) {
+        if (WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().isVisible())
+            WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().click();
     }
 
     public void deleteWorkspace() {
@@ -163,9 +163,9 @@ public class WorkspaceCreation {
         REMOVAL_CONFIRMATION_POPUP.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
-    public void performActionOnWorkspace(String actionName){
+    public void performActionOnWorkspace(String actionName) {
         MORE_ACTION_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        switch(actionName){
+        switch (actionName) {
             case "Duplicate":
                 DUPLICATE_BUTTON.scrollIntoViewIfNeeded();
                 DUPLICATE_BUTTON.click();
@@ -186,7 +186,7 @@ public class WorkspaceCreation {
 
     public String verifyDeletePopUp() {
         waitUtility.waitForLocatorHidden(DEPENDENT_WORKSPACE_TEXT);
-       return REMOVAL_CONFIRMATION_TEXT.innerText();
+        return REMOVAL_CONFIRMATION_TEXT.innerText();
     }
 
     public String deleteWorkspaceWithActiveWebhook() {
@@ -199,8 +199,7 @@ public class WorkspaceCreation {
 
     public String renameWorkspaceName(String oldWorkspaceName, String newWorkspace) {
         WORKSPACE_FRAME.locator(String.format("//h3[text()='Rename Workspace']/parent::header/following-sibling::div//input[@value='%s']", oldWorkspaceName)).fill(newWorkspace);
-        if(!UPDATE_BUTTON.isEnabled())
-            page.waitForTimeout(2000);
+        if (!UPDATE_BUTTON.isEnabled()) page.waitForTimeout(2000);
         UPDATE_BUTTON.click();
         String text = RENAME_WORKSPACE_ALERT.innerText();
         waitUtility.waitForLocatorHidden(RENAME_WORKSPACE_ALERT);
@@ -208,14 +207,14 @@ public class WorkspaceCreation {
     }
 
     public boolean searchWorkspaceName(String workspaceName) {
-        while(!CREATE_WORKSPACE.first().isEnabled()){
-           MENU_ICON.click();
-           page.keyboard().press("Escape");
+        while (!CREATE_WORKSPACE.first().isEnabled()) {
+            MENU_ICON.click();
+            page.keyboard().press("Escape");
         }
         page.waitForCondition(() -> SEARCH_WORKSPACE.filter().count() == 1);
-        if(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible()){
+        if (WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible()) {
             return true;
-        }else {
+        } else {
             SEARCH_WORKSPACE.fill(workspaceName);
             page.keyboard().press("Enter");
             waitUtility.waitForLocatorVisible(PAGINATION.first());
@@ -223,7 +222,7 @@ public class WorkspaceCreation {
         }
     }
 
-    public String fetchDuplicateWorkspaceName(){
+    public String fetchDuplicateWorkspaceName() {
         return DUPLICATE_WORKSPACE_NAME.innerText();
     }
 
@@ -234,7 +233,7 @@ public class WorkspaceCreation {
         return text;
     }
 
-    public void clickWorkspace(String workspaceName){
+    public void clickWorkspace(String workspaceName) {
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).click();
     }
 
@@ -244,7 +243,7 @@ public class WorkspaceCreation {
     }
 
     public void selectMoreActionsMenu(String workspaceName) {
-        Locator moreActionsButton = WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button",workspaceName)).first();
+        Locator moreActionsButton = WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first();
         waitUtility.waitForLocatorVisible(moreActionsButton);
         moreActionsButton.click();
     }

@@ -11,6 +11,7 @@ public class SmartPixel {
     private final Locator INACTIVE_CAMPAIGNS_BUTTON;
     private final Locator ASSOCIATED_CAMPAIGN;
     private final Locator PIXEL_NAME;
+    private final Locator PIXEL_HEADER_NAME;
     private final Locator ADD_SMARTLIST_BUTTON;
     private final Locator ASSOCIATED_SMARTLISTS_TAB;
     private final Locator PIXEL_CODES_TAB;
@@ -35,6 +36,7 @@ public class SmartPixel {
         this.DEACTIVATE_ERROR = page.locator("//div[contains(@class,'confirm-modal header')]");
         this.DEACTIVATE_SUCCESS = page.locator("//div[@role='alert' and text()='Pixel Deactivated successfully']");
         this.UPDATE_SUCCESS = page.locator("//div[@role='alert' and text()='Saved successfully']");
+        this.PIXEL_HEADER_NAME = page.locator("//div[contains(@class,'header-name')]");
     }
 
     public void selectAdvertiser(String advertiser) {
@@ -52,8 +54,8 @@ public class SmartPixel {
         }
     }
 
-    public String getPixelName() {
-        return PIXEL_NAME.inputValue();
+    public String getPixelNameFromHeader() {
+        return PIXEL_HEADER_NAME.textContent().trim();
     }
 
     public void clickAddSmartListButton() {

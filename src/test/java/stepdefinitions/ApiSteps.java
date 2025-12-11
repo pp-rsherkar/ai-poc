@@ -1,5 +1,6 @@
 package stepdefinitions;
 
+import api.ApiActions;
 import api.ApiEndpoints;
 import com.microsoft.playwright.APIResponse;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.JsonNode;
@@ -9,11 +10,11 @@ import io.cucumber.core.internal.com.fasterxml.jackson.databind.node.ObjectNode;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import api.ApiActions;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import utils.CommonUtils;
 import utils.ConfigReader;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,7 +77,7 @@ public class ApiSteps {
     }
 
     @Then("Verify the GET NPI List API response contains the NPI details and a successful status code")
-    public void verifyTheGETNPIListAPIResponseContainsTheNPIDetailsAndASuccessfulStatusCode() throws  Exception{
+    public void verifyTheGETNPIListAPIResponseContainsTheNPIDetailsAndASuccessfulStatusCode() throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(200, response.status());
         Assert.assertFalse("Response is not empty", jsonNode.isEmpty());
@@ -89,9 +90,9 @@ public class ApiSteps {
         }
         JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
         JsonNode templateNode = fullPayload.path("createNPI");
-        ((ObjectNode)templateNode).put("name", listName);
+        ((ObjectNode) templateNode).put("name", listName);
         ArrayNode npiArray = mapper.valueToTree(CommonUtils.parseCommaSeparatedString(npis));
-        ((ObjectNode)templateNode).set("npis", npiArray);
+        ((ObjectNode) templateNode).set("npis", npiArray);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
@@ -102,7 +103,7 @@ public class ApiSteps {
     public void theAPIResponseShouldHaveStatusErrorsAndContainTheSubmittedNPIListIfApplicable(String statusCode, String errorMessage, String npis) throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(Integer.parseInt(statusCode), response.status());
-        if(response.status() != 200){
+        if (response.status() != 200) {
             List<String> expectedErrorMessages = CommonUtils.parseCommaSeparatedString(errorMessage);
             List<String> actualErrorMessages = new ArrayList<>();
             JsonNode validationErrors = jsonNode.get("validationErrors");
@@ -117,7 +118,7 @@ public class ApiSteps {
                 Assert.assertTrue("Expected error not found: " + expectedError, actualErrorMessages.contains(expectedError));
             }
         }
-        if(response.status() == 200){
+        if (response.status() == 200) {
             JsonNode returnedNpis = jsonNode.get("npis");
             Assert.assertTrue("Expected 'npis' array in response", returnedNpis != null && returnedNpis.isArray());
             Set<String> submittedNpisSet = new HashSet<>(CommonUtils.parseCommaSeparatedString(npis));
@@ -134,7 +135,7 @@ public class ApiSteps {
         modifiedName = listName + CommonUtils.timeStampCalculation();
         JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
         JsonNode templateNode = fullPayload.path("createNPIWithAttribute");
-        ((ObjectNode)templateNode).put("name", modifiedName);
+        ((ObjectNode) templateNode).put("name", modifiedName);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
@@ -142,14 +143,14 @@ public class ApiSteps {
     }
 
     @Then("Verify the Create NPI API with Attributes API response contains the same list name and a successful status code")
-    public void verifyTheCreateNPIAPIWithAttributesAPIResponseContainsTheSameListNameAndASuccessfulStatusCode() throws Exception{
+    public void verifyTheCreateNPIAPIWithAttributesAPIResponseContainsTheSameListNameAndASuccessfulStatusCode() throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(200, response.status());
         Assert.assertEquals(modifiedName, jsonNode.get("name").asText());
     }
 
     @And("Add NPIs to the existing NPI list {string} using patch API")
-    public void addNPIsToTheExistingNPIListUsingPatchAPI(String listID) throws Exception{
+    public void addNPIsToTheExistingNPIListUsingPatchAPI(String listID) throws Exception {
         JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
         JsonNode templateNode = fullPayload.path("addNPIToList");
         ArrayNode npiArray = mapper.createArrayNode();
@@ -159,7 +160,7 @@ public class ApiSteps {
         data = mapper.createArrayNode();
         data.addAll(npiArray);
         System.out.println(data);
-        ((ObjectNode)templateNode).set("npis", npiArray);
+        ((ObjectNode) templateNode).set("npis", npiArray);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
@@ -172,7 +173,7 @@ public class ApiSteps {
     }
 
     @Then("Verify the NPI block contains the newly added NPIs")
-    public void verifyTheNPIBlockContainsTheNewlyAddedNPIs() throws Exception{
+    public void verifyTheNPIBlockContainsTheNewlyAddedNPIs() throws Exception {
         jsonNode = mapper.readTree(response.text());
         JsonNode npisInResponse = jsonNode.path("npis");
         Set<String> responseNpisSet = new HashSet<>();

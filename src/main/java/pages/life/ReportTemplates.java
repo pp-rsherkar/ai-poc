@@ -156,11 +156,13 @@ public class ReportTemplates {
 
     public void saveReportTemplate() {
         SAVE_TEMPLATE.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String reportTemplateSuccess() {
         String message = TEMPLATE_SUCCESS.innerText();
         TEMPLATE_SUCCESS.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED));
+        waitUtility.waitUntilPreLoaderHidden();
         return message;
     }
 
@@ -253,8 +255,8 @@ public class ReportTemplates {
         CANCEL_BUTTON.click();
     }
 
-    public boolean verifyReportGeneratedFromLineItemPage(String reportName){
-        Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]",reportName));
+    public boolean verifyReportGeneratedFromLineItemPage(String reportName) {
+        Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]", reportName));
         return xpath.isVisible();
     }
 }

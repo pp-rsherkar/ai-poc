@@ -9,8 +9,8 @@ import io.cucumber.java.Scenario;
 import utils.ConfigReader;
 
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Hooks {
     private static final Logger logger = Logger.getLogger(Hooks.class.getName());
@@ -25,7 +25,7 @@ public class Hooks {
             driverFactory = new DriverFactory();
             page = driverFactory.initDriver(browserName); // Passing browser name to launch the browser
             page.setDefaultTimeout(timeout);
-        }catch(Exception e) {
+        } catch (Exception e) {
             handleError("Error during browser launch", e, scenario);
             throw e; // Failing scenario explicitly
         }
@@ -35,12 +35,9 @@ public class Hooks {
     @After(value = "@e2e or @regression", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
-            if (page != null)
-                page.close();
-            if (DriverFactory.context != null)
-                DriverFactory.context.close(); // Close context
-            if (DriverFactory.browser != null)
-                DriverFactory.browser.close(); // Close browser
+            if (page != null) page.close();
+            if (DriverFactory.context != null) DriverFactory.context.close(); // Close context
+            if (DriverFactory.browser != null) DriverFactory.browser.close(); // Close browser
         } catch (Exception e) {
             handleError("Error during browser cleanup", e, scenario);
             throw new RuntimeException("Error during browser cleanup: ", e);
@@ -54,18 +51,16 @@ public class Hooks {
                 String screenshotName = scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
-                DriverFactory.context.tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/" + screenshotName + ".zip")));
+                DriverFactory.context.tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
             }
             catch (Exception e) {
                 handleError("Error capturing screenshot or trace", e, scenario);
                 throw new RuntimeException("Error during failure capture: ", e);
             }
-        }
-        else {
+        } else {
             // Stop tracing even if test passed
             try {
-                DriverFactory.context.tracing().stop(
-                        new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
+                DriverFactory.context.tracing().stop();
             } catch (Exception e) {
                 logger.warning("Trace stop failed: " + e.getMessage());
             }

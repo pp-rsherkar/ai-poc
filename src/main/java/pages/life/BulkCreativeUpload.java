@@ -76,7 +76,7 @@ public class BulkCreativeUpload {
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
         this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or contains(@aria-label,'Select Advertiser') or contains(@aria-label,'Landing Page Domain is required') or contains(@aria-label, 'Landing Page Domain is not valid.') or contains(@aria-label,'1 error')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
-        this.BULK_UPLOAD_HEADER = page.locator("//div[contains(text(),'Bulk Upload')]");
+        this.BULK_UPLOAD_HEADER = page.locator("//div[contains(@class,'main-heading') and (contains(text(),'Bulk Upload'))]");
         this.CREATIVE_NAME_FROM_TABLE = page.locator("//tbody//span/input");
         this.HEADER_MESSAGE = page.locator("//div[contains(@class,'appr-status-label')]/span");
         this.DROPDOWN_SEARCH = page.locator("//div[@id='campaignLookup' and contains(@class,'loading')]");
@@ -171,17 +171,17 @@ public class BulkCreativeUpload {
     }
 
     public void clickPreviewButton() {
-        if(PREVIEW_BUTTON.isVisible()) PREVIEW_BUTTON.click();
+        if (PREVIEW_BUTTON.isVisible()) PREVIEW_BUTTON.click();
     }
 
     public void clickUploadButton() {
-        if(UPLOAD_BUTTON.isVisible()) UPLOAD_BUTTON.click();
+        if (UPLOAD_BUTTON.isVisible()) UPLOAD_BUTTON.click();
     }
 
     public String fetchErrorAlert() {
         if (!ERROR_ALERT.isVisible()) {
             return "";
-        }else {
+        } else {
             String text = ERROR_ALERT.innerText().trim();
             waitUtility.waitForLocatorHidden(ERROR_ALERT);
             return text;
@@ -216,7 +216,7 @@ public class BulkCreativeUpload {
     }
 
     public void clickOKButton() {
-        if(OK_BUTTON.isVisible()) OK_BUTTON.click();
+        if (OK_BUTTON.isVisible()) OK_BUTTON.click();
     }
 
     public boolean verifyDisplayCreativeSections(String section) {
@@ -419,7 +419,8 @@ public class BulkCreativeUpload {
                 break;
             case "HTML", "Video":
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
-                if (createCreatives.CLICK_THROUGH_URL.isVisible()) enterClickthroughURL(attributeMap.get("ClickThroughURL"));
+                if (createCreatives.CLICK_THROUGH_URL.isVisible())
+                    enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);
