@@ -176,7 +176,7 @@ public class Pixels {
         return NO_RESULTS_FOUND.innerText();
     }
 
-    public void selectAdvertiser(String advertiser){
+    public void selectAdvertiser(String advertiser) {
         ADVERTISER_DROPDOWN.click();
         ADVERTISER_DROPDOWN.locator("xpath=//span[contains(text(),'" + advertiser + "')]").click();
         page.keyboard().press("Escape");
@@ -184,6 +184,6 @@ public class Pixels {
     }
 
     public List<String> fetchPixelsList() {
-       return PIXEL_LIST.allInnerTexts();
+        return PIXEL_LIST.allInnerTexts();
     }
 }

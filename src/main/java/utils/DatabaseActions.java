@@ -1,7 +1,10 @@
 package utils;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DatabaseActions {
     public static Connection getConnection() throws SQLException {
@@ -18,8 +21,7 @@ public class DatabaseActions {
 
     public static String getData(String query, String expectedValue) throws SQLException {
         String actualValue = null;
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, expectedValue);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -32,8 +34,7 @@ public class DatabaseActions {
 
     public static List<Map<String, String>> getDataAsMap(String query, String expectedValue) throws SQLException {
         List<Map<String, String>> actualValue = new ArrayList<>();
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, expectedValue);
             try (ResultSet resultSet = statement.executeQuery()) {
                 ResultSetMetaData metaData = resultSet.getMetaData();
@@ -52,8 +53,7 @@ public class DatabaseActions {
 
     public static List<Object> getDataAsList(String query, String expectedValue) {
         List<Object> resultList = new ArrayList<>();
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, expectedValue);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

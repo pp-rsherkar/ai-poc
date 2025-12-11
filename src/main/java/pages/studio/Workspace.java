@@ -51,6 +51,9 @@ public class Workspace {
     private final Locator RETROFIT_CHECKBOX;
     private final Locator NPI_ENGAGING_TEXT;
     private final Locator PUBLISH_LOADER;
+    private final Locator HCP_WORKSPACE_FILTER_CHECKBOX;
+    private final Locator EXISTING_WORKSPACE;
+    private final Locator ADVERTISER_SELECTOR_DROPDOWN;
     private final Locator NPI_LIST_PULLOUT_MENU;
     private final Locator OK_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
@@ -90,6 +93,9 @@ public class Workspace {
         this.IDENTIFIED_NPI_COUNT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//h3[contains(text(),'Identified NPIs')]/ancestor::div[contains(@class,'SingleValueVisualization')]//span");
         this.RETROFIT_CHECKBOX = WORKSPACE_FRAME.locator("//span[contains(text(),'Retrofit NPIs')]/parent::label/preceding-sibling::div//input");
         this.NPI_ENGAGING_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),'NPIs engaging on or')]");
+        this.HCP_WORKSPACE_FILTER_CHECKBOX = WORKSPACE_FRAME.getByRole(AriaRole.CHECKBOX, new FrameLocator.GetByRoleOptions().setName("HCP Explorer"));
+        this.EXISTING_WORKSPACE = WORKSPACE_FRAME.locator("//tr[1]/td[1]//span");
+        this.ADVERTISER_SELECTOR_DROPDOWN = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("All Advertisers"));
         this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
         this.NPI_LIST_PULLOUT_MENU = WORKSPACE_FRAME.locator("//ul[@data-tour-id='npi-list-pullout-menu']");
         this.OK_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'OK')]");
@@ -101,11 +107,10 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
-        if(PUBLISH_LOADER.isVisible())
-            waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
-        if(NPI_LIST_PULLOUT_MENU.isVisible()) {
+        if (PUBLISH_LOADER.isVisible()) waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
+        if (NPI_LIST_PULLOUT_MENU.isVisible()) {
             OK_BUTTON.click();
-        }else{
+        } else {
             FLY_PAGE_BUTTON.click();
         }
     }
@@ -123,18 +128,16 @@ public class Workspace {
     }
 
     public void hcp() {
-        if(SELECT_HCP.getAttribute("aria-checked").contains("false"))
-            SELECT_HCP.click();
+        if (SELECT_HCP.getAttribute("aria-checked").contains("false")) SELECT_HCP.click();
     }
 
     public void life() {
-        if(SELECT_LIFE.getAttribute("aria-checked").contains("false"))
-            SELECT_LIFE.click();
+        if (SELECT_LIFE.getAttribute("aria-checked").contains("false")) SELECT_LIFE.click();
     }
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        while(!WORKSPACE_CREATED_ALERT.isVisible()){
+        while (!WORKSPACE_CREATED_ALERT.isVisible()) {
             page.waitForTimeout(5000);
         }
     }
@@ -272,7 +275,7 @@ public class Workspace {
         return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 
-    public String checkNPIDownloadComplete(){
+    public String checkNPIDownloadComplete() {
         String text = DOWNLOAD_SUCCESS_ALERT.innerText();
         waitUtility.waitForLocatorHidden(DOWNLOAD_SUCCESS_ALERT);
         return text;
@@ -287,13 +290,12 @@ public class Workspace {
         return FLY_PAGE_BUTTON.evaluate("element => getComputedStyle(element).backgroundColor").toString();
     }
 
-    public boolean isRetrofitCheckboxSelected(){
-        if(!RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true"))
-            RETROFIT_CHECKBOX.click();
+    public boolean isRetrofitCheckboxSelected() {
+        if (!RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true")) RETROFIT_CHECKBOX.click();
         return RETROFIT_CHECKBOX.getAttribute("aria-checked").contains("true");
     }
 
-    public void clickNPIRetentionOption(String option){
+    public void clickNPIRetentionOption(String option) {
         Locator retentionXpath = WORKSPACE_FRAME.locator(String.format("//button[contains(@value,'%s')]", option));
         retentionXpath.click();
     }
@@ -303,10 +305,20 @@ public class Workspace {
     }
 
     public boolean verifyListTypeAfterPublished(String listType) {
-        return WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]",listType)).isVisible();
+        return WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]", listType)).isVisible();
     }
 
     public String verifyNPIsEngagingText() {
         return NPI_ENGAGING_TEXT.innerText().trim();
+    }
+
+    public void selectExistingWorkspace() {
+        waitUtility.waitForLocatorVisible(HCP_WORKSPACE_FILTER_CHECKBOX);
+        HCP_WORKSPACE_FILTER_CHECKBOX.click();
+        ADVERTISER_SELECTOR_DROPDOWN.click();
+        Locator advertiser = WORKSPACE_FRAME.getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Demo W2O"));
+        advertiser.click();
+        waitUtility.waitForLocatorVisible(EXISTING_WORKSPACE);
+        EXISTING_WORKSPACE.click();
     }
 }

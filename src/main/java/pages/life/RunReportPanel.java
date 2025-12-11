@@ -7,7 +7,6 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -516,7 +515,7 @@ public class RunReportPanel {
         return FILE_NAME_TEXTAREA.inputValue().trim();
     }
 
-    public void clickSearchButton(){
+    public void clickSearchButton() {
         SEARCH_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
     }

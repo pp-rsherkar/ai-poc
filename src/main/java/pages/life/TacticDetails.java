@@ -13,8 +13,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class TacticDetails {
-    private final Page page;
     public final Locator TARGETING_RULES_ICON;
+    private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
     private final Locator SAVE_TACTIC_DETAILS;
@@ -330,12 +330,7 @@ public class TacticDetails {
 
     public boolean getToggleClass(String tacticName) {
         Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
-        if (TACTIC_TOGGLE_CLASS.getAttribute("class")
-                .contains("toggle-enabled")) {
-            return true;
-        } else {
-            return false;
-        }
+        return TACTIC_TOGGLE_CLASS.getAttribute("class").contains("toggle-enabled");
     }
 
     public void globalSearchDeletedTactic(String tacticName) {

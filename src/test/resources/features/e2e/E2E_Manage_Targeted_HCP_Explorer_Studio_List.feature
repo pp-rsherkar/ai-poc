@@ -14,9 +14,9 @@ Feature: E2E Workflow for Targeting a Studio HCP Explorer List in LIFE at the Ta
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
     And User applies the filter and selects option
-      | FilterName         | Option   |
-      | NPI Age            | 35 to 45 |
-      | NPI Gender         | Female   |
+      | FilterName | Option   |
+      | NPI Age    | 35 to 45 |
+      | NPI Gender | Female   |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateCreatives {
+    public final Locator CLICK_THROUGH_URL;
     private final Page page;
     private final Locator CREATIVE_PAGE_TITLE;
     private final Locator UNARCHIVED_BUTTON;
@@ -62,7 +63,6 @@ public class CreateCreatives {
     private final Locator PRODUCT_DESCRIPTION;
     private final Locator CREATIVE_NAME_TEXT;
     private final Locator CREATIVE_STATUS;
-    public final Locator CLICK_THROUGH_URL;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<String> creativesList = new ArrayList<>();
     String imageTextLocator = "//span[contains(text(),'%s')]";

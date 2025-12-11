@@ -1,5 +1,6 @@
 package pages.life;
 
+import api.ApiActions;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -7,7 +8,6 @@ import com.microsoft.playwright.Request;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
-import api.ApiActions;
 import utils.CommonUtils;
 import utils.ExcelActions;
 import utils.WaitUtility;
