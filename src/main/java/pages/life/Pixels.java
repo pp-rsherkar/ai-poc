@@ -100,8 +100,9 @@ public class Pixels {
     }
 
     public String verifySaveSuccess() {
-        String successMessage = SAVE_SUCCESS.first().innerText();
-        waitUtility.waitForLocatorDetached(SAVE_SUCCESS.first());
+        String successMessage = SAVE_SUCCESS.innerText();
+        waitUtility.waitForLocatorHidden(SAVE_SUCCESS);
+        waitUtility.waitUntilSpinnerHidden();
         return successMessage;
     }
 
@@ -112,7 +113,7 @@ public class Pixels {
     }
 
     public String verifyCreatedPixel(String pixelName) {
-        String createdPixelXpath = String.format("//div[contains(text(),'%s')]", pixelName);
+        String createdPixelXpath = String.format("//div[contains(@title,'%s')]", pixelName);
         waitUtility.waitForLocatorVisible(page.locator(createdPixelXpath));
         return page.locator(createdPixelXpath).innerText();
     }
@@ -175,7 +176,7 @@ public class Pixels {
         return NO_RESULTS_FOUND.innerText();
     }
 
-    public void selectAdvertiser(String advertiser){
+    public void selectAdvertiser(String advertiser) {
         ADVERTISER_DROPDOWN.click();
         ADVERTISER_DROPDOWN.locator("xpath=//span[contains(text(),'" + advertiser + "')]").click();
         page.keyboard().press("Escape");
@@ -183,6 +184,6 @@ public class Pixels {
     }
 
     public List<String> fetchPixelsList() {
-       return PIXEL_LIST.allInnerTexts();
+        return PIXEL_LIST.allInnerTexts();
     }
 }

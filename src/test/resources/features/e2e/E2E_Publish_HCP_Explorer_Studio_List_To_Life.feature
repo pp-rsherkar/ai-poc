@@ -16,10 +16,10 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
     #2
     And User applies the filter and selects option
-      | FilterName         | Option                                                                                                                  |
-      | NPI Age            | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
-      | NPI Gender         | Female, Male, Unknown                                                                                                   |
-      | Graduation Year    | 1900-2025                                                                                                               |
+      | FilterName      | Option                                                        |
+      | NPI Age         | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
+      | NPI Gender      | Female, Male, Unknown                                         |
+      | Graduation Year | 1900-2025                                                     |
     And User clicks on Ok and closes the filter popup
     #3
     Then Verify that the applied filters are displayed correctly
@@ -65,5 +65,5 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User clicks on Published button, verifies the "<LIST_TYPE>" and "NPIs engaging" text are displayed
     Examples:
       | WORKSPACE_NAME | ADVERTISER | LIST_TYPE | NPI_RETENTION_OPTION |
-      | Explorer       | Abbvie     | Live      |   indefinitely       |
-      | Explorer       | Abbvie     | Live      |   remove after       |
+      | Explorer       | Abbvie     | Live      | indefinitely         |
+      | Explorer       | Abbvie     | Live      | remove after         |

@@ -140,7 +140,7 @@ public class NPIAttributesList {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TOTAL_NPI_LIST_COUNT);
         waitUtility.waitForLocatorVisible(MATCH_NPI_COUNT);
-        if (listName.contains(LIST_NAME.innerText()))
+        if (listName.contains(page.locator(String.format("//div[contains(@class,'header-name') and contains(@title,'%s')]", listName)).innerText()))
             npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-" + MATCH_NPI_COUNT.innerText().trim();
         return npiCount;
     }

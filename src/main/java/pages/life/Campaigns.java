@@ -46,6 +46,23 @@ public class Campaigns {
     private final Locator CUSTOM_FIELD_DELETE_ICON;
     private final Locator CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP;
     private final Locator CUSTOM_FIELD_DELETE_BUTTON;
+    private final Locator COMMENT_BOX_FROM_TITLE;
+    private final Locator COMMENT_BOX_FROM_DASHBOARD;
+    private final Locator LINE_ITEM_TILE;
+    private final Locator TACTIC_TILE;
+    private final Locator CAMPAIGN_TILE;
+    private final Locator TOOL_TIP;
+    private final Locator TOGGLE_STATUS;
+    private final Locator CAMPAIGN_TAB;
+    private final Locator DETAILS_TAB;
+    private final Locator TIMES_PER_DROPDOWN;
+    private final Locator SCOPE_DROPDOWN;
+    private final Locator FREQUENCY_CAP_VALUE;
+    private final Locator CUSTOM_FIELD;
+    private final Locator GET_FREQUENCY_CAP_TEXT;
+    private final Locator LINE_ITEM_TAB;
+    private final Locator FREQUENCY_CAP;
+    private final Locator TIMES_PER_HOURS_VALUE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -81,16 +98,85 @@ public class Campaigns {
         this.ADD_CUSTOM_FIELD_BUTTON = page.locator("//span[text()='Add Custom Field']");
         this.CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
         this.SAVE_CUSTOM_FIELD = page.locator("//button[normalize-space()='Save']");
-        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator("//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted custom Field :')]");
+        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator("//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted the Field :')]");
         this.CUSTOM_FIELD_DELETE_ICON = page.locator("//div[contains(@class,'campaign-height-popover')]//app-icon-lable-link[@text='Delete']");
-        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted')]");
-        this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field')]");
+        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted') or normalize-space(text())=\"Custom Field Can't Be Removed\"]");
+        this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field') or contains(text(),'Ok')]");
+        this.COMMENT_BOX_FROM_TITLE = page.locator("//span[@class='notes-dark-icon-provided']");
+        this.COMMENT_BOX_FROM_DASHBOARD = page.locator("//span[contains(@class,'notes-icon-provided-dashboard')]");
+        this.LINE_ITEM_TILE = page.locator("//div[contains(@class,'listitembox')]");
+        this.TACTIC_TILE = page.locator("//div[contains(@class,'tactic-container')]");
+        this.CAMPAIGN_TILE = page.locator("//div[contains(@class,'campaign-tile')]");
+        this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
+        this.TOGGLE_STATUS = page.locator("//span[contains(@class,'gaEnable ')]//label");
+        this.CAMPAIGN_TAB = page.locator("//div[@class='item-details']");
+        this.CUSTOM_FIELD = page.locator("//label[contains(@class,'cmp-form-label')]");
+        this.DETAILS_TAB = page.locator("//a[contains(text(),'Details')]");
+        this.TIMES_PER_DROPDOWN = page.locator("//div[contains(@class,'dropdown-wrapper ui field noMargin')]");
+        this.SCOPE_DROPDOWN = page.locator("//div[contains(@class,'crossDevice-dropdown')]");
+        this.FREQUENCY_CAP_VALUE = page.locator("//input[@id='windowLimit' or @id='freqWindowLimit']");
+        this.GET_FREQUENCY_CAP_TEXT = page.locator("//p[contains(@class,'display-block')]");
+        this.LINE_ITEM_TAB = page.locator("//div[contains(@class,'listitembox')]");
+        this.FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
+        this.TIMES_PER_HOURS_VALUE = page.locator("//input[@formcontrolname='hour']");
     }
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
     }
+
+    public void selectCampaign() {
+        CAMPAIGN_TAB.first().click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickLineItem() {
+        LINE_ITEM_TAB.first().click();
+        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public boolean isFrequencyCapDisabled() {
+        return FREQUENCY_CAP.getAttribute("class").contains("checked");
+    }
+
+    public void clickDetailsTab() {
+        DETAILS_TAB.click();
+    }
+
+    public void addFrequencyCap(String level, String frequencyValue, String timesPer, String scope) {
+        Locator TIMES_PER_OPTION = page.locator(String.format("//div[contains(text(),'%s')]", timesPer));
+        Locator FREQUENCY_CAP_SCOPE = page.locator(String.format("//div[contains(text(),'%s')]", scope));
+        if (level.contains("Campaign") | level.contains("Line Item")) {
+            waitUtility.waitForLocatorVisible(CUSTOM_FIELD.first());
+        }
+        if (!FREQUENCY_CAP.getAttribute("class").contains("checked")) {
+            FREQUENCY_CAP.click();
+        }
+        FREQUENCY_CAP_VALUE.fill(frequencyValue);
+        TIMES_PER_DROPDOWN.click();
+        TIMES_PER_OPTION.first().click();
+        if (timesPer.contains("hour(s)")) {
+            TIMES_PER_HOURS_VALUE.fill(frequencyValue);
+        }
+        SCOPE_DROPDOWN.click();
+        FREQUENCY_CAP_SCOPE.click();
+        SAVE_CAMPAIGN.click();
+        waitUtility.waitForElementVisible("//div[@role='alert']");
+    }
+
+    public boolean getFrequencyCapState() {
+        return FREQUENCY_CAP.first().getAttribute("class").contains("checked");
+    }
+
+    public String getSavedFrequencyCap(String level) {
+        String frequencyCapValue = GET_FREQUENCY_CAP_TEXT.first().innerText().trim().toUpperCase();
+        if (level.contains("Line Item")) {
+            frequencyCapValue = GET_FREQUENCY_CAP_TEXT.filter(new Locator.FilterOptions().setHasText("Line item")).innerText().trim().toUpperCase();
+        }
+        return frequencyCapValue;
+    }
+
 
     public String campaignDashboard() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
@@ -111,7 +197,8 @@ public class Campaigns {
     }
 
     public void setCampaignType(String campaignType) {
-        CAMPAIGN_TYPE.locator("text=" + campaignType).click();
+        Locator campaignTypeButton = CAMPAIGN_TYPE.filter(new Locator.FilterOptions().setHasText(campaignType));
+        campaignTypeButton.click();
     }
 
     public void enterBudget(String budget) {
@@ -121,7 +208,6 @@ public class Campaigns {
 
     public void saveCampaign() {
         SAVE_CAMPAIGN.click();
-        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String campaignSuccess() {
@@ -179,8 +265,8 @@ public class Campaigns {
     }
 
     public String fetchDefaultValue(Locator locator) {
-        for(int i = 0; i< locator.count(); i++){
-            if(locator.nth(i).getAttribute("class") != null && locator.nth(i).getAttribute("class").contains("active"))
+        for (int i = 0; i < locator.count(); i++) {
+            if (locator.nth(i).getAttribute("class") != null && locator.nth(i).getAttribute("class").contains("active"))
                 return locator.nth(i).textContent().trim();
         }
         return "";
@@ -200,10 +286,8 @@ public class Campaigns {
 
     public void clickManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount) {
         MANAGEMENT_FEE_OPTIONS.locator("text=" + managementFeeOption).click();
-        if(PERCENT_TYPE_FEE_INPUT.isVisible())
-            PERCENT_TYPE_FEE_INPUT.fill(percent);
-        if(DOLLAR_TYPE_FEE_INPUT.isVisible())
-            DOLLAR_TYPE_FEE_INPUT.fill(amount);
+        if (PERCENT_TYPE_FEE_INPUT.isVisible()) PERCENT_TYPE_FEE_INPUT.fill(percent);
+        if (DOLLAR_TYPE_FEE_INPUT.isVisible()) DOLLAR_TYPE_FEE_INPUT.fill(amount);
     }
 
     public void clickActionItemMenu() {
@@ -234,10 +318,8 @@ public class Campaigns {
         enteredData.add(CAMPAIGN_DESCRIPTION.inputValue());
         enteredData.add(fetchDefaultValue(BUDGET_STATUS));
         enteredData.add(fetchDefaultValue(MANAGEMENT_FEE_OPTIONS));
-        if(PERCENT_TYPE_FEE_INPUT.isVisible())
-            enteredData.add(PERCENT_TYPE_FEE_INPUT.inputValue());
-        if(DOLLAR_TYPE_FEE_INPUT.isVisible())
-            enteredData.add(DOLLAR_TYPE_FEE_INPUT.inputValue());
+        if (PERCENT_TYPE_FEE_INPUT.isVisible()) enteredData.add(PERCENT_TYPE_FEE_INPUT.inputValue());
+        if (DOLLAR_TYPE_FEE_INPUT.isVisible()) enteredData.add(DOLLAR_TYPE_FEE_INPUT.inputValue());
         return enteredData;
     }
 
@@ -250,7 +332,7 @@ public class Campaigns {
     public void clickCampaignDetailsTab() {
         waitUtility.waitForLocatorVisible(CAMPAIGN_DETAILS_TAB);
         CAMPAIGN_DETAILS_TAB.click();
-        while(!SELECTED_ADVERTISER.isVisible()){
+        while (!SELECTED_ADVERTISER.isVisible()) {
             page.waitForTimeout(1000);
         }
     }
@@ -287,7 +369,7 @@ public class Campaigns {
     }
 
     public String fetchCustomFieldSuccessAlert() {
-        String text =  CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
+        String text = CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
         waitUtility.waitForLocatorHidden(CUSTOM_FIELD_SUCCESS_ALERT);
         return text;
     }
@@ -313,12 +395,46 @@ public class Campaigns {
         return page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName)).inputValue();
     }
 
-    public void deleteCustomField(String customFieldName) {
+    public String deleteCustomField(String customFieldName) {
         page.locator(String.format("//label[normalize-space(text())='%s']//img", customFieldName)).click();
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_ICON);
         CUSTOM_FIELD_DELETE_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP);
+        String text = CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP.textContent().trim();
         CUSTOM_FIELD_DELETE_BUTTON.click();
+        return text;
+    }
+
+    public void clickCampaignTile(){
+        CAMPAIGN_TILE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickLineItemTile(){
+        LINE_ITEM_TILE.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public void clickTacticTile() {
+        TACTIC_TILE.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String fetchCommentFromCampaignLineItemTacticPanel() {
+        COMMENT_BOX_FROM_TITLE.hover();
+        return TOOL_TIP.innerText();
+    }
+
+    public String fetchCommentFromCampaignLineItemTacticDashboard() {
+        do {
+            COMMENT_BOX_FROM_DASHBOARD.hover();
+        } while (!TOOL_TIP.isVisible());
+        return TOOL_TIP.innerText();
+    }
+
+    public String fetchToggleStatus() {
+        return TOGGLE_STATUS.textContent().trim();
     }
 }

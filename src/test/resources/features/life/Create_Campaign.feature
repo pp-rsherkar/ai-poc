@@ -109,28 +109,28 @@ Feature: LIFE Regression - Create a Campaign
       | MEDIA SUPPLY       | Authentic Brand Suitability,Brand Safety & Suitability,Browser,Curated Markets,Custom Targeting Bundle,Device,Domains/Apps,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                     |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
-      | Behavioral Segment          | AutoSegment18577650                                             |
-      | NPI                         | Automation_NPI_List                                             |
-      | HCP by Specialty            | Radiology, Aerospace Medicine                                   |
-      | Health Populations          | Anesthesia and Analgesia                                        |
-      | Keyword Populations         | CustomTextForKeywordPopulations, KeywordPopulationsTest         |
-      | Practice Staff              | SMART_Pixel_NPI_20250701_155147                                 |
-      | Health Pages                | Animal Diseases                                                 |
-      | Keywords                    | Custom_Keyword, TestingKeyword, Qwerty123                       |
-      | Endemics                    | Endemic + EHR                                                   |
-      | Geo Targets                 | New York, California                                            |
-      | Postal Codes                | 123456, 10001, 987654                                           |
-      | Weather Signals             | Below 15F degrees, Outdoor Activity                             |
-      | Authentic Brand Suitability | 51246802                                                        |
-      | Brand Safety & Suitability  | Unknown Brand Safety, Highly Illicit Do Not Monetize            |
-      | Browser                     | Chrome, EDGE, Opera, Safari                                     |
-      | Device                      | Mobile, Tablet, Connected Device                                |
-      | Domains/Apps                | APP Regular, updaedList106043912                                |
-      | Inventory Source            | New Report                                                      |
-      | Operating System            | Windows, macOS, Blackberry                                      |
-      | Viewability                 | 50                                                              |
-      | Legal Pages                 | Emancipation                                                    |
-      | Legal Populations           | Adoption                                                        |
+      | Behavioral Segment          | AutoSegment18577650                                     |
+      | NPI                         | Automation_NPI_List                                     |
+      | HCP by Specialty            | Radiology, Aerospace Medicine                           |
+      | Health Populations          | Anesthesia and Analgesia                                |
+      | Keyword Populations         | CustomTextForKeywordPopulations, KeywordPopulationsTest |
+      | Practice Staff              | SMART_Pixel_NPI_20250701_155147                         |
+      | Health Pages                | Animal Diseases                                         |
+      | Keywords                    | Custom_Keyword, TestingKeyword, Qwerty123               |
+      | Endemics                    | Endemic + EHR                                           |
+      | Geo Targets                 | New York, California                                    |
+      | Postal Codes                | 123456, 10001, 987654                                   |
+      | Weather Signals             | Below 15F degrees, Outdoor Activity                     |
+      | Authentic Brand Suitability | 51246802                                                |
+      | Brand Safety & Suitability  | Unknown Brand Safety, Highly Illicit Do Not Monetize    |
+      | Browser                     | Chrome, EDGE, Opera, Safari                             |
+      | Device                      | Mobile, Tablet, Connected Device                        |
+      | Domains/Apps                | APP Regular, updaedList106043912                        |
+      | Inventory Source            | New Report                                              |
+      | Operating System            | Windows, macOS, Blackberry                              |
+      | Viewability                 | 50                                                      |
+      | Legal Pages                 | Emancipation                                            |
+      | Legal Populations           | Adoption                                                |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
@@ -153,14 +153,14 @@ Feature: LIFE Regression - Create a Campaign
     And Verify that Campaign Budget accepts only numeric values "<INVALID_CP_BUDGET>"
     And Verify that user is able to enter the data "<DESCRIPTION>" in the Description field
     And Verify that Budget Status has the below options, and the default status is "Approved"
-    | Pending Approval |
-    | Approved         |
-    | Denied           |
+      | Pending Approval |
+      | Approved         |
+      | Denied           |
     And Verify the availability of the Management Fee checkbox and when clicked, below options should be displayed
-    | Percentage |
-    | CPM        |
-    | % + CPM    |
-    | Fixed CPM  |
+      | Percentage |
+      | CPM        |
+      | % + CPM    |
+      | Fixed CPM  |
     And Verify that the user is able to enter data in the selected Management Fee option - "<MANAGEMENT_FEE>", "<PERCENT>", "<AMOUNT>"
     And User clicks the three-dot menu and verifies that "Generate Report" is enabled and "Delete" is disabled
     And User enters other campaign details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
@@ -183,12 +183,12 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     Then Verify that the custom field value "<CUSTOM_FIELD_VALUE>" is saved and displayed in the campaign details page
     And User verifies if the added custom field is available on New Campaign creation page
-    When User deletes the custom field from the campaign creation page
-    Then Verify that the custom field is deleted successfully
+    When User deletes the custom field for which campaign is created and verifies if it is deleted
+    And User deletes the custom field for which campaign is not created and verifies if it is deleted
     And User verifies if the deleted custom field is available on New Campaign creation page
     Examples:
-      | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER    | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
-      | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000    | Test               |
+      | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
+      | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000     | Test               |
 
 #  @regression
 #  Scenario Outline: API Sample Test

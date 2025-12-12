@@ -50,6 +50,17 @@ public class Accounts {
     private final Locator STUDIO_USER_TAB;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_ENABLED;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
+    private final Locator ACCOUNT_ADVERTISER_TAB;
+    private final Locator GLOBAL_SIGNALS_TAB;
+    private final Locator ADVERTISER_PERMISSION_SAVE_BUTTON;
+    private final Locator ACCOUNT_USER_TAB;
+    private final Locator USER_SIGNAL_TAB;
+    private final Locator USER_PERMISSIONS_SAVE_BUTTON;
+    private final Locator USER_PROFILE_ICON;
+    private final Locator LOGOUT_BUTTON;
+    private final Locator MOMENTS_CHECKBOX;
+    private final Locator IBHEALTH_CHECKBOX;
+    private final Locator CLAIMSDATA_CHECKBOX;
     private final Locator ACCOUNTS_ADVERTISER_TAB;
     private final Locator SUCCESS_ALERT;
     private final Locator CLIENT_VALUE;
@@ -94,7 +105,18 @@ public class Accounts {
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
-        this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
+        this.OK_BUTTON = page.locator("//button[contains(@class, 'okButton') or contains(text(),'Save')]");
+        this.ACCOUNT_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
+        this.GLOBAL_SIGNALS_TAB = page.locator("//button[@class='signal']");
+        this.ADVERTISER_PERMISSION_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
+        this.ACCOUNT_USER_TAB = page.locator("//a[@routerlink='users']");
+        this.USER_SIGNAL_TAB = page.locator("//button[normalize-space(.)='Signal']");
+        this.USER_PERMISSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
+        this.USER_PROFILE_ICON = page.locator("//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
+        this.LOGOUT_BUTTON = page.locator("//div[@class='hovitems item last link']");
+        this.MOMENTS_CHECKBOX = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
+        this.IBHEALTH_CHECKBOX = page.locator("//*[@id='45_0' and not(contains(@class, 'checked'))]");
+        this.CLAIMSDATA_CHECKBOX = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
         this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
@@ -118,6 +140,7 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(selectAccount);
         selectAccount.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CLIENT_VALUE);
     }
 
     public void enableStudio() {
@@ -224,7 +247,7 @@ public class Accounts {
 
     public void clickOKButton() {
         OK_BUTTON.click();
-        while(!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()){
+        while (!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()) {
             page.waitForTimeout(5000);
         }
         page.waitForTimeout(10000); //needed this hard wait as page remains un-interactive even after element is visible
@@ -258,6 +281,63 @@ public class Accounts {
         return false;
     }
 
+    public void clickAccountAdvertiserTab() {
+        ACCOUNT_ADVERTISER_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickGlobalSignalsTab() {
+        GLOBAL_SIGNALS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
+        Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
+        switch (advertiserPermission) {
+            case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
+                if (!permissionCheckbox.isHidden()) {
+                    permissionCheckbox.click();
+                    ADVERTISER_PERMISSION_SAVE_BUTTON.click();
+                }
+                break;
+        }
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void navigateToUserTab() {
+        ACCOUNT_USER_TAB.click();
+        waitUtility.waitForLocatorVisible(USER_SIGNAL_TAB);
+    }
+
+    public void externalUserPermissions(String studioPermissions, String accountName) {
+        USER_SIGNAL_TAB.click();
+        switch (studioPermissions) {
+            case "MOMENTS":
+                if (!MOMENTS_CHECKBOX.isHidden()) {
+                    MOMENTS_CHECKBOX.click();
+                }
+                break;
+            case "IB HEALTH":
+                if (!IBHEALTH_CHECKBOX.isHidden()) {
+                    IBHEALTH_CHECKBOX.click();
+                }
+                break;
+            case "CLAIMS DATA":
+                if (!CLAIMSDATA_CHECKBOX.isHidden()) {
+                    CLAIMSDATA_CHECKBOX.click();
+                }
+                break;
+        }
+        if (USER_PERMISSIONS_SAVE_BUTTON.isVisible()) {
+            USER_PERMISSIONS_SAVE_BUTTON.click();
+        }
+    }
+
+    public void internalUserLogout() {
+        USER_PROFILE_ICON.click();
+        LOGOUT_BUTTON.click();
+    }
+
     public boolean isAccountsAdvertiserTabDisplayed() {
         return ACCOUNTS_ADVERTISER_TAB.isVisible();
     }
@@ -277,6 +357,7 @@ public class Accounts {
         boolean flag;
         Locator permissionXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox", advertiser));
         Locator disabledTextXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]", advertiser));
+        waitUtility.waitForLocatorVisible(permissionXpath);
         flag = switch (checkboxStatus) {
             case "Disabled" -> {
                 if (!disabledTextXpath.isVisible()) {
@@ -295,8 +376,8 @@ public class Accounts {
         return flag;
     }
 
-    public void saveAccountsAdvertiserTab(){
-        if(OK_BUTTON.isVisible()) {
+    public void saveAccountsAdvertiserTab() {
+        if (OK_BUTTON.isVisible()) {
             OK_BUTTON.click();
             waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         }

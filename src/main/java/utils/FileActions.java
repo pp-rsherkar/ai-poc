@@ -1,20 +1,24 @@
 package utils;
-import com.opencsv.*;
-import org.apache.poi.ss.usermodel.*;
+
+import com.opencsv.CSVReader;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
-import java.nio.file.DirectoryStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.StreamSupport;
+import java.util.List;
 
 public class FileActions {
 
     public static List<String[]> readAllDataAtOnce(String file) {
-        List<String[]> allData=null;
+        List<String[]> allData = null;
         try {
             FileReader filereader = new FileReader(file);
             CSVReader csvReader = new CSVReader(filereader);
@@ -55,7 +59,6 @@ public class FileActions {
         return rowCount;
     }
 
-
     public static int fetchColumnCountFromExcel(Path filePath, String columnName) throws IOException {
         try (Workbook wb = new XSSFWorkbook(Files.newInputStream(filePath))) {
             Sheet sheet = wb.getSheetAt(0);
@@ -66,8 +69,7 @@ public class FileActions {
 
             int colIndex = -1;
             for (Cell c : header)
-                if (c.getStringCellValue().trim().equalsIgnoreCase(columnName))
-                    colIndex = c.getColumnIndex();
+                if (c.getStringCellValue().trim().equalsIgnoreCase(columnName)) colIndex = c.getColumnIndex();
 
             if (colIndex == -1)
                 throw new IllegalStateException("Column '" + columnName + "' not found in " + filePath.getFileName());
@@ -85,5 +87,18 @@ public class FileActions {
         Path basePath = Paths.get("src/main/resources/uploadfiles", fileName);
         List<String> lines = Files.readAllLines(basePath);
         return Math.toIntExact(lines.stream().filter(line -> !line.trim().isEmpty()).count());
+    }
+
+    public static int fetchRowCountFromCSV(Path filePath) throws IOException {
+        int rowCount = 0;
+        try (BufferedReader br = Files.newBufferedReader(filePath)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    rowCount++;
+                }
+            }
+        }
+        return rowCount;
     }
 }
