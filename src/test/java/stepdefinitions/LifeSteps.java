@@ -3337,12 +3337,10 @@ public class LifeSteps {
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
 
-    @Then("User creates a new tactic with details {string} {string}")
-    public void user_creates_a_new_tactics(String tacticName, String channel) {
+    @Then("User creates a new tactic with details {string}")
+    public void user_creates_a_new_tactics(String tacticName) {
         tacticDetails.enterTacticName(tacticName);
         tacticDetails.saveTacticDetails();
-        tacticSettings.selectChannel(channel);
-        tacticSettings.saveTacticSettings();
     }
 
     @Then("User deletes the tactic {string} and verifies it")

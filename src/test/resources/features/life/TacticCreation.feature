@@ -77,11 +77,11 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>"
+    Then User creates a new tactic with details "<TACTIC_NAME>"
     Then User deletes the tactic "<TACTIC_NAME>" and verifies it
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72739 |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME     |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Targeting-12122025 |
 
   @regression
   Scenario Outline: Create tactic and enable those tactics through bulk action.
@@ -90,11 +90,11 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>"
+    Then User creates a new tactic with details "<TACTIC_NAME>"
     And User enables tactic "<TACTIC_NAME>" through bulk action and verifies the status
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME     |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Targeting-72838 |
 
 
   @regression @vp
