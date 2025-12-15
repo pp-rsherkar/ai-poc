@@ -104,7 +104,7 @@ public class TacticDetails {
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
         this.TACTIC_TAB = page.locator("//div[@class='tactic item-details']");
-        this.THREE_DOT_ICON =page.locator("//span[@class='pointer inlineDiv action-options']");
+        this.THREE_DOT_ICON = page.locator("//span[@class='pointer inlineDiv action-options']");
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
