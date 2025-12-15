@@ -68,6 +68,7 @@ public class TacticSettings {
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
     private final Locator VERIFY_TACTIC_NAME;
+    private final Locator DISPLAY_TACTIC_NAME;
     private final Locator SELECTED_TARGET;
     private final Locator BLOCKED_TARGET;
     private final Locator SELECTED_TARGET_HP;
@@ -139,6 +140,7 @@ public class TacticSettings {
         this.BLOCKED_TARGET_HP = page.locator("//div[contains(@class,'targetRed')]");
         this.TARGET = page.locator("//div[contains(@class,'text-target')]");
         this.BLOCK = page.locator("//div[contains(@class,'text-block')]");
+        this.DISPLAY_TACTIC_NAME = page.locator("//div[@class='tactic-main-details']");
     }
 
     public String verifyTacticSettingsText() {
@@ -654,7 +656,9 @@ public class TacticSettings {
     public BigDecimal getTacticMaxBidPrice() {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
-
+    public String getTacticName() {
+        return DISPLAY_TACTIC_NAME.innerText();
+    }
 
     public String verifyTacticName() {
         return VERIFY_TACTIC_NAME.innerText();

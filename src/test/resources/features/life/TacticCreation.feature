@@ -78,7 +78,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>"
-    Then User deletes the tactic "<TACTIC_NAME>" and verifies it
+    Then User deletes the tactic and verifies it
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME        |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-15122025 |

@@ -3339,17 +3339,19 @@ public class LifeSteps {
 
     @Then("User creates a new tactic with details {string} {string}")
     public void user_creates_a_new_tactics(String tacticName, String channel) {
-        tacticDetails.enterTacticName(tacticName);
+        tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
+        tacticDetails.enterTacticName(tacticNameRandom);
         tacticDetails.saveTacticDetails();
         tacticSettings.selectChannel(channel);
         tacticSettings.saveTacticSettings();
     }
 
-    @Then("User deletes the tactic {string} and verifies it")
-    public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
+    @Then("User deletes the tactic and verifies it")
+    public void user_deletes_the_tactic_and_verifies_it() {
+        String tacticUniqueName = tacticSettings.getTacticName();
         tacticDetails.deleteTactic();
-        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
-        tacticDetails.globalSearchDeletedTactic(tacticName);
+        Assert.assertNotEquals(tacticUniqueName, tacticSettings.verifyTacticName());
+        tacticDetails.globalSearchDeletedTactic(tacticUniqueName);
         Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
     }
 
