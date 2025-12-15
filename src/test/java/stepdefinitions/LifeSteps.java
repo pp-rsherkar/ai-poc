@@ -124,9 +124,7 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        if (navigation.isLifeVisible()) {
-            Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
-        }
+        Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
         switch (application) {
             case "Life":
                 navigation.navigateToLife();
