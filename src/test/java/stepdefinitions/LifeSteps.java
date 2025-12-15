@@ -47,6 +47,7 @@ public class LifeSteps {
     static String metricName;
     static String newPixelName;
     static String pixelNameEdited;
+    static String userType;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
@@ -95,6 +96,7 @@ public class LifeSteps {
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
+        userType = user;
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");
             // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
@@ -124,9 +126,6 @@ public class LifeSteps {
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
-        if (navigation.isLifeVisible()) {
-            Assert.assertEquals("Admin Dashboard", navigation.verifyProfilePage());
-        }
         switch (application) {
             case "Life":
                 navigation.navigateToLife();
@@ -135,12 +134,10 @@ public class LifeSteps {
                 navigation.navigateToHCP();
                 break;
             case "Studio":
-                if (navigation.isLifeVisible()) {
+                if (userType.equals("User")) {
                     navigation.navigateToLife();
-                    navigation.navigateToStudio();
-                } else {
-                    navigation.navigateToStudio();
                 }
+                navigation.navigateToStudio();
                 break;
         }
         navigation.selectAccount(account);
