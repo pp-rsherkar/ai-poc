@@ -15,7 +15,6 @@ import pages.life.*;
 import utils.*;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -27,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -1076,7 +1074,7 @@ public class LifeSteps {
 
     @And("Verify Delete icon is disabled and error message {string}")
     public void verifyDeleteIconIsDisabledAndOnHoverShowErrorMessage(String errorMessage) {
-        Assert.assertTrue("Delete icon is not disabled", pmp.isDeleteIconIsDisabled());
+        Assert.assertTrue("Delete icon is not disabled", pmp.isDeleteIconDisabled());
         Assert.assertEquals(errorMessage, pmp.fetchMessageOnDeleteIconClick());
     }
 
@@ -3280,7 +3278,7 @@ public class LifeSteps {
             String fileName = "Custom Report";
             runReportPanel.clickRunButton(fileName);
             String actualMessage = runReportPanel.fetchSuccessAlert();
-            Assert.assertTrue("Unexpected success message: " + actualMessage,actualMessage.equals("Success!") || actualMessage.equals("You will get the report on your email"));
+            Assert.assertTrue("Unexpected success message: " + actualMessage, actualMessage.equals("Success!") || actualMessage.equals("You will get the report on your email"));
         }
     }
 

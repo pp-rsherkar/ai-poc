@@ -266,7 +266,7 @@ public class PMP {
         return text;
     }
 
-    public boolean isDeleteIconIsDisabled() {
+    public boolean isDeleteIconDisabled() {
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {

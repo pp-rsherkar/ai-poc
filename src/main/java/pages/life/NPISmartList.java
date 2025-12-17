@@ -546,13 +546,13 @@ public class NPISmartList {
 
     public List<String> retrieveEnteredData(String listType) {
         List<String> enteredData = new ArrayList<>();
-        if(LIST_NAME.isVisible())
+        if (LIST_NAME.isVisible())
             enteredData.add(LIST_NAME.inputValue());
-        else if(LIST_NAME_FROM_HEADER.isVisible())
+        else if (LIST_NAME_FROM_HEADER.isVisible())
             enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
-        if(!EDIT_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible())
+        if (!EDIT_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible())
             enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent());
-        else if(ADVERTISER_NAME_FROM_HEADER.isVisible())
+        else if (ADVERTISER_NAME_FROM_HEADER.isVisible())
             enteredData.add(ADVERTISER_NAME_FROM_HEADER.textContent().replace("Advertiser: ", "").trim());
         getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
         switch (listType) {

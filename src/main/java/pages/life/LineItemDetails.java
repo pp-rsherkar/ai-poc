@@ -260,10 +260,10 @@ public class LineItemDetails {
         while (CALENDER_TITLE.first().isVisible() && !CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear))) {
             CALENDER_TITLE.first().click();
             Locator yearLocator = page.locator(String.format("//sui-calendar-year-view//td[contains(text(),'%s')]", currentYear));
-            if(yearLocator.isVisible() && yearLocator.getAttribute("class").contains("today")) {
+            if (yearLocator.isVisible() && yearLocator.getAttribute("class").contains("today")) {
                 CALENDER_TITLE.first().click();
                 CALENDER_PREV_BUTTON.click();
-                if(CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear)))
+                if (CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear)))
                     CALENDER_TITLE.first().click();
             }
         }

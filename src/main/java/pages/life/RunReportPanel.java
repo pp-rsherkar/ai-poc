@@ -268,11 +268,11 @@ public class RunReportPanel {
 
     public String fetchSuccessAlert() {
         String text;
-        if(SUCCESS_ALERT.isVisible()) {
+        if (SUCCESS_ALERT.isVisible()) {
             text = SUCCESS_ALERT.innerText().trim();
             waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
             return text;
-        }else{
+        } else {
             text = ALERT_MESSAGE.innerText().trim();
         }
         return text;
