@@ -31,7 +31,6 @@ public class Navigation {
     private final Locator CREATIVE_LIBRARY_ICON;
     private final Locator MENU_ANGLE;
     private final Locator PULSEPOINT_LOGO;
-    private final Locator ADMIN_DASHBOARD_TITLE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
 
@@ -57,7 +56,6 @@ public class Navigation {
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
         this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
         this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo/div[@class='logo-holder']");
-        this.ADMIN_DASHBOARD_TITLE = page.locator("//span[contains(text(),'Admin Dashboard')]");
     }
 
     public void navigateToUrl(String url) {
@@ -78,15 +76,6 @@ public class Navigation {
 
     public void clickOnIcon(String iconName) {
         this.page.getByText(iconName.trim()).click();
-    }
-
-    public String verifyProfilePage() {
-        waitUtility.waitForLocatorVisible(ADMIN_DASHBOARD_TITLE);
-        return ADMIN_DASHBOARD_TITLE.innerText().trim();
-    }
-
-    public boolean isLifeVisible() {
-        return LIFE.isVisible();
     }
 
     public void navigateToLife() {

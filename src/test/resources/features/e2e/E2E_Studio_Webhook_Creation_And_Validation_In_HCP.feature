@@ -9,15 +9,23 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
   8. Save the webhook setup and verify the webhook icon is highlighted in green color
   9. Verify user receives a warning when attempting to delete a workspace with an active webhook
 
+  Background:
+    Given This scenario will be executed in the "Pre-release" environment as a "User"
+    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+    When User navigates to Administrative section and go to Accounts Tab
+    And User searches the account "PP engineering test" and checks Studio permissions
+    And User clicks PulsePoint icon to navigate back to Life
+    And User navigates to Studio application
+
+
   @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the request URL and body
     #1
-    Given This scenario will be executed in the "Pre-release" environment as a "User"
-    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     #2
     And Verify Webhook panel is disabled before applying filters
     When User applies the filter and selects option
