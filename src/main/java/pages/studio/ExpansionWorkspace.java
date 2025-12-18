@@ -4,6 +4,7 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import utils.WaitUtility;
 
 import java.util.regex.Pattern;
 
@@ -27,9 +28,11 @@ public class ExpansionWorkspace {
     private final Locator POPUP_CLOSE;
     private final Locator DROPDOWN_CARE_TEAM;
     private final Locator DROPDOWN_CARETEAM_VALUE;
+    WaitUtility waitUtility;
 
     public ExpansionWorkspace(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.HCP_AUDIENCEEXP = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.IMG).nth(2);
         this.ADVERTISER_DROPDOWN = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX);
         this.SELECT_ADVERTISER = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Abbvie"));

@@ -6,15 +6,12 @@ import utils.ConfigReader;
 import java.util.List;
 
 public class DriverFactory {
-    public static BrowserContext context;
-    public static Page page;
     public static ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>(); //For Parallel execution
     public static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
     public static ThreadLocal<Browser> threadLocalBrowser = new ThreadLocal<>();
-    public static Browser browser;
     private static Playwright playwright;
 
-    public static Playwright createPlaywright() {
+    public static synchronized Playwright createPlaywright() {
         if (playwright == null) {
             playwright = Playwright.create();
         }
@@ -39,6 +36,7 @@ public class DriverFactory {
         boolean headless = Boolean.parseBoolean(ConfigReader.getProperty("headless"));
         int delay = Integer.parseInt(ConfigReader.getProperty("delay"));
         playwright = createPlaywright();
+        Browser browser = null;
         switch (browserName) {
             case "firefox":
                 browserType = playwright.firefox();
@@ -55,10 +53,10 @@ public class DriverFactory {
         }
         if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);
         threadLocalBrowser.set(browser);
-        context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
+        BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
         //Below line is used to start the trace file
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
-        page = context.newPage();
+        Page page = context.newPage();
         threadLocalDriver.set(page);
         threadLocalContext.set(context);
         return page;

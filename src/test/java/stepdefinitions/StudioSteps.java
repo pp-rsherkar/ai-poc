@@ -45,7 +45,6 @@ public class StudioSteps {
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
-    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -301,7 +300,7 @@ public class StudioSteps {
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
-    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
+    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
         int npiCountFromFile = 0;
         if (fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
