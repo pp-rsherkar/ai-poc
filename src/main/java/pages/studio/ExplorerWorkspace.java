@@ -56,10 +56,11 @@ public class ExplorerWorkspace {
     private final Locator OWNED_AND_OPERATED_SECTION;
     private final Locator WORKSPACE_EDIT_BUTTON;
     private final Locator WORKSPACE_HEADER;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    WaitUtility waitUtility;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.WORKSPACE_NAME = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX).nth(1);
         this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
@@ -224,19 +225,19 @@ public class ExplorerWorkspace {
     }
 
     public void hoverOverNPIVisualsIcon(List<String> npiVisualList) {
-        for (int i = 0; i < npiVisualList.size(); i++) {
-            String visual = npiVisualList.get(i).trim();
+        for (String s : npiVisualList) {
+            String visual = s.trim();
             boolean isInView = false;
-            switch (npiVisualList.get(i).trim()) {
+            switch (s.trim()) {
                 case "NPI Geographic Location", "NPI Facilities Geography", "NPI ZIP Codes":
                     Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[contains(@style,'z-index: 3;')]", visual));
                     isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, CAMERA_CONTROL_ICON, 1000, 100, page);
                     if (!isInView) {
                         continue;
                     }
-                    if (npiVisualList.get(i).contains("NPI Facilities Geography")) {
+                    if (s.contains("NPI Facilities Geography")) {
                         ZOOM_OUT.first().click();
-                    } else if (npiVisualList.get(i).contains("NPI ZIP Codes")) {
+                    } else if (s.contains("NPI ZIP Codes")) {
                         ZOOM_OUT.nth(1).click();
                     }
 

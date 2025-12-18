@@ -19,13 +19,12 @@ import utils.FileActions;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import static factory.DriverFactory.page;
 
 public class StudioSteps {
     static String workspaceName;
@@ -47,7 +46,6 @@ public class StudioSteps {
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
-    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -68,9 +66,9 @@ public class StudioSteps {
 
     @Then("the user selects the advertiser {string}")
     public void the_user_selects_the_advertiser(String advertiser) {
-        page.waitForLoadState();
+        DriverFactory.getPage().waitForLoadState();
         expansionWorkspace.clickAdvertiserDropdown(advertiser);
-        page.waitForLoadState();
+        DriverFactory.getPage().waitForLoadState();
     }
 
     @Then("the user selects Source Audience {string}")
@@ -303,7 +301,7 @@ public class StudioSteps {
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
-    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
+    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
         int npiCountFromFile = 0;
         if (fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);

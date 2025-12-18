@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class TacticSettings {
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -73,8 +75,6 @@ public class TacticSettings {
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
-    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
-    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
 
     public TacticSettings(Page page) {
         this.page = page;
@@ -579,7 +579,7 @@ public class TacticSettings {
      * Open NPI list created in new browser tab */
     public String fetchTotalNPICountFromNewTab(String listName) {
         Page originalPage = DriverFactory.getPage();
-        Page newTab = DriverFactory.context.waitForPage(() -> {
+        Page newTab = DriverFactory.getContext().waitForPage(() -> {
             DriverFactory.getPage().locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName)).click();
         });
         newTab.bringToFront();
@@ -658,3 +658,4 @@ public class TacticSettings {
     }
 
 }
+

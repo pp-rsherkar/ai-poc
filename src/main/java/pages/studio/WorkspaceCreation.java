@@ -45,11 +45,12 @@ public class WorkspaceCreation {
     private final Locator DELETE_WORKSPACE_ERROR_ALERT_BOX;
     private final Locator DELETE_WORKSPACE_ERROR_TEXT;
     private final Locator WORKSPACE_TYPE_LIST;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    WaitUtility waitUtility;
     int counter = 0;
 
     public WorkspaceCreation(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");

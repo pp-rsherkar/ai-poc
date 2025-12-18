@@ -69,10 +69,11 @@ public class Accounts {
     private final Locator STUDIO_SETTINGS_PANEL;
     private final Locator WORKSPACE_PERMISSION_TOGGLE_BUTTON;
     private final Locator SETTINGS_PANEL_CANCEL_BUTTON;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    WaitUtility waitUtility;
 
     public Accounts(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.SUB_MENU = page.locator("span").first();
         this.ADMINISTRATION = page.getByText("Administration", new Page.GetByTextOptions().setExact(true));
         this.ACCOUNTS_TAB = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Accounts"));

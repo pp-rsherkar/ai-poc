@@ -56,10 +56,11 @@ public class Workspace {
     private final Locator ADVERTISER_SELECTOR_DROPDOWN;
     private final Locator NPI_LIST_PULLOUT_MENU;
     private final Locator OK_BUTTON;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    WaitUtility waitUtility;
 
     public Workspace(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.STUDIO_CLICK = page.locator("#megamenu div").filter(new Locator.FilterOptions().setHasText("Studio")).nth(3);
         this.FLY_PAGE_BUTTON = WORKSPACE_FRAME.locator("//div[@role='group']/following-sibling::div//button").first();
