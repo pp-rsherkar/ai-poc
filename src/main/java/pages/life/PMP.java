@@ -114,7 +114,7 @@ public class PMP {
         this.ALL_PREMIUM_PUBS = page.locator("//div[contains(@class,'premiumPub')]");
         this.NO_DEAL_TEXT = page.locator("//div[contains(@class,'noDealsTxt')]");
         this.ADVERTISER = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::app-multi-select");
-        this.ADVERTISER_VALUES = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::app-multi-select//div[@class='menu transition visible']//span");  //need to give index as 2 "span" tags have been defined with no attributes
+        this.ADVERTISER_VALUES = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::app-multi-select//div[@class='menu transition visible']//span");
         this.CURATOR_DROPDOWN = page.locator("//app-single-select-dropdown[@placeholder='Select Curator']");
         this.CURATOR_VALUES = page.locator("//app-single-select-dropdown[@placeholder='Select Curator']//div[contains(@class,'item')]");
         this.DEALS_LIST_SECTION = page.locator("//div[contains(@id,'dealsListWrapper')]");
@@ -270,22 +270,21 @@ public class PMP {
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
-                flag1 = true;
+                return true;
             }
         }
-        return flag1;
+        return false;
     }
 
     public String fetchMessageOnDeleteIconClick() {
-        String tooltipText = "";
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
                 DELETE_ICON.nth(i).click(new Locator.ClickOptions().setForce(true));
-                tooltipText = TOOLTIP_TEXT.textContent();
+                return TOOLTIP_TEXT.textContent().trim();
             }
         }
-        return tooltipText;
+        return "";
     }
 
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
