@@ -31,11 +31,13 @@ public class Navigation {
     private final Locator CREATIVE_LIBRARY_ICON;
     private final Locator MENU_ANGLE;
     private final Locator PULSEPOINT_LOGO;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
+    WaitUtility waitUtility;
+    CampaignDashboard campaignDashboard;
 
     public Navigation(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
+        this.campaignDashboard = new CampaignDashboard(page);
         this.USERNAME = page.locator("#UserName");
         this.PASSWORD = page.locator("#Password");
         this.LOGIN_BUTTON = page.locator(".loginLabel");

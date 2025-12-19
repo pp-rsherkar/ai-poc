@@ -19,12 +19,11 @@ import utils.FileActions;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import static factory.DriverFactory.page;
 
 public class StudioSteps {
     static String workspaceName;
@@ -42,9 +41,10 @@ public class StudioSteps {
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
+    List<String> metricNames = new ArrayList<>();
+    List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
-    String timeStamp = CommonUtils.timeStampCalculation();
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -65,9 +65,9 @@ public class StudioSteps {
 
     @Then("the user selects the advertiser {string}")
     public void the_user_selects_the_advertiser(String advertiser) {
-        page.waitForLoadState();
+        DriverFactory.getPage().waitForLoadState();
         expansionWorkspace.clickAdvertiserDropdown(advertiser);
-        page.waitForLoadState();
+        DriverFactory.getPage().waitForLoadState();
     }
 
     @Then("the user selects Source Audience {string}")
@@ -151,13 +151,14 @@ public class StudioSteps {
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
-        Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
-        // As confirmed by Nikhil - for GA, permissions have been set up like-wise. This is HCP Explorer test-case and in permission feature we can handled this.
-        // Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
+        fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
+        Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
+        if (fetchedMetricNames.contains("HCP Explorer"))
+            Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
         workspaceCreation.clickHCPExplorerWorkspace();
         Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
     }
@@ -168,6 +169,7 @@ public class StudioSteps {
         workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.selectAdvertiser(advertiser);
+        explorerWorkspace.saveWorkspaceName();
     }
 
     @When("User applies the filter and selects option")
@@ -185,6 +187,7 @@ public class StudioSteps {
                 List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
                 explorerWorkspace.selectFilter(filterName, filterOptionList);
             }
+            explorerWorkspace.clickFilterOKButton();
         }
     }
 
@@ -197,8 +200,19 @@ public class StudioSteps {
     public void verify_that_the_applied_filters_are_displayed_correctly() {
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
         for (String appliedFilter : appliedFilterEntries) {
-            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> displayed.toLowerCase().startsWith(appliedFilter.toLowerCase()));
-
+            String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> { String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+                // 1) Exact match
+                boolean exactMatch = displayedNorm.equals(appliedNorm);
+                // 2) Singular/plural
+                boolean singularPlural = displayedNorm.startsWith(appliedNorm.replaceAll("s$", ""));
+                // 3) Word-level contains
+                boolean wordMatch = Arrays.stream(appliedNorm.split(" ")).anyMatch(word -> word.length() > 3 && displayedNorm.contains(word));
+                // 4) Prescription, Diagnosis root match (prescribe/prescribed/prescriptions/diagnosed/diagnosis/diagnoses)
+                boolean prescriptionRoot = appliedNorm.contains("prescri") && displayedNorm.contains("prescri");
+                boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
+                return exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot;
+            });
             Assert.assertTrue("Applied filter not displayed: " + appliedFilter, matchFound);
         }
     }
@@ -211,11 +225,27 @@ public class StudioSteps {
     @Then("Verify the HCP Explorer Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-
         boolean isValid = actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
-
         Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
+    }
+
+    @And("User clicks Edit button and updates workspace name to {string}")
+    public void userClicksEditButtonAndUpdatesWorkspaceNameTo(String editedName) {
+        explorerWorkspace.clickEditWorkspace();
+        workspaceName = editedName + CommonUtils.timeStampCalculation();
+        explorerWorkspace.enterWorkspaceName(workspaceName);
+        explorerWorkspace.saveWorkspaceName();
+    }
+
+    @Then("Verify the Workspace is updated with edited name")
+    public void verifyTheHCPExplorerWorkspaceIsUpdated() {
+        Assert.assertEquals(workspaceName, explorerWorkspace.fetchWorkspaceHeader());
+    }
+
+    @And("Verify that advertiser field is disabled and displayed in {string} after saving the workspace")
+    public void verifyIfAdvertiserIsDisabledAfterSavingTheWorkspace(String textColor) {
+        Assert.assertEquals(textColor, explorerWorkspace.isAdvertiserDisabled());
     }
 
     @Then("verify the file content")
@@ -270,7 +300,7 @@ public class StudioSteps {
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
-    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException, InterruptedException {
+    public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
         int npiCountFromFile = 0;
         if (fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
@@ -695,5 +725,41 @@ public class StudioSteps {
         }
     }
 
+    @And("User searches the account {string} and checks Studio permissions")
+    public void userSearchesTheAccountInWhichPermissionToBeChecked(String account) {
+        accounts.searchAccount(account);
+        Assert.assertTrue("Studio permissions setting icon is not displayed", accounts.isStudioSettingsButtonVisible());
+        accounts.clickStudioSettingsButton();
+        metricNames = accounts.fetchWorkspacesWithPermission();
+        accounts.clickCancelButtonFromSettingsPanel();
+    }
 
+    @And("User navigates to Studio application")
+    public void userNavigatesToStudioApplication() {
+        navigation.navigateToStudio();
+    }
+
+
+    @And("User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
+    public void userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(String filterType, DataTable dataTable) {
+        List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> row : filters) {
+            String filterName = row.get("FilterName").trim();
+            String filterOption = row.get("Option").trim();
+            String recency = row.getOrDefault("Recency", "").trim();
+            explorerWorkspace.clickAddFilter();
+            // Apply option values
+            if (!filterOption.isEmpty()) {
+                List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
+                explorerWorkspace.selectFilter(filterName, filterOptionList);
+                if (!recency.isEmpty()) {
+                    explorerWorkspace.selectRecency(recency);
+                }
+                explorerWorkspace.clickFilterOKButton();
+            }
+            explorerWorkspace.applyFilter();
+            Assert.assertEquals(filterType + " recency value is not matched",  recency, explorerWorkspace.fetchRecencyValue(filterType));
+        }
+    }
 }

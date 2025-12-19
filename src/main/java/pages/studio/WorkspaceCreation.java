@@ -8,6 +8,7 @@ import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.WaitUtility;
+import java.util.List;
 
 public class WorkspaceCreation {
 
@@ -43,11 +44,13 @@ public class WorkspaceCreation {
     private final Locator REMOVE_WORKSPACE_BUTTON;
     private final Locator DELETE_WORKSPACE_ERROR_ALERT_BOX;
     private final Locator DELETE_WORKSPACE_ERROR_TEXT;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    private final Locator WORKSPACE_TYPE_LIST;
+    WaitUtility waitUtility;
     int counter = 0;
 
     public WorkspaceCreation(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
@@ -79,11 +82,16 @@ public class WorkspaceCreation {
         this.REMOVE_WORKSPACE_BUTTON = WORKSPACE_FRAME.locator("//button/div[text()='Remove']");
         this.DELETE_WORKSPACE_ERROR_ALERT_BOX = WORKSPACE_FRAME.locator("//h3[contains(text(),'Deleting workspace')]");
         this.DELETE_WORKSPACE_ERROR_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),\"Deletion blocked by Life. Message: This list can't be deleted\")]");
+        this.WORKSPACE_TYPE_LIST = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace Type')]/following-sibling::div//p[not(@color)]");
     }
 
     public String studioDashboard() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         return this.page.title();
+    }
+
+    public List<String> fetchWorkspaceTypes(){
+        return WORKSPACE_TYPE_LIST.allTextContents();
     }
 
     public String verifyHCPExplorer() {

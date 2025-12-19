@@ -22,7 +22,7 @@ public class ExplorerWorkspace {
     private final Locator DASHBOARD_RELOAD_ICON;
     private final Locator ADD_FILTER;
     private final Locator SEARCH_FILTER;
-    private final Locator SELECT_FILTER;
+    private final Locator ADVERTISER_SELECTED;
     private final Locator FILTER_OK_BUTTON;
     private final Locator FILTER_CLOSE_BUTTON;
     private final Locator APPLIED_FILTER;
@@ -54,10 +54,13 @@ public class ExplorerWorkspace {
     private final Locator MOMENTS_WIDGET;
     private final Locator CLAIMS_WIDGET;
     private final Locator OWNED_AND_OPERATED_SECTION;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    private final Locator WORKSPACE_EDIT_BUTTON;
+    private final Locator WORKSPACE_HEADER;
+    WaitUtility waitUtility;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.WORKSPACE_NAME = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX).nth(1);
         this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
@@ -66,7 +69,7 @@ public class ExplorerWorkspace {
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
         this.ADD_FILTER = WORKSPACE_FRAME.locator("//div[contains(text(),'Add Filter')]");
         this.SEARCH_FILTER = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.SELECT_FILTER = WORKSPACE_FRAME.locator("//div[contains(@class,'styles__StyledIconLabelContainer') or contains(@class,'styles__StyledSubGroupContainer')]");
+        this.ADVERTISER_SELECTED = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspace-back-button']/following-sibling::div//p[contains(text(),'Advertiser:')]");
         this.FILTER_OK_BUTTON = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
         this.FILTER_CLOSE_BUTTON = WORKSPACE_FRAME.locator("//h1[contains(text(),'Select Filter')]/following-sibling::button");
         this.APPLIED_FILTER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'filters-container')]//button/preceding-sibling::p");
@@ -96,8 +99,9 @@ public class ExplorerWorkspace {
         this.IBHEALTH = WORKSPACE_FRAME.locator("//div[@data-tour-id='filters-drawer']//p[normalize-space(.)='WebMD']");
         this.MOMENTS_WIDGET = WORKSPACE_FRAME.getByText("Contextual", new FrameLocator.GetByTextOptions().setExact(true));
         this.CLAIMS_WIDGET = WORKSPACE_FRAME.getByText("Clinical", new FrameLocator.GetByTextOptions().setExact(true));
-
         this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
+        this.WORKSPACE_EDIT_BUTTON = WORKSPACE_FRAME.locator("//button//div[text()='Edit']");
+        this.WORKSPACE_HEADER = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspace-back-button']/following-sibling::div//h1");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -110,6 +114,9 @@ public class ExplorerWorkspace {
         SEARCH_ADVERTISER.fill(advertiser);
         SEARCH_ADVERTISER.press("ArrowDown");
         SEARCH_ADVERTISER.press("Enter");
+    }
+
+    public void saveWorkspaceName() {
         SAVE_WORKSPACE_NAME.click();
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -121,10 +128,11 @@ public class ExplorerWorkspace {
     }
 
     public void selectFilter(String filter, List<String> options) {
+        SEARCH_FILTER.clear();
         SEARCH_FILTER.fill(filter);
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).first().click();
         switch (filter) {
-            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name":
+            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name", "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
                 if (filter.equals("Specialty"))
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
@@ -132,7 +140,10 @@ public class ExplorerWorkspace {
                     TAB_PANEL_SEARCH.fill(option.trim());
                     locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     page.waitForTimeout(1000);
-                    SELECT_DESELECT_ALL.click();
+                    if(SELECT_DESELECT_ALL.isVisible())
+                        SELECT_DESELECT_ALL.click();
+                    else
+                        locator.first().click();
                 }
                 break;
             case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
@@ -163,8 +174,10 @@ public class ExplorerWorkspace {
                 REACHABLE_AUDIENCE.click();
                 break;
         }
+    }
+
+    public void clickFilterOKButton(){
         FILTER_OK_BUTTON.click();
-        SEARCH_FILTER.clear();
     }
 
     public void applyFilter() {
@@ -212,19 +225,19 @@ public class ExplorerWorkspace {
     }
 
     public void hoverOverNPIVisualsIcon(List<String> npiVisualList) {
-        for (int i = 0; i < npiVisualList.size(); i++) {
-            String visual = npiVisualList.get(i).trim();
+        for (String s : npiVisualList) {
+            String visual = s.trim();
             boolean isInView = false;
-            switch (npiVisualList.get(i).trim()) {
+            switch (s.trim()) {
                 case "NPI Geographic Location", "NPI Facilities Geography", "NPI ZIP Codes":
                     Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[contains(@style,'z-index: 3;')]", visual));
                     isInView = CommonUtils.scrollElementIntoView(MAP_CONTENT, CAMERA_CONTROL_ICON, 1000, 100, page);
                     if (!isInView) {
                         continue;
                     }
-                    if (npiVisualList.get(i).contains("NPI Facilities Geography")) {
+                    if (s.contains("NPI Facilities Geography")) {
                         ZOOM_OUT.first().click();
-                    } else if (npiVisualList.get(i).contains("NPI ZIP Codes")) {
+                    } else if (s.contains("NPI ZIP Codes")) {
                         ZOOM_OUT.nth(1).click();
                     }
 
@@ -312,4 +325,26 @@ public class ExplorerWorkspace {
         };
     }
 
+
+    public String isAdvertiserDisabled() {
+        return ADVERTISER_SELECTED.evaluate("el => getComputedStyle(el).color").toString();
+    }
+
+    public void clickEditWorkspace() {
+        WORKSPACE_EDIT_BUTTON.click();
+        waitUtility.waitForLocatorVisible(WORKSPACE_NAME);
+    }
+
+    public String fetchWorkspaceHeader() {
+        return WORKSPACE_HEADER.textContent().trim();
+    }
+
+    public void selectRecency(String recency) {
+        WORKSPACE_FRAME.locator("//p[normalize-space()='Recency']/following-sibling::div//label[normalize-space()='" + recency + "']").click();
+    }
+
+    public String fetchRecencyValue(String filterType) {
+        Locator recencyLocator = WORKSPACE_FRAME.locator(String.format("//p[normalize-space()='%s Recency']/parent::div//following-sibling::div//p", filterType));
+        return recencyLocator.textContent().trim();
+    }
 }
