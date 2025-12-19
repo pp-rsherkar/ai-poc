@@ -2,6 +2,7 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -127,7 +128,7 @@ public class StudioSteps {
         accounts.switchAccount(accountName);
         navigation.navigateToStudio();
         workspaceCreation.createWorkspace();
-        Assert.assertEquals("HCP Audience Expansion", accounts.verifyWorkspacePermission());
+        Assert.assertEquals("HCP Explorer", accounts.verifyWorkspacePermission());
     }
 
     @And("User disables the studio permission for {string} account")
@@ -154,6 +155,45 @@ public class StudioSteps {
         fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
+/*
+
+
+    @Then("User selects the Workspace Type as {string}")
+    public void user_selects_the_workspace_type_as(String string) {
+
+    }
+
+    @Then("User selects the advertiser as {string}")
+    public void user_selects_the_advertiser_as(String string) {
+
+    }
+
+    @Then("User selects Source Audience details as {string},{string}")
+    public void user_selects_source_audience_details_as(String string, String string2) {
+
+    }
+
+    @Then("User selects {string}")
+    public void user_selects(String string) {
+
+    }
+
+    @Then("User applies filters to the workspace")
+    public void user_applies_filters_to_the_workspace() {
+
+    }
+
+    @Then("User clicks on Edit button to rename the workspace to {string}")
+    public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
+
+    }
+
+    @Then("Verify the workspace in workspace management page")
+    public void verify_the_workspace_in_workspace_management_page() {
+
+    }
+*/
+
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
@@ -619,6 +659,7 @@ public class StudioSteps {
     @Then("User turns on studio toggle for external users and verifies that it is enabled")
     public void user_turns_on_studio_toggle_for_external_users_and_verifies_that_it_is_enabled() {
         Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
+        accounts.internalUserLogout();
     }
 
 
@@ -761,5 +802,9 @@ public class StudioSteps {
             explorerWorkspace.applyFilter();
             Assert.assertEquals(filterType + " recency value is not matched",  recency, explorerWorkspace.fetchRecencyValue(filterType));
         }
+    }
+    @Then("User should be able to see Studio for that account")
+    public void userShouldBeAbleToSeeStudioForThatAccount() {
+        Assert.assertEquals("Studio",navigation.verifyStudioTitle());
     }
 }
