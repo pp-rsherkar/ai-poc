@@ -15,7 +15,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates below tactics under same line item and verifies it
+    Then User creates multiple tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Targeting Segment     | Email    | Health Population  |
       | Health Populations    | EHR      | NPI                |
@@ -37,7 +37,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    When User creates below tactics under same line item and verifies it
+    When User creates multiple tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
     When User clicks on first tactic and goes to details tab
@@ -81,7 +81,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72739 |
 
   @regression
-  Scenario Outline: Create tactic and enable those tactics through bulk action.
+  Scenario Outline: Create tactic and enable those tactics through bulk action
     When User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -101,7 +101,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates below tactics under same line item and verifies it
+    Then User creates multiple tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Audience Group tactic | Standard | Behavioral Segment |
     Then User navigates to campaign

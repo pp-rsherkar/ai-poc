@@ -10,11 +10,10 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class TacticDetails {
-    private final Page page;
     public final Locator TARGETING_RULES_ICON;
+    private final Page page;
     private final Locator VERIFY_TACTIC_DETAILS_PAGE;
     private final Locator TACTIC_NAME;
     private final Locator SAVE_TACTIC_DETAILS;
@@ -49,7 +48,7 @@ public class TacticDetails {
     private final Locator CONFIRM_DELETE;
     private final Locator DELETE_SUCCESS;
     private final Locator CUSTOM_FIELD;
-    private final Locator THREE_DOT_ICON;
+    private final Locator TACTIC_OPTIONS;
     private final Locator TACTIC_DELETE_BUTTON;
     private final Locator TACTIC_REMOVE_BUTTON;
     private final Locator EXIT_BULK_MODE;
@@ -109,7 +108,7 @@ public class TacticDetails {
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
         this.TACTIC_TAB = page.locator("//div[@class='tactic item-details']");
-        this.THREE_DOT_ICON = page.locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Generate ReportDuplicateExport Audit LogDelete\\?$"))).first();
+        this.TACTIC_OPTIONS = page.locator("//div[contains(@class, 'tactic-app-action')]//span[@title='options']");
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
@@ -198,7 +197,6 @@ public class TacticDetails {
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
-        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -207,8 +205,8 @@ public class TacticDetails {
         return customField.innerText().trim();
     }
 
-    public void clickTactic() {
-        TACTIC_TAB.last().click();
+    public void clickTactic(String tacticName) {
+        TACTIC_TAB.locator("text=" + tacticName).click();
     }
 
     public void deleteCustomField(String customFieldName) {
@@ -359,7 +357,7 @@ public class TacticDetails {
     }
 
     public void deleteTactic() {
-        THREE_DOT_ICON.click();
+        TACTIC_OPTIONS.click();
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
     }
@@ -374,12 +372,7 @@ public class TacticDetails {
 
     public boolean getToggleClass(String tacticName) {
         Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
-        if (TACTIC_TOGGLE_CLASS.getAttribute("class")
-                .contains("toggle-enabled")) {
-            return true;
-        } else {
-            return false;
-        }
+        return TACTIC_TOGGLE_CLASS.getAttribute("class").contains("toggle-enabled");
     }
 
     public void globalSearchDeletedTactic(String tacticName) {

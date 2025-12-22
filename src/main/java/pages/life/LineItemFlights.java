@@ -37,7 +37,7 @@ public class LineItemFlights {
         return FLIGHTS_DATES.allInnerTexts();
     }
 
-    public List<String> fetchFlightDetailsFromFlightTab(){
+    public List<String> fetchFlightDetailsFromFlightTab() {
         return FLIGHTS_DETAILS.allInnerTexts();
     }
 

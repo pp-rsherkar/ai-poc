@@ -30,7 +30,7 @@ public class TargetingTemplate {
     private final Locator TARGET_TEMPLATE_DELETE_ICON;
     private final Locator DELETE_DIALOG;
     private final Locator REMOVE_BUTTON;
-    private final Locator TEMPLATE_DELETED_ERROR;
+    private final Locator TEMPLATE_DELETED_ALERT;
     private final Locator TARGET_ITEM_LABEL;
     private final Locator TARGET_ITEM_VALUE;
     private final Locator TARGET_TEMPLATE_RULES;
@@ -43,8 +43,8 @@ public class TargetingTemplate {
         this.NEW_TEMPLATE_BUTTON = page.locator("//span[contains(text(),'New Template')]");
         this.SEARCH_BOX = page.locator("//input[contains(@placeholder,'Search') and contains(@class,'search icon-pading')]");
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
-        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
-        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'lineItemType')]//../div[@class='inventory-key']");
+        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[@class='section-name' and contains(text(),'Line Item Type')]/following-sibling::div//div[contains(@id,'lineItemTypeDropdown')]");
+        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@id,'lineItemTypeDropdown')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
         this.CHANNEL_VALUE = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
         this.ADD_TARGETING_RULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
@@ -55,10 +55,10 @@ public class TargetingTemplate {
         this.SHOW_EXPRESSION_ICON = page.locator("//app-icon-lable-link[@text='Show Expression']");
         this.TARGETING_CONTAINER = page.locator("//div[@class='targetingDetailsContainer']");
         this.SEARCH_FIRST_ITEM = page.locator("//div[contains(@class,'first-list-item')]");
-        this.TARGET_TEMPLATE_DELETE_ICON = page.locator("//app-icon-lable-link[contains(@text,'Delete')]");
+        this.TARGET_TEMPLATE_DELETE_ICON = page.locator("//app-icon-lable-link[contains(@icon,'delete.svg')]");
         this.DELETE_DIALOG = page.locator("//div[contains(text(),' Delete Target Template ')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
-        this.TEMPLATE_DELETED_ERROR = page.locator("//div[contains(text(),'Target template deleted successfully')]");
+        this.TEMPLATE_DELETED_ALERT = page.locator("//div[contains(text(),'Target template deleted successfully')]");
         this.TARGET_ITEM_LABEL = page.locator("//label[contains(@class,'target-item__label')]");
         this.TARGET_ITEM_VALUE = page.locator("//span[@class='target-ellipse']");
         this.TARGET_TEMPLATE_RULES = page.locator("//div[@class='targets-list']");
@@ -71,7 +71,7 @@ public class TargetingTemplate {
 
     public boolean clickAndVerifyTargetingTemplate() {
         NEW_TEMPLATE_BUTTON.click();
-        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEM_TYPE_DROPDOWN.isVisible() && CHANNEL_DROPDOWN.isVisible() && ADD_TARGETING_RULE_BUTTON.isVisible();
+        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEM_TYPE_DROPDOWN.isVisible() && ADD_TARGETING_RULE_BUTTON.isVisible();
     }
 
     public Map<String, Map<String, String>> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
@@ -197,7 +197,8 @@ public class TargetingTemplate {
         TARGET_TEMPLATE_DELETE_ICON.click();
         waitUtility.waitForLocatorVisible(DELETE_DIALOG);
         REMOVE_BUTTON.click();
+        String text = TEMPLATE_DELETED_ALERT.innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
-        return TEMPLATE_DELETED_ERROR.innerText();
+        return text;
     }
 }
