@@ -98,7 +98,7 @@ public class Navigation {
     }
 
     public String verifyStudioTitle() {
-       waitUtility.waitForLocatorVisible(STUDIO_TITLE);
+        waitUtility.waitForLocatorVisible(STUDIO_TITLE);
         return STUDIO_TITLE.innerText();
     }
 

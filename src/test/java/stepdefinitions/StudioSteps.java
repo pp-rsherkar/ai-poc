@@ -2,7 +2,6 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -241,7 +240,8 @@ public class StudioSteps {
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
         for (String appliedFilter : appliedFilterEntries) {
             String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
-            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> { String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> {
+                String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
                 // 1) Exact match
                 boolean exactMatch = displayedNorm.equals(appliedNorm);
                 // 2) Singular/plural
@@ -800,11 +800,12 @@ public class StudioSteps {
                 explorerWorkspace.clickFilterOKButton();
             }
             explorerWorkspace.applyFilter();
-            Assert.assertEquals(filterType + " recency value is not matched",  recency, explorerWorkspace.fetchRecencyValue(filterType));
+            Assert.assertEquals(filterType + " recency value is not matched", recency, explorerWorkspace.fetchRecencyValue(filterType));
         }
     }
+
     @Then("User should be able to see Studio for that account")
     public void userShouldBeAbleToSeeStudioForThatAccount() {
-        Assert.assertEquals("Studio",navigation.verifyStudioTitle());
+        Assert.assertEquals("Studio", navigation.verifyStudioTitle());
     }
 }
