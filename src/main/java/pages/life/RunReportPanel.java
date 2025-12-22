@@ -60,6 +60,7 @@ public class RunReportPanel {
     private final Locator FLIGHT_DETAILS_DROPDOWN;
     private final Locator FLIGHT_DETAILS_DROPDOWN_VALUE;
     private final Locator FILE_BREAKDOWN_TYPE;
+    private final Locator ALERT_MESSAGE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public RunReportPanel(Page page) {
@@ -78,7 +79,7 @@ public class RunReportPanel {
         this.SELECTED_VALUES_FROM_DROPDOWN = page.locator("//div[contains(@class,'menu transition visible')]//div[contains(@class,'item active filtered')]");
         this.DROPDOWN_LOADER = page.locator("//div[contains(@class,'loading')]");
         this.FILTER_REPORT_CHECKBOX_LABEL = page.locator("//sui-checkbox[contains(@class,'advancedSettingsCheck')]//label");
-        this.ADVANCED_SETTING_LINK = page.locator("//label[text()='Advanced Settings']");
+        this.ADVANCED_SETTING_LINK = page.locator("//label[@class='advanceSettings' and contains(text(),'Show Advanced Settings')]");
         this.REPORT_PERIOD_BUTTONS = page.locator("//label[contains(text(),'Report Period')]/following-sibling::div//button");
         this.RUN_BUTTON = page.locator("//button[contains(@class, 'okButton') and contains(text(),'Run')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
@@ -102,11 +103,12 @@ public class RunReportPanel {
         this.FETCHED_DIMENSIONS_AND_METRICS = page.locator("//div[@class='field customTemplate']//span");
         this.DIMENSION_LABEL = page.locator("//label[contains(text(),'Dimensions')]");
         this.FILE_NAME_TEXTAREA = page.locator("//textarea[@placeholder='File Name']");
-        this.FILE_NAME_ERROR = page.locator("//div[contains(text(),'Invalid file Name')]");
+        this.FILE_NAME_ERROR = page.locator("//div[contains(@class,'run-report-error') and contains(text(),'Invalid file Name')]");
         this.DEFAULT_FLIGHT_DETAILS = page.locator("//div[@id='date-option-dropdown']/div[contains(@class, 'text')]");
         this.FLIGHT_DETAILS_DROPDOWN = page.locator("//div[@id='date-option-dropdown']");
         this.FLIGHT_DETAILS_DROPDOWN_VALUE = page.locator("//div[@id='date-option-dropdown']/div[@class='menu transition visible']/div");
         this.FILE_BREAKDOWN_TYPE = page.locator("//label[contains(text(),'File Breakdown')]/following-sibling::div/button");
+        this.ALERT_MESSAGE = page.locator("//div[@role='alert']");
     }
 
     public boolean isRunReportPanelOpened() {
@@ -265,8 +267,14 @@ public class RunReportPanel {
     }
 
     public String fetchSuccessAlert() {
-        String text = SUCCESS_ALERT.innerText().trim();
-        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+        String text;
+        if (SUCCESS_ALERT.isVisible()) {
+            text = SUCCESS_ALERT.innerText().trim();
+            waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+            return text;
+        } else {
+            text = ALERT_MESSAGE.innerText().trim();
+        }
         return text;
     }
 
@@ -278,7 +286,9 @@ public class RunReportPanel {
             SEARCH_BUTTON.click();
         }
         Locator templateElements = page.locator(String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
+        waitUtility.waitForLocatorVisible(templateElements.first());
         templateElements.first().click();
+        waitUtility.waitForLocatorVisible(REPORT_MODIFY_OPTION.first());
         REPORT_MODIFY_OPTION.first().click();
         waitUtility.waitUntilSpinnerHidden();
         page.waitForCondition(() -> FETCHED_TEMPLATE_NAME.isVisible() || DIMENSION_LABEL.isVisible());

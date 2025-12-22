@@ -245,7 +245,7 @@ public class TacticSettings {
 
     public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues) {
         SEARCH_RULE_TYPE.clear();
-        SEARCH_RULE_TYPE.fill(ruleType);
+        SEARCH_RULE_TYPE.type(ruleType);
         if (SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitUntilSpinnerHidden();
@@ -289,7 +289,7 @@ public class TacticSettings {
                     PERSON_TAB.click();
                     RULE_INDIVIDUAL_KEYWORDS_OPTION.click();
                     for (String val : ruleValues) {
-                        KEYWORD_POPULATIONS_TEXTBOX.fill(val.trim());
+                        KEYWORD_POPULATIONS_TEXTBOX.type(val.trim());
                         KEYWORD_POPULATIONS_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -338,7 +338,7 @@ public class TacticSettings {
                 case "Keywords":
                     RULE_INDIVIDUAL_KEYWORDS_OPTION.click();
                     for (String val : ruleValues) {
-                        KEYWORDS_TEXTBOX.fill(val.trim());
+                        KEYWORDS_TEXTBOX.type(val.trim());
                         KEYWORDS_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -351,7 +351,7 @@ public class TacticSettings {
                     GEO_TARGETS_BULK_UPLOAD.click();
                     GEO_TARGETS_TEXTBOX.click();
                     for (String val : ruleValues) {
-                        GEO_TARGETS_TEXTBOX.fill(val.trim());
+                        GEO_TARGETS_TEXTBOX.type(val.trim());
                         GEO_TARGETS_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -374,7 +374,7 @@ public class TacticSettings {
                 case "Postal Codes":
                     RULE_POSTAL_CODES_TEXTBOX.click();
                     for (String val : ruleValues) {
-                        RULE_POSTAL_CODES_TEXTBOX.fill(val.trim());
+                        RULE_POSTAL_CODES_TEXTBOX.type(val.trim());
                         RULE_POSTAL_CODES_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -505,7 +505,7 @@ public class TacticSettings {
 
     public void selectTargetingRule(String ruleType, String listName) {
         SEARCH_RULE_TYPE.clear();
-        SEARCH_RULE_TYPE.fill(ruleType);
+        SEARCH_RULE_TYPE.type(ruleType);
         if (SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitForLocatorVisible(TARGETING_RULES_PANEL_TITLE);
@@ -653,11 +653,9 @@ public class TacticSettings {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
 
-
     public String verifyTacticName() {
         return VERIFY_TACTIC_NAME.innerText();
     }
-
 
 }
 

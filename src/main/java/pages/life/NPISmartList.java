@@ -93,6 +93,9 @@ public class NPISmartList {
     private final Locator FETCH_SELECTED_RECENCY_DAYS;
     private final Locator FETCH_SELECTED_DRUG;
     private final Locator FETCH_SELECTED_PROFESSION;
+    private final Locator LIST_NAME_FROM_HEADER;
+    private final Locator ADVERTISER_NAME_FROM_HEADER;
+    private final Locator EDIT_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
@@ -176,6 +179,9 @@ public class NPISmartList {
         this.FETCH_SELECTED_RECENCY_DAYS = page.locator("//div[contains(@class,'recencyframeWrapper')]//div[contains(@class,'recency-days')]");
         this.FETCH_SELECTED_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown')]//span[contains(@class,'ng-value-label')]");
         this.FETCH_SELECTED_PROFESSION = page.locator("//div[contains(text(),'Select Professions')]/following-sibling::div//span[@class='ng-value-label']");
+        this.LIST_NAME_FROM_HEADER = page.locator("//div[contains(@class,'header-name')]");
+        this.ADVERTISER_NAME_FROM_HEADER = page.locator("//span[@class='header-adv']");
+        this.EDIT_ICON = page.locator("//img[contains(@class,'header-edit-icon')]");
     }
 
     public void clickSmartPixelDropDownValue(String smartPixelDropdownValue) {
@@ -240,7 +246,8 @@ public class NPISmartList {
     }
 
     public void selectSmartNPIListType(String smartListType) {
-        CommonUtils.selectAndClickElement(SMART_LIST_POPULATION_OPTIONS, Collections.singletonList(smartListType));
+        SMART_LIST_POPULATION_OPTIONS.locator("text = " + smartListType).scrollIntoViewIfNeeded();
+        SMART_LIST_POPULATION_OPTIONS.locator("text = " + smartListType).click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
@@ -539,8 +546,14 @@ public class NPISmartList {
 
     public List<String> retrieveEnteredData(String listType) {
         List<String> enteredData = new ArrayList<>();
-        enteredData.add(LIST_NAME.inputValue());
-        enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent());
+        if (LIST_NAME.isVisible())
+            enteredData.add(LIST_NAME.inputValue());
+        else if (LIST_NAME_FROM_HEADER.isVisible())
+            enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
+        if (!EDIT_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible())
+            enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent());
+        else if (ADVERTISER_NAME_FROM_HEADER.isVisible())
+            enteredData.add(ADVERTISER_NAME_FROM_HEADER.textContent().replace("Advertiser: ", "").trim());
         getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
         switch (listType) {
             case "Smart Pixel" -> {
