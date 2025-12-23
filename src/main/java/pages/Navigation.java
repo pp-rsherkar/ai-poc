@@ -97,6 +97,11 @@ public class Navigation {
         waitUtility.waitForLocatorVisible(STUDIO_TITLE);
     }
 
+    public String verifyStudioTitle() {
+        waitUtility.waitForLocatorVisible(STUDIO_TITLE);
+        return STUDIO_TITLE.innerText();
+    }
+
     public void selectAccount(String account) {
         if (ACCOUNT_NAME.innerText().contains("buyer2")) {
             ACCOUNT_NAME.click();
