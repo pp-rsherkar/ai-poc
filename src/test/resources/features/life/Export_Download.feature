@@ -88,3 +88,129 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     Examples:
       | LIST_NAME  | ADVERTISER     | FILE_NAME          |
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |
+
+  @regression
+  Scenario Outline: Verify user is able to export Smart NPI list
+    And User navigates to NPI Lists page
+    When User clicks on Create New List
+    Then Verify creation of NPI List screen is displayed
+    And User selects Smart List
+    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
+    And User selects Smart NPI list as "<TYPE>"
+    And User selects "<MEDICAL_PROCEDURE>" from "<TYPE>" dropdown
+    And Verify that Recency is set to "365" by default for "<TYPE>"
+    And verify that Decile is set to "1-10" by default for "<TYPE>"
+    And User retrieves all the entered data before saving the list "<TYPE>"
+    And User saves the Smart List and verifies the successful creation of the list
+    And Verify that user is able to download the "NPI" list
+    And Verify the count of items in the downloaded "NPI" list
+    Examples:
+      | ADVERTISER     | LIST_NAME | TYPE                   | MEDICAL_PROCEDURE                                 |
+      | 01- Advertiser | SMART_NPI | Medical Procedure Code | Cardiac shunt imaging, Florbetaben f18 diagnostic |
+
+  @regression
+  Scenario Outline: Verify user is able to export PulsePoint Provided NPI list
+    And User navigates to NPI Lists page
+    And User searches and selects the NPI List "<LIST_NAME>"
+    And Verify that user is able to download the "NPI" list
+    And Verify the count of items in the downloaded "NPI" list
+    Examples:
+      | LIST_NAME             |
+      | AutoNPIAdmin192021372 |
+
+  @regression
+  Scenario Outline: Verify export option is not available for Email list created by uploading a file
+    And User navigates to the "Email Lists" page
+    When User clicks on Create New List
+    Then Verify that the Create New List screen is displayed
+    And User enters the list name as "<LIST_NAME>" and uploads the file "<UPLOAD_FILENAME1>"
+    And User saves the Email list and verify that the list is created successfully
+    And Verify that the counter on the left displays the correct value after file upload for "Email list"
+    And Verify that download option should not be available for uploaded Email list
+    Examples:
+      | LIST_NAME        | UPLOAD_FILENAME1 |
+      | Email_FileUpload | EmailFile1.csv   |
+
+  @regression
+  Scenario Outline: Verify user is able to export Auto-Imported NPI list
+    And User navigates to NPI Lists page
+    When User clicks on Create New List
+    Then Verify creation of NPI List screen is displayed
+    And User selects the Auto-Imported List
+    And Verify if user navigates to the Auto-Imported List page
+    When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
+    And User makes list available in LIFE and HCP365 module
+    And User clicks Setup Import button to import File details
+    And User enters file details "<FILE_LOCATION>" "<FILE_PATH>" "<FILE_NAME>"
+    And User selects the "<LIST_TYPE>" radio button
+    And User enters NPI column "Name" "<NPI_COLUMN_NAME>"
+    And User selects the "<IMPORT_TYPE>"
+    Then User clicks Check File button to verify the file details are correct
+    Then User saves the import settings and verifies the data is imported successfully
+    And Verify that user is able to download the uploaded "NPI" list
+    And Verify the count of items in the downloaded "NPI" list
+    Examples:
+      | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
+      | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
+
+  @regression
+  Scenario Outline: Verify user is able to export the NPI List created through NPI API call
+    And User navigates to NPI Lists page
+    When User clicks on Create New List
+    Then Verify creation of NPI List screen is displayed
+    And User selects the Auto-Imported List
+    And Verify if user navigates to the Auto-Imported List page
+    When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
+    And User makes list available in LIFE and HCP365 module
+    And User clicks Setup Import button to import File details
+    And User enters file details "<FILE_LOCATION>" "<FILE_PATH>" "<FILE_NAME>"
+    And User selects the "<LIST_TYPE>" radio button
+    And User enters NPI column "Name" "<NPI_COLUMN_NAME>"
+    And User selects the "<IMPORT_TYPE>"
+    Then User clicks Check File button to verify the file details are correct
+    Then User saves the import settings and verifies the data is imported successfully
+    And Verify that Token is fetched successfully from URL "BuyerProxy.ashx"
+    And Pass token in the API Header and run it to upload the data into the list
+    And Verify list data is uploaded successfully
+    And Refresh the Browser to view the data uploaded
+    And Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in "<FILE_NAME>"
+    And Verify that user is able to download the uploaded "NPI" list
+    And Verify the count of items in the downloaded "NPI" list
+    Examples:
+      | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
+      | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | Plain List           | NPI             | Add new NPIs   |
+      | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
+
+  @regression
+  Scenario Outline: Verify user is able to export the audit log of a campaign, line item and tactic
+    And User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify creative details are saved and the campaign is in running state
+    Then Verify that user is able to export the audit log for "campaign"
+    When User navigates to "line item" page
+    Then Verify that user is able to export the audit log for "line item"
+    When User navigates to "tactic" page
+    Then Verify that user is able to export the audit log for "tactic"
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
+
+  @regression
+  Scenario Outline: Verify user is able to export settings of the campaign having "<LINE_ITEM_TYPE>" line items
+    And User searches and selects the campaign "<CAMPAIGN_NAME>"
+    Then Verify that the campaign page is displayed
+    Then Verify that user is able to export the campaign settings
+    Examples:
+      | CAMPAIGN_NAME        | LINE_ITEM_TYPE |
+      | Single_Line_Item     | Single         |
+      | Multiple_Line_Items  | Multiple       |
+      | Different_Line_Items | Different      |

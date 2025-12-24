@@ -48,7 +48,7 @@ public class NPIStaticList {
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
         this.DOWNLOAD_ICON = page.locator("//span[contains(@class,'image download')]");
-        this.ITEM_COUNT_UI = page.locator("//span[text()='Total NPI']/preceding-sibling::span[1]");
+        this.ITEM_COUNT_UI = page.locator("//div[text()='Total NPI']/preceding-sibling::div[1]");
         this.EDIT_NPI_LIST_ICON = page.locator("//img[@alt='edit'  and contains(@src,'edit-inline.svg')]");
     }
 

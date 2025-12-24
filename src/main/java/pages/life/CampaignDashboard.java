@@ -566,4 +566,15 @@ public class CampaignDashboard {
     public boolean isCampaignDataAvailableInCustomDateRange() {
         return NO_CAMPAIGN_AVAILABLE_TEXT.isVisible();
     }
+
+    public void searchExistingCampaign(String createdCampaign) {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
+        ensureCampaignRadioBtnSelected();
+        unselectFavoriteCheckboxIfSelected();
+        unselectHideFinishedCheckboxIfSelected();
+        resetFiltersIfApplied();
+        SEARCH_CAMPAIGN.fill(createdCampaign);
+        CLICK_CAMPAIGN_SEARCH.click();
+        waitUtility.waitUntilPreLoaderHidden();
+    }
 }
