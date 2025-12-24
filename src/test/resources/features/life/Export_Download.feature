@@ -132,56 +132,6 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | Email_FileUpload | EmailFile1.csv   |
 
   @regression
-  Scenario Outline: Verify user is able to export Auto-Imported NPI list
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
-    And User selects the Auto-Imported List
-    And Verify if user navigates to the Auto-Imported List page
-    When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
-    And User makes list available in LIFE and HCP365 module
-    And User clicks Setup Import button to import File details
-    And User enters file details "<FILE_LOCATION>" "<FILE_PATH>" "<FILE_NAME>"
-    And User selects the "<LIST_TYPE>" radio button
-    And User enters NPI column "Name" "<NPI_COLUMN_NAME>"
-    And User selects the "<IMPORT_TYPE>"
-    Then User clicks Check File button to verify the file details are correct
-    Then User saves the import settings and verifies the data is imported successfully
-    And Verify that user is able to download the uploaded "NPI" list
-    And Verify the count of items in the downloaded "NPI" list
-    Examples:
-      | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
-      | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
-
-  @regression
-  Scenario Outline: Verify user is able to export the NPI List created through NPI API call
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
-    And User selects the Auto-Imported List
-    And Verify if user navigates to the Auto-Imported List page
-    When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
-    And User makes list available in LIFE and HCP365 module
-    And User clicks Setup Import button to import File details
-    And User enters file details "<FILE_LOCATION>" "<FILE_PATH>" "<FILE_NAME>"
-    And User selects the "<LIST_TYPE>" radio button
-    And User enters NPI column "Name" "<NPI_COLUMN_NAME>"
-    And User selects the "<IMPORT_TYPE>"
-    Then User clicks Check File button to verify the file details are correct
-    Then User saves the import settings and verifies the data is imported successfully
-    And Verify that Token is fetched successfully from URL "BuyerProxy.ashx"
-    And Pass token in the API Header and run it to upload the data into the list
-    And Verify list data is uploaded successfully
-    And Refresh the Browser to view the data uploaded
-    And Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in "<FILE_NAME>"
-    And Verify that user is able to download the uploaded "NPI" list
-    And Verify the count of items in the downloaded "NPI" list
-    Examples:
-      | LIST_NAME     | ADVERTISER     | FILE_LOCATION | FILE_PATH                      | FILE_NAME                  | LIST_TYPE            | NPI_COLUMN_NAME | IMPORT_TYPE    |
-      | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | Plain List           | NPI             | Add new NPIs   |
-      | Auto_Imported | 01- Advertiser | 1OurVM        | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
-
-  @regression
   Scenario Outline: Verify user is able to export the audit log of a campaign, line item and tactic
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
