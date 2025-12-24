@@ -497,16 +497,13 @@ public class Campaigns {
             EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON.click(new Locator.ClickOptions().setForce(true));
             page.waitForTimeout(500);
             isChecked = (Boolean) page.locator("sui-checkbox input").first().evaluate("el => el.checked");
-            System.out.println("isChecked: " + isChecked);
 
             if (isChecked) {
-                System.out.println("checked");
                 break;
             }
         }
 
         if (!isChecked) {
-            System.out.println("unchecked");
             EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON.dispatchEvent("click");
             page.waitForTimeout(1000);
         }
