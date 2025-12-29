@@ -1,7 +1,0 @@
-stepdefinitions/ApiSteps.class
-stepdefinitions/StudioSteps.class
-testrunner/FailedTestRunner.class
-stepdefinitions/LifeSteps.class
-stepdefinitions/HcpSteps.class
-hooks/Hooks.class
-testrunner/TestRunner.class
