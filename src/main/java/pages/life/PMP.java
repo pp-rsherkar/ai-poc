@@ -60,6 +60,9 @@ public class PMP {
     private final Locator NO_DEAL_TEXT;
     private final Locator ADVERTISER;
     private final Locator ADVERTISER_VALUES;
+    private final Locator CURATOR_DROPDOWN;
+    private final Locator CURATOR_VALUES;
+    private final Locator DEALS_LIST_SECTION;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     boolean flag1, flag2 = false;
 
@@ -110,8 +113,11 @@ public class PMP {
         this.ALL_LIFE_MARKET_PLACE = page.locator("//div[contains(@class,'allPremiumPubs')]");
         this.ALL_PREMIUM_PUBS = page.locator("//div[contains(@class,'premiumPub')]");
         this.NO_DEAL_TEXT = page.locator("//div[contains(@class,'noDealsTxt')]");
-        this.ADVERTISER = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::div//sui-select");
-        this.ADVERTISER_VALUES = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::div//sui-select//sui-select-option/span[2]");  //need to give index as 2 "span" tags have been defined with no attributes
+        this.ADVERTISER = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::app-multi-select");
+        this.ADVERTISER_VALUES = page.locator("//label[contains(text(),'Advertiser')]/following-sibling::app-multi-select//div[@class='menu transition visible']//span");
+        this.CURATOR_DROPDOWN = page.locator("//app-single-select-dropdown[@placeholder='Select Curator']");
+        this.CURATOR_VALUES = page.locator("//app-single-select-dropdown[@placeholder='Select Curator']//div[contains(@class,'item')]");
+        this.DEALS_LIST_SECTION = page.locator("//div[contains(@id,'dealsListWrapper')]");
     }
 
     public void navigateToTacticSettingTab() {
@@ -149,7 +155,7 @@ public class PMP {
         } else {
             PREMIUM_DEALS_TAB.click();
         }
-        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        waitUtility.waitForLocatorVisible(DEALS_LIST_SECTION);
     }
 
     public boolean verifyAsignedDealsList() {
@@ -181,7 +187,7 @@ public class PMP {
             flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
             flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
         } else if (toggleButton.equalsIgnoreCase("OFF")) {
-            flag1 = !page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
+            flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
             flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
         }
         return flag1 && flag2;
@@ -226,7 +232,7 @@ public class PMP {
                 }
                 break;
         }
-        waitUtility.waitForLocatorVisible(DEALS_LIST.first());
+        waitUtility.waitForLocatorVisible(DEALS_LIST_SECTION);
         return DEALS_LIST.first().isVisible();
     }
 
@@ -236,13 +242,16 @@ public class PMP {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public String addAndSaveNewDeals(String exchangeType, String dealID, String dealName, List<String> mediaType, String advertiser, String dealPriceType, String price) {
+    public String addAndSaveNewDeals(String exchangeType, String dealID, String dealName, List<String> mediaType, String advertiser, String dealPriceType, String price, String curator) {
         EXCHANGE_DROPDOWN.click();
         page.locator(String.format("//div[@menutransition='slide up']/div[contains(text(),'%s')]", exchangeType)).click();
         ENTER_DEAL_ID.fill(dealID);
         ENTER_DEAL_NAME.fill(dealName);
         MEDIA_TYPE_DROPDOWN.click();
         CommonUtils.selectAndClickElement(MEDIA_TYPE_VALUE, mediaType);
+        page.keyboard().press("Escape");
+        CURATOR_DROPDOWN.click();
+        CommonUtils.selectAndClickElement(CURATOR_VALUES, Collections.singletonList(curator));
         page.keyboard().press("Escape");
         ADVERTISER.click();
         CommonUtils.selectAndClickElement(ADVERTISER_VALUES, Collections.singletonList(advertiser));
@@ -257,17 +266,25 @@ public class PMP {
         return text;
     }
 
-    public boolean verifyDeleteIconAndMessage(String message) {
+    public boolean isDeleteIconDisabled() {
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
-                flag1 = true;
-                DELETE_ICON.nth(i).click(new Locator.ClickOptions().setForce(true));
-                String tooltipText = TOOLTIP_TEXT.textContent();
-                if (message.equals(tooltipText)) flag2 = true;
+                return true;
             }
         }
-        return flag1 && flag2;
+        return false;
+    }
+
+    public String fetchMessageOnDeleteIconClick() {
+        for (int i = 0; i < DELETE_ICON.count(); i++) {
+            DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
+            if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
+                DELETE_ICON.nth(i).click(new Locator.ClickOptions().setForce(true));
+                return TOOLTIP_TEXT.textContent().trim();
+            }
+        }
+        return "";
     }
 
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
@@ -286,12 +303,12 @@ public class PMP {
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
     }
 
-    public boolean applyDealsFromDealsSection(String dealType, String exchangeType, String dealID, String dealName, List<String> mediaType, String advertiser, String dealPriceType, String price, String toggleButton) {
+    public boolean applyDealsFromDealsSection(String dealType, String exchangeType, String dealID, String dealName, List<String> mediaType, String advertiser, String dealPriceType, String price, String curator, String toggleButton) {
         ADD_DEAL_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
         clickDealsTab(dealType);
         clickAddNewDeals();
-        addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, advertiser, dealPriceType, price);
+        addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, advertiser, dealPriceType, price, curator);
         selectDealFromListAndAssign(dealName);
         saveDealsAssigned();
         return verifyAssignedDealsOnTactic(dealName, toggleButton);

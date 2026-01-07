@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class TacticSettings {
-    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
-    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
     public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
@@ -68,7 +66,6 @@ public class TacticSettings {
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
     private final Locator VERIFY_TACTIC_NAME;
-    private final Locator DISPLAY_TACTIC_NAME;
     private final Locator SELECTED_TARGET;
     private final Locator BLOCKED_TARGET;
     private final Locator SELECTED_TARGET_HP;
@@ -140,7 +137,6 @@ public class TacticSettings {
         this.BLOCKED_TARGET_HP = page.locator("//div[contains(@class,'targetRed')]");
         this.TARGET = page.locator("//div[contains(@class,'text-target')]");
         this.BLOCK = page.locator("//div[contains(@class,'text-block')]");
-        this.DISPLAY_TACTIC_NAME = page.locator("//div[@class='tactic-main-details']");
     }
 
     public String verifyTacticSettingsText() {
@@ -583,7 +579,7 @@ public class TacticSettings {
      * Open NPI list created in new browser tab */
     public String fetchTotalNPICountFromNewTab(String listName) {
         Page originalPage = DriverFactory.getPage();
-        Page newTab = DriverFactory.context.waitForPage(() -> {
+        Page newTab = DriverFactory.getContext().waitForPage(() -> {
             DriverFactory.getPage().locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName)).click();
         });
         newTab.bringToFront();
@@ -656,13 +652,10 @@ public class TacticSettings {
     public BigDecimal getTacticMaxBidPrice() {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
-    public String getTacticName() {
-        return DISPLAY_TACTIC_NAME.innerText();
-    }
 
     public String verifyTacticName() {
         return VERIFY_TACTIC_NAME.innerText();
     }
 
-
 }
+

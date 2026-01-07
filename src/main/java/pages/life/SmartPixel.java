@@ -42,6 +42,7 @@ public class SmartPixel {
     public void selectAdvertiser(String advertiser) {
         waitUtility.waitUntilSpinnerHidden();
         SELECT_ADVERTISER.locator("text=" + advertiser).click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void selectAssociatedCampaign() {
@@ -55,6 +56,7 @@ public class SmartPixel {
     }
 
     public String getPixelNameFromHeader() {
+        waitUtility.waitForLocatorVisible(PIXEL_HEADER_NAME);
         return PIXEL_HEADER_NAME.textContent().trim();
     }
 

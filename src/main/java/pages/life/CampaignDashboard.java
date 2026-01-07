@@ -69,11 +69,12 @@ public class CampaignDashboard {
     private final Locator FLIGHT_START_END_DATE;
     private final Locator INACTIVE_FLIGHT_LIST;
     private final Locator NO_CAMPAIGN_AVAILABLE_TEXT;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    WaitUtility waitUtility;
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
 
     public CampaignDashboard(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.CAMPAIGN_PAGE_TEXT = page.locator("//span[contains(text(),'Campaigns')]");
         this.CAMPAIGN_COMMENT_BOX = page.locator("//div[@class='camp-data']//span[@class='notesIconEmpty' or @class='notesIconProvided']");
         this.LINE_ITEM_COMMENT_BOX = page.locator("//div[contains(@class,'lineitem-data pointer')]//span[@class='notesIconEmpty' or @class='notesIconProvided']");

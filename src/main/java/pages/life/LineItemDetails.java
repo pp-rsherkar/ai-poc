@@ -259,6 +259,13 @@ public class LineItemDetails {
         locator.click();
         while (CALENDER_TITLE.first().isVisible() && !CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear))) {
             CALENDER_TITLE.first().click();
+            Locator yearLocator = page.locator(String.format("//sui-calendar-year-view//td[contains(text(),'%s')]", currentYear));
+            if (yearLocator.isVisible() && yearLocator.getAttribute("class").contains("today")) {
+                CALENDER_TITLE.first().click();
+                CALENDER_PREV_BUTTON.click();
+                if (CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear)))
+                    CALENDER_TITLE.first().click();
+            }
         }
         if (CALENDER_CURRENT_MONTH.isVisible()) CALENDER_CURRENT_MONTH.click();
         if (!CALENDER_DATE.locator("text = " + day).first().isVisible()) {
@@ -309,7 +316,6 @@ public class LineItemDetails {
 
     public void navigateToLineItemDetails(String lineItemName) {
         page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName)).click();
-        waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
     }
 

@@ -107,7 +107,7 @@ public class NPILists {
         String listNameXpath = String.format("//div[contains(text(),'%s')]", listName);
         waitUtility.waitForElementVisible(listNameXpath);
         page.locator(listNameXpath).first().click();
-        waitUtility.waitForElementHidden(".block-ui-spinner");
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void clickAutoImportedList() {
