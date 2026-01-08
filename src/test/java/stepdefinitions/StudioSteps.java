@@ -141,7 +141,7 @@ public class StudioSteps {
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
-        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
+        Assert.assertEquals("", "Studio", workspaceCreation.studioDashboard());
         workspaceCreation.verifyStudioWorkspaceFrame();
         workspaceCreation.createStudioWorkspace();
     }
@@ -150,6 +150,8 @@ public class StudioSteps {
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
+        System.out.println(fetchedMetricNames);
+        System.out.println(metricNames);
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 /*
