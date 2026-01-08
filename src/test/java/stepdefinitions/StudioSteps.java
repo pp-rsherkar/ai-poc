@@ -150,8 +150,6 @@ public class StudioSteps {
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
-        System.out.println(fetchedMetricNames);
-        System.out.println(metricNames);
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 /*
