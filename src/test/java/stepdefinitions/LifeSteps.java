@@ -2348,7 +2348,7 @@ public class LifeSteps {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
-        Assert.assertEquals("You will get the report on your email!", runReportPanel.fetchSuccessAlert());
+        Assert.assertEquals("You will get the report on your email", runReportPanel.fetchSuccessAlert());
     }
 
     @And("Confirms that the report panel retains the entered data")

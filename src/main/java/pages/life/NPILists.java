@@ -22,6 +22,7 @@ public class NPILists {
     private final Locator SEARCH_BOX;
     private final Locator SMART_LIST;
     private final Locator AUTO_IMPORTED_LIST;
+    private final Locator EDIT_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPILists(Page page) {
@@ -33,11 +34,12 @@ public class NPILists {
         this.SEARCH_NPI_LISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
         this.AVAILABLE_IN_CHECKBOX = page.locator("//input[contains(@class,'mat-checkbox-input') and @aria-checked='true']/ancestor::div/following-sibling::span");
         this.AVAILABLE_IN_CONTAINER = page.locator("//div[contains(@class,'npiGroupAvailableSettingContainer')]");
-        this.PARENT_LIST_LABEL = page.locator("//span[@class='parentListLabel']");
+        this.PARENT_LIST_LABEL = page.locator("//span[contains(@class,'parentListLabel')]");
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
         this.SEARCH_BOX = page.locator("//input[@placeholder='Search']");
         this.SMART_LIST = page.getByText("Dynamic list of NPI");
         this.AUTO_IMPORTED_LIST = page.locator("//app-npilisttype[@listtypename='Auto-Imported List']");
+        this.EDIT_ICON = page.locator("//img[@alt='edit' and contains(@src,'edit-inline.svg')]");
     }
 
     public void clickNPILists() {
@@ -77,6 +79,8 @@ public class NPILists {
 
     public void selectPublishedList(String listname) {
         page.locator(String.format("//div[contains(text(),'%s')]", listname)).click();
+        waitUtility.waitForLocatorVisible(EDIT_ICON);
+        EDIT_ICON.click();
         waitUtility.waitForLocatorVisible(PARENT_LIST_LABEL);
         waitUtility.waitUntilSpinnerHidden();
     }
