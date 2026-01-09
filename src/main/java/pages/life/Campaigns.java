@@ -73,6 +73,7 @@ public class Campaigns {
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT;
+    private final Locator EXPORT_CAMPAIGN_SETTINGS_POPUP_CONTENT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -139,6 +140,7 @@ public class Campaigns {
         this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
         this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
+        this.EXPORT_CAMPAIGN_SETTINGS_POPUP_CONTENT = page.locator("//div[contains(@class,'popup-content')]/span");
     }
 
     public void createCampaign() {
@@ -464,10 +466,17 @@ public class Campaigns {
         CAMPAIGN_OPTIONS.click();
     }
 
-    public void exportCampaignAuditLog() {
+    public void openExportAuditLogPopup() {
         waitUtility.waitForLocatorVisible(EXPORT_AUDIT_LOG);
         EXPORT_AUDIT_LOG.click();
         waitUtility.waitForLocatorVisible(EXPORT_AUDIT_LOG_POPUP);
+    }
+
+    public String getExportAuditLogPopupContent() {
+        return EXPORT_CAMPAIGN_SETTINGS_POPUP_CONTENT.innerText();
+    }
+
+    public void exportAuditLog() {
         EXPORT_AUDIT_LOG_POPUP_OK_BUTTON.click();
     }
 

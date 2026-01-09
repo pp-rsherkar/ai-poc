@@ -117,7 +117,7 @@ public class CampaignDashboard {
         this.EXPAND_CREATED_LINE_ITEM = page.locator("//div[contains(@class,'campaignExpand')]/div[contains(@class,'collapsed-thin')]");
         this.VERIFY_CREATED_TACTIC = page.locator("//span[contains(@class,'tactic-name')]");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
-        this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'1 Line items, 1 Campaigns, 1 Advertisers')]");
+        this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'Line items, 1 Campaigns')]");
         this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
         this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.SELECTED_FILTER_VALUES = page.locator("//div[contains(@class,'filter-value')]");
@@ -564,16 +564,5 @@ public class CampaignDashboard {
 
     public boolean isCampaignDataAvailableInCustomDateRange() {
         return NO_CAMPAIGN_AVAILABLE_TEXT.isVisible();
-    }
-
-    public void searchExistingCampaign(String createdCampaign) {
-        waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
-        ensureCampaignRadioBtnSelected();
-        unselectFavoriteCheckboxIfSelected();
-        unselectHideFinishedCheckboxIfSelected();
-        resetFiltersIfApplied();
-        SEARCH_CAMPAIGN.fill(createdCampaign);
-        CLICK_CAMPAIGN_SEARCH.click();
-        waitUtility.waitUntilPreLoaderHidden();
     }
 }

@@ -3882,13 +3882,23 @@ public class LifeSteps {
 
     @Then("Verify that user is able to export the audit log for {string}")
     public void verifyThatUserIsAbleToExportTheAuditLogFor(String moduleName) {
+        campaigns.clickCampaignOptions();
+        campaigns.openExportAuditLogPopup();
+
         switch (moduleName) {
-            case "campaign", "line item", "tactic":
-                campaigns.clickCampaignOptions();
-                campaigns.exportCampaignAuditLog();
-                Assert.assertEquals("Audit Log request created. File will be send via email.", campaigns.fetchExportAuditLogSuccessAlert());
+            case "campaign":
+                assert campaigns.getExportAuditLogPopupContent().contains(campaignNameRandom);
+                break;
+            case "line item":
+                assert campaigns.getExportAuditLogPopupContent().contains(lineItemNameRandom);
+                break;
+            case "tactic":
+                assert campaigns.getExportAuditLogPopupContent().contains(tacticNameRandom);
                 break;
         }
+
+        campaigns.exportAuditLog();
+        Assert.assertEquals("Audit Log request created. File will be send via email.", campaigns.fetchExportAuditLogSuccessAlert());
     }
 
     @When("User navigates to {string} page")
@@ -3928,7 +3938,7 @@ public class LifeSteps {
 
     @And("User searches and selects the campaign {string}")
     public void userSearchesAndSelectsTheCampaign(String campaignName) {
-        campaignDashboard.searchExistingCampaign(campaignName);
+        campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.navigateToCampaign(campaignName);
     }
 
