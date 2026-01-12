@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = {"src/test/resources/features/e2e"}
         , glue = {"stepdefinitions", "hooks"}
-        , tags = "@rs"
+        , tags = "@sanity"
         , plugin = {"pretty", "html:target/cucumber-reports/report.html", "json:target/cucumber-reports/cucumber.json", "junit:target/cucumber-reports/Cucumber.xml", "rerun:target/failed_scenarios.txt"
 })
 

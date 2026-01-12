@@ -16,8 +16,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static factory.DriverFactory.page;
-
 public class StudioSteps {
     static String workspaceName;
     static String newWorkspaceName;
@@ -56,9 +54,9 @@ public class StudioSteps {
 
     @Then("the user selects the advertiser {string}")
     public void the_user_selects_the_advertiser(String advertiser) {
-        page.waitForLoadState();
+        DriverFactory.getPage().waitForLoadState();
         expansionWorkspace.clickAdvertiserDropdown(advertiser);
-        page.waitForLoadState();
+        DriverFactory.getPage().waitForLoadState();
     }
 
     @Then("the user selects Source Audience {string}")

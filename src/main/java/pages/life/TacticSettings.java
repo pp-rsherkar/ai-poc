@@ -589,7 +589,7 @@ public class TacticSettings {
      * Open NPI list created in new browser tab */
     public String fetchTotalNPICountFromNewTab(String listName) {
         Page originalPage = DriverFactory.getPage();
-        Page newTab = DriverFactory.context.waitForPage(() -> {
+        Page newTab = DriverFactory.getContext().waitForPage(() -> {
             DriverFactory.getPage().locator(String.format("//span[@title='%s']/ancestor::div/following-sibling::span", listName)).click();
         });
         newTab.bringToFront();
