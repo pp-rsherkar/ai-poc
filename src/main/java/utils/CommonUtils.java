@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,16 +24,16 @@ public class CommonUtils {
     public static int startDay = 0;
     public static int endDay = 0;
 
-    public static String timeStampCalculation(){
+    public static String timeStampCalculation() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
     }
 
-    public static String generateRandomString(){
+    public static String generateRandomString() {
         return UUID.randomUUID().toString().substring(0, 10);
     }
 
     public static String randomFourDigitNumber() {
-        int number = (int)(Math.random() * 10000); // generates 0 to 9999
+        int number = (int) (Math.random() * 10000); // generates 0 to 9999
         return String.format("%04d", number);      // pads with leading zeros
     }
 
@@ -47,26 +47,19 @@ public class CommonUtils {
     }
 
     public static List<String> normalize(List<String> list) {
-        return list.stream()
-                .map(s -> s.replaceAll("\\s+", " ").trim()) // replaces multiple spaces and trims
+        return list.stream().map(s -> s.replaceAll("\\s+", " ").trim()) // replaces multiple spaces and trims
                 .collect(Collectors.toList());
     }
 
     public static List<String> normalizeObjectList(List<Object> list) {
-        return list.stream()
-                .map(Object::toString)
-                .map(s -> s.replaceAll("\\s+", " ").trim())
-                .collect(Collectors.toList());
+        return list.stream().map(Object::toString).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
     }
 
     public static List<String> parseCommaSeparatedString(String input) {
         if (input == null || input.isBlank()) {
             return List.of();
         }
-        return Arrays.stream(input.split(","))
-                .map(String::trim)
-                .filter(opt -> !opt.isEmpty())
-                .collect(Collectors.toList());
+        return Arrays.stream(input.split(",")).map(String::trim).filter(opt -> !opt.isEmpty()).collect(Collectors.toList());
     }
 
     public static Map<String, List<String>> processDataTable(Map<String, String> map) {
@@ -75,19 +68,17 @@ public class CommonUtils {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey().trim();
             String keyValue = entry.getValue().trim();
-            List<String> values = keyValue.contains(",")
-                    ? Arrays.stream(keyValue.split(",")).map(String::trim).collect(Collectors.toList())
-                    : Collections.singletonList(keyValue);
+            List<String> values = keyValue.contains(",") ? Arrays.stream(keyValue.split(",")).map(String::trim).collect(Collectors.toList()) : Collections.singletonList(keyValue);
             result.put(key, values);
         }
         return result;
     }
 
-    public static void selectAndClickElement(Locator locator, List<String> values){
+    public static void selectAndClickElement(Locator locator, List<String> values) {
         for (int i = 0; i < locator.count(); i++) {
             String text = locator.nth(i).innerText().trim();
             for (String value : values) {
-                if (text.equalsIgnoreCase(value.trim())){
+                if (text.equalsIgnoreCase(value.trim())) {
                     locator.nth(i).click();
                     break;
                 }
@@ -103,10 +94,8 @@ public class CommonUtils {
         return new String(is.readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    public static List<String> convertStringToList(String stringData){
-        return Arrays.stream(stringData.split(","))
-                .map(String::trim)
-                .toList();
+    public static List<String> convertStringToList(String stringData) {
+        return Arrays.stream(stringData.split(",")).map(String::trim).toList();
     }
 
     public static void uploadFile(Locator fileInput, String fileName) {
@@ -138,19 +127,15 @@ public class CommonUtils {
         targetInput.setInputFiles(basePath);
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
         if (locatorValue.contains("%s")) {
-            page.waitForSelector(String.format(locatorValue, fileName),
-                    new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            page.waitForSelector(String.format(locatorValue, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         } else {
-            page.waitForSelector(locatorValue,
-                    new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            page.waitForSelector(locatorValue, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         }
     }
 
     public static boolean isDownloadedFileAvailable(Path filePath, String expectedExtension) {
         File file = filePath.toFile();
-        return file.exists()
-                && file.isFile()
-                && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
+        return file.exists() && file.isFile() && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
     }
 
     public static void hoverAndClick(Page page, BoundingBox box, Locator tooltipLocator) {
@@ -196,15 +181,11 @@ public class CommonUtils {
                 BoundingBox targetBox = targetList.nth(i).boundingBox();
                 BoundingBox containerBox = container.boundingBox();
 
-                if (targetBox != null && containerBox != null &&
-                        targetBox.y >= containerBox.y &&
-                        targetBox.y <= (containerBox.y + containerBox.height)) {
+                if (targetBox != null && containerBox != null && targetBox.y >= containerBox.y && targetBox.y <= (containerBox.y + containerBox.height)) {
                     return true;
-                }else if(targetBox != null && containerBox != null &&
-                        targetBox.y < containerBox.y + containerBox.height &&
-                        targetBox.y + targetBox.height > containerBox.y){
+                } else if (targetBox != null && containerBox != null && targetBox.y < containerBox.y + containerBox.height && targetBox.y + targetBox.height > containerBox.y) {
                     return true;
-                }else{
+                } else {
                     container.evaluate("el => el.scrollBy(0, " + scrollStep + ")");
                 }
             }
@@ -254,7 +235,7 @@ public class CommonUtils {
 
         BoundingBox trackBox = sliderTrack.boundingBox();
         BoundingBox handleBox = sliderHandle.boundingBox();
-        double ratio = (targetValue - min) / (double)(max - min);
+        double ratio = (targetValue - min) / (double) (max - min);
         double targetX = trackBox.x + ratio * trackBox.width;
         double targetY = handleBox.y + (handleBox.height / 2);
 

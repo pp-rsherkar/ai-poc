@@ -38,12 +38,14 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
     Then User creates multiple tactics under same line item and verifies it
-      | Tactic Name           | Channel  | RuleType           |
-      | Targeting Segment     | Email    | Health Population  |
+      | Tactic Name       | Channel | RuleType          |
+      | Targeting Segment | Email   | Health Population |
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible in new and existing tactic
-      | Targeting Segment |
+    #confirm if user is not allowed to delete custom field used in a tactic
+    #clear the custom field
     #And User enters value in custom field and verifies if it's not visible in other tactics
+   # Then User clicks on first tactic
     Then User deletes the custom field
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CUSTOM_NAME |
@@ -81,7 +83,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72739 |
 
   @regression
-  Scenario Outline: Create tactic and enable those tactics through bulk action.
+  Scenario Outline: Create tactic and enable those tactics through bulk action
     When User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -92,3 +94,36 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |
+
+
+  @regression
+  Scenario Outline: To verify user is able to add frequency cap in campaign, line item and tactic levels
+    When User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    Then User creates multiple tactics under same line item and verifies it
+      | Tactic Name           | Channel  | RuleType           |
+      | Audience Group tactic | Standard | Behavioral Segment |
+    Then User navigates to campaign
+    Then User clicks on details tab
+    Then User verified Frequency Cap is in disabled states by default
+    Then User adds frequency cap with details "<ON_CAMPAIGN_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to LineItem
+    Then User clicks on details tab
+    Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
+    Then User verified Frequency Cap is in disabled states by default
+    Then User adds frequency cap with details "<ON_LI_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to Tactic and clicks on settings tab
+    Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
+    Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_LI_LEVEL>"
+    Then User verified Frequency Cap is in disabled states by default
+    Then User adds frequency cap with details "<ON_TACTIC_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+    Then User navigates to LineItem
+    Then User navigates to Tactic and clicks on settings tab
+    Then Verify that frequency cap is saved in tactic
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQUENCY_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL        | ON_TACTIC_LEVEL |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10              | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80              | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |

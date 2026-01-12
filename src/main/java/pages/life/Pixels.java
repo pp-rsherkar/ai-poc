@@ -29,6 +29,7 @@ public class Pixels {
     private final Locator CANCEL_BUTTON;
     private final Locator NO_RESULTS_FOUND;
     private final Locator PIXEL_LIST;
+    private final Locator EDIT_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Pixels(Page page) {
@@ -53,6 +54,7 @@ public class Pixels {
         this.CANCEL_BUTTON = page.locator("//button[contains(@class,'cancel secondary button') and normalize-space(text())='Cancel']");
         this.NO_RESULTS_FOUND = page.locator("//div[contains(text(),'Nothing found') or contains(text(),'Nothing Found')]");
         this.PIXEL_LIST = page.locator("//div[contains(@class,'pixel-list-wrapper')]//div[contains(@class,'main-details')]");
+        this.EDIT_ICON = page.locator("//img[@alt='edit' and contains(@class,'header-edit-icon')]");
     }
 
     public void clickPixelsMenuItem() {
@@ -100,8 +102,9 @@ public class Pixels {
     }
 
     public String verifySaveSuccess() {
-        String successMessage = SAVE_SUCCESS.first().innerText();
-        waitUtility.waitForLocatorDetached(SAVE_SUCCESS.first());
+        String successMessage = SAVE_SUCCESS.innerText();
+        waitUtility.waitForLocatorHidden(SAVE_SUCCESS);
+        waitUtility.waitUntilSpinnerHidden();
         return successMessage;
     }
 
@@ -112,7 +115,7 @@ public class Pixels {
     }
 
     public String verifyCreatedPixel(String pixelName) {
-        String createdPixelXpath = String.format("//div[contains(text(),'%s')]", pixelName);
+        String createdPixelXpath = String.format("//div[contains(@title,'%s')]", pixelName);
         waitUtility.waitForLocatorVisible(page.locator(createdPixelXpath));
         return page.locator(createdPixelXpath).innerText();
     }
@@ -175,7 +178,7 @@ public class Pixels {
         return NO_RESULTS_FOUND.innerText();
     }
 
-    public void selectAdvertiser(String advertiser){
+    public void selectAdvertiser(String advertiser) {
         ADVERTISER_DROPDOWN.click();
         ADVERTISER_DROPDOWN.locator("xpath=//span[contains(text(),'" + advertiser + "')]").click();
         page.keyboard().press("Escape");
@@ -183,6 +186,10 @@ public class Pixels {
     }
 
     public List<String> fetchPixelsList() {
-       return PIXEL_LIST.allInnerTexts();
+        return PIXEL_LIST.allInnerTexts();
+    }
+
+    public void clickEditIcon() {
+        EDIT_ICON.click();
     }
 }

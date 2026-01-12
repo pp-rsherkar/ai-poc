@@ -9,14 +9,18 @@ Feature: E2E Workflow for Targeting a Studio HCP Explorer List in LIFE at the Ta
   Scenario Outline: Create HCP Explorer Workspace in Studio and Publish in LIFE and Target at Tactic level
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+    When User navigates to Administrative section and go to Accounts Tab
+    And User searches the account "PP engineering test" and checks Studio permissions
+    And User clicks PulsePoint icon to navigate back to Life
+    And User navigates to Studio application
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
     And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
     And User applies the filter and selects option
-      | FilterName         | Option   |
-      | NPI Age            | 35 to 45 |
-      | NPI Gender         | Female   |
+      | FilterName | Option   |
+      | NPI Age    | 35 to 45 |
+      | NPI Gender | Female   |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace

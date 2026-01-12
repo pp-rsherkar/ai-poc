@@ -29,6 +29,7 @@ public class NPIAttributesList {
     private final Locator DELETE_SUCCESS;
     private final Locator TOTAL_NPI_LIST_COUNT;
     private final Locator MATCH_NPI_COUNT;
+    private final Locator EDIT_NPI_LIST_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPIAttributesList(Page page) {
@@ -45,7 +46,7 @@ public class NPIAttributesList {
         this.AVAILABLE_IN_LIFE = page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='Life'])[1]");
         this.AVAILABLE_IN_HCP365 = page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='HCP365'])[1]");
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
-        this.BACK_TO_NPI_LISTS = page.locator("//app-icon-lable-link[@icon='12-back.svg']");
+        this.BACK_TO_NPI_LISTS = page.locator("//img[@alt='BackButton_NPI_Lists' and contains(@src,'BackButton_NPI_Lists.svg')]");
         this.SAVE_BUTTON = page.locator("//span[text()='Save']");
         this.LIST_UPDATE_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list updated')]");
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
@@ -53,6 +54,7 @@ public class NPIAttributesList {
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
         this.TOTAL_NPI_LIST_COUNT = page.locator("//div[@class='label' and text()='Total NPI']/preceding-sibling::div");
         this.MATCH_NPI_COUNT = page.locator("//div[@class='label' and text()='Matched NPI']/preceding-sibling::div");
+        this.EDIT_NPI_LIST_ICON = page.locator("//img[@alt='edit'  and contains(@src,'edit-inline.svg')]");
     }
 
     public void uploadAttributesFile(String attributesFile) {
@@ -107,13 +109,15 @@ public class NPIAttributesList {
 
     public void clickBackToNPILists() {
         waitUtility.waitForLocatorDetached(LIST_SUCCESS);
+        BACK_TO_NPI_LISTS.scrollIntoViewIfNeeded();
         BACK_TO_NPI_LISTS.click();
-        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void editListName(String newListName) {
         page.waitForTimeout(5000);
-        waitUtility.waitForLocatorVisible(BACK_TO_NPI_LISTS);
+        waitUtility.waitForLocatorVisible(EDIT_NPI_LIST_ICON);
+        EDIT_NPI_LIST_ICON.click();
         LIST_NAME.fill(newListName);
     }
 
@@ -140,7 +144,7 @@ public class NPIAttributesList {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TOTAL_NPI_LIST_COUNT);
         waitUtility.waitForLocatorVisible(MATCH_NPI_COUNT);
-        if (listName.contains(LIST_NAME.innerText()))
+        if (listName.contains(page.locator(String.format("//div[contains(@class,'header-name') and contains(@title,'%s')]", listName)).innerText()))
             npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-" + MATCH_NPI_COUNT.innerText().trim();
         return npiCount;
     }

@@ -1,5 +1,6 @@
 package pages.life;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -7,6 +8,9 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class NPIStaticList {
     private final Page page;
@@ -23,6 +27,9 @@ public class NPIStaticList {
     private final Locator DELETE_LIST_ICON;
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
+    private final Locator DOWNLOAD_ICON;
+    private final Locator ITEM_COUNT_UI;
+    private final Locator EDIT_NPI_LIST_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPIStaticList(Page page) {
@@ -36,10 +43,13 @@ public class NPIStaticList {
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(text(),'List Name is required')]");
         this.ADVERTISER_NAME_ERROR = page.locator("//div[contains(text(),'Advertiser is required')]");
-        this.BACK_TO_NPI_LISTS = page.locator("//app-icon-lable-link[@icon='12-back.svg']");
+        this.BACK_TO_NPI_LISTS = page.locator("//img[@alt='BackButton_NPI_Lists'  and contains(@src,'BackButton_NPI_Lists.svg')]");
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
+        this.DOWNLOAD_ICON = page.locator("//span[contains(@class,'image download')]");
+        this.ITEM_COUNT_UI = page.locator("//span[text()='Total NPI']/preceding-sibling::span[1]");
+        this.EDIT_NPI_LIST_ICON = page.locator("//img[@alt='edit'  and contains(@src,'edit-inline.svg')]");
     }
 
     public void enterListName(String npiListName) {
@@ -83,12 +93,14 @@ public class NPIStaticList {
 
     public void clickBackToNPILists() {
         waitUtility.waitForLocatorDetached(LIST_SUCCESS);
+        BACK_TO_NPI_LISTS.scrollIntoViewIfNeeded();
         BACK_TO_NPI_LISTS.click();
-        page.waitForSelector(".block-ui-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void editListName(String newListName) {
-        waitUtility.waitForLocatorVisible(BACK_TO_NPI_LISTS);
+        waitUtility.waitForLocatorVisible(EDIT_NPI_LIST_ICON);
+        EDIT_NPI_LIST_ICON.click();
         LIST_NAME.fill(newListName);
     }
 
@@ -100,5 +112,15 @@ public class NPIStaticList {
 
     public String deleteSuccess() {
         return DELETE_SUCCESS.innerText();
+    }
+
+    public Path clickDownloadIcon() throws IOException {
+        Download download = page.waitForDownload(DOWNLOAD_ICON.first()::click);
+        return CommonUtils.downloadFileAndMoveToSystemFolder(download);
+    }
+
+    public String fetchSharedListCountFromUI() {
+        String itemCountText = ITEM_COUNT_UI.first().innerText().trim();
+        return itemCountText.replaceAll("[^0-9]", "");
     }
 }

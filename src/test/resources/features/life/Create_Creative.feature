@@ -1,12 +1,12 @@
 Feature: LIFE Regression - Create a Creative Library and verify filters, sort, search options for all creative types including Bulk Upload
   It covers:
   1. Creating creatives via UI for the following types:
-    a.  Display
-    b.  Video
-    c.  Audio
-    d.  Native Display
-    e.  Native Video
-    f.  Search Extension
+  a.  Display
+  b.  Video
+  c.  Audio
+  d.  Native Display
+  e.  Native Video
+  f.  Search Extension
   2. Bulk uploading creatives for supported types
   3. Verifying available filters, sort, and search functionality on the Creative Library page
 

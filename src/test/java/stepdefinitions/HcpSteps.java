@@ -31,7 +31,7 @@ public class HcpSteps {
 
     @Then("Verify smart action creation page is displayed")
     public void verify_smart_action_creation_page_is_displayed() {
-        Assert.assertEquals("Smart Action Properties", smartActions.getSmartAction());
+        Assert.assertEquals("New Smart Action", smartActions.getSmartAction());
     }
 
     @Then("User enters smart action details as {string} {string}")
@@ -39,7 +39,6 @@ public class HcpSteps {
         smartActionName = smartActionName + '_' + timestamp;
         smartActions.enterSmartActionName(smartActionName);
         smartActions.enterAdvertiser(advertiser);
-
     }
 
     @When("User saves the smart action")
@@ -99,6 +98,4 @@ public class HcpSteps {
     public void verify_response_data_is_saved_successfully() {
         Assert.assertEquals("Data saved successfully", smartActions.getSavedMessage().trim());
     }
-
-
 }

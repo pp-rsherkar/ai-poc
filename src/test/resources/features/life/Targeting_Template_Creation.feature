@@ -62,10 +62,10 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
   Scenario Outline: Create a Targeting Template from Tactic and its availability under Targeting templates page
     #1
     And Create a tactic with below targeting rules and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
-      | Behavioral Segment | AutoSegment  |
-      | Age                | 25-29        |
-      | IP Address         | AutoIP       |
-      | Postal Codes       | 112233       |
+      | Behavioral Segment | AutoSegment |
+      | Age                | 25-29       |
+      | IP Address         | AutoIP      |
+      | Postal Codes       | 112233      |
     Then Verify the template created are saved
     #2
     When User navigates to Targeting template page by clicking the icon from Activation section
@@ -75,5 +75,5 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     Then User searches and verifies the already created targeting template using the search option
 
     Examples:
-     | LINE_ITEMS                                                                  | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     |
-     | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video | 01- Advertiser | TargetingTemplate | Regular | 20000     | TargetingLine | 500         | TargetingTactic |
+      | LINE_ITEMS                                                                  | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     |
+      | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video | 01- Advertiser | TargetingTemplate | Regular | 20000     | TargetingLine | 500         | TargetingTactic |

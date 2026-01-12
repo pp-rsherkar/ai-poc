@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -18,7 +19,7 @@ public class Accounts {
     private final Locator SEARCH_ACCOUNT;
     private final Locator SEARCH_ICON;
     private final Locator SELECT_ACCOUNT;
-    private final Locator STUDIO_SETTINGS_BUTTON;
+    private final Locator STUDIO_TOGGLE_BUTTON;
     private final Locator EXPANSION_TOGGLE;
     private final Locator STUDIO_SETTINGS_SAVE;
     private final Locator STUDIO_MENU;
@@ -50,12 +51,29 @@ public class Accounts {
     private final Locator STUDIO_USER_TAB;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_ENABLED;
     private final Locator STUDIO_TOGGLE_EXTERNAL_USER_DISABLED;
+    private final Locator ACCOUNT_ADVERTISER_TAB;
+    private final Locator GLOBAL_SIGNALS_TAB;
+    private final Locator ADVERTISER_PERMISSION_SAVE_BUTTON;
+    private final Locator ACCOUNT_USER_TAB;
+    private final Locator USER_SIGNAL_TAB;
+    private final Locator USER_PERMISSIONS_SAVE_BUTTON;
+    private final Locator USER_PROFILE_ICON;
+    private final Locator LOGOUT_BUTTON;
+    private final Locator MOMENTS_CHECKBOX;
+    private final Locator IBHEALTH_CHECKBOX;
+    private final Locator CLAIMSDATA_CHECKBOX;
     private final Locator ACCOUNTS_ADVERTISER_TAB;
     private final Locator SUCCESS_ALERT;
-    WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    private final Locator CLIENT_VALUE;
+    private final Locator STUDIO_SETTINGS_ICON;
+    private final Locator STUDIO_SETTINGS_PANEL;
+    private final Locator WORKSPACE_PERMISSION_TOGGLE_BUTTON;
+    private final Locator SETTINGS_PANEL_CANCEL_BUTTON;
+    WaitUtility waitUtility;
 
     public Accounts(Page page) {
         this.page = page;
+        this.waitUtility = new WaitUtility(page);
         this.SUB_MENU = page.locator("span").first();
         this.ADMINISTRATION = page.getByText("Administration", new Page.GetByTextOptions().setExact(true));
         this.ACCOUNTS_TAB = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Accounts"));
@@ -66,7 +84,7 @@ public class Accounts {
         this.STUDIO_USER_TAB = page.locator("//button[.//span[text()='Studio']]");
         this.STUDIO_TOGGLE_EXTERNAL_USER_ENABLED = page.locator("//span[contains(@class,'icons-24-checkmark-green')]");
         this.STUDIO_TOGGLE_EXTERNAL_USER_DISABLED = page.locator("//span[contains(@class,'icons-24-checkmark-white')]");
-        this.STUDIO_SETTINGS_BUTTON = page.locator("div:nth-child(6) > .btn > .acc-toggle-wrapper > .icons-32-checkmark");
+        this.STUDIO_TOGGLE_BUTTON = page.locator("//span[@class='btn-label' and text()='Studio']/following-sibling::span//span");
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
@@ -93,9 +111,25 @@ public class Accounts {
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
-        this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
+        this.OK_BUTTON = page.locator("//button[contains(@class, 'okButton') or contains(text(),'Save')]");
+        this.ACCOUNT_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
+        this.GLOBAL_SIGNALS_TAB = page.locator("//button[@class='signal']");
+        this.ADVERTISER_PERMISSION_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
+        this.ACCOUNT_USER_TAB = page.locator("//a[@routerlink='users']");
+        this.USER_SIGNAL_TAB = page.locator("//button[normalize-space(.)='Signal']");
+        this.USER_PERMISSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
+        this.USER_PROFILE_ICON = page.locator("//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
+        this.LOGOUT_BUTTON = page.locator("//div[@class='hovitems item last link']");
+        this.MOMENTS_CHECKBOX = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
+        this.IBHEALTH_CHECKBOX = page.locator("//*[@id='45_0' and not(contains(@class, 'checked'))]");
+        this.CLAIMSDATA_CHECKBOX = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
+        this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
+        this.STUDIO_SETTINGS_ICON = page.locator("//span[@class='header-name' and text()='Studio']/following-sibling::span");
+        this.STUDIO_SETTINGS_PANEL = page.locator("//div[@class='bsHeaderContainer']//div[contains(text(),'Studio Settings')]");
+        this.WORKSPACE_PERMISSION_TOGGLE_BUTTON = page.locator("//div[@class='secondtablewrapper']//div[contains(@class,'toggle-wrapper-withLabel')]//sui-checkbox");
+        this.SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
     }
 
     public void clickAdministration() {
@@ -116,10 +150,11 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(selectAccount);
         selectAccount.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CLIENT_VALUE);
     }
 
     public void enableStudio() {
-        STUDIO_SETTINGS_BUTTON.click();
+        STUDIO_TOGGLE_BUTTON.click();
     }
 
     public void workSpaceSettings() {
@@ -137,7 +172,7 @@ public class Accounts {
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         SELECT_ACCOUNT.click();
-        STUDIO_SETTINGS_BUTTON.click();
+        STUDIO_TOGGLE_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
         page.reload();
     }
@@ -172,7 +207,7 @@ public class Accounts {
     }
 
     public List<String> fetchAdvertiserList() {
-        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST.last());
         return ADVERTISER_LIST.allInnerTexts();
     }
 
@@ -222,7 +257,7 @@ public class Accounts {
 
     public void clickOKButton() {
         OK_BUTTON.click();
-        while(!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()){
+        while (!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()) {
             page.waitForTimeout(5000);
         }
         page.waitForTimeout(10000); //needed this hard wait as page remains un-interactive even after element is visible
@@ -256,6 +291,63 @@ public class Accounts {
         return false;
     }
 
+    public void clickAccountAdvertiserTab() {
+        ACCOUNT_ADVERTISER_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickGlobalSignalsTab() {
+        GLOBAL_SIGNALS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
+        Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
+        switch (advertiserPermission) {
+            case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
+                if (!permissionCheckbox.isHidden()) {
+                    permissionCheckbox.click();
+                    ADVERTISER_PERMISSION_SAVE_BUTTON.click();
+                }
+                break;
+        }
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void navigateToUserTab() {
+        ACCOUNT_USER_TAB.click();
+        waitUtility.waitForLocatorVisible(USER_SIGNAL_TAB);
+    }
+
+    public void externalUserPermissions(String studioPermissions, String accountName) {
+        USER_SIGNAL_TAB.click();
+        switch (studioPermissions) {
+            case "MOMENTS":
+                if (!MOMENTS_CHECKBOX.isHidden()) {
+                    MOMENTS_CHECKBOX.click();
+                }
+                break;
+            case "IB HEALTH":
+                if (!IBHEALTH_CHECKBOX.isHidden()) {
+                    IBHEALTH_CHECKBOX.click();
+                }
+                break;
+            case "CLAIMS DATA":
+                if (!CLAIMSDATA_CHECKBOX.isHidden()) {
+                    CLAIMSDATA_CHECKBOX.click();
+                }
+                break;
+        }
+        if (USER_PERMISSIONS_SAVE_BUTTON.isVisible()) {
+            USER_PERMISSIONS_SAVE_BUTTON.click();
+        }
+    }
+
+    public void internalUserLogout() {
+        USER_PROFILE_ICON.click();
+        LOGOUT_BUTTON.click();
+    }
+
     public boolean isAccountsAdvertiserTabDisplayed() {
         return ACCOUNTS_ADVERTISER_TAB.isVisible();
     }
@@ -275,6 +367,7 @@ public class Accounts {
         boolean flag;
         Locator permissionXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox", advertiser));
         Locator disabledTextXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]", advertiser));
+        waitUtility.waitForLocatorVisible(permissionXpath);
         flag = switch (checkboxStatus) {
             case "Disabled" -> {
                 if (!disabledTextXpath.isVisible()) {
@@ -293,10 +386,42 @@ public class Accounts {
         return flag;
     }
 
-    public void saveAccountsAdvertiserTab(){
-        if(OK_BUTTON.isVisible()) {
+    public void saveAccountsAdvertiserTab() {
+        if (OK_BUTTON.isVisible()) {
             OK_BUTTON.click();
             waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         }
     }
+
+    public String fetchClientValue() {
+        waitUtility.waitForLocatorVisible(CLIENT_VALUE);
+        return CLIENT_VALUE.textContent().trim();
+    }
+
+    public boolean isStudioSettingsButtonVisible() {
+        return STUDIO_SETTINGS_ICON.isVisible();
+    }
+
+    public void clickStudioSettingsButton() {
+        STUDIO_SETTINGS_ICON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(STUDIO_SETTINGS_PANEL);
+    }
+
+    public List<String> fetchWorkspacesWithPermission() {
+        List<String> workspaceNameList = new ArrayList<>();
+        for (int i = 0; i < WORKSPACE_PERMISSION_TOGGLE_BUTTON.count(); i++) {
+            if(WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
+                int rowIndex = (int) WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).evaluate("(el) => Array.from(el.closest('tbody').children).indexOf(el.closest('tr')) + 1");
+                Locator workspaceNameLocator = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//div", rowIndex));
+                workspaceNameList.add(workspaceNameLocator.textContent().trim());
+            }
+        }
+        return workspaceNameList;
+    }
+
+    public void clickCancelButtonFromSettingsPanel(){
+        SETTINGS_PANEL_CANCEL_BUTTON.click();
+    }
+
 }
