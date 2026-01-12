@@ -3887,17 +3887,17 @@ public class LifeSteps {
 
         switch (moduleName) {
             case "campaign":
-                assert campaigns.getExportAuditLogPopupContent().contains(campaignNameRandom);
+                assert campaigns.fetchExportAuditLogPopupContent().contains(campaignNameRandom);
                 break;
             case "line item":
-                assert campaigns.getExportAuditLogPopupContent().contains(lineItemNameRandom);
+                assert campaigns.fetchExportAuditLogPopupContent().contains(lineItemNameRandom);
                 break;
             case "tactic":
-                assert campaigns.getExportAuditLogPopupContent().contains(tacticNameRandom);
+                assert campaigns.fetchExportAuditLogPopupContent().contains(tacticNameRandom);
                 break;
         }
 
-        campaigns.exportAuditLog();
+        campaigns.clickConfirmExportAuditLog();
         Assert.assertEquals("Audit Log request created. File will be send via email.", campaigns.fetchExportAuditLogSuccessAlert());
     }
 

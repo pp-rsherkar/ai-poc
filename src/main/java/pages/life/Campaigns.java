@@ -472,11 +472,11 @@ public class Campaigns {
         waitUtility.waitForLocatorVisible(EXPORT_AUDIT_LOG_POPUP);
     }
 
-    public String getExportAuditLogPopupContent() {
+    public String fetchExportAuditLogPopupContent() {
         return EXPORT_AUDIT_LOG_POPUP_CONTENT.innerText();
     }
 
-    public void exportAuditLog() {
+    public void clickConfirmExportAuditLog() {
         EXPORT_AUDIT_LOG_POPUP_OK_BUTTON.click();
     }
 
