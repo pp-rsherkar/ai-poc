@@ -653,11 +653,9 @@ public class TacticSettings {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
 
-
     public String verifyTacticName() {
         return VERIFY_TACTIC_NAME.innerText();
     }
-
 
 }
 

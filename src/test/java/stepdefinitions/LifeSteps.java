@@ -26,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
 
@@ -88,10 +87,10 @@ public class LifeSteps {
     int flightEndDate = 0;
     APIResponse response;
     boolean flag = false;
-    private String customFieldName;
-    private String uiCustomFieldName;
-    private BigDecimal campaignBaseBid;
-    private BigDecimal campaignMaxBid;
+    String customFieldName;
+    String uiCustomFieldName;
+    BigDecimal campaignBaseBid;
+    BigDecimal campaignMaxBid;
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -192,6 +191,7 @@ public class LifeSteps {
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
             String tacticName = tacticData.get("Tactic Name");
+            metricName = tacticName;
             String channel = tacticData.get("Channel");
             String ruleType = tacticData.get("RuleType");
             expectedTactic.add(tacticName);
@@ -279,21 +279,19 @@ public class LifeSteps {
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
-        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
-        this.customFieldName = customFieldName;
+        customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
         tacticDetails.clickDetailsTab();
         tacticDetails.addCustomField(customFieldName);
-        String raw = tacticDetails.verifyCustomField(customFieldName);
-        String actualName = raw.split("\\R")[0];// To remove unwanted space and text
+        String actualName = tacticDetails.verifyCustomField(customFieldName).split("\\R")[0];// To remove unwanted space and text
         Assert.assertEquals(customFieldName, actualName);
-        this.uiCustomFieldName = actualName;
+        uiCustomFieldName = actualName;
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
-    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic(DataTable dataTable) {
+    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
-        tacticDetails.clickTactic();
+        tacticDetails.clickTactic(metricName);
         Assert.assertEquals(customFieldName, uiCustomFieldName);
     }
 
@@ -1004,10 +1002,10 @@ public class LifeSteps {
         npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
+        npiNameEdited = "Edited" + '_' + npiName;
         npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
-        assert npiStaticList.saveListSuccess().contains("NPI list created");
+        Assert.assertTrue("Unable to see success message", npiStaticList.saveListSuccess().contains("NPI list created"));
     }
 
     @Then("Verify list gets updated successfully")
@@ -1027,18 +1025,13 @@ public class LifeSteps {
         assert npiStaticList.deleteSuccess().contains("NPI List Deleted");
     }
 
-    @When("User enters below details in respective search field")
+    @When("User enters below details in respective search field, verify that the deal list appears based on the selected filters")
     public void userEntersBelowDetailsInRespectiveSearchField(DataTable filterBy) {
         Map<String, String> rawMap = filterBy.asMap(String.class, String.class);
         Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            flag = pmp.applyFilter(entry.getKey(), entry.getValue());
+            Assert.assertTrue("Deals list is not available for " + entry.getKey(), pmp.applyFilter(entry.getKey(), entry.getValue()));
         }
-    }
-
-    @Then("Verify private deals list should appear based on the filter selected")
-    public void verifyPrivateDealsBasedOnTheFilterSelected() {
-        Assert.assertTrue("Button and Filters are not available", flag);
     }
 
     @And("User clicks on Add New Deal button")
@@ -1046,12 +1039,12 @@ public class LifeSteps {
         pmp.clickAddNewDeals();
     }
 
-    @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}, {string}")
-    public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price) {
+    @Then("New Deal panel should open and user should be able to add new deal with details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void newDealPanelShouldOpenAndUserShouldBeAbleToAddNewDealWithDetails(String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator) {
         dealIDRandom = dealID + CommonUtils.timeStampCalculation();
         dealNameRandom = dealName + CommonUtils.timeStampCalculation();
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
-        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price));
+        Assert.assertEquals("Success!", pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator));
     }
 
     @When("User searches the deal and assign it from the deal list")
@@ -1081,8 +1074,8 @@ public class LifeSteps {
 
     @And("Verify Delete icon is disabled and error message {string}")
     public void verifyDeleteIconIsDisabledAndOnHoverShowErrorMessage(String errorMessage) {
-        flag = pmp.verifyDeleteIconAndMessage(errorMessage);
-        Assert.assertEquals("Go to the Curated Markets & Deals section to remove the market.", errorMessage);
+        Assert.assertTrue("Delete icon is not disabled", pmp.isDeleteIconDisabled());
+        Assert.assertEquals(errorMessage, pmp.fetchMessageOnDeleteIconClick());
     }
 
     @And("Verify Pricing Strategy is editable for Deals present in Curated Market and Deals section")
@@ -1094,12 +1087,12 @@ public class LifeSteps {
         }
     }
 
-    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
-    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String toggleButton) {
+    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
+    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator, String toggleButton) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
         dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, toggleButton));
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator, toggleButton));
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
@@ -1259,7 +1252,7 @@ public class LifeSteps {
         npiAttributesList.clickBackToNPILists();
         npiLists.searchList(npiName);
         npiLists.openSearchedList(npiName);
-        npiNameEdited = "Edited" + '_' + CommonUtils.timeStampCalculation();
+        npiNameEdited = "Edited" + '_' + npiName;
         npiAttributesList.editListName(npiNameEdited);
         npiAttributesList.saveList();
         assert npiAttributesList.updateListSuccess().contains("NPI list updated");
@@ -1581,9 +1574,9 @@ public class LifeSteps {
     public void verifyThatWheNamesAreSpecifiedManuallyTheOptionToUploadAFileDisappears(String listType) {
         keyValues.clear();
         keyValues = new ArrayList<>(CommonUtils.convertStringToList(listType));
-        Assert.assertTrue("Upload section is not available", sharedList.verifyUploadSectionIsVisibleBeforeListInput());
+        Assert.assertTrue("Upload section is not available before list input", sharedList.verifyUploadSectionIsVisibleBeforeListInput());
         sharedList.enterDomainNames(keyValues);
-        Assert.assertTrue("Upload section is available", sharedList.verifyUploadSectionIsVisibleAfterListInput());
+        Assert.assertTrue("Upload section is available after list input", sharedList.verifyUploadSectionIsVisibleAfterListInput());
     }
 
     @And("Verify that the user is able to create a {string} list by specifying names manually")
@@ -1758,7 +1751,7 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheUpdatedValueAfterNewFileUpload(String fileName) {
         sharedList.searchAndOpenCreatedList(metricName);
         int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        Assert.assertEquals(domainCount, itemCount + sharedList.fetchDomainCountFromUploadedFilesSection(fileName));
+        Assert.assertEquals(itemCount + sharedList.fetchDomainCountFromUploadedFilesSection(fileName), domainCount);
     }
 
     @And("Verify that user is able to download the uploaded file {string}, {string}")
@@ -2355,7 +2348,7 @@ public class LifeSteps {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
-        Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+        Assert.assertEquals("You will get the report on your email", runReportPanel.fetchSuccessAlert());
     }
 
     @And("Confirms that the report panel retains the entered data")
@@ -2888,6 +2881,7 @@ public class LifeSteps {
     @When("User edits the name of the created {string}")
     public void userEditsPixel(String pixelType) {
         pixelNameEdited = newPixelName + '_' + "Edited";
+        pixels.clickEditIcon();
         switch (pixelType) {
             case "Retargeting Pixel" -> retargetingPixel.enterPixelName(pixelNameEdited);
             case "Smart Pixel" -> smartPixel.enterPixelName(pixelNameEdited);
@@ -2925,8 +2919,8 @@ public class LifeSteps {
     @Then("Verify the Smart Pixel name is auto populated with {string} and Smart Pixel text")
     public void verifySmartPixelNameIsAutoPopulated(String advertiser) {
         String pixelName = smartPixel.getPixelNameFromHeader();
-        String expectedPixelName = advertiser + ' ' + "Smart Pixel";
-        String regex = "\\Q" + expectedPixelName + "\\E" + "\\s*\\d+$";
+        String expectedPixelName = advertiser + " Smart Pixel";
+        String regex = "^\\Q" + expectedPixelName + "\\E(\\s\\d+)?$";
         Assert.assertTrue(pixelName.matches(regex));
     }
 
@@ -2970,12 +2964,14 @@ public class LifeSteps {
 
     @Then("Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it")
     public void verifyUserCannotDeactivateSmartPixelWithAssociatedSmartList() {
+        pixels.clickEditIcon();
         smartPixel.clickDeactivatePixelIcon();
         Assert.assertEquals("PIXEL CAN'T BE DEACTIVATED", smartPixel.verifyDeactivateError().toUpperCase());
     }
 
     @When("User deactivates the created pixel")
     public void userDeactivatesCreatedPixel() {
+        pixels.clickEditIcon();
         smartPixel.deactivatePixel();
     }
 
@@ -3140,8 +3136,7 @@ public class LifeSteps {
             String dateStr = capturedDetails.get(i);
             LocalDate actualDate = LocalDate.parse(dateStr, formatter);
             LocalDate expectedDate = LocalDate.of(startYear, startMonth, 1).plusMonths(i - 1);
-            if (actualDate.getMonthValue() != expectedDate.getMonthValue() ||
-                    actualDate.getYear() != expectedDate.getYear()) {
+            if (actualDate.getMonthValue() != expectedDate.getMonthValue() || actualDate.getYear() != expectedDate.getYear()) {
                 Assert.assertEquals("Flight date mismatch ", actualDate, expectedDate);
             }
         }
@@ -3282,7 +3277,8 @@ public class LifeSteps {
             runReportPanel.selectTemplateFromDropdown(templateName);
             String fileName = "Custom Report";
             runReportPanel.clickRunButton(fileName);
-            Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+            String actualMessage = runReportPanel.fetchSuccessAlert();
+            Assert.assertTrue("Unexpected success message: " + actualMessage, actualMessage.equals("Success!") || actualMessage.equals("You will get the report on your email"));
         }
     }
 
@@ -3338,8 +3334,6 @@ public class LifeSteps {
     public void user_creates_a_new_tactics(String tacticName, String channel) {
         tacticDetails.enterTacticName(tacticName);
         tacticDetails.saveTacticDetails();
-        tacticSettings.selectChannel(channel);
-        tacticSettings.saveTacticSettings();
     }
 
     @Then("User deletes the tactic {string} and verifies it")

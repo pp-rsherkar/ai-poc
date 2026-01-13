@@ -19,11 +19,9 @@ import utils.FileActions;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
+
 
 public class StudioSteps {
     static String workspaceName;
@@ -127,7 +125,7 @@ public class StudioSteps {
         accounts.switchAccount(accountName);
         navigation.navigateToStudio();
         workspaceCreation.createWorkspace();
-        Assert.assertEquals("HCP Audience Expansion", accounts.verifyWorkspacePermission());
+        Assert.assertEquals("HCP Explorer", accounts.verifyWorkspacePermission());
     }
 
     @And("User disables the studio permission for {string} account")
@@ -143,7 +141,7 @@ public class StudioSteps {
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
-        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
+        Assert.assertEquals("", "Studio", workspaceCreation.studioDashboard());
         workspaceCreation.verifyStudioWorkspaceFrame();
         workspaceCreation.createStudioWorkspace();
     }
@@ -154,6 +152,45 @@ public class StudioSteps {
         fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
+/*
+
+
+    @Then("User selects the Workspace Type as {string}")
+    public void user_selects_the_workspace_type_as(String string) {
+
+    }
+
+    @Then("User selects the advertiser as {string}")
+    public void user_selects_the_advertiser_as(String string) {
+
+    }
+
+    @Then("User selects Source Audience details as {string},{string}")
+    public void user_selects_source_audience_details_as(String string, String string2) {
+
+    }
+
+    @Then("User selects {string}")
+    public void user_selects(String string) {
+
+    }
+
+    @Then("User applies filters to the workspace")
+    public void user_applies_filters_to_the_workspace() {
+
+    }
+
+    @Then("User clicks on Edit button to rename the workspace to {string}")
+    public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
+
+    }
+
+    @Then("Verify the workspace in workspace management page")
+    public void verify_the_workspace_in_workspace_management_page() {
+
+    }
+*/
+
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
@@ -201,7 +238,8 @@ public class StudioSteps {
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
         for (String appliedFilter : appliedFilterEntries) {
             String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
-            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> { String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> {
+                String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
                 // 1) Exact match
                 boolean exactMatch = displayedNorm.equals(appliedNorm);
                 // 2) Singular/plural
@@ -619,6 +657,7 @@ public class StudioSteps {
     @Then("User turns on studio toggle for external users and verifies that it is enabled")
     public void user_turns_on_studio_toggle_for_external_users_and_verifies_that_it_is_enabled() {
         Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
+        accounts.internalUserLogout();
     }
 
 
@@ -759,7 +798,12 @@ public class StudioSteps {
                 explorerWorkspace.clickFilterOKButton();
             }
             explorerWorkspace.applyFilter();
-            Assert.assertEquals(filterType + " recency value is not matched",  recency, explorerWorkspace.fetchRecencyValue(filterType));
+            Assert.assertEquals(filterType + " recency value is not matched", recency, explorerWorkspace.fetchRecencyValue(filterType));
         }
+    }
+
+    @Then("User should be able to see Studio for that account")
+    public void userShouldBeAbleToSeeStudioForThatAccount() {
+        Assert.assertEquals("Studio", navigation.verifyStudioTitle());
     }
 }
