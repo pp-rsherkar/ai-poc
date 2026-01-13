@@ -1316,11 +1316,11 @@ public class LifeSteps {
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(buttonType);
-        Assert.assertTrue("Activity " + buttonType + " button is not present and clicked", createCreatives.isArchiveUnarchiveButtonsPresent(buttonType));
+        Assert.assertTrue("Activity " + buttonType + " button is not present", createCreatives.isArchiveUnarchiveButtonsPresent(buttonType));
         if(buttonType.equals("Active"))
             Assert.assertTrue("Not all content on Creative Library page is Active", createCreatives.showsActiveCreativesWhenActiveClicked());
         else if(buttonType.equals("Archived"))
-            Assert.assertTrue("Not all content on Creative Library page is Active", createCreatives.showsArchivedCreativesWhenArchivedClicked());
+            Assert.assertTrue("Not all content on Creative Library page is Archived", createCreatives.showsArchivedCreativesWhenArchivedClicked());
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
             createCreatives.navigateToFirstCreativePage();
             flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
@@ -1440,7 +1440,7 @@ public class LifeSteps {
     @Then("Verify Creative Preview tab is displayed with correct creative name")
     public void verifyCreativePreviewTabIsDisplayedWithCorrectCreativeName() {
         Assert.assertEquals("Creative Preview", createCreatives.isCreativePreviewTabDisplayed());
-        Assert.assertTrue("", createCreatives.fetchCreativeNameFromPreviewTab().contains(metricName));
+        Assert.assertTrue("Creative name in preview tab does not match expected name", createCreatives.fetchCreativeNameFromPreviewTab().contains(metricName));
     }
 
     @And("Verify user is able to close the Creative Preview tab")

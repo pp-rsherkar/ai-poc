@@ -764,7 +764,7 @@ public class CreateCreatives {
                 return checkBoxLocator.locator("xpath=parent::div/following-sibling::div//div[contains(@class,'name-section-truncate')]").textContent().trim();
             }
         }
-        return " ";
+        return "";
     }
 
     public void clickBulkActionsButton() {
