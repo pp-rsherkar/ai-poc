@@ -19,23 +19,23 @@ Feature: End to End Workflow of Creative Creation and its assignment To Tactic
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     When User creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                           |
-      | Html         | HTMLCode:<html>Auto_Creative</html>, Size:1024x576, DomainLanding:https://www.pulsepoint.com |
+      | CreativeType | CreativeAttributes                                                               |
+      | Html         | HTMLCode:<html>Auto_Creative</html>, Size:1024x576, DomainLanding:pulsepoint.com |
     And User creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                         |
       | Audio URL    | URL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
     And User creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                            |
-      | Video URL    | URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane |
+      | CreativeType | CreativeAttributes                                                                                                                                          |
+      | Video URL    | Type:MP4, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane |
     And User creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                           |
       | Search       | Size:300x600, Headline:Test Automation Headline, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ClickThroughURL:pulsepoint.com, IAB:Profane |
     And User creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                                  |
-      | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |
+      | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                      |
+      | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |
     And User creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                                           |
-      | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:https://www.pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com |
+      | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                                                   |
+      | VAST URL     | Type:STANDARD VAST, VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com |
     #2
     Then Verify the newly created creative is displayed in the Creative Library page
     #3

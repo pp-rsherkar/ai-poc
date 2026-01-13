@@ -6,16 +6,22 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class CreateCreatives {
-    public final Locator CLICK_THROUGH_URL;
     private final Page page;
+    Page newTab;
+    public final Locator CLICK_THROUGH_URL;
     private final Locator CREATIVE_PAGE_TITLE;
     private final Locator UNARCHIVED_BUTTON;
+    private final Locator ENABLED_ARCHIVED_BUTTON;
+    private final Locator DISABLED_ARCHIVED_BUTTON;
     private final Locator ARCHIVED_BUTTON;
     private final Locator SELECT_ADVERTISER;
     private final Locator DROPDOWN_VALUES;
@@ -23,26 +29,21 @@ public class CreateCreatives {
     private final Locator SELECT_CAMPAIGN;
     private final Locator SELECT_AD_SIZE;
     private final Locator SELECT_CREATIVE_TYPE;
-    private final Locator APPROVAL_STATUS;
+    private final Locator CREATIVE_STATUS;
     private final Locator CREATIVE_TYPE_ICON;
     private final Locator CREATED_BY;
     private final Locator SORT_DROPDOWN;
-    private final Locator SORT_BY_UP;
-    private final Locator SORT_BY_DOWN;
     private final Locator SEARCH_BOX;
-    private final Locator DATA_CONTENT_PANEL;
-    private final Locator COPY_ICON;
+    private final Locator CANCEL_BUTTON;
     private final Locator CREATIVE_HEADER;
     private final Locator OK_BUTTON;
     private final Locator SUCCESS_ALERT;
-    private final Locator ARCHIVE_DIALOG;
-    private final Locator ARCHIVE_BUTTON;
     private final Locator NEW_CREATIVE_BUTTON;
     private final Locator ADVERTISER_DROPDOWN;
     private final Locator ADVERTISER_DROPDOWN_VALUES;
     private final Locator CREATIVE_NAME;
-    private final Locator ADVERTISER_DSA;
-    private final Locator FINANCER;
+    public final Locator ADVERTISER_DSA;
+    public final Locator FINANCER;
     private final Locator CREATIVE_TYPE;
     private final Locator CREATIVE_HTML_CODE;
     private final Locator MACROS_CHECKBOX;
@@ -61,37 +62,72 @@ public class CreateCreatives {
     private final Locator DISPLAY_URL;
     private final Locator SPONSORED_BY;
     private final Locator PRODUCT_DESCRIPTION;
-    private final Locator CREATIVE_NAME_TEXT;
-    private final Locator CREATIVE_STATUS;
+    private final Locator SELECTED_IAB_CATEGORY;
+    private final Locator PAGINATION_NEXT_BUTTON;
+    private final Locator PAGINATION_PREVIOUS_BUTTON;
+    private final Locator ITEMS_PER_PAGE_DROPDOWN;
+    private final Locator ITEMS_PER_PAGE;
+    private final Locator SORT_BY_NAME_ASC;
+    private final Locator SORT_BY_NAME_DESC;
+    private final Locator SORT_BY_ID_ASC;
+    private final Locator SORT_BY_ID_DESC;
+    private final Locator SORT_BY_LAST_UPDATED_ASC;
+    private final Locator SORT_BY_LAST_UPDATED_DESC;
+    private final Locator CREATIVE_NAME_LIST;
+    private final Locator CREATIVE_ID_LIST;
+    private final Locator CREATIVE_LAST_UPDATED_LIST;
+    private final Locator CREATIVE_SOURCE_LIST;
+    private final Locator CREATIVE_AD_SIZE_LIST;
+    private final Locator APPROVAL_STATUS_BUTTON;
+    private final Locator CREATIVE_FREQUENCY_OPTIONS;
+    private final Locator SELECTED_AD_SIZE;
+    private final Locator DELETE_ICON;
+    private final Locator BULK_ACTIONS_BUTTON;
+    private final Locator BULK_ASSIGN_CREATIVE_HEADER;
+    private final Locator BULK_ASSIGN_CHECKBOX;
+    private final Locator FETCH_TOOLTIP_TEXT_FOR_ASSIGNED_CAMPAIGNS;
+    private final Locator REMOVAL_CONFIRMATION_POP_UP;
+    private final Locator REMOVAL_CONFIRMATION_TEXT;
+    private final Locator REMOVE_BUTTON;
+    private final Locator NO_CREATIVE_FOUND_MESSAGE;
+    private final Locator CREATIVE_STATUS_LABEL;
+    private final Locator APPROVE_ALL_BUTTON;
+    private final Locator APPROVED_BUTTON;
+    private final Locator PREVIEW_LINK;
+    private final Locator UPLOADING_PROGRESS_BAR;
+    private final Locator UPLOAD_DELETE_ICON;
+    public final Locator SELECTED_AD_CHOICES_ICON;
+    public final Locator CREATIVE_WIDTH_TYPE;
+    private final Locator DOMAIN_LANDING_FROM_CREATIVE_TILE;
+    private final Locator ADSIZE_FROM_CREATIVE_TILE;
+    public final Locator CREATIVE_STATUS_FROM_CREATIVE_TILE;
+    public final Locator CREATED_BY_FROM_CREATIVE_TILE;
+    public final Locator SOURCE_FROM_CREATIVE_TILE;
+    public final Locator LAST_UPDATED_FROM_CREATIVE_TILE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    List<String> creativesList = new ArrayList<>();
     String imageTextLocator = "//span[contains(text(),'%s')]";
 
     public CreateCreatives(Page page) {
         this.page = page;
         this.CREATIVE_PAGE_TITLE = page.locator("//div[contains(text(),'Creatives')]");
-        this.UNARCHIVED_BUTTON = page.locator("//img[@title='unarchive']");
-        this.ARCHIVED_BUTTON = page.locator("//img[@title='archive']");
+        this.UNARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//img[@title='unarchive']");
+        this.ENABLED_ARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//img[contains(@title,'archive')]");
+        this.DISABLED_ARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//span[@class='d-block']");
+        this.ARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//img[@title]");
         this.SELECT_ADVERTISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
         this.DROPDOWN_VALUES = page.locator("//div[@class='menu transition visible']//div[@class='item']/span");
         this.CLEAR_ALL_BUTTON = page.locator("//div[contains(text(),'Clear All')]");
         this.SELECT_CAMPAIGN = page.locator("//app-multi-select[contains(@placeholder,'Select Campaigns')]/div/span/input");
         this.SELECT_AD_SIZE = page.locator("//app-multi-select[contains(@placeholder,'Select Ad Sizes')]/div/span/input");
         this.SELECT_CREATIVE_TYPE = page.locator("//app-multi-select[contains(@placeholder,'Select Type')]/div/span/input");
-        this.APPROVAL_STATUS = page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
+        this.CREATIVE_STATUS = page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
         this.CREATED_BY = page.locator("//app-multi-select[contains(@placeholder,'Select Created By')]/div/span/input");
-        this.CREATIVE_TYPE_ICON = page.locator("//div[contains(@class,'video') or contains(@class,'native') or contains(@class,'image') or contains(@class,'expandablerichmedia') or contains(@class,'search') or contains(@class,'generichtml') or contains(@class,'audio')]");
         this.SORT_DROPDOWN = page.locator("//div[contains(@class, 'sort-option-dropdown')]");
-        this.SORT_BY_UP = page.locator("//span[contains(text(),'Sort by')]/following-sibling::i[contains(@class,'up')]");
-        this.SORT_BY_DOWN = page.locator("//span[contains(text(),'Sort by')]/following-sibling::i[contains(@class,'down')]");
         this.SEARCH_BOX = page.locator("//div[contains(@class,'search-field')]/input[@placeholder='Search']");
-        this.DATA_CONTENT_PANEL = page.locator("//div[contains(@class,'content-section left')]");
-        this.COPY_ICON = page.locator("//div[contains(@class,'approved')]/following-sibling::div/span[contains(@title,'copy')]");
+        this.CANCEL_BUTTON = page.locator("//div[contains(@class,'newCreativeFooter')]//button[normalize-space(text())='Cancel']");
         this.CREATIVE_HEADER = page.locator("//div[contains(@class,'rightPanelHeader1')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
-        this.ARCHIVE_DIALOG = page.locator("//div[contains(text(),'Archive Creative?')]");
-        this.ARCHIVE_BUTTON = page.locator("//div[contains(@class,'approveButtonText')]");
         this.NEW_CREATIVE_BUTTON = page.locator("//button[contains(text(),'New Creative')]");
         this.ADVERTISER_DROPDOWN = page.locator("//app-single-select-dropdown[contains(@placeholder,'Select Advertiser')]/div/div/input");
         this.ADVERTISER_DROPDOWN_VALUES = page.locator("//app-single-select-dropdown[contains(@placeholder,'Select Advertiser')]//input/following-sibling::div/div");
@@ -116,9 +152,50 @@ public class CreateCreatives {
         this.DISPLAY_URL = page.locator("//input[contains(@formcontrolname,'srchDisplayUrl') or contains(@formcontrolname,'displayUrl')]");
         this.SPONSORED_BY = page.locator("//input[contains(@formcontrolname,'sponsoredText')]");
         this.PRODUCT_DESCRIPTION = page.locator("//textarea[contains(@formcontrolname,'productDescription')]");
-        this.CREATIVE_NAME_TEXT = page.locator("//div[contains(@role,'alert')]");
-        this.CREATIVE_STATUS = page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
+        this.SELECTED_IAB_CATEGORY = page.locator("//div[@id='iabcreativeLookup']//span");
         this.CLICK_THROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
+        this.PAGINATION_NEXT_BUTTON = page.locator("//button[contains(@class,'button basic')]//i[contains(@class,'angle right icon')]");
+        this.PAGINATION_PREVIOUS_BUTTON = page.locator("//button[contains(@class,'button basic')]//i[contains(@class,'angle left icon')]");
+        this.ITEMS_PER_PAGE_DROPDOWN = page.locator("//td[contains(@class,'sui-select-single-dropdown')]//div[@class='text']");
+        this.ITEMS_PER_PAGE = page.locator("//div[contains(@class,'content-section')]");
+        this.SORT_BY_NAME_ASC = page.locator("//span[contains(text(),'Name')]/following-sibling::i[contains(@class,'up')]");
+        this.SORT_BY_NAME_DESC = page.locator("//span[contains(text(),'Name')]/following-sibling::i[contains(@class,'down')]");
+        this.SORT_BY_ID_ASC = page.locator("//span[contains(text(),'ID')]/following-sibling::i[contains(@class,'up')]");
+        this.SORT_BY_ID_DESC = page.locator("//span[contains(text(),'ID')]/following-sibling::i[contains(@class,'down')]");
+        this.SORT_BY_LAST_UPDATED_ASC = page.locator("//span[contains(text(),'Last Updated')]/following-sibling::i[contains(@class,'up')]");
+        this.SORT_BY_LAST_UPDATED_DESC = page.locator("//span[contains(text(),'Last Updated')]/following-sibling::i[contains(@class,'down')]");
+        this.CREATIVE_NAME_LIST = page.locator("//div[contains(@class,'name-section-truncate')]");
+        this.CREATIVE_ID_LIST = page.locator("//div[contains(@class,'id-section')]");
+        this.CREATIVE_LAST_UPDATED_LIST = page.locator("//span[contains(text(),'Last updated:')]//following-sibling::span");
+        this.CREATIVE_SOURCE_LIST = page.locator("//span[contains(text(),'Source:')]//following-sibling::span");
+        this.CREATIVE_AD_SIZE_LIST = page.locator("//span[contains(text(),'AdSize:')]//following-sibling::span");
+        this.APPROVAL_STATUS_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
+        this.CREATIVE_FREQUENCY_OPTIONS = page.locator("//button[@name='frequencyOptionType']");
+        this.SELECTED_AD_SIZE = page.locator("//div[contains(@class,'ad-size-group')]//input/following-sibling::span");
+        this.DELETE_ICON = page.locator("//app-icon-lable-link[@text='Delete']//div");
+        this.BULK_ACTIONS_BUTTON = page.locator("//div[contains(@id,'CreativeBulkActions')]");
+        this.BULK_ASSIGN_CREATIVE_HEADER = page.locator("//div[contains(@class,'rightPanelHeader2') and contains(text(),'Bulk Assign Creatives')]");
+        this.BULK_ASSIGN_CHECKBOX = page.locator("//div[contains(@class,'shtCategoryContainer')]//sui-checkbox");
+        this.FETCH_TOOLTIP_TEXT_FOR_ASSIGNED_CAMPAIGNS = page.locator("//div[contains(@class,'ng-tooltip-show')]");
+        this.REMOVAL_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Removal Confirmation')]");
+        this.REMOVAL_CONFIRMATION_TEXT = page.locator("//div[contains(text(),'Removal Confirmation')]/following-sibling::div[contains(@class,'text-middle')]");
+        this.REMOVE_BUTTON = page.locator("//div[contains(text(),'Removal Confirmation')]/following-sibling::div[contains(@class,'popup-actions-footer')]//span[contains(text(),'Remove')]");
+        this.NO_CREATIVE_FOUND_MESSAGE = page.locator("//img[contains(@alt,'No Creatives Found')]/following-sibling::div");
+        this.CREATIVE_STATUS_LABEL = page.locator("//div[contains(@class,'content-section')]//div[contains(@class,'status-label')]");
+        this.APPROVE_ALL_BUTTON = page.locator("//div[contains(@class,'bulkapprove')]//button[contains(text(),'Approve All')]");
+        this.APPROVED_BUTTON = page.locator("//div[contains(@class,'basic group')]//button[contains(text(),'Approved')]");
+        this.CREATIVE_TYPE_ICON = page.locator("//div[contains(@class,'image pointer') or contains(@class,'video pointer') or contains(@class,'generichtml pointer') or contains(@class,'search pointer') or contains(@class,'audio pointer') or contains(@class,'native pointer') or contains(@class,'nativevideo') or contains(@class,'expandablerichmedia pointer')]");
+        this.PREVIEW_LINK = page.locator("//app-icon-lable-link[contains(@text,'Open a creative preview')]");
+        this.UPLOADING_PROGRESS_BAR = page.locator("//sui-progress[contains(@class,'uploadProgressbar')]");
+        this.UPLOAD_DELETE_ICON = page.locator("//img[contains(@alt,'delete')]");
+        this.SELECTED_AD_CHOICES_ICON = page.locator("//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following::div//div[@class='text']");
+        this.CREATIVE_WIDTH_TYPE = page.locator("//button[contains(@name,'VideoTechType')]");
+        this.DOMAIN_LANDING_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Domain Landing:')]/following-sibling::span");
+        this.ADSIZE_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'AdSize:')]/following-sibling::span");
+        this.CREATIVE_STATUS_FROM_CREATIVE_TILE = page.locator("//div[contains(@class,'status-label')]//span");
+        this.CREATED_BY_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Created by :')]/following-sibling::span");
+        this.SOURCE_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Source:')]/following-sibling::span");
+        this.LAST_UPDATED_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Last updated:')]/following-sibling::span");
     }
 
     public String verifyCreativeLibraryPageTitle() {
@@ -130,17 +207,19 @@ public class CreateCreatives {
         Locator button = page.locator(String.format("//div[contains(text(), '%s')]/parent::button", buttonType));
         button.click();
         waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
     public void clickClearAllButton() {
         CLEAR_ALL_BUTTON.scrollIntoViewIfNeeded();
         CLEAR_ALL_BUTTON.click();
-        waitUtility.waitUntilPreLoaderHidden(120000);
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
-    public boolean verifyArchiveUnarchiveButtonsPresent(String buttonType) {
+    public boolean isArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
-        if (buttonType.contains("Active") && ARCHIVED_BUTTON.first().isVisible()) {
+        if (buttonType.contains("Active") && ENABLED_ARCHIVED_BUTTON.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         } else if (buttonType.contains("Archived") && UNARCHIVED_BUTTON.first().isVisible()) {
@@ -150,61 +229,74 @@ public class CreateCreatives {
         return flag;
     }
 
-    public boolean clickArchiveUnarchiveButtons() {
-        boolean flag = false;
-        if (ARCHIVED_BUTTON.first().isVisible()) {
-            ARCHIVED_BUTTON.first().click();
-            if (ARCHIVE_DIALOG.isVisible()) ARCHIVE_BUTTON.click();
-            waitUtility.waitUntilPreLoaderHidden();
-            flag = true;
-        } else if (UNARCHIVED_BUTTON.first().isVisible()) {
-            UNARCHIVED_BUTTON.first().click();
-            waitUtility.waitUntilPreLoaderHidden();
-            flag = true;
+    public String clickArchiveButton() {
+        String text = "";
+        if(CREATIVE_NAME_LIST.first().isVisible()){
+            text = CREATIVE_NAME_LIST.first().textContent().trim();
         }
-        return flag;
+        Locator archiveXpath = page.locator(String.format("//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='archive']", text));
+        archiveXpath.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        return text;
+    }
+
+    public String clickUnarchiveButton() {
+        String text = "";
+        if(CREATIVE_NAME_LIST.first().isVisible()){
+            text = CREATIVE_NAME_LIST.first().textContent().trim();
+        }
+        Locator archiveXpath = page.locator(String.format("//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='unarchive']", text));
+        archiveXpath.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        return text;
     }
 
     public boolean verifyFilterOptions(String key, List<String> values) {
         boolean flag = false;
+        Locator keyLocator;
         switch (key) {
             case "Advertiser":
                 selectDropdownAndFill(SELECT_ADVERTISER, values);
                 for (String value : values) {
-                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
+                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
                 break;
             case "Associated Campaigns":
                 selectDropdownAndFill(SELECT_CAMPAIGN, values);
                 for (String value : values) {
-                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
+                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
                 break;
             case "Creative Status":
-                selectDropdownAndFill(APPROVAL_STATUS, values);
+                selectDropdownAndFill(CREATIVE_STATUS, values);
                 for (String value : values) {
-                    flag = page.locator(String.format("//span[contains(text(),'%s')]", value)).first().isVisible();
+                    keyLocator = page.locator(String.format("//div[contains(@class,'status-label')]//span[contains(text(),'%s')]", value));
+                    flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
                 break;
             case "Ad Sizes":
                 selectDropdownAndFill(SELECT_AD_SIZE, values);
                 for (String value : values) {
-                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
+                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
                 break;
             case "Creative Type":
                 selectDropdownAndFill(SELECT_CREATIVE_TYPE, values);
-                flag = CREATIVE_TYPE_ICON.first().isVisible();
+                flag = isContentCountMatching(CREATIVE_TYPE_ICON);
                 clickClearAllButton();
                 break;
             case "CreatedBy":
                 selectDropdownAndFill(CREATED_BY, values);
                 for (String value : values) {
-                    flag = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value)).first().isVisible();
+                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
                 break;
@@ -222,45 +314,131 @@ public class CreateCreatives {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public boolean verifySortOptions(List<String> sortOptionsList) {
-        boolean flag = false;
-        for (String sortOption : sortOptionsList) {
-            SORT_DROPDOWN.click();
-            String[] options = sortOption.split("-");
-            if (options.length < 2) continue;
-            String direction = options[1].equalsIgnoreCase("Asc") ? "up" : "down";
-            page.locator(String.format("//span[contains(text(),'%s')]/following-sibling::i[contains(@class,'%s')]", options[0], direction)).click();
-            waitUtility.waitUntilPreLoaderHidden();
-            if ((direction.equals("up") && SORT_BY_UP.isVisible()) || (direction.equals("down") && SORT_BY_DOWN.isVisible())) {
-                flag = true;
+    public boolean checkSortingOrder(String sortBy) {
+        String[] parts = sortBy.split("-");
+        String column = parts[0].trim();
+        String order = parts.length > 1 ? parts[1].trim() : "";
+        boolean ascending = order.equalsIgnoreCase("Asc");
+        SORT_DROPDOWN.click();
+        return switch (column) {
+            case "Name" -> {
+                if (ascending)
+                    SORT_BY_NAME_ASC.click();
+                else
+                    SORT_BY_NAME_DESC.click();
+                waitUtility.waitUntilPreLoaderHidden();
+                yield isColumnOrderCorrect(CREATIVE_NAME_LIST, column, ascending);
             }
-        }
-        return flag;
+            case "ID" -> {
+                if (ascending)
+                    SORT_BY_ID_ASC.click();
+                else
+                    SORT_BY_ID_DESC.click();
+                waitUtility.waitUntilPreLoaderHidden();
+                yield isColumnOrderCorrect(CREATIVE_ID_LIST, column, ascending);
+            }
+            case "Last Updated" -> {
+                if (ascending)
+                    SORT_BY_LAST_UPDATED_ASC.click();
+                else
+                    SORT_BY_LAST_UPDATED_DESC.click();
+                waitUtility.waitUntilPreLoaderHidden();
+                yield isColumnOrderCorrect(CREATIVE_LAST_UPDATED_LIST, column, ascending);
+            }
+            default -> false;
+        };
     }
 
-    public boolean searchByValues(List<String> searchValuesList) {
-        boolean flag = false;
-        for (String searchValue : searchValuesList) {
-            searchCreative(searchValue);
-            flag = DATA_CONTENT_PANEL.first().isVisible();
+    public boolean isColumnOrderCorrect(Locator creativeListType, String columnType, boolean ascending) {
+        List<String> values = creativeListType.allTextContents().stream().map(text -> {
+                    text = text.trim();
+                    if (columnType.equals("Name") && text.contains("|")) {
+                        String[] parts = text.split("\\|");
+                        if (parts.length > 5) {
+                            return parts[5].trim();
+                        }
+                    }
+                    return text;
+                }).toList();
+
+        for (int i = 0; i < values.size() - 1; i++) {
+            boolean valid = false;
+            switch (columnType) {
+                case "Name":
+                    int nameCompare = values.get(i).compareToIgnoreCase(values.get(i + 1));
+                    valid = ascending ? nameCompare <= 0 : nameCompare >= 0;
+                    break;
+                case "ID":
+                    long currentId = Long.parseLong(values.get(i).replaceAll("\\D+", ""));
+                    long nextId = Long.parseLong(values.get(i + 1).replaceAll("\\D+", ""));
+                    valid = ascending ? currentId <= nextId : currentId >= nextId;
+                    break;
+                case "Last Updated":
+                    DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("M/d/yyyy h:mm").optionalStart().appendLiteral(' ').optionalEnd().appendPattern("a").toFormatter();
+                    LocalDateTime currentDateTime = LocalDateTime.parse(values.get(i).toUpperCase(), formatter);
+                    LocalDateTime nextDateTime = LocalDateTime.parse(values.get(i + 1).toUpperCase(), formatter);
+                    valid = ascending ? !currentDateTime.isAfter(nextDateTime) : !currentDateTime.isBefore(nextDateTime);
+                    break;
+            }
+            if (!valid) return false;
         }
-        return flag;
+        return true;
     }
+
+    public boolean checkSearchedValue(String searchValue) {
+        Locator[] locators = { CREATIVE_NAME_LIST, CREATIVE_ID_LIST, CREATIVE_AD_SIZE_LIST, CREATIVE_SOURCE_LIST};
+
+        for (Locator locator : locators) {
+            if (locator.first().isVisible()) {
+                for (int i = 0; i < locator.count(); i++) {
+                    String text = locator.nth(i).textContent().trim();
+                    if (text.contains(searchValue)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     public void searchCreative(String searchValue) {
         SEARCH_BOX.fill(searchValue);
         page.keyboard().press("Enter");
         waitUtility.waitUntilPreLoaderHidden();
+        if(CREATIVE_NAME_LIST.last().isVisible())
+            waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
-    public String copyCreative() {
-        COPY_ICON.first().click();
+    public void clearSearchBox() {
+        SEARCH_BOX.clear();
+        page.keyboard().press("Enter");
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+    }
+
+    public void clickCopyCreative(String creativeName) {
+        Locator copyLocator = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div//span[@title='copy']", creativeName));
+        copyLocator.first().click();
+        page.waitForTimeout(2000);
         waitUtility.waitUntilSpinnerHidden();
-        waitUtility.waitForLocatorVisible(CREATIVE_HEADER);
-        String creativeName = "Copy_Creative_" + CommonUtils.timeStampCalculation();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME);
+    }
+
+    public void clickSearchedCreative(String creativeName) {
+        for(int i=0; i<CREATIVE_NAME_LIST.count(); i++) {
+            if (CREATIVE_NAME_LIST.nth(i).textContent().contains(creativeName)) {
+                CREATIVE_NAME_LIST.nth(i).click();
+                page.waitForTimeout(2000);
+                break;
+            }
+        }
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME);
+    }
+
+    public void enterCreativeName(String creativeName) {
         CREATIVE_NAME.fill(creativeName);
-        OK_BUTTON.click();
-        return SUCCESS_ALERT.innerText().trim();
     }
 
     public void clickNewCreativeButton() {
@@ -297,7 +475,8 @@ public class CreateCreatives {
                 }
                 if (type.contains("Image")) {
                     CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("ImageFile"));
-                } else {
+                }
+                if (type.equals("Html")) {
                     CREATIVE_HTML_CODE.fill(attributeMap.get("HTMLCode"));
                     MACROS_CHECKBOX.click();
                 }
@@ -311,17 +490,30 @@ public class CreateCreatives {
 
             case "Upload", "Audio URL", "VAST URL", "VAST XML", "Video URL":
                 page.locator(String.format("//button[text()='%s']", type)).click();
-                if (type.contains("Upload"))
+                if (type.contains("Upload")) {
                     CommonUtils.uploadFile(page, 0, imageTextLocator, attributeMap.get("FileName"));
+                    if (UPLOADING_PROGRESS_BAR.isVisible()) {
+                        waitUtility.waitForLocatorHidden(UPLOADING_PROGRESS_BAR);
+                        waitUtility.waitUntilSpinnerHidden();
+                        waitUtility.waitForLocatorVisible(UPLOAD_DELETE_ICON);
+                    } else {
+                        waitUtility.waitUntilSpinnerHidden();
+                    }
+                }
                 else if (type.contains("Audio URL") || type.contains("Video URL")) URL.fill(attributeMap.get("URL"));
                 else if (type.contains("VAST URL")) URL.fill(attributeMap.get("VASTURL"));
                 else VAST_XML_TEXTAREA.fill(attributeMap.get("VASTXML"));
-                DURATION.fill(attributeMap.get("Durations"));
-                if (WIDTH.isVisible() && HEIGHT.isVisible() && CLICK_THROUGH_URL.isVisible()) {
-                    WIDTH.fill(attributeMap.get("Width"));
-                    HEIGHT.fill(attributeMap.get("Height"));
-                    CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
+                if (type.contains("Audio URL") || type.contains("Video URL") || type.contains("VAST URL") || type.contains("VAST XML")) {
+                    if(CREATIVE_WIDTH_TYPE.first().isVisible()) {
+                        CommonUtils.selectAndClickElement(CREATIVE_TYPE_ICON, Collections.singletonList(attributeMap.get("Type")));
+                    }
+                    DURATION.fill(attributeMap.get("Durations"));
+                    if (WIDTH.isVisible() && HEIGHT.isVisible()) {
+                        WIDTH.fill(attributeMap.get("Width"));
+                        HEIGHT.fill(attributeMap.get("Height"));
+                    }
                 }
+                if (CLICK_THROUGH_URL.isVisible()) CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 DOMAIN_LANDING.fill(attributeMap.get("AdvertiserDomain"));
                 IAB_CATEGORY.fill(attributeMap.get("IAB"));
                 IAB_CATEGORY_VALUE.first().click();
@@ -357,19 +549,337 @@ public class CreateCreatives {
 
     public String saveCreative() {
         OK_BUTTON.click();
-        return SUCCESS_ALERT.innerText().trim();
+        String text = SUCCESS_ALERT.innerText().trim();
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+        return text;
     }
 
-    public List<String> fetchCreatives() {
-        String creativeName = CREATIVE_NAME_TEXT.innerText().replaceAll("\\b(Creative|created)\\b\\p{Punct}?", "").trim().replaceAll(" +", " ");
-        creativesList.add(creativeName);
-        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
-        return creativesList;
+    public String fetchCreativeName(String message) {
+        return message.replaceAll("\\b(Creative|created)\\b\\p{Punct}?", "").trim().replaceAll(" +", " ");
     }
 
     public boolean verifyCreativesInLibrary(String name) {
         searchCreative(name);
         Locator locator = page.locator(String.format("//div[@title='%s']", name));
         return locator.innerText().equalsIgnoreCase(name);
+    }
+
+    public String fetchRecordsNumberAfterSearch(){
+        return page.locator("//div[contains(@class,'total-record')]").textContent().trim();
+    }
+
+    public boolean showsActiveCreativesWhenActiveClicked() {
+        return isContentCountMatching(ARCHIVED_BUTTON);
+    }
+
+    public boolean fetchCreativeCount() {
+        return isContentCountMatching(CREATIVE_NAME_LIST);
+    }
+
+    public boolean isContentCountMatching(Locator locator) {
+        int expectedCount = ITEMS_PER_PAGE.count();
+        if (locator.count() != expectedCount) {
+            return false;
+        }
+        if (expectedCount >= Integer.parseInt(ITEMS_PER_PAGE_DROPDOWN.textContent().trim()) && PAGINATION_NEXT_BUTTON.isVisible()) {
+            navigateToNextCreativePage();
+            expectedCount = ITEMS_PER_PAGE.count();
+            return locator.count() == expectedCount;
+        }
+        return true;
+    }
+
+    public void selectPaginationItemsPerPage(String itemsCount) {
+        ITEMS_PER_PAGE_DROPDOWN.click();
+        Locator itemsLocator = ITEMS_PER_PAGE_DROPDOWN.locator(String.format("xpath=following-sibling::div//div[normalize-space(text())='%s']", itemsCount));
+        itemsLocator.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+    }
+
+    public void navigateToNextCreativePage(){
+        if(PAGINATION_NEXT_BUTTON.locator("xpath=./parent::button").getAttribute("class").contains("disabledButton")){
+            return;
+        }
+        PAGINATION_NEXT_BUTTON.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(page.locator("//td[contains(normalize-space(.), 'of')]"));
+    }
+
+    public void navigateToFirstCreativePage(){
+        Locator pageLocator = page.locator("//td[contains(normalize-space(.), 'of')]");
+        while(!pageLocator.textContent().trim().contains("1 of")){
+            PAGINATION_PREVIOUS_BUTTON.click();
+            waitUtility.waitUntilPreLoaderHidden();
+        }
+    }
+
+    public boolean showsArchivedCreativesWhenArchivedClicked() {
+        return isContentCountMatching(UNARCHIVED_BUTTON);
+    }
+
+    public List<String> fetchCreativeDetails() {
+        List<String> creativeDetails = new ArrayList<>();
+        creativeDetails.add(ADVERTISER_DROPDOWN.locator("xpath = ./following-sibling::span").textContent().trim());
+        if(CREATIVE_NAME.isVisible())
+            creativeDetails.add(CREATIVE_NAME.inputValue().trim());
+        for(int i=0; i<APPROVAL_STATUS_BUTTON.count(); i++){
+            if(APPROVAL_STATUS_BUTTON.nth(i).getAttribute("class").contains("active")){
+                creativeDetails.add(APPROVAL_STATUS_BUTTON.nth(i).textContent().trim());
+                break;
+            }
+        }
+        creativeDetails.add(ADVERTISER_DSA.inputValue().trim());
+        creativeDetails.add(FINANCER.inputValue().trim());
+        for(int i=0; i<CREATIVE_TYPE.count(); i++){
+            if(CREATIVE_TYPE.locator("xpath = ./parent::div").nth(i).getAttribute("class").contains("active")){
+                creativeDetails.add(CREATIVE_TYPE.nth(i).textContent().trim());
+                break;
+            }
+        }
+        for(int i=0; i<CREATIVE_FREQUENCY_OPTIONS.count(); i++){
+            if(CREATIVE_FREQUENCY_OPTIONS.nth(i).getAttribute("class").contains("active")){
+                creativeDetails.add(CREATIVE_FREQUENCY_OPTIONS.nth(i).textContent().trim());
+                break;
+            }
+        }
+        if(SELECTED_AD_SIZE.isVisible())
+            creativeDetails.add(SELECTED_AD_SIZE.textContent().trim());
+        if(CLICK_THROUGH_URL.isVisible() && CLICK_THROUGH_URL.isEnabled())
+            creativeDetails.add(CLICK_THROUGH_URL.inputValue().trim());
+        if(DOMAIN_LANDING.isVisible())
+            creativeDetails.add(DOMAIN_LANDING.inputValue().trim());
+        if(DURATION.isVisible()) {
+            String duration = DURATION.inputValue();
+            creativeDetails.add((duration == null || duration.trim().isEmpty()) ? "0" : duration.trim());
+        }
+        if(SELECTED_IAB_CATEGORY.first().isVisible())
+            creativeDetails.add(SELECTED_IAB_CATEGORY.first().textContent().trim());
+        if(HEIGHT.isVisible() && WIDTH.isVisible()) {
+            creativeDetails.add(HEIGHT.inputValue().trim());
+            creativeDetails.add(WIDTH.inputValue().trim());
+        }
+        if(HEADLINE.isVisible())
+            creativeDetails.add(HEADLINE.inputValue().trim());
+        if(SPONSORED_BY.isVisible())
+            creativeDetails.add(SPONSORED_BY.inputValue().trim());
+        if(DESCRIPTION.isVisible())
+            creativeDetails.add(DESCRIPTION.inputValue().trim());
+        if(PRODUCT_DESCRIPTION.isVisible())
+            creativeDetails.add(PRODUCT_DESCRIPTION.inputValue().trim());
+        if(SELECTED_AD_CHOICES_ICON.isVisible())
+            creativeDetails.add(SELECTED_AD_CHOICES_ICON.textContent().trim());
+        if(DISPLAY_URL.isVisible())
+            creativeDetails.add(DISPLAY_URL.inputValue().trim());
+        return creativeDetails;
+    }
+
+    public void clickCancelButton() {
+        CANCEL_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CREATIVE_PAGE_TITLE);
+    }
+
+    public List<String> fetchFilterValues(String key) {
+        return switch (key) {
+            case "Creative Status" -> {
+                CREATIVE_STATUS.click();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
+                        .map(String::trim)
+                        .toList();
+                page.keyboard().press("Escape");
+                yield values;
+            }
+            case "Ad Sizes" -> {
+                SELECT_AD_SIZE.click();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
+                        .map(String::trim)
+                        .toList();
+                page.keyboard().press("Escape");
+                yield values;
+            }
+            case "Creative Type" -> {
+                SELECT_CREATIVE_TYPE.click();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
+                        .map(String::trim)
+                        .toList();
+                page.keyboard().press("Escape");
+                yield values;
+            }
+            default -> List.of();
+        };
+    }
+
+    public String selectCheckboxWithArchiveButton(){
+        return clickCheckboxAndFetchCreativeName(ENABLED_ARCHIVED_BUTTON);
+    }
+
+    public String selectCheckboxWithCreativeStatusLabel(){
+        return clickCheckboxAndFetchCreativeName(CREATIVE_STATUS_LABEL);
+    }
+
+    public String clickCreativeTypeIconAndFetchCreativeName() {
+        String text = "";
+        checkIfCreativeIsPresent(CREATIVE_TYPE_ICON);
+        for (int i = 0; i < CREATIVE_TYPE_ICON.count(); i++) {
+            if (CREATIVE_TYPE_ICON.nth(i).isVisible()) {
+                final int index = i;
+                text = CREATIVE_TYPE_ICON.nth(i).locator("xpath=.//following-sibling::div//div[contains(@class,'name-section-truncate')]").textContent().trim();
+                newTab = DriverFactory.getContext().waitForPage(() -> {
+                    CREATIVE_TYPE_ICON.nth(index).click();
+                });
+                newTab.waitForLoadState();
+                newTab.bringToFront();
+                DriverFactory.threadLocalDriver.set(newTab);
+                return text;
+            }
+        }
+        return text;
+    }
+
+    public void clickPreviewLinkFromCreativeDetailsPage(){
+        newTab = DriverFactory.getContext().waitForPage(PREVIEW_LINK::click);
+        newTab.waitForLoadState();
+        newTab.bringToFront();
+        DriverFactory.threadLocalDriver.set(newTab);
+    }
+
+    public void checkIfCreativeIsPresent(Locator locator){
+        if(locator.count() == 0) {
+            PAGINATION_NEXT_BUTTON.click();
+            waitUtility.waitUntilPreLoaderHidden();
+            waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+        }
+    }
+
+    public String clickCheckboxAndFetchCreativeName(Locator locator){
+        checkIfCreativeIsPresent(locator);
+        for(int i = 0; i< locator.count(); i++){
+            if(locator.nth(i).isVisible()){
+                Locator checkBoxLocator = locator.nth(i).locator("xpath=.//ancestor::div[contains(@class,'content-section')]/preceding-sibling::div//sui-checkbox");
+                String checkboxClass = checkBoxLocator.getAttribute("class");
+                if (checkboxClass != null && checkboxClass.contains("checked")) {
+                    continue;
+                }
+                checkBoxLocator.click();
+                return checkBoxLocator.locator("xpath=parent::div/following-sibling::div//div[contains(@class,'name-section-truncate')]").textContent().trim();
+            }
+        }
+        return "";
+    }
+
+    public void clickBulkActionsButton() {
+        BULK_ACTIONS_BUTTON.click();
+    }
+
+    public void selectBulkActionsOption(String bulkAssign) {
+        if(bulkAssign.contains("Bulk Assign") || bulkAssign.contains("Bulk Edit"))
+            BULK_ACTIONS_BUTTON.locator("xpath=//div//a//div[normalize-space(.)='" + bulkAssign + "']").click();
+        else
+            BULK_ACTIONS_BUTTON.locator("xpath=//div//a[normalize-space(.)='" + bulkAssign + "']").click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String assignCampaignToCreative() {
+        waitUtility.waitForLocatorVisible(BULK_ASSIGN_CREATIVE_HEADER);
+        int count = BULK_ASSIGN_CHECKBOX.count();
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            indices.add(i);
+        }
+        Collections.shuffle(indices);
+        int selectCount = Math.min(10, count);
+        for(int i = 0; i< selectCount; i++){
+            if(BULK_ASSIGN_CHECKBOX.nth(i).isVisible()){
+                BULK_ASSIGN_CHECKBOX.nth(i).click();
+            }
+        }
+        OK_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        String text = SUCCESS_ALERT.innerText().trim();
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+        return text;
+    }
+
+    public String fetchTooltipTextForAssignedCampaigns() {
+        DISABLED_ARCHIVED_BUTTON.first().hover();
+        return FETCH_TOOLTIP_TEXT_FOR_ASSIGNED_CAMPAIGNS.textContent().trim();
+    }
+
+    public String deleteCreative() {
+        String text = "";
+        if(DELETE_ICON.getAttribute("class").contains("disabled"))
+            text = "Delete icon is disabled, cannot delete the creative.";
+        else{
+            DELETE_ICON.click();
+            waitUtility.waitForLocatorVisible(REMOVAL_CONFIRMATION_POP_UP);
+            text = REMOVAL_CONFIRMATION_TEXT.textContent().trim();
+            REMOVE_BUTTON.click();
+            waitUtility.waitUntilSpinnerHidden();
+        }
+        return text;
+    }
+
+    public String fetchNoCreativeFoundMessage() {
+        return NO_CREATIVE_FOUND_MESSAGE.textContent().trim();
+    }
+
+    public void selectCreativeStatus(List<String> statusList){
+        selectDropdownAndFill(CREATIVE_STATUS, statusList);
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+    }
+
+    public boolean performBulkApproval(){
+        boolean flag = false;
+        waitUtility.waitForLocatorVisible(APPROVE_ALL_BUTTON);
+        APPROVE_ALL_BUTTON.click();
+        for(int i=0; i<APPROVED_BUTTON.count(); i++) {
+            if (APPROVED_BUTTON.nth(i).getAttribute("class").contains("active"))
+                flag = true;
+        }
+        OK_BUTTON.click();
+        page.waitForTimeout(2000);
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+        return flag;
+    }
+
+    public String fetchCreativeStatusLabel(){
+        return CREATIVE_STATUS_LABEL.textContent().trim();
+    }
+
+    public String isCreativePreviewTabDisplayed() {
+        waitUtility.waitForLocatorVisible(newTab.locator("xpath=//div[@class='pagetitle']"));
+        return newTab.locator("xpath=//div[@class='pagetitle']").textContent().trim();
+    }
+
+    public String fetchCreativeNameFromPreviewTab() {
+        return newTab.locator("xpath=//span[text()='Creative Name:']/parent::div").textContent().trim();
+    }
+
+    public void closeCreativePreviewTab() {
+        newTab.close();
+    }
+
+    public List<String> fetchCreativeDetailsFromCreativeTile() {
+        List<String> creativeDetails = new ArrayList<>();
+        creativeDetails.add(CREATIVE_NAME_LIST.textContent().trim());
+        creativeDetails.add(DOMAIN_LANDING_FROM_CREATIVE_TILE.textContent().trim());
+        String size = ADSIZE_FROM_CREATIVE_TILE.textContent().replace("px", "").trim();
+        creativeDetails.add(size);
+        creativeDetails.add(CREATIVE_STATUS_FROM_CREATIVE_TILE.textContent().trim());
+        return creativeDetails;
+    }
+
+    public String fetchCreatedByFromCreativeTile(){
+        return CREATED_BY_FROM_CREATIVE_TILE.textContent().trim();
+    }
+
+    public String fetchSourceFromCreativeTile(){
+        return SOURCE_FROM_CREATIVE_TILE.textContent().trim();
+    }
+
+    public String fetchLastUpdatedTimeFromCreativeTile(){
+        return LAST_UPDATED_FROM_CREATIVE_TILE.textContent().trim();
     }
 }

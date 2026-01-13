@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CommonUtils {
     public static int startDay = 0;
@@ -111,10 +112,34 @@ public class CommonUtils {
     }
 
     public static void uploadFile(Page page, int inputIndex, String locatorValue, String fileName) {
-        Path basePath = Paths.get("src/main/resources", fileName);
+        Path basePath  = Paths.get("src/main/resources", fileName);
         if (!Files.exists(basePath)) {
             basePath = Paths.get("src/main/resources/uploadfiles", fileName);
+            if(!Files.exists(basePath)){
+                basePath = Paths.get(System.getProperty("user.home"), "Downloads", fileName);
+            }
         }
+
+        Locator fileInputs = page.locator("input[type='file']");
+        int fileInputCount = fileInputs.count();
+        Locator targetInput = null;
+        if (fileInputCount == 1) {
+            targetInput = fileInputs.first();
+        } else if (inputIndex < fileInputCount) {
+            targetInput = fileInputs.nth(inputIndex);
+        }
+        ElementHandle fileInputHandle = targetInput.elementHandle();
+        targetInput.setInputFiles(basePath);
+        page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
+        if (locatorValue.contains("%s")) {
+            page.waitForSelector(String.format(locatorValue, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        } else {
+            page.waitForSelector(locatorValue, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+        }
+    }
+
+    public static void uploadFileFromDownloads(Page page, int inputIndex, String locatorValue, String fileName) {
+        Path basePath = Paths.get(System.getProperty("user.home"), "Downloads", fileName);
         Locator fileInputs = page.locator("input[type='file']");
         int fileInputCount = fileInputs.count();
         Locator targetInput = null;
@@ -136,6 +161,14 @@ public class CommonUtils {
     public static boolean isDownloadedFileAvailable(Path filePath, String expectedExtension) {
         File file = filePath.toFile();
         return file.exists() && file.isFile() && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
+    }
+
+    public static Path getMostRecentFileFromDownloads() throws IOException {
+        Path downloadsDir = Paths.get(System.getProperty("user.home"), "Downloads");
+        try (Stream<Path> files = Files.list(downloadsDir)) {
+            Optional<Path> latestFile = files.filter(Files::isRegularFile).max(Comparator.comparingLong(p -> p.toFile().lastModified()));
+            return latestFile.orElse(null);
+        }
     }
 
     public static void hoverAndClick(Page page, BoundingBox box, Locator tooltipLocator) {
