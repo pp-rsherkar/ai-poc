@@ -1517,7 +1517,6 @@ public class LifeSteps {
 
             createCreatives.fillAttributes(type, attributeMap);
             List<String> creativeDetailsBeforeSave = createCreatives.fetchCreativeDetails();
-            System.out.println(creativeDetailsBeforeSave);
             String actualMessage = createCreatives.saveCreative();
             Assert.assertTrue("No message is displayed", actualMessage.contains("BulkUpload created successfully.") || actualMessage.contains("Creative " + newCreativeName + " created."));
 
@@ -1526,7 +1525,6 @@ public class LifeSteps {
             createCreatives.searchCreative(creativeNameFetched);
 
             List<String> creativeDetailsFromCreativeTile = createCreatives.fetchCreativeDetailsFromCreativeTile();
-            System.out.println(creativeDetailsFromCreativeTile);
             for(String creativeDetail : creativeDetailsFromCreativeTile){
                 if (creativeDetail == null || creativeDetail.trim().equalsIgnoreCase("N/A")) {
                     continue;
