@@ -428,11 +428,12 @@ public class BulkCreativeUpload {
                 selectApprovalStatus(attributeMap.get("Status"));
                 clickPreviewButton();
                 updateCreativeName(updatedCreativeName);
+                checkIfValidationErrorsExist();
                 clickOKButton();
                 clickUploadButton();
                 break;
             case "HTML", "Video":
-                selectFileTypeAndUploadFile(attributeMap.get("FileType"), String.valueOf(Collections.singletonList(attributeMap.get("FileName"))));
+                selectFileTypeAndUploadFile(attributeMap.get("FileType"), attributeMap.get("FileName"));
                 if (createCreatives.CLICK_THROUGH_URL.isVisible())
                     enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
@@ -440,6 +441,7 @@ public class BulkCreativeUpload {
                 HTML_CREATIVE_NAME.fill(updatedCreativeName);
                 if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
                 clickPreviewButton();
+                checkIfValidationErrorsExist();
                 clickUploadButton();
                 clickOKButton();
                 break;
