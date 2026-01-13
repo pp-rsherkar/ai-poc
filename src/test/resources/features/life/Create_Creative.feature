@@ -63,11 +63,11 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     When User selects pagination values "<PAGINATION_VALUE>" from the dropdown
     And Verify pagination is working properly on the Creative Library page
     Examples:
-    | PAGINATION_VALUE |
-    | 10               |
-    | 20               |
-    | 50               |
-    | 100              |
+      | PAGINATION_VALUE |
+      | 10               |
+      | 20               |
+      | 50               |
+      | 100              |
 
   @regression
   Scenario: Verify deletion on creatives associated with a Campaign and on creatives that are not associated with any Campaign
@@ -80,11 +80,11 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   Scenario: Verify Bulk actions on creatives not associated with any Campaign
     When User performs "Bulk Archive" action using "Archive Creatives" option on multiple creatives - "2" and verifies the selected creatives are moved to "Archived" tab
     And User performs Bulk approve action using "Bulk Approve" option on multiple creatives - "3" with status other than Approved and verifies the selected creatives are marked as "Approved"
-    | PendingApproval, Denied |
+      | PendingApproval, Denied |
     And User performs "Bulk Unarchive" action using "Unarchive Creatives" option on multiple creatives - "3" and verifies the selected creatives are moved to "Active" tab
 
   @regression
-   Scenario: Verify Preview option on a creative
+  Scenario: Verify Preview option on a creative
     When User clicks on Preview icon for a creative from Creative Library page
     Then Verify Creative Preview tab is displayed with correct creative name
     And Verify user is able to close the Creative Preview tab
@@ -104,32 +104,32 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     # Audio
     And User creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                             |
-      | Upload       | FileName:Creative_Audio.mp3, AdvertiserDomain:pulsepoint.com, IAB:Profane        |
+      | Upload       | FileName:Creative_Audio.mp3, AdvertiserDomain:pulsepoint.com, IAB:Profane                      |
       | Audio URL    | URL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane     |
       | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
       | VAST XML     | VASTXML:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
     # Video
     And User creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                    |
-      | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane                               |
-      | Video URL    | Type:MP4, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane     |
+      | CreativeType | CreativeAttributes                                                                                                                                                        |
+      | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane                                                                 |
+      | Video URL    | Type:MP4, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane               |
       | VAST URL     | Type:STANDARD VAST, VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane |
-      | VAST XML     | Type:VPAID, VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane |
+      | VAST XML     | Type:VPAID, VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane         |
     # Search Extension
     And User creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                           |
       | Search       | Size:300x600, Headline:Test Automation Headline, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ClickThroughURL:pulsepoint.com, IAB:Profane |
     # Native Display
     And User creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                                  |
+      | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                      |
       | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |
     # Native Video
     And User creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                               |
-      | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com                                 |
-      | Video URL    | Type:FLV, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com     |
+      | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                                                   |
+      | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com                                                                 |
+      | Video URL    | Type:FLV, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com               |
       | VAST URL     | Type:STANDARD VAST, VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com |
-      | VAST XML     | Type:VPAID, VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com |
+      | VAST XML     | Type:VPAID, VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com         |
     Then Verify the newly created creative is displayed in the Creative Library page
     Examples:
       | ADVERTISER     | CREATIVE_NAME | ADVERTISER_DSA | FINANCER      |
@@ -262,5 +262,5 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify that the user is able to browse the computer, select the "<FILE_TYPE>" file type, upload the "<FILE_NAME>" file, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
     And Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation
     Examples:
-      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | FILE_TYPE  | FILE_NAME                 |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
+      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | FILE_TYPE | FILE_NAME                 |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | DCM File  | DCM_VIDEO_BulkUpload.xlsx |
