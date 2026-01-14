@@ -76,7 +76,7 @@ Feature: LIFE Regression - Create a Campaign
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
       | CONTEXTUAL         | Health Pages,IAB Categories,Keywords,Language,Endemics                                                                                                                                                                            |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                    |
-      | MEDIA SUPPLY       | Authentic Brand Suitability,Brand Safety & Suitability,Browser,Curated Markets,Custom Targeting Bundle,Device,Domains/Apps,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                     |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability      |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     Examples:
       | ADVERTISER             | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          |
@@ -106,7 +106,7 @@ Feature: LIFE Regression - Create a Campaign
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
       | CONTEXTUAL         | Health Pages,IAB Categories,Keywords,Language,Endemics                                                                                                                                                                            |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                    |
-      | MEDIA SUPPLY       | Authentic Brand Suitability,Brand Safety & Suitability,Browser,Curated Markets,Custom Targeting Bundle,Device,Domains/Apps,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                     |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability                     |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
       | Behavioral Segment          | AutoSegment18577650                                     |
