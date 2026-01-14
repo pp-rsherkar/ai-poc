@@ -285,7 +285,7 @@ public class PMP {
     }
 
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
-        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]/div", dealName);
+        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]//select", dealName);
         page.locator(xpath).first().scrollIntoViewIfNeeded();
         DEAL_TYPE_COLUMN_NAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
         page.locator(xpath).first().click();
