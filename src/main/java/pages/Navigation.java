@@ -31,8 +31,8 @@ public class Navigation {
     public final Locator CREATIVE_LIBRARY_ICON;
     public final Locator MENU_ANGLE;
     public final Locator PULSEPOINT_LOGO;
-    WaitUtility waitUtility;
-    CampaignDashboard campaignDashboard;
+    private WaitUtility waitUtility;
+    private CampaignDashboard campaignDashboard;
 
     public Navigation(Page page) {
         this.page = page;
