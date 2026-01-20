@@ -141,7 +141,7 @@ public class StudioSteps {
 
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
-        Assert.assertEquals("", "Genome Studio", workspaceCreation.studioDashboard());
+        Assert.assertEquals("", "Studio", workspaceCreation.studioDashboard());
         workspaceCreation.verifyStudioWorkspaceFrame();
         workspaceCreation.createStudioWorkspace();
     }

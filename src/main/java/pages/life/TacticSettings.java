@@ -91,7 +91,7 @@ public class TacticSettings {
         this.RULE_POSTAL_CODES_TEXTBOX = page.locator("//div[@id='targetedItemsTA']");
         this.RULE_DEVICE_BLOCK = page.locator("//sui-radio-button[contains(@class,'ui radio checkbox')]//label[text()='Block Selected']");
         this.RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
-        this.VERIFY_NPI = page.locator("//label[normalize-space(text())='NPI']");
+        this.VERIFY_NPI = page.locator("//label[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");

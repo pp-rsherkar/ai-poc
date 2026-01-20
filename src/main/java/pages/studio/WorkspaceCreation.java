@@ -42,7 +42,6 @@ public class WorkspaceCreation {
     private final Locator PAGINATION;
     private final Locator DEPENDENT_WORKSPACE_TEXT;
     private final Locator REMOVE_WORKSPACE_BUTTON;
-    private final Locator DELETE_WORKSPACE_ERROR_ALERT_BOX;
     private final Locator DELETE_WORKSPACE_ERROR_TEXT;
     private final Locator WORKSPACE_TYPE_LIST;
     WaitUtility waitUtility;
@@ -80,7 +79,6 @@ public class WorkspaceCreation {
         this.PAGINATION = WORKSPACE_FRAME.locator("//table[@data-tour-id='workspaces-table']/parent::div/following-sibling::div//span");
         this.DEPENDENT_WORKSPACE_TEXT = WORKSPACE_FRAME.locator("//div[contains(text(),'Checking for dependent workspaces...')]");
         this.REMOVE_WORKSPACE_BUTTON = WORKSPACE_FRAME.locator("//button/div[text()='Remove']");
-        this.DELETE_WORKSPACE_ERROR_ALERT_BOX = WORKSPACE_FRAME.locator("//h3[contains(text(),'Deleting workspace')]");
         this.DELETE_WORKSPACE_ERROR_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),\"Deletion blocked by Life. Message: This list can't be deleted\")]");
         this.WORKSPACE_TYPE_LIST = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace Type')]/following-sibling::div//p[not(@color)]");
     }
@@ -254,10 +252,10 @@ public class WorkspaceCreation {
     }
 
     public String verifyDeleteWorkspaceErrorMessage() {
-        waitUtility.waitForLocatorVisible(DELETE_WORKSPACE_ERROR_ALERT_BOX);
+        waitUtility.waitForLocatorVisible(REMOVAL_CONFIRMATION_POPUP);
         waitUtility.waitForLocatorVisible(DELETE_WORKSPACE_ERROR_TEXT);
         String errorText = DELETE_WORKSPACE_ERROR_TEXT.innerText();
-        waitUtility.waitForLocatorHidden(DELETE_WORKSPACE_ERROR_ALERT_BOX);
+        waitUtility.waitForLocatorHidden(REMOVAL_CONFIRMATION_POPUP);
         return errorText;
     }
 }

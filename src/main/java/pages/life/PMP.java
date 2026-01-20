@@ -182,16 +182,13 @@ public class PMP {
     }
 
     public boolean verifyAssignedDealsOnTactic(String dealName, String toggleButton) {
-        if (MORE_OPTION.isVisible()) MORE_OPTION.click();
-        if (toggleButton.equalsIgnoreCase("ON")) {
-            flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
-            flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
-        } else if (toggleButton.equalsIgnoreCase("OFF")) {
-            flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
-            flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
-        }
-        return flag1 && flag2;
-    }
+    if (MORE_OPTION.isVisible()) MORE_OPTION.click();
+    String ellipseXPath = String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName);
+    String textContentXPath = String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName);
+    flag1 = page.locator(ellipseXPath).first().isVisible();
+    flag2 = page.locator(textContentXPath).first().isVisible();
+    return flag1 && flag2;
+}
 
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
@@ -288,7 +285,7 @@ public class PMP {
     }
 
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
-        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]/div", dealName);
+        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]//select", dealName);
         page.locator(xpath).first().scrollIntoViewIfNeeded();
         DEAL_TYPE_COLUMN_NAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
         page.locator(xpath).first().click();
