@@ -20,7 +20,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "Keywords" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "Keyword" list
-    And Verify the count of items in the downloaded "Keyword" list
+    And Verify that the count of items in the downloaded "Keyword" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME          | UPLOAD_FILENAME1  |
       | Keyword_FileUpload | KeywordsFile1.csv |
@@ -36,7 +36,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "Domains" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "Domain" list
-    And Verify the count of items in the downloaded "Domain" list
+    And Verify that the count of items in the downloaded "Domain" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME         | UPLOAD_FILENAME1    |
       | Domain_FileUpload | DomainNameFile1.csv |
@@ -53,7 +53,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "AppBundle" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "App Bundle" list
-    And Verify the count of items in the downloaded "App Bundle" list
+    And Verify that the count of items in the downloaded "App Bundle" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME            | UPLOAD_FILENAME1   |
       | AppBundle_FileUpload | AppBundleFile1.csv |
@@ -68,7 +68,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the user is able to create a "IP Address" list through file upload
     And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
     And Verify that user is able to download the uploaded "IP" list
-    And Verify the count of items in the downloaded "IP" list
+    And Verify that the count of items in the downloaded "IP" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME            | UPLOAD_FILENAME1   |
       | IPAddress_FileUpload | IPAddressFile1.csv |
@@ -84,7 +84,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     When User makes list available in LIFE and saves the list
     Then Verify list gets saved successfully
     And Verify that user is able to download the uploaded "NPI" list
-    And Verify the count of items in the downloaded "NPI" list
+    And Verify that the count of items in the downloaded "NPI" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME  | ADVERTISER     | FILE_NAME          |
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |
@@ -103,7 +103,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And User retrieves all the entered data before saving the list "<TYPE>"
     And User saves the Smart List and verifies the successful creation of the list
     And Verify that user is able to download the "NPI" list
-    And Verify the count of items in the downloaded "NPI" list
+    And Verify that the count of items in the downloaded "NPI" list is the same as the item count displayed in the UI
     Examples:
       | ADVERTISER     | LIST_NAME | TYPE                   | MEDICAL_PROCEDURE                                 |
       | 01- Advertiser | SMART_NPI | Medical Procedure Code | Cardiac shunt imaging, Florbetaben f18 diagnostic |
@@ -113,7 +113,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And User navigates to NPI Lists page
     And User searches and selects the NPI List "<LIST_NAME>"
     And Verify that user is able to download the "NPI" list
-    And Verify the count of items in the downloaded "NPI" list
+    And Verify that the count of items in the downloaded "NPI" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME             |
       | AutoNPIAdmin192021372 |

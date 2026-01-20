@@ -3816,7 +3816,7 @@ public class LifeSteps {
         Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
     }
 
-    @And("Verify the count of items in the downloaded {string} list")
+    @And("Verify that the count of items in the downloaded {string} list is the same as the item count displayed in the UI")
     public void verifyTheCountOfItemsInTheDownloadedList(String listType) throws IOException {
         String header = null;
         int recordsCountFromFile = 0;
