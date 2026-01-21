@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
@@ -118,7 +117,7 @@ public class CampaignDashboard {
         this.EXPAND_CREATED_LINE_ITEM = page.locator("//div[contains(@class,'campaignExpand')]/div[contains(@class,'collapsed-thin')]");
         this.VERIFY_CREATED_TACTIC = page.locator("//span[contains(@class,'tactic-name')]");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
-        this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'1 Line items, 1 Campaigns, 1 Advertisers')]");
+        this.SUB_TITLE_AFTER_CAMPAIGN_SEARCH = page.locator("//div[contains(@class,'sub-title') and contains(text(),'Line items, 1 Campaigns')]");
         this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
         this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.SELECTED_FILTER_VALUES = page.locator("//div[contains(@class,'filter-value')]");

@@ -34,6 +34,8 @@ public class SharedList {
     private final Locator REPLACE_BUTTON;
     private final Locator DOWNLOAD_ICON;
     private final Locator ITEM_COUNT_UI;
+    private final Locator EMAIL_LIST_COUNT;
+    private final Locator EMAIL_REQUIRED_ERROR;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SharedList(Page page) {
@@ -48,7 +50,7 @@ public class SharedList {
         this.ERROR_MESSAGE_ALERT = page.locator("//div[@aria-label='Domain name is required' or @aria-label='AppBundle name is required' or @aria-label='Keyword is required' or @aria-label='IPAddress is required']");
         this.VALIDATION_ERROR = page.locator("//span[contains(text(),'validation error(s)')]");
         this.UPLOAD_SECTION = page.locator("//div[contains(@class,'fileUploadSection')] | //app-drop-file[contains(@class,'setup-drag')]");
-        this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' " + "or text()='Domains list created successfully' " + "or text()='Domains list updated successfully' " + "or text()='Domain deleted successfully' " + "or text()='AppBundle list created successfully' " + "or text()='AppBundle list updated successfully' " + "or text()='AppBundleGroup deleted successfully' " + "or text()='Keywords list created successfully' " + "or text()='Keywords list updated successfully' " + "or text()='Keyword deleted successfully' " + "or text()='IPAddress list created successfully' " + "or text()='IPAddresses list created successfully' " + "or text()='IPAddresses list updated successfully' " + "or text()='IPAddress deleted successfully']");
+        this.SUCCESS_ALERT = page.locator("//div[text()='Domain list created successfully' " + "or text()='Domains list created successfully' " + "or text()='Domains list updated successfully' " + "or text()='Domain deleted successfully' " + "or text()='AppBundle list created successfully' " + "or text()='AppBundle list updated successfully' " + "or text()='AppBundleGroup deleted successfully' " + "or text()='Keywords list created successfully' " + "or text()='Keywords list updated successfully' " + "or text()='Keyword deleted successfully' " + "or text()='IPAddress list created successfully' " + "or text()='IPAddresses list created successfully' " + "or text()='IPAddresses list updated successfully' " + "or text()='IPAddress deleted successfully' " + "or text()='Email list created successfully' " + "or text()='Email list updated successfully' " + "or text()='Email deleted successfully']");
         this.LIST_DELETE_ICON = page.locator("//div[@tooltip='Delete'] | //span[@tooltip='Delete']//img[contains(@src,'delete.svg')]");
         this.REMOVAL_CONFIRMATION_DIALOG = page.locator("//div[contains(text(),'Removal Confirmation')]");
         this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
@@ -58,6 +60,8 @@ public class SharedList {
         this.REPLACE_BUTTON = page.locator("//span[contains(text(),'Replace')]");
         this.DOWNLOAD_ICON = page.locator("//img[contains(@src,'export.svg')]");
         this.ITEM_COUNT_UI = page.locator("//div[contains(@class,'fileDetails')]/div");
+        this.EMAIL_LIST_COUNT = page.locator("//span[contains(@class,'total-emails')]");
+        this.EMAIL_REQUIRED_ERROR = page.locator("//div[@aria-label='Email is required']");
     }
 
     public void clickDomainListFromMenu(String pageName) {
@@ -287,5 +291,23 @@ public class SharedList {
     public String fetchSharedListCountFromUI() {
         String itemCountText = ITEM_COUNT_UI.first().innerText().trim();
         return itemCountText.replaceAll("[^0-9]", "");
+    }
+
+    public int fetchEmailCount() {
+        String text = EMAIL_LIST_COUNT.innerText().trim();
+        String numberOnly = text.replaceAll("[^0-9]", "");
+        return Integer.parseInt(numberOnly);
+    }
+
+    public boolean isEmailListDownloadIconVisible() {
+        return DOWNLOAD_ICON.isVisible();
+    }
+
+    public void saveEmailList() {
+        SAVE_BUTTON.click();
+        if (EMAIL_REQUIRED_ERROR.isVisible()) {
+            waitUtility.waitForLocatorDetached(EMAIL_REQUIRED_ERROR);
+            SAVE_BUTTON.click();
+        }
     }
 }
