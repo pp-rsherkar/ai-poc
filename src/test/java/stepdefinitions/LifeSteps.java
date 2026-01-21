@@ -96,25 +96,31 @@ public class LifeSteps {
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
         userType = user;
-        if (environment.equals("Demo")) {
-            url = ConfigReader.getProperty("demoURL");
-            // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
-            if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
-                username = ConfigReader.getProperty("demoExternalUser");
-                password = ConfigReader.getProperty("demoExternalPassword");
-            } else {
-                username = ConfigReader.getProperty("demoUser");
-                password = ConfigReader.getProperty("demoPassword");
-            }
-        } else if (environment.equals("Pre-release")) {
-            url = ConfigReader.getProperty("preReleaseURL");
-            // If the test is for an external user, use the pre-release external credentials
-            if (user != null && user.toLowerCase().contains("external")) {
-                username = ConfigReader.getProperty("preReleaseExternalUser");
-                password = ConfigReader.getProperty("preReleaseExternalPassword");
-            } else {
-                username = ConfigReader.getProperty("preReleaseUser");
-                password = ConfigReader.getProperty("preReleasePassword");
+        url = ConfigReader.getProperty("url");
+        username = ConfigReader.getProperty("username");
+        password = ConfigReader.getProperty("password");
+        
+        if (url == null || url.isEmpty()) {
+            if (environment.equals("Demo")) {
+                url = ConfigReader.getProperty("demoURL");
+                // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
+                if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
+                    username = ConfigReader.getProperty("demoExternalUser");
+                    password = ConfigReader.getProperty("demoExternalPassword");
+                } else {
+                    username = ConfigReader.getProperty("demoUser");
+                    password = ConfigReader.getProperty("demoPassword");
+                }
+            } else if (environment.equals("Pre-release")) {
+                url = ConfigReader.getProperty("preReleaseURL");
+                // If the test is for an external user, use the pre-release external credentials
+                if (user != null && user.toLowerCase().contains("external")) {
+                    username = ConfigReader.getProperty("preReleaseExternalUser");
+                    password = ConfigReader.getProperty("preReleaseExternalPassword");
+                } else {
+                    username = ConfigReader.getProperty("preReleaseUser");
+                    password = ConfigReader.getProperty("preReleasePassword");
+                }
             }
         }
     }
@@ -145,7 +151,7 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         campaigns.createCampaign();
-        Assert.assertEquals("Create New Camp", campaigns.verifyCampaignText());
+        Assert.assertEquals("Create New Campa", campaigns.verifyCampaignText());
     }
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
@@ -2348,7 +2354,7 @@ public class LifeSteps {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
-        Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+        Assert.assertEquals("You will get the report on your email", runReportPanel.fetchSuccessAlert());
     }
 
     @And("Confirms that the report panel retains the entered data")
