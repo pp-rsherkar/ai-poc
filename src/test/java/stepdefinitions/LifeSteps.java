@@ -185,8 +185,8 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
-    @Then("User creates multiple tactics under same line item and verifies it")
-    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
+    @Then("User creates below tactics under same line item and verifies it")
+    public void user_creates_below_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
@@ -213,6 +213,17 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget, actualTarget);
     }
 
+    @When("User clicks the comments icon in the tactic {string} section and add {string}")
+    public void userClicksTheCommentsIconInTheTacticSection(String entryPoint, String comment) {
+        tacticDetails.addComment(entryPoint, comment);
+    }
+
+    @When("User validates the comment added in {string} is {string} then clear it")
+    public void user_validates_the_comment_added_then_clear_it(String entryPoint, String expectedComment) {
+        String actualComment = tacticDetails.validateComment(entryPoint);
+        Assert.assertEquals(expectedComment, actualComment);
+    }
+
     @Then("User adds frequency cap with details {string} {string} {string} {string}")
     public void user_adds_frequency_cap_with_details(String level, String FREQ_VALUE, String TIMES_PER, String SCOPE) {
         campaigns.addFrequencyCap(level, FREQ_VALUE, TIMES_PER, SCOPE);
@@ -223,7 +234,7 @@ public class LifeSteps {
         campaigns.clickDetailsTab();
     }
 
-    @Then("User verified Frequency Cap is in disabled states by default")
+    @Then("User verifies if Frequency Cap is in disabled state by default")
     public void userVerifiedFrequencyCapIsInDisabledStatesByDefault() {
         boolean fc_checkbox_state = campaigns.isFrequencyCapDisabled();
         Assert.assertFalse(fc_checkbox_state);
@@ -279,12 +290,24 @@ public class LifeSteps {
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
-        customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
-        tacticDetails.clickDetailsTab();
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
+        this.customFieldName = customFieldName;
         tacticDetails.addCustomField(customFieldName);
-        String actualName = tacticDetails.verifyCustomField(customFieldName).split("\\R")[0];// To remove unwanted space and text
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0];// To remove unwanted space and text
         Assert.assertEquals(customFieldName, actualName);
-        uiCustomFieldName = actualName;
+        this.uiCustomFieldName = actualName;
+    }
+
+
+    @And("User verifies if new custom field is visible and empty in new tactic")
+    public void user_verifies_if_new_custom_field_is_visible_and_empty_in_new_tactic() {
+        tacticDetails.clickNewTactic();
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
+        Assert.assertTrue(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
+        tacticDetails.clickTactic();
+        Assert.assertEquals(customFieldName, uiCustomFieldName);
+        Assert.assertFalse(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
     }
 
     @And("User verifies if new custom field is visible in new and existing tactic")
@@ -329,6 +352,17 @@ public class LifeSteps {
     public void verify_settings_details_are_saved_and_user_is_navigated_to_creatives_tab() {
         assert tacticSettings.tacticSettingsSuccess().contains("Success!");
         Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
+    }
+
+    @Then("User clicks on first tactic and goes to details tab")
+    public void user_clicks_on_first_tactic_and_goes_to_details_tab() {
+        tacticDetails.clickFirstTacticTab();
+        tacticDetails.clickDetailsTab();
+    }
+
+    @Then("User clears the custom field text")
+    public void user_clears_the_custom_field_text() {
+        tacticDetails.clearCustomFieldText(customFieldName);
     }
 
     @Then("User assigns the existing creative named {string}, enables the tactic and saves the changes")

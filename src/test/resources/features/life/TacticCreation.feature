@@ -15,7 +15,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Targeting Segment     | Email    | Health Population  |
       | Health Populations    | EHR      | NPI                |
@@ -37,10 +37,10 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    When User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
-    When User clicks on first tactic and goes to details tab
+    Then User clicks on first tactic and goes to details tab
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible and empty in new tactic
     Then User clears the custom field text
@@ -101,7 +101,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Audience Group tactic | Standard | Behavioral Segment |
     Then User navigates to campaign

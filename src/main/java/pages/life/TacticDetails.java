@@ -197,6 +197,7 @@ public class TacticDetails {
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -207,6 +208,10 @@ public class TacticDetails {
 
     public void clickTactic(String tacticName) {
         TACTIC_TAB.locator("text=" + tacticName).click();
+    }
+
+    public void clickTactic() {
+        TACTIC_TAB.last().click();
     }
 
     public void deleteCustomField(String customFieldName) {
