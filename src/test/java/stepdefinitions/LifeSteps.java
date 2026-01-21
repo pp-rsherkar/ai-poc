@@ -145,7 +145,7 @@ public class LifeSteps {
     @Given("User clicks on Create Campaign")
     public void user_clicks_on_create_campaign() {
         campaigns.createCampaign();
-        Assert.assertEquals("Create New Camp", campaigns.verifyCampaignText());
+        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
 
     @When("User enters the campaign details as {string} {string} {string} {string} and saves the campaign")
