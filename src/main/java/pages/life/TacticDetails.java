@@ -210,7 +210,7 @@ public class TacticDetails {
         TACTIC_TAB.locator("text=" + tacticName).click();
     }
 
-    public void clickTactic() {
+    public void clickLastTactic() {
         TACTIC_TAB.last().click();
     }
 

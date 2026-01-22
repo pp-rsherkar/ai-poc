@@ -44,7 +44,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
     And User verifies if new custom field is visible and empty in new tactic
     Then User clears the custom field text
-    Then User deletes the custom field
+    Then User deletes the custom field and verify its removed from new tactic
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CUSTOM_NAME |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Custom ID   |

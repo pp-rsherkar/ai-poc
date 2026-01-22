@@ -305,7 +305,7 @@ public class LifeSteps {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
         Assert.assertTrue(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
-        tacticDetails.clickTactic();
+        tacticDetails.clickLastTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
         Assert.assertFalse(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
     }
@@ -318,8 +318,8 @@ public class LifeSteps {
         Assert.assertEquals(customFieldName, uiCustomFieldName);
     }
 
-    @Then("User deletes the custom field")
-    public void user_deletes_the_custom_field() {
+    @Then("User deletes the custom field and verify its removed from new tactic")
+    public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         tacticDetails.deleteCustomField(customFieldName);
     }
 
