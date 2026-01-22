@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.Locator;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -3330,27 +3331,44 @@ public class LifeSteps {
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
 
-    @Then("User creates a new tactic with details {string} {string}")
-    public void user_creates_a_new_tactics(String tacticName, String channel) {
-        tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
-        tacticDetails.enterTacticName(tacticNameRandom);
-        tacticDetails.saveTacticDetails();
+    @Then("User creates a new tactic with details {string} {string}{string}")
+    public void user_creates_a_new_tactics(String tacticName, String channel,String count) {
+        int loopCount = 1;
+        loopCount = Integer.parseInt(count.trim());
+        for (int i = 1; i <= loopCount; i++) {
+            tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
+            nameList.add(tacticNameRandom);
+            tacticDetails.enterTacticName(tacticNameRandom);
+            tacticDetails.saveTacticDetails();
+            tacticSettings.selectChannel(channel);
+            tacticSettings.saveTacticSettings();
+            if(i!=loopCount)
+            {
+                tacticSettings.clickNewTactic();
+            }
+        }
     }
 
     @Then("User deletes the tactic and verifies it")
     public void user_deletes_the_tactic_and_verifies_it() {
-        String tacticUniqueName = tacticSettings.getTacticName();
-        tacticDetails.deleteTactic();
-        Assert.assertNotEquals(tacticUniqueName, tacticSettings.verifyTacticName());
-        tacticDetails.globalSearchDeletedTactic(tacticUniqueName);
-        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+        for (int i = 0; i < nameList.size() - 1; i++) {
+            String tacticName = nameList.get(i);
+            tacticDetails.deleteTactic(tacticName);
+            Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+            tacticDetails.globalSearchDeletedTactic(tacticName);
+            Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+            tacticDetails.closeGlobalSearch();
+
+        }
     }
 
-    @And("User enables tactic {string} through bulk action and verifies the status")
-    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
-        tacticDetails.bulkEnableTactics(tacticName);
-        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
-
+    @And("User enables tactic through bulk action and verifies the status")
+    public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        for (int i = 0; i < nameList.size() - 1; i++) {
+            String tacticName = nameList.get(i);
+            tacticDetails.bulkEnableTactics(tacticName);
+            Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+        }
     }
 
     @When("User clicks on create new Campaign")

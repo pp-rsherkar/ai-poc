@@ -11,6 +11,7 @@ import utils.WaitUtility;
 
 import java.util.*;
 
+
 public class TacticDetails {
     public final Locator TARGETING_RULES_ICON;
     private final Page page;
@@ -56,6 +57,9 @@ public class TacticDetails {
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
     private final Locator TACTIC_TAB;
+    private final Locator CLOSE_GLOBAL_SEARCH;
+    private final Locator OPEN_GLOBAL_SEARCH;
+    private final Locator GLOBAL_SEARCH_INPUT_FILED;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -107,10 +111,14 @@ public class TacticDetails {
         this.TACTIC_OPTIONS = page.locator("//div[contains(@class, 'tactic-app-action')]//span[@title='options']");
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
-        this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
+        this.EXIT_BULK_MODE =  page.locator("//button[normalize-space()='Exit Bulk edit mode']");
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
-        this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
-        this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
+        this.BULK_ACTION = page.locator("//span[@class='pointer inlineDiv iconSprite bulkEdit']");
+        this.TACTIC_GLOBAL_SEARCH_TEXT = page.locator("//div[contains(text(),'Nothing found...')]");
+        this.CLOSE_GLOBAL_SEARCH= page.locator("//div[@class='ui image close-white-40 pointer']");
+        this.OPEN_GLOBAL_SEARCH= page.locator("//div[@class='iconSprite search-overlay-lens']");
+        this.GLOBAL_SEARCH_INPUT_FILED=page.locator("//input[@id='global_search_input']");
+
     }
 
     public void clickNewTactic() {
@@ -154,6 +162,7 @@ public class TacticDetails {
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -312,7 +321,10 @@ public class TacticDetails {
         return tacticCreatives.verifyCreativeAssigned(CreativeName);
     }
 
-    public void deleteTactic() {
+    public void deleteTactic(String tacticName) {
+
+        Locator tacticNameXpath = page.getByText(tacticName);
+        tacticNameXpath.click();
         TACTIC_OPTIONS.click();
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
@@ -332,12 +344,18 @@ public class TacticDetails {
     }
 
     public void globalSearchDeletedTactic(String tacticName) {
-        page.locator(".iconSprite").first().click();
-        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill(tacticName);
-        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
+        OPEN_GLOBAL_SEARCH.click();
+        GLOBAL_SEARCH_INPUT_FILED.fill(tacticName);
+        GLOBAL_SEARCH_INPUT_FILED.press("Enter");
+
+
     }
 
     public String getSearchText() {
         return TACTIC_GLOBAL_SEARCH_TEXT.innerText();
+    }
+
+    public void closeGlobalSearch() {
+        CLOSE_GLOBAL_SEARCH.click();
     }
 }

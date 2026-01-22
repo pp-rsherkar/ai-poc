@@ -9,7 +9,10 @@ import utils.WaitUtility;
 import java.math.BigDecimal;
 import java.util.*;
 
+
 public class TacticSettings {
+    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
+    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
     public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
@@ -66,12 +69,14 @@ public class TacticSettings {
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
     private final Locator VERIFY_TACTIC_NAME;
+    private final Locator DISPLAY_TACTIC_NAME;
     private final Locator SELECTED_TARGET;
     private final Locator BLOCKED_TARGET;
     private final Locator SELECTED_TARGET_HP;
     private final Locator BLOCKED_TARGET_HP;
     private final Locator TARGET;
     private final Locator BLOCK;
+    private final Locator NEW_TACTIC;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -137,6 +142,8 @@ public class TacticSettings {
         this.BLOCKED_TARGET_HP = page.locator("//div[contains(@class,'targetRed')]");
         this.TARGET = page.locator("//div[contains(@class,'text-target')]");
         this.BLOCK = page.locator("//div[contains(@class,'text-block')]");
+        this.DISPLAY_TACTIC_NAME = page.locator("//div[@class='tactic-main-details']");
+        this.NEW_TACTIC = page.locator("app-icon-lable-link").filter(new Locator.FilterOptions().setHasText("New Tactic")).locator("img");
     }
 
     public String verifyTacticSettingsText() {
@@ -652,10 +659,16 @@ public class TacticSettings {
     public BigDecimal getTacticMaxBidPrice() {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
+    public String getTacticName() {
+        return DISPLAY_TACTIC_NAME.innerText();
+    }
 
     public String verifyTacticName() {
         return VERIFY_TACTIC_NAME.innerText();
     }
 
-}
 
+    public void clickNewTactic() {
+        NEW_TACTIC.click();
+    }
+}
