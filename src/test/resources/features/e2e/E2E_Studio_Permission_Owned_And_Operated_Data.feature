@@ -3,7 +3,7 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
   2. Create a new Workspace associated with that Advertiser
   3. Verify that the "Owned and Operated Data" filter option is present within the Cross-Filter section of the Workspace
 
-  @e2e
+  @regression
   Scenario Outline: Verify that the visibility of Owned and Operated Data in the Cross-Filter section of the Workspace is based on the Admin Permission - "<PERMISSION_FLAG>"
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
