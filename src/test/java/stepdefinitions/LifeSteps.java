@@ -3334,7 +3334,11 @@ public class LifeSteps {
     @Then("User creates a new tactic with details {string} {string}{string}")
     public void user_creates_a_new_tactics(String tacticName, String channel,String count) {
         int loopCount = 1;
-        loopCount = Integer.parseInt(count.trim());
+        try {
+            loopCount = Integer.parseInt(count.trim());
+        } catch (NumberFormatException e) {
+            Assert.fail("Invalid count value for creating tactics: \"" + count + "\"");
+        }
         for (int i = 1; i <= loopCount; i++) {
             tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
             nameList.add(tacticNameRandom);
