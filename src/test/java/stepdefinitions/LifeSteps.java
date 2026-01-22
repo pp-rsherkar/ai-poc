@@ -2349,7 +2349,7 @@ public class LifeSteps {
         String fileName = "Custom Report";
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
-        Assert.assertEquals("Success!", runReportPanel.fetchSuccessAlert());
+        Assert.assertEquals("You will get the report on your email", runReportPanel.fetchSuccessAlert());
     }
 
     @And("Confirms that the report panel retains the entered data")
@@ -3836,7 +3836,7 @@ public class LifeSteps {
         Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
     }
 
-    @And("Verify the count of items in the downloaded {string} list")
+    @And("Verify that the count of items in the downloaded {string} list is the same as the item count displayed in the UI")
     public void verifyTheCountOfItemsInTheDownloadedList(String listType) throws IOException {
         String header = null;
         int recordsCountFromFile = 0;
@@ -3871,5 +3871,99 @@ public class LifeSteps {
         }
 
         Assert.assertEquals("Downloaded list count doesn't match with UI count", recordsCountFromFile, Integer.parseInt(recordsCountFromUI));
+    }
+
+    @And("User enters the list name as {string} and uploads the file {string}")
+    public void userEntersTheListNameAndUploadsTheFile(String listName, String fileName) {
+        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        npiName = metricName;
+        sharedList.enterListName(metricName);
+        npiStaticList.uploadStaticListFile(fileName);
+    }
+
+    @And("User saves the Email list and verify that the list is created successfully")
+    public void userSavesTheListAndVerifyThatTheListIsCreatedSuccessfully() {
+        sharedList.saveEmailList();
+        Assert.assertEquals("Email list created successfully", sharedList.isListCreatedOrDeleted());
+    }
+
+    @And("Verify that the counter on the left displays the correct value after file upload for {string}")
+    public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUploadFor(String listType) {
+        sharedList.searchAndOpenCreatedList(metricName);
+        totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
+        itemCount = sharedList.fetchEmailCount();
+        Assert.assertEquals(totalListCount, itemCount);
+    }
+
+    @And("Verify that download option should not be available for uploaded Email list")
+    public void verifyThatDownloadOptionShouldNotBeAvailableForUploadedEmailList() {
+        Assert.assertFalse("Download icon is available for Email list", sharedList.isEmailListDownloadIconVisible());
+    }
+
+    @Then("Verify that user is able to export the audit log for {string}")
+    public void verifyThatUserIsAbleToExportTheAuditLogFor(String moduleName) {
+        campaigns.clickCampaignOptions();
+        campaigns.openExportAuditLogPopup();
+
+        switch (moduleName) {
+            case "campaign":
+                assert campaigns.fetchExportAuditLogPopupContent().contains(campaignNameRandom);
+                break;
+            case "line item":
+                assert campaigns.fetchExportAuditLogPopupContent().contains(lineItemNameRandom);
+                break;
+            case "tactic":
+                assert campaigns.fetchExportAuditLogPopupContent().contains(tacticNameRandom);
+                break;
+        }
+
+        campaigns.clickConfirmExportAuditLog();
+        Assert.assertEquals("Audit Log request created. File will be send via email.", campaigns.fetchExportAuditLogSuccessAlert());
+    }
+
+    @When("User navigates to {string} page")
+    public void userNavigatesToItemPage(String moduleName) {
+        switch (moduleName) {
+            case "campaign":
+                campaigns.clickCampaignTile();
+                break;
+            case "line item":
+                campaigns.clickLineItemTile();
+                break;
+            case "tactic":
+                campaigns.clickTacticTile();
+                break;
+        }
+    }
+
+    @Then("Verify that user is able to export the campaign settings")
+    public void verifyThatUserIsAbleToExportTheCampaignSettings() {
+        campaigns.clickCampaignDetailsTab();
+        campaigns.clickCampaignOptions();
+        campaigns.exportCampaignSettings();
+        Assert.assertEquals("Done! The exported file will be sent to default@pulsepoint.com within 10 minutes.", campaigns.fetchExportCampaignSettingsSuccessAlert());
+    }
+
+    @And("Verify that user is able to download the {string} list")
+    public void verifyThatUserIsAbleToDownloadTheList(String listType) throws IOException {
+        targetFilePath = npiStaticList.clickDownloadIcon();
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
+    }
+
+    @And("User searches and selects the NPI List {string}")
+    public void userSearchesAndSelectsThePulsePointProvidedNPIList(String npiListName) {
+        npiLists.searchList(npiListName);
+        npiLists.openSearchedList(npiListName);
+    }
+
+    @And("User searches and selects the campaign {string}")
+    public void userSearchesAndSelectsTheCampaign(String campaignName) {
+        campaignDashboard.searchCreatedCampaign(campaignName);
+        campaignDashboard.navigateToCampaign(campaignName);
+    }
+
+    @Then("Verify that the campaign page is displayed")
+    public void verifyThatTheCampaignPageIsDisplayed() {
+        Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
     }
 }
