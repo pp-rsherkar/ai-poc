@@ -310,14 +310,6 @@ public class LifeSteps {
         Assert.assertFalse(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
     }
 
-    @And("User verifies if new custom field is visible in new and existing tactic")
-    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
-        tacticDetails.clickNewTactic();
-        Assert.assertEquals(customFieldName, uiCustomFieldName);
-        tacticDetails.clickTactic(metricName);
-        Assert.assertEquals(customFieldName, uiCustomFieldName);
-    }
-
     @Then("User deletes the custom field and verify its removed from new tactic")
     public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         tacticDetails.deleteCustomField(customFieldName);

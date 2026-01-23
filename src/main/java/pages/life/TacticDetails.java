@@ -219,7 +219,8 @@ public class TacticDetails {
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
-        DELETE_SUCCESS.isVisible();
+        waitUtility.waitForLocatorVisible(DELETE_SUCCESS);
+        waitUtility.waitForElementHidden(String.format("//label[contains(text(),'%s')]", customFieldName));
     }
 
     public void clickTargetingRuleIcon() {
