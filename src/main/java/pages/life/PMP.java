@@ -276,7 +276,7 @@ public class PMP {
     }
 
     public String fetchMessageOnDeleteIconClick() {
-        if(GA_SURVEY_DIALOG.isVisible())
+        if (GA_SURVEY_DIALOG.isVisible())
             GA_SURVEY_CLOSE_BUTTON.click();
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             DELETE_ICON.nth(i).scrollIntoViewIfNeeded();

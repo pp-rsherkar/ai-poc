@@ -138,7 +138,7 @@ public class Accounts {
     }
 
     public void selectAccountsTab() {
-        while(!ACCOUNTS_TAB_TEXT.isVisible()){
+        while (!ACCOUNTS_TAB_TEXT.isVisible()) {
             ACCOUNTS_TAB.click();
             waitUtility.waitUntilSpinnerHidden();
         }
