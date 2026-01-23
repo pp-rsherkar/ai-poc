@@ -343,6 +343,7 @@ public class LifeSteps {
     public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
         assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
         tacticCreatives.navigateToCampaignDashboard();
+        campaignDashboard.resetFiltersIfApplied();
         Assert.assertEquals("Running", tacticCreatives.verifyCampaignRunning());
     }
 
