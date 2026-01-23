@@ -134,16 +134,17 @@ public class Accounts {
 
     public void clickAdministration() {
         ADMINISTRATION.click();
-    }
-
-    public void selectAccountsTab() {
-        page.waitForLoadState();
-        ACCOUNTS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
+    public void selectAccountsTab() {
+        while(!ACCOUNTS_TAB_TEXT.isVisible()){
+            ACCOUNTS_TAB.click();
+            waitUtility.waitUntilSpinnerHidden();
+        }
+    }
+
     public void searchAccount(String accountName) {
-        waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
         Locator selectAccount = page.locator(String.format("//div[@title='%s']", accountName));
