@@ -92,8 +92,8 @@ public class CampaignDashboard {
         this.TACTIC_PAGE_TITLE = page.locator("//div[contains(@class,'tactic-name')]");
         this.DASHBOARD_MENU_ICON = page.locator("//span[@class='icon-bars']");
         this.SELECT_COLUMNS_FROM_ICON = page.locator("//sui-checkbox[contains(@class,'form-control')]/label");
-        this.SHOW_ALL = page.locator("//div[contains(@class,'menuButtons')]//div[@class='show-all']");
-        this.HIDE_ALL = page.locator("//div[contains(@class,'menuButtons')]//div[@class='hide-all']");
+        this.SHOW_ALL = page.locator("//div[contains(@class,'menuButtons')]//div[contains(@class,'show-all')]");
+        this.HIDE_ALL = page.locator("//div[contains(@class,'menuButtons')]//div[contains(@class,'hide-all')]");
         this.DASHBOARD_MENU_COLUMNS = page.locator("//div[contains(@class,'data-table-header')]/div[contains(@id,'liHeader') or contains(@class,'align-left')]");
         this.FILTER_OK_BUTTON = page.locator("//button[contains(@class,'ui primary button')]");
         this.SELECTED_FILTER_LABEL = page.locator("//div[contains(@class,'selected-filters')]//label");

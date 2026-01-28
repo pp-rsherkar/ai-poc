@@ -80,7 +80,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User deletes the tactic "<TACTIC_NAME>" and verifies it
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72739 |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72749 |
 
   @regression
   Scenario Outline: Create tactic and enable those tactics through bulk action
