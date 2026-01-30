@@ -197,16 +197,23 @@ public class StudioSteps {
         if (fetchedMetricNames.contains("HCP Explorer"))
             Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
         workspaceCreation.clickHCPExplorerWorkspace();
+    }
+
+    @And("User selects the advertiser {string}")
+    public void userSelectsTheAdvertiser(String advertiser) {
+        explorerWorkspace.selectAdvertiser(advertiser);
         Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
     }
 
-    @Then("User adds the workspace name as {string} and selects the advertiser {string}")
-    public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
+    @And("User updates the workspace name as {string}")
+    public void userUpdatesTheWorkspaceNameAs(String wName) {
         workspace.waitTillWorkspaceAlertHide();
         workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
+        explorerWorkspace.clickEditWorkspace();
+        explorerWorkspace.waitForDashboardLoad();
         explorerWorkspace.enterWorkspaceName(workspaceName);
-        explorerWorkspace.selectAdvertiser(advertiser);
         explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitForDashboardLoad();
     }
 
     @When("User applies the filter and selects option")
@@ -274,6 +281,7 @@ public class StudioSteps {
         workspaceName = editedName + CommonUtils.timeStampCalculation();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitForDashboardLoad();
     }
 
     @Then("Verify the Workspace is updated with edited name")
