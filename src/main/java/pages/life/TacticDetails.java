@@ -2,7 +2,6 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
@@ -59,7 +58,7 @@ public class TacticDetails {
     private final Locator TACTIC_TAB;
     private final Locator CLOSE_GLOBAL_SEARCH;
     private final Locator OPEN_GLOBAL_SEARCH;
-    private final Locator GLOBAL_SEARCH_INPUT_FILED;
+    private final Locator GLOBAL_SEARCH_INPUT_FIELD;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -111,13 +110,13 @@ public class TacticDetails {
         this.TACTIC_OPTIONS = page.locator("//div[contains(@class, 'tactic-app-action')]//span[@title='options']");
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
-        this.EXIT_BULK_MODE =  page.locator("//button[normalize-space()='Exit Bulk edit mode']");
+        this.EXIT_BULK_MODE = page.locator("//button[normalize-space()='Exit Bulk edit mode']");
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION = page.locator("//span[@class='pointer inlineDiv iconSprite bulkEdit']");
         this.TACTIC_GLOBAL_SEARCH_TEXT = page.locator("//div[contains(text(),'Nothing found...')]");
-        this.CLOSE_GLOBAL_SEARCH= page.locator("//div[@class='ui image close-white-40 pointer']");
-        this.OPEN_GLOBAL_SEARCH= page.locator("//div[@class='iconSprite search-overlay-lens']");
-        this.GLOBAL_SEARCH_INPUT_FILED=page.locator("//input[@id='global_search_input']");
+        this.CLOSE_GLOBAL_SEARCH = page.locator("//div[@class='ui image close-white-40 pointer']");
+        this.OPEN_GLOBAL_SEARCH = page.locator("//div[@class='iconSprite search-overlay-lens']");
+        this.GLOBAL_SEARCH_INPUT_FIELD = page.locator("//input[@id='global_search_input']");
 
     }
 
@@ -322,7 +321,6 @@ public class TacticDetails {
     }
 
     public void deleteTactic(String tacticName) {
-
         Locator tacticNameXpath = page.getByText(tacticName);
         tacticNameXpath.click();
         TACTIC_OPTIONS.click();
@@ -345,8 +343,8 @@ public class TacticDetails {
 
     public void globalSearchDeletedTactic(String tacticName) {
         OPEN_GLOBAL_SEARCH.click();
-        GLOBAL_SEARCH_INPUT_FILED.fill(tacticName);
-        GLOBAL_SEARCH_INPUT_FILED.press("Enter");
+        GLOBAL_SEARCH_INPUT_FIELD.fill(tacticName);
+        GLOBAL_SEARCH_INPUT_FIELD.press("Enter");
 
 
     }
