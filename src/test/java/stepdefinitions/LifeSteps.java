@@ -239,7 +239,7 @@ public class LifeSteps {
     public void userVerifiesIfFrequencyCapIsSavedWithDetailsOnCampaignLevel(String freqValue, String timesPer, String scope, String level) {
         String actualFrequencyCapText = campaigns.getSavedFrequencyCap(level);
         String expectedFrequencyCapText = String.format("%s x %s x %s %s", freqValue, timesPer, scope, level).toUpperCase();
-        if(timesPer.contains("hour")){
+        if (timesPer.contains("hour")) {
             expectedFrequencyCapText = String.format("%s x Time Per %s hour %s %s", freqValue, freqValue, scope, level).toUpperCase();
         }
         Assert.assertEquals(expectedFrequencyCapText, actualFrequencyCapText);
@@ -907,9 +907,9 @@ public class LifeSteps {
     @And("Verify only Custom date range Flights from {string} to {string} should render on the Dashboard if available")
     public void verifyOnlyCustomDateRangeFlightsShouldRenderOnTheDashboardIfAvailable(String startDate, String endDate) {
         boolean flag = campaignDashboard.isCampaignDataAvailableInCustomDateRange();
-        if(flag)
+        if (flag)
             Assert.assertTrue("No campaign data is available", true);
-        else{
+        else {
             List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             LocalDate start = LocalDate.parse(startDate, inputFormatter);
@@ -922,7 +922,7 @@ public class LifeSteps {
     @When("User clicks the Settings icon and selects the following group by options and verify dashboard data is grouped accordingly")
     public void userClicksTheSettingsIconAndSelectsTheFollowingGroupByOptions(DataTable dataTable) {
         List<String> groupByOption = dataTable.asList(String.class);
-        for(String option : groupByOption){
+        for (String option : groupByOption) {
             campaignDashboard.clickSettingIcon();
             Assert.assertTrue("Dashboard data is not grouped by the selected options - " + option, campaignDashboard.clickGroupByOptionsAndCheckDashboardData(option));
         }
@@ -1881,7 +1881,7 @@ public class LifeSteps {
 
     @Then("Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list")
     public void verifySmartPixelIsSavedSuccessfullyAndDisplayedInPixelList() {
-        Assert.assertTrue("Unable to save Smart Pixel",  pixels.verifySaveSuccess().contains("Success!"));
+        Assert.assertTrue("Unable to save Smart Pixel", pixels.verifySaveSuccess().contains("Success!"));
         newPixelName = smartPixel.getPixelNameFromHeader();
         pixels.searchSavedPixel(newPixelName);
         Assert.assertEquals(newPixelName, pixels.verifyCreatedPixel(newPixelName));
@@ -3333,7 +3333,7 @@ public class LifeSteps {
     }
 
     @Then("User creates a new tactic with details {string} {string}{string}")
-    public void user_creates_a_new_tactics(String tacticName, String channel,String count) {
+    public void user_creates_a_new_tactics(String tacticName, String channel, String count) {
         int loopCount = 1;
         try {
             loopCount = Integer.parseInt(count.trim());
@@ -3347,8 +3347,7 @@ public class LifeSteps {
             tacticDetails.saveTacticDetails();
             tacticSettings.selectChannel(channel);
             tacticSettings.saveTacticSettings();
-            if(i!=loopCount)
-            {
+            if (i != loopCount) {
                 tacticSettings.clickNewTactic();
             }
         }
@@ -3764,7 +3763,7 @@ public class LifeSteps {
         campaigns.clickAddCustomFieldButton();
         campaigns.enterCustomFieldName(customFieldName);
         campaigns.saveCustomField();
-        Assert.assertEquals("Successfully created custom Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        Assert.assertEquals("Successfully created custom Field : " + customFieldName, campaigns.fetchCustomFieldSuccessAlert());
     }
 
     @Then("Verify that the custom field is added on the campaign creation page")
@@ -3778,7 +3777,7 @@ public class LifeSteps {
         campaigns.clickCustomFieldLabel(customFieldName);
         campaigns.enterCustomFieldName(uiCustomFieldName);
         campaigns.saveCustomField();
-        Assert.assertEquals("Successfully updated custom Field : " + uiCustomFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        Assert.assertEquals("Successfully updated custom Field : " + uiCustomFieldName, campaigns.fetchCustomFieldSuccessAlert());
     }
 
     @Then("Verify that the custom field is updated with new label")
@@ -3817,9 +3816,9 @@ public class LifeSteps {
         campaigns.clickAddCustomFieldButton();
         campaigns.enterCustomFieldName(customFieldName);
         campaigns.saveCustomField();
-        Assert.assertEquals("Successfully created custom Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        Assert.assertEquals("Successfully created custom Field : " + customFieldName, campaigns.fetchCustomFieldSuccessAlert());
         campaigns.deleteCustomField(customFieldName);
-        Assert.assertEquals("Successfully deleted the Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        Assert.assertEquals("Successfully deleted the Field : " + customFieldName, campaigns.fetchCustomFieldSuccessAlert());
     }
 
     @And("User verifies if the deleted custom field is available on New Campaign creation page")
