@@ -59,6 +59,7 @@ public class BulkCreativeUpload {
     private final Locator WIDTH_BOX;
     private final Locator HEIGHT_BOX;
     private final Locator UPLOAD_BUTTON;
+    private final Locator DURATION;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
 
@@ -106,6 +107,7 @@ public class BulkCreativeUpload {
         this.WIDTH_BOX = page.locator("//input[contains(@placeholder,'width')]");
         this.HEIGHT_BOX = page.locator("//input[contains(@placeholder, 'height')]");
         this.UPLOAD_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Upload')]");
+        this.DURATION = page.locator("//input[contains(@placeholder,'Duration')]");
     }
 
     public void clickBulkUploadButton() {
@@ -385,6 +387,15 @@ public class BulkCreativeUpload {
         return true;
     }
 
+    public boolean isDurationVisibleAndBlank() {
+        for (int i = 0; i < DURATION.count(); i++) {
+            if (!DURATION.nth(i).isVisible() || !DURATION.nth(i).inputValue().trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void enterWidthHeight(String size) {
         String[] parts = size.split("x");
         if (parts.length == 2) {
@@ -395,6 +406,12 @@ public class BulkCreativeUpload {
                 WIDTH_BOX.nth(i).fill(width);
                 HEIGHT_BOX.nth(i).fill(height);
             }
+        }
+    }
+
+    public void enterDuration(String duration) {
+        for (int i = 0; i < DURATION.count(); i++) {
+            DURATION.nth(i).fill(duration);
         }
     }
 
@@ -418,14 +435,19 @@ public class BulkCreativeUpload {
                 clickUploadButton();
                 break;
             case "HTML", "Video":
-                selectFileTypeAndUploadFile(attributeMap.get("FileType"), Collections.singletonList(attributeMap.get("FileName")));
+                if (type.contains("Video"))
+                    uploadImageFile(attributeMap.get("ImageFile"));
+                selectFileTypeAndUploadFile(attributeMap.get("FileType"),Collections.singletonList(attributeMap.get("FileName")));
                 if (createCreatives.CLICK_THROUGH_URL.isVisible())
                     enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
-                HTML_CREATIVE_NAME.fill(updatedCreativeName);
-                if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
                 clickPreviewButton();
+                HTML_CREATIVE_NAME.fill(updatedCreativeName);
+                if (type.contains("Video")) {
+                    enterWidthHeight(attributeMap.get("Size"));
+                    DURATION.fill(attributeMap.get("Duration"));
+                }
                 clickUploadButton();
                 clickOKButton();
                 break;

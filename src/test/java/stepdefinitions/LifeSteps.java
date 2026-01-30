@@ -94,27 +94,25 @@ public class LifeSteps {
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
-    public void set_environment(String environment, String user) {
+    public void set_environment(String environment, String user) throws Exception {
         userType = user;
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");
-            // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
             if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
                 username = ConfigReader.getProperty("demoExternalUser");
                 password = ConfigReader.getProperty("demoExternalPassword");
             } else {
-                username = ConfigReader.getProperty("demoUser");
-                password = ConfigReader.getProperty("demoPassword");
+                username = ConfigReader.getInternalDemoUsername();
+                password = ConfigReader.getInternalDemoPassword();
             }
         } else if (environment.equals("Pre-release")) {
             url = ConfigReader.getProperty("preReleaseURL");
-            // If the test is for an external user, use the pre-release external credentials
             if (user != null && user.toLowerCase().contains("external")) {
                 username = ConfigReader.getProperty("preReleaseExternalUser");
                 password = ConfigReader.getProperty("preReleaseExternalPassword");
             } else {
-                username = ConfigReader.getProperty("preReleaseUser");
-                password = ConfigReader.getProperty("preReleasePassword");
+                username = ConfigReader.getInternalPreReleaseUsername();
+                password = ConfigReader.getInternalPreReleasePassword();
             }
         }
     }
@@ -2106,21 +2104,21 @@ public class LifeSteps {
 
     @And("Verify Advertiser field should be mandatory")
     public void verifyAdvertiserFieldShouldBeMandatory() {
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Select Advertiser", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify that the Landing Domain field is mandatory when all other required fields, including {string} are filled")
     public void verifyLandingDomainFieldShouldBeMandatoryByEnteringOtherMandatoryFields(String advertiser) {
         bulkCreativeUpload.selectAdvertiser(advertiser);
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Landing Page Domain is required", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify that an appropriate error message is displayed when invalid data {string} is entered for the Landing Domain")
     public void verifyThatAnAppropriateErrorMessageIsDisplayedWhenInvalidDataIsEnteredForTheLandingDomain(String invalidLandingDomain) {
         bulkCreativeUpload.enterLandingPageDomain(invalidLandingDomain);
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Landing Page Domain is not valid.", bulkCreativeUpload.fetchErrorAlert());
     }
 
@@ -2152,8 +2150,8 @@ public class LifeSteps {
         bulkCreativeUpload.selectAndClickDirection(direction);
     }
 
-    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}")
-    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, DataTable dataTable) {
+    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, String size, String duration, DataTable dataTable) {
         nameList.clear();
         Map<String, String> rawFilters = dataTable.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
@@ -2164,8 +2162,10 @@ public class LifeSteps {
             bulkCreativeUpload.selectFileTypeAndUploadFile(entry.getKey(), entry.getValue());
             bulkCreativeUpload.enterLandingPageDomain(landingDomain);
             bulkCreativeUpload.selectApprovalStatus(status);
+            bulkCreativeUpload.clickPreviewButton();
             nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight("800x250");
+            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight(size);
+            if (bulkCreativeUpload.isDurationVisibleAndBlank()) bulkCreativeUpload.enterDuration(duration);
             bulkCreativeUpload.clickUploadButton();
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
@@ -2179,7 +2179,7 @@ public class LifeSteps {
 
     @And("Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         List<String> expectedMessages = Arrays.asList("Clickthrough URL is required", "Landing Page Domain is required");
         Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
     }

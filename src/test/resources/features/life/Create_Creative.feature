@@ -162,7 +162,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the AdChoices Icon should be "TopRight"
     And Verify default value of the Notes Column field should be "None"
     And Verify Rich Media checkbox should be present and selectable "Up"
-    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>"
       | DCM File | DCM_HTML_BulkUpload.xlsx |
 #      | PulsePoint   |
 #      | Sizmek       |
@@ -171,8 +171,8 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
 #      | Flashtalking |
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME |
-      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative |
+      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | SIZE    | DURATION |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       |
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Native Creatives
@@ -213,10 +213,11 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the File field should be "DCM File"
     And Verify default value of the Approval Status field is "Pending"
     And Verify default value of the AdChoices Icon should be "TopRight"
-    And Verify default value of the Notes Column field should be "None"
-    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
+    And Verify user is able to upload images "<IMAGE_FILENAME>" to get a template with URLs
+    #And Verify default value of the Notes Column field should be "None"
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>"
       | DCM File | DCM_VIDEO_BulkUpload.xlsx |
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative |
+      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       |
