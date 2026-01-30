@@ -207,10 +207,9 @@ public class StudioSteps {
 
     @And("User updates the workspace name as {string}")
     public void userUpdatesTheWorkspaceNameAs(String wName) {
-        workspace.waitTillWorkspaceAlertHide();
         workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
-        explorerWorkspace.clickEditWorkspace();
         explorerWorkspace.waitForDashboardLoad();
+        explorerWorkspace.clickEditWorkspace();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.saveWorkspaceName();
         explorerWorkspace.waitForDashboardLoad();
