@@ -1068,7 +1068,7 @@ public class LifeSteps {
         pmp.saveDealsAssigned();
     }
 
-    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button status")
+    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status")
     public void dealDetailsShouldAppearOnTacticSettingsTab() {
         Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom));
     }
@@ -1079,12 +1079,12 @@ public class LifeSteps {
         Assert.assertEquals(errorMessage, pmp.fetchMessageOnDeleteIconClick());
     }
 
-    @And("Verify Pricing Strategy is editable and update it with {string} and {string} for Deals present in Curated Market and Deals section")
+    @And("Verify Pricing Strategy is editable and update it with {string} and {string} for Deals present in Curated Markets and Deals section")
     public void verifyPricingStrategyIsEditableAndUpdateItWithAndForDealsPresentInCuratedMarketAndDealsSection(String pricingStrategy, String value) {
         pmp.verifyPricingStrategyIsEditable(dealNameRandom, pricingStrategy, value);
     }
 
-    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Markets and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
     public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";

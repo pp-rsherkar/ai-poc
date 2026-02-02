@@ -49,21 +49,21 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then user should navigate to PMP Deals Panel
     When User clicks "Private" Deals Tab
     And User clicks on Add New Deal button
-    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEALPRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
     When User searches the deal and assign it from the deal list
     Then Selected Deals should appear in Applied Deals panel
     When User clicks on OK button
-    Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button status
+    Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
     And Verify Delete icon is disabled and error message "Go to the Curated Markets & Deals section to remove the market."
-    And Verify Pricing Strategy is editable and update it with "<PRICING_STRATEGY>" and "<VALUE>" for Deals present in Curated Market and Deals section
-    And Verify user can add new "Private" deals by clicking Add Deal button present in Curated Market and Deals section using details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEALPRICE_TYPE>", "<PRICE>", "<CURATOR>"
-    And Verify Base Bid Price "<BASE_BIDPRICE>" and Max Bid Price "<MAX_BIDPRICE>" fields are editable when deals are targeted
+    And Verify Pricing Strategy is editable and update it with "<PRICING_STRATEGY>" and "<VALUE>" for Deals present in Curated Markets and Deals section
+    And Verify user can add new "Private" deals by clicking Add Deal button present in Curated Markets and Deals section using details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    And Verify Base Bid Price "<BASE_BID_PRICE>" and Max Bid Price "<MAX_BID_PRICE>" fields are editable when deals are targeted
     When User clicks Save button from Tactic Setting tab
     Then Deals should get assigned to the Tactic
     Examples:
-      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEALPRICE_TYPE | PRICE | BASE_BIDPRICE | MAX_BIDPRICE | ADVERTISER     | CURATOR                          | PRICING_STRATEGY | VALUE |
-      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed          | 230   | 34            | 60           | 01- Advertiser | PulsePoint (Direct Integrations) | Flat             | 35    |
-      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor          | 230   | 34            | 60           | 01- Advertiser | PulsePoint (Direct Integrations) | Floor+           |       |
+      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | BASE_BID_PRICE | MAX_BID_PRICE | ADVERTISER     | CURATOR                          | PRICING_STRATEGY | VALUE |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Flat             | 35    |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Floor+           |       |
 
   @regression @e2e
   Scenario Outline: Add New Private Deals and assigned to a tactic when Only Target Applied Deals toggle is OFF
@@ -73,18 +73,18 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then user should navigate to PMP Deals Panel
     When User clicks "Private" Deals Tab
     And User clicks on Add New Deal button
-    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEALPRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
     When User searches the deal and assign it from the deal list
     Then Selected Deals should appear in Applied Deals panel
     When User clicks on OK button
-    Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button status
-    And Verify Pricing Strategy is editable and update it with "<PRICING_STRATEGY>" and "<VALUE>" for Deals present in Curated Market and Deals section
-    And Verify user can add new "Private" deals by clicking Add Deal button present in Curated Market and Deals section using details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEALPRICE_TYPE>", "<PRICE>", "<CURATOR>"
-    And Verify Base Bid Price "<BASE_BIDPRICE>" and Max Bid Price "<MAX_BIDPRICE>" fields are editable when deals are targeted
+    Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+    And Verify Pricing Strategy is editable and update it with "<PRICING_STRATEGY>" and "<VALUE>" for Deals present in Curated Markets and Deals section
+    And Verify user can add new "Private" deals by clicking Add Deal button present in Curated Markets and Deals section using details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    And Verify Base Bid Price "<BASE_BID_PRICE>" and Max Bid Price "<MAX_BID_PRICE>" fields are editable when deals are targeted
     When User clicks Save button from Tactic Setting tab
     Then Deals should get assigned to the Tactic
     Examples:
-      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEALPRICE_TYPE | PRICE | BASE_BIDPRICE | MAX_BIDPRICE | ADVERTISER     | CURATOR                          | PRICING_STRATEGY | VALUE |
-      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed          | 230   | 34            | 60           | 01- Advertiser | PulsePoint (Direct Integrations) | Flat             | 35    |
-      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor          | 230   | 34            | 60           | 01- Advertiser | PulsePoint (Direct Integrations) | Floor+           |       |
-      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed          | 230   | 34            | 60           | 01- Advertiser | PulsePoint (Direct Integrations) | Default          |       |
+      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | BASE_BID_PRICE | MAX_BID_PRICE | ADVERTISER     | CURATOR                          | PRICING_STRATEGY | VALUE |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Flat             | 35    |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Floor+           |       |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Default          |       |
