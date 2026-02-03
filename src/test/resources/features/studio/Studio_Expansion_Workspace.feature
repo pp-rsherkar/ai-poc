@@ -17,7 +17,7 @@ Feature: HCP Audience Workspace in Studio Application
     Then User verifies the expanded audience count
     And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
     And User saves the workspace
-    Then Verify the workspace in workspace management page
+    Then Verify the workspace is visible in workspace management page
     Examples:
       | ADVERTISER | WORKSPACE_NAME | SOURCE_AUDIENCE  | OPTIONS      | EXPANDED_AUDIENCE             |
       | Abbvie     | HCP_Expansion  | Studio Workspace | PB_Test      | Expand with Care Team         |
