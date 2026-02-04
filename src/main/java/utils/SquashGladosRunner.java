@@ -21,12 +21,23 @@ public class SquashGladosRunner {
                     "squashglados" + File.separator + ".venv" + File.separator +
                     "Scripts" + File.separator + "python.exe";
 
-            // 3. Run: python -m SquashGlados config.json
+            // 3. Set PYTHONPATH to include the src directory containing SquashGlados package
+            String squashGladosSrcPath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "squashglados" + File.separator + "src";
+
             ProcessBuilder pb = new ProcessBuilder(
-                    pythonExecutable, "-m", "SquashGlados", configPath
-            );
+                    pythonExecutable, "-m", "SquashGlados", configPath);
             pb.directory(new File(projectRoot));
             pb.redirectErrorStream(true);
+            pb.environment().put("PYTHONPATH", squashGladosSrcPath);
+
+            // Example: pass Squash token from Java code
+            String squashToken = ConfigReader.getProperty("PROD_SQUASH_SECRET_API_TOKEN");
+            if (squashToken != null && !squashToken.isEmpty()) {
+                pb.environment().put("PROD_SQUASH_SECRET_API_TOKEN", squashToken);
+            } else {
+                // Optionally, read from a config or fail gracefully
+                System.err.println("Warning: PROD_SQUASH_SECRET_API_TOKEN is not set in environment variables.");
+            }
 
             Process process = pb.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

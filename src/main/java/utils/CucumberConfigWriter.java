@@ -5,14 +5,6 @@ import java.io.*;
 import java.util.*;
 
 public class CucumberConfigWriter {
-    static class Config {
-        String automation = "cucumber-java-bdd-playwright-maven";
-        String squash_server = "prod";
-        String test_id_type = "iteration";
-        String IDS = "10568";
-        List<Map<String, String>> tests;
-    }
-
     public static List<String> getScenarioNames(String cucumberJsonPath) throws IOException {
         List<String> scenarioNames = new ArrayList<>();
         Gson gson = new Gson();
@@ -38,21 +30,27 @@ public class CucumberConfigWriter {
         return scenarioNames;
     }
 
-    public static void writeConfig(String cucumberJsonPath, String configPath, String automation, String squashServer, String testIdType, String ids) throws IOException {
-        Config config = new Config();
-        config.automation = automation;
-        config.squash_server = squashServer;
-        config.test_id_type = testIdType;
-        config.IDS = ids;
+    public static void writeConfig(String cucumberJsonPath, String configPath, String automation, String squashServer, String testIdType, String ids, String results_path) throws IOException {
+        Map<String, Object> config = new LinkedHashMap<>();
+        config.put("automation", automation);
+        config.put("squash_server", squashServer);
+        config.put("results_path", results_path);
+        if ("test-suite".equals(testIdType)) {
+            config.put("test_suites", Arrays.asList(ids.split(",")));
+        } else {
+            config.put("iterations", Arrays.asList(ids.split(",")));
+        }
 
         List<String> scenarioNames = getScenarioNames(cucumberJsonPath);
-        config.tests = new ArrayList<>();
+        List<Map<String, String>> tests = new ArrayList<>();
         for (String name : scenarioNames) {
             Map<String, String> test = new HashMap<>();
             test.put("name", name);
             test.put("command", "");
-            config.tests.add(test);
+            tests.add(test);
         }
+        config.put("tests", tests);
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter(configPath)) {
             gson.toJson(config, writer);

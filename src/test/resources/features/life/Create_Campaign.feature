@@ -5,7 +5,7 @@ Feature: LIFE Regression - Create a Campaign
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
   @regression
-  Scenario Outline: Create a Campaign with a Tactic & a Line Item
+  Scenario Outline: Create a Campaign with a Tactic and a Line Item
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page

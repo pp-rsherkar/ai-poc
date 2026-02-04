@@ -4,6 +4,7 @@ import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
+import utils.ConfigReader;
 
 import java.util.logging.Logger;
 
@@ -22,15 +23,14 @@ public class TestRunner {
             String cucumberJsonPath = "target/cucumber-reports/cucumber.json";
             String configPath = "target/config.json";
 
-            String automation = utils.ConfigReader.getProperty("automation");
-            String squashServer = utils.ConfigReader.getProperty("squash_server");
-            String testIdType = utils.ConfigReader.getProperty("test_id_type");
-            String ids = utils.ConfigReader.getProperty("IDS");
+            String automation = ConfigReader.getProperty("automation");
+            String squashServer = ConfigReader.getProperty("squash_server");
+            String testIdType = ConfigReader.getProperty("test_id_type");
+            String ids = ConfigReader.getProperty("IDS");
 
             utils.CucumberConfigWriter.writeConfig(
                     cucumberJsonPath, configPath,
-                    automation, squashServer, testIdType, ids
-            );
+                    automation, squashServer, testIdType, ids, cucumberJsonPath);
 
             // Call SquashGlados after config file is generated
             utils.SquashGladosRunner.runSquashGladosWithConfig(configPath);
