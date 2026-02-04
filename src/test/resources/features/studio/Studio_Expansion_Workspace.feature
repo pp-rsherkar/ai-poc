@@ -43,7 +43,7 @@ Feature: HCP Audience Workspace in Studio Application
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace
       #4
-    Then Verify the HCP Explorer Workspace is saved
+    Then Verify the Workspace is saved
     And Download button is enabled to the user
     And User clicks on Publish NPI List
     And User selects publish "<LIST_TYPE>"
