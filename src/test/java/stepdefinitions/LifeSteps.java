@@ -4105,7 +4105,7 @@ public class LifeSteps {
         List<String> filterFields = createCreatives.fetchFilterFields();
         Assert.assertTrue("Add Filter button is not available", filterFields.contains(button1));
         Assert.assertTrue("Done button is not available", filterFields.contains(button2));
-        Assert.assertTrue("No Filters applied text is not available", filterFields.contains(button1));
+        Assert.assertTrue("No Filters applied text is not available", filterFields.contains(text));
     }
 
     @And("User clicks {string}, selects below filters and apply using {string} button")
