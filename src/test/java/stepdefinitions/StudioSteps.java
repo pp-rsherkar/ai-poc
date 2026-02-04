@@ -145,52 +145,48 @@ public class StudioSteps {
         workspaceCreation.verifyStudioWorkspaceFrame();
         workspaceCreation.createStudioWorkspace();
     }
+/*
+    @And("User selects the Workspace Type as {string}")
+    public void userSelectsTheWorkspaceTypeAs(String workspaceType) {
+    }
 
+    @And("User selects the advertiser as {string}")
+    public void userSelectsTheAdvertiserAs(String advertiser) {
+    }
+
+    @Then("User selects Source Audience details as {string},{string}")
+    public void userSelectsSourceAudienceDetailsAs(String sourceAudience, String options) {
+    }
+
+    @And("User selects {string}")
+    public void userSelects(String expandedAudience) {
+    }
+
+    @Then("User verifies the expanded audience count")
+    public void userVerifiesTheExpandedAudienceCount() {
+    }
+
+    @And("User clicks on Edit button to rename the workspace to {string}")
+    public void userClicksOnEditButtonToRenameTheWorkspaceTo(String workspaceName) {
+    }
+
+    @Then("Verify the workspace is visible in workspace management page")
+    public void verifyTheWorkspaceIsVisibleInWorkspaceManagementPage() {
+    }
+
+    @Then("Verify the Workspace is saved")
+    public void verifyTheWorkspaceIsSaved() {
+    }
+
+    @Then("User Verify the list is displayed in the LIFE")
+    public void userVerifyTheListIsDisplayedInTheLIFE() {
+    }*/
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
-/*
-
-
-    @Then("User selects the Workspace Type as {string}")
-    public void user_selects_the_workspace_type_as(String string) {
-
-    }
-
-    @Then("User selects the advertiser as {string}")
-    public void user_selects_the_advertiser_as(String string) {
-
-    }
-
-    @Then("User selects Source Audience details as {string},{string}")
-    public void user_selects_source_audience_details_as(String string, String string2) {
-
-    }
-
-    @Then("User selects {string}")
-    public void user_selects(String string) {
-
-    }
-
-    @Then("User applies filters to the workspace")
-    public void user_applies_filters_to_the_workspace() {
-
-    }
-
-    @Then("User clicks on Edit button to rename the workspace to {string}")
-    public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
-
-    }
-
-    @Then("Verify the workspace in workspace management page")
-    public void verify_the_workspace_in_workspace_management_page() {
-
-    }
-*/
-
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
