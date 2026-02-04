@@ -15,7 +15,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Targeting Segment     | Email    | Health Population  |
       | Health Populations    | EHR      | NPI                |
@@ -37,16 +37,14 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name       | Channel | RuleType          |
       | Targeting Segment | Email   | Health Population |
+    Then User clicks on first tactic and goes to details tab
     Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
-    And User verifies if new custom field is visible in new and existing tactic
-    #confirm if user is not allowed to delete custom field used in a tactic
-    #clear the custom field
-    #And User enters value in custom field and verifies if it's not visible in other tactics
-   # Then User clicks on first tactic
-    Then User deletes the custom field
+    And User verifies if new custom field is visible and empty in new tactic
+    Then User clears the custom field text
+    Then User deletes the custom field and verify its removed from new tactic
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CUSTOM_NAME |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Custom ID   |
@@ -103,22 +101,22 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    Then User creates multiple tactics under same line item and verifies it
+    Then User creates below tactics under same line item and verifies it
       | Tactic Name           | Channel  | RuleType           |
       | Audience Group tactic | Standard | Behavioral Segment |
     Then User navigates to campaign
     Then User clicks on details tab
-    Then User verified Frequency Cap is in disabled states by default
+    Then User verifies if Frequency Cap is in disabled state by default
     Then User adds frequency cap with details "<ON_CAMPAIGN_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
     Then User navigates to LineItem
     Then User clicks on details tab
     Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
-    Then User verified Frequency Cap is in disabled states by default
+    Then User verifies if Frequency Cap is in disabled state by default
     Then User adds frequency cap with details "<ON_LI_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
     Then User navigates to Tactic and clicks on settings tab
     Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
     Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_LI_LEVEL>"
-    Then User verified Frequency Cap is in disabled states by default
+    Then User verifies if Frequency Cap is in disabled state by default
     Then User adds frequency cap with details "<ON_TACTIC_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
     Then User navigates to LineItem
     Then User navigates to Tactic and clicks on settings tab
@@ -127,3 +125,22 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | FREQUENCY_VALUE | TIMES_PER | SCOPE         | ON_CAMPAIGN_LEVEL | ON_LI_LEVEL        | ON_TACTIC_LEVEL |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 10              | hour(s)   | Per Person    | on Campaign Level | on Line Item Level | on tactic level |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | 80              | week      | Per Household | on Campaign Level | on Line Item Level | on tactic level |
+
+  @regression
+  Scenario Outline: Add and Verify Comment/notes on New Tactic from Header and Navigation
+    When User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User creates below tactics under same line item and verifies it
+      | Tactic Name       | Channel | RuleType          |
+      | Targeting Segment | Email   | Health Population |
+    When User navigates to Tactic and clicks on settings tab
+    And User clicks the comments icon in the tactic "header" section and add "<HEADER_COMMENT>"
+    Then User validates the comment added in "header" is "<HEADER_COMMENT>" then clear it
+    And User clicks the comments icon in the tactic "navigation" section and add "<NAV_COMMENT>"
+    Then User validates the comment added in "navigation" is "<NAV_COMMENT>" then clear it
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel |
