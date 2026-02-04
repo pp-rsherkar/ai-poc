@@ -1,0 +1,110 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'ITERATION_IDS', description: 'Enter iteration IDs separated by commas', defaultValue: '')
+        string(name: 'ENVIRONMENT', description: 'Enter the target environment', defaultValue: 'staging')
+        choice(name: 'BROWSER', choices: ['', 'chrome', 'firefox', 'safari'], description: 'Select the browser')
+        choice(name: 'DEVICE', choices: ['', 'iphone', 'android'], description: 'Select the device (leave empty for desktop)')
+        choice(name: 'PLATFORM', choices: ['', 'windows', 'mac', 'IOS', 'ANDROID'], description: 'Select the platform')
+        choice(name: 'TEST_FRAMEWORK', choices: ['robot', 'pytest'], description: 'Select the test framework')
+        string(name: 'TESTS_DIRECTORY', description: 'Folder/path where the automated tests are', defaultValue: '.')
+        booleanParam(name: 'MERGE_LOGS', description: 'Merge all output logs (Robot Framework: robot.rebot --merge)?', defaultValue: false)
+        activeChoice(choiceType: 'PT_MULTI_SELECT', filterLength: 1, filterable: false, name: 'INCLUDE_CATEGORIES', script: groovyScript(fallbackScript: [classpath: [], oldScript: '', sandbox: true, script: ''], script: [classpath: [], oldScript: '', sandbox: true, script: '[\'All\',  \'Design/UI\', \'Smoke Test\', \'Library Case\', \'Release Test Only\', \'Compatibility\', \'Logic\', \'Performance\', \'Security\', \'Single Code Source\', \'SEO\', \'Tracking Code/Metrics\', \'User Scenarios\', \'No PreProd/Canary\', \'Revenue Impacting\', \'Build Verification\', \'Desktop Test\', \'Mobile Test\', \'Responsive Test\', \'Desktop Required\', \'Functional\', \'Sanity Test\', \'Staging Test Only\', \'Data/Content\', \'Light Regression\', \'Full Regression\'] ']) )
+        activeChoice(choiceType: 'PT_MULTI_SELECT', filterLength: 1, filterable: false, name: 'EXCLUDE_CATEGORIES', script: groovyScript(fallbackScript: [classpath: [], oldScript: '', sandbox: true, script: ''], script: [classpath: [], oldScript: '', sandbox: true, script: '[\'All\',  \'Design/UI\', \'Smoke Test\', \'Library Case\', \'Release Test Only\', \'Compatibility\', \'Logic\', \'Performance\', \'Security\', \'Single Code Source\', \'SEO\', \'Tracking Code/Metrics\', \'User Scenarios\', \'No PreProd/Canary\', \'Revenue Impacting\', \'Build Verification\', \'Desktop Test\', \'Mobile Test\', \'Responsive Test\', \'Desktop Required\', \'Functional\', \'Sanity Test\', \'Staging Test Only\', \'Data/Content\', \'Light Regression\', \'Full Regression\'] ']) )
+        choice(name: 'SELENIUM_GRID', choices: ['http://general.stg-qa-selenium1.internetbrands.com/', 'http://phone.stg-qa-selenium2.internetbrands.com/'], description: 'Select the Selenium Grid')
+        string(name: 'ADDITIONAL_ARGS', description: 'Enter any additional arguments', defaultValue: '')
+        activeChoice(choiceType: 'PT_MULTI_SELECT', filterLength: 1, filterable: false, name: 'STATUS_FILTER', script: groovyScript(fallbackScript: [classpath: [], oldScript: '', sandbox: true, script: ''], script: [classpath: [], oldScript: '', sandbox: true, script: '[\'All\',  \'READY\', \'RUNNING\', \'SUCCESS\', \'FAILURE\', \'BLOCKED\', \'SETTLED\', \'UNTESTABLE\', \'SKIPPED\', \'CANCELLED\'] ']) )
+        booleanParam(name: 'developer_mode', description: 'developer mode allows you to run tests with Automation Test Name and Automation Suite Name (even if the Automation Type has not been updated yet)', defaultValue: false)
+        booleanParam(name: 'automation_only_mode', description: 'automation_only_mode will only run tests if the most recent execution was run by the apiuser', defaultValue: false)
+        booleanParam(name: 'useSkippedFiltered', description: 'check this if you want an execution to have skipped status for the filtered cases', defaultValue: false)
+        string(name: 'RERUN_FAILED_TESTS', description: 'How many times do you want to rerun FAILED and BLOCKED tests?', defaultValue: '0')
+        activeChoice(choiceType: 'PT_MULTI_SELECT',  filterLength: 1, filterable: false, name: 'RERUN_STATUS_FILTER', script: groovyScript(fallbackScript: [classpath: [], oldScript: '', sandbox: true, script: ''], script: [classpath: [], oldScript: '', sandbox: true, script: '[\'READY\', \'RUNNING\', \'SUCCESS\', \'FAILURE\', \'BLOCKED\', \'SETTLED\', \'UNTESTABLE\', \'SKIPPED\', \'CANCELLED\'] ']))
+        string(name: 'pool', description: 'how many tests do you want to run at the same time?', defaultValue: '4')
+    }
+
+    stages {
+        stage('Prepare Environment') {
+            steps {
+                // Replace with your git repo URL
+                // git git@git.internetbrands.com:QAAutomation/squashglados.git
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'ceec4c06-b4f7-4794-9b8b-6537b8cced95', url: 'git@git.internetbrands.com:QAAutomation/squashglados.git']])
+                // checkout scmGit(branches: [[name: '*/QAA-94483']], extensions: [], userRemoteConfigs: [[credentialsId: 'QAA TOOLS PROJ', url: 'git@git.internetbrands.com:QAAutomation/nolo-automation.git']])
+
+
+                // Create and activate virtual environment
+                sh '''
+                python -m venv ./.venv
+                source ./.venv/bin/activate
+                python -m pip install .
+                python -m pip install --upgrade pip 
+                python -m pip list
+                '''
+                // python -m pip install -r requirements.txt
+            }
+        }
+
+        stage('Generate Config') {
+            steps {
+                script {
+                    // Prepare data for config.json
+                    def config = [
+                        'iterations': params.ITERATION_IDS.split(','),
+                        'environment': params.ENVIRONMENT,
+                        'browser': params.BROWSER,
+                        'device': params.DEVICE,
+                        'platform': params.PLATFORM,
+                        'automation': params.TEST_FRAMEWORK,
+                        'categories': params.INCLUDE_CATEGORIES,
+                        'notCategories': params.EXCLUDE_CATEGORIES,
+                        'seleniumGridUrl': params.SELENIUM_GRID,
+                        'additionalArgs': params.ADDITIONAL_ARGS,
+                        'developer_mode': params.developer_mode,
+                        'test_status_filter': params.STATUS_FILTER,
+                        'automation_only_mode': params.automation_only_mode,
+                        'useSkippedFiltered': params.useSkippedFiltered,
+                        'rerun_failed_tests': params.RERUN_FAILED_TESTS,
+                        'rerun_statuses': params.RERUN_STATUS_FILTER,
+                        'pool_size': params.pool
+                    ]
+                    if (params.TEST_FRAMEWORK == 'robot') {
+                        config['tests_directory'] = params.TESTS_DIRECTORY
+                        config['merge_output'] = params.MERGE_LOGS
+                    } else {
+                        config['cwd'] = params.TESTS_DIRECTORY
+                    } 
+                    // Write config to JSON file
+                    writeJSON file: 'config.json', json: config
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    if (env.ITERATION_IDS != null && !env.ITERATION_IDS.isEmpty()) {
+                        sh '''
+                        source ./.venv/bin/activate
+                        echo "===== This is the config.json file ====="
+                        cat config.json
+                        pwd
+                        ls
+                        python -m SquashGlados config.json 
+                        '''
+                    } else { 
+                            sh '''echo "iteration id is empty" '''
+                    }
+                }
+            }
+        }
+
+    }
+    // post {
+    //     always {
+    //         // Clean up virtual environment (optional)
+    //         // sh 'deactivate'
+    //         // deleteDir()
+    //     }
+    // }
+
+}

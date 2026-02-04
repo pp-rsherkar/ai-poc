@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SquashGlados Configuration File Creator</title>
+    <script>
+        function generateConfig() {
+            const iterations = document.getElementById('iterations').value;
+            const errorMessage = document.getElementById('errorMessage');
+            if (!iterations) {
+                errorMessage.textContent = 'Iteration_id(s) is required.';
+                errorMessage.style.display = 'block';
+                return;
+            } else {
+                errorMessage.style.display = 'none';
+            }
+            let iterationsList = [];
+            const listOfIntsPattern = /^\d+(,\s*\d+)*$/;
+            if (iterations && !listOfIntsPattern.test(iterations)) {
+                errorMessage.textContent = 'Iteration_id(s) must be one or more integers separated by commas.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            if (iterations) {
+                iterationsList = iterations.split(',').map(iteration => iteration.trim());
+            }
+
+            const environment = document.getElementById('environment').value;
+            const squash_server = document.querySelector('input[name="squashserver"]:checked').value;
+            const browser = document.getElementById('browser').value;
+            const device = document.getElementById('device').value;
+            const platform = document.getElementById('platform').value;
+            const automation = document.querySelector('input[name="automation"]:checked').value;
+            const testsDirectory = document.getElementById('testsDirectory').value;
+            const cwd = document.getElementById('cwd').value;
+            const mergeLogs = document.querySelector('input[name="mergeLogs"]:checked').value === 'yes';
+
+            const categories = Array.from(document.getElementById('categories').selectedOptions).map(option => option.value);
+            const allCategories = document.getElementById('allCategories').checked;
+            if (allCategories) {
+                categories.length = 0;
+            }
+            let excludedCategories = [];
+            if (document.getElementById('excludeCategoriesYes').checked) {
+                excludedCategories = Array.from(document.getElementById('notCategories').selectedOptions).map(option => option.value);
+            }
+            const seleniumGridUrl = document.getElementById('seleniumGridUrl').value;
+            const additionalArgs = document.getElementById('additionalArgs').value;
+            const developer_mode = document.getElementById('developer_mode').checked;
+            const automation_only = document.getElementById('automation_only').checked;
+            // get filter statuses
+            filterStatuses = Array.from(document.querySelectorAll('input[name="testStatus"]:checked')).map(checkbox => checkbox.value);
+            const statusOptions = document.querySelectorAll('input[name="testStatus"]');
+            const allChecked = Array.from(statusOptions).every(option => option.checked);
+            if (allChecked) { filterStatuses = ["all"]; }
+            // useSkippedFiltered (boolean) - true means you want to see an execution with SKIPPED status for any tests that are filtered (missing automation info, mismatched categories, etc) (false means no updates in Squash for skipped tests)
+            const useSkippedFiltered = document.querySelector('input[name="useSkippedFiltered"]:checked').value === 'yes';
+            const rerun_failed_tests = "0";
+            const rerun_statuses = Array.from(document.querySelectorAll('input[name="rerunTestStatus"]:checked')).map(checkbox => checkbox.value);
+            const poolSize = document.getElementById('poolSize').value;
+
+            const config = {
+                iterations: iterationsList,
+                squash_server: squash_server,
+                environment: environment,
+                browser: browser,
+                device: device,
+                platform: platform,
+                automation: automation,
+                categories: categories,
+                notCategories: excludedCategories,
+                seleniumGridUrl: seleniumGridUrl,
+                additionalArgs: additionalArgs,
+                developer_mode: developer_mode,
+                automation_only: automation_only,
+                test_status_filter: filterStatuses,
+                useSkippedFiltered: useSkippedFiltered,
+                rerun_failed_tests: rerun_failed_tests,
+                rerun_statuses: rerun_statuses,
+                pool_size: poolSize
+            };
+            if (automation == "robot") {
+                config['merge_output'] = mergeLogs;
+                config['tests_directory'] = testsDirectory;
+            } else {
+                config['cwd'] = cwd;
+            }
+
+            document.getElementById('configOutput').value = JSON.stringify(config, null, 2);
+            document.getElementById("downloadhint").style.display = 'none';
+        }
+
+        function downloadConfig() {
+            const configText = document.getElementById('configOutput').value;
+            if (configText.length > 0) {
+                const blob = new Blob([configText], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'config.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            } else {
+                console.log("trying to download empty file")
+                document.getElementById("downloadhint").style.display = 'block'; 
+            }
+        }
+
+        function toggleCategories(show) {
+            document.getElementById('categories').style.display = show ? 'block' : 'none';
+        }
+        function toggleNotCategories(show) {
+            document.getElementById('notCategories').style.display = show ? 'block' : 'none';
+        }
+        function checkSelectAllStatuses(selectAllCheckbox) {
+            statusOptions = document.querySelectorAll('input[name="testStatus"]');
+            statusOptions.forEach(element => { element.checked = selectAllCheckbox.checked; });
+        }
+        function checkStatusOption() {
+            //const filterStatuses = Array.from(document.querySelectorAll('input[name="testStatus"]:checked')).map(checkbox => checkbox.value);
+            const selectAllCheckbox = document.getElementById('allStatuses');
+            const statusOptions = document.querySelectorAll('input[name="testStatus"]');
+            // const anyChecked = Array.from(statusOptions).some(option => option.checked);
+            const allChecked = Array.from(statusOptions).every(option => option.checked);
+            selectAllCheckbox.checked = allChecked;
+        }
+        function showRerunStatuses() {
+            const rerun_count = document.getElementById('rerun_failed_tests').value;
+            if (rerun_count > 0) { 
+                document.getElementById('rerun_statuses_fieldset').style.display = 'block';
+            } else {
+                document.getElementById('rerun_statuses_fieldset').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pytestRadio = document.getElementById('pytest');
+            const robotRadio = document.getElementById('robot');
+            const testsDirectoryInput = document.getElementById('testsDirectory');
+            const mergeLogs = document.getElementById('mergeLogsSection');
+
+            function toggleMergeLogs(show) {
+                document.getElementById('mergeLogsSection').style.display = show ? 'block' : 'none';
+                if (show) { 
+                    document.getElementById('testsDirectoryDiv').style.display = 'block';     // show testsDirectory and hide cwd for 'robot'
+                    document.getElementById('cwdDiv').style.display = 'none';
+                } else {
+                    document.getElementById('testsDirectoryDiv').style.display = 'none';     // hide testsDirectory and show cwd for 'pytest'
+                    document.getElementById('cwdDiv').style.display = 'block';
+                }
+                const defaultDirectory = show ? 'desktop_tests' : 'tests';
+                testsDirectoryInput.value = defaultDirectory;
+                testsDirectoryInput.style.backgroundColor = 'yellow';
+                mergeLogs.style.backgroundColor = 'yellow';
+                mergeLogs.style.transition = 'background-color 0.5s ease';
+                setTimeout(() => { mergeLogs.style.backgroundColor = '';}, 50);
+                setTimeout(() => { testsDirectoryInput.style.backgroundColor = ''; }, 300);
+            }
+
+            pytestRadio.addEventListener('change', () => toggleMergeLogs(false));
+            robotRadio.addEventListener('change', () => toggleMergeLogs(true));
+        });
+    </script>
+    <style>
+        body {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        input[type="text"], select {
+            width: 100%;
+            box-sizing: border-box;
+        }
+	    .sp1 { height: 25px }
+	    .sp2 { height: 100px }
+        #cwdDiv { display: none;}
+        #categories, #notCategories {
+            height: 200px; 
+        }
+        #rerun_statuses_fieldset { display: none; }
+        .warningmsg {  color: black; background-color: #fd9393; margin: 10px; padding: 10px; width: 85%; }
+        #errorMessage { display: none; }
+        #downloadhint { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Glados Configuration File Creator</h1>
+    <form onsubmit="generateConfig(); return false;"> 
+        <label for="iterations">What are the iteration id(s)?</label><br>
+	<input type="text" id="iterations" name="iterations" aria-label="Iterations" placeholder="Enter one or more iteration ids, separated by commas">
+	<div class="sp1"></div>
+
+        <label for="environment">What environment do you want to use?</label><br>
+        <input type="text" id="environment" name="environment" aria-label="Environment" placeholder="Enter the environment where you want to run tests">
+	<div class="sp1"></div>
+
+    <!-- Squash Server Selection -->
+    <fieldset>
+        <legend>Which Squash Server do you want Glados to update?</legend> 
+        <label for="stg">
+          <input type="radio" id="stg" name="squashserver" value="stg"> 
+          Staging
+        </label>
+      
+        <label for="prod">
+          <input type="radio" id="prod" name="squashserver" value="prod" checked> 
+          Production
+        </label>
+    </fieldset>
+	<div class="sp1"></div>
+
+        <label for="browser">What browser do you want to use?</label><br>
+        <input type="text" id="browser" name="browser" aria-label="Browser" placeholder="Enter the browser (chrome, firefox, safari)">
+	<div class="sp1"></div>
+
+        <label for="device">What device do you want to use?</label><br>
+        <input type="text" id="device" name="device" aria-label="Device" placeholder="Enter the device">
+	<div class="sp1"></div>
+
+        <label for="platform">What platform do you want to use?</label><br>
+        <input type="text" id="platform" name="platform" aria-label="Platform" placeholder="Enter the platform">
+	<div class="sp1"></div>
+
+        <!-- Automation Type -->
+        <fieldset>
+            <legend>Is the automation in pytest or robot?</legend> 
+            <label for="pytest">
+              <input type="radio" id="pytest" name="automation" value="pytest"> 
+              Pytest
+            </label>
+          
+            <label for="robot">
+              <input type="radio" id="robot" name="automation" value="robot" checked> 
+              Robot
+            </label>
+        </fieldset>
+        <br>
+
+        <!-- Tests Directory -->
+        <div id="testsDirectoryDiv">
+            <label for="testsDirectory">What is the directory where the automated test cases are?</label><br>
+            <div id="testsDirectoryNote"></div>
+            <input type="text" id="testsDirectory" name="testsDirectory" aria-label="Tests Directory" value="desktop_tests"><br>
+            <br>
+        </div>
+
+        <!-- CWD -->
+        <div id="cwdDiv">
+            <label for="cwd">What is the CWD where the pytest test cases are?</label><br>
+            <div id="cwdNote"></div>
+            <input type="text" id="cwd" name="cwd" aria-label="CWD" value="tests"><br>
+            <br>
+        </div>
+
+        <!--- Merge Logs --->
+        <div id="mergeLogsSection">
+            <fieldset>
+                <legend>Do you want to merge all output log files into one output log file?</legend>
+                <label for="mergeLogsYes">
+                    <input type="radio" id="mergeLogsYes" name="mergeLogs" value="yes">
+                    Yes
+                </label>
+                <label for="mergeLogsNo">
+                    <input type="radio" id="mergeLogsNo" name="mergeLogs" value="no" checked>
+                    No
+                </label>
+        </div>
+        <br>
+        
+        <!--- Categories --->
+        <fieldset>
+            <legend>Do you want to include all categories or some?</legend>
+            <label for="allCategories">
+                <input type="radio" id="allCategories" name="categorySelection" aria-label="All Categories" value="all" onclick="toggleCategories(false)" checked>
+                All
+            </label>
+            <label for="someCategories">
+                <input type="radio" id="someCategories" name="categorySelection" aria-label="Some Categories" value="some" onclick="toggleCategories(true)">
+                Some
+            </label>
+        
+            <select id="categories" name="categories" aria-label="Categories" multiple style="display: none;">
+                <option value="Design/UI">Design/UI</option>
+                <option value="Smoke Test">Smoke Test</option>
+                <option value="Library Case">Library Case</option>
+                <option value="Release Test Only">Release Test Only</option>
+                <option value="Compatibility">Compatibility</option>
+                <option value="Logic">Logic</option>
+                <option value="Performance">Performance</option>
+                <option value="Security">Security</option>
+                <option value="Single Code Source">Single Code Source</option>
+                <option value="SEO">SEO</option>
+                <option value="Tracking Code/Metrics">Tracking Code/Metrics</option>
+                <option value="User Scenarios">User Scenarios</option>
+                <option value="No PreProd/Canary">No PreProd/Canary</option>
+                <option value="Revenue Impacting">Revenue Impacting</option>
+                <option value="Build Verification">Build Verification</option>
+                <option value="Desktop Test">Desktop Test</option>
+                <option value="Mobile Test">Mobile Test</option>
+                <option value="Responsive Test">Responsive Test</option>
+                <option value="Desktop Required">Desktop Required</option>
+                <option value="Functional">Functional</option>
+                <option value="Sanity Test">Sanity Test</option>
+                <option value="Staging Test Only">Staging Test Only</option>
+                <option value="Data/Content">Data/Content</option>
+                <option value="Light Regression">Light Regression</option>
+                <option value="Full Regression">Full Regression</option>
+            </select>
+        </fieldset>
+        <br>
+        <fieldset>
+            <legend>Are there any categories where you do not want to run tests that have that category?</legend>
+            <label for="excludeCategoriesYes">
+                <input type="radio" id="excludeCategoriesYes" name="excludeCategories" value="yes" onclick="toggleNotCategories(true)">
+                Yes
+            </label>
+            <label for="excludeCategoriesNo">
+                <input type="radio" id="excludeCategoriesNo" name="excludeCategories" value="no" onclick="toggleNotCategories(false)" checked>
+                No
+            </label>
+        </fieldset>
+        
+        <select id="notCategories" name="notCategories" aria-label="Not Categories" multiple style="display: none;">
+            <option value="Design/UI">Design/UI</option>
+            <option value="Smoke Test">Smoke Test</option>
+            <option value="Library Case">Library Case</option>
+            <option value="Release Test Only">Release Test Only</option>
+            <option value="Compatibility">Compatibility</option>
+            <option value="Logic">Logic</option>
+            <option value="Performance">Performance</option>
+            <option value="Security">Security</option>
+            <option value="Single Code Source">Single Code Source</option>
+            <option value="SEO">SEO</option>
+            <option value="Tracking Code/Metrics">Tracking Code/Metrics</option>
+            <option value="User Scenarios">User Scenarios</option>
+            <option value="No PreProd/Canary">No PreProd/Canary</option>
+            <option value="Revenue Impacting">Revenue Impacting</option>
+            <option value="Build Verification">Build Verification</option>
+            <option value="Desktop Test">Desktop Test</option>
+            <option value="Mobile Test">Mobile Test</option>
+            <option value="Responsive Test">Responsive Test</option>
+            <option value="Desktop Required">Desktop Required</option>
+            <option value="Functional">Functional</option>
+            <option value="Sanity Test">Sanity Test</option>
+            <option value="Staging Test Only">Staging Test Only</option>
+            <option value="Data/Content">Data/Content</option>
+            <option value="Light Regression">Light Regression</option>
+            <option value="Full Regression">Full Regression</option>
+        </select><br>
+
+        <!-- Selenium Grid URL -->
+        <label for="seleniumGridUrl">Selenium Grid URL:</label><br>
+        <input type="text" id="seleniumGridUrl" name="seleniumGridUrl" aria-label="Selenium Grid URL" placeholder="http://your_selenium_url.internetbrands.com/">
+	<div class="sp1"></div>
+        
+        <!-- Additional Arguments -->
+        <label for="additionalArgs">Any additional arguments?</label><br>
+        <input type="text" id="additionalArgs" name="additionalArgs" aria-label="Additional Arguments" placeholder="Any other command line arguments to include?">
+	<div class="sp1"></div>
+
+        <!-- Developer Mode -->
+        <label for="developer_mode">Developer Mode</label>
+        <input type="checkbox" id="developer_mode" name="developer_mode" aria-label="Developer Mode" value="developer_mode">
+	<div class="sp1"></div>
+
+        <!-- Automation Only -->
+        <label for="automation_only">Automation Only Mode</label>
+        <input type="checkbox" id="automation_only" name="automation_only" aria-label="Automation Only" value="automation_only">
+	<div class="sp1"></div>
+
+
+        <!-- Test Status Filter -->
+        <fieldset>
+            <legend>Are there specific test statuses that you want to run?</legend>
+            <label for="allStatuses">
+                <input type="checkbox" id="allStatuses" name="testStatusAll" value="all" onclick="checkSelectAllStatuses(this)">
+                All
+            </label><br/>
+            <label for="readyStatus">
+                <input type="checkbox" id="readyStatus" name="testStatus" value="READY" onclick="checkStatusOption()">
+                Ready
+            </label><br/>
+            <label for="runningStatus">
+                <input type="checkbox" id="runningStatus" name="testStatus" value="RUNNING" onclick="checkStatusOption()">
+                Running
+            </label><br/>
+            <label for="passedStatus">
+		        <input type="checkbox" id="passedStatus" name="testStatus" value="SUCCESS" onclick="checkStatusOption()">
+                Passed
+            </label><br/>
+            <label for="failureStatus">
+                <input type="checkbox" id="failureStatus" name="testStatus" value="FAILURE" onclick="checkStatusOption()">
+                Failed
+            </label><br/>
+            <label for="blockedStatus">
+                <input type="checkbox" id="blockedStatus" name="testStatus" value="BLOCKED" onclick="checkStatusOption()">
+                Blocked
+            </label><br/>
+            <label for="settledStatus">
+                <input type="checkbox" id="settledStatus" name="testStatus" value="SETTLED" onclick="checkStatusOption()">
+                Settled
+            </label><br/>
+            <label for="untestableStatus">
+                <input type="checkbox" id="untestableStatus" name="testStatus" value="UNTESTABLE" onclick="checkStatusOption()">
+                Untestable
+            </label><br/>
+            <label for="skippedStatus">
+                <input type="checkbox" id="skippedStatus" name="testStatus" value="SKIPPED" onclick="checkStatusOption()">
+                Skipped
+            </label><br/>
+            <label for="cancelledStatus">
+                <input type="checkbox" id="cancelledStatus" name="testStatus" value="CANCELLED" onclick="checkStatusOption()">
+                Cancelled
+            </label>
+        </fieldset>
+        <br>
+
+        <!-- Use Skipped Execution Status -->
+        <fieldset>
+            <legend>For test cases that are filtered, do you want the status to be updated to SKIPPED?</legend> 
+	    <!-- <label for="useSkippedFiltered">For test cases that are filtered, do you want the status to be updated to SKIPPED?</label><br/> -->
+            <label for="useSkippedFilteredYes">
+                <input type="radio" id="useSkippedFilteredYes" name="useSkippedFiltered" value="yes" onclick="toggleSkippedFiltered(true)">
+                Yes
+            </label>
+            <label for="useSkippedFilteredNo">
+                <input type="radio" id="useSkippedFilteredNo" name="useSkippedFiltered" value="no" onclick="toggleSkippedFiltered(false)" checked>
+                No
+            </label>
+        </fieldset>
+    <div class="sp1"></div>
+        <!-- rerun failed tests -->
+        <label for="rerun_failed_tests">How many times do you want to rerun failed tests?</label>
+        <input type="number" id="rerun_failed_tests" name="rerun_failed_tests" aria-label="Pool Size" value="0" min="0" max="12" step="1" onchange="showRerunStatuses()">
+	<div class="sp1"></div>
+
+    <!--  rerun_statuses  -->
+    <div id="rerun_statuses_fieldset">
+        <fieldset>
+            <legend>Which test statuses do you want to rerun?</legend>
+            <label for="readyStatus">
+                <input type="checkbox" id="rerunreadyStatus" name="rerunTestStatus" value="READY">
+                Ready
+            </label><br/>
+            <label for="runningStatus">
+                <input type="checkbox" id="rerunrunningStatus" name="rerunTestStatus" value="RUNNING">
+                Running
+            </label><br/>
+            <label for="passedStatus">
+		        <input type="checkbox" id="rerunpassedStatus" name="rerunTestStatus" value="SUCCESS">
+                Passed
+            </label><br/>
+            <label for="failureStatus">
+                <input type="checkbox" id="rerunfailureStatus" name="rerunTestStatus" value="FAILURE" checked aria-checked="true">
+                Failed
+            </label><br/>
+            <label for="blockedStatus">
+                <input type="checkbox" id="rerunblockedStatus" name="rerunTestStatus" value="BLOCKED">
+                Blocked
+            </label><br/>
+            <label for="settledStatus">
+                <input type="checkbox" id="rerunsettledStatus" name="rerunTestStatus" value="SETTLED">
+                Settled
+            </label><br/>
+            <label for="untestableStatus">
+                <input type="checkbox" id="rerununtestableStatus" name="rerunTestStatus" value="UNTESTABLE">
+                Untestable
+            </label><br/>
+            <label for="skippedStatus">
+                <input type="checkbox" id="rerunskippedStatus" name="rerunTestStatus" value="SKIPPED">
+                Skipped
+            </label><br/>
+            <label for="cancelledStatus">
+                <input type="checkbox" id="reruncancelledStatus" name="rerunTestStatus" value="CANCELLED">
+                Cancelled
+            </label>
+        </fieldset>
+        <div class="sp1"></div>
+    </div>
+    <!--  end rerun_statuses  -->
+
+    <!-- Pool Size -->
+    <label for="poolSize">Pool Size</label>
+    <input type="number" id="poolSize" name="poolSize" aria-label="Pool Size" value="1" min="1" max="12" step="1">
+	<div class="sp1"></div>
+        
+    <!-- Generate Config -->
+    <input type="submit" aria-label="Generate Config" value="Generate Config">
+    <div id="errorMessage" class="warningmsg" aria-live="assertive"></div>
+    </form>
+
+    <h2>Generated Configuration</h2>
+    <textarea id="configOutput" rows="15" cols="70" readonly aria-live="polite" placeholder="Click Generate Config to see the json here"></textarea><br>
+    <br>
+    <button onclick="downloadConfig()" aria-label="Download Config File">Download Config</button>
+    <div id="downloadhint" class="warningmsg" aria-live="assertive">Click "Generate Config" above before clicking "Download Config"</div>
+    <div class="sp2"></div>
+</body>
+</html>

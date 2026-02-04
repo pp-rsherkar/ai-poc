@@ -1,0 +1,34 @@
+*** Settings ***
+Library           SeleniumLibrary
+Library           Collections
+Library           String
+Library           SquashGlados
+
+*** Variables ***
+${comment}    This is a test comment
+${images}    Create List
+${last_step_started}    -1
+${execution_id}         ${EMPTY}
+${REMOTE}    ${EMPTY}
+
+*** Keywords ***
+test setup
+    glados setup    ### ???
+    # open browser    https://www.google.com    ${BROWSER}    ${EMPTY}    ${REMOTE}    ${EMPTY}    ${EMPTY}
+    Log    This is the Test Setup
+    ${SQUASH EXECUTION IMAGES}=    Create List
+    Set Test Variable    ${SQUASH EXECUTION IMAGES}
+    ${SQUASH_COMMENT_FORMAT}=    Set Variable    02
+    Set Test Variable    ${SQUASH_COMMENT_FORMAT}
+
+test teardown
+    log variables
+    #${squash comment}=    Set Variable    The test had status ${TEST STATUS} and test message ${TEST MESSAGE}
+    IF    ${last_step_started} > 0
+        update execution    ${execution_id}     last_step_started=${last_step_started}
+    ELSE
+        update execution    ${execution_id}    #### images=${SQUASH EXECUTION IMAGES}      # ${TEST_STATUS}    # ${comment}    ${images}    ${last_step_started}
+        # optional args for "update_execution" are: execution_status, comment, images, last_step_started, squash_server, using_robot
+    END
+    close all browsers
+    Log    This is the Test Teardown

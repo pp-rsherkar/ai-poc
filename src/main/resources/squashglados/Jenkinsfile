@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+    
+    triggers {
+        GenericTrigger(
+            genericVariables: [
+                [
+                    key: "ref",
+                    value: "\$.ref"
+                ]
+            ],
+            causeString: 'Triggered on $ref',
+            token: 'SquashGlados_Update',
+            tokenCredentialId: '',
+            printContributedVariables: true,
+            printPostContent: true,
+            silentResponse: false,
+            shouldNotFlatten: false,
+        ) 
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '$ref']], extensions: [[$class: 'CleanBeforeCheckout']],
+                userRemoteConfigs: [[credentialsId: 'ceec4c06-b4f7-4794-9b8b-6537b8cced95', url: 'git@git.internetbrands.com:QAAutomation/squashglados.git']])
+            }
+        }
+
+        stage('Prepare Virtual Environment') {
+            steps {
+                sh '''
+                python -m venv ./.venv
+                source ./.venv/bin/activate
+                python -m pip install --upgrade pip
+                python -m pip list
+                '''
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    echo "Going to try to upload SquashGlados to the pip server..."
+                    try {
+                        sh """
+                        ZIPFILENAME=SquashGladosTest_latest.zip
+                        echo "zip file name: \$ZIPFILENAME"
+                         
+                        zip -r \$ZIPFILENAME *
+                        ( scp -v \$ZIPFILENAME jenkins@stg-qa-selenium1.internetbrands.com:/var/www/html/status/squashglados/SquashGlados_latest.zip && rm \$ZIPFILENAME ) || exit 1
+                        
+                        echo "----- Going to use twine to upload to the IBQA pypiserver ----"
+                        source .venv/bin/activate
+                        python -m pip install twine
+                        python -m pip install build
+                        python -m pip list
+                        python -m build
+                        python -m twine upload --non-interactive --repository-url http://stg-qa-selenium1.internetbrands.com:8080 -u qatest -p qatest dist/*
+                        python -m pip install requests
+                        python tools/send_new_version_message.py $ref
+                        deactivate
+                        """
+                    } catch (Exception e) {
+                        echo "ERROR: ${e.getMessage()}"
+                        env.error_stages += "Deploy Stage failed: ${e.getMessage()}. "
+                        unstable(message: "Deploy stage is unstable: ${e.getMessage()}")
+                    }
+                }
+            }
+        }
+        
+    }
+}
