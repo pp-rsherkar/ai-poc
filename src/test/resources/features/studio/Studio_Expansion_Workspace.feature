@@ -52,7 +52,7 @@ Feature: HCP Audience Workspace in Studio Application
     And User navigates to NPI Lists page in LIFE
     And User searches the workspace in LIFE and selects it
     And User clicks on the published workspace
-    Then User Verify the list is displayed in the Life
+    Then User Verify the list is displayed in the LIFE
 
     Examples:
       | ADVERTISER | SOURCE_AUDIENCE  | OPTIONS      | EXPANDED_AUDIENCE             | LIST_TYPE |
