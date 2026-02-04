@@ -23,7 +23,7 @@ Feature: HCP Audience Workspace in Studio Application
       | Abbvie     | HCP_Expansion  | Studio Workspace | PB_Test      | Expand with Care Team         |
       | Abbvie     | HCP_Expansion  | NPI List         | PB_Test_List | Expand with Affiliation Graph |
 
-    #@e2e
+    #@e2e added hash tags before tags for future reference, it will be removed once all stpes are implemented
   Scenario Outline: Create and save an HCP Audience Expansion workspace and publish the workspace
       #1
     Given This scenario will be executed in the "Pre-release" environment as a "User"
