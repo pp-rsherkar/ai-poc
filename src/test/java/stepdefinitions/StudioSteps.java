@@ -145,42 +145,6 @@ public class StudioSteps {
         workspaceCreation.verifyStudioWorkspaceFrame();
         workspaceCreation.createStudioWorkspace();
     }
-/*
-    @And("User selects the Workspace Type as {string}")
-    public void userSelectsTheWorkspaceTypeAs(String workspaceType) {
-    }
-
-    @And("User selects the advertiser as {string}")
-    public void userSelectsTheAdvertiserAs(String advertiser) {
-    }
-
-    @Then("User selects Source Audience details as {string},{string}")
-    public void userSelectsSourceAudienceDetailsAs(String sourceAudience, String options) {
-    }
-
-    @And("User selects {string}")
-    public void userSelects(String expandedAudience) {
-    }
-
-    @Then("User verifies the expanded audience count")
-    public void userVerifiesTheExpandedAudienceCount() {
-    }
-
-    @And("User clicks on Edit button to rename the workspace to {string}")
-    public void userClicksOnEditButtonToRenameTheWorkspaceTo(String workspaceName) {
-    }
-
-    @Then("Verify the workspace is visible in workspace management page")
-    public void verifyTheWorkspaceIsVisibleInWorkspaceManagementPage() {
-    }
-
-    @Then("Verify the Workspace is saved")
-    public void verifyTheWorkspaceIsSaved() {
-    }
-
-    @Then("User Verify the list is displayed in the LIFE")
-    public void userVerifyTheListIsDisplayedInTheLIFE() {
-    }*/
 
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
@@ -802,4 +766,40 @@ public class StudioSteps {
     public void userShouldBeAbleToSeeStudioForThatAccount() {
         Assert.assertEquals("Studio", navigation.verifyStudioTitle());
     }
+/*
+    @And("User selects the Workspace Type as {string}")
+    public void userSelectsTheWorkspaceTypeAs(String workspaceType) {
+    }
+
+    @And("User selects the advertiser as {string}")
+    public void userSelectsTheAdvertiserAs(String advertiser) {
+    }
+
+    @Then("User selects Source Audience details as {string},{string}")
+    public void userSelectsSourceAudienceDetailsAs(String sourceAudience, String options) {
+    }
+
+    @And("User selects {string}")
+    public void userSelects(String expandedAudience) {
+    }
+
+    @Then("User verifies the expanded audience count")
+    public void userVerifiesTheExpandedAudienceCount() {
+    }
+
+    @And("User clicks on Edit button to rename the workspace to {string}")
+    public void userClicksOnEditButtonToRenameTheWorkspaceTo(String workspaceName) {
+    }
+
+    @Then("Verify the workspace is visible in workspace management page")
+    public void verifyTheWorkspaceIsVisibleInWorkspaceManagementPage() {
+    }
+
+    @Then("Verify the Workspace is saved")
+    public void verifyTheWorkspaceIsSaved() {
+    }
+
+    @Then("User Verify the list is displayed in the LIFE")
+    public void userVerifyTheListIsDisplayedInTheLIFE() {
+    }*/
 }
