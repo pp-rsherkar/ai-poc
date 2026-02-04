@@ -104,7 +104,26 @@ public class CreateCreatives {
     public final Locator CREATED_BY_FROM_CREATIVE_TILE;
     public final Locator SOURCE_FROM_CREATIVE_TILE;
     public final Locator LAST_UPDATED_FROM_CREATIVE_TILE;
+    public final Locator ASSOCIATIONS_TAB;
+    public final Locator COLUMN_SELECTION_ICON;
+    public final Locator COLUMN_NAME_FROM_SELECTION_ICON;
+    public final Locator ASSOCIATIONS_TAB_COLUMN_NAME;
+    public final Locator MENU_BUTTONS_FROM_ASSOCIATION_ICON;
+    private final Locator FILTER_ICON;
+    private final Locator NO_FILTER_TEXT;
+    private final Locator FILTER_BUTTONS;
+    private final Locator SELECTED_FILTER_NAME;
+    private final Locator FILTER_VALUE;
+    private final Locator FILTER_START_DATE;
+    private final Locator FILTER_END_DATE;
+    private final Locator ASSOCIATIONS_TAB_LINE_ITEM_NAME;
+    private final Locator ASSOCIATIONS_TAB_CAMPAIGN_NAME;
+    private final Locator FILTERED_RECORD_COUNT;
+    private final Locator CALENDAR_TITLE;
+    private final Locator CALENDAR_MONTH;
+    private final Locator CALENDAR_DATE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     String imageTextLocator = "//span[contains(text(),'%s')]";
 
     public CreateCreatives(Page page) {
@@ -196,6 +215,24 @@ public class CreateCreatives {
         this.CREATED_BY_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Created by :')]/following-sibling::span");
         this.SOURCE_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Source:')]/following-sibling::span");
         this.LAST_UPDATED_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Last updated:')]/following-sibling::span");
+        this.ASSOCIATIONS_TAB = page.locator("//div[@class='creativeContainer']//a[contains(text(),'Associations')]");
+        this.COLUMN_SELECTION_ICON = page.locator("//span[@class='icon-bars']");
+        this.COLUMN_NAME_FROM_SELECTION_ICON = page.locator("//span[@class='icon-bars']/following-sibling::div//div[contains(@class,'item')]");
+        this.ASSOCIATIONS_TAB_COLUMN_NAME = page.locator("//div[@class='filter-container']");
+        this.MENU_BUTTONS_FROM_ASSOCIATION_ICON = page.locator("//div[@class='menuButtons']/button[contains(@class,'button small')]");
+        this.FILTER_ICON = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link");
+        this.NO_FILTER_TEXT = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//p");
+        this.FILTER_BUTTONS = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//button");
+        this.SELECTED_FILTER_NAME = page.locator("//table[contains(@class,'filterTable')]//div[@class='text']");
+        this.FILTER_VALUE = page.locator("//input[@value='Enter Value']");
+        this.FILTER_START_DATE = page.locator("//td[not(@hidden)]//input[contains(@placeholder,'Start Date')]");
+        this.FILTER_END_DATE = page.locator("//td[not(@hidden)]//input[contains(@placeholder,'End Date')]");
+        this.ASSOCIATIONS_TAB_LINE_ITEM_NAME = page.locator("//td[contains(@class,'gaTableRow creativeNames')]");
+        this.ASSOCIATIONS_TAB_CAMPAIGN_NAME = page.locator("//td[contains(@class,'multiline-wrapper')]//div[contains(@class,'ellipsediv')]");
+        this.FILTERED_RECORD_COUNT = page.locator("//td[contains(@class,'total-record-counts')]");
+        this.CALENDAR_TITLE = page.locator("//sui-calendar-view-title//span[@class='title link']");
+        this.CALENDAR_MONTH = page.locator("//sui-calendar-month-view//tbody//td");
+        this.CALENDAR_DATE = page.locator("//sui-calendar-date-view//tbody//td");
     }
 
     public String verifyCreativeLibraryPageTitle() {
@@ -400,7 +437,6 @@ public class CreateCreatives {
         }
         return false;
     }
-
 
     public void searchCreative(String searchValue) {
         SEARCH_BOX.fill(searchValue);
@@ -744,7 +780,7 @@ public class CreateCreatives {
     }
 
     public void checkIfCreativeIsPresent(Locator locator){
-        if(locator.count() == 0) {
+        while(locator.count() == 0) {
             PAGINATION_NEXT_BUTTON.click();
             waitUtility.waitUntilPreLoaderHidden();
             waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
@@ -881,5 +917,120 @@ public class CreateCreatives {
 
     public String fetchLastUpdatedTimeFromCreativeTile(){
         return LAST_UPDATED_FROM_CREATIVE_TILE.textContent().trim();
+    }
+
+    public void clickAssociationTab() {
+        ASSOCIATIONS_TAB.click();
+    }
+
+    public void clickColumnSelectionIcon() {
+        if(!COLUMN_NAME_FROM_SELECTION_ICON.first().isVisible())
+            COLUMN_SELECTION_ICON.click();
+    }
+
+    public List<String> fetchColumnNamesFromSelectionIconList() {
+        List<String> columnNames = new ArrayList<>();
+        for (int i = 0; i < COLUMN_NAME_FROM_SELECTION_ICON.count(); i++) {
+            columnNames.add(COLUMN_NAME_FROM_SELECTION_ICON.nth(i).textContent().trim());
+        }
+        return columnNames;
+    }
+
+    public void deselectColumnNamesFromSelectionIconList(List<String> unselectedColumnNames){
+        for(String columnName : unselectedColumnNames){
+            for(int i = 0; i< COLUMN_NAME_FROM_SELECTION_ICON.count(); i++){
+                if(COLUMN_NAME_FROM_SELECTION_ICON.nth(i).textContent().trim().equalsIgnoreCase(columnName)){
+                    COLUMN_NAME_FROM_SELECTION_ICON.nth(i).click();
+                    break;
+                }
+            }
+        }
+        page.keyboard().press("Escape");
+    }
+
+    public List<String> fetchColumnNamesFromAssociationsTab() {
+        List<String> columnNames = new ArrayList<>();
+        for (int i = 0; i < ASSOCIATIONS_TAB_COLUMN_NAME.count(); i++) {
+            Locator columnHeader = ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).locator("xpath=./parent::th");
+            if(columnHeader.getAttribute("hidden") == null)
+                columnNames.add(ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).textContent().trim());
+        }
+        return columnNames;
+    }
+
+    public void clickMenuButtonFromColumnSelection(String buttonName) {
+        for (int i = 0; i < MENU_BUTTONS_FROM_ASSOCIATION_ICON.count(); i++) {
+            if(MENU_BUTTONS_FROM_ASSOCIATION_ICON.nth(i).textContent().trim().equalsIgnoreCase(buttonName)){
+                MENU_BUTTONS_FROM_ASSOCIATION_ICON.nth(i).click();
+                break;
+            }
+        }
+    }
+
+    public void clickFilterIcon() {
+        FILTER_ICON.click();
+    }
+
+    public List<String> fetchFilterFields(){
+        List<String> filterFields = new ArrayList<>();
+        filterFields.add(NO_FILTER_TEXT.textContent().trim());
+        for(int i = 0; i<FILTER_BUTTONS.count(); i++){
+            filterFields.add(FILTER_BUTTONS.nth(i).textContent().trim());
+        }
+        return filterFields;
+    }
+
+    public void clickFilterButton(String buttonName) {
+        FILTER_BUTTONS.getByText(buttonName).scrollIntoViewIfNeeded();
+        FILTER_BUTTONS.getByText(buttonName).click();
+    }
+
+    public void selectFilterName(String name) {
+        for (int i = 0; i < SELECTED_FILTER_NAME.count(); i++) {
+            String text = SELECTED_FILTER_NAME.nth(i).textContent().trim();
+            if (text.equalsIgnoreCase(name)) {
+                return;
+            }
+        }
+    }
+
+    public String fetchLineItemFromAssociation(){
+        return ASSOCIATIONS_TAB_LINE_ITEM_NAME.first().textContent().trim();
+    }
+
+    public String fetchCampaignFromAssociation(){
+        return ASSOCIATIONS_TAB_CAMPAIGN_NAME.first().textContent().trim();
+    }
+
+    public void enterFilterValue(String name) {
+        for (int i = 0; i < FILTER_VALUE.count(); i++) {
+            if (FILTER_VALUE.nth(i).inputValue().isEmpty())
+                FILTER_VALUE.nth(i).fill(name);
+        }
+    }
+
+    public void enterDates() {
+        FILTER_START_DATE.click();
+        CALENDAR_TITLE.click();
+        CALENDAR_MONTH.getByText("Jan").click();
+        CALENDAR_DATE.getByText("1", new Locator.GetByTextOptions().setExact(true)).first().click();
+
+        FILTER_END_DATE.click();
+        CALENDAR_TITLE.click();
+        CALENDAR_MONTH.getByText("Dec").scrollIntoViewIfNeeded();
+        CALENDAR_MONTH.getByText("Dec").click();
+        CALENDAR_DATE.getByText("31", new Locator.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
+        CALENDAR_DATE.getByText("31", new Locator.GetByTextOptions().setExact(true)).first().click();
+    }
+
+    public String fetchFilteredRecordsCount() {
+        waitUtility.waitUntilSpinnerHidden();
+        return FILTERED_RECORD_COUNT.textContent().trim();
+    }
+
+    public String clickLineItemName(String lineItemName) {
+        page.locator(String.format("//div[contains(@title,'%s')]", lineItemName)).click();
+        waitUtility.waitForLocatorVisible(campaignDashboard.LINE_ITEM_PAGE_TITLE);
+        return campaignDashboard.LINE_ITEM_PAGE_TITLE.textContent().trim();
     }
 }
