@@ -766,7 +766,8 @@ public class StudioSteps {
     public void userShouldBeAbleToSeeStudioForThatAccount() {
         Assert.assertEquals("Studio", navigation.verifyStudioTitle());
     }
-/*
+
+    //Implementation is in progress- Pbalu-04-02-2026
     @And("User selects the Workspace Type as {string}")
     public void userSelectsTheWorkspaceTypeAs(String workspaceType) {
     }
@@ -801,5 +802,5 @@ public class StudioSteps {
 
     @Then("User Verify the list is displayed in the LIFE")
     public void userVerifyTheListIsDisplayedInTheLIFE() {
-    }*/
+    }
 }
