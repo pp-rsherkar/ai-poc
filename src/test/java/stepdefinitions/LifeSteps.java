@@ -3,12 +3,15 @@ package stepdefinitions;
 import com.microsoft.playwright.APIResponse;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
+import hooks.Hooks;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pages.Navigation;
 import pages.admin.Accounts;
 import pages.life.*;
@@ -92,9 +95,11 @@ public class LifeSteps {
     BigDecimal campaignBaseBid;
     BigDecimal campaignMaxBid;
     Path targetFilePath;
+    private static final Logger logger = LoggerFactory.getLogger(LifeSteps.class);
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) {
+        logger.info("Setting up environment: {} for user type: {}", environment, user);
         userType = user;
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");

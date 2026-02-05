@@ -6,6 +6,8 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pages.Navigation;
 import pages.admin.Accounts;
 import pages.studio.ExpansionWorkspace;
@@ -43,6 +45,7 @@ public class StudioSteps {
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
+    private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
