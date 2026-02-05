@@ -128,6 +128,7 @@ public class TacticDetails {
     public Locator customFieldValue(String customFieldName) {
         return page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
     }
+
     public List<String> getAllTactics() {
         return SAVED_TACTICS.allInnerTexts();
     }
@@ -237,7 +238,6 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
-        waitUtility.waitForLocatorVisible(ADD_CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();
     }
 
