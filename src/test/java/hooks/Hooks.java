@@ -8,7 +8,10 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import utils.ConfigReader;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +34,32 @@ public class Hooks {
         }
     }
 
-    //After runs in reverse order so order=1 will run first
+    // After runs in reverse order so order = -1 runs LAST
+    @After(value = "@e2e or @regression", order = -1)
+    public void renameAndAttachVideo(Scenario scenario) {
+        if (page.video() == null) {
+            return;
+        }
+        try {
+            Path videoPath = page.video().path();
+            if (!Files.exists(videoPath)) {
+                return;
+            }
+            String scenarioName = "Video - " + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_");
+            if (scenario.isFailed()) {
+                Path renamed = videoPath.getParent().resolve(scenarioName + ".webm");
+                Files.move(videoPath, renamed, StandardCopyOption.REPLACE_EXISTING);
+                scenario.attach(Files.readAllBytes(renamed), "video/webm", scenarioName);
+                Files.deleteIfExists(renamed);
+            } else {
+                Files.deleteIfExists(videoPath);
+            }
+        } catch (Exception e) {
+            logger.warning("Video handling failed: " + e.getMessage());
+        }
+    }
+
+
     @After(value = "@e2e or @regression", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
@@ -48,7 +76,7 @@ public class Hooks {
     public void takeScreenshotAndTrace(Scenario scenario) {
         if (scenario.isFailed()) {
             try {
-                String screenshotName = scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
+                String screenshotName = "Screenshot - " + scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
                 DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
