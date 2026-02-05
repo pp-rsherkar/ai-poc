@@ -237,7 +237,6 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
-        waitUtility.waitForLocatorVisible(ADD_CUSTOM_FIELD);
         SAVE_TACTIC_DETAILS.click();
     }
 
