@@ -190,6 +190,9 @@ Feature: LIFE Regression - Create a Campaign
       | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
       | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000     | Test               |
 
+  @todo
+  Scenario: Create a Campaign with a Tactic & a Line Item for an External user
+
 #  @regression
 #  Scenario Outline: API Sample Test
 #    Given I call "<apiName>" with parameters "<param1>" & "<param2>"
