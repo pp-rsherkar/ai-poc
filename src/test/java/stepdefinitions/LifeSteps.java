@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -186,8 +185,8 @@ public class LifeSteps {
         Assert.assertEquals("New Tactic", tacticDetails.verifyTacticDetailsText());
     }
 
-    @Then("User creates multiple tactics under same line item and verifies it")
-    public void user_creates_multiple_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
+    @Then("User creates below tactics under same line item and verifies it")
+    public void user_creates_below_tactics_under_same_line_item_and_verifies_it(DataTable dataTable) {
         List<Map<String, String>> tactics = dataTable.asMaps(String.class, String.class);
         List<String> expectedTactic = new ArrayList<>();
         for (Map<String, String> tacticData : tactics) {
@@ -214,6 +213,17 @@ public class LifeSteps {
         Assert.assertEquals(expectedTarget, actualTarget);
     }
 
+    @When("User clicks the comments icon in the tactic {string} section and add {string}")
+    public void userClicksTheCommentsIconInTheTacticSection(String entryPoint, String comment) {
+        tacticDetails.addComment(entryPoint, comment);
+    }
+
+    @When("User validates the comment added in {string} is {string} then clear it")
+    public void user_validates_the_comment_added_then_clear_it(String entryPoint, String expectedComment) {
+        String actualComment = tacticDetails.validateComment(entryPoint);
+        Assert.assertEquals(expectedComment, actualComment);
+    }
+
     @Then("User adds frequency cap with details {string} {string} {string} {string}")
     public void user_adds_frequency_cap_with_details(String level, String FREQ_VALUE, String TIMES_PER, String SCOPE) {
         campaigns.addFrequencyCap(level, FREQ_VALUE, TIMES_PER, SCOPE);
@@ -224,7 +234,7 @@ public class LifeSteps {
         campaigns.clickDetailsTab();
     }
 
-    @Then("User verified Frequency Cap is in disabled states by default")
+    @Then("User verifies if Frequency Cap is in disabled state by default")
     public void userVerifiedFrequencyCapIsInDisabledStatesByDefault() {
         boolean fc_checkbox_state = campaigns.isFrequencyCapDisabled();
         Assert.assertFalse(fc_checkbox_state);
@@ -280,24 +290,28 @@ public class LifeSteps {
 
     @Then("User creates new custom field {string} and verifies the same")
     public void user_creates_new_custom_field_and_verifies_the_same(String customField) {
-        customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
-        tacticDetails.clickDetailsTab();
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
+        this.customFieldName = customFieldName;
         tacticDetails.addCustomField(customFieldName);
-        String actualName = tacticDetails.verifyCustomField(customFieldName).split("\\R")[0];// To remove unwanted space and text
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0];// To remove unwanted space and text
         Assert.assertEquals(customFieldName, actualName);
-        uiCustomFieldName = actualName;
+        this.uiCustomFieldName = actualName;
     }
 
-    @And("User verifies if new custom field is visible in new and existing tactic")
-    public void userVerifiesIfNewCustomFieldIsVisibleInNewAndExistingTactic() {
+
+    @And("User verifies if new custom field is visible and empty in new tactic")
+    public void user_verifies_if_new_custom_field_is_visible_and_empty_in_new_tactic() {
         tacticDetails.clickNewTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
-        tacticDetails.clickTactic(metricName);
+        Assert.assertTrue(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
+        tacticDetails.clickLastTactic();
         Assert.assertEquals(customFieldName, uiCustomFieldName);
+        Assert.assertFalse(tacticDetails.customFieldValue(customFieldName).inputValue().isEmpty());
     }
 
-    @Then("User deletes the custom field")
-    public void user_deletes_the_custom_field() {
+    @Then("User deletes the custom field and verify its removed from new tactic")
+    public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         tacticDetails.deleteCustomField(customFieldName);
     }
 
@@ -332,6 +346,17 @@ public class LifeSteps {
         Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
     }
 
+    @Then("User clicks on first tactic and goes to details tab")
+    public void user_clicks_on_first_tactic_and_goes_to_details_tab() {
+        tacticDetails.clickFirstTacticTab();
+        tacticDetails.clickDetailsTab();
+    }
+
+    @Then("User clears the custom field text")
+    public void user_clears_the_custom_field_text() {
+        tacticDetails.clearCustomFieldText(customFieldName);
+    }
+
     @Then("User assigns the existing creative named {string}, enables the tactic and saves the changes")
     public void user_assigns_the_existing_creative_enables_the_tactic_and_saves_the_changes(String creative) {
         navigation.clickOnIcon("Assign Existing Creatives");
@@ -344,6 +369,7 @@ public class LifeSteps {
     public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
         assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
         tacticCreatives.navigateToCampaignDashboard();
+        campaignDashboard.resetFiltersIfApplied();
         Assert.assertEquals("Running", tacticCreatives.verifyCampaignRunning());
     }
 
@@ -4021,7 +4047,7 @@ public class LifeSteps {
         Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
     }
 
-    @And("Verify the count of items in the downloaded {string} list")
+    @And("Verify that the count of items in the downloaded {string} list is the same as the item count displayed in the UI")
     public void verifyTheCountOfItemsInTheDownloadedList(String listType) throws IOException {
         String header = null;
         int recordsCountFromFile = 0;
@@ -4058,6 +4084,97 @@ public class LifeSteps {
         Assert.assertEquals("Downloaded list count doesn't match with UI count", recordsCountFromFile, Integer.parseInt(recordsCountFromUI));
     }
 
+    @And("User enters the list name as {string} and uploads the file {string}")
+    public void userEntersTheListNameAndUploadsTheFile(String listName, String fileName) {
+        metricName = listName + "_" + CommonUtils.timeStampCalculation();
+        npiName = metricName;
+        sharedList.enterListName(metricName);
+        npiStaticList.uploadStaticListFile(fileName);
+    }
 
+    @And("User saves the Email list and verify that the list is created successfully")
+    public void userSavesTheListAndVerifyThatTheListIsCreatedSuccessfully() {
+        sharedList.saveEmailList();
+        Assert.assertEquals("Email list created successfully", sharedList.isListCreatedOrDeleted());
+    }
 
+    @And("Verify that the counter on the left displays the correct value after file upload for {string}")
+    public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUploadFor(String listType) {
+        sharedList.searchAndOpenCreatedList(metricName);
+        totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
+        itemCount = sharedList.fetchEmailCount();
+        Assert.assertEquals(totalListCount, itemCount);
+    }
+
+    @And("Verify that download option should not be available for uploaded Email list")
+    public void verifyThatDownloadOptionShouldNotBeAvailableForUploadedEmailList() {
+        Assert.assertFalse("Download icon is available for Email list", sharedList.isEmailListDownloadIconVisible());
+    }
+
+    @Then("Verify that user is able to export the audit log for {string}")
+    public void verifyThatUserIsAbleToExportTheAuditLogFor(String moduleName) {
+        campaigns.clickCampaignOptions();
+        campaigns.openExportAuditLogPopup();
+
+        switch (moduleName) {
+            case "campaign":
+                assert campaigns.fetchExportAuditLogPopupContent().contains(campaignNameRandom);
+                break;
+            case "line item":
+                assert campaigns.fetchExportAuditLogPopupContent().contains(lineItemNameRandom);
+                break;
+            case "tactic":
+                assert campaigns.fetchExportAuditLogPopupContent().contains(tacticNameRandom);
+                break;
+        }
+
+        campaigns.clickConfirmExportAuditLog();
+        Assert.assertEquals("Audit Log request created. File will be send via email.", campaigns.fetchExportAuditLogSuccessAlert());
+    }
+
+    @When("User navigates to {string} page")
+    public void userNavigatesToItemPage(String moduleName) {
+        switch (moduleName) {
+            case "campaign":
+                campaigns.clickCampaignTile();
+                break;
+            case "line item":
+                campaigns.clickLineItemTile();
+                break;
+            case "tactic":
+                campaigns.clickTacticTile();
+                break;
+        }
+    }
+
+    @Then("Verify that user is able to export the campaign settings")
+    public void verifyThatUserIsAbleToExportTheCampaignSettings() {
+        campaigns.clickCampaignDetailsTab();
+        campaigns.clickCampaignOptions();
+        campaigns.exportCampaignSettings();
+        Assert.assertEquals("Done! The exported file will be sent to default@pulsepoint.com within 10 minutes.", campaigns.fetchExportCampaignSettingsSuccessAlert());
+    }
+
+    @And("Verify that user is able to download the {string} list")
+    public void verifyThatUserIsAbleToDownloadTheList(String listType) throws IOException {
+        targetFilePath = npiStaticList.clickDownloadIcon();
+        Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
+    }
+
+    @And("User searches and selects the NPI List {string}")
+    public void userSearchesAndSelectsThePulsePointProvidedNPIList(String npiListName) {
+        npiLists.searchList(npiListName);
+        npiLists.openSearchedList(npiListName);
+    }
+
+    @And("User searches and selects the campaign {string}")
+    public void userSearchesAndSelectsTheCampaign(String campaignName) {
+        campaignDashboard.searchCreatedCampaign(campaignName);
+        campaignDashboard.navigateToCampaign(campaignName);
+    }
+
+    @Then("Verify that the campaign page is displayed")
+    public void verifyThatTheCampaignPageIsDisplayed() {
+        Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
+    }
 }

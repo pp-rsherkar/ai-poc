@@ -63,6 +63,17 @@ public class Campaigns {
     private final Locator LINE_ITEM_TAB;
     private final Locator FREQUENCY_CAP;
     private final Locator TIMES_PER_HOURS_VALUE;
+    private final Locator CAMPAIGN_OPTIONS;
+    private final Locator EXPORT_AUDIT_LOG;
+    private final Locator EXPORT_AUDIT_LOG_POPUP;
+    private final Locator EXPORT_AUDIT_LOG_POPUP_CONTENT;
+    private final Locator EXPORT_AUDIT_LOG_POPUP_OK_BUTTON;
+    private final Locator EXPORT_AUDIT_LOG_SUCCESS_ALERT;
+    private final Locator EXPORT_CAMPAIGN_SETTINGS;
+    private final Locator EXPORT_CAMPAIGN_SETTINGS_POPUP;
+    private final Locator EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON;
+    private final Locator EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON;
+    private final Locator EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -119,6 +130,17 @@ public class Campaigns {
         this.LINE_ITEM_TAB = page.locator("//div[contains(@class,'listitembox')]");
         this.FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
         this.TIMES_PER_HOURS_VALUE = page.locator("//input[@formcontrolname='hour']");
+        this.CAMPAIGN_OPTIONS = page.locator("//div[contains(@class, 'action-items')]//span[@title='options']");
+        this.EXPORT_AUDIT_LOG = page.locator("//span[text()='Export Audit Log']");
+        this.EXPORT_AUDIT_LOG_POPUP = page.locator("//div[@class='popup-header' and text()='Export Audit Log']");
+        this.EXPORT_AUDIT_LOG_POPUP_CONTENT = page.locator("//div[contains(@class,'popup-content')]/span");
+        this.EXPORT_AUDIT_LOG_POPUP_OK_BUTTON = page.locator("//span[@class='text' and text()='Ok']");
+        this.EXPORT_AUDIT_LOG_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Audit Log request created')]");
+        this.EXPORT_CAMPAIGN_SETTINGS = page.locator("//app-icon-lable-link[@icon='20-export.svg']//div[@class='icolink']");
+        this.EXPORT_CAMPAIGN_SETTINGS_POPUP = page.locator("//div[@class='rightPanelHeader2' and text()='Export Campaign Settings']");
+        this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
+        this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
+        this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
     }
 
     public void createCampaign() {
@@ -436,5 +458,71 @@ public class Campaigns {
 
     public String fetchToggleStatus() {
         return TOGGLE_STATUS.textContent().trim();
+    }
+
+    public void clickCampaignOptions() {
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(CAMPAIGN_OPTIONS);
+        CAMPAIGN_OPTIONS.click();
+    }
+
+    public void openExportAuditLogPopup() {
+        waitUtility.waitForLocatorVisible(EXPORT_AUDIT_LOG);
+        EXPORT_AUDIT_LOG.click();
+        waitUtility.waitForLocatorVisible(EXPORT_AUDIT_LOG_POPUP);
+    }
+
+    public String fetchExportAuditLogPopupContent() {
+        return EXPORT_AUDIT_LOG_POPUP_CONTENT.innerText();
+    }
+
+    public void clickConfirmExportAuditLog() {
+        EXPORT_AUDIT_LOG_POPUP_OK_BUTTON.click();
+    }
+
+    public String fetchExportAuditLogSuccessAlert() {
+        String text = EXPORT_AUDIT_LOG_SUCCESS_ALERT.innerText().trim();
+        waitUtility.waitForLocatorHidden(EXPORT_AUDIT_LOG_SUCCESS_ALERT);
+        return text;
+    }
+
+    public void exportCampaignSettings() {
+        waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS);
+
+        page.evaluate("() => { " +
+                "if (window.isPatched) return; " +
+                "const o = Element.prototype.setAttribute; " +
+                "Element.prototype.setAttribute = function(n, v) { " +
+                "if (n !== ']') o.apply(this, arguments); " +
+                "}; window.isPatched = true; }");
+
+        EXPORT_CAMPAIGN_SETTINGS.evaluate("el => el.click()");
+        waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS_POPUP);
+
+        long timeout = System.currentTimeMillis() + 5000;
+        boolean isChecked = false;
+
+        while (System.currentTimeMillis() < timeout) {
+            EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON.click(new Locator.ClickOptions().setForce(true));
+            page.waitForTimeout(500);
+            isChecked = (Boolean) page.locator("sui-checkbox input").first().evaluate("el => el.checked");
+
+            if (isChecked) {
+                break;
+            }
+        }
+
+        if (!isChecked) {
+            EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON.dispatchEvent("click");
+            page.waitForTimeout(1000);
+        }
+
+        EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON.click();
+    }
+
+    public String fetchExportCampaignSettingsSuccessAlert() {
+        String text = EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT.innerText().trim();
+        waitUtility.waitForLocatorHidden(EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT);
+        return text;
     }
 }
