@@ -112,10 +112,10 @@ public class CommonUtils {
     }
 
     public static void uploadFile(Page page, int inputIndex, String locatorValue, String fileName) {
-        Path basePath  = Paths.get("src/main/resources", fileName);
+        Path basePath = Paths.get("src/main/resources", fileName);
         if (!Files.exists(basePath)) {
             basePath = Paths.get("src/main/resources/uploadfiles", fileName);
-            if(!Files.exists(basePath)){
+            if (!Files.exists(basePath)) {
                 basePath = Paths.get(System.getProperty("user.home"), "Downloads", fileName);
             }
         }
