@@ -96,35 +96,35 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario Outline: Create new Creative Library entries for multiple Creative Types
     # Display
-    When User creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    When Verify data persistence when user creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                      |
       | Html         | HTMLCode:<html>Auto_Creative</html>, Size:1024x576, DomainLanding:pulsepoint.com                                        |
       | Image        | ImageFile:Display_Image.jpg, Size:1024x576, ClickThroughURL:https://www.pulsepoint.com, DomainLanding:pulsepoint.com    |
       | Html5        | ArchiveFile:HTML5_Template.zip, Size:1024x576, ClickThroughURL:https://www.pulsepoint.com, DomainLanding:pulsepoint.com |
     # Audio
-    And User creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                             |
       | Upload       | FileName:Creative_Audio.mp3, AdvertiserDomain:pulsepoint.com, IAB:Profane                      |
       | Audio URL    | URL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane     |
       | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
       | VAST XML     | VASTXML:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
     # Video
-    And User creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                        |
       | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane                                                                 |
       | Video URL    | Type:MP4, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane               |
       | VAST URL     | Type:STANDARD VAST, VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane |
       | VAST XML     | Type:VPAID, VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane         |
     # Search Extension
-    And User creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                           |
       | Search       | Size:300x600, Headline:Test Automation Headline, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ClickThroughURL:pulsepoint.com, IAB:Profane |
     # Native Display
-    And User creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                      |
       | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |
     # Native Video
-    And User creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                                                   |
       | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com                                                                 |
       | Video URL    | Type:FLV, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com               |
