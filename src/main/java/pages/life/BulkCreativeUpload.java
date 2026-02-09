@@ -452,7 +452,7 @@ public class BulkCreativeUpload {
             case "HTML", "Video":
                 if (type.contains("Video"))
                     uploadImageFile(attributeMap.get("ImageFile"));
-                selectFileTypeAndUploadFile(attributeMap.get("FileType"),Collections.singletonList(attributeMap.get("FileName")));
+                selectFileTypeAndUploadFile(attributeMap.get("FileType"), attributeMap.get("FileName"));
                 if (createCreatives.CLICK_THROUGH_URL.isVisible())
                     enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));

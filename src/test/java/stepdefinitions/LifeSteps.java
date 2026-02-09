@@ -1486,7 +1486,7 @@ public class LifeSteps {
     @When("User performs {string} action using {string} option on multiple creatives - {string} and verifies the selected creatives are moved to {string} tab")
     public void userPerformsBulkArchiveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreMovedToArchivedTab(String bulkAction, String bulkActionOption, String noOfCreatives, String tabName) {
         createCreatives.clearSearchBox();
-        if(bulkAction.contains("Bulk Archive"))
+        if(bulkAction.equalsIgnoreCase("Bulk Archive"))
             createCreatives.clickActivityButton("Active");
         else
             createCreatives.clickActivityButton("Archived");
@@ -2381,26 +2381,22 @@ public class LifeSteps {
         bulkCreativeUpload.selectAndClickDirection(direction);
     }
 
-    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
-    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, String size, String duration, DataTable dataTable) {
+    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, String size, String duration, String fileType, String fileName) throws IOException {
         nameList.clear();
-        Map<String, String> rawFilters = dataTable.asMap(String.class, String.class);
-        Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
-        for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
-            bulkCreativeUpload.selectAdvertiser(advertiser);
-            bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
-            bulkCreativeUpload.enterFinancer(financer);
-            bulkCreativeUpload.selectFileTypeAndUploadFile(entry.getKey(), entry.getValue());
-            bulkCreativeUpload.enterLandingPageDomain(landingDomain);
-            bulkCreativeUpload.selectApprovalStatus(status);
-            bulkCreativeUpload.clickPreviewButton();
-            nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-            if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight(size);
-            if (bulkCreativeUpload.isDurationVisibleAndBlank()) bulkCreativeUpload.enterDuration(duration);
-            bulkCreativeUpload.clickUploadButton();
-            bulkCreativeUpload.clickOKButton();
-            Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
-        }
+        bulkCreativeUpload.selectAdvertiser(advertiser);
+        bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
+        bulkCreativeUpload.enterFinancer(financer);
+        bulkCreativeUpload.selectFileTypeAndUploadFile(fileType, fileName);
+        bulkCreativeUpload.enterLandingPageDomain(landingDomain);
+        bulkCreativeUpload.selectApprovalStatus(status);
+        bulkCreativeUpload.clickPreviewButton();
+        nameList = bulkCreativeUpload.enterCreativeName(creativeName);
+        if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight(size);
+        if (bulkCreativeUpload.isDurationVisibleAndBlank()) bulkCreativeUpload.enterDuration(duration);
+        bulkCreativeUpload.clickUploadButton();
+        bulkCreativeUpload.clickOKButton();
+        Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
     }
 
     @And("Verify user is able to type in {string} categories")
@@ -4178,4 +4174,6 @@ public class LifeSteps {
     public void verifyThatTheCampaignPageIsDisplayed() {
         Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
     }
+
+
 }
