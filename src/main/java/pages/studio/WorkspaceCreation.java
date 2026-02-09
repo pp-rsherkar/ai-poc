@@ -6,7 +6,6 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import factory.DriverFactory;
 import utils.WaitUtility;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class WorkspaceCreation {
     private final Locator WORKSPACE_CREATED_ALERT;
     private final Locator MENU_ICON;
     private final FrameLocator WORKSPACE_FRAME;
-    private final Locator WORKSPACE_TYPE;
+    private final Locator WORKSPACE_TYPE_TITLE;
     private final Locator MORE_ACTION_DIALOG;
     private final Locator DELETE_BUTTON;
     private final Locator REMOVAL_CONFIRMATION_POPUP;
@@ -57,7 +56,7 @@ public class WorkspaceCreation {
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
         this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
         this.MENU_ICON = page.locator("//img[contains(@class,'menu-icon')]");
-        this.WORKSPACE_TYPE = WORKSPACE_FRAME.locator("//p[text()='Workspace Type']");
+        this.WORKSPACE_TYPE_TITLE = WORKSPACE_FRAME.locator("//p[text()='Workspace Type']");
         this.MORE_ACTION_DIALOG = WORKSPACE_FRAME.locator("//div[@role='dialog']");
         this.DELETE_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Delete')]");
         this.REMOVAL_CONFIRMATION_POPUP = WORKSPACE_FRAME.locator("//h3[contains(text(),'Removal Confirmation')]");
@@ -123,7 +122,7 @@ public class WorkspaceCreation {
             page.keyboard().press("Escape");
         }
         CREATE_WORKSPACE.first().click();
-        page.waitForCondition(() -> WORKSPACE_TYPE.filter(new Locator.FilterOptions().setHasText("Workspace Type")).count() == 1);
+        waitUtility.waitForLocatorVisible(WORKSPACE_TYPE_TITLE);
     }
 
     public void verifyStudioWorkspaceFrame() {
