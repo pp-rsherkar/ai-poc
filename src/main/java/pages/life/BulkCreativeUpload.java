@@ -249,7 +249,8 @@ public class BulkCreativeUpload {
     }
 
     public void uploadImageFile(String imageFileName) {
-        String locator = "//span[contains(@class,'reupload-image')]";
+        //String locator = "//span[contains(@class,'reupload-image')]";
+        String locator = "//div[contains(@title,'%s')]";
         CommonUtils.uploadFile(page, 0, locator, imageFileName);
     }
 

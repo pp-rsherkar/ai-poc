@@ -263,4 +263,4 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
       | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_HTML_BulkUpload.xlsx |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
