@@ -2105,90 +2105,120 @@ public class LifeSteps {
 
     @And("Verify under the {string} section the fields Add Third Party Tracking Pixel and Add DoubleVerify Pixel are available")
     public void verifyUnderTheSectionTheFieldsAddThirdPartyTrackingPixelTagAndAddDoubleVerifyPixelAreAvailable(String sectionName) {
+        logger.info("Verifying availability of Third Party Tracking Pixel and DoubleVerify Pixel under section: {}", sectionName);
         Assert.assertTrue("Add Third Party Tracking Pixel/Tag field is not available under " + sectionName, bulkCreativeUpload.isThirdPartyTrackingPixelAvailable());
         Assert.assertTrue("Add DoubleVerify Pixel is not available under " + sectionName, bulkCreativeUpload.isDoubleVerifyPixelAvailable());
+        logger.info("Both pixel fields are available under section: {}", sectionName);
     }
 
     @And("User is able to click a third-party tracking pixel and add details {string}")
     public void userIsAbleToSelectAThirdPartyTrackingPixelForACreative(String pixelDetails) {
+        logger.info("Adding Third Party Tracking Pixel with details: {}", pixelDetails);
         bulkCreativeUpload.addThirdPartyTrackingPixel(pixelDetails);
+        logger.info("Third Party Tracking Pixel added successfully");
     }
 
     @And("User is able to add a DoubleVerify pixel")
     public void userIsAbleToAddADoubleVerifyPixelForACreative() {
+        logger.info("Attempting to add DoubleVerify Pixel");
         Assert.assertTrue("Unable to add DoubleVerify Pixel", bulkCreativeUpload.addDoubleVerifyPixel());
+        logger.info("DoubleVerify Pixel added successfully");
     }
 
     @And("User is able to delete third-party tracking pixel entries")
     public void userIsAbleToDeleteThirdPartyTrackingPixelEntries() {
+        logger.info("Attempting to delete Third Party Tracking Pixel entries");
         Assert.assertTrue("Unable to delete Third Party Tracking Pixel", bulkCreativeUpload.deleteThirdPartyTrackingPixel());
+        logger.info("Third Party Tracking Pixel entries deleted successfully");
     }
 
     @And("An error message is displayed when a blank template {string} is uploaded")
     public void anErrorMessageIsDisplayedWhenABlankTemplateIsUploaded(String fileName) {
+        logger.info("Uploading blank template file: {}", fileName);
         bulkCreativeUpload.uploadBlankTemplate(fileName);
+        logger.info("Blank template upload attempted, error message should be displayed");
     }
 
     @And("User enters {string}, {string} mandatory fields data for Display creative")
     public void userEntersMandatoryFieldsDataForCreative(String advertiserDSA, String financer) {
+        logger.info("Entering mandatory fields data - Advertiser DSA: {}, Financer: {}", advertiserDSA, financer);
         bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
         bulkCreativeUpload.enterFinancer(financer);
+        logger.info("Mandatory fields data entered successfully");
     }
 
     @And("Verify Advertiser field should be mandatory")
     public void verifyAdvertiserFieldShouldBeMandatory() {
+        logger.info("Verifying Advertiser field mandatory validation");
         bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("Select Advertiser", bulkCreativeUpload.fetchErrorAlert());
+        logger.info("Advertiser mandatory validation message verified");
     }
 
     @And("Verify that the Landing Domain field is mandatory when all other required fields, including {string} are filled")
     public void verifyLandingDomainFieldShouldBeMandatoryByEnteringOtherMandatoryFields(String advertiser) {
+        logger.info("Verifying Landing Domain mandatory validation after selecting advertiser: {}", advertiser);
         bulkCreativeUpload.selectAdvertiser(advertiser);
         bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("Landing Page Domain is required", bulkCreativeUpload.fetchErrorAlert());
+        logger.info("Landing Domain mandatory validation message verified");
     }
 
     @And("Verify that an appropriate error message is displayed when invalid data {string} is entered for the Landing Domain")
     public void verifyThatAnAppropriateErrorMessageIsDisplayedWhenInvalidDataIsEnteredForTheLandingDomain(String invalidLandingDomain) {
+        logger.info("Entering invalid Landing Domain: {}", invalidLandingDomain);
         bulkCreativeUpload.enterLandingPageDomain(invalidLandingDomain);
         bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("Landing Page Domain is not valid.", bulkCreativeUpload.fetchErrorAlert());
+        logger.info("Invalid Landing Domain validation message verified");
     }
 
     @And("Verify only valid Landing Domain {string} values should be permitted")
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
+        logger.info("Entering valid Landing Domain: {}", validLandingDomain);
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
         Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        logger.info("Valid Landing Domain accepted successfully");
     }
 
     @And("Verify default value of the File field should be {string}")
     public void verifyDefaultValueOfTheFileFieldShouldBe(String defaultValue) {
+        logger.info("Verifying default value of File field");
         Assert.assertEquals(defaultValue, bulkCreativeUpload.fetchFileDefaultValue());
+        logger.info("Default File field value verified as: {}", defaultValue);
     }
 
     @And("Verify default value of the AdChoices Icon should be {string}")
     public void verifyDefaultValueOfTheAdChoicesIconShouldBe(String defaultValue) {
+        logger.info("Verifying default value of AdChoices Icon");
         Assert.assertEquals(defaultValue, bulkCreativeUpload.fetchAdChoiceDefaultValue());
+        logger.info("Default AdChoices Icon value verified as: {}", defaultValue);
     }
 
     @And("Verify default value of the Notes Column field should be {string}")
     public void verifyDefaultValueOfTheNotesColumnFieldShouldBe(String defaultValue) {
+        logger.info("Verifying default value of Notes Column field");
         Assert.assertEquals(defaultValue, bulkCreativeUpload.fetchNotesColumnDefaultValue());
+        logger.info("Default Notes Column value verified as: {}", defaultValue);
     }
 
     @And("Verify Rich Media checkbox should be present and selectable {string}")
     public void verifyRichMediaCheckboxShouldBePresentAndSelectable(String direction) {
+        logger.info("Verifying Rich Media checkbox presence and clickability");
         Assert.assertTrue("Rich Media Checkbox is not available", bulkCreativeUpload.isRichMediaCheckboxAvailable());
         Assert.assertTrue("Rich Media Checkbox is not clickable", bulkCreativeUpload.isRichMediaCheckboxClickable());
         bulkCreativeUpload.selectAndClickDirection(direction);
+        logger.info("Rich Media checkbox selected with direction: {}", direction);
     }
 
     @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}")
     public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, DataTable dataTable) {
+        logger.info("Starting bulk upload creative creation flow");
         nameList.clear();
         Map<String, String> rawFilters = dataTable.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
+            logger.info("Uploading file type: {} with extensions: {}", entry.getKey(), entry.getValue());
             bulkCreativeUpload.selectAdvertiser(advertiser);
             bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
             bulkCreativeUpload.enterFinancer(financer);
@@ -2200,34 +2230,42 @@ public class LifeSteps {
             bulkCreativeUpload.clickUploadButton();
             bulkCreativeUpload.clickOKButton();
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+            logger.info("Bulk upload creative created successfully for file type: {}", entry.getKey());
         }
     }
 
     @And("Verify user is able to type in {string} categories")
     public void verifyUserIsAbleToTypeInCategories(String iabCategory) {
+        logger.info("Typing IAB Category: {}", iabCategory);
         bulkCreativeUpload.typeIABCategory(iabCategory);
     }
 
     @And("Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
+        logger.info("Verifying mandatory validation for Clickthrough URL and Landing Domain");
         bulkCreativeUpload.clickOKButton();
         List<String> expectedMessages = Arrays.asList("Clickthrough URL is required", "Landing Page Domain is required");
         Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
+        logger.info("Mandatory validation messages verified for Clickthrough URL and Landing Domain");
     }
 
     @And("Verify only valid Clickthrough URL {string} values should be permitted")
     public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
+        logger.info("Entering valid Clickthrough URL: {}", validURL);
         bulkCreativeUpload.enterClickthroughURL(validURL);
         Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        logger.info("Valid Clickthrough URL accepted successfully");
     }
 
     @When("User creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
     public void userCreatesAndSavesBulkUploadCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String advertiserDSA, String financer, DataTable dataTable) {
+        logger.info("Creating and saving Bulk Upload creatives of type: {}", creativeType);
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         for (Map<String, String> row : rows) {
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
             String creativeName = creativeType + "_Creative_" + CommonUtils.timeStampCalculation();
+            logger.info("Creating creative: {} with attributes: {}", creativeName, attributes);
             Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
             bulkCreativeUpload.clickBulkUploadButton();
             bulkCreativeUpload.selectAndClickCreativeType(creativeType);
@@ -2235,156 +2273,192 @@ public class LifeSteps {
             bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
             Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
             nameList.add(creativeName);
+            logger.info("Bulk upload creative created successfully: {}", creativeName);
         }
     }
 
     /*Run A Report - Fields verification and validation*/
     @And("Verify Run Report panel should be opened")
     public void verifyRunReportPanelIsOpened() {
+        logger.info("Verifying Run Report panel is opened");
         Assert.assertTrue("Run Report panel is not opened", runReportPanel.isRunReportPanelOpened());
     }
 
     @And("Template drop-down should display templates created under {string}")
     public void templateDropDownShouldDisplayTemplatesCreatedUnder(String templateName) {
+        logger.info("Verifying Template dropdown availability for templates under: {}", templateName);
         Assert.assertTrue("Template dropdown is not present", runReportPanel.isTemplateDropdownAvailable());
-        //Template present in logged account
     }
 
     @When("User clicks on {string} link")
     public void userClicksOnLink(String linkName) {
+        logger.info("Clicking on link: {}", linkName);
         runReportPanel.clickLink(linkName);
     }
 
     @Then("Dimensions and Metrics fields should be displayed")
     public void dimensionsAndMetricsFieldsShouldBeDisplayed() {
+        logger.info("Verifying Dimensions and Metrics fields are displayed");
         Assert.assertTrue("Dimension and Metrics dropdown are not displayed", runReportPanel.isDimensionsAndMetricsDisplayed());
     }
 
     @And("User should navigate back to Template drop-down by clicking {string}")
     public void userShouldNavigateBackToTemplateDropDownByClicking(String linkName) {
+        logger.info("Navigating back by clicking link: {}", linkName);
         runReportPanel.clickLink(linkName);
     }
 
     @Then("Template drop-down should be visible")
     public void templateDropDownShouldBeVisible() {
+        logger.info("Verifying Template dropdown visibility");
         Assert.assertTrue("Template dropdown is not present", runReportPanel.isTemplateDropdownAvailable());
     }
 
     @Then("Data Granularity should have default value {string}")
     public void dataGranularityShouldHaveDefaultValue(String defaultValue) {
+        logger.info("Verifying default Data Granularity value");
         Assert.assertEquals(defaultValue.trim(), runReportPanel.getDefaultDataGranularity());
     }
 
     @And("Verify Data Granularity dropdown should show below list of values")
     public void verifyDataGranularityDropdownShouldShowBelowListOfValues(DataTable dataTable) {
         List<String> dropdownValues = dataTable.asList(String.class);
+        logger.info("Verifying Data Granularity dropdown values: {}", dropdownValues);
         runReportPanel.showDataGranularityOptions();
         Assert.assertEquals(new HashSet<>(dropdownValues), new HashSet<>(runReportPanel.fetchDataGranularityOptions()));
     }
 
     @And("Verify Data Granularity field should allow selection any of the values {string} from the dropdown")
     public void verifyDataGranularityFieldShouldAllowSelectionAnyOfTheValuesFromTheDropdown(String dropdownValue) {
+        logger.info("Selecting Data Granularity value: {}", dropdownValue);
         Assert.assertTrue("Unable to set Data Granularity value from drop-down", runReportPanel.setDataGranularity(dropdownValue));
+        logger.info("Data Granularity value selected successfully: {}", dropdownValue);
     }
 
     @Then("Advertiser drop-down should list advertisers mapped to {string}")
     public void advertiserDropDownShouldListAdvertisersMappedTo(String arg0) {
+        logger.info("Verifying Advertiser dropdown lists mapped advertisers");
         Assert.assertTrue("Advertiser dropdown is not present", runReportPanel.isAdvertiserDropdownAvailable());
         runReportPanel.clickAdvertiserDropdown();
         List<String> advertiser = runReportPanel.fetchAdvertisers();
         Assert.assertTrue("Advertiser List does not match", advertiser.containsAll(itemList));
+        logger.info("Advertiser dropdown contains all mapped advertisers");
     }
 
     @And("User should be able to select multiple advertisers from the list")
     public void userShouldBeAbleToSelectMultipleAdvertisersFromTheList() {
+        logger.info("Selecting multiple advertisers from dropdown");
         runReportPanel.clickAdvertiserDropdown();
         Assert.assertTrue("Unable to select multiple advertisers", runReportPanel.selectMultipleAdvertisersFromDropdown());
+        logger.info("Multiple advertisers selected successfully");
     }
 
     @And("Verify on selecting {string} option, previously selected individual advertisers should be cleared")
     public void verifyOnSelectingOptionPreviouslySelectedIndividualAdvertisersShouldBeCleared(String advertiser) {
+        logger.info("Selecting advertiser option to clear previous selections: {}", advertiser);
         Assert.assertEquals(advertiser, runReportPanel.selectAdvertiser(advertiser));
+        logger.info("Previously selected advertisers cleared successfully");
     }
 
     @And("User should be able to select template {string} from the dropdown")
     public void userShouldBeAbleToSelectTemplateFromTheDropdownAndAdvertiserAs(String templateName) {
+        logger.info("Selecting template from dropdown: {}", templateName);
         runReportPanel.selectTemplateFromDropdown(templateName);
         templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
         nameList.add(templateNameRandom);
+        logger.info("Template selected successfully: {}", templateNameRandom);
     }
 
     @And("User should be able to select advertiser as {string}")
     public void userShouldBeAbleToSelectAdvertiserAs(String advertiser) {
+        logger.info("Selecting advertiser: {}", advertiser);
         runReportPanel.clickAdvertiserDropdown();
         Assert.assertEquals(advertiser, runReportPanel.selectAdvertiser(advertiser));
         nameList.add(advertiser);
+        logger.info("Advertiser selected successfully: {}", advertiser);
     }
 
     @When("Campaign should load for selection when user types campaign initials {string} in {string} field")
     public void campaignShouldLoadForSelectionWhenUserTypesCampaignInitialsInCampaignField(String campaignInitials, String fieldName) {
+        logger.info("Typing campaign initials '{}' in field '{}'", campaignInitials, fieldName);
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(campaignInitials, fieldName));
+        logger.info("Campaign dropdown values loaded successfully");
     }
 
     @Then("User should be able to select multiple values from dropdown")
     public void userShouldBeAbleToSelectMultipleValuesFromDropdown() {
+        logger.info("Selecting multiple values from dropdown");
         List<String> valuesSelected = runReportPanel.selectMultipleValueFromDropdown();
         Assert.assertFalse("Unable to select multiple values from dropdown", valuesSelected.isEmpty());
         nameList.addAll(valuesSelected);
+        logger.info("Multiple dropdown values selected: {}", valuesSelected);
     }
 
     @When("Line Items of selected campaigns should load when user types line items initials {string} in {string} field")
     public void lineItemsOfSelectedCampaignsShouldLoadWhenUserTypesLineItemsInitialsInLineItemField(String lineItemInitials, String fieldName) {
+        logger.info("Typing line item initials '{}' in field '{}'", lineItemInitials, fieldName);
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(lineItemInitials, fieldName));
     }
 
     @When("Tactic of selected line items should load when user types tactic names initials {string} in {string} field")
     public void tacticOfSelectedLineItemsShouldLoadWhenUserTypesTacticNamesInitialsInTacticField(String tacticInitials, String fieldName) {
+        logger.info("Typing tactic initials '{}' in field '{}'", tacticInitials, fieldName);
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(tacticInitials, fieldName));
     }
 
     @When("Creative of selected tactic should load when user types creative names initials {string} in {string} field")
     public void creativeOfSelectedTacticShouldLoadWhenUserTypesCreativeNamesInitialsInCreativeField(String creativeInitials, String fieldName) {
+        logger.info("Typing creative initials '{}' in field '{}'", creativeInitials, fieldName);
         Assert.assertTrue("Dropdown values are not loaded", runReportPanel.isDropdownValueLoadedForInitials(creativeInitials, fieldName));
     }
 
     @When("User clicks on Advanced Settings")
     public void userClicksOn() {
+        logger.info("Clicking on Advanced Settings");
         runReportPanel.clickAdvanceSettings();
     }
 
     @Then("{string} section should be visible with label {string} checkbox")
     public void checkboxShouldBeVisibleWithLabel(String filterReportSection, String checkboxLabel) {
+        logger.info("Verifying filter section '{}' with checkbox '{}'", filterReportSection, checkboxLabel);
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
             Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel));
+        logger.info("Filter section and checkbox verified successfully");
     }
 
     @Then("{string} and {string} tabs should be present in the Run Report pop-up")
     public void andTabsShouldBePresentInTheRunReportPopUp(String runNowTab, String scheduleTab) {
+        logger.info("Verifying Run Report popup tabs: {}, {}", runNowTab, scheduleTab);
         Assert.assertTrue("Run Now and Schedule tabs are not available", runReportPanel.isRunNowAndScheduleTabsAvailable(runNowTab, scheduleTab));
     }
 
     @When("On Run Now tab, Report Period field should have options below")
     public void onRunNowTabReportPeriodFieldShouldHaveOptionsBelow(DataTable dataTable) {
         List<String> dropdownValues = dataTable.asList(String.class);
+        logger.info("Verifying Report Period dropdown options: {}", dropdownValues);
         Assert.assertEquals(new HashSet<>(dropdownValues), new HashSet<>(runReportPanel.fetchReportPeriodOptions()));
     }
 
     @And("User selects the option Only Report on Impressions with Identifiable NPIs")
     public void userSelectsTheOptionOnlyReportOnImpressionsWithIdentifiableNPIs() {
+        logger.info("Selecting 'Only Report on Impressions with Identifiable NPIs' option");
         runReportPanel.clickFilterReportCheckbox();
     }
 
     @And("User should be able to generate the report")
     public void userShouldAbleToGenerateTheReport() {
         String fileName = "Custom Report";
+        logger.info("Generating report with file name: {}", fileName);
         metricName = runReportPanel.fetchFileName();
         runReportPanel.clickRunButton(fileName);
         Assert.assertEquals("You will get the report on your email", runReportPanel.fetchSuccessAlert());
+        logger.info("Report generation triggered successfully");
     }
 
     @And("Confirms that the report panel retains the entered data")
     public void andConfirmThatTheReportPanelRetainsTheEnteredData() {
+        logger.info("Verifying report panel retains entered data");
         runReportPanel.clickModifyOption(metricName);
         capturedDetails.addAll(runReportPanel.fetchTemplateValue());
         capturedDetails.addAll(runReportPanel.fetchDimensionAndMetricValues());
@@ -2397,20 +2471,24 @@ public class LifeSteps {
         capturedDetails.add(runReportPanel.fetchEndTime());
         capturedDetails.add(runReportPanel.fetchTimeZone());
         Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
+        logger.info("Report panel data persistence verified successfully");
     }
 
     @And("Verify that by default {string} option is selected for Report Period Field")
     public void verifyThatByDefaultCustomDatesOptionIsSelectedForReportPeriodField(String buttonType) {
+        logger.info("Verifying default Report Period option selected: {}", buttonType);
         Assert.assertTrue("Custom Dates button is not enabled by default", runReportPanel.isReportPeriodSelected(buttonType));
     }
 
     @And("Verify that user is able to select start date and end date when Custom Dates option is selected")
     public void verifyThatUserIsAbleToSelectStartDateAndEndDateWhenCustomDatesOptionIsSelected() {
+        logger.info("Selecting start and end date using Custom Dates option");
         Assert.assertTrue("Unable to select date from date picker", runReportPanel.selectStartAndEndDate());
     }
 
     @And("Verify that user is able to select start {string} and end time {string} when Custom Dates option is selected")
     public void verifyThatUserIsAbleToSelectStartAndEndTimeWhenCustomDatesOptionIsSelected(String startTime, String endTime) {
+        logger.info("Selecting start time '{}' and end time '{}' for Custom Dates", startTime, endTime);
         Assert.assertTrue("Unable to select time", runReportPanel.enterStartAndEndTime(startTime, endTime));
         nameList.add(startTime);
         nameList.add(endTime);
@@ -2418,12 +2496,14 @@ public class LifeSteps {
 
     @And("Verify that user is able to select Timezone field value {string}")
     public void verifyThatUserIsAbleToSelectTimezoneFieldValue(String timeZone) {
+        logger.info("Selecting Timezone: {}", timeZone);
         Assert.assertTrue("Unable to select time zone " + timeZone, runReportPanel.selectTimeZone(timeZone.trim()));
         nameList.add(timeZone);
     }
 
     @And("Verify the default value of the Report Format field is {string}")
     public void verifyTheDefaultValueOfTheTheReportFormatFieldIsCSV(String fileFormat) {
+        logger.info("Verifying default Report Format value: {}", fileFormat);
         Assert.assertEquals(fileFormat, runReportPanel.fetchDefaultReportFormat());
     }
 
@@ -2431,6 +2511,7 @@ public class LifeSteps {
     public void verifyTheAvailabilityOfVariousOptionsOfTheReportFormatField(String reportFormats) {
         List<String> expectedFormats = CommonUtils.convertStringToList(reportFormats);
         List<String> reportFormatValues = runReportPanel.fetchReportFormatList();
+        logger.info("Verifying available Report Format options: {}", expectedFormats);
         for (String format : expectedFormats) {
             Assert.assertTrue("Missing report format: " + format, reportFormatValues.contains(format));
         }
@@ -2438,11 +2519,13 @@ public class LifeSteps {
 
     @And("Verify by default the Text Qualifier checkbox is checked")
     public void verifyByDefaultTheTextQualifierCheckboxIsChecked() {
+        logger.info("Verifying Text Qualifier checkbox is checked by default");
         Assert.assertTrue("Text Qualifier is not checked by default", runReportPanel.isTextQualifierCheckboxChecked());
     }
 
     @And("Verify that {string} and {string} options are disabled until a Line Item is selected")
     public void verifyThatLifetimeAndFlightsOptionsAreDisabledUntilALineItemIsSelected(String lifeTime, String flights) {
+        logger.info("Verifying buttons disabled before Line Item selection: {}, {}", lifeTime, flights);
         List<String> disabledButtons = runReportPanel.verifyButtonsDisabledBeforeLineItemSelection();
         Assert.assertTrue("Expected disabled button missing: " + lifeTime, disabledButtons.contains(lifeTime));
         Assert.assertTrue("Expected disabled button missing: " + flights, disabledButtons.contains(flights));
@@ -2452,6 +2535,7 @@ public class LifeSteps {
     public void userShouldBeAbleToSelectAnd(String dimensions, String metrics) {
         List<String> dimensionList = CommonUtils.convertStringToList(dimensions);
         List<String> metricsList = CommonUtils.convertStringToList(metrics);
+        logger.info("Selecting Dimensions: {} and Metrics: {}", dimensionList, metricsList);
         runReportPanel.selectDimension(dimensionList);
         runReportPanel.selectMetrics(metricsList);
         nameList.addAll(dimensionList);
@@ -2461,6 +2545,7 @@ public class LifeSteps {
 
     @And("Verify that {string} and {string} options are enabled")
     public void verifyThatLifetimeAndFlightsOptionsAreEnabled(String lifeTime, String flights) {
+        logger.info("Verifying buttons enabled after Line Item selection: {}, {}", lifeTime, flights);
         List<String> enabledButtons = runReportPanel.verifyButtonsEnabledAfterLineItemSelection();
         Assert.assertTrue("Expected " + lifeTime + " button to be enabled", enabledButtons.contains("Lifetime"));
         Assert.assertTrue("Expected " + flights + " button to be enabled", enabledButtons.contains("Flights"));
@@ -2468,11 +2553,13 @@ public class LifeSteps {
 
     @And("User clicks {string} report period button")
     public void userClicksReportPeriodButton(String buttonName) {
+        logger.info("Clicking Report Period button: {}", buttonName);
         runReportPanel.selectReportPeriodButton(buttonName);
     }
 
     @Then("User should be able to select value from dropdown")
     public void userShouldBeAbleToSelectValueFromDropdown() {
+        logger.info("Selecting value from dropdown");
         String valuesSelected = runReportPanel.selectValueFromDropdown();
         Assert.assertFalse("Unable to select value from dropdown", valuesSelected.isEmpty());
         nameList.add(valuesSelected);
@@ -2480,64 +2567,89 @@ public class LifeSteps {
 
     @And("User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic")
     public void userShouldBeAbleToFetchDetailsAdvertiserCampaignLineItemTactic() {
+        logger.info("Fetching Advertiser, Campaign, Line Item, and Tactic details from Run Report panel");
         nameList.addAll(runReportPanel.fetchAdvertiserName());
         nameList.addAll(runReportPanel.fetchCampaignName());
         nameList.addAll(runReportPanel.fetchLineItemName());
+        logger.info("Fetched details successfully. Total values captured so far: {}", nameList.size());
     }
 
     @And("Verify that Flight details field is displayed with value")
     public void verifyThatFlightDetailsFieldIsDisplayedWithValue() {
+        logger.info("Verifying that Flight details field is displayed and populated");
         Assert.assertFalse("Flight details are not populated", runReportPanel.isFlightDetailsDisplayed().isEmpty());
+        logger.info("Flight details field is displayed with populated values");
     }
 
     @And("User navigates to Administrative section and fetches the advertiser for the account {string}")
     public void userNavigatesToAdministrativeSectionAndFetchesTheAdvertiserForTheAccount(String account) {
+        logger.info("Navigating to Administrative section to fetch advertisers for account: {}", account);
         navigation.clickSubMenu();
         accounts.clickAdministration();
         accounts.clickAdvertiserTab();
         accounts.selectAccount(account);
         itemList = accounts.fetchAdvertiserList();
+        logger.info("Fetched {} advertisers for account {}", itemList.size(), account);
         navigation.clickPulsePointLogo();
+        logger.info("Navigated back to Life application");
     }
 
     @And("Expand all the groups and fetch dimensions and metrics")
     public void expandAllTheGroupsAndFetchDimensions() {
+        logger.info("Expanding all template groups to fetch dimensions");
         nameList = reportTemplates.expandGroupsAndFetchDimensionsAndMetrics();
+        logger.info("Fetched {} dimensions from template", nameList.size());
         reportTemplates.clickMetricsTab();
+        logger.info("Switched to Metrics tab to fetch metrics");
         capturedDetails = reportTemplates.expandGroupsAndFetchDimensionsAndMetrics();
+        logger.info("Fetched {} metrics from template", capturedDetails.size());
         reportTemplates.clickCancelButton();
+        logger.info("Closed Report Template panel after fetching dimensions and metrics");
     }
 
     @And("Verify dropdown dimensions with the template")
     public void verifyDropdownDimensionsWithTheTemplate() {
+        logger.info("Verifying Dimension dropdown values with template");
         List<String> dimensionList = runReportPanel.clickDimensionDropdownAndFetchValues();
+        logger.info("Fetched Dimension values: {}", dimensionList);
         Assert.assertTrue("Template's Dimension values are not available in Run report", dimensionList.containsAll(nameList));
     }
 
     @And("Verify dropdown metrics with the template")
     public void verifyDropdownMetricsWithTheTemplate() {
+        logger.info("Verifying Metrics dropdown values with template");
         List<String> metricList = runReportPanel.clickMetricDropdownAndFetchValues();
+        logger.info("Fetched Metric values: {}", metricList);
         Assert.assertTrue("Template's Dimension values are not available in Run report", metricList.containsAll(capturedDetails));
     }
 
     @And("User selects {string} button")
     public void userSelects(String buttonType) {
+        logger.info("User selects button: {}", buttonType);
         runReportPanel.clickFileBreakdownType(buttonType);
     }
 
     @Then("{string} section should be visible with label {string}, {string}, {string} checkbox")
     public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
+        logger.info("Verifying filter report section: {}", filterReportSection);
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1))
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1)){
+            logger.info("Verifying checkbox label: {}", checkboxLabel1);
             Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
-        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2))
+        }
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2)){
+            logger.info("Verifying checkbox label: {}", checkboxLabel2);
             Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
-        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3))
+        }
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3)){
+            logger.info("Verifying checkbox label: {}", checkboxLabel3);
             Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
+        }
     }
 
     @When("User navigates to Schedule report from mega menu of the life application")
     public void userNavigatesToScheduleReportFromMegaMenuOfTheLifeApplication() {
+        logger.info("Navigating to Schedule Report from mega menu");
         navigation.clickSubMenu();
         navigation.clickMenuAngle();
         navigation.clickScheduledReport();
@@ -2545,109 +2657,140 @@ public class LifeSteps {
 
     @And("User clicks Schedule Report button")
     public void userClicksScheduleReportButton() {
+        logger.info("Verifying Schedule Report panel is opened");
         scheduleReport.clickScheduleReportButton();
     }
 
     @And("Verify Schedule Report panel should be opened")
     public void verifyScheduleReportPanelShouldBeOpened() {
+        logger.info("Verifying Report Report panel is opened");
         Assert.assertTrue("Schedule Report panel is not opened", scheduleReport.isScheduleReportPanelOpened());
     }
 
     @And("Verify Report Name field is available and accepts input {string}")
     public void verifyReportNameFieldIsAvailableAndAcceptsInput(String name) {
+        logger.info("Verifying Report Name field and entering value");
         Assert.assertTrue("Report Name field is not available", scheduleReport.isReportNameAvailable());
         metricName = name + "_" + CommonUtils.timeStampCalculation();
+        logger.info("Generated Report Name: {}", metricName);
         scheduleReport.enterReportName(metricName);
         nameList.add(metricName);
     }
 
     @And("Verify availability of frequency field with options below")
     public void verifyAvailabilityOfFrequencyFieldWithOptions(DataTable dataTable) {
+        logger.info("Verifying availability of Frequency field with expected options");
         List<String> buttonLabels = dataTable.asList(String.class);
-        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(scheduleReport.fetchFrequencyOptions()));
+        logger.info("Expected Frequency options: {}", buttonLabels);
+        List<String> actualOptions = scheduleReport.fetchFrequencyOptions();
+        logger.info("Actual Frequency options: {}", actualOptions);
+        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(actualOptions));
     }
 
     @And("Verify default value of the Frequency field is {string}")
     public void verifyDefaultValueOfTheFrequencyFieldIs(String defaultValue) {
+        logger.info("Verifying default Frequency value is: {}", defaultValue);
         Assert.assertTrue("Weekly is not selected by default", scheduleReport.checkDefaultFrequencyOption(defaultValue));
     }
 
     @And("Verify that user is able to select Schedule start date and Schedule end date")
     public void verifyThatUserIsAbleToSelectScheduleStartDateAndScheduleEndDate() {
+        logger.info("Verifying user can select Schedule Start Date and End Date");
         Assert.assertTrue("Unable to select start date from date picker", scheduleReport.selectScheduleStartDate());
         Assert.assertTrue("Unable to select end date from date picker", scheduleReport.selectScheduleEndDate());
     }
 
     @And("Verify default value of Data Timezone is {string}")
     public void verifyDefaultValueOfDataTimezoneIs(String timeZone) {
-        Assert.assertEquals(timeZone.trim(), scheduleReport.fetchDefaultTimeZone());
+        logger.info("Verifying default Data Timezone is: {}", timeZone);
+        String actualTimezone = scheduleReport.fetchDefaultTimeZone();
+        logger.info("Actual default Data Timezone: {}", actualTimezone);
+        Assert.assertEquals(timeZone.trim(), actualTimezone);
     }
 
     @And("Verify that user is able to select Data Timezone field value {string}")
     public void verifyThatUserIsAbleToSelectDataTimezoneFieldValue(String timeZone) {
+        logger.info("Selecting Data Timezone: {}", timeZone);
         Assert.assertTrue("Unable to select time zone", scheduleReport.selectDataTimeZone(timeZone.trim()));
         nameList.add(timeZone);
+        logger.info("Added timezone to nameList: {}", timeZone);
     }
 
     @And("The Send On field should contain all days of the week when {string} is selected as Frequency")
     public void theSendOnFieldShouldContainAllDaysOfTheWeekWhenIsSelectedAsFrequency(String frequencyOption, DataTable dataTable) {
-        List<String> buttonLabels = dataTable.asList(String.class);
+        logger.info("Verifying Send On field for Frequency: {}", frequencyOption);
+        List<String> expectedDays = dataTable.asList(String.class);
+        logger.info("Expected Send On days: {}", expectedDays);
         Assert.assertTrue("Weekly is not selected by default", scheduleReport.checkDefaultFrequencyOption(frequencyOption));
-        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(scheduleReport.fetchWeekDays()));
+        List<String> actualDays = scheduleReport.fetchWeekDays();
+        logger.info("Actual Send On days: {}", actualDays);
+        Assert.assertEquals(new HashSet<>(expectedDays), new HashSet<>(actualDays));
     }
 
     @And("Verify default value of Send On is {string}")
     public void verifyDefaultValueOfSendOnIs(String defaultValue) {
+        logger.info("Verifying default Send On day is: {}", defaultValue);
         Assert.assertTrue("Sun is not selected by default", scheduleReport.checkDefaultWeekDay(defaultValue));
     }
 
     @And("Verify Send At field is available with Start Time and Timezone fields")
     public void verifySendAtFieldIsAvailableWithStartTimeAndTimezoneFields() {
+        logger.info("Verifying Send At field availability (Start Time + Timezone)");
         Assert.assertTrue("Send At fields - Time and TimeZone are not available", scheduleReport.isSendAtFieldAvailable());
     }
 
     @And("Verify default value of Send At fields - Start Time is {string} and Timezone is {string}")
     public void verifyDefaultValueOfSendAtFieldsStartTimeIsAndTimezoneIs(String defaultTime, String defaultTimezone) {
+        logger.info("Verifying default Send At values - Time: {}, Timezone: {}", defaultTime, defaultTimezone);
         Assert.assertEquals("Default time " + defaultTime + " is not present", defaultTime, scheduleReport.fetchSendAtTimeValue());
         Assert.assertEquals("Default time " + defaultTimezone + " is not present", defaultTimezone, scheduleReport.fetchSendAtTimezoneValue());
     }
 
     @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
     public void verifyUserIsAbleToSelectTimeAndTimezoneForSendAtFields(String time, String timeZone) {
+        logger.info("Selecting Send At Time: {} and Timezone: {}", time, timeZone);
         Assert.assertTrue("Unable to enter time and timezone", scheduleReport.enterSendAtTimeAndTimezone(time, timeZone));
         nameList.add(time);
         nameList.add(timeZone);
+        logger.info("Added Send At Time and Timezone to nameList");
     }
 
     @And("Verify Delivery field has two methods - {string} and {string}")
     public void verifyDeliveryFieldHasTwoMethodsAnd(String email, String customDestination) {
+        logger.info("Verifying Delivery methods: {} and {}", email, customDestination);
         List<String> methodNames = scheduleReport.verifyDeliveryMethods();
+        logger.info("Available Delivery methods: {}", methodNames);
         Assert.assertTrue("Methods are not available", methodNames.contains(email) && methodNames.contains(customDestination));
     }
 
     @When("User clicks on {string} tab as Delivery Method")
     public void userClicksOnTabAsDeliveryMethod(String tabName) {
+        logger.info("User clicks Delivery Method tab: {}", tabName);
         scheduleReport.clickDeliveryTab(tabName);
     }
 
     @Then("Verify Deliver to Users field is available")
     public void verifyDeliverToUsersFieldIsAvailable() {
+        logger.info("Verifying Deliver To Users field availability");
         Assert.assertTrue("Deliver To Users field is not available", scheduleReport.isDeliveryToUserAvailable());
     }
 
     @And("User should be able to specify multiple users in Deliver to Users field")
     public void userShouldAbleToSpecifyMultipleUsersInDeliverToUsersField(DataTable dataTable) {
         List<String> userLists = dataTable.asList(String.class);
+        logger.info("Adding multiple users for delivery: {}", userLists);
         scheduleReport.selectUsersForDelivery(userLists);
     }
 
     @And("Verify that Add Emails link is available below Deliver to Users")
     public void verifyThatAddEmailsLinkIsAvailableBelowDeliverToUsers() {
+        logger.info("Verifying Add Emails link availability");
         Assert.assertTrue("Deliver To Users field is not available", scheduleReport.isAddEmailLinkAvailable());
     }
 
     @When("User clicks Add Emails link, Deliver to External Emails field should display")
     public void userClicksAddEmailsLinkDeliverToExternalEmailsFieldShouldDisplay() {
+        logger.info("User clicks Add Emails link");
         scheduleReport.clickAddEmailsLink();
         Assert.assertTrue("Deliver To External Users field is not available", scheduleReport.isDeliverToExternalEmailsAvailable());
     }
@@ -2655,33 +2798,41 @@ public class LifeSteps {
     @And("User should be able to add multiple emails in Deliver to External Emails field")
     public void userShouldBeAbleToAddMultipleEmailsInDeliverToExternalEmailsField(DataTable dataTable) {
         List<String> emailList = dataTable.asList(String.class);
+        logger.info("Adding external email addresses: {}", emailList);
         scheduleReport.enterExternalEmails(emailList);
     }
 
     @Then("Verify Destination dropdown field is available")
     public void verifyDestinationDropdownFieldIsAvailable() {
+        logger.info("Verifying Destination dropdown field availability");
         Assert.assertTrue("Destination field is not available", scheduleReport.isDestinationAvailable());
     }
 
     @And("Verify {string} button is available in Destination dropdown field")
     public void verifyAddDestinationButtonIsAvailableInDestinationDropdownField(String buttonName) {
+        logger.info("Verifying Add Destination button: {}", buttonName);
         Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
     }
 
     @When("User clicks {string} button")
     public void userClicksAddDestinationButton(String buttonName) {
+        logger.info("User clicks Destination button: {}", buttonName);
         scheduleReport.clickAddDestination(buttonName);
     }
 
     @Then("Verify Destination Name, Destination Type fields are displayed")
     public void verifyDestinationNameDestinationTypeFieldsAreDisplayed() {
+        logger.info("Verifying Destination Name and Destination Type fields");
         Assert.assertTrue("Destination Name and Type fields are not available", scheduleReport.isDestinationNameAndTypeDisplayed());
     }
 
     @And("Verify that Destination Type has values {string}")
     public void verifyThatDestinationTypeHasValues(String destinationTypes) {
+        logger.info("Verifying Destination Type values: {}", destinationTypes);
         List<String> expectedTypes = CommonUtils.convertStringToList(destinationTypes);
         List<String> actualTypes = scheduleReport.fetchDestinationTypes();
+        logger.info("Expected Destination Types: {}", expectedTypes);
+        logger.info("Actual Destination Types: {}", actualTypes);
         for (String type : expectedTypes) {
             Assert.assertTrue("Missing Destination Type: " + type, actualTypes.contains(type));
         }
@@ -2689,51 +2840,64 @@ public class LifeSteps {
 
     @And("Verify File Path field is available")
     public void verifyFilePathFieldIsAvailable() {
+        logger.info("Verifying File Path field availability");
         Assert.assertTrue("File Path field is not available", scheduleReport.isFilePathAvailable());
     }
 
     @And("Verify File Name field is available")
     public void verifyFileNameFieldIsAvailable() {
+        logger.info("Verifying File Name field availability");
         Assert.assertTrue("File Path field is not available", scheduleReport.isFileNameAvailable());
     }
 
     @And("Verify Compression field is available with below options and default value is {string}")
     public void verifyCompressionFieldIsAvailableWithBelowOptions(String defaultCompressionType, DataTable dataTable) {
-        List<String> buttonLabels = dataTable.asList(String.class);
+        logger.info("Verifying Compression field with default value: {}", defaultCompressionType);
+        List<String> expectedTypes = dataTable.asList(String.class);
+        logger.info("Expected Compression types: {}", expectedTypes);
         Assert.assertTrue("None is not selected by default", scheduleReport.checkDefaultCompression(defaultCompressionType));
-        Assert.assertEquals(new HashSet<>(buttonLabels), new HashSet<>(scheduleReport.fetchCompressionTypes()));
+        List<String> actualTypes = scheduleReport.fetchCompressionTypes();
+        logger.info("Actual Compression types: {}", actualTypes);
+        Assert.assertEquals(new HashSet<>(expectedTypes), new HashSet<>(actualTypes));
     }
 
     @And("Verify Control File checkbox is present and by default it should be unchecked")
     public void verifyControlFileCheckboxIsPresentAndByDefaultItShouldBeUnchecked() {
+        logger.info("Verifying Control File checkbox availability and default state");
         Assert.assertTrue("Control File checkbox is not available", scheduleReport.isControlFileCheckboxAvailable());
         Assert.assertTrue("Control File checkbox is not unchecked by default", scheduleReport.isControlFileCheckboxSelected());
     }
 
     @And("User clicks {string} as frequency")
     public void userClicksAsFrequency(String frequencyType) {
+        logger.info("User selects Frequency option: {}", frequencyType);
         scheduleReport.clickFrequencyOption(frequencyType);
     }
 
     @And("User selects Send On date")
     public void userSelectsSendOnDate() {
+        logger.info("User selects Send On date");
         Assert.assertTrue("Unable to select date from date picker", scheduleReport.selectScheduleStartDate());
     }
 
     @And("Verify Report Period is selected as {string}")
     public void verifyReportPeriodIsSelectedAs(String periodType) {
+        logger.info("Selecting Report Period: {}", periodType);
         scheduleReport.selectReportPeriod(periodType);
         nameList.add(periodType);
+        logger.info("Added Report Period to nameList: {}", periodType);
     }
 
     @And("User selects start date and end date when Custom Dates option is selected")
     public void userSelectsStartDateAndEndDateWhenCustomDatesOptionIsSelected() {
+        logger.info("Selecting Start Date and End Date for Custom Dates");
         Assert.assertTrue("Unable to select start date", scheduleReport.selectStartDate());
         Assert.assertTrue("Unable to select end date", scheduleReport.selectEndDate());
     }
 
     @And("User selects start {string} and end time {string} when Custom Dates option is selected")
     public void userSelectsStartAndEndTimeWhenCustomDatesOptionIsSelected(String startTime, String endTime) {
+        logger.info("Selecting Start Time: {} and End Time: {}", startTime, endTime);
         Assert.assertTrue("Unable to select start and end time", scheduleReport.selectStartAndEndTime(startTime, endTime));
         nameList.add(startTime);
         nameList.add(endTime);
@@ -2741,12 +2905,16 @@ public class LifeSteps {
 
     @And("User clicks Schedule button to generate the report")
     public void userClicksScheduleButtonForReportGeneration() {
+        logger.info("User clicks Schedule button to generate report");
         scheduleReport.clickScheduleButton();
-        Assert.assertEquals("Success!", scheduleReport.fetchSuccessAlert());
+        String successMsg = scheduleReport.fetchSuccessAlert();
+        logger.info("Schedule Report success message: {}", successMsg);
+        Assert.assertEquals("Success!", successMsg);
     }
 
     @And("User searches the report and checks the report panel retains the entered data")
     public void userSearchesTheReportAndChecksTheReportPanelRetainsTheEnteredData() {
+        logger.info("Searching scheduled report and verifying retained data for report: {}", metricName);
         scheduleReport.searchReport(metricName);
         scheduleReport.clickReportName(metricName);
         capturedDetails.addAll(runReportPanel.fetchTemplateValue());
@@ -2762,33 +2930,41 @@ public class LifeSteps {
         capturedDetails.add(scheduleReport.fetchReportPeriod());
         capturedDetails.add(scheduleReport.fetchStartTime());
         capturedDetails.add(scheduleReport.fetchEndTime());
+        logger.info("Captured Report Details: {}", capturedDetails);
+        logger.info("Expected values: {}", nameList);
         Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
     }
 
     @And("Verify Send On field is visible and user should be able to select the day {string} of the month")
     public void verifySendOnFieldIsVisibleAndUserShouldBeAbleToSelectTheDayOfTheMonth(String dayOfTheMonth) {
+        logger.info("Verifying Send On field and selecting day of month: {}", dayOfTheMonth);
         Assert.assertTrue("Send On field is not available", scheduleReport.isSendOnAvailable());
         Assert.assertTrue("Unable to select Day of the Month", scheduleReport.selectDayOfTheMonth(dayOfTheMonth));
     }
 
     @And("Verify that user is able to select Send On day {string}")
     public void verifyThatUserIsAbleToSelectSendOnDay(String day) {
+        logger.info("Selecting Send On weekday: {}", day);
         Assert.assertTrue("Unable to select Send On Day", scheduleReport.selectWeekDay(day));
     }
 
     @Then("User searches the Campaign {string}, navigates to LineItem and fetches the flight details")
     public void userSearchesTheCampaignNavigatesToLineItemAndFetchesTheFlightDetails(String campaignName) {
+        logger.info("Searching Campaign: {} and fetching Line Item flight details", campaignName);
         campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.expandCreatedLineItem();
         campaignDashboard.navigateToLineItemDetails();
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         itemList = lineItemFlights.fetchFlightDates();
+        logger.info("Fetched Flight Dates: {}", itemList);
     }
 
     @And("User fetches all the Flight details and verifies that selected Line Item flight details appear in the Flight tab of the Run Report panel")
     public void userFetchesAllTheFlightDetailsAndSelects() throws ParseException {
+        logger.info("Fetching and validating Flight details in Run Report panel");
         List<String> flightDescriptions = runReportPanel.fetchAndSelectFlightDetails();
+        logger.info("Flight Descriptions from Run Report: {}", flightDescriptions);
         SimpleDateFormat descFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
         SimpleDateFormat extractedFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         SimpleDateFormat compareFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -2811,11 +2987,13 @@ public class LifeSteps {
 
     @And("User downloads the Scheduled report and verify the data in downloaded report")
     public void userDownloadsTheScheduledReportAndVerifyTheDataInDownloadedReport() {
+        logger.info("Downloading scheduled report");
         runReportPanel.downloadScheduledReport();
     }
 
     @When("User navigates to Administrative section and go to Accounts Tab")
     public void userNavigatesToAdministrativeSectionAndGoToTab() throws Exception {
+        logger.info("Navigating to Administrative section - Accounts tab");
         navigation.clickSubMenu();
         accounts.clickAdministration();
         accounts.selectAccountsTab();
@@ -2823,23 +3001,27 @@ public class LifeSteps {
 
     @And("User searches the account {string} in which Destination to be created")
     public void userSearchesTheAccountInWhichDestinationToBeCreated(String account) {
+        logger.info("Searching account for destination creation: {}", account);
         accounts.searchAccount(account);
         Assert.assertTrue("Reporting Tab is not displayed", accounts.isReportingTabDisplayed());
     }
 
     @And("User navigates to Reporting tab")
     public void userNavigatesToReportingTab() {
+        logger.info("Navigating to Reporting tab");
         accounts.clickReportingTab();
     }
 
     @Then("User clicks Add Destination button")
     public void userClicksAddDestinationButton() {
+        logger.info("User clicks Add Destination button");
         accounts.clickAddDestination();
     }
 
     @And("User enters Destination details - {string}, {string}, {string}, {string}")
     public void userEntersDestinationDetails(String destinationName, String destinationType, String hostName, String port) throws Exception {
         dimensionName = destinationName + CommonUtils.timeStampCalculation();
+        logger.info("Entering Destination details. Name: {}, Type: {}", dimensionName, destinationType);
         accounts.enterDestinationName(dimensionName);
         accounts.selectDestinationType(destinationType);
         accounts.enterHostName(hostName);
@@ -2850,31 +3032,37 @@ public class LifeSteps {
 
     @And("User clicks Test Connection link to verify if connection happened successfully")
     public void userClicksTestConnectionLinkToVerifyIfConnectionHappenedSuccessfully() {
+        logger.info("Clicking Test Connection for destination");
         accounts.clickTestConnection();
     }
 
     @Then("User selects destination name created, and other details - {string}, {string}")
     public void userSelectsDestinationNameCreatedAndOtherDetails(String filePath, String fileName) {
+        logger.info("Selecting custom destination: {}, FilePath: {}, FileName: {}", dimensionName, filePath, fileName);
         scheduleReport.enterCustomDestinationDetailsOnReportPanel(dimensionName, filePath, fileName);
     }
 
     @And("User saves the custom destination")
     public void userSavesTheCustomDestination() {
+        logger.info("Saving custom destination");
         accounts.clickOKButton();
     }
 
     @And("User clicks PulsePoint icon to navigate back to Life")
     public void userClicksPulsePointIconToNavigateBackToLife() {
+        logger.info("Navigating back to Life via PulsePoint icon");
         navigation.clickPulsePointLogo();
     }
 
     @And("User clicks Lifetime filter")
     public void userClicksLifetimeFilter() {
+        logger.info("Clicking Lifetime filter");
         campaignDashboard.clickLifetimeFilter();
     }
 
     @And("User removes all the filters applied on the Dashboard")
     public void userRemovesAllTheFiltersAppliedOnTheDashboard() {
+        logger.info("Removing all applied dashboard filters");
         campaignDashboard.ensureCampaignRadioBtnSelected();
         campaignDashboard.unselectFavoriteCheckboxIfSelected();
         campaignDashboard.unselectHideFinishedCheckboxIfSelected();
@@ -2883,6 +3071,7 @@ public class LifeSteps {
 
     @Then("Verify the tabs displayed on the Pixels page")
     public void verifyTabsDisplayedOnPixelsPage() {
+        logger.info("Verifying tabs on Pixels page");
         Assert.assertEquals("RETARGETING", pixels.verifyRetargetingTab().toUpperCase());
         Assert.assertEquals("SMART", pixels.verifySmartTab().toUpperCase());
         Assert.assertEquals("CONVERSION", pixels.verifyConversionTab().toUpperCase());
@@ -2890,12 +3079,14 @@ public class LifeSteps {
 
     @Then("Verify the Advertiser dropdown and search box are displayed on the Pixels page")
     public void verifyAdvertiserDropdownAndSearchBoxDisplayed() {
+        logger.info("Verifying Advertiser dropdown and Search box on Pixels page");
         Assert.assertTrue("Advertiser Dropdown is not visible", pixels.verifyAdvertiserDropdown());
         Assert.assertTrue("Search Box is not visible", pixels.verifySearchBox());
     }
 
     @When("User tries to save the Retargeting pixel without entering any details, an error message should be displayed")
     public void userTriesToSaveRetargetingPixelWithoutDetails() {
+        logger.info("Validating error messages when saving Retargeting pixel without required fields");
         String pixelNameTemp = "Temporary Pixel Name";
         retargetingPixel.enterPixelName(pixelNameTemp);
         pixels.savePixel();
@@ -2907,12 +3098,14 @@ public class LifeSteps {
 
     @And("User selects the {string} pixel")
     public void userSelectsPixel(String pixelType) {
+        logger.info("Selecting pixel type: {}", pixelType);
         retargetingPixel.selectPixelType(pixelType);
     }
 
     @When("User edits the name of the created {string}")
     public void userEditsPixel(String pixelType) {
         pixelNameEdited = newPixelName + '_' + "Edited";
+        logger.info("Editing {} name to {}", pixelType, pixelNameEdited);
         pixels.clickEditIcon();
         switch (pixelType) {
             case "Retargeting Pixel" -> retargetingPixel.enterPixelName(pixelNameEdited);
@@ -2924,6 +3117,7 @@ public class LifeSteps {
 
     @Then("Verify the {string} gets updated successfully")
     public void verifyPixelUpdated(String pixelType) {
+        logger.info("Verifying {} update success", pixelType);
         if (pixelType.equals("Retargeting Pixel") || pixelType.equals("Conversion Pixel")) {
             Assert.assertEquals("PIXEL UPDATED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
         } else if (pixelType.equals("Smart Pixel")) {
@@ -2935,48 +3129,60 @@ public class LifeSteps {
 
     @When("User removes the created pixel")
     public void userRemovesPixel() {
+        logger.info("Removing created pixel");
         pixels.removePixel();
     }
 
     @Then("Verify the pixel gets removed successfully")
     public void verifyPixelRemoved() {
+        logger.info("Verifying pixel removal success");
         Assert.assertEquals("Pixel deleted successfully", pixels.removeSuccess());
     }
 
     @When("User selects {string} as advertiser")
     public void userSelectsAdvertiser(String advertiser) {
+        logger.info("Select advertiser: {}", advertiser);
         smartPixel.selectAdvertiser(advertiser);
     }
 
     @Then("Verify the Smart Pixel name is auto populated with {string} and Smart Pixel text")
     public void verifySmartPixelNameIsAutoPopulated(String advertiser) {
+        logger.info("STEP: Verify Smart Pixel name auto-population for advertiser: {}", advertiser);
         String pixelName = smartPixel.getPixelNameFromHeader();
+        logger.info("Fetched Smart Pixel name from UI: {}", pixelName);
         String expectedPixelName = advertiser + " Smart Pixel";
         String regex = "^\\Q" + expectedPixelName + "\\E(\\s\\d+)?$";
         Assert.assertTrue(pixelName.matches(regex));
+        logger.info("Smart Pixel name verified successfully");
     }
 
     @And("User selects the associated campaign")
     public void userSelectsAssociatedCampaign() {
+        logger.info("User selects the associated campaign");
         smartPixel.selectAssociatedCampaign();
     }
 
     @And("User adds the associated Smart List and enters list details as {string}")
     public void addsAssociatedSmartList(String listName) {
+        logger.info("Adding associated Smart List with base name: {}", listName);
         smartPixel.clickAddSmartListButton();
         npiName = listName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Generated Smart List name: {}", npiName);
         npiStaticList.enterListName(npiName);
     }
 
     @Then("Verify the selected {string} and Smart Pixel")
     public void verifySelectedAdvertiserAndSmartPixel(String advertiser) {
+        logger.info("Verifying selected advertiser: {}", advertiser);
         Assert.assertEquals(advertiser, npiSmartList.verifySelectedAdvertiser());
+        logger.info("Verifying selected Smart Pixel: {}", newPixelName);
         Assert.assertEquals(newPixelName, npiSmartList.verifySelectedSmartPixel());
         npiSmartList.clickLifeCheckbox();
     }
 
     @And("User selects the created Smart Pixel")
     public void userSelectsCreatedSmartPixel() {
+        logger.info("Selecting created Smart Pixel: {}", newPixelName);
         pixels.selectSmartPixelTab();
         pixels.searchSavedPixel(newPixelName);
         pixels.openSearchedPixel(newPixelName);
@@ -2984,18 +3190,21 @@ public class LifeSteps {
 
     @Then("Verify the selected Smart List should be reflected in the Associated Smartlists tab")
     public void verifySmartListReflectedInAssociatedTab() {
+        logger.info("Verifying Smart List is reflected in Associated Smart Lists tab: {}", npiName);
         smartPixel.clickAssociatedSmartListsTab();
         Assert.assertEquals(npiName, smartPixel.verifyAssociatedSmartList(npiName));
     }
 
     @And("User navigates to the Pixel Codes tab")
     public void userNavigatesToPixelCodesTab() {
+        logger.info("Navigating to Pixel Codes tab");
         smartPixel.clickPixelCodesTab();
         Assert.assertTrue(smartPixel.verifyPixelCodesTabIsSelected());
     }
 
     @Then("Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it")
     public void verifyUserCannotDeactivateSmartPixelWithAssociatedSmartList() {
+        logger.info("Verifying Smart Pixel cannot be deactivated when Smart List is associated");
         pixels.clickEditIcon();
         smartPixel.clickDeactivatePixelIcon();
         Assert.assertEquals("PIXEL CAN'T BE DEACTIVATED", smartPixel.verifyDeactivateError().toUpperCase());
@@ -3003,34 +3212,43 @@ public class LifeSteps {
 
     @When("User deactivates the created pixel")
     public void userDeactivatesCreatedPixel() {
+        logger.info("Deactivating pixel: {}", newPixelName);
         pixels.clickEditIcon();
         smartPixel.deactivatePixel();
     }
 
     @Then("Verify the pixel gets deactivated successfully")
     public void verifyPixelDeactivatedSuccessfully() {
-        assert smartPixel.deactivateSuccess().contains("Pixel Deactivated successfully");
+        logger.info("Verifying pixel deactivation success message");
+        Assert.assertTrue("Deactivate success message is not displayed", smartPixel.deactivateSuccess().contains("Pixel Deactivated successfully"));
     }
 
     @When("User tries to save the Conversion pixel without entering any details, an error message should be displayed")
     public void userTriesToSaveConversionPixelWithoutDetails() {
+        logger.info("Validating mandatory field errors while saving Conversion Pixel");
         String pixelNameTemp = "Temporary Pixel Name";
+        logger.info("Using temporary pixel name: {}", pixelNameTemp);
         conversionPixel.enterPixelName(pixelNameTemp);
         pixels.savePixel();
+        logger.info("Verifying advertiser mandatory error");
         Assert.assertEquals("Advertiser is required", conversionPixel.advertiserError());
         conversionPixel.clearPixelName();
         pixels.savePixel();
+        logger.info("Verifying pixel name mandatory error");
         Assert.assertEquals("Pixel Name is required", conversionPixel.pixelNameError());
         conversionPixel.enterPixelName(pixelNameTemp);
+        logger.info("Selecting temporary advertiser to validate conversion type mandatory field");
         // Temporary hardcoded selection of advertiser to validate mandatory fields
         conversionPixel.selectAdvertiser("01- Advertiser");
         pixels.savePixel();
         Assert.assertEquals("Conversion Type is required", conversionPixel.pixelTypeOptionError());
+        logger.info("Cancelling Conversion Pixel creation");
         pixels.clickCancelButton();
     }
 
     @Then("Verify the removed pixel should not be displayed in the pixel list")
     public void verifyRemovedPixelNotDisplayedInPixelList() {
+        logger.info("Verifying removed pixel is not displayed: {}", pixelNameEdited);
         pixels.searchSavedPixel(pixelNameEdited);
         String noResultText = pixels.verifyDeletedPixel().toUpperCase();
         Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
@@ -3038,34 +3256,43 @@ public class LifeSteps {
 
     @Then("Verify the deactivated pixel should not be displayed in the pixel list")
     public void verifyDeactivatedPixelNotDisplayedInPixelList() {
+        logger.info("Verifying deactivated pixel is not displayed in pixel list: {}", pixelNameEdited);
         pixels.searchSavedPixel(pixelNameEdited);
         String noResultText = pixels.verifyDeletedPixel().toUpperCase();
+        logger.info("Pixel search result text: {}", noResultText);
         Assert.assertTrue(noResultText.equals("NOTHING FOUND...") || noResultText.equals("NOTHING FOUND"));
     }
 
 
     @And("User should be able to select the created template from the dropdown")
     public void userShouldBeAbleToSelectTheTemplateCreatedFromTheDropdown() {
+        logger.info("Selecting created template from dropdown: {}", templateNameRandom);
         runReportPanel.selectTemplateFromDropdown(templateNameRandom);
         templateNameRandom = runReportPanel.fetchTemplateValue().get(0);
+        logger.info("Fetched selected template value: {}", templateNameRandom);
         nameList.add(templateNameRandom);
     }
 
     @When("User selects {string} as rule type and selects the published Studio list")
     public void userSelectsRuleTypeAndSelectsThePublishedStudioList(String ruleType) {
+        logger.info("Selecting rule type '{}' and published Studio list '{}'", ruleType, StudioSteps.workspaceName);
         itemCount = tacticSettings.selectRuleType(ruleType, StudioSteps.workspaceName);
+        logger.info("Item count returned after rule selection: {}", itemCount);
     }
 
     @Then("Verify the selected targeting rule {string} and rule option")
     public void verifyTheSelectedTargetingRuleAndRuleOption(String ruleType) {
+        logger.info("Verifying selected targeting rule and rule option");
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
         Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
+        logger.info("Targeting rule '{}' and rule option '{}' verified successfully", ruleType, StudioSteps.workspaceName);
     }
 
     // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
     // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
     @And("User navigates to {string} application")
     public void userNavigatesToApplication(String application) {
+        logger.info("Navigating back to application: {}", application);
         switch (application.toLowerCase()) {
             case "life":
                 navigation.navigateBackToLife();
@@ -3076,17 +3303,21 @@ public class LifeSteps {
             case "studio":
                 navigation.navigateBackToStudio();
                 break;
+            default:
+                logger.warn("Unknown application requested: {}", application);
         }
     }
 
     @And("Verify Line Item page has below tabs")
     public void verifyLineItemPageHasBelowTabs(DataTable dataTable) {
         List<String> tabNames = dataTable.asList(String.class);
+        logger.info("Verifying Line Item page tabs: {}", tabNames);
         Assert.assertTrue("Line Item tabs are not available", lineItemDetails.verifyLineItemTabs(tabNames));
     }
 
     @And("Verify status of line item is Incomplete when there are no tactics under the line item")
     public void verifyStatusOfLineItemIsIncompleteWhenThereAreNoTacticsUnderTheLineItem() {
+        logger.info("Verifying Line Item status when no tactics are present");
         Assert.assertEquals("Incomplete", lineItemDetails.verifyLineItemStatus());
         Assert.assertEquals("Campaign is enabled . Tactic is Incomplete.", lineItemDetails.fetchIncompleteStatusToolTip());
     }
@@ -3094,17 +3325,20 @@ public class LifeSteps {
     @When("User fills in required details {string} except for flight information and save")
     public void userFillsInRequiredDetailsExceptForFlightInformation(String lineItemName) {
         lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
+        logger.info("Entering Line Item name without flight details: {}", lineItemNameRandom);
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         lineItemDetails.saveLineItem();
     }
 
     @Then("User should see an error message to add flight details")
     public void userShouldSeeAnErrorMessageToAddFlightDetails() {
+        logger.info("Verifying error message for missing flight details");
         Assert.assertEquals("LineItem Flight is required.", lineItemDetails.fetchErrorAlert());
     }
 
     @And("User clicks Add Flight button")
     public void userClicksAddFlightButton() {
+        logger.info("Clicking Add Flight button");
         lineItemDetails.clickAddFlightButton();
     }
 
@@ -3112,24 +3346,29 @@ public class LifeSteps {
     public void verifyIfUserEntersFlightBudgetThatExceedsCampaignBudget() {
         String unaccountedBudget = lineItemDetails.fetchCampaignBudget();
         String modifiedBudget = String.valueOf(Integer.parseInt(unaccountedBudget) + 1000);
+        logger.info("Entering flight budget exceeding campaign budget. Campaign: {}, Entered: {}", unaccountedBudget, modifiedBudget);
         lineItemDetails.enterLineItemBudget(modifiedBudget);
         lineItemDetails.saveLineItem();
     }
 
     @Then("User should see error message when tries to save line item page")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage() {
+        logger.info("Verifying error message when flight budget exceeds campaign budget");
         Assert.assertTrue("The total flight budget is exceeded", lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed"));
     }
 
     @And("User adds the flight details - Flight Start Date, Flight End Date, {string}")
     public void userAddsTheFlightDetailsFlightStartDateFlightStartDate(String budget) {
+        logger.info("Adding flight details with budget: {}", budget);
         lineItemDetails.enterLineItemBudget(budget);
         flightStartDate = lineItemDetails.selectStartDateOfFlight();
         flightEndDate = lineItemDetails.selectEndDateOfFlight();
+        logger.info("Selected flight dates → Start: {}, End: {}", flightStartDate, flightEndDate);
     }
 
     @And("User adds new flight and enter overlapping flight details - Flight Start Date, Flight End Date, {string}")
     public void userAddsOverlappingFlightDetailsFlightStartDateFlightStartDate(String budget) {
+        logger.info("Adding overlapping flight with budget: {}", budget);
         lineItemDetails.clickAddFlightButton();
         lineItemDetails.enterLineItemBudget(budget);
         lineItemDetails.selectOverlappingFlightDates(flightStartDate, flightEndDate);
@@ -3138,6 +3377,7 @@ public class LifeSteps {
 
     @And("User should see error message when tries to save line item page and dates fields should get highlighted with inline error message")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPageAndDatesFieldsShouldGetHighlighted() {
+        logger.info("Verifying overlapping flight error message and inline validation");
         Assert.assertTrue("LineItem flights overlap message is not displayed", lineItemDetails.fetchErrorAlert().contains("LineItem flights overlap."));
         Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
     }
@@ -3145,21 +3385,26 @@ public class LifeSteps {
     @When("User enters line item details {string}")
     public void userEntersLineItemDetails(String lineItemName) {
         lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
+        logger.info("Entering Line Item name: {}", lineItemNameRandom);
         lineItemDetails.enterLineItemName(lineItemNameRandom);
     }
 
     @And("User adds {string} flights, fills in the details with {string} for each flight section, and saves the line item")
     public void userAddsMultipleFlightsAndFillsInDetailsForEachFlightSection(String noOfFlights, String budget) {
+        logger.info("Adding {} flights with budget {} for each flight", noOfFlights, budget);
         lineItemDetails.addMultipleFlights(noOfFlights, budget);
     }
 
     @And("User generates sequential flights for the line item using {string} and {string}")
     public void userGeneratesSequentialFlightsToALineItem(String budget, String numberOfMonths) {
+        logger.info("Generating sequential flights with budget {} for {} months", budget, numberOfMonths);
         capturedDetails = lineItemDetails.generateSequentialFlights(budget, numberOfMonths);
+        logger.info("Generated sequential flight details: {}", capturedDetails);
     }
 
     @And("Verify that Sequential flights should be added based on the start month")
     public void verifyThatSequentialFlightsShouldBeAddedBasedOnTheStartMonth() {
+        logger.info("Verifying sequential flights based on start month");
         String[] parts = capturedDetails.get(0).split(" ");
         Month startMonth = Month.valueOf(parts[0].toUpperCase(Locale.ENGLISH));
         int startYear = Integer.parseInt(parts[1]);
@@ -3169,6 +3414,7 @@ public class LifeSteps {
             LocalDate actualDate = LocalDate.parse(dateStr, formatter);
             LocalDate expectedDate = LocalDate.of(startYear, startMonth, 1).plusMonths(i - 1);
             if (actualDate.getMonthValue() != expectedDate.getMonthValue() || actualDate.getYear() != expectedDate.getYear()) {
+                logger.error("Flight date mismatch. Expected: {}, Actual: {}", expectedDate, actualDate);
                 Assert.assertEquals("Flight date mismatch ", actualDate, expectedDate);
             }
         }
@@ -3176,18 +3422,22 @@ public class LifeSteps {
 
     @And("User fetches all the flight details added")
     public void userFetchesAllTheFlightDetailsAdded() {
+        logger.info("Saving Line Item and fetching all flight details");
         lineItemDetails.saveLineItem();
         lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
         lineItemDetails.clickDetailsTab();
         itemList = lineItemDetails.fetchFlightDetails();
+        logger.info("Fetched flight details: {}", itemList);
     }
 
     @Then("User navigates to the Flights tab and verifies the flight details")
     public void userNavigatesToTheFlightsTabAndVerifiesTheFlightDetails() {
+        logger.info("Navigating to Flights tab and verifying flight details");
         List<String> flightDetails;
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         flightDetails = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        logger.info("Flight details from Flights tab: {}", flightDetails);
         for (String expected : itemList) {
             boolean matchFound = flightDetails.stream().anyMatch(actual -> actual.contains(expected));
             Assert.assertTrue("Expected value not found in flight tab: " + expected, matchFound);
@@ -3198,18 +3448,22 @@ public class LifeSteps {
 
     @When("User deletes some flight entries")
     public void userDeletesSomeFlightEntries() {
+        logger.info("Deleting some flight entries");
         lineItemDetails.clickDetailsTab();
         lineItemDetails.deleteFlightEntry();
         lineItemDetails.saveLineItem();
         itemList = lineItemDetails.fetchFlightDetails();
+        logger.info("Remaining flight details after deletion: {}", itemList);
     }
 
     @Then("User should see the remaining flights listed under the Flights section")
     public void userShouldSeeTheRemainingFlightsListedUnderTheFlightsSection() {
+        logger.info("Verifying remaining flights after deletion");
         List<String> flightDetailsAfterDeletion;
         lineItemFlights.clickFlightTab();
         Assert.assertTrue("Flight details are not displayed", lineItemFlights.isFlightTableDisplayed());
         flightDetailsAfterDeletion = lineItemFlights.fetchFlightDetailsFromFlightTab();
+        logger.info("Flight details after deletion: {}", flightDetailsAfterDeletion);
         for (String expected : itemList) {
             boolean matchFound = flightDetailsAfterDeletion.stream().anyMatch(actual -> actual.contains(expected));
             Assert.assertTrue("Expected value not found in flight tab after flight deletion: " + expected, matchFound);
@@ -3219,6 +3473,7 @@ public class LifeSteps {
 
     @When("User creates line items with below line types and other details, enables the line item and saves the changes")
     public void userEntersTheLineItemDetailsWithDifferentLineTypesEnablesTheLineItemAndSavesTheChanges(DataTable dataTable) {
+        logger.info("Creating multiple Line Items with different line types");
         nameList.clear();
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         int currentRowIndex = 0;
@@ -3228,6 +3483,7 @@ public class LifeSteps {
             String attributes = row.get("LINE_ITEM_DETAILS").trim();
             Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
             lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
+            logger.info("Creating Line Item: {} of type {}", lineItemNameRandom, type);
             nameList.add(lineItemNameRandom);
             lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
             Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
@@ -3243,9 +3499,11 @@ public class LifeSteps {
 
     @Then("User adds Comments or Notes {string} to each line item")
     public void userAddsCommentsOrNotesToEachLineItem(String notes) {
+        logger.info("Adding comments/notes to each Line Item");
         for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String newNotes = name + " " + notes;
+            logger.info("Adding notes to {}: {}", name, newNotes);
             itemList.add(newNotes);
             Assert.assertEquals("Notes saved successfully.", lineItemDetails.addNotesToLineItem(newNotes));
         }
@@ -3253,48 +3511,63 @@ public class LifeSteps {
 
     @And("Verify the notes added to each line item")
     public void verifyTheNotesAddedToEachLineItem() {
+        logger.info("Verifying notes added to each Line Item");
         for (String name : nameList) {
             lineItemDetails.navigateToLineItemDetails(name);
             String notes = lineItemDetails.fetchLineItemNotes();
+            logger.info("Fetching notes added to Line Item {}: {}", notes, name);
             Assert.assertTrue("Note of '" + name + "' is not available", itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
         }
     }
 
     @And("Verify Bulk Edit Mode successfully {string} multiple selected line items")
     public void verifyBulkEditModeWorksForDisablingMultipleLineItems(String bulkOperations) {
+        logger.info("Verifying Bulk Edit Mode operation: {}", bulkOperations);
         lineItemDetails.clickBulkEditMode();
+        logger.info("Entered Bulk Edit Mode");
         for (String name : nameList) {
+            logger.info("Selecting line item '{}' for bulk operation", name);
             lineItemDetails.selectLineItemUsingBulkEdit(name);
         }
         Assert.assertEquals("Lineitems status updated successfully", lineItemDetails.performBulkModeOperationsOnLineItems(bulkOperations));
         lineItemDetails.exitBulkEditMode();
+        logger.info("Exited Bulk Edit Mode");
     }
 
     @And("Verify that each selected line item is {string}")
     public void verifyThatEachSelectedLineItemIsDisabled(String label) {
+        logger.info("Verifying that each selected line item is '{}'", label);
         for (String name : nameList) {
+            logger.info("Navigating to line item details for '{}'", name);
             lineItemDetails.navigateToLineItemDetails(name);
-            Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label));
+            boolean isDisabled = lineItemDetails.checkIfEachLineItemEnabledOrDisabled(label);
+            logger.info("Line item '{}' enabled/disabled status: {}", name, isDisabled);
+            Assert.assertTrue(name + " is not " + label + " using Bulk Edit Mode", isDisabled);
         }
     }
 
     @And("Verify user is able to create a copy of the line items using {string} option")
     public void verifyUserIsAbleToCreateACopyOfTheLineItems(String lineItemOption) {
+        logger.info("Verifying that user can create a copy of line items using '{}' option", lineItemOption);
         itemList.clear();
         List<String> originalLineItemDetails;
         List<String> copiedLineItemDetails;
         for (String name : nameList) {
+            logger.info("Processing line item '{}'", name);
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickDetailsTab();
             originalLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            logger.info("Fetched original line item details: {}", originalLineItemDetails);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             String lineItemName = "Copy of " + name;
             itemList.add(lineItemName);
             Assert.assertEquals("Line Item copied successfully.", lineItemDetails.createACopyOfLineItem(lineItemName));
+            logger.info("Created copy of line item '{}'", lineItemName);
             Assert.assertTrue("Copied Line Item is not available", lineItemDetails.verifyLineItemAvailable(lineItemName));
             lineItemDetails.navigateToLineItemDetails(lineItemName);
             lineItemDetails.clickDetailsTab();
             copiedLineItemDetails = lineItemDetails.fetchLineItemDetails();
+            logger.info("Fetched copied line item details: {}", copiedLineItemDetails);
             lineItemDetails.clickOverviewTab();
             Assert.assertEquals("Line item details do not match after copy.", originalLineItemDetails, copiedLineItemDetails);
         }
@@ -3302,7 +3575,9 @@ public class LifeSteps {
 
     @And("Verify {string} option opens the Run report screen for user and run the report for {string}")
     public void verifyOptionOpensTheRunReportScreenForUser(String lineItemOption, String templateName) {
+        logger.info("Verifying '{}' option opens Run Report screen and running report for '{}'", lineItemOption, templateName);
         for (String name : nameList) {
+            logger.info("Navigating to line item '{}'", name);
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.runReportFromLineItemPage();
@@ -3310,28 +3585,35 @@ public class LifeSteps {
             String fileName = "Custom Report";
             runReportPanel.clickRunButton(fileName);
             String actualMessage = runReportPanel.fetchSuccessAlert();
+            logger.info("Report run success message: '{}'", actualMessage);
             Assert.assertTrue("Unexpected success message: " + actualMessage, actualMessage.equals("Success!") || actualMessage.equals("You will get the report on your email"));
         }
     }
 
     @And("Verify that the reports generated on the Line Item page are available on the Generate Report page")
     public void verifyThatTheReportsGeneratedOnTheLineItemPageAreAvailableOnTheGenerateReportPage() {
+        logger.info("Verifying reports generated on Line Item page are available on Generate Report page");
         navigation.clickSubMenu();
         navigation.clickMenuAngle();
         navigation.clickGeneratedReport();
         runReportPanel.clickSearchButton();
         for (String name : nameList) {
-            Assert.assertTrue("Report generated using line item " + name + " is not available", reportTemplates.verifyReportGeneratedFromLineItemPage(name));
+            boolean reportAvailable = reportTemplates.verifyReportGeneratedFromLineItemPage(name);
+            logger.info("Report availability for line item '{}': {}", name, reportAvailable);
+            Assert.assertTrue("Report generated using line item " + name + " is not available", reportAvailable);
         }
     }
 
     @And("Verify {string} is available for each item, and deleted items are removed from the Left menu")
     public void isAvailableForEachItemAndDeletedItemsAreRemovedFromTheLeftMenu(String lineItemOption) {
+        logger.info("Verifying '{}' option availability and deletion for each item", lineItemOption);
         for (String name : itemList) {
+            logger.info("Navigating to line item name '{}'", name);
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickLineItemOptions(lineItemOption);
             lineItemDetails.performDeleteOperation();
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
+            logger.info("Remaining line items after deletion: {}", lineItemLabelList);
             Assert.assertFalse("Line Item '" + name + "' is still available after performing Delete Operation", lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(name)));
         }
     }
@@ -3339,58 +3621,74 @@ public class LifeSteps {
     //* Rajyalaxmi - Tactic max bid and base bid verification
     @When("User clicks on Campaign Settings")
     public void user_clicks_on_campaign_settings() {
+        logger.info("Clicking on Campaign Settings link and navigating to Bid Settings tab");
         campaignSettings.campaignSettingsLink();
         campaignSettings.bidSettingsTab();
     }
 
     @Then("Verify user is on default bid settings page")
     public void verify_user_is_on_default_bid_settings_page() {
-        Assert.assertEquals("Default Bid Settings", campaignSettings.getDefaultSettings());
+        String defaultSettings = campaignSettings.getDefaultSettings();
+        logger.info("Verifying default bid settings page, found: '{}'", defaultSettings);
+        Assert.assertEquals("Default Bid Settings", defaultSettings);
     }
 
     @Then("User gets Max Bid and Base Bid values")
     public void user_gets_max_bid_and_base_bid_values() {
         campaignBaseBid = (campaignSettings.getBaseBidPrice());
         campaignMaxBid = (campaignSettings.getMaxBidPrice());
+        logger.info("Fetched Campaign Base Bid: {}, Max Bid: {}", campaignBaseBid, campaignMaxBid);
     }
 
     @Then("Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values")
     public void verify_max_bid_and_base_bid_values_on_the_tactic_settings_match_with_campaign_settings_values() {
         BigDecimal tacticBaseBid = (tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
         BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
+        logger.info("Verifying tactic settings: Base Bid={}, Max Bid={}", tacticBaseBid, tacticMaxBid);
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
     }
 
     @Then("User creates a new tactic with details {string} {string}")
     public void user_creates_a_new_tactics(String tacticName, String channel) {
+        logger.info("Creating new tactic '{}' for channel '{}'", tacticName, channel);
         tacticDetails.enterTacticName(tacticName);
         tacticDetails.saveTacticDetails();
     }
 
     @Then("User deletes the tactic {string} and verifies it")
     public void user_deletes_the_tactic_and_verifies_it(String tacticName) {
+        logger.info("Deleting tactic '{}'", tacticName);
         tacticDetails.deleteTactic();
-        Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+        String currentTacticName = tacticSettings.verifyTacticName();
+        logger.info("Current tactic after deletion: '{}'", currentTacticName);
+        Assert.assertNotEquals(tacticName, currentTacticName);
         tacticDetails.globalSearchDeletedTactic(tacticName);
-        Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+        String searchText = tacticDetails.getSearchText();
+        logger.info("Search text for deleted tactic '{}': '{}'", tacticName, searchText);
+        Assert.assertEquals("Nothing found...", searchText);
     }
 
     @And("User enables tactic {string} through bulk action and verifies the status")
     public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus(String tacticName) {
+        logger.info("Enabling tactic '{}' through bulk action", tacticName);
         tacticDetails.bulkEnableTactics(tacticName);
-        Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+        boolean isEnabled = tacticDetails.getToggleClass(tacticName);
+        logger.info("Tactic '{}' enabled status: {}", tacticName, isEnabled);
+        Assert.assertTrue(isEnabled);
 
     }
 
     @When("User clicks on create new Campaign")
     public void userClicksOnCreateNewCampaign() {
+        logger.info("Clicking on create new Campaign");
         campaigns.createCampaign();
     }
 
     @Then("Verify Smart List Creation Panel should display the following List Population Options")
     public void verifySmartListCreationPanelShouldDisplayTheFollowingListPopulationOptions(DataTable dataTable) {
         List<String> listPopulationOptions = dataTable.asList(String.class);
+        logger.info("Verifying Smart List Population Options: {}", listPopulationOptions);
         for (String option : listPopulationOptions) {
             Assert.assertTrue("List Population Option - " + option + " is not available in Smart List Container", npiSmartList.verifyListPopulationOptions(option.trim()));
         }
@@ -3398,14 +3696,17 @@ public class LifeSteps {
 
     @And("User selects the {string} and fetches Smart pixel list")
     public void userSelectsTheAndFetchesSmartPixelList(String advertiser) {
+        logger.info("Selecting Smart Pixel tab and advertiser '{}'", advertiser);
         pixels.selectSmartPixelTab();
         pixels.selectAdvertiser(advertiser);
         itemList = pixels.fetchPixelsList();
+        logger.info("Fetched Smart Pixel list: {}", itemList);
     }
 
     @And("User enters the Smart NPI list details as {string} {string}")
     public void userEntersTheSmartNPIListDetailsAsFor(String npiListName, String advertiser) {
         npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Entering Smart NPI list details: Name='{}', Advertiser='{}'", npiName, advertiser);
         npiSmartList.enterListName(npiName);
         npiSmartList.selectAdvertiser(advertiser);
         npiSmartList.clickLifeCheckbox();
@@ -3413,19 +3714,23 @@ public class LifeSteps {
 
     @And("User selects Smart NPI list as {string}")
     public void userSelectsSmartNPIList(String smartListType) {
+        logger.info("Selecting Smart NPI list type '{}'", smartListType);
         npiSmartList.selectSmartNPIListType(smartListType);
     }
 
     @And("User verifies the Smart Pixel dropdown displays all Smart Pixels for the selected advertiser and select the pixel")
     public void userVerifiesTheSmartPixelDropdownDisplaysAllSmartPixelsForTheSelectedAdvertiser() {
+        logger.info("Verifying Smart Pixel dropdown values match fetched pixel list");
         npiSmartList.clickSmartPixelDropDown();
         List<String> list = npiSmartList.fetchSmartPixelDropdownValue();
+        logger.info("Dropdown values: {}", list);
         Assert.assertTrue("Pixel list doesn't match", itemList.retainAll(list));
         npiSmartList.selectSmartPixelDropdownValue();
     }
 
     @And("User selects Engagement Type {string} and enter related details {string}, {string}, {string}")
     public void userSelectsEngagementType(String engagementType, String visitedURL, String ignoredURL, String keywords) {
+        logger.info("Selecting engagement type '{}' with visitedURL='{}', ignoredURL='{}', keywords='{}'", engagementType, visitedURL, ignoredURL, keywords);
         List<String> visitedUrlList = CommonUtils.parseCommaSeparatedString(visitedURL);
         List<String> ignoredUrlList = CommonUtils.parseCommaSeparatedString(ignoredURL);
         List<String> keywordList = CommonUtils.parseCommaSeparatedString(keywords);
@@ -3451,6 +3756,7 @@ public class LifeSteps {
 
     @And("User retrieves all the entered data before saving the list {string}")
     public void userRetrievesAllTheEnteredDataBeforeSavingTheList(String listType) {
+        logger.info("Retrieving entered data before saving list '{}'", listType);
         if (listType.contains(",")) {
             List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
             for (String list : listTypes) {
@@ -3459,16 +3765,21 @@ public class LifeSteps {
         } else {
             capturedDetails = npiSmartList.retrieveEnteredData(listType);
         }
+        logger.info("Captured details: {}", capturedDetails);
     }
 
     @And("User saves the Smart List and verifies the successful creation of the list")
     public void theUserSavesTheSmartListAndVerifiesTheSuccessfulCreationOfTheList() {
+        logger.info("Saving Smart NPI list '{}'", npiName);
         npiSmartList.clickSaveButton();
-        Assert.assertEquals("NPI list created successfully", npiSmartList.fetchSuccessAlert());
+        String alert = npiSmartList.fetchSuccessAlert();
+        logger.info("Success alert: '{}'", alert);
+        Assert.assertEquals("NPI list created successfully", alert);
     }
 
     @And("Verify that the retrieved data for the {string} list was saved correctly")
     public void verifyThatTheRetrievedDataForTheListWasSavedCorrectly(String listType) {
+        logger.info("Verifying retrieved data for list '{}'", listType);
         List<String> onListSavedFetchData = new ArrayList<>();
         if (listType.contains(",")) {
             List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
@@ -3478,27 +3789,32 @@ public class LifeSteps {
         } else {
             onListSavedFetchData = npiSmartList.retrieveEnteredData(listType);
         }
+        logger.info("Data fetched after save: {}", onListSavedFetchData);
         Assert.assertEquals("Data entered doesn't match after saving the list", capturedDetails, onListSavedFetchData);
     }
 
     @And("Verify {string} population option is disabled when Advertiser value is not selected")
     public void verifyNPIListPopulationOptionIsDisabledWhenAdvertiserValueIsNotSelected(String smartListType) {
+        logger.info("Verifying that '{}' population option is disabled when Advertiser is not selected", smartListType);
         Assert.assertTrue("NPI List is not disabled", npiSmartList.verifyNPIListDisabled(smartListType));
     }
 
     @And("User selects the HCP switch {string}")
     public void userSelectsTheHCPSwitch(String hcpSwitch) {
+        logger.info("Selecting HCP switch '{}'", hcpSwitch);
         npiSmartList.selectHCPSwitch(hcpSwitch);
     }
 
     @And("User selects the NPI Group {string}")
     public void userSelectsTheNPIGroup(String npiList) {
+        logger.info("Selecting NPI Group '{}'", npiList);
         npiSmartList.selectNPIGroup(npiList);
     }
 
     @And("User selects the Speciality {string}")
     public void userSelectsTheSpeciality(String specialities) {
         List<String> specialityList = CommonUtils.parseCommaSeparatedString(specialities);
+        logger.info("Selecting Specialities: {}", specialityList);
         for (String speciality : specialityList) {
             npiSmartList.selectSpeciality(speciality);
         }
@@ -3507,6 +3823,7 @@ public class LifeSteps {
     @And("User selects the Profession {string}")
     public void userSelectsTheProfession(String professions) {
         List<String> professionList = CommonUtils.parseCommaSeparatedString(professions);
+        logger.info("Selecting Professions: {}", professionList);
         for (String profession : professionList) {
             npiSmartList.selectProfession(profession);
         }
@@ -3514,27 +3831,34 @@ public class LifeSteps {
 
     @And("Verify that Recency is set to {string} by default for {string}")
     public void verifyThatRecencyIsSetToByDefault(String recency, String type) {
-        Assert.assertEquals(recency, npiSmartList.fetchRecency(type));
+        String currentRecency = npiSmartList.fetchRecency(type);
+        logger.info("Verifying Recency for type '{}': expected='{}', actual='{}'", type, recency, currentRecency);
+        Assert.assertEquals(recency, currentRecency);
     }
 
     @And("verify that Decile is set to {string} by default for {string}")
     public void verifyThatDecileIsSetToByDefault(String decile, String type) {
-        Assert.assertEquals(decile + " decile", npiSmartList.fetchDecile(type));
+        String fetchedDecile = npiSmartList.fetchDecile(type);
+        logger.info("Verifying Decile for type '{}': expected='{}', actual='{}'", type, decile + " decile", fetchedDecile);
+        Assert.assertEquals(decile + " decile", fetchedDecile);
     }
 
     @And("User selects {string} from {string} dropdown")
     public void userSelectsTheDiagnosis(String options, String type) {
         List<String> optionList = CommonUtils.parseCommaSeparatedString(options);
+        logger.info("Selecting options '{}' from dropdown '{}'", optionList, type);
         for (int i = 0; i < optionList.size(); i++) {
             npiSmartList.selectValueFromClinicalDropdown(optionList.get(i), type);
             if (i < optionList.size() - 1) {
                 npiSmartList.clickAddButton(type);
+                logger.info("Clicked Add button for '{}' in '{}'", optionList.get(i), type);
             }
         }
     }
 
     @And("User clicks Browse button to upload {string} file {string}")
     public void userClicksBrowseButtonToUploadDiagnosisFile(String type, String fileName) {
+        logger.info("Uploading file '{}' for type '{}'", fileName, type);
         npiSmartList.browseBulkUploadTemplate(type, fileName);
     }
 
@@ -3542,6 +3866,7 @@ public class LifeSteps {
     @And("Verify that Prescribed Behavior Change should display below tabs")
     public void verifyThatPrescribedBehaviorChangeShouldDisplayDroppersAndNewPrescribersTabs(DataTable dataTable) {
         List<String> tabList = dataTable.asList(String.class);
+        logger.info("Verifying Prescribed Behavior Change tabs: {}", tabList);
         for (String tabName : tabList) {
             Assert.assertTrue(tabName + " is not available", npiSmartList.fetchPrescriptionBehaviourTab(tabName));
         }
@@ -3549,22 +3874,26 @@ public class LifeSteps {
 
     @And("Verify that {string} tab should be selected by default")
     public void verifyThatDroppersTabShouldBeSelectedByDefault(String defaultTabName) {
+        logger.info("Verifying default tab selection: '{}'", defaultTabName);
         Assert.assertTrue("Droppers is not a default selection", npiSmartList.fetchDefaultPrescriptionBehaviourTab(defaultTabName));
     }
 
     @And("Verify that Top Droppers percentage slider should range from {string} to {string} and should be set to {string} by default")
     public void topDroppersPercentageSliderShouldRangeFromToAndShouldBeSetToByDefault(String topDropperMin, String topDropperMax, String topDropperDefault) {
+        logger.info("Verifying Top Droppers slider: min='{}', max='{}', default='{}'", topDropperMin, topDropperMax, topDropperDefault);
         Assert.assertTrue("Top Dropper range is not set from 1 to 100%", npiSmartList.fetchTopDropperMinAndMaxValues(topDropperMin, topDropperMax));
         Assert.assertEquals(topDropperDefault, npiSmartList.fetchTopDropperDefaultValue());
     }
 
     @And("User selects the {string} value as {string} from the slider")
     public void userSelectsTheValueFromTheSlider(String sliderType, String sliderValue) {
+        logger.info("Selecting '{}' value '{}' from slider", sliderType, sliderValue);
         npiSmartList.selectDropperValueFromSlider(sliderType, sliderValue);
     }
 
     @And("Verify that Time Frame Selector slider should range from {string} to {string} months and should be set to {string} by default")
     public void verifyThatTimeFrameSelectorSliderShouldRangeFromToMonthsAndShouldBeSetToByDefault(String timeframeSelectorMin, String timeframeSelectorMax, String timeframeSelectorDefault) {
+        logger.info("Verifying Time Frame Selector slider: min='{}', max='{}', default='{}'", timeframeSelectorMin, timeframeSelectorMax, timeframeSelectorDefault);
         Assert.assertTrue("Time Frame Selector range is not set from 6 to 12 months", npiSmartList.fetchTimeframeSelectorMinAndMaxValues(timeframeSelectorMin, timeframeSelectorMax));
         Assert.assertEquals(timeframeSelectorDefault, npiSmartList.fetchTimeframeSelectorDefaultValue());
     }
@@ -3572,6 +3901,7 @@ public class LifeSteps {
     @And("User selects the prescription drug name {string}")
     public void userSelectsThePrescriptionDrugName(String drugNames) {
         List<String> drugList = CommonUtils.parseCommaSeparatedString(drugNames);
+        logger.info("Selecting prescription drugs: {}", drugList);
         for (String drug : drugList) {
             npiSmartList.selectPrescriptionDrug(drug);
         }
@@ -3579,38 +3909,46 @@ public class LifeSteps {
 
     @And("User selects the {string} tab under Prescription Behavior Change")
     public void userSelectsTheTabUnderPrescriptionBehaviorChange(String tabName) {
+        logger.info("Selecting Prescription Behavior Change tab '{}'", tabName);
         npiSmartList.clickPrescriptionBehaviourTab(tabName);
     }
 
     @And("User selects Engagement Type {string} and contextual category {string}")
     public void userSelectsEngagementTypeAndContextualCategory(String engagementType, String contextualCategory) {
+        logger.info("Selecting Engagement Type '{}' and Contextual Category '{}'", engagementType, contextualCategory);
         npiSmartList.selectEngagementTypeAndContextualCategory(engagementType, contextualCategory);
     }
 
     @And("User clicks MESH dropdown, enters {string} and selects it")
     public void userClicksMESHDropdownEntersAndSelectsIt(String meshCondition) {
+        logger.info("Selecting MESH condition '{}'", meshCondition);
         npiSmartList.selectMESHCondition(meshCondition);
     }
 
     @And("Verify that Recency slider should range from {string} to {string} days and should be set to {string} by default")
     public void verifyThatRecencySliderShouldRangeFromToDaysAndShouldBeSetToByDefault(String recencyMin, String recencyMax, String recencyDefault) {
+        logger.info("Verifying Recency slider: min='{}', max='{}', default='{}'", recencyMin, recencyMax, recencyDefault);
         Assert.assertTrue("Recency range is not set from 1 to 60 days", npiSmartList.fetchRecencyMinAndMaxValues(recencyMin, recencyMax));
         Assert.assertEquals(recencyDefault, npiSmartList.fetchRecencyDefaultValue());
     }
 
     @And("User checks Prime list with historical data check box")
     public void userChecksPrimeListWithHistoricalDataCheckBox() {
+        logger.info("Selecting Prime list with historical data checkbox");
         npiSmartList.selectPrimeListWithHistoricalDataCheckbox();
     }
 
     @And("User hovers over the {string} question icon and fetches tool-tip {string}")
     public void userHoversOverTheMedscapeQuestionIconAndFetchesToolTipFor(String contextualCategory, String tooltip) {
-        Assert.assertEquals(tooltip, npiSmartList.hoverAndFetchTooltip(contextualCategory));
+        String actualTooltip = npiSmartList.hoverAndFetchTooltip(contextualCategory);
+        logger.info("Hovering over '{}' icon: expected tooltip='{}', actual='{}'", contextualCategory, tooltip, actualTooltip);
+        Assert.assertEquals(tooltip, actualTooltip);
     }
 
     @And("User clicks {string} primary concept dropdown, enters {string} and selects it")
     public void userClicksMedscapePrimaryConceptDropdownEntersAndSelectsIt(String contextualCategory, String primaryConcept) {
         List<String> primaryConceptList = CommonUtils.parseCommaSeparatedString(primaryConcept);
+        logger.info("Selecting primary concepts '{}' under '{}'", primaryConceptList, contextualCategory);
         for (String concept : primaryConceptList) {
             npiSmartList.selectMedscapePrimaryConcept(contextualCategory, concept);
         }
@@ -3618,24 +3956,29 @@ public class LifeSteps {
 
     @And("Verify that {string} is disabled under Endemic Network")
     public void verifyThatIsDisabledUnderEndemicNetwork(String contextualCategory) {
+        logger.info("Verifying '{}' is disabled under Endemic Network", contextualCategory);
         Assert.assertTrue(contextualCategory + "is not disabled", npiSmartList.verifyMedscapeAndWebMDAreDisabled(contextualCategory));
     }
 
     @And("The user saves the Smart List without selecting any other Population options and verifies error message")
     public void theUserSavesTheSmartListWithoutSelectingAnyOtherPopulationOptionsAndVerifiesErrorMessage() {
+        logger.info("Saving Smart List without selecting any Population options to verify error message");
         npiSmartList.clickSaveButton();
-        Assert.assertEquals("Select one or more List Population Options", npiSmartList.fetchErrorAlert());
+        String errorMsg = npiSmartList.fetchErrorAlert();
+        logger.info("Error message displayed: '{}'", errorMsg);
+        Assert.assertEquals("Select one or more List Population Options", errorMsg);
     }
 
     @And("User selects Smart NPI list as below with mandatory details")
     public void userSelectsSmartNPIListAsBelowWithMandatoryDetails(DataTable dataTable) {
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
-
+        logger.info("Selecting Smart NPI list with mandatory details: {}", rows);
         for (Map<String, String> row : rows) {
             String option = row.get("PopulationOption").trim();
             String details = row.get("OptionDetails").trim();
             npiSmartList.selectSmartNPIListType(option);
             Map<String, String> attributeMap = Arrays.stream(details.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            logger.info("Entering details for '{}': {}", option, attributeMap);
             npiSmartList.enterPopulationOptionsDetail(option, attributeMap);
         }
     }
@@ -3649,44 +3992,54 @@ public class LifeSteps {
         } else {
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchMedicalProcedureCodesFromUI());
         }
+        logger.info("Verifying Bulk Upload counts: File='{}', UI='{}'", recordsCountFromFile, recordsCountFromUI);
         Assert.assertEquals("Bulk Upload template records doesn't match with UI", recordsCountFromFile, recordsCountFromUI);
     }
 
     @And("User navigates to Administrative section and fetches the advertisers and client value for the account {string}")
     public void userNavigatesToAdministrativeSectionAndFetchesTheAdvertisersAndClientValueForTheAccount(String account) {
+        logger.info("Navigating to Administrative section to fetch advertisers and client for account '{}'", account);
         navigation.clickSubMenu();
         accounts.clickAdministration();
         accounts.clickAdvertiserTab();
         accounts.selectAccount(account);
         itemList = CommonUtils.normalize(accounts.fetchAdvertiserList());
+        logger.info("Fetched advertisers for account '{}': {}", account, itemList);
         accounts.selectAccountsTab();
         accounts.searchAccount(account);
         metricName = accounts.fetchClientValue();
+        logger.info("Fetched client value: '{}'", metricName);
         navigation.clickPulsePointLogo();
     }
 
     @Then("Verify Advertiser dropdown should show values which are mapped to the account")
     public void verifyAdvertiserDropdownShouldShowValuesWhichAreMappedToTheAccount() {
         List<String> actualAdvertiserList = CommonUtils.normalize(campaigns.fetchAdvertiserList());
+        logger.info("Verifying Advertiser dropdown values: expected={}, actual={}", itemList, actualAdvertiserList);
         Assert.assertEquals("Advertisers list is not matched", actualAdvertiserList, itemList);
     }
 
     @And("Verify that an error message is displayed when no Advertiser is selected")
     public void verifyThatAnErrorMessageIsDisplayedWhenNoAdvertiserIsSelected() {
+        logger.info("Saving campaign without selecting Advertiser to verify error message");
         campaigns.saveCampaign();
         List<String> errorList = campaigns.fetchMandatoryFieldsError();
+        logger.info("Fetched mandatory field errors: {}", errorList);
         Assert.assertTrue("Mandatory field error message is not displayed", errorList.contains("Select Advertiser"));
     }
 
     @And("Verify that Campaign Type default value is set to {string}")
     public void verifyThatCampaignTypeDefaultValueIsSetTo(String campaignType) {
-        Assert.assertEquals("Campaign Type default value is not set to " + campaignType, campaignType, campaigns.fetchDefaultCampaignType());
+        String defaultValue = campaigns.fetchDefaultCampaignType();
+        logger.info("Verifying Campaign Type default: expected='{}', actual='{}'", campaignType, defaultValue);
+        Assert.assertEquals("Campaign Type default value is not set to " + campaignType, campaignType, defaultValue);
     }
 
     @And("Verify that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {string}")
     public void verifyThatIfTheAccountHasAClientValueSetTheClientFieldIsDisabledAndAutoPopulatedOtherwiseItRemainsEnabledForUserSelection(String clientName) {
         boolean isEnabled = metricName.equalsIgnoreCase("None");
         String actualState = campaigns.verifyClientFieldEnabledOrDisabledBasedOnAccount(clientName);
+        logger.info("Verifying Client field for '{}': expected='{}', actual='{}'", clientName, isEnabled ? "Enabled" : "Disabled", actualState);
         if (isEnabled) {
             Assert.assertEquals("Enabled", actualState);
         } else {
@@ -3696,40 +4049,56 @@ public class LifeSteps {
 
     @And("Verify that user is able to enter and select the drug {string}")
     public void verifyThatUserIsAbleToEnterAndSelectTheDrug(String drugName) {
+        logger.info("Selecting drug '{}'", drugName);
         campaigns.selectDrug(drugName);
     }
 
     @And("Verify that Campaign Budget accepts only numeric values {string}")
     public void verifyThatCampaignBudgetAcceptsOnlyNumericValues(String budget) {
-        Assert.assertEquals("Campaign Budget accepts invalid values", "", campaigns.fetchCampaignBudget(budget));
+        String invalidValue = campaigns.fetchCampaignBudget(budget);
+        logger.info("Verifying Campaign Budget with input '{}': fetched value='{}'", budget, invalidValue);
+        Assert.assertEquals("Campaign Budget accepts invalid values", "", invalidValue);
     }
 
     @And("Verify that user is able to enter the data {string} in the Description field")
     public void verifyThatUserIsAbleToEnterTheDataInTheDescriptionField(String campaignDescription) {
+        logger.info("Entering campaign description: '{}'", campaignDescription);
         campaigns.enterCampaignDescription(campaignDescription);
     }
 
     @And("Verify that Budget Status has the below options, and the default status is {string}")
     public void verifyThatBudgetStatusHasTheOptionsAndAndTheDefaultStatusIs(String defaultButton, DataTable dataTable) {
-        Assert.assertEquals("Budget status has different options", campaigns.fetchBudgetStatus(), dataTable.asList(String.class));
-        Assert.assertEquals(defaultButton + " button is not set as default", defaultButton, campaigns.fetchDefaultBudgetStatus());
+        List<String> expectedOptions = dataTable.asList(String.class);
+        List<String> actualOptions = campaigns.fetchBudgetStatus();
+        logger.info("Verifying Budget Status options: expected={}, actual={}", expectedOptions, actualOptions);
+        Assert.assertEquals("Budget status has different options", expectedOptions, actualOptions);
+
+        String actualDefault = campaigns.fetchDefaultBudgetStatus();
+        logger.info("Verifying default Budget Status button: expected='{}', actual='{}'", defaultButton, actualDefault);
+        Assert.assertEquals(defaultButton + " button is not set as default", defaultButton, actualDefault);
     }
 
     @And("Verify the availability of the Management Fee checkbox and when clicked, below options should be displayed")
     public void verifyTheAvailabilityOfTheManagementFeeCheckboxAndWhenClickedTheOptionsAndShouldBeDisplayed(DataTable dataTable) {
+        List<String> expectedOptions = dataTable.asList(String.class);
         Assert.assertTrue("Management Fee checkbox is not available", campaigns.isManagementFeeAvailable());
+        logger.info("Management Fee checkbox is available. Clicking to display options.");
         campaigns.clickManagementFee();
-        Assert.assertEquals("Management Fee has different options", dataTable.asList(String.class), campaigns.fetchManagementFeeOptions());
+        List<String> actualOptions = campaigns.fetchManagementFeeOptions();
+        logger.info("Verifying Management Fee options: expected={}, actual={}", expectedOptions, actualOptions);
+        Assert.assertEquals("Management Fee has different options", expectedOptions, actualOptions);
     }
 
     @And("Verify that the user is able to enter data in the selected Management Fee option - {string}, {string}, {string}")
     public void verifyThatTheUserIsAbleToEnterDataInTheSelectedManagementFeeOption(String managementFeeOption, String percent, String amount) {
+        logger.info("Entering Management Fee data: Option='{}', Percent='{}', Amount='{}'", managementFeeOption, percent, amount);
         campaigns.clickManagementFeeOptionAndEnterData(managementFeeOption, percent, amount);
     }
 
     @And("User clicks the three-dot menu and verifies that {string} is enabled and {string} is disabled")
     public void userClicksTheThreeDotMenuAndVerifiesThatIsEnabledAndIsDisabled(String reportOption, String deleteOption) {
         campaigns.clickActionItemMenu();
+        logger.info("Verifying three-dot menu options: '{}' should be enabled, '{}' should be disabled", reportOption, deleteOption);
         Assert.assertTrue("Generate Report option is not available and enabled", campaigns.isGenerateReportOptionAvailable(reportOption));
         Assert.assertTrue("Delete option is not available and disabled", campaigns.isDeleteOptionAvailable(deleteOption));
     }
@@ -3737,6 +4106,7 @@ public class LifeSteps {
     @And("User enters other campaign details {string} {string} {string} {string}")
     public void userEntersOtherCampaignDetails(String advertiser, String campaign_name, String campaign_type, String budget) {
         campaignNameRandom = campaign_name + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Entering campaign details: Advertiser='{}', Campaign='{}', Type='{}', Budget='{}'", advertiser, campaignNameRandom, campaign_type, budget);
         campaigns.selectAdvertiser(advertiser);
         campaigns.enterCampaignName(campaignNameRandom);
         campaigns.setCampaignType(campaign_type);
@@ -3747,8 +4117,11 @@ public class LifeSteps {
     public void userRetrievesAllTheEnteredDataSavesTheCampaignAndVerifiesSuccessfulCreation() {
         capturedDetails.clear();
         capturedDetails = campaigns.fetchCampaignDetails();
+        logger.info("Fetched campaign details before saving: {}", capturedDetails);
         campaigns.saveCampaign();
-        Assert.assertEquals("Campaign " + campaignNameRandom + " created.", campaigns.campaignSuccess());
+        String successMsg = campaigns.campaignSuccess();
+        logger.info("Campaign save success message: '{}'", successMsg);
+        Assert.assertEquals("Campaign " + campaignNameRandom + " created.", successMsg);
     }
 
     @And("Verify that the saved Campaign data matches the entered data")
@@ -3756,6 +4129,7 @@ public class LifeSteps {
         campaigns.clickSavedCampaign(campaignNameRandom);
         campaigns.clickCampaignDetailsTab();
         List<String> fetchedData = campaigns.fetchCampaignDetails();
+        logger.info("Comparing captured data vs saved data: captured={}, fetched={}", capturedDetails, fetchedData);
         Assert.assertEquals("The saved Campaign data doesn't match the entered data", capturedDetails, fetchedData);
     }
 
@@ -3763,25 +4137,31 @@ public class LifeSteps {
     @And("User verifies if Add Custom Field button is available")
     public void userVerifiesIfAddCustomFieldButtonIsAvailable() {
         Assert.assertTrue("Add Custom Field Button is not available", campaigns.isAddCustomFieldButtonAvailable());
+        logger.info("Add Custom Field button is available");
     }
 
     @When("User adds a custom field with {string} on the campaign creation page successfully")
     public void userAddsACustomFieldWithOnTheCampaignCreationPage(String fieldName) {
         customFieldName = fieldName + '_' + CommonUtils.randomFourDigitNumber();
+        logger.info("Adding Custom Field: '{}'", customFieldName);
         campaigns.clickAddCustomFieldButton();
         campaigns.enterCustomFieldName(customFieldName);
         campaigns.saveCustomField();
-        Assert.assertEquals("Successfully created custom Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        String successAlert = campaigns.fetchCustomFieldSuccessAlert();
+        logger.info("Custom Field creation success alert: '{}'", successAlert);
+        Assert.assertEquals("Successfully created custom Field : " + customFieldName, successAlert);
     }
 
     @Then("Verify that the custom field is added on the campaign creation page")
     public void verifyThatTheCustomFieldIsAddedOnTheCampaignCreationPage() {
+        logger.info("Verifying Custom Field '{}' is added", customFieldName);
         Assert.assertTrue(customFieldName + " Custom Field is not available", campaigns.isAddedCustomFieldAvailable(customFieldName));
     }
 
     @When("User modifies the custom field label to new label {string}")
     public void userModifiesTheCustomFieldToNewLabel(String newFieldName) {
         uiCustomFieldName = newFieldName + '_' + CommonUtils.randomFourDigitNumber();
+        logger.info("Modifying Custom Field '{}' to new label '{}'", customFieldName, uiCustomFieldName);
         campaigns.clickCustomFieldLabel(customFieldName);
         campaigns.enterCustomFieldName(uiCustomFieldName);
         campaigns.saveCustomField();
@@ -3790,11 +4170,13 @@ public class LifeSteps {
 
     @Then("Verify that the custom field is updated with new label")
     public void verifyThatTheCustomFieldIsUpdatedWithNewLabel() {
+        logger.info("Verifying updated Custom Field '{}' is available", uiCustomFieldName);
         Assert.assertTrue(customFieldName + " Custom Field label is not updated with " + uiCustomFieldName, campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
     }
 
     @And("User enters data {string} in the custom field")
     public void userEntersDataInTheCustomField(String customFieldData) {
+        logger.info("Entering data '{}' in Custom Field '{}'", customFieldData, uiCustomFieldName);
         campaigns.enterCustomFieldData(uiCustomFieldName, customFieldData);
     }
 
@@ -3802,7 +4184,9 @@ public class LifeSteps {
     public void verifyThatTheCustomFieldValueIsSavedAndDisplayedInTheCampaignDetailsPage(String customFieldData) {
         campaigns.navigateToCampaign(campaignNameRandom);
         campaigns.clickCampaignDetailsTab();
-        Assert.assertEquals(customFieldData, campaigns.fetchCustomFieldData(uiCustomFieldName));
+        String fetchedData = campaigns.fetchCustomFieldData(uiCustomFieldName);
+        logger.info("Verifying saved Custom Field value: expected='{}', actual='{}'", customFieldData, fetchedData);
+        Assert.assertEquals(customFieldData, fetchedData);
     }
 
     @And("User verifies if the added custom field is available on New Campaign creation page")
@@ -3810,21 +4194,25 @@ public class LifeSteps {
         campaigns.navigateToCampaignDashboard();
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        logger.info("Verifying added custom field '{}' is present on New Campaign creation page", uiCustomFieldName);
         Assert.assertTrue(uiCustomFieldName + " Custom Field is not available", campaigns.isAddedCustomFieldAvailable(uiCustomFieldName));
     }
 
     @When("User deletes the custom field for which campaign is created and verifies if it is deleted")
     public void userDeletesTheCustomFieldFromTheCampaignCreationPage() {
+        logger.info("Deleting custom field '{}' for campaign already created", uiCustomFieldName);
         Assert.assertEquals("Custom Field Can't Be Removed", campaigns.deleteCustomField(uiCustomFieldName));
     }
 
     @And("User deletes the custom field for which campaign is not created and verifies if it is deleted")
     public void userDeletesTheCustomFieldForWhichCampaignIsNotCreatedAndVerifiesIfItIsDeleted() {
         customFieldName = "Test" + '_' + uiCustomFieldName;
+        logger.info("Creating temporary custom field '{}' to delete later", customFieldName);
         campaigns.clickAddCustomFieldButton();
         campaigns.enterCustomFieldName(customFieldName);
         campaigns.saveCustomField();
         Assert.assertEquals("Successfully created custom Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
+        logger.info("Deleting temporary custom field '{}'", customFieldName);
         campaigns.deleteCustomField(customFieldName);
         Assert.assertEquals("Successfully deleted the Field : " + customFieldName , campaigns.fetchCustomFieldSuccessAlert());
     }
@@ -3834,6 +4222,7 @@ public class LifeSteps {
         navigation.clickPulsePointLogo();
         campaigns.createCampaign();
         Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
+        logger.info("Verifying deleted custom field '{}' is not available", customFieldName);
         Assert.assertFalse(customFieldName + " Custom Field is available", campaigns.isAddedCustomFieldAvailable(customFieldName));
     }
 
@@ -3844,7 +4233,7 @@ public class LifeSteps {
         } else {
             targetFilePath = sharedList.clickDownloadIcon();
         }
-
+        logger.info("Verifying downloaded file for '{}' list exists at '{}'", listType, targetFilePath);
         Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
     }
 
@@ -3881,7 +4270,7 @@ public class LifeSteps {
         } else {
             recordsCountFromUI = sharedList.fetchSharedListCountFromUI();
         }
-
+        logger.info("Verifying {} list count: File={}, UI={}", listType, recordsCountFromFile, recordsCountFromUI);
         Assert.assertEquals("Downloaded list count doesn't match with UI count", recordsCountFromFile, Integer.parseInt(recordsCountFromUI));
     }
 
@@ -3889,6 +4278,7 @@ public class LifeSteps {
     public void userEntersTheListNameAndUploadsTheFile(String listName, String fileName) {
         metricName = listName + "_" + CommonUtils.timeStampCalculation();
         npiName = metricName;
+        logger.info("Uploading '{}' as list name '{}'", fileName, metricName);
         sharedList.enterListName(metricName);
         npiStaticList.uploadStaticListFile(fileName);
     }
@@ -3896,6 +4286,7 @@ public class LifeSteps {
     @And("User saves the Email list and verify that the list is created successfully")
     public void userSavesTheListAndVerifyThatTheListIsCreatedSuccessfully() {
         sharedList.saveEmailList();
+        logger.info("Verifying Email list '{}' is created successfully", metricName);
         Assert.assertEquals("Email list created successfully", sharedList.isListCreatedOrDeleted());
     }
 
@@ -3904,11 +4295,13 @@ public class LifeSteps {
         sharedList.searchAndOpenCreatedList(metricName);
         totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
         itemCount = sharedList.fetchEmailCount();
+        logger.info("Verifying counter for {} list: Left Panel={}, Item Count={}", listType, totalListCount, itemCount);
         Assert.assertEquals(totalListCount, itemCount);
     }
 
     @And("Verify that download option should not be available for uploaded Email list")
     public void verifyThatDownloadOptionShouldNotBeAvailableForUploadedEmailList() {
+        logger.info("Verifying download option is disabled for Email list '{}'", metricName);
         Assert.assertFalse("Download icon is available for Email list", sharedList.isEmailListDownloadIconVisible());
     }
 
@@ -3916,6 +4309,7 @@ public class LifeSteps {
     public void verifyThatUserIsAbleToExportTheAuditLogFor(String moduleName) {
         campaigns.clickCampaignOptions();
         campaigns.openExportAuditLogPopup();
+        logger.info("Export audit log popup content for module '{}'", moduleName);
 
         switch (moduleName) {
             case "campaign":
@@ -3935,6 +4329,7 @@ public class LifeSteps {
 
     @When("User navigates to {string} page")
     public void userNavigatesToItemPage(String moduleName) {
+        logger.info("Navigating to '{}' page", moduleName);
         switch (moduleName) {
             case "campaign":
                 campaigns.clickCampaignTile();
@@ -3953,29 +4348,35 @@ public class LifeSteps {
         campaigns.clickCampaignDetailsTab();
         campaigns.clickCampaignOptions();
         campaigns.exportCampaignSettings();
-        Assert.assertEquals("Done! The exported file will be sent to default@pulsepoint.com within 10 minutes.", campaigns.fetchExportCampaignSettingsSuccessAlert());
+        String successMsg = campaigns.fetchExportCampaignSettingsSuccessAlert();
+        logger.info("Export campaign settings success message: '{}'", successMsg);
+        Assert.assertEquals("Done! The exported file will be sent to default@pulsepoint.com within 10 minutes.", successMsg);
     }
 
     @And("Verify that user is able to download the {string} list")
     public void verifyThatUserIsAbleToDownloadTheList(String listType) throws IOException {
         targetFilePath = npiStaticList.clickDownloadIcon();
+        logger.info("Verifying downloaded '{}' list is available at '{}'", listType, targetFilePath);
         Assert.assertTrue("Downloaded file is not available", CommonUtils.isDownloadedFileAvailable(targetFilePath, "csv"));
     }
 
     @And("User searches and selects the NPI List {string}")
     public void userSearchesAndSelectsThePulsePointProvidedNPIList(String npiListName) {
+        logger.info("Searching and selecting NPI list '{}'", npiListName);
         npiLists.searchList(npiListName);
         npiLists.openSearchedList(npiListName);
     }
 
     @And("User searches and selects the campaign {string}")
     public void userSearchesAndSelectsTheCampaign(String campaignName) {
+        logger.info("Searching and opening campaign '{}'", campaignName);
         campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.navigateToCampaign(campaignName);
     }
 
     @Then("Verify that the campaign page is displayed")
     public void verifyThatTheCampaignPageIsDisplayed() {
+        logger.info("Verifying campaign page is displayed");
         Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
     }
 }
