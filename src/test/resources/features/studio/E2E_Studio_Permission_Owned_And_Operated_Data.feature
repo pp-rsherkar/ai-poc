@@ -3,7 +3,7 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
   2. Create a new Workspace associated with that Advertiser
   3. Verify that the "Owned and Operated Data" filter option is present within the Cross-Filter section of the Workspace
 
-  @e2e
+  @regression
   Scenario Outline: Verify that the visibility of Owned and Operated Data in the Cross-Filter section of the Workspace is based on the Admin Permission - "<PERMISSION_FLAG>"
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
@@ -17,7 +17,8 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify Owned And Operated section is "<VISIBILITY_FLAG>" within the Cross-Filter section of the Workspace
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved

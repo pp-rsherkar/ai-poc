@@ -452,21 +452,22 @@ public class BulkCreativeUpload {
         if (VALIDATION_ERROR.isVisible()) {
             WARNING_IMAGE_ICON.click();
             String errorField = TOOL_TIP_TEXT.textContent().trim();
-            switch (errorField){
+            switch (errorField) {
                 case "AD SIZE is not supported":
-                    for(int i=0; i<CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.count(); i++){
+                    for (int i = 0; i < CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.count(); i++) {
                         String fieldPlaceholder = CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).getAttribute("class");
-                        if(fieldPlaceholder.contains("red-border")){
+                        if (fieldPlaceholder.contains("red-border")) {
                             List<String> texts = CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).locator("option").allInnerTexts().stream().map(String::trim).filter(text -> !text.isEmpty()).toList();
                             String randomText = texts.get(new Random().nextInt(texts.size()));
-                            CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.first().selectOption(new SelectOption().setLabel(randomText));                            break;
+                            CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.first().selectOption(new SelectOption().setLabel(randomText));
+                            break;
                         }
                     }
                     break;
                 case "Display URL is required":
-                    for(int i=0; i<CREATIVE_TEXT_DETAILS_FROM_TABLE.count(); i++){
+                    for (int i = 0; i < CREATIVE_TEXT_DETAILS_FROM_TABLE.count(); i++) {
                         String fieldPlaceholder = CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).getAttribute("class");
-                        if(fieldPlaceholder.contains("red-border")){
+                        if (fieldPlaceholder.contains("red-border")) {
                             CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).fill(constants.DISPLAY_URL);
                             break;
                         }

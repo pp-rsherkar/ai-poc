@@ -56,6 +56,10 @@ public class TacticDetails {
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
     private final Locator TACTIC_TAB;
+    private final Locator HEADER_COMMENT;
+    private final Locator NAVIGATION_COMMENT;
+    private final Locator COMMENT_TEXT_BOX;
+    private final Locator COMMENT_SUCCESS_ALERT;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -111,12 +115,19 @@ public class TacticDetails {
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
         this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
         this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
+        this.HEADER_COMMENT = page.locator("//div[@class='notes-dashboard left']");
+        this.NAVIGATION_COMMENT = page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
+        this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
+        this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
     }
 
     public void clickNewTactic() {
         NEW_TACTIC_BUTTON.click();
     }
 
+    public Locator customFieldValue(String customFieldName) {
+        return page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+    }
     public List<String> getAllTactics() {
         return SAVED_TACTICS.allInnerTexts();
     }
@@ -133,8 +144,40 @@ public class TacticDetails {
         SAVED_TACTICS.first().click();
     }
 
+    public void clearCustomFieldText(String customFieldName) {
+        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+        FIELD_OPTIONS.clear();
+        SAVE_TACTIC_DETAILS.click();
+    }
+
+    public String validateComment(String entryPoint) {
+        if (entryPoint.contains("header")) {
+            HEADER_COMMENT.click();
+        } else if (entryPoint.contains("navigation")) {
+            NAVIGATION_COMMENT.click();
+        }
+        String actualComment = COMMENT_TEXT_BOX.inputValue();
+        COMMENT_TEXT_BOX.clear();
+        SAVE_BUTTON.click();
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT.first());
+        waitUtility.waitForElementVisible("//span[@class='notes-icon-empty-dashboard']");
+        return actualComment;
+    }
+
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public void addComment(String entryPoint, String comment) {
+        if (entryPoint.contains("header")) {
+            HEADER_COMMENT.click();
+        } else if (entryPoint.contains("navigation")) {
+            NAVIGATION_COMMENT.click();
+        }
+        COMMENT_TEXT_BOX.fill(comment);
+        SAVE_BUTTON.click();
+        waitUtility.waitForLocatorHidden(COMMENT_SUCCESS_ALERT.first());
+        waitUtility.waitForElementVisible("//span[@class='notes-icon-provided-dashboard']");
     }
 
     public List<String> allTacticsUnderLI() {
@@ -154,6 +197,7 @@ public class TacticDetails {
         ADD_CUSTOM_FIELD_INPUT.fill(fieldName);
         SAVE_CUSTOM_FIELD_BUTTON.click();
         waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+        CUSTOM_FIELD_TEXT.last().fill(CommonUtils.generateRandomString());
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -166,12 +210,17 @@ public class TacticDetails {
         TACTIC_TAB.locator("text=" + tacticName).click();
     }
 
+    public void clickLastTactic() {
+        TACTIC_TAB.last().click();
+    }
+
     public void deleteCustomField(String customFieldName) {
         Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
-        DELETE_SUCCESS.isVisible();
+        waitUtility.waitForLocatorVisible(DELETE_SUCCESS);
+        waitUtility.waitForElementHidden(String.format("//label[contains(text(),'%s')]", customFieldName));
     }
 
     public void clickTargetingRuleIcon() {

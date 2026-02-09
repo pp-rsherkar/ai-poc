@@ -44,7 +44,6 @@ public class PMP {
     private final Locator NEW_DEAL_SAVE_BUTTON;
     private final Locator TACTIC_SETTING_TAB;
     private final Locator DELETE_ICON;
-    private final Locator PRICING_STRATEGY_DROPDOWN;
     private final Locator PRICE_TEXT;
     private final Locator PERCENTAGE_TEXT;
     private final Locator ADD_DEAL_BUTTON;
@@ -63,6 +62,8 @@ public class PMP {
     private final Locator CURATOR_DROPDOWN;
     private final Locator CURATOR_VALUES;
     private final Locator DEALS_LIST_SECTION;
+    private final Locator GA_SURVEY_DIALOG;
+    private final Locator GA_SURVEY_CLOSE_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     boolean flag1, flag2 = false;
 
@@ -99,7 +100,6 @@ public class PMP {
         this.NEW_DEAL_SAVE_BUTTON = page.locator("//div[contains(@class,'addDealFooter')]//button[contains(@class,'okButton')]");
         this.TACTIC_SETTING_TAB = page.locator("//a[contains(@class,'gaTabSettings')]");
         this.DELETE_ICON = page.locator("//div[contains(@title,'delete')]");
-        this.PRICING_STRATEGY_DROPDOWN = page.locator("//app-native-dropdown[contains(@cssclass,'pricing-dropdown')]//select[contains(@class, 'filter-dropdown')]");
         this.PRICE_TEXT = page.locator("//div[contains(@class,'pricingstrategy')]//input[contains(@placeholder,'Price')]");
         this.PERCENTAGE_TEXT = page.locator("//div[contains(@class,'pricingstrategy')]//input[contains(@placeholder,'percentage')]");
         this.ADD_DEAL_BUTTON = page.locator("//span[@class='add-action-new-deal']");
@@ -118,6 +118,8 @@ public class PMP {
         this.CURATOR_DROPDOWN = page.locator("//app-single-select-dropdown[@placeholder='Select Curator']");
         this.CURATOR_VALUES = page.locator("//app-single-select-dropdown[@placeholder='Select Curator']//div[contains(@class,'item')]");
         this.DEALS_LIST_SECTION = page.locator("//div[contains(@id,'dealsListWrapper')]");
+        this.GA_SURVEY_DIALOG = page.locator("//div[contains(text(),'Please rate the campaign setup process')]");
+        this.GA_SURVEY_CLOSE_BUTTON = page.locator("//div[contains(@class,'btn-close .gaSurveyClose')]");
     }
 
     public void navigateToTacticSettingTab() {
@@ -182,16 +184,13 @@ public class PMP {
     }
 
     public boolean verifyAssignedDealsOnTactic(String dealName, String toggleButton) {
-        if (MORE_OPTION.isVisible()) MORE_OPTION.click();
-        if (toggleButton.equalsIgnoreCase("ON")) {
-            flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
-            flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
-        } else if (toggleButton.equalsIgnoreCase("OFF")) {
-            flag1 = page.locator(String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName)).isVisible();
-            flag2 = page.locator(String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName)).isVisible();
-        }
-        return flag1 && flag2;
-    }
+    if (MORE_OPTION.isVisible()) MORE_OPTION.click();
+    String ellipseXPath = String.format("//span[contains(@class,'target-ellipse') and contains(text(),'%s')]", dealName);
+    String textContentXPath = String.format("//span[contains(@class,'text-content') and contains(text(),'%s')]", dealName);
+    flag1 = page.locator(ellipseXPath).first().isVisible();
+    flag2 = page.locator(textContentXPath).first().isVisible();
+    return flag1 && flag2;
+}
 
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
@@ -277,6 +276,8 @@ public class PMP {
     }
 
     public String fetchMessageOnDeleteIconClick() {
+        if (GA_SURVEY_DIALOG.isVisible())
+            GA_SURVEY_CLOSE_BUTTON.click();
         for (int i = 0; i < DELETE_ICON.count(); i++) {
             DELETE_ICON.nth(i).scrollIntoViewIfNeeded();
             if (DELETE_ICON.nth(i).getAttribute("class").contains("disabled")) {
@@ -288,11 +289,10 @@ public class PMP {
     }
 
     public void verifyPricingStrategyIsEditable(String dealName, String key, List<String> pricingStrategyType) {
-        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]/div", dealName);
+        String xpath = String.format("//span[contains(text(),'%s')]/ancestor::div[contains(@class,'nameWrapper')]/following-sibling::div[@class='detailsScrollWrapper']//div[contains(@class,'data-section')]//div[contains(@class,'pricingstrategy')]//select", dealName);
         page.locator(xpath).first().scrollIntoViewIfNeeded();
         DEAL_TYPE_COLUMN_NAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
-        page.locator(xpath).first().click();
-        PRICING_STRATEGY_DROPDOWN.selectOption(new SelectOption().setLabel(key));
+        page.locator(xpath).first().selectOption(new SelectOption().setLabel(key));
         if (key.equalsIgnoreCase("Flat")) {
             PRICE_TEXT.fill(pricingStrategyType.get(0));
         } else if (key.equalsIgnoreCase("% above floor")) {
