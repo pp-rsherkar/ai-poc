@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 public class Hooks {
     private static final Logger logger = Logger.getLogger(Hooks.class.getName());
+    private static final long MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
     public DriverFactory driverFactory;
     public Page page;
 
@@ -49,13 +50,18 @@ public class Hooks {
             if (scenario.isFailed()) {
                 Path renamed = videoPath.getParent().resolve(scenarioName + ".webm");
                 Files.move(videoPath, renamed, StandardCopyOption.REPLACE_EXISTING);
-                scenario.attach(Files.readAllBytes(renamed), "video/webm", scenarioName);
+                long videoSize = Files.size(renamed);
+                if (videoSize > MAX_VIDEO_SIZE) {
+                    scenario.attach(("Video file too large (" + videoSize + " bytes). See: " + renamed.toAbsolutePath()).getBytes(), "text/plain", scenarioName);
+                } else {
+                    scenario.attach(Files.readAllBytes(renamed), "video/webm", scenarioName);
+                }
                 Files.deleteIfExists(renamed);
             } else {
                 Files.deleteIfExists(videoPath);
             }
         } catch (Exception e) {
-            logger.warning("Video handling failed: " + e.getMessage());
+            logger.warning("Video handling failed: " + e);
         }
     }
 
