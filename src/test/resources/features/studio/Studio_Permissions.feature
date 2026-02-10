@@ -16,7 +16,6 @@ Feature: Enable Studio permissions for an account,advertiser and external users
     Then User should be able to see the enabled workspaces for "<ACCOUNT_NAME>" account under Studio
     When User disables the studio permission for "<ACCOUNT_NAME>" account
     Then User should not be able to see the studio permission for that account
-
     Examples:
       | ACCOUNT_NAME |
       | 100Plus      |

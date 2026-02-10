@@ -17,7 +17,8 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify Owned And Operated section is "<VISIBILITY_FLAG>" within the Cross-Filter section of the Workspace
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
