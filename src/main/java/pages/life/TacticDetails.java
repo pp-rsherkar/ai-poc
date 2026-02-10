@@ -121,9 +121,6 @@ public class TacticDetails {
         this.CLOSE_GLOBAL_SEARCH = page.locator("//div[@class='ui image close-white-40 pointer']");
         this.OPEN_GLOBAL_SEARCH = page.locator("//div[@class='iconSprite search-overlay-lens']");
         this.GLOBAL_SEARCH_INPUT_FIELD = page.locator("//input[@id='global_search_input']");
-
-        this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
-        this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
         this.HEADER_COMMENT = page.locator("//div[@class='notes-dashboard left']");
         this.NAVIGATION_COMMENT = page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
         this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");

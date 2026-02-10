@@ -151,6 +151,7 @@ public class TacticSettings {
     }
 
     public void selectChannel(String channel) {
+        page.waitForLoadState(LoadState.LOAD);
         if (SELECT_CHANNEL.isVisible()) {
             SELECT_CHANNEL.click();
             SELECT_CHANNEL.locator("text=" + channel).first().click();

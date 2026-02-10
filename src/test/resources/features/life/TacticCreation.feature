@@ -90,8 +90,8 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>""<COUNT>"
     And User enables tactic through bulk action and verifies the status
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     |COUNT |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 |3     |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME     | COUNT |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Targeting-72838 | 3     |
 
 
   @regression
