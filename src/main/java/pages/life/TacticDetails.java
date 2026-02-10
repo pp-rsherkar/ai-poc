@@ -407,3 +407,5 @@ public class TacticDetails {
         CLOSE_GLOBAL_SEARCH.click();
     }
 }
+
+
