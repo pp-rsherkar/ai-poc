@@ -209,11 +209,6 @@ public class BulkCreativeUpload {
         return text;
     }
 
-    public void uploadDisplayCreativeTemplate(String fileName) {
-        String locator = "//div[contains(@title,'%s')]";
-        CommonUtils.uploadFile(page, 1, locator, fileName);
-    }
-
     public void updateCreativeName(String updatedCreativeName) {
         waitUtility.waitForLocatorVisible(BULK_UPLOAD_HEADER);
         CREATIVE_TEXT_DETAILS_FROM_TABLE.first().fill(updatedCreativeName);
@@ -249,10 +244,20 @@ public class BulkCreativeUpload {
     }
 
     public void uploadImageFile(String imageFileName) {
-        //String locator = "//span[contains(@class,'reupload-image')]";
-        String locator = "//div[contains(@title,'%s')]";
+        String locator = "//span[contains(@class,'reupload-image')]";
         CommonUtils.uploadFile(page, 0, locator, imageFileName);
     }
+
+    public void uploadSecondaryCreativeTemplate(String fileName) {
+        String locator = "//div[contains(@title,'%s')]";
+        CommonUtils.uploadFile(page, 1, locator, fileName);
+    }
+
+    public void uploadPrimaryCreativeTemplate(String fileName) {
+        String locator = "//div[contains(@title,'%s')]";
+        CommonUtils.uploadFile(page, 0, locator, fileName);
+    }
+
 
     public Path clickTemplateWithURLsLink() throws IOException {
         Download download = page.waitForDownload(TEMPLATE_WITH_URL_LINK::click);
@@ -440,7 +445,7 @@ public class BulkCreativeUpload {
     public void fillAttributes(String type, Map<String, String> attributeMap, String updatedCreativeName) throws IOException {
         switch (type) {
             case "Display", "Native":
-                uploadDisplayCreativeTemplate(attributeMap.get("FileName"));
+                uploadSecondaryCreativeTemplate(attributeMap.get("FileName"));
                 if (LANDING_PAGE_DOMAIN.isVisible()) enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
@@ -452,7 +457,7 @@ public class BulkCreativeUpload {
                 break;
             case "HTML", "Video":
                 if (type.contains("Video"))
-                    uploadImageFile(attributeMap.get("ImageFile"));
+                    uploadPrimaryCreativeTemplate(attributeMap.get("ImageFile"));
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), attributeMap.get("FileName"));
                 if (createCreatives.CLICK_THROUGH_URL.isVisible())
                     enterClickthroughURL(attributeMap.get("ClickThroughURL"));

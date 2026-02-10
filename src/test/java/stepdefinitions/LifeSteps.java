@@ -2207,16 +2207,16 @@ public class LifeSteps {
 
     @And("User uploads a valid file {string} for {string} creative")
     public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
-        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
     }
 
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) throws IOException {
         Path latestFile = CommonUtils.getMostRecentFileFromDownloads();
         if(fileName.contains("Downloaded"))
-            bulkCreativeUpload.uploadDisplayCreativeTemplate(String.valueOf(latestFile.getFileName()));
+            bulkCreativeUpload.uploadSecondaryCreativeTemplate(String.valueOf(latestFile.getFileName()));
         else
-            bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+            bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
         itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
         bulkCreativeUpload.clickPreviewButton();
         bulkCreativeUpload.clickOKButton();
@@ -2293,7 +2293,7 @@ public class LifeSteps {
 
     @And("User is able to browse and select a template {string} from the system")
     public void userIsAbleToBrowseAndSelectATemplateFromTheSystem(String fileName) {
-        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
     }
 
     @And("Verify default value of the Approval Status field is {string}")
