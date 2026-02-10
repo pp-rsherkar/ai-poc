@@ -3,7 +3,6 @@ package stepdefinitions;
 import com.microsoft.playwright.APIResponse;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
-import hooks.Hooks;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -2106,8 +2105,12 @@ public class LifeSteps {
     @And("Verify under the {string} section the fields Add Third Party Tracking Pixel and Add DoubleVerify Pixel are available")
     public void verifyUnderTheSectionTheFieldsAddThirdPartyTrackingPixelTagAndAddDoubleVerifyPixelAreAvailable(String sectionName) {
         logger.info("Verifying availability of Third Party Tracking Pixel and DoubleVerify Pixel under section: {}", sectionName);
-        Assert.assertTrue("Add Third Party Tracking Pixel/Tag field is not available under " + sectionName, bulkCreativeUpload.isThirdPartyTrackingPixelAvailable());
-        Assert.assertTrue("Add DoubleVerify Pixel is not available under " + sectionName, bulkCreativeUpload.isDoubleVerifyPixelAvailable());
+        boolean thirdPartyAvailable = bulkCreativeUpload.isThirdPartyTrackingPixelAvailable();
+        logger.info("Third Party Tracking Pixel available: {}", thirdPartyAvailable);
+        Assert.assertTrue("Add Third Party Tracking Pixel/Tag field is not available under " + sectionName, thirdPartyAvailable);
+        boolean doubleVerifyAvailable = bulkCreativeUpload.isDoubleVerifyPixelAvailable();
+        logger.info("DoubleVerify Pixel available: {}", doubleVerifyAvailable);
+        Assert.assertTrue("Add DoubleVerify Pixel is not available under " + sectionName, doubleVerifyAvailable);
         logger.info("Both pixel fields are available under section: {}", sectionName);
     }
 

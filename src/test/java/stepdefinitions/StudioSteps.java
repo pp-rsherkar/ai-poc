@@ -63,16 +63,13 @@ public class StudioSteps {
     @When("the user sees the types of workspaces they have permissions for")
     public void the_user_sees_the_types_of_workspaces_they_have_permissions_for() {
         logger.info("Verifying available workspace types based on permissions");
-        Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
-        Assert.assertEquals("HCP Audience Expansion", workspaceCreation.verifyHCPAudienceExpansion());
-    }
+        String actualHCPExplorer = workspaceCreation.verifyHCPExplorer();
+        logger.info("Assertion: HCP Explorer workspace - expected='HCP Explorer', actual='{}'", actualHCPExplorer);
+        Assert.assertEquals("HCP Explorer", actualHCPExplorer);
 
-    @Then("the user selects the advertiser {string}")
-    public void the_user_selects_the_advertiser(String advertiser) {
-        logger.info("Selecting advertiser: {}", advertiser);
-        DriverFactory.getPage().waitForLoadState();
-        expansionWorkspace.clickAdvertiserDropdown(advertiser);
-        DriverFactory.getPage().waitForLoadState();
+        String actualHCPEAudienceExpansion = workspaceCreation.verifyHCPAudienceExpansion();
+        logger.info("Assertion: HCP Audience Expansion workspace - expected='HCP Audience Expansion', actual='{}'", actualHCPEAudienceExpansion);
+        Assert.assertEquals("HCP Audience Expansion", actualHCPEAudienceExpansion);
     }
 
     @Then("the user selects Source Audience {string}")
@@ -105,7 +102,9 @@ public class StudioSteps {
     public void the_user_saves_the_workspace_and_check_the_workspace_is_Saved() {
         logger.info("Saving the workspace");
         expansionWorkspace.saveExpansion();
-        assert explorerWorkspace.workspaceSuccess().contains("Workspace saved");
+        String workspaceSuccessMsg = explorerWorkspace.workspaceSuccess();
+        logger.info("Workspace save message: {}", workspaceSuccessMsg);
+        Assert.assertTrue("Unable to save workspace", workspaceSuccessMsg.contains("Workspace saved"));
     }
 
     @And("User enables the studio for {string} account")
@@ -141,7 +140,9 @@ public class StudioSteps {
         accounts.switchAccount(accountName);
         navigation.navigateToStudio();
         workspaceCreation.createWorkspace();
-        Assert.assertEquals("HCP Explorer", accounts.verifyWorkspacePermission());
+        String permission = accounts.verifyWorkspacePermission();
+        logger.info("Workspace permission: {}", permission);
+        Assert.assertEquals("HCP Explorer", permission);
     }
 
     @And("User disables the studio permission for {string} account")
@@ -160,7 +161,9 @@ public class StudioSteps {
     @When("User clicks on Create New Workspace")
     public void user_clicks_on_create_new_workspace() {
         logger.info("User clicks on Create New Workspace from Studio dashboard");
-        Assert.assertEquals("", "Studio", workspaceCreation.studioDashboard());
+        String dashboard = workspaceCreation.studioDashboard();
+        logger.info("Studio dashboard: {}", dashboard);
+        Assert.assertEquals("Unable to click on Create New Workspace button", "Studio", dashboard);
         workspaceCreation.verifyStudioWorkspaceFrame();
         workspaceCreation.createStudioWorkspace();
     }
@@ -170,6 +173,8 @@ public class StudioSteps {
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         logger.info("Fetching and validating workspace types against permissions");
         fetchedMetricNames = workspaceCreation.fetchWorkspaceTypes();
+        logger.info("Fetched metric names: {}", fetchedMetricNames);
+        logger.info("Admin metric names: {}", metricNames);
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 /*
@@ -216,11 +221,15 @@ public class StudioSteps {
     public void user_clicks_on_hcp_explorer_workspace() {
         logger.info("User clicks on HCP Explorer workspace");
         if (fetchedMetricNames.contains("HCP Explorer")) {
-            logger.debug("HCP Explorer permission is available");
-            Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
+            logger.info("HCP Explorer permission is available");
+            String explorer = workspaceCreation.verifyHCPExplorer();
+            logger.info("HCP Explorer permission: {}", explorer);
+            Assert.assertEquals("HCP Explorer", explorer);
         }
         workspaceCreation.clickHCPExplorerWorkspace();
-        Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
+        String alert = workspaceCreation.isWorkspaceCreationAlertDisplayed();
+        logger.info("Workspace creation alert: {}", alert);
+        Assert.assertEquals("Workspace created successfully", alert);
     }
 
     @Then("User adds the workspace name as {string} and selects the advertiser {string}")
@@ -242,7 +251,7 @@ public class StudioSteps {
         for (Map<String, String> row : filters) {
             String filterName = row.get("FilterName").trim();
             String filterOption = row.get("Option").trim();
-            logger.debug("Processing filter: {} with option: {}", filterName, filterOption);
+            logger.info("Processing filter: {} with option: {}", filterName, filterOption);
 
             if (!filterOption.isEmpty()) {
                 appliedFilterEntries.add(filterName);
@@ -264,28 +273,25 @@ public class StudioSteps {
     public void verify_that_the_applied_filters_are_displayed_correctly() {
         logger.info("Verifying applied filters are displayed correctly");
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
-        logger.debug("Displayed filters from UI: {}", displayedFilters);
+        logger.info("Displayed filters from UI: {}", displayedFilters);
         for (String appliedFilter : appliedFilterEntries) {
-            logger.debug("Validating displayed filter for: {}", appliedFilter);
+            logger.info("Validating displayed filter for: {}", appliedFilter);
             String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
             boolean matchFound = displayedFilters.stream().anyMatch(displayed -> {
                 String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
-                // 1) Exact match
                 boolean exactMatch = displayedNorm.equals(appliedNorm);
-                // 2) Singular/plural
                 boolean singularPlural = displayedNorm.startsWith(appliedNorm.replaceAll("s$", ""));
-                // 3) Word-level contains
                 boolean wordMatch = Arrays.stream(appliedNorm.split(" ")).anyMatch(word -> word.length() > 3 && displayedNorm.contains(word));
-                // 4) Prescription, Diagnosis root match (prescribe/prescribed/prescriptions/diagnosed/diagnosis/diagnoses)
                 boolean prescriptionRoot = appliedNorm.contains("prescri") && displayedNorm.contains("prescri");
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
-                    logger.debug("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
+                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
                             appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
                     return true;
                 }
                 return false;
             });
+            logger.info("Filter '{}' match found: {}", appliedFilter, matchFound);
             Assert.assertTrue("Applied filter not displayed: " + appliedFilter, matchFound);
         }
     }
@@ -301,6 +307,7 @@ public class StudioSteps {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Workspace save alert message: {}", actualMessage);
         boolean isValid = actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+        logger.info("Workspace save valid: {}", isValid);
         Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
@@ -317,13 +324,17 @@ public class StudioSteps {
     @Then("Verify the Workspace is updated with edited name")
     public void verifyTheHCPExplorerWorkspaceIsUpdated() {
         logger.info("Verifying updated workspace name");
-        Assert.assertEquals(workspaceName, explorerWorkspace.fetchWorkspaceHeader());
+        String header = explorerWorkspace.fetchWorkspaceHeader();
+        logger.info("Workspace header: {}", header);
+        Assert.assertEquals(workspaceName, header);
     }
 
     @And("Verify that advertiser field is disabled and displayed in {string} after saving the workspace")
     public void verifyIfAdvertiserIsDisabledAfterSavingTheWorkspace(String textColor) {
         logger.info("Verifying advertiser field is disabled with color: {}", textColor);
-        Assert.assertEquals(textColor, explorerWorkspace.isAdvertiserDisabled());
+        String color = explorerWorkspace.isAdvertiserDisabled();
+        logger.info("Advertiser disabled color: {}", color);
+        Assert.assertEquals(textColor, color);
     }
 
     @Then("verify the file content")
@@ -340,7 +351,7 @@ public class StudioSteps {
         for (String[] row : fileContent) {
             fileContentData.add(String.join(", ", row));
         }
-        logger.debug("CSV File Content: {}", fileContentData);
+        logger.info("CSV File Content: {}", fileContentData);
     }
 
     @When("Studio platform is available")
@@ -354,14 +365,16 @@ public class StudioSteps {
         logger.info("Searching and opening workspace: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspace);
         workspaceCreation.clickWorkspace(workspace);
-        Assert.assertTrue("Unable to navigate to workspace", workspaceCreation.navigateToWorkspace(workspace));
+        boolean navigated = workspaceCreation.navigateToWorkspace(workspace);
+        logger.info("Workspace navigation result: {}", navigated);
+        Assert.assertTrue("Unable to navigate to workspace", navigated);
     }
 
     @And("User fetches the Identified NPI count from the workspace")
     public void userFetchesTheIdentifiedNPICountFromTheWorkspace() {
         logger.info("Fetching Identified NPI count from workspace");
         npiCount = workspace.fetchIdentifiedNPICount();
-        logger.debug("Identified NPI count fetched: {}", npiCount);
+        logger.info("Identified NPI count fetched: {}", npiCount);
     }
 
     @And("Download button is enabled to the user")
@@ -381,8 +394,10 @@ public class StudioSteps {
         logger.info("Downloading NPI file with format: {}", fileExtension);
         workspace.selectFileExtension(fileExtension);
         targetFilePath = workspace.clickDownloadButton();
-        logger.debug("Downloaded file path: {}", targetFilePath);
-        Assert.assertEquals("Download completed successfully", workspace.checkNPIDownloadComplete());
+        logger.info("Downloaded file path: {}", targetFilePath);
+        String downloadMsg = workspace.checkNPIDownloadComplete();
+        logger.info("Download message: {}", downloadMsg);
+        Assert.assertEquals("Download completed successfully", downloadMsg);
     }
 
     @And("User verifies the total Identified {string} count in the downloaded file - {string}")
@@ -393,7 +408,7 @@ public class StudioSteps {
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if (fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
-        logger.debug("NPI count from UI: {}, NPI count from file: {}", npiCount, npiCountFromFile);
+        logger.info("NPI count from UI: {}, NPI count from file: {}", npiCount, npiCountFromFile);
         Assert.assertEquals("NPI count is not matching", Integer.parseInt(npiCount), npiCountFromFile);
     }
 
@@ -420,23 +435,31 @@ public class StudioSteps {
     public void verify_list_is_published() {
         logger.info("Publishing NPI list");
         workspace.clickPublish();
-        Assert.assertEquals("Workspace saved successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
+        String alertMsg = workspaceCreation.isWorkspaceCreationAlertDisplayed();
+        logger.info("Publish alert message: {}", alertMsg);
+        Assert.assertEquals("Workspace saved successfully", alertMsg);
         workspace.waitTillWorkspaceAlertHide();
         workspace.clickFlyOrPageButton();
-        Assert.assertEquals("Published NPI List", workspace.verifyPublishedNpi());
+        String publishedNpi = workspace.verifyPublishedNpi();
+        logger.info("Published NPI: {}", publishedNpi);
+        Assert.assertEquals("Published NPI List", publishedNpi);
     }
 
     @And("Check the Download icon is highlighted in green color")
     public void checkTheDownloadIconIsHighlightedInGreenColor() {
         logger.info("Verifying Download icon is highlighted in green");
-        Assert.assertEquals("rgb(0, 136, 136)", workspace.checkBackgroundColorOfDownloadIcon());
+        String color = workspace.checkBackgroundColorOfDownloadIcon();
+        logger.info("Download icon color: {}", color);
+        Assert.assertEquals("rgb(0, 136, 136)", color);
     }
 
     @And("Verify Webhook panel is disabled before applying filters")
     public void verifyWebhookPanelIsDisabledBeforeApplyingFilters() {
         logger.info("Verifying Webhook panel is disabled before applying filters");
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Disabled", workspace.verifyWebhookToggleButton());
+        String toggleStatus = workspace.verifyWebhookToggleButton();
+        logger.info("Webhook toggle status: {}", toggleStatus);
+        Assert.assertEquals("Disabled", toggleStatus);
         workspace.closeWebhookPanel();
     }
 
@@ -444,7 +467,9 @@ public class StudioSteps {
     public void verifyWebhookPanelIsEnabledAfterApplyingFilters() {
         logger.info("Verifying Webhook panel is enabled after applying filters");
         workspace.clickWebhookIcon();
-        Assert.assertEquals("Enabled", workspace.verifyWebhookToggleButton());
+        String toggleStatus = workspace.verifyWebhookToggleButton();
+        logger.info("Webhook toggle status: {}", toggleStatus);
+        Assert.assertEquals("Enabled", toggleStatus);
     }
 
     @When("User clicks {string} request method")
@@ -526,7 +551,9 @@ public class StudioSteps {
     @Then("Check the webhook icon is highlighted in green color")
     public void checkTheWebhookIconIsHighlightedInGreenColor() {
         logger.info("Verifying webhook icon is highlighted in green");
-        Assert.assertEquals("rgb(0, 136, 136)", workspace.checkBackgroundColorOfWebhookIcon());
+        String color = workspace.checkBackgroundColorOfWebhookIcon();
+        logger.info("Webhook icon color: {}", color);
+        Assert.assertEquals("rgb(0, 136, 136)", color);
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
@@ -540,12 +567,15 @@ public class StudioSteps {
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         logger.info("Verifying delete warning for workspace with active webhook");
-        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\\r\\n|\\r|\\n", "\n").replaceAll("\\s+", " ").trim();
+        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\r\n|\r|\n", "\n").replaceAll("\s+", " ").trim();
+        logger.info("Delete popup message: {}", actual);
         Assert.assertTrue("Message should warn about deleting the workspace", actual.contains("You are trying to delete the workspace " + workspaceName + "."));
         Assert.assertTrue("Message should mention that webhooks are enabled", actual.contains("Webhooks are enabled for this workspace."));
         Assert.assertTrue("Message should mention that deletion is irreversible and will delete the webhook", actual.contains("Deleting the workspace will delete the webhook as well. This action cannot be undone."));
         Assert.assertTrue("Message should confirm user wants to proceed", actual.contains("Do you want to proceed?"));
-        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+        String deleteMsg = workspaceCreation.deleteWorkspaceWithActiveWebhook().trim();
+        logger.info("Delete workspace message: {}", deleteMsg);
+        Assert.assertEquals("Workspace deleted successfully", deleteMsg);
     }
 
     /*Roshani Sherkar
@@ -555,7 +585,7 @@ public class StudioSteps {
         logger.info("Building audience using AI prompt");
         explorerWorkspace.clickAIConfigurator();
         flag = explorerWorkspace.describeAudience(aiPrompt);
-        logger.debug("AI audience build status: {}", flag);
+        logger.info("AI audience build status: {}", flag);
     }
 
     @Then("Verify the filter is applied correctly {string}")
@@ -585,7 +615,7 @@ public class StudioSteps {
             explorerWorkspace.clickAddFilter();
             String filterName = row.get("FilterName").trim();
             String filterOption = row.get("Option").trim();
-            logger.debug("Applying filter: {} with option: {}", filterName, filterOption);
+            logger.info("Applying filter: {} with option: {}", filterName, filterOption);
 
             if (!filterOption.isEmpty()) {
                 List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
@@ -638,7 +668,7 @@ public class StudioSteps {
     public void userHoversOverTheNPIVisualsIconAndClicksOnIt(DataTable dataTable) {
         List<String> npiVisualList = dataTable.asList(String.class);
         logger.info("Hovering over dashboard filters and selecting region with maximum NPIs");
-        logger.debug("Dashboard filter options: {}", npiVisualList);
+        logger.info("Dashboard filter options: {}", npiVisualList);
         explorerWorkspace.hoverOverNPIVisualsIcon(npiVisualList);
     }
 
@@ -647,7 +677,7 @@ public class StudioSteps {
         logger.info("Verifying dashboard filters are displayed in Filter section");
         Assert.assertTrue("Filters were not added", explorerWorkspace.verifyCrossFiltersDisplayed());
         appliedFilterEntries = explorerWorkspace.fetchMergedFilters();
-        logger.debug("Merged dashboard filters: {}", appliedFilterEntries);
+        logger.info("Merged dashboard filters: {}", appliedFilterEntries);
     }
 
     @And("Verify dashboard filters are merged with Primary filters")
@@ -683,7 +713,9 @@ public class StudioSteps {
     public void verifyUserIsAbleToRenameTheWorkspace(String newWorkspace) {
         newWorkspaceName = newWorkspace + CommonUtils.timeStampCalculation();
         logger.info("Renaming workspace from {} to {}", workspaceName, newWorkspaceName);
-        Assert.assertEquals("Workspace renamed successfully", workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName));
+        String renameMsg = workspaceCreation.renameWorkspaceName(workspaceName, newWorkspaceName);
+        logger.info("Rename workspace message: {}", renameMsg);
+        Assert.assertEquals("Workspace renamed successfully", renameMsg);
         workspaceName = newWorkspaceName;
     }
 
@@ -691,19 +723,24 @@ public class StudioSteps {
     public void verifyUserIsAbleToDuplicateTheWorkspace() {
         logger.info("Duplicating workspace: {}", workspaceName);
         workspaceName = workspaceCreation.fetchDuplicateWorkspaceName();
-        Assert.assertEquals("Workspace duplicated successfully", workspaceCreation.clickDuplicateButton());
+        String duplicateMsg = workspaceCreation.clickDuplicateButton();
+        logger.info("Duplicate workspace message: {}", duplicateMsg);
+        Assert.assertEquals("Workspace duplicated successfully", duplicateMsg);
     }
 
     @And("User is able to search the workspace after performing operation - {string}")
     public void userIsAbleToSearchTheWorkspaceWithTheNewName(String operationName) {
         logger.info("Searching workspace after {} operation: {}", operationName, workspaceName);
-        Assert.assertTrue("Unable to search workspace after performing " + operationName + " operation", workspaceCreation.searchWorkspaceName(workspaceName));
+        boolean searched = workspaceCreation.searchWorkspaceName(workspaceName);
+        logger.info("Workspace search result: {}", searched);
+        Assert.assertTrue("Unable to search workspace after performing " + operationName + " operation", searched);
     }
 
     @And("Verify user is able to delete the workspace")
     public void verifyUserIsAbleToDeleteTheWorkspace() {
         logger.info("Verifying delete confirmation for workspace: {}", workspaceName);
         String text = workspaceCreation.verifyDeletePopUp().trim();
+        logger.info("Delete popup message: {}", text);
         Assert.assertTrue("Message should contain warning about deleting workspace", text.contains("You are trying to delete the workspace " + workspaceName));
         Assert.assertTrue("Message should mention irreversible deletion", text.contains("This action cannot be undone – all deleted data will be lost."));
         Assert.assertTrue("Message should ask for confirmation", text.contains("Do you want to proceed?"));
@@ -761,7 +798,9 @@ public class StudioSteps {
     @And("Verify the Retrofit checkbox is selected")
     public void verifyTheRetrofitCheckboxIsSelected() {
         logger.info("Verifying Retrofit checkbox is selected");
-        Assert.assertTrue("Retrofit Checkbox is not selected", workspace.isRetrofitCheckboxSelected());
+        boolean retrofitSelected = workspace.isRetrofitCheckboxSelected();
+        logger.info("Retrofit checkbox selected: {}", retrofitSelected);
+        Assert.assertTrue("Retrofit Checkbox is not selected", retrofitSelected);
     }
 
     @And("User selects {string} as Keep NPIs on the list option")
@@ -857,16 +896,18 @@ public class StudioSteps {
     @And("User sets the HCP365 permission {string} for {string} and saves the changes")
     public void userChecksTheHCPPermissionAndItFor(String checkboxStatus, String advertiser) {
         logger.info("Setting HCP365 permission '{}' for advertiser '{}'", checkboxStatus, advertiser);
-        Assert.assertTrue("HCP365 permission is not modified correctly", accounts.checkHCPPermissionForAdvertiser(checkboxStatus, advertiser));
+        boolean permissionModified = accounts.checkHCPPermissionForAdvertiser(checkboxStatus, advertiser);
+        logger.info("HCP365 permission modified: {}", permissionModified);
+        Assert.assertTrue("HCP365 permission is not modified correctly", permissionModified);
         accounts.saveAccountsAdvertiserTab();
-        logger.debug("HCP365 permission saved for advertiser: {}", advertiser);
+        logger.info("HCP365 permission saved for advertiser: {}", advertiser);
     }
 
     @And("Verify Owned And Operated section is {string} within the Cross-Filter section of the Workspace")
     public void verifyOwnedAndOperatedSectionWithinTheCrossFilterSectionOfTheWorkspace(String visibilityFlag) {
         logger.info("Verifying Owned And Operated section is {}", visibilityFlag);
         boolean flag = explorerWorkspace.isOwnedAndOperatedSectionAvailable();
-        logger.debug("Owned And Operated section availability: {}", flag);
+        logger.info("Owned And Operated section availability: {}", flag);
         switch (visibilityFlag.toLowerCase()) {
             case "present":
                 Assert.assertTrue("Expected 'Owned and Operated' section to be present, but it was absent.", flag);
@@ -886,7 +927,7 @@ public class StudioSteps {
         Assert.assertTrue("Studio permissions setting icon is not displayed", accounts.isStudioSettingsButtonVisible());
         accounts.clickStudioSettingsButton();
         metricNames = accounts.fetchWorkspacesWithPermission();
-        logger.debug("Workspace permissions fetched for account '{}': {}", account, metricNames);
+        logger.info("Workspace permissions fetched for account '{}': {}", account, metricNames);
         accounts.clickCancelButtonFromSettingsPanel();
     }
 
@@ -906,7 +947,7 @@ public class StudioSteps {
             String filterName = row.get("FilterName").trim();
             String filterOption = row.get("Option").trim();
             String recency = row.getOrDefault("Recency", "").trim();
-            logger.debug("Applying filter '{}' with options '{}' and recency '{}'", filterName, filterOption, recency);
+            logger.info("Applying filter '{}' with options '{}' and recency '{}'", filterName, filterOption, recency);
             explorerWorkspace.clickAddFilter();
             // Apply option values
             if (!filterOption.isEmpty()) {
@@ -918,7 +959,7 @@ public class StudioSteps {
                 explorerWorkspace.clickFilterOKButton();
             }
             explorerWorkspace.applyFilter();
-            logger.debug("Expected recency: '{}' | Actual recency: '{}'", recency, explorerWorkspace.fetchRecencyValue(filterType));
+            logger.info("Expected recency: '{}' | Actual recency: '{}'", recency, explorerWorkspace.fetchRecencyValue(filterType));
             Assert.assertEquals(filterType + " recency value is not matched", recency, explorerWorkspace.fetchRecencyValue(filterType));
         }
     }
@@ -926,6 +967,8 @@ public class StudioSteps {
     @Then("User should be able to see Studio for that account")
     public void userShouldBeAbleToSeeStudioForThatAccount() {
         logger.info("Verifying Studio is visible for the account");
-        Assert.assertEquals("Studio", navigation.verifyStudioTitle());
+        String studioTitle = navigation.verifyStudioTitle();
+        logger.info("Studio title: {}", studioTitle);
+        Assert.assertEquals("Studio", studioTitle);
     }
 }
