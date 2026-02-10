@@ -59,7 +59,7 @@ Feature: End to End Workflow of Creative Creation and its assignment To Tactic
       | HTML         | FileType: DCM File, FileName:DCM_HTML_E2E_BulkUpload.xlsx, Status:Pending, LandingDomain:https://www.pulsepoint.com |
     And Verify data persistence when user creates and saves "Video" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                |
-      | Video        | FileType: DCM File, FileName:DCM_VIDEO_E2E_BulkUpload.xlsx, Status:Denied, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, Size:800x250 |
+      | Video        | FileType: DCM File, FileName:DCM_VIDEO_E2E_BulkUpload.xlsx, Status:Denied, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, Size:800x250, Duration:60, ImageFile:NativeDisplay_Image.jpg |
     And Verify data persistence when user creates and saves "Native" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                           |
       | Native       | FileName:NativeBulkUploadTemplate.xlsx, Status:Approved, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, IAB:Profane, Size:800x250 |

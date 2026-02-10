@@ -40,6 +40,22 @@ public class ConfigReader {
     public static String getCustomDestinationPassword() throws Exception {
         return EncryptionDecryption.decrypt(getProperty("customDestinationPassword"));
     }
+
+    public static String getInternalDemoUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("demoUser"));
+    }
+
+    public static String getInternalDemoPassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("demoPassword"));
+    }
+
+    public static String getInternalPreReleaseUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("preReleaseUser"));
+    }
+
+    public static String getInternalPreReleasePassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("preReleasePassword"));
+    }
 }
 
 
