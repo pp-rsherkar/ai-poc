@@ -122,8 +122,8 @@ public class CreateCreatives {
     private final Locator CALENDAR_TITLE;
     private final Locator CALENDAR_MONTH;
     private final Locator CALENDAR_DATE;
+    private final Locator LINE_ITEM_PAGE_TITLE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    CampaignDashboard campaignDashboard = new CampaignDashboard(DriverFactory.getPage());
     String imageTextLocator = "//span[contains(text(),'%s')]";
 
     public CreateCreatives(Page page) {
@@ -233,6 +233,7 @@ public class CreateCreatives {
         this.CALENDAR_TITLE = page.locator("//sui-calendar-view-title//span[@class='title link']");
         this.CALENDAR_MONTH = page.locator("//sui-calendar-month-view//tbody//td");
         this.CALENDAR_DATE = page.locator("//sui-calendar-date-view//tbody//td");
+        this.LINE_ITEM_PAGE_TITLE = page.locator("//div[contains(@class,'lineitem-name')]");
     }
 
     public String verifyCreativeLibraryPageTitle() {
@@ -1030,7 +1031,7 @@ public class CreateCreatives {
 
     public String clickLineItemName(String lineItemName) {
         page.locator(String.format("//div[contains(@title,'%s')]", lineItemName)).click();
-        waitUtility.waitForLocatorVisible(campaignDashboard.LINE_ITEM_PAGE_TITLE);
-        return campaignDashboard.LINE_ITEM_PAGE_TITLE.textContent().trim();
+        waitUtility.waitForLocatorVisible(LINE_ITEM_PAGE_TITLE);
+        return LINE_ITEM_PAGE_TITLE.textContent().trim();
     }
 }

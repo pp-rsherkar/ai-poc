@@ -4166,7 +4166,7 @@ public class LifeSteps {
         npiLists.searchList(npiListName);
         npiLists.openSearchedList(npiListName);
     }
-    @Then("User navigates to creative details and click on Association tab")
+    @Then("User navigates to creative details and clicks Association tab")
     public void userNavigatesToCreativeDetailsAndClickOnAssociationTab() {
         createCreatives.searchCreative(metricName);
         createCreatives.clickSearchedCreative(metricName);
@@ -4205,7 +4205,7 @@ public class LifeSteps {
         createCreatives.clickColumnSelectionIcon();
         createCreatives.clickMenuButtonFromColumnSelection(buttonName);
         List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
-        Assert.assertTrue("", columnName.isEmpty());
+        Assert.assertTrue("Column names are available", columnName.isEmpty());
     }
 
     @And("Verify if {string} displays all the columns in the Association tab")

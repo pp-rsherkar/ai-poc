@@ -27,7 +27,7 @@ public class CampaignDashboard {
     private final Locator LINE_ITEM_NAME;
     private final Locator TACTIC_NAME;
     private final Locator CAMPAIGN_PAGE_TITLE;
-    public final Locator LINE_ITEM_PAGE_TITLE;
+    private final Locator LINE_ITEM_PAGE_TITLE;
     private final Locator TACTIC_PAGE_TITLE;
     private final Locator DASHBOARD_MENU_ICON;
     private final Locator SELECT_COLUMNS_FROM_ICON;

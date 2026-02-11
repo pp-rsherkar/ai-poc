@@ -268,7 +268,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative
     When User assigns a campaign to the creative using "Bulk Assign" option
-    Then User navigates to creative details and click on Association tab
+    Then User navigates to creative details and clicks Association tab
     And Verify column selection icon is available and upon clicking it below columns should display
         | Line Item Name |
         | ID             |
@@ -291,7 +291,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
     When User assigns a campaign to the creative using "Bulk Assign" option
-    Then User navigates to creative details and click on Association tab
+    Then User navigates to creative details and clicks Association tab
     And Verify filter icon is available and upon clicking it "Add Filter", "Done" and "No Filters applied." text should display
     And User clicks "Add Filter", selects below filters and apply using "Done" button
       | Line Item Name  |
