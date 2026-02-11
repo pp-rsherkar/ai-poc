@@ -499,7 +499,7 @@ public class LineItemDetails {
     }
 
     public void isPlacementIdAvailable(String lineItemNameRandom) {
-        if(PLACEMENT_ID.isVisible()) {
+        if (PLACEMENT_ID.isVisible()) {
             PLACEMENT_ID.fill(lineItemNameRandom);
         }
     }
