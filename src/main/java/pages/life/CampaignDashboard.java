@@ -427,7 +427,7 @@ public class CampaignDashboard {
 
     public void navigateToLineItemDetails() {
         LINE_ITEM_NAME.click();
-        LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(LINE_ITEM_PAGE_TITLE);
     }
 
     public void navigateToTacticDetails(){
@@ -474,23 +474,23 @@ public class CampaignDashboard {
     }
 
     public void searchCreatedCampaign(String createdCampaign) {
-        waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
-        ensureCampaignRadioBtnSelected();
-        unselectFavoriteCheckboxIfSelected();
-        unselectHideFinishedCheckboxIfSelected();
-        resetFiltersIfApplied();
-        while(true) {
-            SEARCH_CAMPAIGN.fill(createdCampaign);
-            CLICK_CAMPAIGN_SEARCH.click();
-            waitUtility.waitUntilPreLoaderHidden();
-            if (SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()) {
-                break;
-            }
-            if (NO_CAMPAIGN_AVAILABLE_TEXT.isVisible()) {
-                break;
-            }
+    waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
+    ensureCampaignRadioBtnSelected();
+    unselectFavoriteCheckboxIfSelected();
+    unselectHideFinishedCheckboxIfSelected();
+    resetFiltersIfApplied();
+    while(true) {
+        SEARCH_CAMPAIGN.fill(createdCampaign);
+        CLICK_CAMPAIGN_SEARCH.click();
+        waitUtility.waitUntilPreLoaderHidden();
+        if (SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()) {
+            break;
+        }
+        if (NO_CAMPAIGN_AVAILABLE_TEXT.isVisible()) {
+            break;
         }
     }
+}
 
     public String verifyCreatedCampaign(String createdCampaign) {
         String campaignNameXpath = String.format("//span[contains(text(),'%s')]", createdCampaign);
