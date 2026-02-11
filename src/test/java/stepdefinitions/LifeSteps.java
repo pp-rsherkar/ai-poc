@@ -1737,7 +1737,7 @@ public class LifeSteps {
 
     @Then("Verify that the Create New List screen is displayed")
     public void verifyThatTheCreateListScreenIsDisplayed() {
-        Assert.assertTrue("", sharedList.verifyNewListPage());
+        Assert.assertTrue("The screen is not displayed", sharedList.verifyNewListPage());
     }
 
     @And("Verify that an error message is displayed when no listname {string} or {string} names are specified")
@@ -2352,7 +2352,7 @@ public class LifeSteps {
     @And("Verify only valid Landing Domain {string} values should be permitted")
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
-        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify default value of the File field should be {string}")
@@ -2410,7 +2410,7 @@ public class LifeSteps {
     @And("Verify only valid Clickthrough URL {string} values should be permitted")
     public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
         bulkCreativeUpload.enterClickthroughURL(validURL);
-        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify data persistence when user creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
@@ -4193,6 +4193,7 @@ public class LifeSteps {
     public void verifyThatTheCampaignPageIsDisplayed() {
         Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
     }
+
     @And("Verify if {string} hides all the columns in the Association tab")
     public void verifyIfHidesAllTheColumnsInTheAssociationTab(String buttonName) {
         createCreatives.clickColumnSelectionIcon();
