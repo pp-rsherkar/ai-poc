@@ -2807,7 +2807,8 @@ public class LifeSteps {
 
     @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
     public void verifyUserIsAbleToSelectTimeAndTimezoneForSendAtFields(String time, String timeZone) {
-        Assert.assertTrue("Unable to enter time and timezone", scheduleReport.enterSendAtTimeAndTimezone(time, timeZone));
+        scheduleReport.enterSendAtTime(time);
+        Assert.assertTrue("Unable to select timezone", scheduleReport.selectDataTimeZone(timeZone));
         nameList.add(time);
         nameList.add(timeZone);
     }
