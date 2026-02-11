@@ -42,7 +42,7 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
       | SearchByExchange | Pubmatic       |
 
   @regression @e2e
-  Scenario Outline: Add New Private Deals and assigned to a tactic with deal price type "<DEAL_PRICE_TYPE>"
+  Scenario Outline: Add New Private Deals with deal price type "<DEAL_PRICE_TYPE>" and assign to a tactic
     When User clicks Tactic Setting tab
     Then User should navigate to respective Tactic Setting tab
     When User add new targeting rule for Rule Type "Deals"
