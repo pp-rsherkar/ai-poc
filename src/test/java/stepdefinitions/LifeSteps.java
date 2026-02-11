@@ -173,6 +173,7 @@ public class LifeSteps {
         lineItemDetails.enterLineItemName(lineItemNameRandom);
         navigation.clickOnIcon("Add Flight");
         lineItemDetails.enterLineItemBudget(lineBudget);
+        lineItemDetails.isPlacementIdAvailable(lineItemNameRandom);
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
     }

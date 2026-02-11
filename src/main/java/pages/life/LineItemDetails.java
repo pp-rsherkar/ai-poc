@@ -69,6 +69,7 @@ public class LineItemDetails {
     private final Locator PACING_MODE;
     private final Locator FLAT_CPM;
     private final Locator PACING_MODE_INPUT;
+    private final Locator PLACEMENT_ID;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -144,6 +145,7 @@ public class LineItemDetails {
         this.PACING_MODE = page.locator("//sui-select[@placeholder='PacingMode']");
         this.FLAT_CPM = page.locator("//input[@formcontrolname='flatCPM']");
         this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
+        this.PLACEMENT_ID = page.locator("//label[contains(text(),'PlacementId')]/following-sibling::input");
     }
 
     public String verifyLineItemText() {
@@ -494,5 +496,11 @@ public class LineItemDetails {
         String optionXPath = String.format("//sui-select-option//span[text()='%s']", pacingMode);
         PACING_MODE.locator(optionXPath).click();
         if (PACING_MODE_INPUT.isVisible()) PACING_MODE_INPUT.fill(pacingPercentage);
+    }
+
+    public void isPlacementIdAvailable(String lineItemNameRandom) {
+        if(PLACEMENT_ID.isVisible()) {
+            PLACEMENT_ID.fill(lineItemNameRandom);
+        }
     }
 }

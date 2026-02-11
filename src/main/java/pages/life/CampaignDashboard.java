@@ -479,10 +479,16 @@ public class CampaignDashboard {
         unselectFavoriteCheckboxIfSelected();
         unselectHideFinishedCheckboxIfSelected();
         resetFiltersIfApplied();
-        while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
+        while(true) {
             SEARCH_CAMPAIGN.fill(createdCampaign);
             CLICK_CAMPAIGN_SEARCH.click();
             waitUtility.waitUntilPreLoaderHidden();
+            if (SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()) {
+                break;
+            }
+            if (NO_CAMPAIGN_AVAILABLE_TEXT.isVisible()) {
+                break;
+            }
         }
     }
 
