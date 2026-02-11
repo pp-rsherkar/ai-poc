@@ -15,7 +15,7 @@ import java.util.List;
 public class ExplorerWorkspace {
     private final Page page;
     private final Locator WORKSPACE_NAME;
-    private final Locator EDIT_WORKSPACE_SEARCH_ADVERTISER;
+    private final Locator SEARCH_ADVERTISER_IN_EDIT_WORKSPACE;
     private final Locator DASHBOARD_CONTENT;
     private final Locator DASHBOARD_ELEMENT;
     private final Locator DASHBOARD_RELOAD_ICON;
@@ -65,7 +65,7 @@ public class ExplorerWorkspace {
         this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.WORKSPACE_NAME = WORKSPACE_FRAME.locator("//p[text()='Workspace Name']/following-sibling::div//input");
-        this.EDIT_WORKSPACE_SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
+        this.SEARCH_ADVERTISER_IN_EDIT_WORKSPACE = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
         this.DASHBOARD_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content"));
         this.DASHBOARD_ELEMENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("(//p[contains(@class,'TextBase-sc')])[1]");
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
@@ -126,10 +126,10 @@ public class ExplorerWorkspace {
     }
 
     public void selectAdvertiserFromWorkspaceEdit(String advertiser) {
-        EDIT_WORKSPACE_SEARCH_ADVERTISER.click();
-        EDIT_WORKSPACE_SEARCH_ADVERTISER.fill(advertiser);
-        EDIT_WORKSPACE_SEARCH_ADVERTISER.press("ArrowDown");
-        EDIT_WORKSPACE_SEARCH_ADVERTISER.press("Enter");
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.click();
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.fill(advertiser);
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.press("ArrowDown");
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.press("Enter");
     }
 
     public void saveWorkspaceName() {

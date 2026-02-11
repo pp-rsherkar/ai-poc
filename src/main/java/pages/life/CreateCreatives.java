@@ -246,6 +246,7 @@ public class CreateCreatives {
         button.click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+        page.waitForTimeout(1000);
     }
 
     public void clickClearAllButton() {
@@ -257,7 +258,7 @@ public class CreateCreatives {
 
     public boolean isArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
-        if (buttonType.contains("Active") && ENABLED_ARCHIVED_BUTTON.first().isVisible()) {
+        if (buttonType.contains("Active") && ENABLED_ARCHIVED_BUTTON.first().isVisible() || DISABLED_ARCHIVED_BUTTON.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         } else if (buttonType.contains("Archived") && UNARCHIVED_BUTTON.first().isVisible()) {
@@ -425,15 +426,9 @@ public class CreateCreatives {
 
     public boolean checkSearchedValue(String searchValue) {
         Locator[] locators = { CREATIVE_NAME_LIST, CREATIVE_ID_LIST, CREATIVE_AD_SIZE_LIST, CREATIVE_SOURCE_LIST};
-
         for (Locator locator : locators) {
-            if (locator.first().isVisible()) {
-                for (int i = 0; i < locator.count(); i++) {
-                    String text = locator.nth(i).textContent().trim();
-                    if (text.contains(searchValue)) {
-                        return true;
-                    }
-                }
+            if (locator.filter(new Locator.FilterOptions().setHasText(searchValue)).count() > 0) {
+                return true;
             }
         }
         return false;
@@ -464,7 +459,7 @@ public class CreateCreatives {
 
     public void clickSearchedCreative(String creativeName) {
         for(int i=0; i<CREATIVE_NAME_LIST.count(); i++) {
-            if (CREATIVE_NAME_LIST.nth(i).textContent().contains(creativeName)) {
+            if (CREATIVE_NAME_LIST.nth(i).textContent().equalsIgnoreCase(creativeName)) {
                 CREATIVE_NAME_LIST.nth(i).click();
                 page.waitForTimeout(2000);
                 break;
@@ -882,7 +877,7 @@ public class CreateCreatives {
     }
 
     public String fetchCreativeStatusLabel(){
-        return CREATIVE_STATUS_LABEL.textContent().trim();
+        return CREATIVE_STATUS_LABEL.first().textContent().trim();
     }
 
     public String isCreativePreviewTabDisplayed() {

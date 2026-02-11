@@ -94,27 +94,25 @@ public class LifeSteps {
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
-    public void set_environment(String environment, String user) {
+    public void set_environment(String environment, String user) throws Exception {
         userType = user;
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");
-            // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
             if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
                 username = ConfigReader.getProperty("demoExternalUser");
                 password = ConfigReader.getProperty("demoExternalPassword");
             } else {
-                username = ConfigReader.getProperty("demoUser");
-                password = ConfigReader.getProperty("demoPassword");
+                username = ConfigReader.getInternalDemoUsername();
+                password = ConfigReader.getInternalDemoPassword();
             }
         } else if (environment.equals("Pre-release")) {
             url = ConfigReader.getProperty("preReleaseURL");
-            // If the test is for an external user, use the pre-release external credentials
             if (user != null && user.toLowerCase().contains("external")) {
                 username = ConfigReader.getProperty("preReleaseExternalUser");
                 password = ConfigReader.getProperty("preReleaseExternalPassword");
             } else {
-                username = ConfigReader.getProperty("preReleaseUser");
-                password = ConfigReader.getProperty("preReleasePassword");
+                username = ConfigReader.getInternalPreReleaseUsername();
+                password = ConfigReader.getInternalPreReleasePassword();
             }
         }
     }
@@ -1094,9 +1092,9 @@ public class LifeSteps {
         pmp.saveDealsAssigned();
     }
 
-    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button {string}")
-    public void dealDetailsShouldAppearOnTacticSettingsTab(String toggleButton) {
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom, toggleButton));
+    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status")
+    public void dealDetailsShouldAppearOnTacticSettingsTab() {
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom));
     }
 
     @And("Verify Delete icon is disabled and error message {string}")
@@ -1105,21 +1103,17 @@ public class LifeSteps {
         Assert.assertEquals(errorMessage, pmp.fetchMessageOnDeleteIconClick());
     }
 
-    @And("Verify Pricing Strategy is editable for Deals present in Curated Market and Deals section")
-    public void verifyPricingStrategyIsEditableForDealsPresentInCuratedMarketAndDealsSection(DataTable pricingStrategy) {
-        Map<String, String> rawMap = pricingStrategy.asMap(String.class, String.class);
-        Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
-        for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            pmp.verifyPricingStrategyIsEditable(dealNameRandom, entry.getKey(), entry.getValue());
-        }
+    @And("Verify Pricing Strategy is editable and update it with {string} and {string} for Deals present in Curated Markets and Deals section")
+    public void verifyPricingStrategyIsEditableAndUpdateItWithAndForDealsPresentInCuratedMarketAndDealsSection(String pricingStrategy, String value) {
+        pmp.verifyPricingStrategyIsEditable(dealNameRandom, pricingStrategy, value);
     }
 
-    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
-    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator, String toggleButton) {
+    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Markets and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
         dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator, toggleButton));
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator));
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
@@ -1488,7 +1482,7 @@ public class LifeSteps {
     @When("User performs {string} action using {string} option on multiple creatives - {string} and verifies the selected creatives are moved to {string} tab")
     public void userPerformsBulkArchiveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreMovedToArchivedTab(String bulkAction, String bulkActionOption, String noOfCreatives, String tabName) {
         createCreatives.clearSearchBox();
-        if(bulkAction.contains("Bulk Archive"))
+        if(bulkAction.equalsIgnoreCase("Bulk Archive"))
             createCreatives.clickActivityButton("Active");
         else
             createCreatives.clickActivityButton("Archived");
@@ -2209,16 +2203,16 @@ public class LifeSteps {
 
     @And("User uploads a valid file {string} for {string} creative")
     public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
-        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
     }
 
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) throws IOException {
         Path latestFile = CommonUtils.getMostRecentFileFromDownloads();
         if(fileName.contains("Downloaded"))
-            bulkCreativeUpload.uploadDisplayCreativeTemplate(String.valueOf(latestFile.getFileName()));
+            bulkCreativeUpload.uploadSecondaryCreativeTemplate(String.valueOf(latestFile.getFileName()));
         else
-            bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+            bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
         itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
         bulkCreativeUpload.clickPreviewButton();
         bulkCreativeUpload.clickOKButton();
@@ -2295,7 +2289,7 @@ public class LifeSteps {
 
     @And("User is able to browse and select a template {string} from the system")
     public void userIsAbleToBrowseAndSelectATemplateFromTheSystem(String fileName) {
-        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
     }
 
     @And("Verify default value of the Approval Status field is {string}")
@@ -2337,21 +2331,21 @@ public class LifeSteps {
 
     @And("Verify Advertiser field should be mandatory")
     public void verifyAdvertiserFieldShouldBeMandatory() {
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Select Advertiser", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify that the Landing Domain field is mandatory when all other required fields, including {string} are filled")
     public void verifyLandingDomainFieldShouldBeMandatoryByEnteringOtherMandatoryFields(String advertiser) {
         bulkCreativeUpload.selectAdvertiser(advertiser);
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Landing Page Domain is required", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify that an appropriate error message is displayed when invalid data {string} is entered for the Landing Domain")
     public void verifyThatAnAppropriateErrorMessageIsDisplayedWhenInvalidDataIsEnteredForTheLandingDomain(String invalidLandingDomain) {
         bulkCreativeUpload.enterLandingPageDomain(invalidLandingDomain);
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Landing Page Domain is not valid.", bulkCreativeUpload.fetchErrorAlert());
     }
 
@@ -2383,23 +2377,22 @@ public class LifeSteps {
         bulkCreativeUpload.selectAndClickDirection(direction);
     }
 
-    @And("Verify that the user is able to browse the computer, select the {string} file type, upload the {string} file, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}")
-    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String fileType, String fileName, String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName) throws IOException {
+    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, String size, String duration, String fileType, String fileName) throws IOException {
         nameList.clear();
-        itemList.clear();
         bulkCreativeUpload.selectAdvertiser(advertiser);
         bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
         bulkCreativeUpload.enterFinancer(financer);
         bulkCreativeUpload.selectFileTypeAndUploadFile(fileType, fileName);
         bulkCreativeUpload.enterLandingPageDomain(landingDomain);
         bulkCreativeUpload.selectApprovalStatus(status);
+        bulkCreativeUpload.clickPreviewButton();
         nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-        if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight("800x250");
+        if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight(size);
+        if (bulkCreativeUpload.isDurationVisibleAndBlank()) bulkCreativeUpload.enterDuration(duration);
         bulkCreativeUpload.clickUploadButton();
-        itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
         bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
-
     }
 
     @And("Verify user is able to type in {string} categories")
@@ -2409,7 +2402,7 @@ public class LifeSteps {
 
     @And("Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         List<String> expectedMessages = Arrays.asList("Clickthrough URL is required", "Landing Page Domain is required");
         Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
     }

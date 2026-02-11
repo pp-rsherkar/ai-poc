@@ -164,9 +164,9 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
       | CREATIVE_TYPE | ADVERTISER     | ADVERTISER_DSA | FINANCER      | STATUS   | FILE_NAME                      |
-      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate.xlsx |
-      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate.xlsx |
-      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate.xlsx |
+      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate1.xlsx |
+      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate1.xlsx |
+      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate1.xlsx |
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Display Creatives
@@ -210,13 +210,12 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the AdChoices Icon should be "TopRight"
     And Verify default value of the Notes Column field should be "None"
     And Verify Rich Media checkbox should be present and selectable "Up"
-    And Verify that the user is able to browse the computer, select the "<FILE_TYPE>" file type, upload the "<FILE_NAME>" file, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
-    And Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
+    And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | FILE_TYPE  | FILE_NAME                |
-      | 01- Advertiser | test                   | google.com     | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | DCM File   | DCM_HTML_BulkUpload.xlsx |
-      | 01- Advertiser | test                   | google.com     | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | PulsePoint | Downloaded               |
-
+      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | DCM File   | DCM_HTML_BulkUpload.xlsx |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | PulsePoint |                          |
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Native Creatives
@@ -258,12 +257,13 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the File field should be "DCM File"
     And Verify default value of the Approval Status field is "Pending"
     And Verify default value of the AdChoices Icon should be "TopRight"
+    #And Verify user is able to upload images "<IMAGE_FILENAME>" to get a template with URLs
     And Verify default value of the Notes Column field should be "None"
-    And Verify that the user is able to browse the computer, select the "<FILE_TYPE>" file type, upload the "<FILE_NAME>" file, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
-    And Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
+    And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | FILE_TYPE | FILE_NAME                 |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | DCM File  | DCM_VIDEO_BulkUpload.xlsx |
+      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
 
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative
