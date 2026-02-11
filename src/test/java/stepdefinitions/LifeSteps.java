@@ -1737,7 +1737,7 @@ public class LifeSteps {
 
     @Then("Verify that the Create New List screen is displayed")
     public void verifyThatTheCreateListScreenIsDisplayed() {
-        Assert.assertTrue("", sharedList.verifyNewListPage());
+        Assert.assertTrue("The screen is not displayed", sharedList.verifyNewListPage());
     }
 
     @And("Verify that an error message is displayed when no listname {string} or {string} names are specified")
@@ -2352,7 +2352,7 @@ public class LifeSteps {
     @And("Verify only valid Landing Domain {string} values should be permitted")
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
-        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify default value of the File field should be {string}")
@@ -2410,7 +2410,7 @@ public class LifeSteps {
     @And("Verify only valid Clickthrough URL {string} values should be permitted")
     public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
         bulkCreativeUpload.enterClickthroughURL(validURL);
-        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify data persistence when user creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
@@ -4159,11 +4159,34 @@ public class LifeSteps {
         npiLists.searchList(npiListName);
         npiLists.openSearchedList(npiListName);
     }
+    @Then("User navigates to creative details and clicks Association tab")
+    public void userNavigatesToCreativeDetailsAndClickOnAssociationTab() {
+        createCreatives.searchCreative(metricName);
+        createCreatives.clickSearchedCreative(metricName);
+        createCreatives.clickAssociationTab();
+    }
+
+    @And("Verify column selection icon is available and upon clicking it below columns should display")
+    public void verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(DataTable dataTable) {
+        List<String> expectedColumnNames = dataTable.asList(String.class);
+        createCreatives.clickColumnSelectionIcon();
+        List<String> actualColumnNames = createCreatives.fetchColumnNamesFromSelectionIconList();
+        Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
+    }
 
     @And("User searches and selects the campaign {string}")
     public void userSearchesAndSelectsTheCampaign(String campaignName) {
         campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.navigateToCampaign(campaignName);
+    }
+    @And("Verify unselected columns are not displayed in the Association tab")
+    public void verifyUnselectedColumnsAreNotDisplayedInTheAssociationTab(DataTable dataTable) {
+        List<String> unselectedColumnNames = dataTable.asList(String.class);
+        createCreatives.deselectColumnNamesFromSelectionIconList(unselectedColumnNames);
+        List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
+        for (String name : unselectedColumnNames) {
+            Assert.assertFalse(name + " column is still displayed in Association tab after deselecting it", columnName.contains(name));
+        }
     }
 
     @Then("Verify that the campaign page is displayed")
@@ -4171,5 +4194,53 @@ public class LifeSteps {
         Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
     }
 
+    @And("Verify if {string} hides all the columns in the Association tab")
+    public void verifyIfHidesAllTheColumnsInTheAssociationTab(String buttonName) {
+        createCreatives.clickColumnSelectionIcon();
+        createCreatives.clickMenuButtonFromColumnSelection(buttonName);
+        List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
+        Assert.assertTrue("Column names are available", columnName.isEmpty());
+    }
 
+    @And("Verify if {string} displays all the columns in the Association tab")
+    public void verifyIfDisplaysAllTheColumnsInTheAssociationTab(String buttonName, DataTable dataTable) {
+        List<String> expectedColumnNames = dataTable.asList(String.class);
+        createCreatives.clickColumnSelectionIcon();
+        createCreatives.clickMenuButtonFromColumnSelection(buttonName);
+        List<String> actualColumnNames = createCreatives.fetchColumnNamesFromAssociationsTab();
+        Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
+    }
+
+    @And("Verify filter icon is available and upon clicking it {string}, {string} and {string} text should display")
+    public void verifyFilterIconIsAvailableAndUponClickingItAndTextShouldDisplay(String button1, String button2, String text) {
+        createCreatives.clickFilterIcon();
+        List<String> filterFields = createCreatives.fetchFilterFields();
+        Assert.assertTrue("Add Filter button is not available", filterFields.contains(button1));
+        Assert.assertTrue("Done button is not available", filterFields.contains(button2));
+        Assert.assertTrue("No Filters applied text is not available", filterFields.contains(text));
+    }
+
+    @And("User clicks {string}, selects below filters and apply using {string} button")
+    public void userClicksSelectsBelowFiltersAndApplyUsingButton(String addFilterButton, String doneButton, DataTable dataTable) {
+        List<String> filterName = dataTable.asList(String.class);
+        lineItemNameRandom = createCreatives.fetchLineItemFromAssociation();
+        String campaignName = createCreatives.fetchCampaignFromAssociation();
+        for (String name : filterName) {
+            createCreatives.clickFilterButton(addFilterButton);
+            createCreatives.selectFilterName(name);
+            if (name.contains("Line Item Name"))
+                createCreatives.enterFilterValue(lineItemNameRandom);
+            else if (name.contains("Campaign Name"))
+                createCreatives.enterFilterValue(campaignName);
+            else
+                createCreatives.enterDates();
+        }
+        createCreatives.clickFilterButton(doneButton);
+        Assert.assertEquals("1 records", createCreatives.fetchFilteredRecordsCount());
+    }
+
+    @And("User navigates to Line item from Association Tab")
+    public void userNavigatesToLineItemFromAssociationTab() {
+        Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
+    }
 }

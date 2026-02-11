@@ -264,3 +264,37 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     Examples:
       | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
+
+  @regression
+  Scenario: Verify Column Filter present on Association Tab of existing creative
+    When User assigns a campaign to the creative using "Bulk Assign" option
+    Then User navigates to creative details and clicks Association tab
+    And Verify column selection icon is available and upon clicking it below columns should display
+        | Line Item Name |
+        | ID             |
+        | Status         |
+        | Campaign Name  |
+        | Start Date     |
+        | End Date       |
+    And Verify unselected columns are not displayed in the Association tab
+        | Start Date |
+        | End Date   |
+    And Verify if "Hide All" hides all the columns in the Association tab
+    And Verify if "Show All" displays all the columns in the Association tab
+        | Line Item Name |
+        | ID             |
+        | Status         |
+        | Campaign Name  |
+        | Start Date     |
+        | End Date       |
+
+  @regression
+  Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
+    When User assigns a campaign to the creative using "Bulk Assign" option
+    Then User navigates to creative details and clicks Association tab
+    And Verify filter icon is available and upon clicking it "Add Filter", "Done" and "No Filters applied." text should display
+    And User clicks "Add Filter", selects below filters and apply using "Done" button
+      | Line Item Name  |
+      | Campaign Name   |
+      | Line Item Dates |
+    And User navigates to Line item from Association Tab
