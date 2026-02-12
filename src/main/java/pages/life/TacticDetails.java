@@ -134,6 +134,7 @@ public class TacticDetails {
     public Locator customFieldValue(String customFieldName) {
         return page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
     }
+
     public List<String> getAllTactics() {
         return SAVED_TACTICS.allInnerTexts();
     }
@@ -392,8 +393,6 @@ public class TacticDetails {
         OPEN_GLOBAL_SEARCH.click();
         GLOBAL_SEARCH_INPUT_FIELD.fill(tacticName);
         GLOBAL_SEARCH_INPUT_FIELD.press("Enter");
-
-
     }
 
     public String getSearchText() {

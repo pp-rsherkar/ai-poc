@@ -68,7 +68,7 @@ public class TacticSettings {
     private final Locator PRACTICE_IP;
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
-    private final Locator VERIFY_TACTIC_NAME;
+    private final Locator TACTIC_NAME;
     private final Locator DISPLAY_TACTIC_NAME;
     private final Locator SELECTED_TARGET;
     private final Locator BLOCKED_TARGET;
@@ -134,7 +134,7 @@ public class TacticSettings {
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
         this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
         this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
-        this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
+        this.TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
         this.SELECTED_ONLY_TAB = page.locator("//span[contains(text(),'Selected Only')]");
         this.BLOCKED_TARGET = page.locator("//div[contains(@class,'danger')]");
         this.SELECTED_TARGET = page.locator("//div[contains(@class,'success')]");
@@ -666,7 +666,7 @@ public class TacticSettings {
     }
 
     public String verifyTacticName() {
-        return VERIFY_TACTIC_NAME.innerText();
+        return TACTIC_NAME.innerText();
     }
 
 
