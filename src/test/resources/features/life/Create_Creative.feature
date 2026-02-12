@@ -96,35 +96,35 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario Outline: Create new Creative Library entries for multiple Creative Types
     # Display
-    When User creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    When Verify data persistence when user creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                      |
       | Html         | HTMLCode:<html>Auto_Creative</html>, Size:1024x576, DomainLanding:pulsepoint.com                                        |
       | Image        | ImageFile:Display_Image.jpg, Size:1024x576, ClickThroughURL:https://www.pulsepoint.com, DomainLanding:pulsepoint.com    |
       | Html5        | ArchiveFile:HTML5_Template.zip, Size:1024x576, ClickThroughURL:https://www.pulsepoint.com, DomainLanding:pulsepoint.com |
     # Audio
-    And User creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                             |
       | Upload       | FileName:Creative_Audio.mp3, AdvertiserDomain:pulsepoint.com, IAB:Profane                      |
       | Audio URL    | URL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane     |
       | VAST URL     | VASTURL:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
       | VAST XML     | VASTXML:https://www.pulsepoint.com, Durations:60, AdvertiserDomain:pulsepoint.com, IAB:Profane |
     # Video
-    And User creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                        |
       | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane                                                                 |
       | Video URL    | Type:MP4, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane               |
       | VAST URL     | Type:STANDARD VAST, VASTURL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane |
       | VAST XML     | Type:VPAID, VASTXML:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane         |
     # Search Extension
-    And User creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                           |
       | Search       | Size:300x600, Headline:Test Automation Headline, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ClickThroughURL:pulsepoint.com, IAB:Profane |
     # Native Display
-    And User creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType   | CreativeAttributes                                                                                                                                                                                                                                      |
       | Native Display | ClickThroughURL:pulsepoint.com, DomainLanding:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com, ImageFile:NativeDisplay_Image.jpg |
     # Native Video
-    And User creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+    And Verify data persistence when user creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                                                                                                                                                                                                                   |
       | Upload       | FileName:Creative_Video.mp4, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com                                                                 |
       | Video URL    | Type:FLV, URL:https://www.pulsepoint.com, Durations:60, Width:100, Height:100, ClickThroughURL:pulsepoint.com, AdvertiserDomain:pulsepoint.com, IAB:Profane, Headline:Test Automation Headline, SponsoredBy:PulsePoint, Description:Test Automation Description, DisplayURL:https://www.pulsepoint.com               |
@@ -164,9 +164,9 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
       | CREATIVE_TYPE | ADVERTISER     | ADVERTISER_DSA | FINANCER      | STATUS   | FILE_NAME                      |
-      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate.xlsx |
-      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate.xlsx |
-      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate.xlsx |
+      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate1.xlsx |
+      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate1.xlsx |
+      | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate1.xlsx |
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Display Creatives
@@ -210,13 +210,12 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the AdChoices Icon should be "TopRight"
     And Verify default value of the Notes Column field should be "None"
     And Verify Rich Media checkbox should be present and selectable "Up"
-    And Verify that the user is able to browse the computer, select the "<FILE_TYPE>" file type, upload the "<FILE_NAME>" file, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
-    And Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
+    And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | FILE_TYPE  | FILE_NAME                |
-      | 01- Advertiser | test                   | google.com     | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | DCM File   | DCM_HTML_BulkUpload.xlsx |
-      | 01- Advertiser | test                   | google.com     | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | PulsePoint | Downloaded               |
-
+      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | DCM File   | DCM_HTML_BulkUpload.xlsx |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | PulsePoint |                          |
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Native Creatives
@@ -258,9 +257,44 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify default value of the File field should be "DCM File"
     And Verify default value of the Approval Status field is "Pending"
     And Verify default value of the AdChoices Icon should be "TopRight"
+    #And Verify user is able to upload images "<IMAGE_FILENAME>" to get a template with URLs
     And Verify default value of the Notes Column field should be "None"
-    And Verify that the user is able to browse the computer, select the "<FILE_TYPE>" file type, upload the "<FILE_NAME>" file, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>"
-    And Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
+    And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | FILE_TYPE | FILE_NAME                 |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | DCM File  | DCM_VIDEO_BulkUpload.xlsx |
+      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
+
+  @regression
+  Scenario: Verify Column Filter present on Association Tab of existing creative
+    When User assigns a campaign to the creative using "Bulk Assign" option
+    Then User navigates to creative details and clicks Association tab
+    And Verify column selection icon is available and upon clicking it below columns should display
+        | Line Item Name |
+        | ID             |
+        | Status         |
+        | Campaign Name  |
+        | Start Date     |
+        | End Date       |
+    And Verify unselected columns are not displayed in the Association tab
+        | Start Date |
+        | End Date   |
+    And Verify if "Hide All" hides all the columns in the Association tab
+    And Verify if "Show All" displays all the columns in the Association tab
+        | Line Item Name |
+        | ID             |
+        | Status         |
+        | Campaign Name  |
+        | Start Date     |
+        | End Date       |
+
+  @regression
+  Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
+    When User assigns a campaign to the creative using "Bulk Assign" option
+    Then User navigates to creative details and clicks Association tab
+    And Verify filter icon is available and upon clicking it "Add Filter", "Done" and "No Filters applied." text should display
+    And User clicks "Add Filter", selects below filters and apply using "Done" button
+      | Line Item Name  |
+      | Campaign Name   |
+      | Line Item Dates |
+    And User navigates to Line item from Association Tab

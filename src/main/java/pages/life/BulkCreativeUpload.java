@@ -61,6 +61,7 @@ public class BulkCreativeUpload {
     private final Locator WARNING_IMAGE_ICON;
     private final Locator CREATIVE_DROPDOWN_DETAILS_FROM_TABLE;
     private final Locator DOWNLOAD_BULK_UPLOAD_TEMPLATE;
+    private final Locator DURATION;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     CreateCreatives createCreatives = new CreateCreatives(DriverFactory.getPage());
     Constants constants = new Constants();
@@ -112,6 +113,7 @@ public class BulkCreativeUpload {
         this.WARNING_IMAGE_ICON = page.locator("//div[@class='preview-table-container']//img[contains(@src,'warning.svg')]");
         this.CREATIVE_DROPDOWN_DETAILS_FROM_TABLE = page.locator("select.selectBox");
         this.DOWNLOAD_BULK_UPLOAD_TEMPLATE = page.locator("//div[contains(@onclick,'BulkUploadTemplate')]");
+        this.DURATION = page.locator("//input[contains(@placeholder,'Duration')]");
     }
 
     public void clickBulkUploadButton() {
@@ -207,11 +209,6 @@ public class BulkCreativeUpload {
         return text;
     }
 
-    public void uploadDisplayCreativeTemplate(String fileName) {
-        String locator = "//div[contains(@title,'%s')]";
-        CommonUtils.uploadFile(page, 1, locator, fileName);
-    }
-
     public void updateCreativeName(String updatedCreativeName) {
         waitUtility.waitForLocatorVisible(BULK_UPLOAD_HEADER);
         CREATIVE_TEXT_DETAILS_FROM_TABLE.first().fill(updatedCreativeName);
@@ -250,6 +247,17 @@ public class BulkCreativeUpload {
         String locator = "//span[contains(@class,'reupload-image')]";
         CommonUtils.uploadFile(page, 0, locator, imageFileName);
     }
+
+    public void uploadSecondaryCreativeTemplate(String fileName) {
+        String locator = "//div[contains(@title,'%s')]";
+        CommonUtils.uploadFile(page, 1, locator, fileName);
+    }
+
+    public void uploadPrimaryCreativeTemplate(String fileName) {
+        String locator = "//div[contains(@title,'%s')]";
+        CommonUtils.uploadFile(page, 0, locator, fileName);
+    }
+
 
     public Path clickTemplateWithURLsLink() throws IOException {
         Download download = page.waitForDownload(TEMPLATE_WITH_URL_LINK::click);
@@ -399,6 +407,15 @@ public class BulkCreativeUpload {
         return true;
     }
 
+    public boolean isDurationVisibleAndBlank() {
+        for (int i = 0; i < DURATION.count(); i++) {
+            if (!DURATION.nth(i).isVisible() || !DURATION.nth(i).inputValue().trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void enterWidthHeight(String size) {
         String[] parts = size.split("x");
         if (parts.length == 2) {
@@ -412,6 +429,12 @@ public class BulkCreativeUpload {
         }
     }
 
+    public void enterDuration(String duration) {
+        for (int i = 0; i < DURATION.count(); i++) {
+            DURATION.nth(i).fill(duration);
+        }
+    }
+
     public void enterCreativeAndDSADetails(String advertiser, String advertiserDSA, String financer) {
         selectAdvertiser(advertiser);
         waitUtility.waitUntilSpinnerHidden();
@@ -422,7 +445,7 @@ public class BulkCreativeUpload {
     public void fillAttributes(String type, Map<String, String> attributeMap, String updatedCreativeName) throws IOException {
         switch (type) {
             case "Display", "Native":
-                uploadDisplayCreativeTemplate(attributeMap.get("FileName"));
+                uploadSecondaryCreativeTemplate(attributeMap.get("FileName"));
                 if (LANDING_PAGE_DOMAIN.isVisible()) enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 if (IAB_CATEGORY_DROPDOWN.isVisible()) typeIABCategory(attributeMap.get("IAB"));
                 selectApprovalStatus(attributeMap.get("Status"));
@@ -433,15 +456,19 @@ public class BulkCreativeUpload {
                 clickUploadButton();
                 break;
             case "HTML", "Video":
+//                if (type.contains("Video"))
+//                    uploadPrimaryCreativeTemplate(attributeMap.get("ImageFile"));
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), attributeMap.get("FileName"));
                 if (createCreatives.CLICK_THROUGH_URL.isVisible())
                     enterClickthroughURL(attributeMap.get("ClickThroughURL"));
                 enterLandingPageDomain(attributeMap.get("LandingDomain"));
                 selectApprovalStatus(attributeMap.get("Status"));
-                HTML_CREATIVE_NAME.fill(updatedCreativeName);
-                if (type.contains("Video")) enterWidthHeight(attributeMap.get("Size"));
                 clickPreviewButton();
-                checkIfValidationErrorsExist();
+                HTML_CREATIVE_NAME.fill(updatedCreativeName);
+                if (type.contains("Video")) {
+                    enterWidthHeight(attributeMap.get("Size"));
+                    DURATION.fill(attributeMap.get("Duration"));
+                }
                 clickUploadButton();
                 clickOKButton();
                 break;

@@ -94,27 +94,25 @@ public class LifeSteps {
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
-    public void set_environment(String environment, String user) {
+    public void set_environment(String environment, String user) throws Exception {
         userType = user;
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");
-            // If the feature indicates an external user, prefer external demo credentials if available, otherwise fall back
             if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
                 username = ConfigReader.getProperty("demoExternalUser");
                 password = ConfigReader.getProperty("demoExternalPassword");
             } else {
-                username = ConfigReader.getProperty("demoUser");
-                password = ConfigReader.getProperty("demoPassword");
+                username = ConfigReader.getInternalDemoUsername();
+                password = ConfigReader.getInternalDemoPassword();
             }
         } else if (environment.equals("Pre-release")) {
             url = ConfigReader.getProperty("preReleaseURL");
-            // If the test is for an external user, use the pre-release external credentials
             if (user != null && user.toLowerCase().contains("external")) {
                 username = ConfigReader.getProperty("preReleaseExternalUser");
                 password = ConfigReader.getProperty("preReleaseExternalPassword");
             } else {
-                username = ConfigReader.getProperty("preReleaseUser");
-                password = ConfigReader.getProperty("preReleasePassword");
+                username = ConfigReader.getInternalPreReleaseUsername();
+                password = ConfigReader.getInternalPreReleasePassword();
             }
         }
     }
@@ -1094,9 +1092,9 @@ public class LifeSteps {
         pmp.saveDealsAssigned();
     }
 
-    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Market and Deals section depending on toggle button {string}")
-    public void dealDetailsShouldAppearOnTacticSettingsTab(String toggleButton) {
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom, toggleButton));
+    @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status")
+    public void dealDetailsShouldAppearOnTacticSettingsTab() {
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom));
     }
 
     @And("Verify Delete icon is disabled and error message {string}")
@@ -1105,21 +1103,17 @@ public class LifeSteps {
         Assert.assertEquals(errorMessage, pmp.fetchMessageOnDeleteIconClick());
     }
 
-    @And("Verify Pricing Strategy is editable for Deals present in Curated Market and Deals section")
-    public void verifyPricingStrategyIsEditableForDealsPresentInCuratedMarketAndDealsSection(DataTable pricingStrategy) {
-        Map<String, String> rawMap = pricingStrategy.asMap(String.class, String.class);
-        Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
-        for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-            pmp.verifyPricingStrategyIsEditable(dealNameRandom, entry.getKey(), entry.getValue());
-        }
+    @And("Verify Pricing Strategy is editable and update it with {string} and {string} for Deals present in Curated Markets and Deals section")
+    public void verifyPricingStrategyIsEditableAndUpdateItWithAndForDealsPresentInCuratedMarketAndDealsSection(String pricingStrategy, String value) {
+        pmp.verifyPricingStrategyIsEditable(dealNameRandom, pricingStrategy, value);
     }
 
-    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Market and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string} with toggle {string}")
-    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator, String toggleButton) {
+    @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Markets and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator) {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
         dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator, toggleButton));
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator));
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
@@ -1488,7 +1482,7 @@ public class LifeSteps {
     @When("User performs {string} action using {string} option on multiple creatives - {string} and verifies the selected creatives are moved to {string} tab")
     public void userPerformsBulkArchiveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreMovedToArchivedTab(String bulkAction, String bulkActionOption, String noOfCreatives, String tabName) {
         createCreatives.clearSearchBox();
-        if(bulkAction.contains("Bulk Archive"))
+        if(bulkAction.equalsIgnoreCase("Bulk Archive"))
             createCreatives.clickActivityButton("Active");
         else
             createCreatives.clickActivityButton("Archived");
@@ -1743,7 +1737,7 @@ public class LifeSteps {
 
     @Then("Verify that the Create New List screen is displayed")
     public void verifyThatTheCreateListScreenIsDisplayed() {
-        Assert.assertTrue("", sharedList.verifyNewListPage());
+        Assert.assertTrue("The screen is not displayed", sharedList.verifyNewListPage());
     }
 
     @And("Verify that an error message is displayed when no listname {string} or {string} names are specified")
@@ -2209,16 +2203,16 @@ public class LifeSteps {
 
     @And("User uploads a valid file {string} for {string} creative")
     public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
-        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
     }
 
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) throws IOException {
         Path latestFile = CommonUtils.getMostRecentFileFromDownloads();
         if(fileName.contains("Downloaded"))
-            bulkCreativeUpload.uploadDisplayCreativeTemplate(String.valueOf(latestFile.getFileName()));
+            bulkCreativeUpload.uploadSecondaryCreativeTemplate(String.valueOf(latestFile.getFileName()));
         else
-            bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+            bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
         itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
         bulkCreativeUpload.clickPreviewButton();
         bulkCreativeUpload.clickOKButton();
@@ -2295,7 +2289,7 @@ public class LifeSteps {
 
     @And("User is able to browse and select a template {string} from the system")
     public void userIsAbleToBrowseAndSelectATemplateFromTheSystem(String fileName) {
-        bulkCreativeUpload.uploadDisplayCreativeTemplate(fileName);
+        bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
     }
 
     @And("Verify default value of the Approval Status field is {string}")
@@ -2337,28 +2331,28 @@ public class LifeSteps {
 
     @And("Verify Advertiser field should be mandatory")
     public void verifyAdvertiserFieldShouldBeMandatory() {
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Select Advertiser", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify that the Landing Domain field is mandatory when all other required fields, including {string} are filled")
     public void verifyLandingDomainFieldShouldBeMandatoryByEnteringOtherMandatoryFields(String advertiser) {
         bulkCreativeUpload.selectAdvertiser(advertiser);
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Landing Page Domain is required", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify that an appropriate error message is displayed when invalid data {string} is entered for the Landing Domain")
     public void verifyThatAnAppropriateErrorMessageIsDisplayedWhenInvalidDataIsEnteredForTheLandingDomain(String invalidLandingDomain) {
         bulkCreativeUpload.enterLandingPageDomain(invalidLandingDomain);
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         Assert.assertEquals("Landing Page Domain is not valid.", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify only valid Landing Domain {string} values should be permitted")
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
-        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify default value of the File field should be {string}")
@@ -2383,23 +2377,22 @@ public class LifeSteps {
         bulkCreativeUpload.selectAndClickDirection(direction);
     }
 
-    @And("Verify that the user is able to browse the computer, select the {string} file type, upload the {string} file, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}")
-    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String fileType, String fileName, String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName) throws IOException {
+    @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
+    public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, String size, String duration, String fileType, String fileName) throws IOException {
         nameList.clear();
-        itemList.clear();
         bulkCreativeUpload.selectAdvertiser(advertiser);
         bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
         bulkCreativeUpload.enterFinancer(financer);
         bulkCreativeUpload.selectFileTypeAndUploadFile(fileType, fileName);
         bulkCreativeUpload.enterLandingPageDomain(landingDomain);
         bulkCreativeUpload.selectApprovalStatus(status);
+        bulkCreativeUpload.clickPreviewButton();
         nameList = bulkCreativeUpload.enterCreativeName(creativeName);
-        if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight("800x250");
+        if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight(size);
+        if (bulkCreativeUpload.isDurationVisibleAndBlank()) bulkCreativeUpload.enterDuration(duration);
         bulkCreativeUpload.clickUploadButton();
-        itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
         bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
-
     }
 
     @And("Verify user is able to type in {string} categories")
@@ -2409,7 +2402,7 @@ public class LifeSteps {
 
     @And("Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
-        bulkCreativeUpload.clickOKButton();
+        bulkCreativeUpload.clickPreviewButton();
         List<String> expectedMessages = Arrays.asList("Clickthrough URL is required", "Landing Page Domain is required");
         Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
     }
@@ -2417,7 +2410,7 @@ public class LifeSteps {
     @And("Verify only valid Clickthrough URL {string} values should be permitted")
     public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
         bulkCreativeUpload.enterClickthroughURL(validURL);
-        Assert.assertEquals("", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
     }
 
     @And("Verify data persistence when user creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
@@ -4166,15 +4159,88 @@ public class LifeSteps {
         npiLists.searchList(npiListName);
         npiLists.openSearchedList(npiListName);
     }
+    @Then("User navigates to creative details and clicks Association tab")
+    public void userNavigatesToCreativeDetailsAndClickOnAssociationTab() {
+        createCreatives.searchCreative(metricName);
+        createCreatives.clickSearchedCreative(metricName);
+        createCreatives.clickAssociationTab();
+    }
+
+    @And("Verify column selection icon is available and upon clicking it below columns should display")
+    public void verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(DataTable dataTable) {
+        List<String> expectedColumnNames = dataTable.asList(String.class);
+        createCreatives.clickColumnSelectionIcon();
+        List<String> actualColumnNames = createCreatives.fetchColumnNamesFromSelectionIconList();
+        Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
+    }
 
     @And("User searches and selects the campaign {string}")
     public void userSearchesAndSelectsTheCampaign(String campaignName) {
         campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.navigateToCampaign(campaignName);
     }
+    @And("Verify unselected columns are not displayed in the Association tab")
+    public void verifyUnselectedColumnsAreNotDisplayedInTheAssociationTab(DataTable dataTable) {
+        List<String> unselectedColumnNames = dataTable.asList(String.class);
+        createCreatives.deselectColumnNamesFromSelectionIconList(unselectedColumnNames);
+        List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
+        for (String name : unselectedColumnNames) {
+            Assert.assertFalse(name + " column is still displayed in Association tab after deselecting it", columnName.contains(name));
+        }
+    }
 
     @Then("Verify that the campaign page is displayed")
     public void verifyThatTheCampaignPageIsDisplayed() {
         Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
+    }
+
+    @And("Verify if {string} hides all the columns in the Association tab")
+    public void verifyIfHidesAllTheColumnsInTheAssociationTab(String buttonName) {
+        createCreatives.clickColumnSelectionIcon();
+        createCreatives.clickMenuButtonFromColumnSelection(buttonName);
+        List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
+        Assert.assertTrue("Column names are available", columnName.isEmpty());
+    }
+
+    @And("Verify if {string} displays all the columns in the Association tab")
+    public void verifyIfDisplaysAllTheColumnsInTheAssociationTab(String buttonName, DataTable dataTable) {
+        List<String> expectedColumnNames = dataTable.asList(String.class);
+        createCreatives.clickColumnSelectionIcon();
+        createCreatives.clickMenuButtonFromColumnSelection(buttonName);
+        List<String> actualColumnNames = createCreatives.fetchColumnNamesFromAssociationsTab();
+        Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
+    }
+
+    @And("Verify filter icon is available and upon clicking it {string}, {string} and {string} text should display")
+    public void verifyFilterIconIsAvailableAndUponClickingItAndTextShouldDisplay(String button1, String button2, String text) {
+        createCreatives.clickFilterIcon();
+        List<String> filterFields = createCreatives.fetchFilterFields();
+        Assert.assertTrue("Add Filter button is not available", filterFields.contains(button1));
+        Assert.assertTrue("Done button is not available", filterFields.contains(button2));
+        Assert.assertTrue("No Filters applied text is not available", filterFields.contains(text));
+    }
+
+    @And("User clicks {string}, selects below filters and apply using {string} button")
+    public void userClicksSelectsBelowFiltersAndApplyUsingButton(String addFilterButton, String doneButton, DataTable dataTable) {
+        List<String> filterName = dataTable.asList(String.class);
+        lineItemNameRandom = createCreatives.fetchLineItemFromAssociation();
+        String campaignName = createCreatives.fetchCampaignFromAssociation();
+        for (String name : filterName) {
+            createCreatives.clickFilterButton(addFilterButton);
+            createCreatives.selectFilterName(name);
+            if (name.contains("Line Item Name"))
+                createCreatives.enterFilterValue(lineItemNameRandom);
+            else if (name.contains("Campaign Name"))
+                createCreatives.enterFilterValue(campaignName);
+            else
+                createCreatives.enterDates();
+        }
+        createCreatives.clickFilterButton(doneButton);
+        Assert.assertEquals("1 records", createCreatives.fetchFilteredRecordsCount());
+    }
+
+    @And("User navigates to Line item from Association Tab")
+    public void userNavigatesToLineItemFromAssociationTab() {
+        Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
     }
 }
