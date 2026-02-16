@@ -390,8 +390,8 @@ public class TacticDetails {
     }
 
     public boolean getToggleIcon() {
-        Locator TACTIC_TOGGLE = page.locator(("//label[normalize-space()='Enabled']"));
-        return TACTIC_TOGGLE.isVisible();
+        Locator TACTIC_TOGGLE = page.locator(("//label[normalize-space()='Enabled']/preceding-sibling::input"));
+        return TACTIC_TOGGLE.isChecked();
     }
 
 
