@@ -72,6 +72,13 @@ public class StudioSteps {
         Assert.assertEquals("HCP Audience Expansion", actualHCPEAudienceExpansion);
     }
 
+    @Then("the user selects the advertiser {string}")
+    public void the_user_selects_the_advertiser(String advertiser) {
+        DriverFactory.getPage().waitForLoadState();
+        expansionWorkspace.clickAdvertiserDropdown(advertiser);
+        DriverFactory.getPage().waitForLoadState();
+    }
+
     @Then("the user selects Source Audience {string}")
     public void the_user_selects_source_audience(String sourceAudience) {
         logger.info("Selecting source audience: {}", sourceAudience);
@@ -227,19 +234,23 @@ public class StudioSteps {
             Assert.assertEquals("HCP Explorer", explorer);
         }
         workspaceCreation.clickHCPExplorerWorkspace();
-        String alert = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Workspace creation alert: {}", alert);
-        Assert.assertEquals("Workspace created successfully", alert);
     }
 
-    @Then("User adds the workspace name as {string} and selects the advertiser {string}")
-    public void user_adds_the_workspace_name_and_selects_the_advertiser(String wName, String advertiser) {
-        workspace.waitTillWorkspaceAlertHide();
-        workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
-        logger.info("Adding workspace name: {} and selecting advertiser: {}", workspaceName, advertiser);
-        explorerWorkspace.enterWorkspaceName(workspaceName);
+    @And("User selects the advertiser {string}")
+    public void userSelectsTheAdvertiser(String advertiser) {
         explorerWorkspace.selectAdvertiser(advertiser);
+        Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
+    }
+
+    @And("User updates the workspace name as {string}")
+    public void userUpdatesTheWorkspaceNameAs(String wName) {
+        workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Adding workspace name: {}", workspaceName);
+        explorerWorkspace.waitForDashboardLoad();
+        explorerWorkspace.clickEditWorkspace();
+        explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitForDashboardLoad();
     }
 
     @When("User applies the filter and selects option")
@@ -319,6 +330,7 @@ public class StudioSteps {
         workspaceName = editedName + CommonUtils.timeStampCalculation();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitForDashboardLoad();
     }
 
     @Then("Verify the Workspace is updated with edited name")
@@ -475,7 +487,6 @@ public class StudioSteps {
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
         logger.info("User clicks request method: {}", requestType);
-        if (requestType.contains("POST")) workspace.clickWebhookIcon();
         workspace.clickRequestOrContentButton(requestType);
     }
 

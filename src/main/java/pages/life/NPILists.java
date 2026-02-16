@@ -28,7 +28,7 @@ public class NPILists {
     public NPILists(Page page) {
         this.page = page;
         this.NPI_LISTS = page.locator("//div[contains(@class, 'menu') and contains(text(),'NPI Lists')]");
-        this.NPI_LISTS_STG = page.getByText("NPI Lists");
+        this.NPI_LISTS_STG = page.locator("//span[normalize-space(text())='NPI Lists']");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
         this.SEARCH_NPI_LISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
@@ -46,6 +46,7 @@ public class NPILists {
         waitUtility.waitForLocatorVisible(NPI_LISTS);
         NPI_LISTS.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(NPI_LISTS_STG);
     }
 
     public void clickNPIListsStg() {
