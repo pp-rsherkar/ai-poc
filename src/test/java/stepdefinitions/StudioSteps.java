@@ -74,9 +74,11 @@ public class StudioSteps {
 
     @Then("the user selects the advertiser {string}")
     public void the_user_selects_the_advertiser(String advertiser) {
+        logger.info("Selecting advertiser: '{}'", advertiser);
         DriverFactory.getPage().waitForLoadState();
         expansionWorkspace.clickAdvertiserDropdown(advertiser);
         DriverFactory.getPage().waitForLoadState();
+        logger.info("Advertiser '{}' selected successfully", advertiser);
     }
 
     @Then("the user selects Source Audience {string}")
@@ -227,19 +229,26 @@ public class StudioSteps {
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
         logger.info("User clicks on HCP Explorer workspace");
+
         if (fetchedMetricNames.contains("HCP Explorer")) {
             logger.info("HCP Explorer permission is available");
             String explorer = workspaceCreation.verifyHCPExplorer();
             logger.info("HCP Explorer permission: {}", explorer);
             Assert.assertEquals("HCP Explorer", explorer);
         }
+
         workspaceCreation.clickHCPExplorerWorkspace();
     }
 
     @And("User selects the advertiser {string}")
     public void userSelectsTheAdvertiser(String advertiser) {
+        logger.info("Selecting advertiser '{}' in Explorer Workspace", advertiser);
         explorerWorkspace.selectAdvertiser(advertiser);
-        Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
+        logger.info("Verifying workspace creation success alert");
+        String alertText = workspaceCreation.isWorkspaceCreationAlertDisplayed();
+        logger.info("Fetched alert text: '{}'", alertText);
+        Assert.assertEquals("Workspace created successfully", alertText);
+        logger.info("Advertiser selected and workspace created successfully");
     }
 
     @And("User updates the workspace name as {string}")
@@ -285,6 +294,7 @@ public class StudioSteps {
         logger.info("Verifying applied filters are displayed correctly");
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
         logger.info("Displayed filters from UI: {}", displayedFilters);
+
         for (String appliedFilter : appliedFilterEntries) {
             logger.info("Validating displayed filter for: {}", appliedFilter);
             String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
@@ -295,11 +305,13 @@ public class StudioSteps {
                 boolean wordMatch = Arrays.stream(appliedNorm.split(" ")).anyMatch(word -> word.length() > 3 && displayedNorm.contains(word));
                 boolean prescriptionRoot = appliedNorm.contains("prescri") && displayedNorm.contains("prescri");
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
+
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
                     logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
                             appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
                     return true;
                 }
+
                 return false;
             });
             logger.info("Filter '{}' match found: {}", appliedFilter, matchFound);
@@ -416,10 +428,12 @@ public class StudioSteps {
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
         logger.info("Verifying NPI count in downloaded {} file for header: {}", fileExtension, npiHeader);
         int npiCountFromFile = 0;
+
         if (fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if (fileExtension.equalsIgnoreCase("XLSX"))
             npiCountFromFile = FileActions.fetchColumnCountFromExcel(targetFilePath, npiHeader);
+
         logger.info("NPI count from UI: {}, NPI count from file: {}", npiCount, npiCountFromFile);
         Assert.assertEquals("NPI count is not matching", Integer.parseInt(npiCount), npiCountFromFile);
     }
@@ -602,6 +616,7 @@ public class StudioSteps {
     @Then("Verify the filter is applied correctly {string}")
     public void verifyTheFilterIsAppliedCorrectly(String primaryFilter) {
         logger.info("Verifying AI-applied filters");
+
         if (flag) {
             List<String> appliedFilters = explorerWorkspace.verifyAllSelectedFilters();
             List<String> expectedFilters = CommonUtils.parseCommaSeparatedString(primaryFilter);
@@ -610,6 +625,7 @@ public class StudioSteps {
                 boolean isFilterApplied = appliedFilters.stream().anyMatch(filter -> filter.equalsIgnoreCase(expected));
                 Assert.assertTrue("The filter '" + expected + "' is not applied correctly", isFilterApplied);
             }
+
             isOverwritten = true;
         } else {
             Assert.fail("AI is unable to build audience");
@@ -845,6 +861,7 @@ public class StudioSteps {
     @And("User enables the {string} permission for the {string} advertiser")
     public void userEnablesThePermissionForTheAdvertiser(String advertiserPermissions, String advertiserName) {
         logger.info("Enabling advertiser permission '{}' for advertiser '{}'", advertiserPermissions, advertiserName);
+
         if (!advertiserPermissions.isBlank()) {
             accounts.enableAdvertiserPermission(advertiserName, advertiserPermissions);
         }
@@ -878,6 +895,7 @@ public class StudioSteps {
     @Then("External user should be able to see the {string} permission in the workspace")
     public void externalUserShouldBeAbleToSeeThePermissionInTheWorkspace(String permissions) {
         logger.info("Verifying external user permission in workspace: {}", permissions);
+
         if (permissions.equals("MOMENTS") || permissions.equals("IB HEALTH") || permissions.equals("CLAIMS DATA")) {
             Assert.assertTrue(explorerWorkspace.verifyPermissionFilters(permissions));
             Assert.assertTrue(explorerWorkspace.verifyWidgets(permissions));
@@ -919,6 +937,7 @@ public class StudioSteps {
         logger.info("Verifying Owned And Operated section is {}", visibilityFlag);
         boolean flag = explorerWorkspace.isOwnedAndOperatedSectionAvailable();
         logger.info("Owned And Operated section availability: {}", flag);
+
         switch (visibilityFlag.toLowerCase()) {
             case "present":
                 Assert.assertTrue("Expected 'Owned and Operated' section to be present, but it was absent.", flag);
@@ -947,7 +966,6 @@ public class StudioSteps {
         logger.info("Navigating to Studio application");
         navigation.navigateToStudio();
     }
-
 
     @And("User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
     public void userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(String filterType, DataTable dataTable) {

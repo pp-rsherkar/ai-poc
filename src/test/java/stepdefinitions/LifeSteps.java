@@ -1187,15 +1187,22 @@ public class LifeSteps {
 
     @And("Verify only Custom date range Flights from {string} to {string} should render on the Dashboard if available")
     public void verifyOnlyCustomDateRangeFlightsShouldRenderOnTheDashboardIfAvailable(String startDate, String endDate) {
+        logger.info("Verifying dashboard reflects flights for custom date range: {} to {}", startDate, endDate);
         boolean flag = campaignDashboard.isCampaignDataAvailableInCustomDateRange();
-        if (flag)
+        logger.info("Is campaign data empty/unavailable in custom date range: {}", flag);
+
+        if (flag) {
+            logger.info("No campaign data is available in range, bypassing date bounds verification");
             Assert.assertTrue("No campaign data is available", true);
-        else {
+        } else {
             List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
+            logger.info("Fetched flight dates from dashboard: {}", dates);
             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             LocalDate start = LocalDate.parse(startDate, inputFormatter);
             LocalDate end = LocalDate.parse(endDate, inputFormatter);
+            logger.info("Parsed validation bounds - Start: {}, End: {}", start, end);
             boolean allDatesInCurrentMonth = dates.stream().noneMatch(date -> date.isBefore(start) || date.isAfter(end));
+            logger.info("All dates fall within the custom range: {}", allDatesInCurrentMonth);
             Assert.assertTrue("Only flights within the selected date range should be visible on the Dashboard", allDatesInCurrentMonth);
         }
     }
@@ -1203,9 +1210,14 @@ public class LifeSteps {
     @When("User clicks the Settings icon and selects the following group by options and verify dashboard data is grouped accordingly")
     public void userClicksTheSettingsIconAndSelectsTheFollowingGroupByOptions(DataTable dataTable) {
         List<String> groupByOption = dataTable.asList(String.class);
+        logger.info("Initiating dashboard grouping verification for options: {}", groupByOption);
+
         for (String option : groupByOption) {
             campaignDashboard.clickSettingIcon();
-            Assert.assertTrue("Dashboard data is not grouped by the selected options - " + option, campaignDashboard.clickGroupByOptionsAndCheckDashboardData(option));
+            logger.info("Selecting '{}' and validating dashboard data grouping", option);
+            boolean isGrouped = campaignDashboard.clickGroupByOptionsAndCheckDashboardData(option);
+            logger.info("Data grouped correctly for '{}': {}", option, isGrouped);
+            Assert.assertTrue("Dashboard data is not grouped by the selected options - " + option, isGrouped);
         }
     }
 
@@ -1402,7 +1414,11 @@ public class LifeSteps {
 
     @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status")
     public void dealDetailsShouldAppearOnTacticSettingsTab() {
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.verifyAssignedDealsOnTactic(dealNameRandom));
+        logger.info("Verifying deal details appear on Tactic Settings tab under Targeting and Curated Markets/Deals sections");
+        boolean areDealsPresent = pmp.verifyAssignedDealsOnTactic(dealNameRandom);
+        logger.info("Are assigned deals present on tactic: {}", areDealsPresent);
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", areDealsPresent);
+        logger.info("Deal details verification completed successfully");
     }
 
     @And("Verify Delete icon is disabled and error message {string}")
@@ -1423,10 +1439,16 @@ public class LifeSteps {
 
     @And("Verify user can add new {string} deals by clicking Add Deal button present in Curated Markets and Deals section using details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
     public void verifyUserCanApplyDealsByClickingAddDealButtonPresentInCuratedMarketAndDealsSection(String dealType, String exchangeType, String dealID, String dealName, String mediaType, String advertiser, String dealPriceType, String price, String curator) {
+        logger.info("Initiating addition of new '{}' deal from Curated Markets and Deals section", dealType);
+        logger.info("Provided details - Exchange: {}, Deal ID Base: {}, Name Base: {}, Media Type: {}, Advertiser: {}", exchangeType, dealID, dealName, mediaType, advertiser);
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         dealIDRandom = dealID + CommonUtils.timeStampCalculation() + "_01";
         dealNameRandom = dealName + CommonUtils.timeStampCalculation() + "_01";
-        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator));
+        logger.info("Generated unique Deal ID: {} and Deal Name: {} for assignment", dealIDRandom, dealNameRandom);
+        boolean isDealApplied = pmp.applyDealsFromDealsSection(dealType, exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator);
+        logger.info("Deal application and presence status: {}", isDealApplied);
+        Assert.assertTrue("Assigned Deals are not present under targeting and deals section", isDealApplied);
+        logger.info("New deal successfully added and verified");
     }
 
     @And("Verify Base Bid Price {string} and Max Bid Price {string} fields are editable when deals are targeted")
@@ -1733,43 +1755,74 @@ public class LifeSteps {
 
     @And("Check Activity buttons {string} and verify following filters are available and working")
     public void checkActivityButtonsAndVerifyFollowingFiltersAreAvailableAndWorking(String buttonType, DataTable filters) {
+        logger.info("Initiating verification for Activity button: '{}' and associated filters", buttonType);
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
+        logger.info("Processed filters map: {}", filtersMap);
+        logger.info("Clicking Activity button: '{}'", buttonType);
         createCreatives.clickActivityButton(buttonType);
-        Assert.assertTrue("Activity " + buttonType + " button is not present", createCreatives.isArchiveUnarchiveButtonsPresent(buttonType));
-        if(buttonType.equals("Active"))
-            Assert.assertTrue("Not all content on Creative Library page is Active", createCreatives.showsActiveCreativesWhenActiveClicked());
-        else if(buttonType.equals("Archived"))
-            Assert.assertTrue("Not all content on Creative Library page is Archived", createCreatives.showsArchivedCreativesWhenArchivedClicked());
+        boolean isButtonPresent = createCreatives.isArchiveUnarchiveButtonsPresent(buttonType);
+        logger.info("Activity button '{}' presence status: {}", buttonType, isButtonPresent);
+        Assert.assertTrue("Activity " + buttonType + " button is not present", isButtonPresent);
+
+        if(buttonType.equals("Active")) {
+            logger.info("Verifying all content on Creative Library page is 'Active'");
+            boolean isAllActive = createCreatives.showsActiveCreativesWhenActiveClicked();
+            logger.info("Active creatives visibility status: {}", isAllActive);
+            Assert.assertTrue("Not all content on Creative Library page is Active", isAllActive);
+        } else if(buttonType.equals("Archived")) {
+            logger.info("Verifying all content on Creative Library page is 'Archived'");
+            boolean isAllArchived = createCreatives.showsArchivedCreativesWhenArchivedClicked();
+            logger.info("Archived creatives visibility status: {}", isAllArchived);
+            Assert.assertTrue("Not all content on Creative Library page is Archived", isAllArchived);
+        }
+
+        logger.info("Iterating through {} filters to verify filter options", filtersMap.size());
+
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
+            logger.info("Navigating to first creative page before applying filter: {}", entry.getKey());
             createCreatives.navigateToFirstCreativePage();
+            logger.info("Verifying filter option - Key: {}, Expected Values: {}", entry.getKey(), entry.getValue());
             flag = createCreatives.verifyFilterOptions(entry.getKey(), entry.getValue());
+            logger.info("Filter verification result for '{}': {}", entry.getKey(), flag);
             Assert.assertTrue("Creative Library page does not display values for all content " + entry.getValue(), flag);
         }
-    }
 
+        logger.info("Successfully verified Activity button '{}' and all provided filters", buttonType);
+    }
 
     @And("Verify the following sort options are available and working")
     public void verifyTheFollowingSortOptionsAreAvailableAndWorking(DataTable sortOptions) {
         List<String> sortOptionsList = sortOptions.asList(String.class);
+        logger.info("Verifying sort options: {}", sortOptionsList);
+
         for(String sortOption : sortOptionsList){
-            Assert.assertTrue(sortOption + " is not working correctly", createCreatives.checkSortingOrder(sortOption));
+            boolean isWorking = createCreatives.checkSortingOrder(sortOption);
+            Assert.assertTrue(sortOption + " is not working correctly", isWorking);
         }
+
+        logger.info("All sort options verified successfully");
     }
 
     @And("Verify Search Box is available and working")
     public void verifySearchBoxIsAvailableAndWorking(DataTable searchValues) {
         List<String> searchValuesList = searchValues.asList(String.class);
+        logger.info("Verifying search functionality for values: {}", searchValuesList);
         createCreatives.clickActivityButton("Active");
+
         for(String searchValue : searchValuesList){
             createCreatives.searchCreative(searchValue);
-            Assert.assertTrue("Search is not working for value: " + searchValue, createCreatives.checkSearchedValue(searchValue));
+            boolean isFound = createCreatives.checkSearchedValue(searchValue);
+            Assert.assertTrue("Search is not working for value: " + searchValue, isFound);
         }
+
+        logger.info("Search functionality verified successfully");
     }
 
     @And("User checks Copy option is working for creative and verify details before and after saving the creative")
     public void verifyCopyOptionIsAvailableAndWorking() {
         String creativeName = "Copy_Creative_" + CommonUtils.timeStampCalculation();
+        logger.info("Testing Creative Copy option. Target name: {}", creativeName);
         metricName = createCreatives.selectCheckboxWithArchiveButton();
         createCreatives.searchCreative(metricName);
         createCreatives.clickCopyCreative(metricName);
@@ -1781,149 +1834,196 @@ public class LifeSteps {
         List<String> fetchCreativeDetailsAfterSave = createCreatives.fetchCreativeDetails();
         createCreatives.clickCancelButton();
         Assert.assertEquals("Creative details are not matched", fetchCreativeDetailsBeforeSave, fetchCreativeDetailsAfterSave);
+        logger.info("Copy option and data persistence verified successfully");
     }
 
     @And("User checks Archive option is working for creative and verify the creative is moved to {string} tab")
     public void userChecksArchiveOptionIsWorkingForCreativeAndVerifyTheCreativeIsMovedToArchivedTab(String tabName) {
+        logger.info("Testing Archive option and verifying movement to '{}' tab", tabName);
         String archiveCreative = createCreatives.clickArchiveButton();
         createCreatives.clickActivityButton(tabName);
         createCreatives.searchCreative(archiveCreative);
         Assert.assertTrue(archiveCreative + " - creative is not available on " + tabName, createCreatives.checkSearchedValue(archiveCreative));
+        logger.info("Archive functionality verified successfully");
     }
 
     @And("User checks Unarchive option is working for creative and verify the creative is moved to {string} tab")
     public void userChecksArchiveOptionIsWorkingForCreativeAndVerifyTheCreativeIsMovedToUnarchivedTab(String tabName) {
+        logger.info("Testing Unarchive option and verifying movement to '{}' tab", tabName);
         String unarchiveCreative = createCreatives.clickUnarchiveButton();
         createCreatives.clickActivityButton(tabName);
         createCreatives.searchCreative(unarchiveCreative);
         Assert.assertTrue(unarchiveCreative + " - creative is not available on " + tabName, createCreatives.checkSearchedValue(unarchiveCreative));
+        logger.info("Unarchive functionality verified successfully");
     }
 
     @When("User clicks on {string} tab and verify following filters value")
     public void userClicksOnTabAndVerifyFollowingFiltersValue(String tabName, DataTable filters) {
+        logger.info("Verifying filters on '{}' tab", tabName);
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(tabName);
+
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
             List<String> fetchedFilterValues = createCreatives.fetchFilterValues(entry.getKey());
             Assert.assertEquals("Creative details are not matched", entry.getValue(), fetchedFilterValues);
         }
+
+        logger.info("Filter values verified successfully");
     }
 
     @When("User selects pagination values {string} from the dropdown")
     public void userSelectsPaginationValuesFromTheDropdown(String paginationValue) {
+        logger.info("Selecting pagination value: {}", paginationValue);
         createCreatives.selectPaginationItemsPerPage(paginationValue);
     }
 
     @And("Verify pagination is working properly on the Creative Library page")
     public void verifyPaginationIsWorkingProperlyOnTheCreativeLibraryPage() {
-        Assert.assertTrue("Pagination is not working properly", createCreatives.fetchCreativeCount());
+        logger.info("Verifying pagination functionality on Creative Library page");
+        boolean isWorking = createCreatives.fetchCreativeCount();
+        Assert.assertTrue("Pagination is not working properly", isWorking);
+        logger.info("Pagination verified successfully");
     }
 
     @When("User assigns a campaign to the creative using {string} option")
     public void userAssignsACampaignToTheCreative(String bulkActionOption) {
+        logger.info("Assigning campaign to creative via bulk action: {}", bulkActionOption);
         metricName = createCreatives.selectCheckboxWithArchiveButton();
         createCreatives.clickBulkActionsButton();
         createCreatives.selectBulkActionsOption(bulkActionOption);
         Assert.assertEquals("Bulk Assign Successful", createCreatives.assignCampaignToCreative());
+        logger.info("Campaign assigned to creative successfully");
     }
 
     @Then("Verify user is not able to delete a creative associated with a Campaign and appropriate error message is displayed")
     public void verifyUserIsNotAbleToDeleteACreativeAssociatedWithACampaignAndAppropriateErrorMessageIsDisplayed() {
+        logger.info("Verifying deletion restriction for creatives associated with running campaigns");
         createCreatives.searchCreative(metricName);
         Assert.assertEquals("Creatives that have 1 or more running campaigns cannot be archived.", createCreatives.fetchTooltipTextForAssignedCampaigns());
         createCreatives.clickSearchedCreative(metricName);
         Assert.assertEquals("Delete icon is disabled, cannot delete the creative.", createCreatives.deleteCreative());
         createCreatives.clickCancelButton();
         createCreatives.clearSearchBox();
+        logger.info("Deletion restriction verified successfully");
     }
 
     @And("User deletes a creative not associated with any Campaign")
     public void userDeletesACreativeNotAssociatedWithAnyCampaign() {
+        logger.info("Initiating deletion of an unassigned creative");
         metricName = createCreatives.selectCheckboxWithArchiveButton();
         createCreatives.searchCreative(metricName);
         createCreatives.clickSearchedCreative(metricName);
         Assert.assertEquals("You are about to delete "+ metricName +".This action cannot be undone: all deleted data will be lost.Do you want to proceed?", createCreatives.deleteCreative());
+        logger.info("Creative deletion initiated successfully");
     }
 
     @And("Verify the creative is removed from the Creative Library page")
     public void verifyTheCreativeIsRemovedFromTheCreativeLibraryPage() {
+        logger.info("Verifying creative removal from library: {}", metricName);
         createCreatives.searchCreative(metricName);
-        Assert.assertEquals("Nothing Found", createCreatives.fetchNoCreativeFoundMessage());
+        String notFoundMessage = createCreatives.fetchNoCreativeFoundMessage();
+        Assert.assertEquals("Nothing Found", notFoundMessage);
+        logger.info("Creative removal verified successfully");
     }
 
     @When("User clicks on Preview icon for a creative from Creative Library page")
     public void userClicksOnPreviewIconForACreative() {
+        logger.info("Clicking Preview icon for a creative in the library");
         metricName = createCreatives.clickCreativeTypeIconAndFetchCreativeName();
+        logger.info("Previewing creative: {}", metricName);
     }
 
     @Then("Verify Creative Preview tab is displayed with correct creative name")
     public void verifyCreativePreviewTabIsDisplayedWithCorrectCreativeName() {
+        logger.info("Verifying Creative Preview tab details");
         Assert.assertEquals("Creative Preview", createCreatives.isCreativePreviewTabDisplayed());
         Assert.assertTrue("Creative name in preview tab does not match expected name", createCreatives.fetchCreativeNameFromPreviewTab().contains(metricName));
+        logger.info("Creative Preview tab verified successfully");
     }
 
     @And("Verify user is able to close the Creative Preview tab")
     public void verifyUserIsAbleToCloseTheCreativePreviewTab() {
+        logger.info("Closing Creative Preview tab");
         createCreatives.closeCreativePreviewTab();
     }
 
     @And("User searches the creative and clicks the creative details from Creative Library page")
     public void userSearchesTheCreativeAndClicksTheCreativeDetailsFromCreativeLibraryPage() {
+        logger.info("Searching and opening creative details for: {}", metricName);
         createCreatives.searchCreative(metricName);
         createCreatives.clickSearchedCreative(metricName);
     }
 
     @And("User clicks on Preview link from Creative Details page")
     public void userClicksOnPreviewLinkFromCreativeDetailsPage() {
+        logger.info("Clicking Preview link from Creative Details page");
         createCreatives.clickPreviewLinkFromCreativeDetailsPage();
     }
 
     @When("User performs {string} action using {string} option on multiple creatives - {string} and verifies the selected creatives are moved to {string} tab")
     public void userPerformsBulkArchiveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreMovedToArchivedTab(String bulkAction, String bulkActionOption, String noOfCreatives, String tabName) {
+        logger.info("Performing bulk action: {} ({}) on {} creatives", bulkAction, bulkActionOption, noOfCreatives);
         createCreatives.clearSearchBox();
+
         if(bulkAction.equalsIgnoreCase("Bulk Archive"))
             createCreatives.clickActivityButton("Active");
         else
             createCreatives.clickActivityButton("Archived");
+
         nameList.clear();
+
         for(int i=0; i<Integer.parseInt(noOfCreatives); i++){
             nameList.add(createCreatives.selectCheckboxWithArchiveButton());
         }
+
         createCreatives.clickBulkActionsButton();
         createCreatives.selectBulkActionsOption(bulkActionOption);
+        logger.info("Verifying creatives moved to '{}' tab", tabName);
         createCreatives.clickActivityButton(tabName);
+
         for(String name : nameList){
             createCreatives.searchCreative(name);
             Assert.assertTrue("Creative " + name + " is not found in the " + tabName + " tab", createCreatives.checkSearchedValue(name));
         }
+
+        logger.info("Bulk action and verification completed successfully");
     }
 
     @And("User performs Bulk approve action using {string} option on multiple creatives - {string} with status other than Approved and verifies the selected creatives are marked as {string}")
     public void userPerformsBulkApproveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreRemovedFromTheCreativeLibraryPage(String bulkActionOption, String noOfCreatives, String statusLabel, DataTable dataTable) {
+        logger.info("Performing bulk approval ({}) on {} creatives to set status: {}", bulkActionOption, noOfCreatives, statusLabel);
         List<String> statusList = Arrays.stream(dataTable.asList(String.class).get(0).split(",")).map(String::trim).toList();
         createCreatives.clearSearchBox();
         createCreatives.clickActivityButton("Active");
         createCreatives.selectCreativeStatus(statusList);
         nameList.clear();
+
         for(int i=0; i<Integer.parseInt(noOfCreatives); i++){
             nameList.add(createCreatives.selectCheckboxWithCreativeStatusLabel());
         }
+
         createCreatives.clickBulkActionsButton();
         createCreatives.selectBulkActionsOption(bulkActionOption);
         Assert.assertTrue("Unable to perform approval in bulk", createCreatives.performBulkApproval());
+        logger.info("Verifying updated status labels");
         createCreatives.clickClearAllButton();
+
         for(String name : nameList){
             createCreatives.searchCreative(name);
             Assert.assertTrue("Creative " + name + " is not found", createCreatives.checkSearchedValue(name));
             Assert.assertEquals(statusLabel, createCreatives.fetchCreativeStatusLabel());
         }
+
+        logger.info("Bulk approval and status verification completed successfully");
     }
 
     @And("Verify data persistence when user creates and saves {string} creative using details {string} as Advertiser, {string} as Creative Name, {string}, {string} and below Creative attributes")
     public void userCreatesAndSavesCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String creativeName, String advertiserDSA, String financer, DataTable dataTable) {
+        logger.info("Creating {} creatives and verifying data persistence. Advertiser: {}, Base Name: {}", creativeType, advertiser, creativeName);
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         nameList.clear();
+
         for (Map<String, String> row : rows) {
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
@@ -1943,8 +2043,9 @@ public class LifeSteps {
             String creativeNameFetched = createCreatives.fetchCreativeName(actualMessage);
             nameList.add(creativeNameFetched);
             createCreatives.searchCreative(creativeNameFetched);
-
+            logger.info("Verifying data persistence on Creative Tile for: {}", creativeNameFetched);
             List<String> creativeDetailsFromCreativeTile = createCreatives.fetchCreativeDetailsFromCreativeTile();
+
             for(String creativeDetail : creativeDetailsFromCreativeTile){
                 if (creativeDetail == null || creativeDetail.trim().equalsIgnoreCase("N/A")) {
                     continue;
@@ -1953,20 +2054,26 @@ public class LifeSteps {
             }
             Assert.assertEquals("Creative detail - CreatedBy is not matched in the creative tile", "Anand Venkatraman", createCreatives.fetchCreatedByFromCreativeTile());
             Assert.assertEquals("Creative detail - Source is not matched in the creative tile", "Manual", createCreatives.fetchSourceFromCreativeTile());
-
+            logger.info("Verifying data persistence on Details Page");
             createCreatives.clickSearchedCreative(creativeNameFetched);
             List<String> creativeDetailsAfterSave = createCreatives.fetchCreativeDetails();
             Assert.assertEquals("Creative Details are not same", creativeDetailsBeforeSave, creativeDetailsAfterSave);
             createCreatives.clickCancelButton();
         }
+
+        logger.info("Data persistence verified successfully for all created creatives");
     }
 
     @Then("Verify the newly created creative is displayed in the Creative Library page")
     public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPage() {
+        logger.info("Verifying visibility of newly created creatives in the library");
+
         for (String name : nameList) {
             Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.verifyCreativesInLibrary(name));
             Assert.assertEquals("1 records", createCreatives.fetchRecordsNumberAfterSearch());
         }
+
+        logger.info("Creative visibility verified successfully");
     }
 
     @And("Create and verify a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and assign the created creatives to it")
@@ -2782,8 +2889,14 @@ public class LifeSteps {
 
     @And("Verify Creative Type field is present and default value is {string}")
     public void verifyCreativeTypeFieldIsPresentAndDefaultValueIs(String defaultButtonName) {
-        Assert.assertTrue("Creative Width Type Button is not available", bulkCreativeUpload.checkCreativeWidthTypeIsVisible());
-        Assert.assertEquals(defaultButtonName, bulkCreativeUpload.fetchDefaultCreativeWidthType());
+        logger.info("Verifying Creative Type field is present and default value is expected to be: '{}'", defaultButtonName);
+        boolean isVisible = bulkCreativeUpload.checkCreativeWidthTypeIsVisible();
+        logger.info("Creative Width Type Button visibility status: {}", isVisible);
+        Assert.assertTrue("Creative Width Type Button is not available", isVisible);
+        String actualDefaultValue = bulkCreativeUpload.fetchDefaultCreativeWidthType();
+        logger.info("Fetched default Creative Width Type: '{}', Expected: '{}'", actualDefaultValue, defaultButtonName);
+        Assert.assertEquals(defaultButtonName, actualDefaultValue);
+        logger.info("Creative Type field presence and default value verified successfully");
     }
 
     @And("User selects the Approval status {string}")
@@ -2826,27 +2939,43 @@ public class LifeSteps {
 
     @And("User uploads a valid file {string} for {string} creative")
     public void userUploadsAValidFileForTheCreative(String fileName, String creativeType) {
+        logger.info("Uploading valid file '{}' for '{}' secondary creative", fileName, creativeType);
         bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
+        logger.info("File upload initiated successfully");
     }
 
     @And("User uploads a valid file {string} for {string} creative and previews the creative details")
     public void userUploadsAValidFileAndPreviewsTheCreativeDetails(String fileName, String creativeType) throws IOException {
+        logger.info("Uploading file '{}' for '{}' creative and previewing details", fileName, creativeType);
         Path latestFile = CommonUtils.getMostRecentFileFromDownloads();
-        if(fileName.contains("Downloaded"))
+
+        if(fileName.contains("Downloaded")) {
+            logger.info("File name indicates a downloaded file. Using most recent file from downloads: '{}'", latestFile.getFileName());
             bulkCreativeUpload.uploadSecondaryCreativeTemplate(String.valueOf(latestFile.getFileName()));
-        else
+        } else {
+            logger.info("Using explicitly provided file name: '{}'", fileName);
             bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
+        }
+
         itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
+        logger.info("Fetched initial creative details before preview: {}", itemList);
+        logger.info("Clicking Preview and acknowledging OK");
         bulkCreativeUpload.clickPreviewButton();
         bulkCreativeUpload.clickOKButton();
         metricName = creativeType + "_" + CommonUtils.timeStampCalculation();
+        logger.info("Updating creative name to: {}", metricName);
         bulkCreativeUpload.updateCreativeName(metricName);
+        logger.info("Checking for validation errors");
         bulkCreativeUpload.checkIfValidationErrorsExist();
         itemList = bulkCreativeUpload.fetchBulkUploadCreativeDetails();
+        logger.info("Fetched creative details after updating name and validation check: {}", itemList);
+        logger.info("Clicking Upload button");
         bulkCreativeUpload.clickUploadButton();
         itemList = itemList.stream().filter(item -> !item.startsWith("https://media-active.contextweb.com/")).map(item -> item.contains("*") ? item.replace("*", "x") : item).toList();
+        logger.info("Item list: {}", itemList);
         nameList.clear();
         nameList.add(metricName);
+        logger.info("Cleared nameList and tracked new creative name: {}", nameList);
     }
 
     @And("User saves the creative")
@@ -2861,16 +2990,26 @@ public class LifeSteps {
 
     @And("Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation")
     public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPageAndContainsAllTheDetailsEnteredDuringCreation() {
+        logger.info("Verifying {} newly created creatives are displayed with correct details", nameList.size());
+
         for(String name : nameList){
+            logger.info("Searching and opening creative: {}", name);
             createCreatives.searchCreative(name);
             createCreatives.clickSearchedCreative(name);
             List<String> fetchSavedCreativeDetails = createCreatives.fetchCreativeDetails();
+            logger.info("Fetched saved creative details for '{}': {}", name, fetchSavedCreativeDetails);
             List<String> expectedValues = itemList.stream().filter(fetchSavedCreativeDetails::contains).toList();
+            logger.info("Expected values to verify (intersected from itemList): {}", expectedValues);
+
             for (String expected : expectedValues) {
+                logger.info("Verifying presence of expected value: '{}'", expected);
                 Assert.assertTrue("Expected value not found: " + expected, fetchSavedCreativeDetails.contains(expected));
             }
+
             createCreatives.clickCancelButton();
         }
+
+        logger.info("All newly created creatives verified successfully against entered details");
     }
 
     /*Display Creative Bulk Upload*/
@@ -2929,7 +3068,9 @@ public class LifeSteps {
 
     @And("User is able to browse and select a template {string} from the system")
     public void userIsAbleToBrowseAndSelectATemplateFromTheSystem(String fileName) {
+        logger.info("Browsing and selecting system template file for secondary creative: {}", fileName);
         bulkCreativeUpload.uploadSecondaryCreativeTemplate(fileName);
+        logger.info("Template file '{}' selected successfully", fileName);
     }
 
     @And("Verify default value of the Approval Status field is {string}")
@@ -3054,20 +3195,33 @@ public class LifeSteps {
 
     @And("Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
     public void verifyThatTheUserIsAbleToBrowseTheComputerUploadTheFollowingFileTypesAndCreateCreativesUsingDetails(String advertiser, String advertiserDSA, String financer, String landingDomain, String status, String creativeName, String size, String duration, String fileType, String fileName) throws IOException {
+        logger.info("Starting creative upload and creation flow. Advertiser: {}, FileType: {}, FileName: {}", advertiser, fileType, fileName);
         nameList.clear();
+        logger.info("Filling advertiser and financial details - DSA: {}, Financer: {}", advertiserDSA, financer);
         bulkCreativeUpload.selectAdvertiser(advertiser);
         bulkCreativeUpload.enterAdvertiserDSA(advertiserDSA);
         bulkCreativeUpload.enterFinancer(financer);
+        logger.info("Selecting file type '{}' and uploading file '{}'", fileType, fileName);
         bulkCreativeUpload.selectFileTypeAndUploadFile(fileType, fileName);
+        logger.info("Entering Landing Domain: {} and Approval Status: {}", landingDomain, status);
         bulkCreativeUpload.enterLandingPageDomain(landingDomain);
         bulkCreativeUpload.selectApprovalStatus(status);
+        logger.info("Clicking preview button to generate creative entries");
         bulkCreativeUpload.clickPreviewButton();
+        logger.info("Entering creative name: {}", creativeName);
         nameList = bulkCreativeUpload.enterCreativeName(creativeName);
+        logger.info("Generated and tracked creative names: {}", nameList);
+
         if (bulkCreativeUpload.isWidthHeightVisibleAndBlank()) bulkCreativeUpload.enterWidthHeight(size);
         if (bulkCreativeUpload.isDurationVisibleAndBlank()) bulkCreativeUpload.enterDuration(duration);
+
         bulkCreativeUpload.clickUploadButton();
         bulkCreativeUpload.clickOKButton();
-        Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+        logger.info("Verifying creative bulk upload success alert");
+        String successAlert = bulkCreativeUpload.fetchSuccessAlert();
+        logger.info("Fetched success alert: '{}'", successAlert);
+        Assert.assertEquals("BulkUpload created successfully.", successAlert);
+        logger.info("Creative bulk upload verified successfully");
     }
 
     @And("Verify user is able to type in {string} categories")
@@ -3095,19 +3249,33 @@ public class LifeSteps {
 
     @And("Verify data persistence when user creates and saves {string} Bulk upload creative using details {string} as Advertiser, {string}, {string} and below Creative attributes")
     public void userCreatesAndSavesBulkUploadCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String advertiserDSA, String financer, DataTable dataTable) throws IOException {
+        logger.info("Starting Bulk Upload creative creation with data persistence verification");
+        logger.info("Creative Type: {}, Advertiser: {}, DSA: {}, Financer: {}", creativeType, advertiser, advertiserDSA, financer);
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        logger.info("Processing {} rows from DataTable for creative attributes", rows.size());
+
         for (Map<String, String> row : rows) {
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
+            logger.info("Processing row - Type: {}, Attributes string: '{}'", type, attributes);
             String creativeName = creativeType + "_Creative_" + CommonUtils.timeStampCalculation();
+            logger.info("Generated Creative Name: {}", creativeName);
             Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            logger.info("Parsed attribute map: {}", attributeMap);
+            logger.info("Initiating Bulk Upload UI flow");
             bulkCreativeUpload.clickBulkUploadButton();
             bulkCreativeUpload.selectAndClickCreativeType(creativeType);
             bulkCreativeUpload.enterCreativeAndDSADetails(advertiser, advertiserDSA, financer);
             bulkCreativeUpload.fillAttributes(type, attributeMap, creativeName);
-            Assert.assertEquals("BulkUpload created successfully.", bulkCreativeUpload.fetchSuccessAlert());
+            logger.info("Verifying Bulk Upload success alert");
+            String successAlert = bulkCreativeUpload.fetchSuccessAlert();
+            logger.info("Fetched success alert: '{}'", successAlert);
+            Assert.assertEquals("BulkUpload created successfully.", successAlert);
             nameList.add(creativeName);
+            logger.info("Successfully created and added '{}' to nameList", creativeName);
         }
+
+        logger.info("Completed Bulk Upload creative creation and verification flow for all rows");
     }
 
     /*Run A Report - Fields verification and validation*/
@@ -3581,10 +3749,14 @@ public class LifeSteps {
 
     @And("Verify user is able to select Time {string} and Timezone {string} for Send At fields")
     public void verifyUserIsAbleToSelectTimeAndTimezoneForSendAtFields(String time, String timeZone) {
+        logger.info("Verifying user can select 'Send At' Time: '{}' and Timezone: '{}'", time, timeZone);
         scheduleReport.enterSendAtTime(time);
-        Assert.assertTrue("Unable to select timezone", scheduleReport.selectDataTimeZone(timeZone));
+        boolean isTimeZoneSelected = scheduleReport.selectDataTimeZone(timeZone);
+        logger.info("Timezone selection status: {}", isTimeZoneSelected);
+        Assert.assertTrue("Unable to select timezone", isTimeZoneSelected);
         nameList.add(time);
         nameList.add(timeZone);
+        logger.info("Time and Timezone successfully selected and tracked");
     }
 
     @And("Verify Delivery field has two methods - {string} and {string}")
@@ -4484,45 +4656,77 @@ public class LifeSteps {
     @Then("User creates a new tactic with details {string} {string} {string}")
     public void user_creates_a_new_tactics(String tacticName, String channel, String count) {
         int loopCount = 1;
+
         try {
             loopCount = Integer.parseInt(count.trim());
+            logger.info("Parsed tactic count successfully: {}", loopCount);
         } catch (NumberFormatException e) {
+            logger.error("Failed to parse tactic count: '{}'", count, e);
             Assert.fail("Invalid count value for creating tactics: \"" + count + "\"");
         }
+
         for (int i = 1; i <= loopCount; i++) {
             tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
+            logger.info("Generated Tactic Name: {}", tacticNameRandom);
             nameList.add(tacticNameRandom);
+            logger.info("Entering and saving tactic details");
             tacticDetails.enterTacticName(tacticNameRandom);
             tacticDetails.saveTacticDetails();
+            logger.info("Selecting channel '{}' and saving tactic settings", channel);
             tacticSettings.selectChannel(channel);
             tacticSettings.saveTacticSettings();
+
             if (i != loopCount) {
+                logger.info("Clicking 'New Tactic' button for the next iteration");
                 tacticSettings.clickNewTactic();
             }
         }
+
+        logger.info("Successfully created {} tactic(s)", loopCount);
     }
 
     @Then("User deletes the tactic and verifies it")
     public void user_deletes_the_tactic_and_verifies_it() {
         for (int i = 0; i < nameList.size() - 1; i++) {
             String tacticName = nameList.get(i);
+            logger.info("Deleting tactic via Tactic Details panel");
             tacticDetails.deleteTactic(tacticName);
-            Assert.assertNotEquals(tacticName, tacticSettings.verifyTacticName());
+            String currentTacticName = tacticSettings.verifyTacticName();
+            logger.info("Verifying current active tactic name is not the deleted one. Current tactic: '{}'", currentTacticName);
+            Assert.assertNotEquals(tacticName, currentTacticName);
+            logger.info("Performing global search to ensure deleted tactic '{}' is not found", tacticName);
             tacticDetails.globalSearchDeletedTactic(tacticName);
-            Assert.assertEquals("Nothing found...", tacticDetails.getSearchText());
+            String searchText = tacticDetails.getSearchText();
+            logger.info("Global search result text: '{}'", searchText);
+            Assert.assertEquals("Nothing found...", searchText);
+            logger.info("Closing global search panel for the next iteration");
             tacticDetails.closeGlobalSearch();
-
         }
+
+        logger.info("Successfully deleted and verified all tactics");
     }
 
     @And("User enables tactic through bulk action and verifies the status")
     public void userEnableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        logger.info("Initiating bulk enable action and status verification for {} tactic(s)", (nameList.size() - 1));
+
         for (int i = 0; i < nameList.size() - 1; i++) {
             String tacticName = nameList.get(i);
+            logger.info("Processing bulk enable for tactic: '{}'", tacticName);
             tacticDetails.bulkEnableTactics(tacticName);
-            Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
-            Assert.assertTrue(tacticDetails.getToggleIcon());
+
+            logger.info("Verifying toggle class state for tactic '{}'", tacticName);
+            boolean isToggleClassEnabled = tacticDetails.getToggleClass(tacticName);
+            logger.info("Toggle class enabled status: {}", isToggleClassEnabled);
+            Assert.assertTrue(isToggleClassEnabled);
+
+            logger.info("Verifying toggle icon state for tactic '{}'", tacticName);
+            boolean isToggleIconEnabled = tacticDetails.getToggleIcon();
+            logger.info("Toggle icon enabled status: {}", isToggleIconEnabled);
+            Assert.assertTrue(isToggleIconEnabled);
         }
+
+        logger.info("Successfully completed bulk enable action and verification loop");
     }
 
     @When("User clicks on create new Campaign")
@@ -5212,19 +5416,29 @@ public class LifeSteps {
         npiLists.searchList(npiListName);
         npiLists.openSearchedList(npiListName);
     }
+
     @Then("User navigates to creative details and clicks Association tab")
     public void userNavigatesToCreativeDetailsAndClickOnAssociationTab() {
+        logger.info("Navigating to creative details and Association tab for creative: '{}'", metricName);
+        logger.info("Searching for creative using name: '{}'", metricName);
         createCreatives.searchCreative(metricName);
         createCreatives.clickSearchedCreative(metricName);
+        logger.info("Clicking the Association tab within creative details");
         createCreatives.clickAssociationTab();
+        logger.info("Successfully navigated to the Association tab");
     }
 
     @And("Verify column selection icon is available and upon clicking it below columns should display")
     public void verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(DataTable dataTable) {
         List<String> expectedColumnNames = dataTable.asList(String.class);
+        logger.info("Verifying column selection icon and expected available columns: {}", expectedColumnNames);
+        logger.info("Clicking the column selection icon");
         createCreatives.clickColumnSelectionIcon();
         List<String> actualColumnNames = createCreatives.fetchColumnNamesFromSelectionIconList();
+        logger.info("Fetched actual column names from UI: {}", actualColumnNames);
+        logger.info("Asserting that expected column names match the actual column names");
         Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
+        logger.info("Column selection icon and expected column list verified successfully");
     }
 
     @And("User searches and selects the campaign {string}")
@@ -5233,14 +5447,25 @@ public class LifeSteps {
         campaignDashboard.searchCreatedCampaign(campaignName);
         campaignDashboard.navigateToCampaign(campaignName);
     }
+
     @And("Verify unselected columns are not displayed in the Association tab")
     public void verifyUnselectedColumnsAreNotDisplayedInTheAssociationTab(DataTable dataTable) {
         List<String> unselectedColumnNames = dataTable.asList(String.class);
+        logger.info("Verifying the following columns are hidden in the Association tab after deselection: {}", unselectedColumnNames);
+        logger.info("Deselecting columns from the column selection icon list");
         createCreatives.deselectColumnNamesFromSelectionIconList(unselectedColumnNames);
         List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
+        logger.info("Fetched visible columns from Association tab: {}", columnName);
+        logger.info("Verifying none of the deselected columns are present in the visible columns list");
+
         for (String name : unselectedColumnNames) {
-            Assert.assertFalse(name + " column is still displayed in Association tab after deselecting it", columnName.contains(name));
+            logger.info("Checking visibility of deselected column: '{}'", name);
+            boolean isColumnDisplayed = columnName.contains(name);
+            logger.info("Is column '{}' displayed: {}", name, isColumnDisplayed);
+            Assert.assertFalse(name + " column is still displayed in Association tab after deselecting it", isColumnDisplayed);
         }
+
+        logger.info("Unselected columns verification completed successfully");
     }
 
     @Then("Verify that the campaign page is displayed")
@@ -5251,51 +5476,91 @@ public class LifeSteps {
 
     @And("Verify if {string} hides all the columns in the Association tab")
     public void verifyIfHidesAllTheColumnsInTheAssociationTab(String buttonName) {
+        logger.info("Verifying if menu button '{}' hides all columns in the Association tab", buttonName);
+        logger.info("Clicking column selection icon");
         createCreatives.clickColumnSelectionIcon();
+        logger.info("Clicking menu button '{}' from column selection", buttonName);
         createCreatives.clickMenuButtonFromColumnSelection(buttonName);
         List<String> columnName = createCreatives.fetchColumnNamesFromAssociationsTab();
-        Assert.assertTrue("Column names are available", columnName.isEmpty());
+        logger.info("Fetched column names from Association tab: {}", columnName);
+        boolean isColumnListEmpty = columnName.isEmpty();
+        logger.info("Is column list empty: {}", isColumnListEmpty);
+        Assert.assertTrue("Column names are available", isColumnListEmpty);
+        logger.info("Verified all columns are hidden successfully");
     }
 
     @And("Verify if {string} displays all the columns in the Association tab")
     public void verifyIfDisplaysAllTheColumnsInTheAssociationTab(String buttonName, DataTable dataTable) {
         List<String> expectedColumnNames = dataTable.asList(String.class);
+        logger.info("Verifying if menu button '{}' displays all expected columns: {}", buttonName, expectedColumnNames);
+        logger.info("Clicking column selection icon");
         createCreatives.clickColumnSelectionIcon();
+        logger.info("Clicking menu button '{}' from column selection", buttonName);
         createCreatives.clickMenuButtonFromColumnSelection(buttonName);
         List<String> actualColumnNames = createCreatives.fetchColumnNamesFromAssociationsTab();
+        logger.info("Fetched actual column names from Association tab: {}", actualColumnNames);
         Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
+        logger.info("Verified all expected columns are displayed successfully");
     }
 
     @And("Verify filter icon is available and upon clicking it {string}, {string} and {string} text should display")
     public void verifyFilterIconIsAvailableAndUponClickingItAndTextShouldDisplay(String button1, String button2, String text) {
+        logger.info("Verifying filter icon availability and expected UI text: '{}', '{}', '{}'", button1, button2, text);
+        logger.info("Clicking filter icon");
         createCreatives.clickFilterIcon();
         List<String> filterFields = createCreatives.fetchFilterFields();
-        Assert.assertTrue("Add Filter button is not available", filterFields.contains(button1));
-        Assert.assertTrue("Done button is not available", filterFields.contains(button2));
-        Assert.assertTrue("No Filters applied text is not available", filterFields.contains(text));
+        logger.info("Fetched filter fields: {}", filterFields);
+        boolean isButton1Available = filterFields.contains(button1);
+        logger.info("Is '{}' available: {}", button1, isButton1Available);
+        Assert.assertTrue("Add Filter button is not available", isButton1Available);
+        boolean isButton2Available = filterFields.contains(button2);
+        logger.info("Is '{}' available: {}", button2, isButton2Available);
+        Assert.assertTrue("Done button is not available", isButton2Available);
+        boolean isTextAvailable = filterFields.contains(text);
+        logger.info("Is '{}' available: {}", text, isTextAvailable);
+        Assert.assertTrue("No Filters applied text is not available", isTextAvailable);
+        logger.info("Filter icon and UI text verified successfully");
     }
 
     @And("User clicks {string}, selects below filters and apply using {string} button")
     public void userClicksSelectsBelowFiltersAndApplyUsingButton(String addFilterButton, String doneButton, DataTable dataTable) {
         List<String> filterName = dataTable.asList(String.class);
+        logger.info("Applying filters using Add button '{}' and Done button '{}'. Filters to apply: {}", addFilterButton, doneButton, filterName);
         lineItemNameRandom = createCreatives.fetchLineItemFromAssociation();
         String campaignName = createCreatives.fetchCampaignFromAssociation();
+        logger.info("Fetched target Line Item Name: '{}' and Campaign Name: '{}' for filtering", lineItemNameRandom, campaignName);
+
         for (String name : filterName) {
+            logger.info("Processing filter: '{}'", name);
+            logger.info("Clicking add filter button: '{}'", addFilterButton);
             createCreatives.clickFilterButton(addFilterButton);
+            logger.info("Selecting filter name: '{}'", name);
             createCreatives.selectFilterName(name);
-            if (name.contains("Line Item Name"))
+
+            if (name.contains("Line Item Name")) {
+                logger.info("Entering value for Line Item Name filter: '{}'", lineItemNameRandom);
                 createCreatives.enterFilterValue(lineItemNameRandom);
-            else if (name.contains("Campaign Name"))
+            } else if (name.contains("Campaign Name")) {
+                logger.info("Entering value for Campaign Name filter: '{}'", campaignName);
                 createCreatives.enterFilterValue(campaignName);
-            else
+            } else {
+                logger.info("Entering default dates for date-based filter");
                 createCreatives.enterDates();
+            }
         }
+
+        logger.info("Applying filters by clicking done button: '{}'", doneButton);
         createCreatives.clickFilterButton(doneButton);
-        Assert.assertEquals("1 records", createCreatives.fetchFilteredRecordsCount());
+        String filteredRecordsCount = createCreatives.fetchFilteredRecordsCount();
+        logger.info("Fetched filtered records count: '{}'", filteredRecordsCount);
+        Assert.assertEquals("1 records", filteredRecordsCount);
+        logger.info("Filters applied and records count verified successfully");
     }
 
     @And("User navigates to Line item from Association Tab")
     public void userNavigatesToLineItemFromAssociationTab() {
+        logger.info("Navigating to Line Item from Association Tab using Line Item Name: '{}'", lineItemNameRandom);
         Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
+        logger.info("Line Item navigation verified successfully");
     }
 }
