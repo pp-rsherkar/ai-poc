@@ -3602,6 +3602,7 @@ public class LifeSteps {
             String tacticName = nameList.get(i);
             tacticDetails.bulkEnableTactics(tacticName);
             Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+            Assert.assertTrue(tacticDetails.getToggleIcon());
         }
     }
 

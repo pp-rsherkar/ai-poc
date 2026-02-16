@@ -389,6 +389,12 @@ public class TacticDetails {
         return TACTIC_TOGGLE_CLASS.getAttribute("class").contains("toggle-enabled");
     }
 
+    public boolean getToggleIcon() {
+        Locator TACTIC_TOGGLE = page.locator(("//label[normalize-space()='Enabled']"));
+        return TACTIC_TOGGLE.isVisible();
+    }
+
+
     public void globalSearchDeletedTactic(String tacticName) {
         OPEN_GLOBAL_SEARCH.click();
         GLOBAL_SEARCH_INPUT_FIELD.fill(tacticName);
