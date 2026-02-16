@@ -83,7 +83,7 @@ public class Workspace {
         this.WEBHOOK_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Webhook setup successfully')]");
         this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
-        this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
+        this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //p[contains(text(),'Error occurred while saving workspace or editing webhook')]");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.BEFORE_YOU_LEAVE_DIALOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
         this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
@@ -195,7 +195,7 @@ public class Workspace {
 
     public void addMacros(String textType, String param, List<String> macrosList) {
         for (String macros : macrosList) {
-            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//p[contains(text(),'%s')]", textType, macros);
+            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'FieldTextArea')]/following-sibling::div//p[contains(text(),'%s')]", textType, macros);
             Locator MACROS = WORKSPACE_FRAME.locator(xpath);
             if (MACROS.innerText().contains(macros)) {
                 MACROS.click();

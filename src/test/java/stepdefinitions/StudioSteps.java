@@ -399,7 +399,6 @@ public class StudioSteps {
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
-        if (requestType.contains("POST")) workspace.clickWebhookIcon();
         workspace.clickRequestOrContentButton(requestType);
     }
 
