@@ -103,7 +103,6 @@ public class LifeSteps {
         userType = user;
 
         if (environment.equals("Demo")) {
-            logger.info("Configuring for Demo environment");
             url = ConfigReader.getProperty("demoURL");
             if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
                 logger.info("Selecting Demo External User credentials");
@@ -131,7 +130,6 @@ public class LifeSteps {
 
     @And("{string} application is logged in successfully with Account {string}")
     public void life_application_is_logged_in_as(String application, String account) {
-        logger.info("Logging into application: {} with Account: {}", application, account);
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
