@@ -102,7 +102,7 @@ public class Accounts {
         this.ADVERTISER_LIST = page.locator("//td[contains(@class,'gaTableRow')]//div");
         this.REPORTING_TAB = page.locator("//a[@routerlink='reporting']");
         this.CUSTOM_DESTINATION_SECTION = page.locator("//div[@id='custom-destinations']");
-        this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']");
+        this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']//div");
         this.ENTER_DESTINATION_NAME = page.locator("//input[@placeholder='Enter Destination Name']");
         this.DESTINATION_TYPE_DROPDOWN = page.locator("//label[text()='Destination Type']/following-sibling::select");
         this.HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
