@@ -1,7 +1,6 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
-import com.microsoft.playwright.Locator;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -3055,7 +3054,8 @@ public class LifeSteps {
 
     @And("User saves the custom destination")
     public void userSavesTheCustomDestination() {
-        accounts.clickOKButton();
+        Assert.assertTrue("Unable to save custom destination details", accounts.clickOKButton());
+        accounts.isPulsePointIconEnabled();
     }
 
     @And("User clicks PulsePoint icon to navigate back to Life")
