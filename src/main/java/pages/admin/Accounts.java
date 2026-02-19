@@ -3,7 +3,6 @@ package pages.admin;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import factory.DriverFactory;
 import utils.WaitUtility;
 
 import java.util.ArrayList;
@@ -69,6 +68,8 @@ public class Accounts {
     private final Locator STUDIO_SETTINGS_PANEL;
     private final Locator WORKSPACE_PERMISSION_TOGGLE_BUTTON;
     private final Locator SETTINGS_PANEL_CANCEL_BUTTON;
+    private final Locator ERROR_ALERT;
+    private final Locator ALERT;
     WaitUtility waitUtility;
 
     public Accounts(Page page) {
@@ -102,7 +103,7 @@ public class Accounts {
         this.ADVERTISER_LIST = page.locator("//td[contains(@class,'gaTableRow')]//div");
         this.REPORTING_TAB = page.locator("//a[@routerlink='reporting']");
         this.CUSTOM_DESTINATION_SECTION = page.locator("//div[@id='custom-destinations']");
-        this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']");
+        this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']//div");
         this.ENTER_DESTINATION_NAME = page.locator("//input[@placeholder='Enter Destination Name']");
         this.DESTINATION_TYPE_DROPDOWN = page.locator("//label[text()='Destination Type']/following-sibling::select");
         this.HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
@@ -130,6 +131,8 @@ public class Accounts {
         this.STUDIO_SETTINGS_PANEL = page.locator("//div[@class='bsHeaderContainer']//div[contains(text(),'Studio Settings')]");
         this.WORKSPACE_PERMISSION_TOGGLE_BUTTON = page.locator("//div[@class='secondtablewrapper']//div[contains(@class,'toggle-wrapper-withLabel')]//sui-checkbox");
         this.SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
+        this.ERROR_ALERT = page.locator("//div[@aria-label='Error while saving.']");
+        this.ALERT = page.locator("//div[@role='alert']");
     }
 
     public void clickAdministration() {
@@ -256,8 +259,13 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
     }
 
-    public void clickOKButton() {
+    public boolean clickOKButton() {
         OK_BUTTON.click();
+        waitUtility.waitForLocatorVisible(ALERT);
+        return !ERROR_ALERT.isVisible();
+    }
+
+    public void isPulsePointIconEnabled() {
         while (!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()) {
             page.waitForTimeout(5000);
         }
