@@ -43,7 +43,7 @@ public class Hooks {
             if (DriverFactory.getBrowser() != null) DriverFactory.getBrowser().close(); // Close browser
         } catch (Exception e) {
             handleError("Error during browser cleanup", e, scenario);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error during browser cleanup: ", e);
         }
     }
 

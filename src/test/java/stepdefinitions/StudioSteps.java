@@ -72,6 +72,15 @@ public class StudioSteps {
         Assert.assertEquals("HCP Audience Expansion", actualHCPEAudienceExpansion);
     }
 
+    @Then("the user selects the advertiser {string}")
+    public void the_user_selects_the_advertiser(String advertiser) {
+        logger.info("Selecting advertiser: '{}'", advertiser);
+        DriverFactory.getPage().waitForLoadState();
+        expansionWorkspace.clickAdvertiserDropdown(advertiser);
+        DriverFactory.getPage().waitForLoadState();
+        logger.info("Advertiser '{}' selected successfully", advertiser);
+    }
+
     @Then("the user selects Source Audience {string}")
     public void the_user_selects_source_audience(String sourceAudience) {
         logger.info("Selecting source audience: {}", sourceAudience);
@@ -219,20 +228,33 @@ public class StudioSteps {
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
-        if (fetchedMetricNames.contains("HCP Explorer"))
-            Assert.assertEquals("HCP Explorer", workspaceCreation.verifyHCPExplorer());
+        logger.info("User clicks on HCP Explorer workspace");
+
+        if (fetchedMetricNames.contains("HCP Explorer")) {
+            logger.info("HCP Explorer permission is available");
+            String explorer = workspaceCreation.verifyHCPExplorer();
+            logger.info("HCP Explorer permission: {}", explorer);
+            Assert.assertEquals("HCP Explorer", explorer);
+        }
+
         workspaceCreation.clickHCPExplorerWorkspace();
     }
 
     @And("User selects the advertiser {string}")
     public void userSelectsTheAdvertiser(String advertiser) {
+        logger.info("Selecting advertiser '{}' in Explorer Workspace", advertiser);
         explorerWorkspace.selectAdvertiser(advertiser);
-        Assert.assertEquals("Workspace created successfully", workspaceCreation.isWorkspaceCreationAlertDisplayed());
+        logger.info("Verifying workspace creation success alert");
+        String alertText = workspaceCreation.isWorkspaceCreationAlertDisplayed();
+        logger.info("Fetched alert text: '{}'", alertText);
+        Assert.assertEquals("Workspace created successfully", alertText);
+        logger.info("Advertiser selected and workspace created successfully");
     }
 
     @And("User updates the workspace name as {string}")
     public void userUpdatesTheWorkspaceNameAs(String wName) {
         workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Adding workspace name: {}", workspaceName);
         explorerWorkspace.waitForDashboardLoad();
         explorerWorkspace.clickEditWorkspace();
         explorerWorkspace.enterWorkspaceName(workspaceName);
@@ -282,11 +304,13 @@ public class StudioSteps {
                 boolean wordMatch = Arrays.stream(appliedNorm.split(" ")).anyMatch(word -> word.length() > 3 && displayedNorm.contains(word));
                 boolean prescriptionRoot = appliedNorm.contains("prescri") && displayedNorm.contains("prescri");
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
+
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
                     logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
                             appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
                     return true;
                 }
+
                 return false;
             });
             logger.info("Filter '{}' match found: {}", appliedFilter, matchFound);
@@ -403,6 +427,7 @@ public class StudioSteps {
     public void userVerifiesTheFileContent(String npiHeader, String fileExtension) throws IOException {
         logger.info("Verifying NPI count in downloaded {} file for header: {}", fileExtension, npiHeader);
         int npiCountFromFile = 0;
+
         if (fileExtension.equalsIgnoreCase("CSV"))
             npiCountFromFile = FileActions.fetchColumnCountFromCSV(targetFilePath, npiHeader);
         else if (fileExtension.equalsIgnoreCase("XLSX"))
@@ -473,6 +498,7 @@ public class StudioSteps {
 
     @When("User clicks {string} request method")
     public void userClicksRequestMethod(String requestType) {
+        logger.info("User clicks request method: {}", requestType);
         workspace.clickRequestOrContentButton(requestType);
     }
 
@@ -933,7 +959,6 @@ public class StudioSteps {
         logger.info("Navigating to Studio application");
         navigation.navigateToStudio();
     }
-
 
     @And("User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
     public void userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(String filterType, DataTable dataTable) {
