@@ -3610,7 +3610,6 @@ public class LifeSteps {
             Assert.assertTrue(tacticDetails.getToggleIcon());
             tacticDetails.bulkDisableTactics(tacticName);
             Assert.assertTrue(tacticDetails.getDisabledToggleIcon(tacticName));
-
         }
     }
 

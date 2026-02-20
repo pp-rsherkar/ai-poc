@@ -391,8 +391,6 @@ public class TacticDetails {
         tacticNameXpath.click();
         DISABLE_TACTIC.click();
         EXIT_BULK_MODE.click();
-        System.out.println("test101");
-//        page.waitForTimeout(6000);
     }
 
     public boolean getToggleClass(String tacticName) {
