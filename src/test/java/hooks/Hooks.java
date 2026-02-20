@@ -56,8 +56,7 @@ public class Hooks {
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
                 DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 handleError("Error capturing screenshot or trace", e, scenario);
                 throw new RuntimeException(e);
             }
@@ -70,8 +69,6 @@ public class Hooks {
                 logger.warn("Trace stop failed", e);
             }
         }
-
-
     }
 
     // Method to handle and log errors globally
