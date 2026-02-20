@@ -63,6 +63,7 @@ public class PMP {
     private final Locator GA_SURVEY_DIALOG;
     private final Locator GA_SURVEY_CLOSE_BUTTON;
     private final Locator CURATED_MARKETS_AND_DEALS_TITLE;
+    private final Locator ALERT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     boolean flag1, flag2 = false;
 
@@ -118,6 +119,7 @@ public class PMP {
         this.GA_SURVEY_DIALOG = page.locator("//div[contains(text(),'Please rate the campaign setup process')]");
         this.GA_SURVEY_CLOSE_BUTTON = page.locator("//div[contains(@class,'btn-close .gaSurveyClose')]");
         this.CURATED_MARKETS_AND_DEALS_TITLE = page.locator("//span[text()='Curated Markets and Deals']");
+        this.ALERT =  page.locator("//div[@role='alert']");
     }
 
     public void navigateToTacticSettingTab() {
@@ -258,7 +260,7 @@ public class PMP {
         DEAL_PRICE_TYPE.locator("text=" + dealPriceType).click();
         ENTER_PRICE.fill(price);
         NEW_DEAL_SAVE_BUTTON.click();
-        String text = SUCCESS_ALERT.innerText().trim();
+        String text = ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
         return text;
     }

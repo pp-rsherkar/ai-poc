@@ -498,7 +498,7 @@ public class LifeSteps {
     public void userNavigatesToNPIListsPageInLIFE() {
         logger.info("Navigating to NPI Lists page (Pre-release)");
         navigation.clickSubMenu();
-        npiLists.clickNPIListsStg();
+        npiLists.clickNPILists();
     }
 
     @And("User searches the workspace in LIFE and selects it")
@@ -1376,7 +1376,7 @@ public class LifeSteps {
         List<String> mediaTypeList = Arrays.stream(mediaType.split(",")).toList();
         String saveResult = pmp.addAndSaveNewDeals(exchangeType, dealIDRandom, dealNameRandom, mediaTypeList, advertiser, dealPriceType, price, curator);
         logger.info("Save deal result: {}", saveResult);
-        Assert.assertEquals("Success!", saveResult);
+        Assert.assertEquals("Deal saved successfully", saveResult);
     }
 
     @When("User searches the deal and assign it from the deal list")
@@ -4030,7 +4030,9 @@ public class LifeSteps {
     @And("User clicks Test Connection link to verify if connection happened successfully")
     public void userClicksTestConnectionLinkToVerifyIfConnectionHappenedSuccessfully() {
         logger.info("Clicking Test Connection for destination");
-        accounts.clickTestConnection();
+        String connectionStatus = accounts.clickTestConnection();
+        logger.info("Connection status: {}", connectionStatus);
+        Assert.assertEquals("Connection confirmed", connectionStatus);
     }
 
     @Then("User selects destination name created, and other details - {string}, {string}")
