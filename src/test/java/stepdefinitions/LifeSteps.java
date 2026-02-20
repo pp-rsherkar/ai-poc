@@ -3601,6 +3601,19 @@ public class LifeSteps {
         }
     }
 
+    @And("User disables tactic through bulk action and verifies the status")
+    public void userDisableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        for (int i = 0; i < nameList.size() - 1; i++) {
+            String tacticName = nameList.get(i);
+            tacticDetails.bulkEnableTactics(tacticName);
+            Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
+            Assert.assertTrue(tacticDetails.getToggleIcon());
+            tacticDetails.bulkDisableTactics(tacticName);
+            Assert.assertTrue(tacticDetails.getDisabledToggleIcon(tacticName));
+
+        }
+    }
+
     @When("User clicks on create new Campaign")
     public void userClicksOnCreateNewCampaign() {
         campaigns.createCampaign();

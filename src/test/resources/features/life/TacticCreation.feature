@@ -144,3 +144,18 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel |
+
+
+  @regression
+  Scenario Outline: Create tactic and disable those tactics through bulk action
+    When User clicks on create new Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+    And User enables tactic through bulk action and verifies the status
+    And User disables tactic through bulk action and verifies the status
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME | COUNT |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Tactic      | 3     |
