@@ -61,8 +61,7 @@ public class TacticCreatives {
             waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
             for (int i = 0; i < CREATIVE_STATUS.count(); i++) {
                 if (CREATIVE_STATUS.nth(i).innerText().equalsIgnoreCase("Approved")) {
-                    int rowIndex = (int) CREATIVE_STATUS.nth(i).evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
-                    selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
+                    selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", i + 1));
                     break;
                 }
             }
