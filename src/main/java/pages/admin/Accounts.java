@@ -262,11 +262,9 @@ public class Accounts {
 
     public String clickTestConnection() {
         TEST_CONNECTION_LINK.last().click();
-        if (EXPORT_OPTIONS_DIALOG.isVisible())
-            RUN_BUTTON.click();
-        if(TEST_ACCESS_FAILED_TEXT.isVisible())
-            return TEST_ACCESS_FAILED_TEXT.textContent().trim();
-        else{
+        if (EXPORT_OPTIONS_DIALOG.isVisible()) RUN_BUTTON.click();
+        if (TEST_ACCESS_FAILED_TEXT.isVisible()) return TEST_ACCESS_FAILED_TEXT.textContent().trim();
+        else {
             waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
             return CONNECTION_CONFIRMATION_TEXT.textContent().trim();
         }
@@ -433,7 +431,7 @@ public class Accounts {
     public List<String> fetchWorkspacesWithPermission() {
         List<String> workspaceNameList = new ArrayList<>();
         for (int i = 0; i < WORKSPACE_PERMISSION_TOGGLE_BUTTON.count(); i++) {
-            if(WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
+            if (WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
                 int rowIndex = (int) WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).evaluate("(el) => Array.from(el.closest('tbody').children).indexOf(el.closest('tr')) + 1");
                 Locator workspaceNameLocator = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//div", rowIndex));
                 workspaceNameList.add(workspaceNameLocator.textContent().trim());
@@ -442,7 +440,7 @@ public class Accounts {
         return workspaceNameList;
     }
 
-    public void clickCancelButtonFromSettingsPanel(){
+    public void clickCancelButtonFromSettingsPanel() {
         SETTINGS_PANEL_CANCEL_BUTTON.click();
     }
 

@@ -21,11 +21,15 @@ import utils.FileActions;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
 public class StudioSteps {
+    private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
     static String workspaceName;
     static String newWorkspaceName;
     Boolean flag = true;
@@ -45,7 +49,6 @@ public class StudioSteps {
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
-    private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -306,8 +309,7 @@ public class StudioSteps {
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
 
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
-                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
-                            appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
+                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]", appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
                     return true;
                 }
 
@@ -590,7 +592,7 @@ public class StudioSteps {
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         logger.info("Verifying delete warning for workspace with active webhook");
-        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\r\n|\r|\n", "\n").replaceAll("\s+", " ").trim();
+        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\r\n|\r|\n", "\n").replaceAll(" +", " ").trim();
         logger.info("Delete popup message: {}", actual);
         Assert.assertTrue("Message should warn about deleting the workspace", actual.contains("You are trying to delete the workspace " + workspaceName + "."));
         Assert.assertTrue("Message should mention that webhooks are enabled", actual.contains("Webhooks are enabled for this workspace."));

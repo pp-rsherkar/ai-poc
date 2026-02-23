@@ -428,12 +428,12 @@ public class Campaigns {
         return text;
     }
 
-    public void clickCampaignTile(){
+    public void clickCampaignTile() {
         CAMPAIGN_TILE.click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void clickLineItemTile(){
+    public void clickLineItemTile() {
         LINE_ITEM_TILE.click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
@@ -489,12 +489,7 @@ public class Campaigns {
     public void exportCampaignSettings() {
         waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS);
 
-        page.evaluate("() => { " +
-                "if (window.isPatched) return; " +
-                "const o = Element.prototype.setAttribute; " +
-                "Element.prototype.setAttribute = function(n, v) { " +
-                "if (n !== ']') o.apply(this, arguments); " +
-                "}; window.isPatched = true; }");
+        page.evaluate("() => { " + "if (window.isPatched) return; " + "const o = Element.prototype.setAttribute; " + "Element.prototype.setAttribute = function(n, v) { " + "if (n !== ']') o.apply(this, arguments); " + "}; window.isPatched = true; }");
 
         EXPORT_CAMPAIGN_SETTINGS.evaluate("el => el.click()");
         waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS_POPUP);

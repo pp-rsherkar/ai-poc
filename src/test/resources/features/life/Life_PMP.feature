@@ -38,8 +38,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then user should navigate to PMP Deals Panel
     When User clicks "Life Marketplace Deals" Deals Tab
     When User enters below details in respective search field, verify that the deal list appears based on the selected filters
-      | SearchByName     | Deal           |
-      | SearchByExchange | Pubmatic       |
+      | SearchByName     | Deal     |
+      | SearchByExchange | Pubmatic |
 
   @regression @e2e
   Scenario Outline: Add New Private Deals with deal price type "<DEAL_PRICE_TYPE>", pricing strategy "<PRICING_STRATEGY>" and assign to a tactic
