@@ -47,7 +47,6 @@ public class ReportTemplates {
     private final Locator SEARCH_REPORT;
     private final Locator SEARCH_BUTTON;
     private final Locator DOWNLOAD_REPORT;
-    private final Locator REPORT_PROGRESS_ICON;
     private final Locator TEMPLATE_PAGINATION;
     private final Locator TREE_COLLAPSED_ICON;
     private final Locator DIMENSION_AND_METRICS_LABELS;
@@ -79,7 +78,6 @@ public class ReportTemplates {
         this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
         this.TEMPLATE_COLUMNS = page.locator("//tr[contains(@class, 'highlighted') and contains(@class, 'loadedall')]//td[1]/div");
         this.SEARCH_ICON = page.locator(".search-field > .ui");
-        this.REPORT_PROGRESS_ICON = page.locator("div.icon.report-progress");
         this.RUN_REPORT = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Run").setExact(true));
         this.REPORT_DOWNLOAD_OPTION = page.locator("//img[@title='options']");
         this.REPORT_PANEL = page.locator(".reports-body > div").first();
@@ -213,11 +211,12 @@ public class ReportTemplates {
         SEARCH_REPORT.fill(templateNameRandom);
         SEARCH_BUTTON.click();
         waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom));
-        while (REPORT_PROGRESS_ICON.isVisible()) {
+        Locator reportProgressIcon = page.locator(String.format("//div[contains(text(), '%s')]/ancestor::div[contains(@class,'left data-container')]/preceding-sibling::div//div[contains(@class,'icon report-progress')]", templateNameRandom));
+        while (reportProgressIcon.isVisible()) {
             SEARCH_BUTTON.click();
             page.waitForTimeout(5000); // wait for 1 second
         }
-        waitUtility.waitForLocatorDetached(REPORT_PROGRESS_ICON);
+        waitUtility.waitForLocatorDetached(reportProgressIcon);
         REPORT_DOWNLOAD_OPTION.click();
         Download download = page.waitForDownload(DOWNLOAD_REPORT::click);
         String REPORT_NAME = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());

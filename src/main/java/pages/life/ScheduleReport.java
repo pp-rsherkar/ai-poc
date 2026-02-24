@@ -25,7 +25,6 @@ public class ScheduleReport {
     private final Locator DEFAULT_TIME_ZONE;
     private final Locator WEEK_DAYS_BUTTON;
     private final Locator SEND_AT_TIME;
-    private final Locator SEND_AT_TIMEZONE;
     private final Locator DELIVERY_METHODS;
     private final Locator DELIVERY_TO_USER;
     private final Locator ADD_EMAILS_LINK;
@@ -60,11 +59,10 @@ public class ScheduleReport {
         this.SCHEDULE_START_DATE = page.locator("//input[@id='scheduleStartDate']");
         this.SCHEDULE_END_DATE = page.locator("//input[@id='scheduleEndDate']");
         this.CALENDAR_VIEW = page.locator("sui-calendar-date-view");
-        this.TIME_ZONE = page.locator("//div[@id='timeZoneTypeDropdown']");
-        this.DEFAULT_TIME_ZONE = page.locator("//div[@id='timeZoneTypeDropdown']/div[@class='text']");
+        this.TIME_ZONE = page.locator("//div[contains(@class, 'gaTimezone')]//div[contains(@class,'dropdown')]");
+        this.DEFAULT_TIME_ZONE = page.locator("//div[contains(@class, 'gaTimezone')]/div[contains(@class,'dropdown')]/div[@class='text']");
         this.WEEK_DAYS_BUTTON = page.locator("//button[@name='reportScheduleWeekDayTYpe']");
         this.SEND_AT_TIME = page.locator("//label[contains(text(),'Send At')]/following-sibling::div/input[@type='time']");
-        this.SEND_AT_TIMEZONE = page.locator("//div[contains(@class,'gaTimezone')]");
         this.DELIVERY_METHODS = page.locator("//div[contains(@class,'delivery-method-navbar')]/a");
         this.DELIVERY_TO_USER = page.locator("//div[contains(text(),'Deliver to Users')]/following-sibling::div/app-multi-select");
         this.ADD_EMAILS_LINK = page.locator("//label[contains(text(),'Add Emails')]");
@@ -157,7 +155,7 @@ public class ScheduleReport {
 
     public void selectTimeZone(Locator locator, String timeZone) {
         locator.click();
-        locator.getByText(timeZone).click();
+        locator.getByText(timeZone).first().click();
         page.waitForTimeout(1000);
     }
 
@@ -179,7 +177,7 @@ public class ScheduleReport {
     }
 
     public boolean isSendAtFieldAvailable() {
-        return SEND_AT_TIME.isVisible() && SEND_AT_TIMEZONE.isVisible();
+        return SEND_AT_TIME.isVisible() && TIME_ZONE.isVisible();
     }
 
     public String fetchSendAtTimeValue() {
@@ -187,13 +185,11 @@ public class ScheduleReport {
     }
 
     public String fetchSendAtTimezoneValue() {
-        return SEND_AT_TIMEZONE.innerText().trim();
+        return TIME_ZONE.innerText().trim();
     }
 
-    public boolean enterSendAtTimeAndTimezone(String time, String timeZone) {
+    public void enterSendAtTime(String time) {
         SEND_AT_TIME.fill(time);
-        selectTimeZone(SEND_AT_TIMEZONE, timeZone);
-        return SEND_AT_TIMEZONE.locator("xpath=//div[@class='text']").innerText().contains(timeZone);
     }
 
     public List<String> verifyDeliveryMethods() {
@@ -363,8 +359,7 @@ public class ScheduleReport {
     }
 
     public String fetchSendAtTimezone() {
-        if (SEND_AT_TIMEZONE.isVisible())
-            return SEND_AT_TIMEZONE.locator("xpath=//div[@class='text']").innerText().trim();
+        if (TIME_ZONE.isVisible()) return DEFAULT_TIME_ZONE.innerText().trim();
         return " ";
     }
 

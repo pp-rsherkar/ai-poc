@@ -21,6 +21,9 @@ public class TacticCreatives {
     private final Locator CREATIVE_TAB;
     private final Locator ASSIGN_EXISTING_CREATIVE;
     private final Locator SHOW_MORE_BUTTON;
+    private final Locator CREATIVE_STATUS;
+    private final Locator CLEAR_SEARCH_BOX;
+    private final Locator CREATIVES_TABLE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public TacticCreatives(Page page) {
@@ -38,6 +41,9 @@ public class TacticCreatives {
         this.CREATIVE_TAB = page.locator("//a[contains(text(),'Creatives')]");
         this.ASSIGN_EXISTING_CREATIVE = page.locator("//span[contains(text(),'Assign Existing Creatives')]");
         this.SHOW_MORE_BUTTON = page.locator("//button[contains(text(),'Show More')]");
+        this.CREATIVE_STATUS = page.locator("//td[contains(@class,'status-label')]");
+        this.CLEAR_SEARCH_BOX = page.locator("//div[contains(@class,'clear-search-close')]");
+        this.CREATIVES_TABLE = page.locator("//div[@id='parentTable']");
     }
 
     public String verifyTacticCreativesText() {
@@ -49,7 +55,17 @@ public class TacticCreatives {
         ASSIGN_CREATIVE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CREATIVE.fill(creative);
         CLICK_SEARCH.click();
-        waitUtility.waitForLocatorVisible(selectCreative.first(), 5000);
+        waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
+        if (!selectCreative.first().isVisible()) {
+            CLEAR_SEARCH_BOX.click();
+            waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
+            for (int i = 0; i < CREATIVE_STATUS.count(); i++) {
+                if (CREATIVE_STATUS.nth(i).innerText().equalsIgnoreCase("Approved")) {
+                    selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", i + 1));
+                    break;
+                }
+            }
+        }
         selectCreative.first().scrollIntoViewIfNeeded();
         if (!selectCreative.first().getAttribute("class").contains("checked")) selectCreative.first().click();
         ASSIGN_CREATIVE_OK_BUTTON.click();
@@ -90,7 +106,7 @@ public class TacticCreatives {
 
     public void selectAndAssignCreativeByStatus(String status) {
         Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
-        while(!statusLocator.first().isVisible()){
+        while (!statusLocator.first().isVisible()) {
             SHOW_MORE_BUTTON.scrollIntoViewIfNeeded();
             SHOW_MORE_BUTTON.click();
             waitUtility.waitForLocatorVisible(SEARCH_CREATIVE);

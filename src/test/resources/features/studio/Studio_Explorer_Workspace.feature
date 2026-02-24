@@ -15,7 +15,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName           | Option                                                                                                                  |
@@ -54,7 +55,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User clicks on AI Configurator and build audience using the AIPrompt "<AI_PROMPT>"
     Then Verify the filter is applied correctly "<PRIMARY_FILTERS>"
@@ -81,7 +83,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the following filters one by one and checks that NPI details are refined after each filter:
       | FilterName         | Option                                                                                                                  |
@@ -109,7 +112,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName | Option                                                        |
@@ -150,7 +154,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName | Option                |
@@ -185,12 +190,13 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies "Clinical" filter, selects filter options as below and verifies the clinical recency filter is updated correctly
       | FilterName           | Option                                                  | Recency  |
-      | Prescriptions        | 100％ Mineral Sunscreen                                 | 1 Month  |
-      | Prescribing behavior | 100％ Mineral Broad Spectrum Sunscreen Spf 30           | 3 Months |
+      | Prescriptions        | 100％ Mineral Sunscreen                                  | 1 Month  |
+      | Prescribing behavior | 100％ Mineral Broad Spectrum Sunscreen Spf 30            | 3 Months |
       | Diagnoses            | Maternal care for face٫ brow and chin presentation٫ oth | 6 Months |
       | Procedures           | Removal of face wrinkles                                | 1 Year   |
     And User applies "Contextual" filter, selects filter options as below and verifies the clinical recency filter is updated correctly
@@ -200,5 +206,5 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
     Examples:
-        | ADVERTISER | WORKSPACE_NAME |
-        | Abbvie     | Explorer       |
+      | ADVERTISER | WORKSPACE_NAME |
+      | Abbvie     | Explorer       |

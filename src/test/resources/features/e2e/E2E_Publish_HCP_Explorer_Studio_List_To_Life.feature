@@ -17,7 +17,8 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     #2
     And User applies the filter and selects option
@@ -51,7 +52,8 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     #2
     When User applies the filter and selects option
@@ -79,7 +81,8 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on HCP Explorer workspace
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
     And User applies the filter and selects option
       | FilterName | Option                                                        |
@@ -100,8 +103,8 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User clicks on Ok and closes the filter popup
     And Fetch and verify that NPI details are refined
     And User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it
-      | NPI Geographic Location    |
-      | NPI Facilities Geography   |
+      | NPI Geographic Location  |
+      | NPI Facilities Geography |
     And Fetch and verify that NPI details are refined
     Then Delete the filter
     And Fetch and verify that NPI details are refined
