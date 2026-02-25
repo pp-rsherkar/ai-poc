@@ -51,7 +51,7 @@ Feature: LIFE Regression - Line Item Management
       | Display          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60    |
       | Audio            | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60           |
       | Video            | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
-      | Native Display   | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60        |
+      | Native Display   | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60          |
       | Native Video     | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Ahead, PacingPercentage:60   |
       | DOOH             | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60           |
       | Search Extension | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |

@@ -103,8 +103,8 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User clicks on Ok and closes the filter popup
     And Fetch and verify that NPI details are refined
     And User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it
-      | NPI Geographic Location    |
-      | NPI Facilities Geography   |
+      | NPI Geographic Location  |
+      | NPI Facilities Geography |
     And Fetch and verify that NPI details are refined
     Then Delete the filter
     And Fetch and verify that NPI details are refined

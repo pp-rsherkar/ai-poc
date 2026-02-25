@@ -70,6 +70,9 @@ public class Accounts {
     private final Locator SETTINGS_PANEL_CANCEL_BUTTON;
     private final Locator ERROR_ALERT;
     private final Locator ALERT;
+    private final Locator EXPORT_OPTIONS_DIALOG;
+    private final Locator RUN_BUTTON;
+    private final Locator TEST_ACCESS_FAILED_TEXT;
     WaitUtility waitUtility;
 
     public Accounts(Page page) {
@@ -110,7 +113,7 @@ public class Accounts {
         this.USERNAME = page.locator("//input[@placeholder='Enter User Name']");
         this.PASSWORD = page.locator("//input[@placeholder='Enter Password']");
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
-        this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection']");
+        this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection' or text()='Test Access']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
         this.OK_BUTTON = page.locator("//button[contains(@class, 'okButton') or contains(text(),'Save')]");
         this.ACCOUNT_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
@@ -133,6 +136,9 @@ public class Accounts {
         this.SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
         this.ERROR_ALERT = page.locator("//div[@aria-label='Error while saving.']");
         this.ALERT = page.locator("//div[@role='alert']");
+        this.EXPORT_OPTIONS_DIALOG = page.locator("//div[text()='Choose file size to test access']");
+        this.RUN_BUTTON = page.locator("//button[text()='Run']");
+        this.TEST_ACCESS_FAILED_TEXT = page.locator("//span[text()='Access Test Failed']");
     }
 
     public void clickAdministration() {
@@ -254,9 +260,14 @@ public class Accounts {
         PASSWORD.last().fill(demoPassword);
     }
 
-    public void clickTestConnection() {
+    public String clickTestConnection() {
         TEST_CONNECTION_LINK.last().click();
-        waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
+        if (EXPORT_OPTIONS_DIALOG.isVisible()) RUN_BUTTON.click();
+        if (TEST_ACCESS_FAILED_TEXT.isVisible()) return TEST_ACCESS_FAILED_TEXT.textContent().trim();
+        else {
+            waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
+            return CONNECTION_CONFIRMATION_TEXT.textContent().trim();
+        }
     }
 
     public boolean clickOKButton() {
@@ -420,7 +431,7 @@ public class Accounts {
     public List<String> fetchWorkspacesWithPermission() {
         List<String> workspaceNameList = new ArrayList<>();
         for (int i = 0; i < WORKSPACE_PERMISSION_TOGGLE_BUTTON.count(); i++) {
-            if(WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
+            if (WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
                 int rowIndex = (int) WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).evaluate("(el) => Array.from(el.closest('tbody').children).indexOf(el.closest('tr')) + 1");
                 Locator workspaceNameLocator = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//div", rowIndex));
                 workspaceNameList.add(workspaceNameLocator.textContent().trim());
@@ -429,7 +440,7 @@ public class Accounts {
         return workspaceNameList;
     }
 
-    public void clickCancelButtonFromSettingsPanel(){
+    public void clickCancelButtonFromSettingsPanel() {
         SETTINGS_PANEL_CANCEL_BUTTON.click();
     }
 

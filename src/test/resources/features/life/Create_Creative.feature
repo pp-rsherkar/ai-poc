@@ -163,7 +163,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And User saves the creative
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | CREATIVE_TYPE | ADVERTISER     | ADVERTISER_DSA | FINANCER      | STATUS   | FILE_NAME                      |
+      | CREATIVE_TYPE | ADVERTISER     | ADVERTISER_DSA | FINANCER      | STATUS   | FILE_NAME                       |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate1.xlsx |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate1.xlsx |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate1.xlsx |
@@ -262,31 +262,31 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
+      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE | FILE_NAME                 |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File  | DCM_VIDEO_BulkUpload.xlsx |
 
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative
     When User assigns a campaign to the creative using "Bulk Assign" option
     Then User navigates to creative details and clicks Association tab
     And Verify column selection icon is available and upon clicking it below columns should display
-        | Line Item Name |
-        | ID             |
-        | Status         |
-        | Campaign Name  |
-        | Start Date     |
-        | End Date       |
+      | Line Item Name |
+      | ID             |
+      | Status         |
+      | Campaign Name  |
+      | Start Date     |
+      | End Date       |
     And Verify unselected columns are not displayed in the Association tab
-        | Start Date |
-        | End Date   |
+      | Start Date |
+      | End Date   |
     And Verify if "Hide All" hides all the columns in the Association tab
     And Verify if "Show All" displays all the columns in the Association tab
-        | Line Item Name |
-        | ID             |
-        | Status         |
-        | Campaign Name  |
-        | Start Date     |
-        | End Date       |
+      | Line Item Name |
+      | ID             |
+      | Status         |
+      | Campaign Name  |
+      | Start Date     |
+      | End Date       |
 
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
