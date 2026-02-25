@@ -4725,7 +4725,6 @@ public class LifeSteps {
         logger.info("Initiating bulk disables action and status verification for {} tactic(s)", (nameList.size() - 1));
         for (int i = 0; i < nameList.size() - 1; i++) {
             String tacticName = nameList.get(i);
-            logger.info("Processing bulk enable and disable for tactic: '{}'", tacticName);
             tacticDetails.bulkEnableTactics(tacticName);
             Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
             Assert.assertTrue(tacticDetails.getToggleIcon());

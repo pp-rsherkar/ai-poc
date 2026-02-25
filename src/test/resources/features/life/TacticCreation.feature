@@ -145,7 +145,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | HEADER_COMMENT        | NAV_COMMENT              |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Test Note from Header | Test Note from Nav Panel |
 
-
   @regression
   Scenario Outline: Create tactic and disable those tactics through bulk action
     When User clicks on create new Campaign
