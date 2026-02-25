@@ -4721,14 +4721,18 @@ public class LifeSteps {
 
     @And("User disables tactic through bulk action and verifies the status")
     public void userDisableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        logger.info("Initiating bulk disables action and status verification for {} tactic(s)", (nameList.size() - 1));
         for (int i = 0; i < nameList.size() - 1; i++) {
             String tacticName = nameList.get(i);
+            logger.info("Processing bulk enable and disable for tactic: '{}'", tacticName);
             tacticDetails.bulkEnableTactics(tacticName);
             Assert.assertTrue(tacticDetails.getToggleClass(tacticName));
             Assert.assertTrue(tacticDetails.getToggleIcon());
+            logger.info("Processing bulk disable for tactic: '{}'", tacticName);
             tacticDetails.bulkDisableTactics(tacticName);
             Assert.assertTrue(tacticDetails.getDisabledToggleIcon(tacticName));
         }
+        logger.info("Successfully completed bulk disable action and verification loop");
     }
 
     @When("User clicks on create new Campaign")
