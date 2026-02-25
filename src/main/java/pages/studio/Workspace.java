@@ -151,6 +151,7 @@ public class Workspace {
     }
 
     public void clickWebhookIcon() {
+        waitUtility.waitForLocatorVisible(WEBHOOK_ICON);
         WEBHOOK_ICON.click();
     }
 
