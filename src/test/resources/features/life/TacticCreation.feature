@@ -67,6 +67,29 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |
 
 
+  @regressionBas
+  Scenario Outline: Verify user is not able to set bid price more than Max Bid in tactic settings
+    When User clicks on Campaign Settings
+    Then Verify user is on default bid settings page
+    And  User gets Max Bid and Base Bid values
+    And Navigate to Campaign Dashboard and clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    And  Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values
+    When Verify user is able to update and save the base bid price
+    When Verify user is able to update and save the max bid price
+    When Verify user is not able to update max bid price more then highest possible max bid price
+    Then Verify that user is not able to set bid price more than Max Bid
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |
+
+
   @regression
   Scenario Outline: Verify deletion of Tactic from a Line Item
     When User clicks on create new Campaign
