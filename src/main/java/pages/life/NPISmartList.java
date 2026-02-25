@@ -8,7 +8,6 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -546,10 +545,8 @@ public class NPISmartList {
 
     public List<String> retrieveEnteredData(String listType) {
         List<String> enteredData = new ArrayList<>();
-        if (LIST_NAME.isVisible())
-            enteredData.add(LIST_NAME.inputValue());
-        else if (LIST_NAME_FROM_HEADER.isVisible())
-            enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
+        if (LIST_NAME.isVisible()) enteredData.add(LIST_NAME.inputValue());
+        else if (LIST_NAME_FROM_HEADER.isVisible()) enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
         if (!EDIT_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible())
             enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent());
         else if (ADVERTISER_NAME_FROM_HEADER.isVisible())
