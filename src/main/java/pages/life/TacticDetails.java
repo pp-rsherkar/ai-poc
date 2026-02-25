@@ -406,7 +406,7 @@ public class TacticDetails {
     public boolean getDisabledToggleIcon(String tacticName) {
         Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
         String cls = TACTIC_TOGGLE_CLASS.getAttribute("class");
-        return cls == null || !cls.contains("toggle-enabled");
+        return !cls.contains("toggle-enabled");
     }
 
     public void globalSearchDeletedTactic(String tacticName) {

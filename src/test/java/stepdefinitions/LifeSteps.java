@@ -4662,6 +4662,7 @@ public class LifeSteps {
             logger.info("Entering and saving tactic details");
             tacticDetails.enterTacticName(tacticNameRandom);
             tacticDetails.saveTacticDetails();
+            tacticDetails.tacticDetailsSuccess();
             logger.info("Selecting channel '{}' and saving tactic settings", channel);
             tacticSettings.selectChannel(channel);
             tacticSettings.saveTacticSettings();
