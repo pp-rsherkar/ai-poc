@@ -4662,6 +4662,7 @@ public class LifeSteps {
             logger.info("Entering and saving tactic details");
             tacticDetails.enterTacticName(tacticNameRandom);
             tacticDetails.saveTacticDetails();
+            tacticDetails.tacticDetailsSuccess();
             logger.info("Selecting channel '{}' and saving tactic settings", channel);
             tacticSettings.selectChannel(channel);
             tacticSettings.saveTacticSettings();
@@ -4711,12 +4712,29 @@ public class LifeSteps {
             Assert.assertTrue(isToggleClassEnabled);
 
             logger.info("Verifying toggle icon state for tactic '{}'", tacticName);
-            boolean isToggleIconEnabled = tacticDetails.getToggleIcon();
-            logger.info("Toggle icon enabled status: {}", isToggleIconEnabled);
+            boolean isToggleIconEnabled = tacticDetails.getToggleIcon(tacticName);
+            logger.info("Toggle icon Enabled status: {}", isToggleIconEnabled);
             Assert.assertTrue(isToggleIconEnabled);
         }
 
         logger.info("Successfully completed bulk enable action and verification loop");
+    }
+
+    @And("User disables tactic through bulk action and verifies the status")
+    public void userDisableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        logger.info("Initiating bulk disable action and status verification for {} tactic(s)", (nameList.size() - 1));
+        for (int i = 0; i < nameList.size() - 1; i++) {
+            String tacticName = nameList.get(i);
+            logger.info("Processing bulk disable for tactic: '{}'", tacticName);
+            tacticDetails.bulkDisableTactics(tacticName);
+            Assert.assertTrue(tacticDetails.getDisabledToggleClass(tacticName));
+
+            logger.info("Verifying toggle icon state for tactic is disabled '{}'", tacticName);
+            boolean isToggleIconDisabled = tacticDetails.getToggleDisabledIcon(tacticName);
+            logger.info("Toggle icon Disabled status: {}", isToggleIconDisabled);
+            Assert.assertTrue(isToggleIconDisabled);
+        }
+        logger.info("Successfully completed bulk disable action and verification loop");
     }
 
     @When("User clicks on create new Campaign")
