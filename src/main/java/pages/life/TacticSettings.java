@@ -661,6 +661,15 @@ public class TacticSettings {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
 
+    public void updateBaseBidPrice(BigDecimal updatedBaseBidPrice) {
+        TACTIC_BASE_BID_PRICE.fill(String.valueOf(updatedBaseBidPrice));
+    }
+
+
+    public void updateMaxBidPrice(BigDecimal updatedMaxBidPrice) {
+        TACTIC_MAX_BID_PRICE.fill(String.valueOf(updatedMaxBidPrice));
+    }
+
     public String getTacticName() {
         return DISPLAY_TACTIC_NAME.innerText();
     }

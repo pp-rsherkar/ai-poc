@@ -94,6 +94,7 @@ public class LifeSteps {
     String uiCustomFieldName;
     BigDecimal campaignBaseBid;
     BigDecimal campaignMaxBid;
+    BigDecimal campaignHighestBid;
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -3550,8 +3551,7 @@ public class LifeSteps {
         logger.info("Selecting value from dropdown");
         String valuesSelected = runReportPanel.selectValueFromDropdown();
         Assert.assertFalse("Unable to select value from dropdown", valuesSelected.isEmpty());
-        nameList.add(valuesSelected);
-    }
+        nameList.add(valuesSelected);}
 
     @And("User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic")
     public void userShouldBeAbleToFetchDetailsAdvertiserCampaignLineItemTactic() {
@@ -4627,10 +4627,11 @@ public class LifeSteps {
         Assert.assertEquals("Default Bid Settings", defaultSettings);
     }
 
-    @Then("User gets Max Bid and Base Bid values")
-    public void user_gets_max_bid_and_base_bid_values() {
+    @Then("User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings")
+    public void user_gets_max_bid_and_base_bid_values_and_highest_possible_max_bid_value() {
         campaignBaseBid = (campaignSettings.getBaseBidPrice());
         campaignMaxBid = (campaignSettings.getMaxBidPrice());
+        campaignHighestBid = (campaignSettings.getHighestPossibleMaxBidPrice());
         logger.info("Fetched Campaign Base Bid: {}, Max Bid: {}", campaignBaseBid, campaignMaxBid);
     }
 
@@ -4641,6 +4642,38 @@ public class LifeSteps {
         logger.info("Verifying tactic settings: Base Bid={}, Max Bid={}", tacticBaseBid, tacticMaxBid);
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @When("Verify user is able to update and save the base bid price")
+    public void verify_user_is_able_to_update_and_save_the_base_bid_price() {
+        BigDecimal tacticBaseBid = (tacticSettings.getTacticBaseBidPrice()).stripTrailingZeros();
+        logger.info("Base Bid Before update {}", tacticBaseBid);
+        BigDecimal updatedBaseBidPrice = campaignBaseBid.add(BigDecimal.ONE);
+        logger.info("Updating Base Bid price to {}", updatedBaseBidPrice);
+        tacticSettings.updateBaseBidPrice(updatedBaseBidPrice);
+        tacticSettings.saveTacticSettings();
+        tacticDetails.clickSettingsTab();
+        //Assert.assertEquals("Bid price update failed", updatedBaseBidPrice, tacticBaseBid);
+    }
+
+    @When("Verify user is able to update and save the max bid price")
+    public void verify_user_is_able_to_update_and_save_the_max_bid_price() {
+        BigDecimal tacticMaxBid = (tacticSettings.getTacticMaxBidPrice()).stripTrailingZeros();
+        logger.info("Max Bid Before update {}", tacticMaxBid);
+        BigDecimal updatedMaxBidPrice = tacticMaxBid.add(BigDecimal.ONE);
+        logger.info("Updating Max Bid price to {}", updatedMaxBidPrice);
+        tacticSettings.updateMaxBidPrice(updatedMaxBidPrice);
+        tacticSettings.saveTacticSettings();
+        tacticDetails.clickSettingsTab();
+        //Assert.assertEquals("Bid price update failed", updatedBaseBidPrice, tacticBaseBid);
+    }
+
+    @When("Verify user is not able to update max bid price more then highest possible max bid price")
+    public void verify_user_is_not_able_to_update_max_bid_price_more_than_highest_possible_max_bid_price() {
+    }
+
+    @Then("Verify that user is not able to set bid price more than Max Bid")
+    public void verify_that_user_is_not_able_to_set_bid_price_more_than_max_bid() {
     }
 
     @Then("User creates a new tactic with details {string} {string} {string}")
