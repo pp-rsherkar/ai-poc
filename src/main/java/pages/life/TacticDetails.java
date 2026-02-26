@@ -398,15 +398,25 @@ public class TacticDetails {
         return TACTIC_TOGGLE_CLASS.getAttribute("class").contains("toggle-enabled");
     }
 
-    public boolean getToggleIcon() {
+    public boolean getToggleIcon(String tacticName) {
+        Locator TACTIC_NAME = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]", tacticName));
+        TACTIC_NAME.click();
         Locator TACTIC_TOGGLE = page.locator(("//label[normalize-space()='Enabled']/preceding-sibling::input"));
         return TACTIC_TOGGLE.isChecked();
     }
 
-    public boolean getDisabledToggleIcon(String tacticName) {
+    public boolean getDisabledToggleClass(String tacticName) {
         Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
         String cls = TACTIC_TOGGLE_CLASS.getAttribute("class");
         return !cls.contains("toggle-enabled");
+    }
+
+    public boolean getToggleDisabledIcon(String tacticName) {
+        Locator TACTIC_NAME = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]", tacticName));
+        TACTIC_NAME.click();
+        Locator TACTIC_TOGGLE = page.locator(("//*[@id='actionComponent']/div/div/span/sui-checkbox"));
+        String cls = TACTIC_TOGGLE.getAttribute("class");
+        return !cls.contains("checked");
     }
 
     public void globalSearchDeletedTactic(String tacticName) {
