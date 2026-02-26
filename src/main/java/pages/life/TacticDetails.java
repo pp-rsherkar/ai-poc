@@ -52,6 +52,7 @@ public class TacticDetails {
     private final Locator TACTIC_REMOVE_BUTTON;
     private final Locator EXIT_BULK_MODE;
     private final Locator ENABLE_TACTIC;
+    private final Locator DISABLE_TACTIC;
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
     private final Locator TACTIC_TAB;
@@ -115,6 +116,7 @@ public class TacticDetails {
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
         this.EXIT_BULK_MODE = page.locator("//button[normalize-space()='Exit Bulk edit mode']");
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
+        this.DISABLE_TACTIC = page.locator("//div[contains(text(),'Disable Tactics')]");
         this.BULK_ACTION = page.locator("//span[@class='pointer inlineDiv iconSprite bulkEdit']");
         this.TACTIC_GLOBAL_SEARCH_TEXT = page.locator("//div[contains(text(),'Nothing found...')]");
         this.CLOSE_GLOBAL_SEARCH = page.locator("//div[@class='ui image close-white-40 pointer']");
@@ -383,16 +385,39 @@ public class TacticDetails {
         EXIT_BULK_MODE.click();
     }
 
+    public void bulkDisableTactics(String tacticName) {
+        Locator tacticNameXpath = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']/ancestor::div[contains(@class,'tactic-list')]/preceding-sibling::div/sui-checkbox", tacticName));
+        BULK_ACTION.click();
+        tacticNameXpath.click();
+        DISABLE_TACTIC.click();
+        EXIT_BULK_MODE.click();
+    }
+
     public boolean getToggleClass(String tacticName) {
         Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
         return TACTIC_TOGGLE_CLASS.getAttribute("class").contains("toggle-enabled");
     }
 
-    public boolean getToggleIcon() {
+    public boolean getToggleIcon(String tacticName) {
+        Locator TACTIC_NAME = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]", tacticName));
+        TACTIC_NAME.click();
         Locator TACTIC_TOGGLE = page.locator(("//label[normalize-space()='Enabled']/preceding-sibling::input"));
         return TACTIC_TOGGLE.isChecked();
     }
 
+    public boolean getDisabledToggleClass(String tacticName) {
+        Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
+        String cls = TACTIC_TOGGLE_CLASS.getAttribute("class");
+        return !cls.contains("toggle-enabled");
+    }
+
+    public boolean getToggleDisabledIcon(String tacticName) {
+        Locator TACTIC_NAME = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]", tacticName));
+        TACTIC_NAME.click();
+        Locator TACTIC_TOGGLE = page.locator(("//*[@id='actionComponent']/div/div/span/sui-checkbox"));
+        String cls = TACTIC_TOGGLE.getAttribute("class");
+        return !cls.contains("checked");
+    }
 
     public void globalSearchDeletedTactic(String tacticName) {
         OPEN_GLOBAL_SEARCH.click();
@@ -408,5 +433,4 @@ public class TacticDetails {
         CLOSE_GLOBAL_SEARCH.click();
     }
 }
-
 
