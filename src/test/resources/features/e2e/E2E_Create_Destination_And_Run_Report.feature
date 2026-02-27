@@ -6,7 +6,7 @@ Feature: Create a Destination in Admin and run below report against it.
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     When User navigates to Administrative section and go to Accounts Tab
-    And User searches the account "automation@pulsepoint" in which Destination to be created
+    And User searches the account "automation@pulsepoint" and selects the account
     And User navigates to Reporting tab
     Then User clicks Add Destination button
     And User enters Destination details - "Auto_Destination_", "SFTP", "ma2-qa-automation01", "22"

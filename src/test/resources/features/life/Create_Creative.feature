@@ -198,7 +198,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | 01- Advertiser | Display_Image.jpg | Creative      | DisplayBulkUploadTemplate1.xlsx | BlankDisplayBulkUploadTemplate.xlsx | Auto_DSA       | Auto_Financer | Approved |
 
   @regression
-  Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for HTML Creatives
+  Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for HTML Creatives using file type "<FILE_TYPE>"
     Given User clicks Bulk Upload button on Creative Library page
     When User selects the "HTML" creative type
     And Verify Advertiser field should be mandatory
@@ -213,9 +213,24 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
-      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | DCM File   | DCM_HTML_BulkUpload.xlsx |
-      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | PulsePoint |                          |
+      | ADVERTISER     | INVALID_LANDING_DOMAIN | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | SIZE    | DURATION | FILE_TYPE    | FILE_NAME              |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | DCM File     | HTML_DCM.xls           |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | PulsePoint   | HTML_Pulsepoint.xlsx   |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | Adform       | HTML_Adform.xls        |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | DoubleVerify | HTML_DoubleVerify.xlsx |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | Flashtalking | HTML_Flashtalking.csv  |
+      | 01- Advertiser | test                   | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | Sizmek       | HTML_Sizmek.xlsx       |
+
+  @regression
+  Scenario Outline: Validate Bulk Upload Functionality for HTML Creatives by downloading the template and uploading the file with type "<FILE_TYPE>"
+    Given User clicks Bulk Upload button on Creative Library page
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "HTML" creative type
+    And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
+    And Verify the newly created creative is displayed in the Creative Library page
+    Examples:
+      | ADVERTISER     | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME | SIZE    | DURATION | FILE_TYPE  | FILE_NAME         |
+      | 01- Advertiser | www.google.com | Auto_DSA       | Auto_Financer | Approved | HTML_Creative | 800x250 | 60       | PulsePoint | Download Template |
 
   @regression
   Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for Native Creatives
@@ -262,8 +277,12 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE  | FILE_NAME                |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File   | DCM_VIDEO_BulkUpload.xlsx |
+      | ADVERTISER     | CLICKTHROUGH_URL   | LANDING_DOMAIN | ADVERTISER_DSA | FINANCER      | STATUS   | CREATIVE_NAME  | IMAGE_FILENAME    | SIZE    | DURATION | FILE_TYPE    | FILE_NAME               |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File     | Video_DCM.xls           |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DoubleVerify | Video_DoubleVerify.xls  |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Flashtalking | Video_FlashTalking.xlsx |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Innovid      | VideoINNOVID.xlsx       |
+
 
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative

@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.CommonUtils;
@@ -96,6 +97,8 @@ public class NPISmartList {
     private final Locator LIST_NAME_FROM_HEADER;
     private final Locator ADVERTISER_NAME_FROM_HEADER;
     private final Locator EDIT_ICON;
+    private final Locator DECILE_SLIDER;
+    private final Locator BROWSE_PRESCRIBED_DRUG_FILE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPISmartList(Page page) {
@@ -159,7 +162,7 @@ public class NPISmartList {
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
         this.MEDSCAPE_PRIMARY_CONCEPT = page.locator("//div[contains(text(),'Select Medscape Primary Concept')]/following-sibling::div/input");
         this.WEBMD_PRIMARY_TOPIC = page.locator("//div[contains(text(),'Select WebMD Primary Topic')]/following-sibling::div/input");
-        this.ERROR_ALERT = page.locator("//div[@role='alertdialog' and contains(text(),'Select one or more List Population Options')]");
+        this.ERROR_ALERT = page.locator("//div[@role='alertdialog']");
         this.FETCH_SELECTED_ADVERTISER = page.locator("//span[@class='ng-value-label']");
         this.FETCH_SELECTED_SMART_PIXEL = page.locator("//span[contains(@class,'pixel-template-options')]");
         this.FETCH_SELECTED_ENGAGEMENT_SWITCH = page.locator("//div[contains(text(),'Engagement')]//following-sibling::div//button");
@@ -182,6 +185,8 @@ public class NPISmartList {
         this.LIST_NAME_FROM_HEADER = page.locator("//div[contains(@class,'header-name')]");
         this.ADVERTISER_NAME_FROM_HEADER = page.locator("//span[@class='header-adv']");
         this.EDIT_ICON = page.locator("//img[contains(@class,'header-edit-icon')]");
+        this.DECILE_SLIDER = page.locator("//div[contains(@class, 'decileSelectorContainer')]//span[@role='slider' and @aria-label='ngx-slider-max']");
+        this.BROWSE_PRESCRIBED_DRUG_FILE = page.locator("//app-clinical-population[@headername='Prescribed Drug']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
     }
 
     public void clickSmartPixelDropDownValue(String smartPixelDropdownValue) {
@@ -239,6 +244,7 @@ public class NPISmartList {
     public boolean verifyListPopulationOptions(String listPopulationOption) {
         waitUtility.waitForLocatorVisible(SMART_LIST_CONTAINER);
         for (int i = 0; i < SMART_LIST_POPULATION_OPTIONS.count(); i++) {
+            SMART_LIST_POPULATION_OPTIONS.nth(i).scrollIntoViewIfNeeded();
             String text = SMART_LIST_POPULATION_OPTIONS.nth(i).innerText().trim();
             if (text.equalsIgnoreCase(listPopulationOption)) return true;
         }
@@ -347,6 +353,7 @@ public class NPISmartList {
     }
 
     public void enterDiagnosisDetails(String diagnosis) {
+        waitUtility.waitForLocatorVisible(ADD_DIAGNOSIS_BUTTON.last());
         if (!SEARCH_DIAGNOSIS.last().isVisible()) {
             ADD_DIAGNOSIS_BUTTON.scrollIntoViewIfNeeded();
             ADD_DIAGNOSIS_BUTTON.click();
@@ -375,13 +382,26 @@ public class NPISmartList {
         };
     }
 
-    public String fetchDecile(String type) {
-        return switch (type) {
-            case "Prescribed Drug" -> PRESCRIBED_DRUG_DECILE.first().innerText();
-            case "Diagnosis Code" -> DIAGNOSIS_DECILE.first().innerText();
-            case "Medical Procedure Code" -> MEDICAL_PROCEDURE_DECILE.first().innerText();
-            default -> "";
-        };
+    public List<String> fetchDecile(String type) {
+        List<String> decileValues = new ArrayList<>();
+        switch (type) {
+            case "Prescribed Drug":
+                for (int i = 0; i < PRESCRIBED_DRUG_DECILE.count(); i++) {
+                    decileValues.add(PRESCRIBED_DRUG_DECILE.nth(i).innerText().trim());
+                }
+                break;
+            case "Diagnosis Code":
+                for (int i = 0; i < DIAGNOSIS_DECILE.count(); i++) {
+                    decileValues.add(DIAGNOSIS_DECILE.nth(i).innerText().trim());
+                }
+                break;
+            case "Medical Procedure Code":
+                for (int i = 0; i < MEDICAL_PROCEDURE_DECILE.count(); i++) {
+                    decileValues.add(MEDICAL_PROCEDURE_DECILE.nth(i).innerText().trim());
+                }
+                break;
+        }
+        return decileValues;
     }
 
     public void selectValueFromClinicalDropdown(String dropdownValue, String type) {
@@ -419,6 +439,7 @@ public class NPISmartList {
         switch (type) {
             case "Diagnosis Code" -> BROWSE_DIAGNOSIS_FILE.click();
             case "Medical Procedure Code" -> BROWSE_MEDICAL_PROCEDURE_FILE.click();
+            case "Prescribed Drug" -> BROWSE_PRESCRIBED_DRUG_FILE.click();
         }
         String fileLocator = "//div[contains(text(),'%s')]";
         CommonUtils.uploadFile(page, 0, fileLocator, fileName);
@@ -495,7 +516,8 @@ public class NPISmartList {
     }
 
     public String hoverAndFetchTooltip(String contextualCategory) {
-        page.locator(String.format("//div[contains(text(),'%s')]//span[@class='question-icon']", contextualCategory)).hover();
+        Locator questionIcon = page.locator(String.format("//div[contains(text(),'%s')]//span[@class='question-icon']", contextualCategory));
+        waitUtility.waitForLocatorVisible(TOOL_TIP);
         return TOOL_TIP.innerText().trim();
     }
 
@@ -527,6 +549,20 @@ public class NPISmartList {
             case "Profession":
                 selectProfession(detailsMap.get("Profession"));
                 break;
+            case "Smart Pixel":
+                clickSmartPixelDropDown();
+                selectSmartPixelDropdownValue();
+                selectEngagementType(detailsMap.get("EngagementType"));
+                clickSearchKeywordsCheckbox();
+                enterSearchKeywords(Collections.singletonList(detailsMap.get("Keyword")));
+                break;
+            case "NPI List":
+                selectHCPSwitch(detailsMap.get("HCPSwitch"));
+                selectNPIGroup(detailsMap.get("NPIGroup"));
+                break;
+            case "Prescription Behavior Change":
+                selectPrescriptionDrug(detailsMap.get("Drug"));
+                break;
         }
     }
 
@@ -547,17 +583,17 @@ public class NPISmartList {
     public List<String> retrieveEnteredData(String listType) {
         List<String> enteredData = new ArrayList<>();
         if (LIST_NAME.isVisible())
-            enteredData.add(LIST_NAME.inputValue());
+            enteredData.add(LIST_NAME.inputValue().trim());
         else if (LIST_NAME_FROM_HEADER.isVisible())
             enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
         if (!EDIT_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible())
-            enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent());
+            enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent().trim());
         else if (ADVERTISER_NAME_FROM_HEADER.isVisible())
             enteredData.add(ADVERTISER_NAME_FROM_HEADER.textContent().replace("Advertiser: ", "").trim());
         getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
         switch (listType) {
             case "Smart Pixel" -> {
-                enteredData.add(FETCH_SELECTED_SMART_PIXEL.textContent());
+                enteredData.add(FETCH_SELECTED_SMART_PIXEL.textContent().trim());
                 getValuesByClassAttribute(FETCH_SELECTED_ENGAGEMENT_SWITCH, "active", "xpath=//div", enteredData);
                 getValuesByClassAttribute(FETCH_SELECTED_RECENCY, "mat-radio-checked", "xpath=//div[@class='mat-radio-label-content']", enteredData);
                 if (FETCH_SELECTED_KEYWORD_FLAG.first().isVisible()) {
@@ -570,7 +606,7 @@ public class NPISmartList {
             case "NPI List" -> {
                 Locator npiListLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button", listType));
                 getValuesByClassAttribute(npiListLocator, "active", "xpath=//div", enteredData);
-                enteredData.add(FETCH_SELECTED_NPI_LIST.textContent());
+                enteredData.add(FETCH_SELECTED_NPI_LIST.textContent().trim());
             }
             case "Specialty" -> {
                 Locator specialtyLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button", listType));
@@ -581,35 +617,35 @@ public class NPISmartList {
             case "Prescribed Drug", "Diagnosis Code", "Medical Procedure Code" -> {
                 Locator prescribedDrugLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//div[contains(@class,'clinicalPopulationSwitch')]//button", listType));
                 getValuesByClassAttribute(prescribedDrugLocator, "active", "xpath=//div", enteredData);
-                fetchRecency(listType);
+                enteredData.add(fetchRecency(listType));
                 if (listType.contains("Prescribed Drug")) addLocatorData(FETCH_SELECTED_DRUG, enteredData, false);
                 if (listType.contains("Diagnosis Code") && FETCH_SELECTED_DIAGNOSIS_CODE.first().isVisible())
                     addLocatorData(FETCH_SELECTED_DIAGNOSIS_CODE, enteredData, false);
                 if (listType.contains("Medical Procedure Code") && FETCH_SELECTED_MEDICAL_PROCEDURE_CODE.first().isVisible())
                     addLocatorData(FETCH_SELECTED_MEDICAL_PROCEDURE_CODE, enteredData, false);
-                fetchDecile(listType);
+                enteredData.addAll(fetchDecile(listType));
             }
             case "Prescription Behavior Change" -> {
                 getValuesByClassAttribute(PRESCRIPTION_BEHAVIOUR_BUTTON, "active", "xpath=//parent::button", enteredData);
                 addLocatorData(FETCH_SELECTED_PRESCRIPTION_DRUG, enteredData, false);
                 if (FETCH_SELECTED_TOP_DROPPER_PERCENT.isVisible())
-                    enteredData.add(FETCH_SELECTED_TOP_DROPPER_PERCENT.textContent());
+                    enteredData.add(FETCH_SELECTED_TOP_DROPPER_PERCENT.textContent().trim());
                 if (FETCH_SELECTED_TIME_FRAME_MONTHS.isVisible())
-                    enteredData.add(FETCH_SELECTED_TIME_FRAME_MONTHS.textContent());
+                    enteredData.add(FETCH_SELECTED_TIME_FRAME_MONTHS.textContent().trim());
             }
             case "Endemic Research" -> {
                 Locator buttonXpath = ENDEMIC_RESEARCH_SECTION.locator("xpath=//button");
                 getValuesByClassAttribute(buttonXpath, "active", "", enteredData);
                 Locator dropdownXpath = ENDEMIC_RESEARCH_SECTION.locator("xpath=//div[@placement='top']");
                 addLocatorData(dropdownXpath, enteredData, false);
-                enteredData.add(FETCH_SELECTED_RECENCY_DAYS.textContent());
+                enteredData.add(FETCH_SELECTED_RECENCY_DAYS.textContent().trim());
             }
         }
         return enteredData;
     }
 
 
-    private void getValuesByClassAttribute(Locator locator, String classValue, String extendedLocator, List<String> dataList) {
+    public void getValuesByClassAttribute(Locator locator, String classValue, String extendedLocator, List<String> dataList) {
         for (int i = 0; i < locator.count(); i++) {
             String classAttribute = locator.nth(i).getAttribute("class");
             if (classAttribute != null && classAttribute.contains(classValue)) {
@@ -625,13 +661,14 @@ public class NPISmartList {
     }
 
     private void addLocatorData(Locator locator, List<String> dataList, boolean useInputValue) {
-        if (locator.first().isVisible()) {
-            for (int i = 0; i < locator.count(); i++) {
-                String value = useInputValue ? locator.nth(i).inputValue() : locator.nth(i).textContent();
-                dataList.add(value.trim());
-            }
-        }
+       if(locator.first().isVisible()) {
+           for (int i = 0; i < locator.count(); i++) {
+               String value = useInputValue ? locator.nth(i).inputValue() : locator.nth(i).textContent();
+               dataList.add(value.trim());
+           }
+       }
     }
+
 
     public String fetchDiagnosisCodesFromUI() {
         return DIAGNOSIS_CODE_FILE_DETAILS.textContent().split(" ")[0];
@@ -639,5 +676,21 @@ public class NPISmartList {
 
     public String fetchMedicalProcedureCodesFromUI() {
         return MEDICAL_PROCEDURE_CODE_FILE_DETAILS.textContent().split(" ")[3];
+    }
+
+    public void selectDecile(String sliderType, String sliderValue, String listOption) {
+        switch (listOption){
+            case "Prescribed Drug":
+                PRESCRIBED_DRUG_DECILE.first().click();
+                break;
+            case "Diagnosis Code":
+                DIAGNOSIS_DECILE.first().click();
+                break;
+            case "Medical Procedure":
+                MEDICAL_PROCEDURE_DECILE.first().click();
+                break;
+        }
+        CommonUtils.moveSliderToValue(DECILE_SLIDER, Integer.parseInt(sliderValue), page);
+        page.keyboard().press("Escape");
     }
 }

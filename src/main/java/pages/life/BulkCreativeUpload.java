@@ -188,7 +188,7 @@ public class BulkCreativeUpload {
 
     public String fetchErrorAlert() {
         if (!ERROR_ALERT.isVisible()) {
-            return "";
+            return "No error alert is displayed.";
         } else {
             String text = ERROR_ALERT.innerText().trim();
             waitUtility.waitForLocatorHidden(ERROR_ALERT);
@@ -356,7 +356,7 @@ public class BulkCreativeUpload {
         String locatorValue = "//div[@title='%s']";
         FILE_DROPDOWN.click();
         FILE_DROPDOWN_VALUE.locator("text=" + fileType).click();
-        if(fileType.contains("PulsePoint"))
+        if(fileType.contains("PulsePoint") && fileName.equalsIgnoreCase("Download Template"))
         {
             waitUtility.waitForLocatorVisible(DOWNLOAD_BULK_UPLOAD_TEMPLATE);
             Download download = page.waitForDownload(DOWNLOAD_BULK_UPLOAD_TEMPLATE::click);
@@ -365,6 +365,7 @@ public class BulkCreativeUpload {
             fileName = latestFile.getFileName().toString();
         }
         CommonUtils.uploadFile(page, 0, locatorValue, fileName);
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void selectAndClickDirection(String direction) {
@@ -373,6 +374,7 @@ public class BulkCreativeUpload {
     }
 
     public List<String> enterCreativeName(String name) {
+        waitUtility.waitUntilSpinnerHidden();
         List<String> nameList = new ArrayList<>();
         for (int i = 0; i < HTML_CREATIVE_NAME.count(); i++) {
             String newName = name + "_" + CommonUtils.timeStampCalculation() + "_" + CommonUtils.randomFourDigitNumber();
