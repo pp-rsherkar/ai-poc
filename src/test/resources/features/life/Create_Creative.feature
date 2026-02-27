@@ -163,7 +163,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And User saves the creative
     And Verify the newly created creative is displayed in the Creative Library page
     Examples:
-      | CREATIVE_TYPE | ADVERTISER     | ADVERTISER_DSA | FINANCER      | STATUS   | FILE_NAME                      |
+      | CREATIVE_TYPE | ADVERTISER     | ADVERTISER_DSA | FINANCER      | STATUS   | FILE_NAME                       |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Pending  | DisplayBulkUploadTemplate1.xlsx |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Approved | DisplayBulkUploadTemplate1.xlsx |
       | Display       | 01- Advertiser | Auto_DSA       | Auto_Financer | Denied   | DisplayBulkUploadTemplate1.xlsx |
@@ -289,23 +289,23 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     When User assigns a campaign to the creative using "Bulk Assign" option
     Then User navigates to creative details and clicks Association tab
     And Verify column selection icon is available and upon clicking it below columns should display
-        | Line Item Name |
-        | ID             |
-        | Status         |
-        | Campaign Name  |
-        | Start Date     |
-        | End Date       |
+      | Line Item Name |
+      | ID             |
+      | Status         |
+      | Campaign Name  |
+      | Start Date     |
+      | End Date       |
     And Verify unselected columns are not displayed in the Association tab
-        | Start Date |
-        | End Date   |
+      | Start Date |
+      | End Date   |
     And Verify if "Hide All" hides all the columns in the Association tab
     And Verify if "Show All" displays all the columns in the Association tab
-        | Line Item Name |
-        | ID             |
-        | Status         |
-        | Campaign Name  |
-        | Start Date     |
-        | End Date       |
+      | Line Item Name |
+      | ID             |
+      | Status         |
+      | Campaign Name  |
+      | Start Date     |
+      | End Date       |
 
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item

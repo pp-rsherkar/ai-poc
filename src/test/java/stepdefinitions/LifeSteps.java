@@ -34,6 +34,7 @@ import static utils.CommonUtils.normalizeObjectList;
 
 public class LifeSteps {
 
+    private static final Logger logger = LoggerFactory.getLogger(LifeSteps.class);
     static String campaignNameRandom;
     static String lineItemNameRandom;
     static String tacticNameRandom;
@@ -95,7 +96,6 @@ public class LifeSteps {
     BigDecimal campaignBaseBid;
     BigDecimal campaignMaxBid;
     Path targetFilePath;
-    private static final Logger logger = LoggerFactory.getLogger(LifeSteps.class);
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
     public void set_environment(String environment, String user) throws Exception {
@@ -1072,12 +1072,8 @@ public class LifeSteps {
         List<String> cleanedActual = selectedFilterLabels.stream().map(s -> s.replaceAll(":$", "")).toList();
         logger.info("Labels found: {}", cleanedActual);
         Assert.assertEquals(keyType, cleanedActual);
-        List<String> normalizedExpected = keyValues.stream()
-                .map(obj -> obj.toString().toLowerCase().trim())
-                .toList();
-        List<String> normalizedActual = campaignDashboard.fetchSelectedFilterValues().stream()
-                .map(s -> s.trim().toLowerCase())
-                .toList();
+        List<String> normalizedExpected = keyValues.stream().map(obj -> obj.toString().toLowerCase().trim()).toList();
+        List<String> normalizedActual = campaignDashboard.fetchSelectedFilterValues().stream().map(s -> s.trim().toLowerCase()).toList();
         logger.info("Values found: {}", normalizedActual);
         Assert.assertEquals(normalizedExpected, normalizedActual);
     }
@@ -1795,12 +1791,12 @@ public class LifeSteps {
         logger.info("Activity button '{}' presence status: {}", buttonType, isButtonPresent);
         Assert.assertTrue("Activity " + buttonType + " button is not present", isButtonPresent);
 
-        if(buttonType.equals("Active")) {
+        if (buttonType.equals("Active")) {
             logger.info("Verifying all content on Creative Library page is 'Active'");
             boolean isAllActive = createCreatives.showsActiveCreativesWhenActiveClicked();
             logger.info("Active creatives visibility status: {}", isAllActive);
             Assert.assertTrue("Not all content on Creative Library page is Active", isAllActive);
-        } else if(buttonType.equals("Archived")) {
+        } else if (buttonType.equals("Archived")) {
             logger.info("Verifying all content on Creative Library page is 'Archived'");
             boolean isAllArchived = createCreatives.showsArchivedCreativesWhenArchivedClicked();
             logger.info("Archived creatives visibility status: {}", isAllArchived);
@@ -1826,7 +1822,7 @@ public class LifeSteps {
         List<String> sortOptionsList = sortOptions.asList(String.class);
         logger.info("Verifying sort options: {}", sortOptionsList);
 
-        for(String sortOption : sortOptionsList){
+        for (String sortOption : sortOptionsList) {
             boolean isWorking = createCreatives.checkSortingOrder(sortOption);
             Assert.assertTrue(sortOption + " is not working correctly", isWorking);
         }
@@ -1840,7 +1836,7 @@ public class LifeSteps {
         logger.info("Verifying search functionality for values: {}", searchValuesList);
         createCreatives.clickActivityButton("Active");
 
-        for(String searchValue : searchValuesList){
+        for (String searchValue : searchValuesList) {
             createCreatives.searchCreative(searchValue);
             boolean isFound = createCreatives.checkSearchedValue(searchValue);
             Assert.assertTrue("Search is not working for value: " + searchValue, isFound);
@@ -1944,7 +1940,7 @@ public class LifeSteps {
         metricName = createCreatives.selectCheckboxWithArchiveButton();
         createCreatives.searchCreative(metricName);
         createCreatives.clickSearchedCreative(metricName);
-        Assert.assertEquals("You are about to delete "+ metricName +".This action cannot be undone: all deleted data will be lost.Do you want to proceed?", createCreatives.deleteCreative());
+        Assert.assertEquals("You are about to delete " + metricName + ".This action cannot be undone: all deleted data will be lost.Do you want to proceed?", createCreatives.deleteCreative());
         logger.info("Creative deletion initiated successfully");
     }
 
@@ -1996,14 +1992,12 @@ public class LifeSteps {
         logger.info("Performing bulk action: {} ({}) on {} creatives", bulkAction, bulkActionOption, noOfCreatives);
         createCreatives.clearSearchBox();
 
-        if(bulkAction.equalsIgnoreCase("Bulk Archive"))
-            createCreatives.clickActivityButton("Active");
-        else
-            createCreatives.clickActivityButton("Archived");
+        if (bulkAction.equalsIgnoreCase("Bulk Archive")) createCreatives.clickActivityButton("Active");
+        else createCreatives.clickActivityButton("Archived");
 
         nameList.clear();
 
-        for(int i=0; i<Integer.parseInt(noOfCreatives); i++){
+        for (int i = 0; i < Integer.parseInt(noOfCreatives); i++) {
             nameList.add(createCreatives.selectCheckboxWithArchiveButton());
         }
 
@@ -2012,7 +2006,7 @@ public class LifeSteps {
         logger.info("Verifying creatives moved to '{}' tab", tabName);
         createCreatives.clickActivityButton(tabName);
 
-        for(String name : nameList){
+        for (String name : nameList) {
             createCreatives.searchCreative(name);
             Assert.assertTrue("Creative " + name + " is not found in the " + tabName + " tab", createCreatives.checkSearchedValue(name));
         }
@@ -2029,7 +2023,7 @@ public class LifeSteps {
         createCreatives.selectCreativeStatus(statusList);
         nameList.clear();
 
-        for(int i=0; i<Integer.parseInt(noOfCreatives); i++){
+        for (int i = 0; i < Integer.parseInt(noOfCreatives); i++) {
             nameList.add(createCreatives.selectCheckboxWithCreativeStatusLabel());
         }
 
@@ -2039,7 +2033,7 @@ public class LifeSteps {
         logger.info("Verifying updated status labels");
         createCreatives.clickClearAllButton();
 
-        for(String name : nameList){
+        for (String name : nameList) {
             createCreatives.searchCreative(name);
             Assert.assertTrue("Creative " + name + " is not found", createCreatives.checkSearchedValue(name));
             Assert.assertEquals(statusLabel, createCreatives.fetchCreativeStatusLabel());
@@ -2076,7 +2070,7 @@ public class LifeSteps {
             logger.info("Verifying data persistence on Creative Tile for: {}", creativeNameFetched);
             List<String> creativeDetailsFromCreativeTile = createCreatives.fetchCreativeDetailsFromCreativeTile();
 
-            for(String creativeDetail : creativeDetailsFromCreativeTile){
+            for (String creativeDetail : creativeDetailsFromCreativeTile) {
                 if (creativeDetail == null || creativeDetail.trim().equalsIgnoreCase("N/A")) {
                     continue;
                 }
@@ -2984,7 +2978,7 @@ public class LifeSteps {
         logger.info("Uploading file '{}' for '{}' creative and previewing details", fileName, creativeType);
         Path latestFile = CommonUtils.getMostRecentFileFromDownloads();
 
-        if(fileName.contains("Downloaded")) {
+        if (fileName.contains("Downloaded")) {
             logger.info("File name indicates a downloaded file. Using most recent file from downloads: '{}'", latestFile.getFileName());
             bulkCreativeUpload.uploadSecondaryCreativeTemplate(String.valueOf(latestFile.getFileName()));
         } else {
@@ -3027,7 +3021,7 @@ public class LifeSteps {
     public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPageAndContainsAllTheDetailsEnteredDuringCreation() {
         logger.info("Verifying {} newly created creatives are displayed with correct details", nameList.size());
 
-        for(String name : nameList){
+        for (String name : nameList) {
             logger.info("Searching and opening creative: {}", name);
             createCreatives.searchCreative(name);
             createCreatives.clickSearchedCreative(name);
@@ -3671,15 +3665,15 @@ public class LifeSteps {
     public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
         logger.info("Verifying filter report section: {}", filterReportSection);
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
-        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1)){
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1)) {
             logger.info("Verifying checkbox label: {}", checkboxLabel1);
             Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
         }
-        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2)){
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2)) {
             logger.info("Verifying checkbox label: {}", checkboxLabel2);
             Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
         }
-        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3)){
+        if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3)) {
             logger.info("Verifying checkbox label: {}", checkboxLabel3);
             Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
         }
@@ -4712,6 +4706,7 @@ public class LifeSteps {
             logger.info("Entering and saving tactic details");
             tacticDetails.enterTacticName(tacticNameRandom);
             tacticDetails.saveTacticDetails();
+            tacticDetails.tacticDetailsSuccess();
             logger.info("Selecting channel '{}' and saving tactic settings", channel);
             tacticSettings.selectChannel(channel);
             tacticSettings.saveTacticSettings();
@@ -4761,12 +4756,29 @@ public class LifeSteps {
             Assert.assertTrue(isToggleClassEnabled);
 
             logger.info("Verifying toggle icon state for tactic '{}'", tacticName);
-            boolean isToggleIconEnabled = tacticDetails.getToggleIcon();
-            logger.info("Toggle icon enabled status: {}", isToggleIconEnabled);
+            boolean isToggleIconEnabled = tacticDetails.getToggleIcon(tacticName);
+            logger.info("Toggle icon Enabled status: {}", isToggleIconEnabled);
             Assert.assertTrue(isToggleIconEnabled);
         }
 
         logger.info("Successfully completed bulk enable action and verification loop");
+    }
+
+    @And("User disables tactic through bulk action and verifies the status")
+    public void userDisableAllTacticsThroughBulkActionAndVerifiesTheStatus() {
+        logger.info("Initiating bulk disable action and status verification for {} tactic(s)", (nameList.size() - 1));
+        for (int i = 0; i < nameList.size() - 1; i++) {
+            String tacticName = nameList.get(i);
+            logger.info("Processing bulk disable for tactic: '{}'", tacticName);
+            tacticDetails.bulkDisableTactics(tacticName);
+            Assert.assertTrue(tacticDetails.getDisabledToggleClass(tacticName));
+
+            logger.info("Verifying toggle icon state for tactic is disabled '{}'", tacticName);
+            boolean isToggleIconDisabled = tacticDetails.getToggleDisabledIcon(tacticName);
+            logger.info("Toggle icon Disabled status: {}", isToggleIconDisabled);
+            Assert.assertTrue(isToggleIconDisabled);
+        }
+        logger.info("Successfully completed bulk disable action and verification loop");
     }
 
     @When("User clicks on create new Campaign")

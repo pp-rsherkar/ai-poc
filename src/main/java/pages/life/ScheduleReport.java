@@ -359,8 +359,7 @@ public class ScheduleReport {
     }
 
     public String fetchSendAtTimezone() {
-        if (TIME_ZONE.isVisible())
-            return DEFAULT_TIME_ZONE.innerText().trim();
+        if (TIME_ZONE.isVisible()) return DEFAULT_TIME_ZONE.innerText().trim();
         return " ";
     }
 

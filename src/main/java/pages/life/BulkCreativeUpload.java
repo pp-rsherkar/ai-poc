@@ -356,8 +356,7 @@ public class BulkCreativeUpload {
         String locatorValue = "//div[@title='%s']";
         FILE_DROPDOWN.click();
         FILE_DROPDOWN_VALUE.locator("text=" + fileType).click();
-        if(fileType.contains("PulsePoint") && fileName.equalsIgnoreCase("Download Template"))
-        {
+        if (fileType.contains("PulsePoint") && fileName.equalsIgnoreCase("Download Template")) {
             waitUtility.waitForLocatorVisible(DOWNLOAD_BULK_UPLOAD_TEMPLATE);
             Download download = page.waitForDownload(DOWNLOAD_BULK_UPLOAD_TEMPLATE::click);
             CommonUtils.downloadFileAndMoveToSystemFolder(download);
@@ -511,37 +510,34 @@ public class BulkCreativeUpload {
         creativeDetails.add(ADVERTISER_DROPDOWN.locator("xpath=./div/span[2]").textContent().trim());
         creativeDetails.add(createCreatives.ADVERTISER_DSA.inputValue().trim());
         creativeDetails.add(createCreatives.FINANCER.inputValue().trim());
-        for(int i=0; i<APPROVAL_STATUS_BUTTON.count(); i++){
-            if(APPROVAL_STATUS_BUTTON.nth(i).getAttribute("class").contains("active")){
+        for (int i = 0; i < APPROVAL_STATUS_BUTTON.count(); i++) {
+            if (APPROVAL_STATUS_BUTTON.nth(i).getAttribute("class").contains("active")) {
                 creativeDetails.add(APPROVAL_STATUS_BUTTON.nth(i).textContent().trim());
                 break;
             }
         }
-        if(CREATIVE_TEXT_DETAILS_FROM_TABLE.first().isVisible()){
-            for(int i = 0; i < CREATIVE_TEXT_DETAILS_FROM_TABLE.count(); i++){
+        if (CREATIVE_TEXT_DETAILS_FROM_TABLE.first().isVisible()) {
+            for (int i = 0; i < CREATIVE_TEXT_DETAILS_FROM_TABLE.count(); i++) {
                 String bulkUploadFields = CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).inputValue().trim();
-                if(!bulkUploadFields.isEmpty())
-                    creativeDetails.add(bulkUploadFields);
+                if (!bulkUploadFields.isEmpty()) creativeDetails.add(bulkUploadFields);
             }
         }
-        if(CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.first().isVisible()){
-            for(int i = 0; i < CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.count(); i++){
+        if (CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.first().isVisible()) {
+            for (int i = 0; i < CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.count(); i++) {
                 String bulkUploadFields = CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).inputValue().trim();
-                if(!bulkUploadFields.isEmpty())
-                    creativeDetails.add(bulkUploadFields);
+                if (!bulkUploadFields.isEmpty()) creativeDetails.add(bulkUploadFields);
             }
         }
-        if(LANDING_PAGE_DOMAIN.isVisible())
-            creativeDetails.add(LANDING_PAGE_DOMAIN.inputValue().trim());
-        if(createCreatives.SELECTED_AD_CHOICES_ICON.first().isVisible())
+        if (LANDING_PAGE_DOMAIN.isVisible()) creativeDetails.add(LANDING_PAGE_DOMAIN.inputValue().trim());
+        if (createCreatives.SELECTED_AD_CHOICES_ICON.first().isVisible())
             creativeDetails.add(createCreatives.SELECTED_AD_CHOICES_ICON.first().textContent().trim());
-        if(HTML_CREATIVE_NAME.first().isVisible()){
+        if (HTML_CREATIVE_NAME.first().isVisible()) {
             for (int i = 0; i < HTML_CREATIVE_NAME.count(); i++) {
                 creativeDetails.add(HTML_CREATIVE_NAME.nth(i).inputValue().trim());
             }
         }
         Locator htmlAdSize = HTML_CREATIVE_NAME.locator("xpath=./ancestor::td/following-sibling::td[2]");
-        if(htmlAdSize.first().isVisible()){
+        if (htmlAdSize.first().isVisible()) {
             for (int i = 0; i < htmlAdSize.count(); i++) {
                 creativeDetails.add(htmlAdSize.nth(i).textContent().trim());
             }

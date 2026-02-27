@@ -21,11 +21,14 @@ import utils.FileActions;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
-
 public class StudioSteps {
+    private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
     static String workspaceName;
     static String newWorkspaceName;
     Boolean flag = true;
@@ -45,7 +48,6 @@ public class StudioSteps {
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
-    private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -66,7 +68,6 @@ public class StudioSteps {
         String actualHCPExplorer = workspaceCreation.verifyHCPExplorer();
         logger.info("Assertion: HCP Explorer workspace - expected='HCP Explorer', actual='{}'", actualHCPExplorer);
         Assert.assertEquals("HCP Explorer", actualHCPExplorer);
-
         String actualHCPEAudienceExpansion = workspaceCreation.verifyHCPAudienceExpansion();
         logger.info("Assertion: HCP Audience Expansion workspace - expected='HCP Audience Expansion', actual='{}'", actualHCPEAudienceExpansion);
         Assert.assertEquals("HCP Audience Expansion", actualHCPEAudienceExpansion);
@@ -177,7 +178,6 @@ public class StudioSteps {
         workspaceCreation.createStudioWorkspace();
     }
 
-
     @Then("User sees the types of workspaces they have permissions for")
     public void user_sees_the_types_of_workspaces_they_have_permissions_for() {
         logger.info("Fetching and validating workspace types against permissions");
@@ -186,9 +186,8 @@ public class StudioSteps {
         logger.info("Admin metric names: {}", metricNames);
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
+
 /*
-
-
     @Then("User selects the Workspace Type as {string}")
     public void user_selects_the_workspace_type_as(String string) {
 
@@ -224,7 +223,6 @@ public class StudioSteps {
 
     }
 */
-
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
@@ -306,8 +304,7 @@ public class StudioSteps {
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
 
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
-                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
-                            appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
+                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]", appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
                     return true;
                 }
 
@@ -537,7 +534,6 @@ public class StudioSteps {
         String text = workspace.verifyMacrosAppendedToBody();
         String[] parts = text.split("%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%");
         Assert.assertTrue("Macro suffix not found in text", parts.length == 1 || parts.length == 2);
-
         String actualJson = parts[0].replaceAll("\\s+", "");
         String expectedJsonNormalized = CommonUtils.readJsonTestDataFile(body).replaceAll("\\s+", "");
         Assert.assertEquals("JSON part does not match", expectedJsonNormalized, actualJson);
@@ -590,7 +586,7 @@ public class StudioSteps {
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         logger.info("Verifying delete warning for workspace with active webhook");
-        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\r\n|\r|\n", "\n").replaceAll("\s+", " ").trim();
+        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\r\n|\r|\n", "\n").replaceAll(" +", " ").trim();
         logger.info("Delete popup message: {}", actual);
         Assert.assertTrue("Message should warn about deleting the workspace", actual.contains("You are trying to delete the workspace " + workspaceName + "."));
         Assert.assertTrue("Message should mention that webhooks are enabled", actual.contains("Webhooks are enabled for this workspace."));
@@ -628,7 +624,6 @@ public class StudioSteps {
         }
     }
 
-
     @And("User applies the following filters one by one and checks that NPI details are refined after each filter:")
     public void userAppliesBelowFilterWithOptionAndCheckNPIDetails(DataTable dataTable) {
         logger.info("Applying filters one by one and verifying NPI refinement");
@@ -644,6 +639,7 @@ public class StudioSteps {
                 List<String> filterOptionList = CommonUtils.parseCommaSeparatedString(filterOption);
                 explorerWorkspace.selectFilter(filterName, filterOptionList);
             }
+            explorerWorkspace.clickFilterOKButton();
             explorerWorkspace.applyFilter();
             List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
             //explorerWorkspace.deleteFilter();
@@ -657,7 +653,6 @@ public class StudioSteps {
             previousNpiDetails = currentNpiDetails;
         }
     }
-
 
     @And("Verify after adding ai prompt filter selected manually should be overwritten")
     public void verifyAfterAddingAiPromptManuallySelectedFilterShouldBeOverwritten() {
@@ -817,7 +812,6 @@ public class StudioSteps {
         accounts.internalUserLogout();
     }
 
-
     @And("Verify the Retrofit checkbox is selected")
     public void verifyTheRetrofitCheckboxIsSelected() {
         logger.info("Verifying Retrofit checkbox is selected");
@@ -895,7 +889,6 @@ public class StudioSteps {
             Assert.assertTrue(explorerWorkspace.verifyWidgets(permissions));
         }
     }
-
 
     @And("User searches the account {string} for which permission to be checked")
     public void userSearchesTheAccountForWhichPermissionToBeChecked(String account) {

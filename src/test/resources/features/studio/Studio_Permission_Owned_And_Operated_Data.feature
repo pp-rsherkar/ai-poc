@@ -8,7 +8,7 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User navigates to Administrative section and go to Accounts Tab
-    And User searches the account "PP engineering test" for which permission to be checked
+    And User searches the account "PP engineering test" and checks Studio permissions
     And User navigates to Advertisers tab
     And User clicks on "HCP365" tab present under Advertisers tab
     And User sets the HCP365 permission "<PERMISSION_FLAG>" for "<ADVERTISER>" and saves the changes

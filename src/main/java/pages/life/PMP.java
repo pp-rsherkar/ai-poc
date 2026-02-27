@@ -119,7 +119,7 @@ public class PMP {
         this.GA_SURVEY_DIALOG = page.locator("//div[contains(text(),'Please rate the campaign setup process')]");
         this.GA_SURVEY_CLOSE_BUTTON = page.locator("//div[contains(@class,'btn-close .gaSurveyClose')]");
         this.CURATED_MARKETS_AND_DEALS_TITLE = page.locator("//span[text()='Curated Markets and Deals']");
-        this.ALERT =  page.locator("//div[@role='alert']");
+        this.ALERT = page.locator("//div[@role='alert']");
     }
 
     public void navigateToTacticSettingTab() {
@@ -271,8 +271,7 @@ public class PMP {
     }
 
     public String fetchMessageOnDeleteIconClick() {
-        if (GA_SURVEY_DIALOG.isVisible())
-            GA_SURVEY_CLOSE_BUTTON.click();
+        if (GA_SURVEY_DIALOG.isVisible()) GA_SURVEY_CLOSE_BUTTON.click();
         CURATED_MARKETS_AND_DEALS_TITLE.scrollIntoViewIfNeeded();
         DEALS_DELETE_ICON.click(new Locator.ClickOptions().setForce(true));
         return TOOLTIP_TEXT.textContent().trim();
@@ -283,8 +282,7 @@ public class PMP {
         page.locator(xpath).first().scrollIntoViewIfNeeded();
         DEAL_TYPE_COLUMN_NAME.evaluate("el => el.scrollIntoView({ inline: 'end', behavior: 'auto' })");
         page.locator(xpath).first().selectOption(new SelectOption().setLabel(pricingStrategyType));
-        if (pricingStrategyType.equalsIgnoreCase("Flat"))
-            PRICE_TEXT.fill(value);
+        if (pricingStrategyType.equalsIgnoreCase("Flat")) PRICE_TEXT.fill(value);
         saveTacticSettings();
         verifyTacticIsSaved();
         waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
