@@ -5570,4 +5570,10 @@ public class LifeSteps {
         Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
         logger.info("Line Item navigation verified successfully");
     }
+
+    @Then("User navigates to tactic setting tab and add targeting rule")
+    public void userNavigatesToTacticSettingTab() {
+        tacticDetails.clickSettingsTab();
+        navigation.clickOnIcon("New Targeting Rule");
+    }
 }
