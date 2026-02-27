@@ -29,7 +29,7 @@ public class ApiActions {
         try {
             response = request.post(endpointPath);
         } catch (PlaywrightException e) {
-            logger.info("POST request failed for endpoint: {}. Error: {}", endpointPath, e.getMessage());
+            logger.warn("POST request failed for endpoint: {}. Error: {}", endpointPath, e.getMessage());
             return null;
         }
         return response;

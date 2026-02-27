@@ -106,7 +106,7 @@ public class NPIAttributesList {
         AVAILABLE_IN_HCP365.check();
     }
 
-    public String saveListSuccess() {
+    public String fetchSuccessAlert() {
         String text = LIST_SUCCESS.innerText();
         waitUtility.waitForLocatorHidden(LIST_SUCCESS);
         return text;

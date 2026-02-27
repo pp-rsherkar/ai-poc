@@ -250,7 +250,7 @@ Feature: LIFE regression - Create NPI List of following types:
     And User selects "<DRUG>" from "<TYPE>" dropdown
     And Verify that Recency is set to "365" by default for "<TYPE>"
     And verify that Decile is set to "1-10" by default for "<TYPE>"
-    And User selects the "Decile" value as "<DECILE>" from the slider for "Prescribed Drug"
+    And User selects the Decile value as "<DECILE>" from the slider for "Prescribed Drug"
     And User retrieves all the entered data before saving the list "<TYPE>"
     And User saves the Smart List and verifies the successful creation of the list
     And Verify that the retrieved data for the "<TYPE>" list was saved correctly
@@ -286,7 +286,7 @@ Feature: LIFE regression - Create NPI List of following types:
     And User selects "<DIAGNOSIS>" from "<TYPE>" dropdown
     And Verify that Recency is set to "365" by default for "<TYPE>"
     And verify that Decile is set to "1-10" by default for "<TYPE>"
-    And User selects the "Decile" value as "<DECILE>" from the slider for "Diagnosis Code"
+    And User selects the Decile value as "<DECILE>" from the slider for "Diagnosis Code"
     And User retrieves all the entered data before saving the list "<TYPE>"
     And User saves the Smart List and verifies the successful creation of the list
     And Verify that the retrieved data for the "<TYPE>" list was saved correctly
@@ -322,7 +322,7 @@ Feature: LIFE regression - Create NPI List of following types:
     And User selects "<MEDICAL_PROCEDURE>" from "<TYPE>" dropdown
     And Verify that Recency is set to "365" by default for "<TYPE>"
     And verify that Decile is set to "1-10" by default for "<TYPE>"
-    And User selects the "Decile" value as "<DECILE>" from the slider for "Medical Procedure"
+    And User selects the Decile value as "<DECILE>" from the slider for "Medical Procedure"
     And User retrieves all the entered data before saving the list "<TYPE>"
     And User saves the Smart List and verifies the successful creation of the list
     And Verify that the retrieved data for the "<TYPE>" list was saved correctly

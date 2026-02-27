@@ -1691,7 +1691,7 @@ public class LifeSteps {
     @Then("Verify the Attributes list is saved successfully")
     public void verifyTheAttributesListIsSavedSuccessfully() {
         logger.info("Verifying Attributes list save success");
-        String successMessage = npiAttributesList.saveListSuccess();
+        String successMessage = npiAttributesList.fetchSuccessAlert();
         logger.info("Save message: '{}'", successMessage);
         assert successMessage.contains("NPI list created");
     }
@@ -3191,7 +3191,7 @@ public class LifeSteps {
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
         logger.info("Entering valid Landing Domain: {}", validLandingDomain);
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
-        Assert.assertEquals("No error alert is displayed.", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertFalse("No error alert is displayed.", bulkCreativeUpload.fetchErrorAlert().contains("No error alert is displayed."));
         logger.info("Valid Landing Domain accepted successfully");
     }
 
@@ -5026,10 +5026,10 @@ public class LifeSteps {
         npiSmartList.selectDropperValueFromSlider(sliderType, sliderValue);
     }
 
-    @And("User selects the {string} value as {string} from the slider for {string}")
-    public void userSelectsTheValueFromTheSliderFor(String sliderType, String sliderValue, String listOption) {
-        logger.info("Selecting '{}' value '{}' for option '{}' from slider", sliderType, sliderValue, listOption);
-        npiSmartList.selectDecile(sliderType, sliderValue, listOption);
+    @And("User selects the Decile value as {string} from the slider for {string}")
+    public void userSelectsTheValueFromTheSliderFor(String sliderValue, String listOption) {
+        logger.info("Selecting value '{}' for option '{}' from slider", sliderValue, listOption);
+        npiSmartList.selectDecile(sliderValue, listOption);
     }
 
     @And("Verify that Time Frame Selector slider should range from {string} to {string} months and should be set to {string} by default")

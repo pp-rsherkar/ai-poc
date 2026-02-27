@@ -675,7 +675,7 @@ public class NPISmartList {
         return MEDICAL_PROCEDURE_CODE_FILE_DETAILS.textContent().split(" ")[3];
     }
 
-    public void selectDecile(String sliderType, String sliderValue, String listOption) {
+    public void selectDecile(String sliderValue, String listOption) {
         switch (listOption){
             case "Prescribed Drug":
                 PRESCRIBED_DRUG_DECILE.first().click();

@@ -224,7 +224,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario Outline: Validate Bulk Upload Functionality for HTML Creatives by downloading the template and uploading the file with type "<FILE_TYPE>"
     Given User clicks Bulk Upload button on Creative Library page
-    Given User clicks Bulk Upload button on Creative Library page
     When User selects the "HTML" creative type
     And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
     And Verify the newly created creative is displayed in the Creative Library page
