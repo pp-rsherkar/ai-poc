@@ -3,6 +3,7 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
+import com.sun.source.tree.ReturnTree;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
@@ -77,6 +78,7 @@ public class TacticSettings {
     private final Locator TARGET;
     private final Locator BLOCK;
     private final Locator NEW_TACTIC;
+    private final Locator BASE_BID_ERROR;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -144,6 +146,7 @@ public class TacticSettings {
         this.BLOCK = page.locator("//div[contains(@class,'text-block')]");
         this.DISPLAY_TACTIC_NAME = page.locator("//div[@class='tactic-main-details']");
         this.NEW_TACTIC = page.locator("app-icon-lable-link").filter(new Locator.FilterOptions().setHasText("New Tactic")).locator("img");
+        this.BASE_BID_ERROR = page.locator("//div[contains(@aria-label,'Base Bid Price can not exceed Max Bid Price') or contains(@aria-label,'Your Account Manager has limited Max Bid')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -663,11 +666,17 @@ public class TacticSettings {
 
     public void updateBaseBidPrice(BigDecimal updatedBaseBidPrice) {
         TACTIC_BASE_BID_PRICE.fill(String.valueOf(updatedBaseBidPrice));
+        SAVE_TACTIC_SETTINGS.click();
     }
-
 
     public void updateMaxBidPrice(BigDecimal updatedMaxBidPrice) {
         TACTIC_MAX_BID_PRICE.fill(String.valueOf(updatedMaxBidPrice));
+        SAVE_TACTIC_SETTINGS.click();
+
+    }
+
+    public String getBidErrorText() {
+        return BASE_BID_ERROR.innerText();
     }
 
     public String getTacticName() {
