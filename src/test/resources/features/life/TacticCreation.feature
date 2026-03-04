@@ -68,7 +68,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
 
 
   @regression
-  Scenario Outline: Verify user is not able to set bid price more than Max Bid in tactic settings
+  Scenario Outline: Verify user is not able to set Base bid price and Max Bid more then allowed limit for a tactic
     When User clicks on Campaign Settings
     Then Verify user is on default bid settings page
     And  User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings
@@ -85,8 +85,8 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify user is not able to update "max" bid price more than allowed limit
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | Updated_Base_Bid | Updated_Max_Bid | Highest_Possible_Max_Bid |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | 13.31            | 15.15           | 9999                     |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |
 
 
   @regression

@@ -4667,9 +4667,9 @@ public class LifeSteps {
             actualBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
 
         }
-        else {
-            throw new IllegalArgumentException("Unsupported bid type: " + bidType);
-        }
+            else {
+                throw new IllegalArgumentException("Unsupported bid type: " + bidType);
+            }
         Assert.assertEquals(updatedBid, actualBid);
 
     }
@@ -4688,6 +4688,7 @@ public class LifeSteps {
             logger.info("Updating the Base Bid price from {} to {}", originalBid, updatedBid);
             tacticSettings.updateBaseBidPrice(updatedBid);
             FetchError = tacticSettings.getBidErrorText();
+            tacticSettings.clickCancel();
 
         }
         else if (bidType.equalsIgnoreCase("Max")) {
@@ -4697,6 +4698,7 @@ public class LifeSteps {
             logger.info("Updating the Max Bid price from {} to {}", originalBid, updatedBid);
             tacticSettings.updateMaxBidPrice(updatedBid);
             FetchError = tacticSettings.getBidErrorText().replaceAll("to.*","").trim();
+            tacticSettings.clickCancel();
         }
         else {
             throw new IllegalArgumentException("Unsupported bid type: " + bidType);
