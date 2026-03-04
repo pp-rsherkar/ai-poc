@@ -3551,7 +3551,8 @@ public class LifeSteps {
         logger.info("Selecting value from dropdown");
         String valuesSelected = runReportPanel.selectValueFromDropdown();
         Assert.assertFalse("Unable to select value from dropdown", valuesSelected.isEmpty());
-        nameList.add(valuesSelected);}
+        nameList.add(valuesSelected);
+    }
 
     @And("User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic")
     public void userShouldBeAbleToFetchDetailsAdvertiserCampaignLineItemTactic() {
