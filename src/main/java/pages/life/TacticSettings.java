@@ -672,13 +672,11 @@ public class TacticSettings {
     public void updateBaseBidPrice(BigDecimal updatedBaseBidPrice) {
         TACTIC_BASE_BID_PRICE.fill(String.valueOf(updatedBaseBidPrice));
         SAVE_TACTIC_SETTINGS.click();
-        //waitUtility.waitForElementHidden("//div[@role='alert']");
     }
 
     public void updateMaxBidPrice(BigDecimal updatedMaxBidPrice) {
         TACTIC_MAX_BID_PRICE.fill(String.valueOf(updatedMaxBidPrice));
         SAVE_TACTIC_SETTINGS.click();
-       // waitUtility.waitForElementHidden("//div[@role='alert']");
     }
 
     public String getBidErrorText() {

@@ -4667,10 +4667,9 @@ public class LifeSteps {
             tacticDetails.clickSettingsTab();
             actualBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
 
+        } else {
+            throw new IllegalArgumentException("Unsupported bid type: " + bidType);
         }
-            else {
-                throw new IllegalArgumentException("Unsupported bid type: " + bidType);
-            }
         Assert.assertEquals(updatedBid, actualBid);
 
     }
@@ -4685,23 +4684,21 @@ public class LifeSteps {
         if (bidType.equalsIgnoreCase("Base")) {
             expectedError = "Base Bid Price can not exceed Max Bid Price";
             originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
-            updatedBid = campaignMaxBid.add(BigDecimal.valueOf(1000));
+            updatedBid = campaignMaxBid.add(BigDecimal.TEN);
             logger.info("Updating the Base Bid price from {} to {}", originalBid, updatedBid);
             tacticSettings.updateBaseBidPrice(updatedBid);
             fetchError = tacticSettings.getBidErrorText();
             tacticSettings.clickCancel();
 
-        }
-        else if (bidType.equalsIgnoreCase("Max")) {
+        } else if (bidType.equalsIgnoreCase("Max")) {
             expectedError = "Your Account Manager has limited Max Bid";
             originalBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
-            updatedBid = campaignHighestBid.add(BigDecimal.valueOf(1000));
+            updatedBid = campaignHighestBid.add(BigDecimal.TEN);
             logger.info("Updating the Max Bid price from {} to {}", originalBid, updatedBid);
             tacticSettings.updateMaxBidPrice(updatedBid);
-            fetchError = tacticSettings.getBidErrorText().replaceAll("to.*","").trim();
+            fetchError = tacticSettings.getBidErrorText().replaceAll("to.*", "").trim();
             tacticSettings.clickCancel();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Unsupported bid type: " + bidType);
         }
         Assert.assertEquals(expectedError, fetchError);
