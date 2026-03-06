@@ -3551,7 +3551,8 @@ public class LifeSteps {
         logger.info("Selecting value from dropdown");
         String valuesSelected = runReportPanel.selectValueFromDropdown();
         Assert.assertFalse("Unable to select value from dropdown", valuesSelected.isEmpty());
-        nameList.add(valuesSelected);}
+        nameList.add(valuesSelected);
+    }
 
     @And("User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic")
     public void userShouldBeAbleToFetchDetailsAdvertiserCampaignLineItemTactic() {
@@ -4678,32 +4679,32 @@ public class LifeSteps {
     public void verifyUserIsNotAbleToSetBidPriceMoreThanAllowedLimit(String bidType) {
         BigDecimal originalBid;
         BigDecimal updatedBid;
-        String FetchError;
-        String ExpectedError;
+        String fetchError;
+        String expectedError;
 
         if (bidType.equalsIgnoreCase("Base")) {
-            ExpectedError = "Base Bid Price can not exceed Max Bid Price";
+            expectedError = "Base Bid Price can not exceed Max Bid Price";
             originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
             updatedBid = campaignMaxBid.add(BigDecimal.valueOf(1000));
             logger.info("Updating the Base Bid price from {} to {}", originalBid, updatedBid);
             tacticSettings.updateBaseBidPrice(updatedBid);
-            FetchError = tacticSettings.getBidErrorText();
+            fetchError = tacticSettings.getBidErrorText();
             tacticSettings.clickCancel();
 
         }
         else if (bidType.equalsIgnoreCase("Max")) {
-            ExpectedError = "Your Account Manager has limited Max Bid";
+            expectedError = "Your Account Manager has limited Max Bid";
             originalBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
             updatedBid = campaignHighestBid.add(BigDecimal.valueOf(1000));
             logger.info("Updating the Max Bid price from {} to {}", originalBid, updatedBid);
             tacticSettings.updateMaxBidPrice(updatedBid);
-            FetchError = tacticSettings.getBidErrorText().replaceAll("to.*","").trim();
+            fetchError = tacticSettings.getBidErrorText().replaceAll("to.*","").trim();
             tacticSettings.clickCancel();
         }
         else {
             throw new IllegalArgumentException("Unsupported bid type: " + bidType);
         }
-        Assert.assertEquals(ExpectedError, FetchError);
+        Assert.assertEquals(expectedError, fetchError);
     }
 
     @Then("User creates a new tactic with details {string} {string} {string}")

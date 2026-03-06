@@ -3,7 +3,6 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
-import com.sun.source.tree.ReturnTree;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
