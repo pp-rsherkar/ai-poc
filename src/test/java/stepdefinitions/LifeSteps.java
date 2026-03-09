@@ -5571,9 +5571,8 @@ public class LifeSteps {
         logger.info("Line Item navigation verified successfully");
     }
 
-    @Then("User navigates to tactic setting tab and add targeting rule")
+    @Then("User navigates to tactic setting tab")
     public void userNavigatesToTacticSettingTab() {
         tacticDetails.clickSettingsTab();
-        navigation.clickOnIcon("New Targeting Rule");
     }
 }
