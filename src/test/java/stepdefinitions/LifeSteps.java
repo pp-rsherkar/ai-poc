@@ -5581,7 +5581,7 @@ public class LifeSteps {
         List<String> copiedTacticDetails;
         for (String name : nameList) {
             tacticDetails.navigateToTacticDetails(name);
-            tacticDetails.clickTacticSettingsTab();
+            tacticDetails.clickSettingsTab();
             originalTacticDetails = tacticDetails.fetchTacticDetails();
             tacticCreatives.clickCreativeTab();
             originalTacticDetails.addAll(tacticDetails.fetchTacticCreative());

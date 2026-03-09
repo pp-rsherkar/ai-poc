@@ -456,14 +456,14 @@ public class TacticDetails {
         CLOSE_GLOBAL_SEARCH.click();
     }
 
-    public void clickTacticSettingsTab(){
-        TACTIC_SETTING_TAB.click();
-    }
+  //  public void clickTacticSettingsTab(){
+ //       TACTIC_SETTING_TAB.click();
+  //  }
 
     public boolean verifyTacticAvailable(String tacticName) {
-        Locator lineItem = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName));
-        lineItem.scrollIntoViewIfNeeded();
-        return lineItem.isVisible();
+        Locator tacticItem = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName));
+        tacticItem.scrollIntoViewIfNeeded();
+        return tacticItem.isVisible();
     }
 
     public void clickTacticOptions(String option){
@@ -502,7 +502,7 @@ public class TacticDetails {
 
     public List<String> fetchTacticCreative() {
         CREATIVE_NAME.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        List <String> originalTacticCreative = CREATIVE_NAME.allInnerTexts();;
+        List <String> originalTacticCreative = CREATIVE_NAME.allInnerTexts();
         return originalTacticCreative;
     }
 }
