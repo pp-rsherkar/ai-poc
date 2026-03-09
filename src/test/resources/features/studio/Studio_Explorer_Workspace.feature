@@ -208,3 +208,15 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     Examples:
       | ADVERTISER | WORKSPACE_NAME |
       | Abbvie     | Explorer       |
+
+  @todo
+  Scenario Outline: Validate the persistence of applied filters (Workspace Type, Advertiser, Created By, Workspace Name) on the Studio Workspace Details page
+    When User selects the workspace type "<WORKSPACE_TYPE>"
+    And User selects "<ADVERTISER>" from the Studio Workspace Advertiser dropdown
+    And User selects "<CREATED_BY>" from the Studio Workspace Created By dropdown
+    And User searches for a workspace by name using the search box on the Workspace Details page
+    And User navigates to another page and then returns to the Studio page
+    Then User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared
+    Examples:
+      | WORKSPACE_TYPE | ADVERTISER | CREATED_BY                     |
+      | HCP Explorer   | Abbvie     | ppqa_automation@pulsepoint.com |

@@ -52,7 +52,7 @@ public class StudioSteps {
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
         logger.info("User clicks on Create New Workspace");
-        workspaceCreation.createStudioWorkspace();
+        workspaceCreation.clickCreateStudioWorkspace();
     }
 
     @And("the User navigate to studio")
@@ -175,7 +175,7 @@ public class StudioSteps {
         logger.info("Studio dashboard: {}", dashboard);
         Assert.assertEquals("Unable to click on Create New Workspace button", "Studio", dashboard);
         workspaceCreation.verifyStudioWorkspaceFrame();
-        workspaceCreation.createStudioWorkspace();
+        workspaceCreation.clickCreateStudioWorkspace();
     }
 
     @Then("User sees the types of workspaces they have permissions for")
@@ -382,6 +382,8 @@ public class StudioSteps {
 
     @And("User searches the {string} and selects it")
     public void userSearchesTheAndSelectsIt(String workspace) {
+        logger.info("Verifying Studio workspace frame is visible");
+        workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching and opening workspace: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspace);
         workspaceCreation.clickWorkspace(workspace);
@@ -985,5 +987,47 @@ public class StudioSteps {
         String studioTitle = navigation.verifyStudioTitle();
         logger.info("Studio title: {}", studioTitle);
         Assert.assertEquals("Studio", studioTitle);
+    }
+
+    @When("User selects the workspace type {string}")
+    public void userSelectsTheWorkspaceType(String workspaceType){
+        logger.info("Verifying Studio Workspace frame is displayed");
+        workspaceCreation.verifyStudioWorkspaceFrame();
+        logger.info("Selecting workspace type: {}", workspaceType);
+        workspaceCreation.selectWorkspaceType(workspaceType);
+    }
+
+    @And("User selects {string} from the Studio Workspace Advertiser dropdown")
+    public void userSelectsFromTheStudioWorkspaceAdvertiserDropdown(String workspaceAdvertiser) {
+        logger.info("Selecting workspace advertiser: {}", workspaceAdvertiser);
+        workspaceCreation.selectWorkspaceAdvertiser(workspaceAdvertiser);
+    }
+
+    @And("User selects {string} from the Studio Workspace Created By dropdown")
+    public void userSelectsFromTheStudioWorkspaceCreatedByDropdown(String createdBy) {
+        logger.info("Selecting workspace created by: {}", createdBy);
+        workspaceCreation.selectWorkspaceCreatedBy(createdBy);
+    }
+
+    @And("User searches for a workspace by name using the search box on the Workspace Details page")
+    public void userSearchesForAWorkspaceByNameUsingTheSearchBoxOnTheWorkspaceDetailsPage() {
+        logger.info("Fetching workspace name from dashboard to search");
+        String workspaceName = workspaceCreation.fetchWorkspaceNameFromDashboard();
+        logger.info("Searching workspace by name: {}", workspaceName);
+        workspaceCreation.searchByWorkspaceName(workspaceName);
+    }
+
+    @And("User navigates to another page and then returns to the Studio page")
+    public void userNavigatesToAnotherPageAndThenReturnsToTheStudioPage() {
+        logger.info("Navigating to Campaign Dashboard to verify filter persistence");
+        navigation.clickPulsePointLogo();
+        logger.info("Navigating to Studio application again");
+        navigation.navigateToStudio();
+        logger.info("Verifying Studio Workspace frame is displayed");
+        workspaceCreation.verifyStudioWorkspaceFrame();
+    }
+
+    @Then("User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared")
+    public void userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared() {
     }
 }
