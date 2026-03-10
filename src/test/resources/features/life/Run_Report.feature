@@ -14,6 +14,10 @@ Feature: LIFE Regression - Run Report fields verification and report generation
   @regression
   Scenario Outline: Validate Run Report panel's field verification on Reports Page and allow report generation
     And User navigates to Administrative section and fetches the advertiser for the account "automation@pulsepoint"
+#    And User navigates to Report Templates page
+#    Then Verify the tabs displayed on the Report Templates page
+#    And User fetches the template created from Templates tab
+    And User fetches the logged in username
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
     And Template drop-down should display templates created under "automation@pulsepoint"
@@ -52,11 +56,42 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | Lifetime     |
       | Flights      |
     And User selects the option Only Report on Impressions with Identifiable NPIs
+    And Verify that "Email" tab is selected as Delivery method by default
+    And Verify that "Deliver to Users" field is pre-populated with logged in user email and user should be able to edit the email address "<USER_EMAIL>"
+    And Verify that "Notify User for Failures" field is pre-populated with logged in user email and user should be able to edit the email address "<USER_EMAIL>"
+    And Verify File Name field is available on report panel
     And User should be able to generate the report
+    And Validate report details such as Created By, Reporting period, Report Name from Report Listing page
     And Confirms that the report panel retains the entered data
     Examples:
-      | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS |
-      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          |
+      | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | USER_EMAIL          |
+      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | automationUserInter |
+
+  @regression
+  Scenario Outline: Verify Run Now tab's field options and their selection behavior
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    And User should be able to select template "<TEMPLATE>" from the dropdown
+    And User should be able to select advertiser as "<ADVERTISER>"
+    When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+    Then User should be able to select value from dropdown
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+    Then User should be able to select value from dropdown
+    When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+    Then User should be able to select value from dropdown
+    When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+    Then User should be able to select value from dropdown
+    When On Run Now tab, Report Period field should have options below
+      | Custom Dates |
+      | Lifetime     |
+      | Flights      |
+    And User selects "Custom Dates" option from Report Period field and verify the fields displayed on selecting the option
+    And User selects "Lifetime" option from Report Period field and verify the fields displayed on selecting the option
+    And User selects "Flights" option from Report Period field and verify the fields displayed on selecting the option
+    Examples:
+      | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | REPORT_FORMATS                                                             |
+      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
+
 
   @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report using Template and Custom Dates option from Run Now
@@ -165,6 +200,6 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     # And And confirm that the report panel retains the entered data
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | FILE_BREAKDOWN_TYPE |
-      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Single File         |
-      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Per Advertiser      |
-      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Per Campaign        |
+      | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Single File         |
+      | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Per Advertiser      |
+      | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Per Campaign        |

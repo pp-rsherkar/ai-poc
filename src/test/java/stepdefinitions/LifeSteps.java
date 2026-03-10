@@ -3411,7 +3411,7 @@ public class LifeSteps {
         logger.info("Verifying filter section '{}' with checkbox '{}'", filterReportSection, checkboxLabel);
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel))
-            Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel));
+            Assert.assertEquals(checkboxLabel.trim(), runReportPanel.fetchAndClickFilterReportCheckboxLabel(checkboxLabel));
         logger.info("Filter section and checkbox verified successfully");
     }
 
@@ -3425,7 +3425,16 @@ public class LifeSteps {
     public void onRunNowTabReportPeriodFieldShouldHaveOptionsBelow(DataTable dataTable) {
         List<String> dropdownValues = dataTable.asList(String.class);
         logger.info("Verifying Report Period dropdown options: {}", dropdownValues);
+        logger.info("Fetching Report Period options from UI: {}", runReportPanel.fetchReportPeriodOptions());
         Assert.assertEquals(new HashSet<>(dropdownValues), new HashSet<>(runReportPanel.fetchReportPeriodOptions()));
+    }
+
+    @And("User selects {string} option from Report Period field and verify the fields displayed on selecting the option")
+    public void userSelectsOptionFromReportPeriodFieldAndVerifyTheFieldsDisplayedOnSelectingTheOption(String option) {
+        logger.info("Selecting Report Period option: {}", option);
+        runReportPanel.selectReportPeriodButton(option);
+        logger.info("Verifying fields displayed for Report Period option: {}", option);
+        Assert.assertTrue("Fields are not available", runReportPanel.verifyReportPeriodRelatedFields(option));
     }
 
     @And("User selects the option Only Report on Impressions with Identifiable NPIs")
@@ -3444,9 +3453,26 @@ public class LifeSteps {
         logger.info("Report generation triggered successfully");
     }
 
+    @And("Validate report details such as Created By, Reporting period, Report Name from Report Listing page")
+    public void validateReportDetailsSuchAsCreatedByReportingPeriodReportNameFromReportListingPage() {
+        logger.info("Validating report details on Report Listing page for report: {}", metricName);
+        runReportPanel.searchReportName(metricName);
+        logger.info("Fetching report details for '{}'", metricName);
+        List<String> reportDetails = runReportPanel.fetchReportDetailsFromListingPage();
+        logger.info("Fetched report details: {}", reportDetails);
+        logger.info("Validating Created By field contains user type: {}", userType);
+        Assert.assertTrue("Created By is not available", reportDetails.contains(userType));
+        String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        logger.info("Validating Reporting Period is today's date: {}", formattedDate);
+        Assert.assertTrue("Reporting Period is not today's date", reportDetails.contains(formattedDate));
+        logger.info("Validating Report Name matches the generated metric name: {}", metricName);
+        Assert.assertTrue("Report name doesn't match", reportDetails.contains(metricName));
+    }
+
     @And("Confirms that the report panel retains the entered data")
     public void andConfirmThatTheReportPanelRetainsTheEnteredData() {
         logger.info("Verifying report panel retains entered data");
+        logger.info("Fetching data before saving the report: {}", nameList);
         runReportPanel.clickModifyOption(metricName);
         capturedDetails.addAll(runReportPanel.fetchTemplateValue());
         capturedDetails.addAll(runReportPanel.fetchDimensionAndMetricValues());
@@ -3458,6 +3484,9 @@ public class LifeSteps {
         capturedDetails.add(runReportPanel.fetchStartTime());
         capturedDetails.add(runReportPanel.fetchEndTime());
         capturedDetails.add(runReportPanel.fetchTimeZone());
+        capturedDetails.addAll(runReportPanel.fetchScheduleReportInputValue("Deliver to Users"));
+        capturedDetails.addAll(runReportPanel.fetchScheduleReportInputValue("Notify User for Failures"));
+        logger.info("Fetching data after saving the report: {}", capturedDetails);
         Assert.assertTrue("Not all entered data present in fetched values", capturedDetails.containsAll(nameList));
         logger.info("Report panel data persistence verified successfully");
     }
@@ -3623,15 +3652,15 @@ public class LifeSteps {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1)) {
             logger.info("Verifying checkbox label: {}", checkboxLabel1);
-            Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel1));
+            Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchAndClickFilterReportCheckboxLabel(checkboxLabel1));
         }
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2)) {
             logger.info("Verifying checkbox label: {}", checkboxLabel2);
-            Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel2));
+            Assert.assertEquals(checkboxLabel2.trim(), runReportPanel.fetchAndClickFilterReportCheckboxLabel(checkboxLabel2));
         }
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel3)) {
             logger.info("Verifying checkbox label: {}", checkboxLabel3);
-            Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchFilterReportCheckboxLabel(checkboxLabel3));
+            Assert.assertEquals(checkboxLabel3.trim(), runReportPanel.fetchAndClickFilterReportCheckboxLabel(checkboxLabel3));
         }
     }
 
@@ -5569,5 +5598,46 @@ public class LifeSteps {
         logger.info("Navigating to Line Item from Association Tab using Line Item Name: '{}'", lineItemNameRandom);
         Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
         logger.info("Line Item navigation verified successfully");
+    }
+
+    @And("User fetches the template created from Templates tab")
+    public void userFetchesTheTemplateCreatedUnder(){
+        logger.info("Navigating to Templates tab to fetch the created template");
+        //nameList = reportTemplates.fetchTemplateNameFromUI();
+        logger.info("Fetched template name: '{}'", metricName);
+    }
+
+    @And("User fetches the logged in username")
+    public void userFetchesTheLoggedInUsername() {
+        logger.info("Fetching logged in username");
+        userType = runReportPanel.fetchLoggedInUsername().split("\\(")[0];
+        logger.info("Fetched logged in username: '{}'", userType);
+    }
+
+    @And("Verify that {string} tab is selected as Delivery method by default")
+    public void verifyThatTabIsSelectedByDefault(String deliveryTab) {
+        logger.info("Verifying default selected delivery tab: '{}'", deliveryTab);
+        Assert.assertTrue(deliveryTab + "is not default Delivery Method", runReportPanel.fetchDefaultDeliveryTab(deliveryTab));
+    }
+
+    @And("Verify that {string} field is pre-populated with logged in user email and user should be able to edit the email address {string}")
+    public void verifyThatFieldIsPrePopulatedWithLoggedInUserEmailAndUserShouldBeAbleToEditTheEmailAddress(String fieldName, String newEmail) {
+        logger.info("Verifying that '{}' field is pre-populated with logged in user email and is editable", fieldName);
+        List<String> fetchScheduleReportValue = runReportPanel.fetchScheduleReportInputValue(fieldName);
+        logger.info("Fetched value from '{}' field: '{}'", fieldName, fetchScheduleReportValue);
+        for(String value : fetchScheduleReportValue){
+            logger.info("Checking if fetched value '{}' contains logged in username '{}'", value, userType);
+            Assert.assertTrue(fieldName + " field is not pre-populated with logged in user email", userType.contains(value));
+        }
+        logger.info("Verifying that '{}' field is editable", fieldName);
+        runReportPanel.enterDataInScheduleReport(fieldName, newEmail);
+        logger.info("Entered new email '{}' in '{}' field", newEmail, fieldName);
+        nameList.addAll(runReportPanel.fetchScheduleReportInputValue(fieldName));
+    }
+
+    @And("Verify File Name field is available on report panel")
+    public void verifyFileNameFieldIsAvailableOnReportPanel() {
+        logger.info("Verifying File Name field is available on report panel");
+        Assert.assertTrue("File Name field is not available on report panel", runReportPanel.isFileNameFieldAvailable());
     }
 }
