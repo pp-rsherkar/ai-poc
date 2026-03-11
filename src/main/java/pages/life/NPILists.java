@@ -106,6 +106,7 @@ public class NPILists {
         waitUtility.waitForLocatorVisible(CREATE_NEW_LIST);
         SEARCH_BOX.first().fill(listName);
         SEARCH_BOX.first().press("Enter");
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void openSearchedList(String listName) {
