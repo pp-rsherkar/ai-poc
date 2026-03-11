@@ -1018,10 +1018,10 @@ public class StudioSteps {
     }
 
     @And("User navigates to another page within Studio and then returns to the workspace list page")
-    public void userNavigatesToAnotherPageAndThenReturnsToTheCreateWorkspacePage() {
-        logger.info("Navigating to another page within Studio and returning to create workspace page");
+    public void userNavigatesToAnotherPageWithinStudioAndThenReturnsToTheWorkspaceListPage() {
+        logger.info("Navigating to another page within Studio and then returning to the workspace list page");
         workspaceCreation.clickCreateStudioWorkspace();
-        logger.info("Navigated back to workspace list page from create new workspace");
+        logger.info("Navigated back to the workspace list page after visiting the create new workspace page");
         workspaceCreation.clickBackArrowFromCreateNewWorkspace();
     }
 
