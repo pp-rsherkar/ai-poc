@@ -202,4 +202,4 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | FILE_BREAKDOWN_TYPE |
       | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Single File         |
       | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Per Advertiser      |
-      | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Per Campaign        |
+      | AutoTemplate20 | Z_automation   | Auto              | Line               | Tactic          | Creative          | Per Campaign        |
