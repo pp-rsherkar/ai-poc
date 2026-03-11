@@ -1012,22 +1012,44 @@ public class StudioSteps {
     @And("User searches for a workspace by name using the search box on the Workspace Details page")
     public void userSearchesForAWorkspaceByNameUsingTheSearchBoxOnTheWorkspaceDetailsPage() {
         logger.info("Fetching workspace name from dashboard to search");
-        String workspaceName = workspaceCreation.fetchWorkspaceNameFromDashboard();
+        workspaceName = workspaceCreation.fetchWorkspaceNameFromDashboard();
         logger.info("Searching workspace by name: {}", workspaceName);
         workspaceCreation.searchByWorkspaceName(workspaceName);
     }
 
-    @And("User navigates to another page and then returns to the Studio page")
-    public void userNavigatesToAnotherPageAndThenReturnsToTheStudioPage() {
-        logger.info("Navigating to Campaign Dashboard to verify filter persistence");
-        navigation.clickPulsePointLogo();
-        logger.info("Navigating to Studio application again");
-        navigation.navigateToStudio();
-        logger.info("Verifying Studio Workspace frame is displayed");
-        workspaceCreation.verifyStudioWorkspaceFrame();
+    @And("User navigates to another page within Studio and then returns to the workspace list page")
+    public void userNavigatesToAnotherPageAndThenReturnsToTheCreateWorkspacePage() {
+        logger.info("Navigating to another page within Studio and returning to create workspace page");
+        workspaceCreation.clickCreateStudioWorkspace();
+        logger.info("Navigated back to workspace list page from create new workspace");
+        workspaceCreation.clickBackArrowFromCreateNewWorkspace();
     }
 
-    @Then("User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared")
-    public void userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared() {
+    @Then("User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
+    public void userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
+        logger.info("Verifying persistence of selected filters, dropdown values, and search input");
+        String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
+        logger.info("Selected workspace type: {}", actualWorkspaceType);
+        Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
+        String actualWorkspaceAdvertiser = workspaceCreation.getSelectedWorkspaceAdvertiser();
+        logger.info("Selected workspace advertiser: {}", actualWorkspaceAdvertiser);
+        Assert.assertEquals("Selected workspace advertiser is not persistent", expectedAdvertiser, actualWorkspaceAdvertiser);
+        String actualWorkspaceCreatedBy = workspaceCreation.getSelectedWorkspaceCreatedBy();
+        logger.info("Selected workspace created by: {}", actualWorkspaceCreatedBy);
+        Assert.assertEquals("Selected workspace created by is not persistent", expectedCreatedBy, actualWorkspaceCreatedBy);
+        String actualWorkspaceName = workspaceCreation.getSearchedWorkspaceName();
+        logger.info("Searched workspace name: {}", actualWorkspaceName);
+        Assert.assertEquals("Search input value is not persistent", workspaceName, actualWorkspaceName);
+    }
+
+    @And("Verify on refresh of the page, the filters are reset and search input is cleared")
+    public void verifyOnRefreshOfThePageTheFiltersAreResetAndSearchInputIsCleared() {
+        logger.info("Refreshing the page to verify filters are reset and search input is cleared");
+        workspaceCreation.refreshPage();
+        logger.info("Verifying filters are reset and search input is cleared after page refresh");
+        Assert.assertTrue("Workspace Type checkbox is not reset", workspaceCreation.getSelectedWorkspaceType().isEmpty());
+        Assert.assertTrue("Workspace advertiser dropdown is not reset", workspaceCreation.getSelectedWorkspaceAdvertiser().isEmpty());
+        Assert.assertTrue("Workspace created by dropdown is not reset", workspaceCreation.getSelectedWorkspaceCreatedBy().isEmpty());
+        Assert.assertTrue("Search box is not cleared", workspaceCreation.getSearchedWorkspaceName().isEmpty());
     }
 }
