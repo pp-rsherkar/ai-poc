@@ -94,6 +94,7 @@ public class LifeSteps {
     String uiCustomFieldName;
     BigDecimal campaignBaseBid;
     BigDecimal campaignMaxBid;
+    BigDecimal campaignHighestBid;
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -4627,10 +4628,11 @@ public class LifeSteps {
         Assert.assertEquals("Default Bid Settings", defaultSettings);
     }
 
-    @Then("User gets Max Bid and Base Bid values")
-    public void user_gets_max_bid_and_base_bid_values() {
+    @Then("User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings")
+    public void user_gets_max_bid_and_base_bid_values_and_highest_possible_max_bid_value() {
         campaignBaseBid = (campaignSettings.getBaseBidPrice());
         campaignMaxBid = (campaignSettings.getMaxBidPrice());
+        campaignHighestBid = (campaignSettings.getHighestPossibleMaxBidPrice());
         logger.info("Fetched Campaign Base Bid: {}, Max Bid: {}", campaignBaseBid, campaignMaxBid);
     }
 
@@ -4641,6 +4643,65 @@ public class LifeSteps {
         logger.info("Verifying tactic settings: Base Bid={}, Max Bid={}", tacticBaseBid, tacticMaxBid);
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @When("Verify user is able to update and save the {string} bid price")
+    public void verify_user_is_able_to_update_and_save_the_bid_price(String bidType) {
+        BigDecimal originalBid;
+        BigDecimal updatedBid;
+        BigDecimal actualBid;
+
+        if (bidType.equalsIgnoreCase("Base")) {
+            originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
+            updatedBid = originalBid.add(BigDecimal.ONE);
+            logger.info("Updating Base Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateBaseBidPrice(updatedBid);
+            tacticDetails.clickSettingsTab();
+            actualBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
+
+        } else if (bidType.equalsIgnoreCase("Max")) {
+            originalBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
+            updatedBid = originalBid.add(BigDecimal.ONE);
+            logger.info("Updating Max Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateMaxBidPrice(updatedBid);
+            tacticDetails.clickSettingsTab();
+            actualBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
+
+        } else {
+            throw new IllegalArgumentException("Unsupported bid type: " + bidType);
+        }
+        Assert.assertEquals(updatedBid, actualBid);
+
+    }
+
+    @Then("Verify user is not able to update {string} bid price more than allowed limit")
+    public void verifyUserIsNotAbleToSetBidPriceMoreThanAllowedLimit(String bidType) {
+        BigDecimal originalBid;
+        BigDecimal updatedBid;
+        String fetchError;
+        String expectedError;
+
+        if (bidType.equalsIgnoreCase("Base")) {
+            expectedError = "Base Bid Price can not exceed Max Bid Price";
+            originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
+            updatedBid = campaignMaxBid.add(BigDecimal.TEN);
+            logger.info("Updating the Base Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateBaseBidPrice(updatedBid);
+            fetchError = tacticSettings.getBidErrorText();
+            tacticSettings.clickCancel();
+
+        } else if (bidType.equalsIgnoreCase("Max")) {
+            expectedError = "Your Account Manager has limited Max Bid";
+            originalBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
+            updatedBid = campaignHighestBid.add(BigDecimal.TEN);
+            logger.info("Updating the Max Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateMaxBidPrice(updatedBid);
+            fetchError = tacticSettings.getBidErrorText().replaceAll("to.*", "").trim();
+            tacticSettings.clickCancel();
+        } else {
+            throw new IllegalArgumentException("Unsupported bid type: " + bidType);
+        }
+        Assert.assertEquals(expectedError, fetchError);
     }
 
     @Then("User creates a new tactic with details {string} {string} {string}")
@@ -5061,7 +5122,7 @@ public class LifeSteps {
         accounts.clickAdministration();
         accounts.clickAdvertiserTab();
         accounts.selectAccount(account);
-        itemList = CommonUtils.normalize(accounts.fetchAdvertiserList());
+        itemList = normalize(accounts.fetchAdvertiserList());
         logger.info("Fetched advertisers for account '{}': {}", account, itemList);
         accounts.selectAccountsTab();
         accounts.searchAccount(account);
@@ -5072,7 +5133,7 @@ public class LifeSteps {
 
     @Then("Verify Advertiser dropdown should show values which are mapped to the account")
     public void verifyAdvertiserDropdownShouldShowValuesWhichAreMappedToTheAccount() {
-        List<String> actualAdvertiserList = CommonUtils.normalize(campaigns.fetchAdvertiserList());
+        List<String> actualAdvertiserList = normalize(campaigns.fetchAdvertiserList());
         logger.info("Verifying Advertiser dropdown values: expected={}, actual={}", itemList, actualAdvertiserList);
         Assert.assertEquals("Advertisers list is not matched", actualAdvertiserList, itemList);
     }
