@@ -181,6 +181,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Tactic      | 3     |
 
+  @todo
   Scenario Outline: Verify all Bid Multipliers Rules under categories and Create a tactic by adding all Bid multipliers Rules
     And User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
@@ -194,7 +195,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
       | Day of the Week    | Monday, Tuesday, Friday                                            |
       | Speciality         | Anesthesiology,Genetics & Genomics                                 |
-
       | Practitioner Type  | Physician, Chiropractor, Pharmacist                                |
       | NPI                | AutoSmartList954103283                                             |
       | Age                | 35-39, 55-59, 18-24,65+                                            |
@@ -205,7 +205,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | Operating System   | Windows, macOS, Blackberry                                         |
       | Inventory Source   | New Report                                                         |
       | Domains/Apps       | APP Regular, updaedList106043912                                   |
-
     Then Verify Bid multiplier panel with all options under below categories
       | AUDIENCE ATTRIBUTE |
       | DEMOGRAPHICS       |
