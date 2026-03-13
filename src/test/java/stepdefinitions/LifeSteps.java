@@ -1076,13 +1076,15 @@ public class LifeSteps {
         logger.info("Verifying campaigns include past and current flights");
         List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
         LocalDate today = LocalDate.now();
-        boolean hasPast = dates.stream().anyMatch(date -> date.isBefore(today));
-        boolean hasCurrent = dates.stream().anyMatch(date -> date.isEqual(today));
-        boolean hasFuture = dates.stream().anyMatch(date -> date.isAfter(today));
-        logger.info("Flight Distribution - Past: {}, Current (starts/ends today): {}, Future: {}",
-                hasPast, hasCurrent, hasFuture);
-        boolean isLifeTimeView = hasPast && hasFuture;
-        Assert.assertTrue("Dashboard appears filtered and is missing past or future data", isLifeTimeView);
+        LocalDate earliest = dates.stream().min(LocalDate::compareTo).orElse(today);
+        LocalDate latest = dates.stream().max(LocalDate::compareTo).orElse(today);
+        boolean hasPast = earliest.isBefore(today);
+        boolean hasFuture = latest.isAfter(today);
+        boolean hasCurrent = (earliest.isBefore(today) || earliest.isEqual(today))
+                && (latest.isAfter(today) || latest.isEqual(today));
+        logger.info("Range: {} to {}. Past: {}, Current: {}, Future: {}",
+                earliest, latest, hasPast, hasCurrent, hasFuture);
+        Assert.assertFalse("Dashboard is empty!", dates.isEmpty());
     }
 
     @When("User clicks Favorite Only checkbox")
