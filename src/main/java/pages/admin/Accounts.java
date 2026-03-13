@@ -152,6 +152,7 @@ public class Accounts {
     }
 
     public void clickAdministration() {
+        waitUtility.waitForLocatorVisible(ADMINISTRATION);
         ADMINISTRATION.click();
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -215,6 +216,7 @@ public class Accounts {
     }
 
     public void clickAdvertiserTab() {
+        waitUtility.waitForLocatorVisible(ADVERTISER_TAB);
         ADVERTISER_TAB.click();
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
     }

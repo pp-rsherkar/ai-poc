@@ -187,13 +187,12 @@ public class BulkCreativeUpload {
     }
 
     public String fetchErrorAlert() {
-        if (!ERROR_ALERT.isVisible()) {
-            return "No error alert is displayed.";
-        } else {
-            String text = ERROR_ALERT.innerText().trim();
+        String text = "No error alert is displayed.";
+        if (ERROR_ALERT.isVisible()) {
+            text = ERROR_ALERT.innerText().trim();
             waitUtility.waitForLocatorHidden(ERROR_ALERT);
-            return text;
         }
+        return text;
     }
 
     public List<String> fetchInlineValidationMessage() {
@@ -355,7 +354,7 @@ public class BulkCreativeUpload {
     public void selectFileTypeAndUploadFile(String fileType, String fileName) throws IOException {
         String locatorValue = "//div[@title='%s']";
         FILE_DROPDOWN.click();
-        FILE_DROPDOWN_VALUE.locator("text=" + fileType).click();
+        FILE_DROPDOWN_VALUE.locator("text=" + fileType).first().click();
         if (fileType.contains("PulsePoint") && fileName.equalsIgnoreCase("Download Template")) {
             waitUtility.waitForLocatorVisible(DOWNLOAD_BULK_UPLOAD_TEMPLATE);
             Download download = page.waitForDownload(DOWNLOAD_BULK_UPLOAD_TEMPLATE::click);

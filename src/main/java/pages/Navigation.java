@@ -30,6 +30,7 @@ public class Navigation {
     private final Locator CREATIVE_LIBRARY_ICON;
     private final Locator MENU_ANGLE;
     private final Locator PULSEPOINT_LOGO;
+    private final Locator TARGETING_TEMPLATE_HEADER;
     WaitUtility waitUtility;
     CampaignDashboard campaignDashboard;
 
@@ -57,6 +58,7 @@ public class Navigation {
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
         this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
         this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo/div[@class='logo-holder']");
+        this.TARGETING_TEMPLATE_HEADER = page.locator("//div[contains(text(),'Targeting Templates') and contains(@class,'section-name')]");
     }
 
     public void navigateToUrl(String url) {
@@ -112,6 +114,7 @@ public class Navigation {
     }
 
     public void clickSubMenu() {
+        waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
     }
 
@@ -134,7 +137,6 @@ public class Navigation {
 
     public void clickScheduledReport() {
         SCHEDULED_REPORT.click();
-
     }
 
     public void clickReportTemplate() {
@@ -144,6 +146,7 @@ public class Navigation {
     public void clickTargetingTemplate() {
         TARGETING_TEMPLATE_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(TARGETING_TEMPLATE_HEADER);
     }
 
     public void clickCampaigns() {
@@ -152,6 +155,7 @@ public class Navigation {
     }
 
     public void clickCreativeLibrary() {
+        waitUtility.waitForLocatorVisible(CREATIVE_LIBRARY_ICON);
         CREATIVE_LIBRARY_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
     }

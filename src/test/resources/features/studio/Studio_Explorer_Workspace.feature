@@ -35,7 +35,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Specialty            | Foot & Ankle Surgery, Internal Medicine                                                                                 |
       #| NPI List Name      | Large file test                                                                                                         |
       | Medical School       | New York College                                                                                                        |
-      | Patient Facility     | . Arizona Autism United٫ Inc.                                                                                           |
+      | Patient Facility     | Arizona Autism United٫ Inc.                                                                                             |
       | Prescriptions        | .Insulin Aspart Protamine And Insulin Aspart                                                                            |
       | Prescribing behavior | .Insulin Aspart Protamine And Insulin Aspart                                                                            |
       | Diagnoses            | ABO incompatibility w hemolytic transfs react٫ unsp٫ subs                                                               |
@@ -124,13 +124,13 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it
       | NPI Geographic Location    |
       | NPI Facilities Geography   |
-      | NPI Age Range              |
-      | NPI Gender                 |
       | Patient Age Range          |
       | Patient Gender             |
-      | Net Worth                  |
-      | Years Practiced            |
       | Patient Distribution       |
+      | Net Worth                  |
+      | NPI Gender                 |
+      | NPI Age Range              |
+      | Years Practiced            |
       | Top 20 Market Areas        |
       | Top 20 Professions         |
       | Top 20 Specialties         |

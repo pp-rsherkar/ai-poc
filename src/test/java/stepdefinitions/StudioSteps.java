@@ -456,10 +456,11 @@ public class StudioSteps {
     public void verify_list_is_published() {
         logger.info("Publishing NPI list");
         workspace.clickPublish();
-        String alertMsg = workspaceCreation.isWorkspaceCreationAlertDisplayed();
+        String alertMsg = workspace.isNPIListPublishAlertDisplayed();
         logger.info("Publish alert message: {}", alertMsg);
-        Assert.assertEquals("Workspace saved successfully", alertMsg);
+        Assert.assertEquals("NPI list published successfully", alertMsg);
         workspace.waitTillWorkspaceAlertHide();
+        logger.info("Verifying published NPI list");
         workspace.clickFlyOrPageButton();
         String publishedNpi = workspace.verifyPublishedNpi();
         logger.info("Published NPI: {}", publishedNpi);
@@ -718,6 +719,7 @@ public class StudioSteps {
     public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() {
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
+        logger.info("Clicking More Actions menu for workspace: {}", workspaceName);
         workspaceCreation.clickMoreActionsMenu(workspaceName);
     }
 

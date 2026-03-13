@@ -105,6 +105,7 @@ public class TacticCreatives {
     }
 
     public void selectAndAssignCreativeByStatus(String status) {
+        waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
         Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
         while (!statusLocator.first().isVisible()) {
             SHOW_MORE_BUTTON.scrollIntoViewIfNeeded();

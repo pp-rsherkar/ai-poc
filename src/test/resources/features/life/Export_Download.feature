@@ -8,6 +8,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
   Scenario Outline: Verify user is able to export Keyword list created by uploading a file
@@ -81,7 +82,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And User selects Static List
     And User enters the NPI Static list details as "<LIST_NAME>" "<ADVERTISER>"
     And User uploads the file "<FILE_NAME>"
-    When User makes list available in LIFE and saves the list
+    When User makes list available in "LIFE" and saves the list
     Then Verify list gets saved successfully
     And Verify that user is able to download the uploaded "NPI" list
     And Verify that the count of items in the downloaded "NPI" list is the same as the item count displayed in the UI

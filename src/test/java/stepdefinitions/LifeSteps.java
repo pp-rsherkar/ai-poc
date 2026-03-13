@@ -236,8 +236,11 @@ public class LifeSteps {
             // Select channel and add targeting rules
             logger.info("Configuring channel and targeting rules for: {}", tacticName);
             tacticSettings.selectChannel(channel);
+            logger.info("Clicking on Add Targeting Rule icon for: {}", tacticName);
             tacticDetails.clickTargetingRuleIcon();
+            logger.info("Adding targeting rules of type: {}", ruleType);
             tacticSettings.addTargetingRules(ruleType);
+            logger.info("Saving tactic settings for: {}", tacticName);
             tacticSettings.saveTacticSettings();
             logger.info("Initiating creation of next tactic");
             tacticDetails.clickNewTactic();
@@ -1786,6 +1789,8 @@ public class LifeSteps {
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         logger.info("Processed filters map: {}", filtersMap);
+        logger.info("Navigating to first creative page before verifying button presence");
+        createCreatives.navigateToFirstCreativePage();
         logger.info("Clicking Activity button: '{}'", buttonType);
         createCreatives.clickActivityButton(buttonType);
         boolean isButtonPresent = createCreatives.isArchiveUnarchiveButtonsPresent(buttonType);
@@ -2287,6 +2292,8 @@ public class LifeSteps {
     public void userNavigatesToTheDomainListPage(String pageName) {
         logger.info("Navigating to Shared List type: {}", pageName);
         navigation.clickSubMenu();
+        if(campaigns.isCreateCampaignButtonVisible())
+            navigation.clickSubMenu();
         sharedList.clickDomainListFromMenu(pageName);
     }
 
@@ -3192,7 +3199,7 @@ public class LifeSteps {
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
         logger.info("Entering valid Landing Domain: {}", validLandingDomain);
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
-        Assert.assertFalse("No error alert is displayed.", bulkCreativeUpload.fetchErrorAlert().contains("No error alert is displayed."));
+        Assert.assertEquals("No error alert is displayed.", bulkCreativeUpload.fetchErrorAlert());
         logger.info("Valid Landing Domain accepted successfully");
     }
 
@@ -3690,7 +3697,7 @@ public class LifeSteps {
 
     @And("User clicks Schedule Report button")
     public void userClicksScheduleReportButton() {
-        logger.info("Verifying Schedule Report panel is opened");
+        logger.info("Clicking Schedule Report button");
         scheduleReport.clickScheduleReportButton();
     }
 
