@@ -391,9 +391,11 @@ public class LifeSteps {
 
     @When("User enters the tactic details as {string} and saves the tactic")
     public void user_enters_the_tactic_details_and_saves_the_tactic(String tacticName) {
+        nameList.clear();
         tacticNameRandom = tacticName + '_' + CommonUtils.timeStampCalculation();
         logger.info("Entering tactic details for name: {}", tacticNameRandom);
         tacticDetails.enterTacticName(tacticNameRandom);
+        nameList.add(tacticNameRandom);
         tacticDetails.saveTacticDetails();
         logger.info("Tactic details saved");
     }
@@ -457,6 +459,7 @@ public class LifeSteps {
         logger.info("Enabling Tactic and saving Creatives");
         tacticCreatives.enableCreative();
         tacticCreatives.saveTacticCreatives();
+
     }
 
     @Then("Verify creative details are saved and the campaign is in running state")
@@ -5644,5 +5647,43 @@ public class LifeSteps {
         logger.info("Navigating to Line Item from Association Tab using Line Item Name: '{}'", lineItemNameRandom);
         Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
         logger.info("Line Item navigation verified successfully");
+    }
+
+    @When("User duplicates tactic, verify data on the duplicated tactic using {string} option")
+    public void user_duplicates_tactic_verify_data_on_the_duplicated_tactic_using_option(String tacticOption) {
+        itemList.clear();
+        List<String> originalTacticDetails;
+        List<String> copiedTacticDetails;
+        for (String name : nameList) {
+            logger.info("Starting copy verification for Tactic: {}", name);
+            tacticDetails.navigateToTacticDetails(name);
+            tacticDetails.clickSettingsTab();
+            originalTacticDetails = tacticDetails.fetchTacticDetails();
+            tacticCreatives.clickCreativeTab();
+            originalTacticDetails.addAll(tacticDetails.fetchTacticCreative());
+            logger.debug("Original details captured for {}: {}", name, originalTacticDetails);
+            tacticDetails.clickTacticOptions(tacticOption);
+            String tacticName = "Copy of " + name;
+            itemList.add(tacticName);
+            logger.info("Creating a copy named: {}", tacticName);
+            String actualMsg = tacticDetails.createACopyOfTactic(tacticName);
+            String expectedMsg = String.format("×\nTactic(s) %s copied successfully.", tacticName);
+            Assert.assertEquals("Tactic copied Successfully", expectedMsg, actualMsg);
+            boolean isAvailable = tacticDetails.verifyTacticAvailable(tacticName);
+            logger.info("Is copied tactic '{}' available on dashboard? {}", tacticName, isAvailable);
+            Assert.assertTrue("Copied tactic is not available", tacticDetails.verifyTacticAvailable(tacticName));
+            tacticDetails.navigateToTacticDetails(tacticName);
+            tacticDetails.clickSettingsTab();
+            copiedTacticDetails = tacticDetails.fetchTacticDetails();
+            tacticCreatives.clickCreativeTab();
+            copiedTacticDetails.addAll(tacticDetails.fetchTacticCreative());
+            logger.debug("Copied details captured for {}: {}", tacticName, copiedTacticDetails);
+            logger.info("Comparing Original vs. Copied data for {}", name);
+            if (!originalTacticDetails.equals(copiedTacticDetails)) {
+                logger.error("Mismatch found!\nOriginal: {}\nCopied:   {}", originalTacticDetails, copiedTacticDetails);
+            }
+            Assert.assertEquals("Tactic details do not match after copy.", originalTacticDetails, copiedTacticDetails);
+            logger.info("Successfully verified copy for tactic: {}", name);
+        }
     }
 }

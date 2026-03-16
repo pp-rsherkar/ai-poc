@@ -44,6 +44,7 @@ public class TacticCreatives {
         this.CREATIVE_STATUS = page.locator("//td[contains(@class,'status-label')]");
         this.CLEAR_SEARCH_BOX = page.locator("//div[contains(@class,'clear-search-close')]");
         this.CREATIVES_TABLE = page.locator("//div[@id='parentTable']");
+
     }
 
     public String verifyTacticCreativesText() {

@@ -180,3 +180,23 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Tactic      | 3     |
+
+
+  @regression
+  Scenario Outline: Verify user is able to create duplicate of a Tactic
+    When User clicks on Create Campaign
+    And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    When User duplicates tactic, verify data on the duplicated tactic using "Duplicate" option
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
