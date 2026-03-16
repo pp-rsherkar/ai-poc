@@ -237,6 +237,7 @@ public class WorkspaceCreation {
             SEARCH_WORKSPACE.fill(workspaceName);
             page.keyboard().press("Enter");
             waitUtility.waitForLocatorVisible(PAGINATION.first());
+            waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
             return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
         }
     }

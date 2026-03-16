@@ -106,6 +106,7 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if (NPI_PUBLISH_ALERT.isVisible()) waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
         if (PUBLISH_LOADER.isVisible()) waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         if (NPI_LIST_PULLOUT_MENU.isVisible()) {
             OK_BUTTON.click();
@@ -323,7 +324,7 @@ public class Workspace {
             String text = NPI_PUBLISH_ALERT.innerText();
             waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
             return text;
-        }catch (PlaywrightException e) {
+        } catch (PlaywrightException e) {
             return "";
         }
     }
