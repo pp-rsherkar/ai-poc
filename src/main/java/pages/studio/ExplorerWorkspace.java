@@ -114,11 +114,11 @@ public class ExplorerWorkspace {
         WORKSPACE_NAME.fill(workspaceName);
     }
 
-    public void selectAdvertiser(String advertiser){
+    public void selectAdvertiser(String advertiser) {
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST);
         SEARCH_ADVERTISER.fill(advertiser);
-        for(int i=0; i<ADVERTISER_BUTTON.count(); i++){
-            if(ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)){
+        for (int i = 0; i < ADVERTISER_BUTTON.count(); i++) {
+            if (ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)) {
                 ADVERTISER_BUTTON.nth(i).click();
                 break;
             }
@@ -151,7 +151,8 @@ public class ExplorerWorkspace {
         SEARCH_FILTER.fill(filter);
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).first().click();
         switch (filter) {
-            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name", "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
+            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name",
+                 "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
                 if (filter.equals("Specialty"))
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
@@ -159,10 +160,8 @@ public class ExplorerWorkspace {
                     TAB_PANEL_SEARCH.fill(option.trim());
                     locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     page.waitForTimeout(1000);
-                    if(SELECT_DESELECT_ALL.isVisible())
-                        SELECT_DESELECT_ALL.click();
-                    else
-                        locator.first().click();
+                    if (SELECT_DESELECT_ALL.isVisible()) SELECT_DESELECT_ALL.click();
+                    else locator.first().click();
                 }
                 break;
             case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
@@ -195,7 +194,7 @@ public class ExplorerWorkspace {
         }
     }
 
-    public void clickFilterOKButton(){
+    public void clickFilterOKButton() {
         FILTER_OK_BUTTON.click();
     }
 

@@ -52,17 +52,17 @@ Feature: End to End Workflow of Creative Creation and its assignment To Tactic
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     And Verify data persistence when user creates and saves "Display" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                       |
-      | Display      | FileName:DisplayBulkUploadTemplate.xlsx, Status:Approved |
+      | CreativeType | CreativeAttributes                                        |
+      | Display      | FileName:DisplayBulkUploadTemplate1.xlsx, Status:Approved |
     And Verify data persistence when user creates and saves "HTML" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
       | CreativeType | CreativeAttributes                                                                                                  |
       | HTML         | FileType: DCM File, FileName:DCM_HTML_E2E_BulkUpload.xlsx, Status:Pending, LandingDomain:https://www.pulsepoint.com |
     And Verify data persistence when user creates and saves "Video" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                                |
+      | CreativeType | CreativeAttributes                                                                                                                                                                                                |
       | Video        | FileType: DCM File, FileName:DCM_VIDEO_E2E_BulkUpload.xlsx, Status:Denied, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, Size:800x250, Duration:60, ImageFile:NativeDisplay_Image.jpg |
     And Verify data persistence when user creates and saves "Native" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
-      | CreativeType | CreativeAttributes                                                                                                                                           |
-      | Native       | FileName:NativeBulkUploadTemplate.xlsx, Status:Approved, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, IAB:Profane, Size:800x250 |
+      | CreativeType | CreativeAttributes                                                                                                                                            |
+      | Native       | FileName:NativeBulkUploadTemplate1.xlsx, Status:Approved, ClickThroughURL:pulsepoint.com, LandingDomain:https://www.pulsepoint.com, IAB:Profane, Size:800x250 |
     #2
     Then Verify the newly created creative is displayed in the Creative Library page
     #3

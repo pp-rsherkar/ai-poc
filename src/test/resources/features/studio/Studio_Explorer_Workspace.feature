@@ -28,7 +28,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Graduation Year      | 1900-2025                                                                                                               |
       | Net Worth            | Less than $50٫000, $100٫000 to $249٫999, $250٫000 to $499٫999, $500٫000 or above                                        |
       | Number of Patients   | Below 5, 6 to 20, 21 to 50, 51 to 100, 101 to 200, 201 to 300, 301 to 400, 401 to 500, 501 to 1000, 1001 or above       |
-      | Reachable Audience   | Yes                                                                                                                     |
+      #| Reachable Audience   | Yes                                                                                                                     |
       | Patient Age          | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
       | Patient Gender       | Female, Male, Unknown                                                                                                   |
       | Years Practiced      | Below 5, 5 to 10, 10 to 15, 15 to 20, 20 to 25, 25 to 30, 30 to 35, 35 to 40, 40 to 45, 45 to 50, 50 or Above           |
@@ -96,7 +96,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Graduation Year    | 1900-2025                                                                                                               |
       | Net Worth          | Less than $50٫000, $100٫000 to $249٫999, $250٫000 to $499٫999, $500٫000 or above                                        |
       | Number of Patients | Below 5, 6 to 20, 21 to 50, 51 to 100, 101 to 200, 201 to 300, 301 to 400, 401 to 500, 501 to 1000, 1001 or above       |
-      | Reachable Audience | Yes                                                                                                                     |
+      #| Reachable Audience | Yes                                                                                                                     |
       | Patient Age        | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
       | Patient Gender     | Female, Male, Unknown                                                                                                   |
       | Years Practiced    | Below 5, 5 to 10, 10 to 15, 15 to 20, 20 to 25, 25 to 30, 30 to 35, 35 to 40, 40 to 45, 45 to 50, 50 or Above           |

@@ -7,6 +7,7 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.WaitUtility;
+
 import java.util.List;
 
 public class WorkspaceCreation {
@@ -87,7 +88,7 @@ public class WorkspaceCreation {
         return this.page.title();
     }
 
-    public List<String> fetchWorkspaceTypes(){
+    public List<String> fetchWorkspaceTypes() {
         return WORKSPACE_TYPE_LIST.allTextContents();
     }
 
