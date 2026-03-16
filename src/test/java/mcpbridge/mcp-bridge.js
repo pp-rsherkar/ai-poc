@@ -41,23 +41,38 @@ async function main() {
                 : axTree;
 
         const prompt = `
-			You are an expert AI Test Automation Engineer specializing in Playwright and Model Context Protocol (MCP).
+        You are an expert AI Test Automation Engineer specializing in Playwright and Model Context Protocol (MCP).
 
-			Find the best CSS or XPath selector for: "${intent}".
+        GOAL: Find the most stable CSS or XPath selector for the element described as: "${intent}".
 
-			CRITICAL RULES:
-			1. Return ONLY ONE raw selector string.
-			2. DO NOT return code snippets like getByRole(), getByText(), or page.locator().
-			3. Use ONLY:
-			   - CSS Selectors (e.g., .loginBtn, button[type='submit'])
-			   - XPath Selectors (e.g., //button[contains(., 'Log In')])
-			4. NO markdown (no \`\`\`).
-			5. DO NOT provide multiple options.
-			6. No commas, no explanations, no markdown
+        CRITICAL RULES:
+        1. Return ONLY ONE raw selector string.
+        2. STRICT CONTEXT ONLY: You MUST find an element that actually exists in the provided CONTEXT.
+        3. NO HALLUCINATIONS: Do not guess class names. Use exact attributes and text found in CONTEXT.
+        4. ATTRIBUTE HIERARCHY:
+            - If the intent contains an email or unique text, prioritize exact text-based XPath: //div[text()='buyer2@ppcom']
+            - Then use the closest class match found IN THE CONTEXT.
+        5. VERIFICATION: Double-check that your selector exists in CONTEXT before outputting.
+        6. OUTPUT: Return ONLY the raw selector string.
+        7. FUZZY MATCHING: Match intent text to visible element placeholders or innerText, not assumed attributes.
+        8. DO NOT return code snippets like getByRole(), getByText(), or page.locator().
+        9. Use ONLY:
+            - Placeholder text (e.g., //input[@placeholder='Search'])
+            - CSS selectors (e.g., .loginBtn, button[type='submit'], ignoring 'ng-' or 'active' classes)
+            - XPath selectors (e.g., //button[contains(., 'Log In')])
+            - Text-based XPath (e.g., //button[contains(., 'Log In')])
+        10. NO markdown.
+        11. DO NOT provide multiple options.
+        12. No commas or explanations.
+        13. UNIQUENESS & PRECISION: If multiple elements match, differentiate them using parent containers, combined classes, or index-based XPath ([1], [last()]) to ensure a 1:1 match.
+        14. VISIBILITY & POSITION: Target only elements visible in the UI. Prefer elements in header, top-right, or user-profile sections if CONTEXT shows them. Ignore hidden duplicates.
+        15. EXACT TEXT PRIORITY: For intents containing emails, usernames, or unique identifiers, prioritize exact or substring text matches (e.g., //div[text()='buyer2@ppcom']).
+        16. SELECTOR PREFERENCE ORDER:
+            Exact text XPath > XPath with combined parent/child classes > Indexed XPath > CSS selector.
 
-			CONTEXT:
-			${trimmedContext}
-			`;
+        CONTEXT:
+        ${trimmedContext}
+        `;
 
         try {
             const response = await fetch(
