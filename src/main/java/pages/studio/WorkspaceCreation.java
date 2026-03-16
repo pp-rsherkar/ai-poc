@@ -7,6 +7,7 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.CommonUtils;
+import utils.ConfigReader;
 import utils.WaitUtility;
 
 import java.util.Collections;
@@ -139,7 +140,16 @@ public class WorkspaceCreation {
     public void verifyStudioWorkspaceFrame() {
         OUTER_FRAME.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        while (!CREATE_WORKSPACE.first().isEnabled()) {
+        waitForStudioWorkspacePage(CREATE_WORKSPACE);
+    }
+
+    private void waitForStudioWorkspacePage(Locator locator){
+        long startTime = System.currentTimeMillis();
+        long timeout = Long.parseLong(ConfigReader.getProperty("timeout"));
+        while (System.currentTimeMillis() - startTime < timeout) {
+            if (locator.count() > 0 && locator.first().isVisible()) {
+                break;
+            }
             MENU_ICON.click();
             page.keyboard().press("Escape");
         }
@@ -270,10 +280,7 @@ public class WorkspaceCreation {
     }
 
     public void selectWorkspaceType(String workspaceType) {
-        while (!WORKSPACE_TYPE.first().isVisible()) {
-            MENU_ICON.click();
-            page.keyboard().press("Escape");
-        }
+        waitForStudioWorkspacePage(WORKSPACE_TYPE);
         waitUtility.waitForLocatorVisible(WORKSPACE_TYPE.last());
         CommonUtils.selectAndClickElement(WORKSPACE_TYPE, Collections.singletonList(workspaceType));
         waitUtility.waitForLocatorVisible(PAGINATION.first());
