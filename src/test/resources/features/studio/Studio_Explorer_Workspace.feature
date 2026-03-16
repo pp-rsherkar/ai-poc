@@ -228,7 +228,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User saves the workspace
     Given This scenario will be executed in the "Pre-release" environment as a "External User"
     And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
-    When External user Searches the "<WORKSPACE_NAME>"
+    When External user Searches the "<WORKSPACE_NAME>" in studio application
     Then External user Verifies whether the "<WORKSPACE_NAME>" is visible in workspace management page
     Examples:
       | ADVERTISER |  | DRAFT_OPTION | WORKSPACE_NAME |
