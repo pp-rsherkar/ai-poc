@@ -75,7 +75,6 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User clicks Lifetime filter
     And User verifies that the campaigns displayed on the Dashboard include all past and current flights
     And User clicks "Today" filter
-    #Then Verify only Today's Flights should render on the Dashboard
     Then Verify only Current Month's Flights should render on the Dashboard
     And User clicks "Yesterday" filter
     Then Verify only Current Month's Flights should render on the Dashboard
