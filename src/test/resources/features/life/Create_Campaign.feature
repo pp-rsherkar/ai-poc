@@ -110,7 +110,7 @@ Feature: LIFE Regression - Create a Campaign
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
       | Behavioral Segment          | AutoSegment18577650                                     |
-      | NPI                         | Automation_NPI_List                                     |
+      | NPI                         | AutoSmartList954103283                                  |
       | HCP by Specialty            | Radiology, Aerospace Medicine                           |
       | Health Populations          | Anesthesia and Analgesia                                |
       | Keyword Populations         | CustomTextForKeywordPopulations, KeywordPopulationsTest |

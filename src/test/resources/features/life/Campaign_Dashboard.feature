@@ -21,7 +21,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User verifies the comments in the campaign, line item, and tactic dashboard's comment boxes
     Examples:
       | Campaign ID          | COLOUR                     |
-      | Auto_20251005_024613 | 24-note-table-provided.svg |
+      | Auto_20260218_024705 | 24-note-table-provided.svg |
 
   @regression
   Scenario Outline: Verify toggle functionality for Line Item and Tactic on Campaign Dashboard and validate it on Line Item and Tactic pages
@@ -36,7 +36,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using "<Campaign ID>" and verifies the same status in the respective Line Item and Tactic pages
     Examples:
       | Campaign ID          |
-      | Auto_20251005_024613 |
+      | Auto_20260218_024705 |
 
   @regression
   Scenario Outline: Verify filtering and column customization on Campaign Dashboard
@@ -75,7 +75,6 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User clicks Lifetime filter
     And User verifies that the campaigns displayed on the Dashboard include all past and current flights
     And User clicks "Today" filter
-    #Then Verify only Today's Flights should render on the Dashboard
     Then Verify only Current Month's Flights should render on the Dashboard
     And User clicks "Yesterday" filter
     Then Verify only Current Month's Flights should render on the Dashboard
@@ -123,7 +122,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     When User clicks Campaign "<Campaign ID>", Line Item and Tactic and verify navigation to respective pages
     Examples:
       | Campaign ID          |
-      | Auto_20251005_024613 |
+      | Auto_20260218_024705 |
 
   @regression
   Scenario Outline: Verify navigation to Tactic, assign Creatives of "<STATUS>" and check the creative assignment on Campaign Dashboard

@@ -6,7 +6,6 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
@@ -16,7 +15,7 @@ import java.util.List;
 public class ExplorerWorkspace {
     private final Page page;
     private final Locator WORKSPACE_NAME;
-    private final Locator SEARCH_ADVERTISER;
+    private final Locator SEARCH_ADVERTISER_IN_EDIT_WORKSPACE;
     private final Locator DASHBOARD_CONTENT;
     private final Locator DASHBOARD_ELEMENT;
     private final Locator DASHBOARD_RELOAD_ICON;
@@ -56,14 +55,17 @@ public class ExplorerWorkspace {
     private final Locator OWNED_AND_OPERATED_SECTION;
     private final Locator WORKSPACE_EDIT_BUTTON;
     private final Locator WORKSPACE_HEADER;
+    private final Locator ADVERTISER_LIST;
+    private final Locator SEARCH_ADVERTISER;
+    private final Locator ADVERTISER_BUTTON;
     WaitUtility waitUtility;
 
     public ExplorerWorkspace(Page page) {
         this.page = page;
         this.waitUtility = new WaitUtility(page);
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
-        this.WORKSPACE_NAME = WORKSPACE_FRAME.getByRole(AriaRole.TEXTBOX).nth(1);
-        this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
+        this.WORKSPACE_NAME = WORKSPACE_FRAME.locator("//p[text()='Workspace Name']/following-sibling::div//input");
+        this.SEARCH_ADVERTISER_IN_EDIT_WORKSPACE = WORKSPACE_FRAME.locator("input[id^='listbox-input']");
         this.DASHBOARD_CONTENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().getByRole(AriaRole.REGION, new FrameLocator.GetByRoleOptions().setName("Dashboard Content"));
         this.DASHBOARD_ELEMENT = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("(//p[contains(@class,'TextBase-sc')])[1]");
         this.DASHBOARD_RELOAD_ICON = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//div[contains(text(),'Reload')]");
@@ -102,6 +104,9 @@ public class ExplorerWorkspace {
         this.OWNED_AND_OPERATED_SECTION = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator("//span[text()='Owned & Operated']");
         this.WORKSPACE_EDIT_BUTTON = WORKSPACE_FRAME.locator("//button//div[text()='Edit']");
         this.WORKSPACE_HEADER = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspace-back-button']/following-sibling::div//h1");
+        this.ADVERTISER_LIST = WORKSPACE_FRAME.locator("//p[text()='Advertisers']");
+        this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("//input[@placeholder='Search']");
+        this.ADVERTISER_BUTTON = WORKSPACE_FRAME.locator("//button[contains(@data-tour-id,'workspace-advertiser')]");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -110,14 +115,28 @@ public class ExplorerWorkspace {
     }
 
     public void selectAdvertiser(String advertiser) {
-        SEARCH_ADVERTISER.click();
+        waitUtility.waitForLocatorVisible(ADVERTISER_LIST);
         SEARCH_ADVERTISER.fill(advertiser);
-        SEARCH_ADVERTISER.press("ArrowDown");
-        SEARCH_ADVERTISER.press("Enter");
+        for (int i = 0; i < ADVERTISER_BUTTON.count(); i++) {
+            if (ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)) {
+                ADVERTISER_BUTTON.nth(i).click();
+                break;
+            }
+        }
+    }
+
+    public void selectAdvertiserFromWorkspaceEdit(String advertiser) {
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.click();
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.fill(advertiser);
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.press("ArrowDown");
+        SEARCH_ADVERTISER_IN_EDIT_WORKSPACE.press("Enter");
     }
 
     public void saveWorkspaceName() {
         SAVE_WORKSPACE_NAME.click();
+    }
+
+    public void waitForDashboardLoad() {
         DASHBOARD_CONTENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_ELEMENT.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -132,7 +151,8 @@ public class ExplorerWorkspace {
         SEARCH_FILTER.fill(filter);
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).first().click();
         switch (filter) {
-            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name", "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
+            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name",
+                 "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
                 if (filter.equals("Specialty"))
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
                 for (String option : options) {
@@ -140,10 +160,8 @@ public class ExplorerWorkspace {
                     TAB_PANEL_SEARCH.fill(option.trim());
                     locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
                     page.waitForTimeout(1000);
-                    if(SELECT_DESELECT_ALL.isVisible())
-                        SELECT_DESELECT_ALL.click();
-                    else
-                        locator.first().click();
+                    if (SELECT_DESELECT_ALL.isVisible()) SELECT_DESELECT_ALL.click();
+                    else locator.first().click();
                 }
                 break;
             case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
@@ -153,7 +171,7 @@ public class ExplorerWorkspace {
                 break;
             case "Site", "Search":
                 for (String option : options) {
-                    WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]", option.trim())).click();
+                    WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", option.trim())).click();
                 }
                 break;
             case "Graduation Year":
@@ -176,7 +194,7 @@ public class ExplorerWorkspace {
         }
     }
 
-    public void clickFilterOKButton(){
+    public void clickFilterOKButton() {
         FILTER_OK_BUTTON.click();
     }
 
@@ -194,8 +212,7 @@ public class ExplorerWorkspace {
     }
 
     public void saveExplorerWorkspace() {
-        DASHBOARD_ELEMENT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        DASHBOARD_RELOAD_ICON.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitForDashboardLoad();
         SAVE_WORKSPACE.first().click();
     }
 

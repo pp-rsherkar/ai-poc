@@ -9,7 +9,10 @@ import utils.WaitUtility;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public class CampaignDashboard {
     private final Page page;
@@ -122,9 +125,9 @@ public class CampaignDashboard {
         this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.SELECTED_FILTER_VALUES = page.locator("//div[contains(@class,'filter-value')]");
         this.FILTER_LIST = page.locator("//app-overlay[@class='line-item-list-filter']//label");
-        this.STATUS_COLUMN_DATA =  page.locator("//div[contains(@class,'status-col') and not(contains(@id,'liHeaderStatus'))]//span[contains(@class,'display-inline')]//span");
-        this.TYPE_COLUMN_DATA =  page.locator("//div[contains(@class,'type-col') and not(contains(@id,'liHeaderType'))]");
-        this.ENABLED_COLUMN_DATA =  page.locator("//div[contains(@class,'enable-col') and not(contains(@id,'liHeaderEnabled'))]//sui-checkbox");
+        this.STATUS_COLUMN_DATA = page.locator("//div[contains(@class,'status-col') and not(contains(@id,'liHeaderStatus'))]//span[contains(@class,'display-inline')]//span");
+        this.TYPE_COLUMN_DATA = page.locator("//div[contains(@class,'type-col') and not(contains(@id,'liHeaderType'))]");
+        this.ENABLED_COLUMN_DATA = page.locator("//div[contains(@class,'enable-col') and not(contains(@id,'liHeaderEnabled'))]//sui-checkbox");
         this.CAMPAIGN_COUNT_FROM_PAGINATION = page.locator("//div[contains(@class,'paging-desc')]");
         this.FLIGHT_START_END_DATE = page.locator("//div[contains(@class,'date-col trc lac')]//span");
         this.INACTIVE_FLIGHT_LIST = page.locator("//div[contains(@class, 'active-flight-col') and (contains(text(), 'inactive flight'))]");
@@ -219,15 +222,11 @@ public class CampaignDashboard {
     }
 
     public List<String> fetchLineAndTacticToggleStatus() {
-        if(lineItemClassAfterClick.contains("checked"))
-            lineItemClassAfterClick = "Enabled";
-        else
-            lineItemClassAfterClick = "Disabled";
+        if (lineItemClassAfterClick.contains("checked")) lineItemClassAfterClick = "Enabled";
+        else lineItemClassAfterClick = "Disabled";
 
-        if(tacticClassAfterClick.contains("checked"))
-            tacticClassAfterClick = "Enabled";
-        else
-            tacticClassAfterClick = "Disabled";
+        if (tacticClassAfterClick.contains("checked")) tacticClassAfterClick = "Enabled";
+        else tacticClassAfterClick = "Disabled";
 
         return List.of(lineItemClassAfterClick, tacticClassAfterClick);
     }
@@ -313,17 +312,16 @@ public class CampaignDashboard {
 
     public boolean isFavoriteCampaignShown() {
         boolean flag = false;
-        for(int i = 0; i < FAVORITE_CAMPAIGN_LIST.count(); i++ ){
-            if(!FAVORITE_CAMPAIGN_LIST.nth(i).getAttribute("class").contains("empty"))
-                flag = true;
+        for (int i = 0; i < FAVORITE_CAMPAIGN_LIST.count(); i++) {
+            if (!FAVORITE_CAMPAIGN_LIST.nth(i).getAttribute("class").contains("empty")) flag = true;
         }
         return flag;
     }
 
     public boolean isFavoriteNonFavoriteCampaignAvailable() {
         boolean flag = false;
-        for(int i = 0; i < FAVORITE_CAMPAIGN_LIST.count(); i++ ){
-            if(!FAVORITE_CAMPAIGN_LIST.nth(i).getAttribute("class").contains("empty") || FAVORITE_CAMPAIGN_LIST.nth(i).getAttribute("class").contains("empty"))
+        for (int i = 0; i < FAVORITE_CAMPAIGN_LIST.count(); i++) {
+            if (!FAVORITE_CAMPAIGN_LIST.nth(i).getAttribute("class").contains("empty") || FAVORITE_CAMPAIGN_LIST.nth(i).getAttribute("class").contains("empty"))
                 flag = true;
         }
         return flag;
@@ -357,14 +355,14 @@ public class CampaignDashboard {
         return flag;
     }
 
-    public boolean ifInactiveFlightPresent(){
+    public boolean ifInactiveFlightPresent() {
         return !INACTIVE_FLIGHT_LIST.first().isVisible();
     }
 
-    public List<LocalDate> fetchFlightStartAndEndDate(){
+    public List<LocalDate> fetchFlightStartAndEndDate() {
         List<LocalDate> dates = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        for(int i=0; i<FLIGHT_START_END_DATE.count(); i++){
+        for (int i = 0; i < FLIGHT_START_END_DATE.count(); i++) {
             String dateText = FLIGHT_START_END_DATE.nth(i).innerText().trim();
             LocalDate date = LocalDate.parse(dateText, formatter);
             dates.add(date);
@@ -387,13 +385,13 @@ public class CampaignDashboard {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public void clickSettingIcon(){
+    public void clickSettingIcon() {
         SETTING_ICON.click();
     }
 
     public boolean clickGroupByOptionsAndCheckDashboardData(String groupByOption) {
         boolean flag = false;
-        switch (groupByOption){
+        switch (groupByOption) {
             case "Group By Campaign":
                 GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
                 waitUtility.waitUntilPreLoaderHidden();
@@ -415,11 +413,11 @@ public class CampaignDashboard {
     public String fetchCreativeToolTipText() {
         String text = "";
         String tooltipText = CREATIVE_TOOLTIP.getAttribute("tooltip-text");
-        if(tooltipText != null ){
+        if (tooltipText != null) {
             if (tooltipText.contains("No creative assigned") || tooltipText.contains("are pending approval") || tooltipText.contains("are denied")) {
                 text = tooltipText;
             }
-        }else{
+        } else {
             text = "Creative assigned and approved";
         }
         return text;
@@ -427,10 +425,10 @@ public class CampaignDashboard {
 
     public void navigateToLineItemDetails() {
         LINE_ITEM_NAME.click();
-        LINE_ITEM_PAGE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(LINE_ITEM_PAGE_TITLE);
     }
 
-    public void navigateToTacticDetails(){
+    public void navigateToTacticDetails() {
         TACTIC_NAME.click();
         waitUtility.waitForLocatorVisible(TACTIC_PAGE_TITLE);
     }
@@ -446,7 +444,7 @@ public class CampaignDashboard {
             GROUP_BY_CAMPAIGN_RADIO_BUTTON.click();
             waitUtility.waitUntilPreLoaderHidden();
             waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
-        }else{
+        } else {
             page.keyboard().press("Escape");
         }
     }
@@ -479,10 +477,16 @@ public class CampaignDashboard {
         unselectFavoriteCheckboxIfSelected();
         unselectHideFinishedCheckboxIfSelected();
         resetFiltersIfApplied();
-        while(!SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()){
+        while (true) {
             SEARCH_CAMPAIGN.fill(createdCampaign);
             CLICK_CAMPAIGN_SEARCH.click();
             waitUtility.waitUntilPreLoaderHidden();
+            if (SUB_TITLE_AFTER_CAMPAIGN_SEARCH.isVisible()) {
+                break;
+            }
+            if (NO_CAMPAIGN_AVAILABLE_TEXT.isVisible()) {
+                break;
+            }
         }
     }
 
@@ -517,9 +521,7 @@ public class CampaignDashboard {
     public List<String> fetchSelectedFilterValues() {
         List<String> selectedFilter = new ArrayList<>();
         for (int i = 0; i < SELECTED_FILTER_VALUES.count(); i++) {
-            List<String> splitValues = Arrays.stream(SELECTED_FILTER_VALUES.nth(i).innerText().split(","))
-                    .map(String::trim)
-                    .toList();
+            List<String> splitValues = Arrays.stream(SELECTED_FILTER_VALUES.nth(i).innerText().split(",")).map(String::trim).toList();
             selectedFilter.addAll(splitValues);
         }
         return selectedFilter;
@@ -527,23 +529,20 @@ public class CampaignDashboard {
 
     public boolean isCampaignDataFilteredAccordingToSelectedFilters(String keyType, List<Object> keyValues) {
         return switch (keyType) {
-            case "Status"  -> checkValueInList(keyType, STATUS_COLUMN_DATA, keyValues);
-            case "Type"    -> checkValueInList(keyType, TYPE_COLUMN_DATA, keyValues);
+            case "Status" -> checkValueInList(keyType, STATUS_COLUMN_DATA, keyValues);
+            case "Type" -> checkValueInList(keyType, TYPE_COLUMN_DATA, keyValues);
             case "Enabled" -> checkValueInList(keyType, ENABLED_COLUMN_DATA, keyValues);
-            default        -> false;
+            default -> false;
         };
     }
 
     private boolean checkValueInList(String keyType, Locator columnName, List<Object> allowedValues) {
         String cellValue;
         for (int i = 0; i < columnName.count(); i++) {
-            if(keyType.contains("Enabled")){
-                if(columnName.nth(i).getAttribute("class").contains("checked"))
-                    cellValue = "Enabled";
-                else
-                    cellValue = "Disabled";
-            }else
-                cellValue = columnName.nth(i).innerText().trim();
+            if (keyType.contains("Enabled")) {
+                if (columnName.nth(i).getAttribute("class").contains("checked")) cellValue = "Enabled";
+                else cellValue = "Disabled";
+            } else cellValue = columnName.nth(i).innerText().trim();
             if (!allowedValues.contains(cellValue)) {
                 return false;
             }
@@ -551,7 +550,7 @@ public class CampaignDashboard {
         return true;
     }
 
-    public void clickResetAllFilters(){
+    public void clickResetAllFilters() {
         RESET_FILTER_ICON.click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
