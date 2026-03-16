@@ -135,9 +135,12 @@ public class LifeSteps {
         navigation.enterPassword(password);
         navigation.clickLogin();
         logger.info("Navigating to specific application module: {}", application);
+
         switch (application) {
             case "Life":
-                navigation.navigateToLife();
+                if (userType.equals("User")) {
+                    navigation.navigateToLife();
+                }
                 break;
             case "HCP":
                 navigation.navigateToHCP();
@@ -149,8 +152,13 @@ public class LifeSteps {
                 navigation.navigateToStudio();
                 break;
         }
-        logger.info("Selecting account: {}", account);
-        navigation.selectAccount(account);
+
+        if (userType.equals("User")) {
+            logger.info("Selecting account: {}", account);
+            navigation.selectAccount(account);
+        } else {
+            logger.info("Selected account: {}", account);
+        }
     }
 
     @Given("User clicks on Create Campaign")
@@ -416,6 +424,12 @@ public class LifeSteps {
         navigation.clickOnIcon("Add Targeting Rule");
     }
 
+    @When("User clicks on Add Targeting Rule")
+    public void userClicksOnAddTargetingRule() {
+        logger.info("Adding Targeting Rule");
+        navigation.clickOnIcon("Add Targeting Rule");
+    }
+
     @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
     public void user_configures_the_targeting_rules_and_saves_the_settings(String ruleType) {
         logger.info("Selecting rule type: {}", ruleType);
@@ -470,6 +484,12 @@ public class LifeSteps {
         logger.info("Campaign status: {}", status);
         Assert.assertEquals("Running", status);
         logger.info("Campaign is in Running state");
+    }
+
+    @Then("Verify creative details are saved")
+    public void verifyCreativeDetailsAreSaved() {
+        logger.info("Verifying creative save success");
+        assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
     }
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")
