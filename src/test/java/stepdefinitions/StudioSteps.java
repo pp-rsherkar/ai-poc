@@ -460,8 +460,9 @@ public class StudioSteps {
         workspace.clickPublish();
         String alertMsg = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Publish alert message: {}", alertMsg);
-        Assert.assertEquals("Workspace saved successfully", alertMsg);
+        Assert.assertEquals("NPI list published successfully", alertMsg);
         workspace.waitTillWorkspaceAlertHide();
+        logger.info("Verifying published NPI list");
         workspace.clickFlyOrPageButton();
         String publishedNpi = workspace.verifyPublishedNpi();
         logger.info("Published NPI: {}", publishedNpi);
