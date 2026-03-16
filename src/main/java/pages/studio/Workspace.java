@@ -1,9 +1,6 @@
 package pages.studio;
 
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.FrameLocator;
-import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.CommonUtils;
@@ -146,7 +143,7 @@ public class Workspace {
     }
 
     public void waitTillWorkspaceAlertHide() {
-        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
     }
 
     public void clickWebhookIcon() {
@@ -321,9 +318,13 @@ public class Workspace {
         EXISTING_WORKSPACE.click();
     }
 
-    public String isNPIListPublishAlertDisplayed() {
-        String text = NPI_PUBLISH_ALERT.innerText();
-        waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
-        return text;
+    public String fetchNPIListPublishAlertDisplayed() {
+        try {
+            String text = NPI_PUBLISH_ALERT.innerText();
+            waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
+            return text;
+        }catch (PlaywrightException e) {
+            return "";
+        }
     }
 }

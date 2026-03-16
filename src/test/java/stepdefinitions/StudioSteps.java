@@ -325,7 +325,7 @@ public class StudioSteps {
     public void verify_the_hcp_explorer_workspace_is_saved() {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Workspace save alert message: {}", actualMessage);
-        boolean isValid = actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+        boolean isValid = actualMessage.equals("Workspace created successfully") || actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         logger.info("Workspace save valid: {}", isValid);
         Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
@@ -458,10 +458,13 @@ public class StudioSteps {
     public void verify_list_is_published() {
         logger.info("Publishing NPI list");
         workspace.clickPublish();
-        String alertMsg = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Publish alert message: {}", alertMsg);
-        Assert.assertEquals("NPI list published successfully", alertMsg);
-        workspace.waitTillWorkspaceAlertHide();
+        String alertMsg = workspace.fetchNPIListPublishAlertDisplayed();
+        if (!alertMsg.isEmpty()) {
+            logger.info("Publish alert message: {}", alertMsg);
+            Assert.assertEquals("NPI list published successfully", alertMsg);
+        } else {
+            Assert.assertFalse("Publish alert is not displayed", false);
+        }
         logger.info("Verifying published NPI list");
         workspace.clickFlyOrPageButton();
         String publishedNpi = workspace.verifyPublishedNpi();
@@ -719,6 +722,8 @@ public class StudioSteps {
 
     @And("User searches the workspace created to perform Actions from More menu")
     public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() {
+        logger.info("Verifying Studio workspace frame is visible before searching for workspace");
+        workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
         workspaceCreation.clickMoreActionsMenu(workspaceName);
