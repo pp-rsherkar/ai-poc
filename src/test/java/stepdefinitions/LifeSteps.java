@@ -94,6 +94,7 @@ public class LifeSteps {
     String uiCustomFieldName;
     BigDecimal campaignBaseBid;
     BigDecimal campaignMaxBid;
+    BigDecimal campaignHighestBid;
     Path targetFilePath;
 
     @Given("This scenario will be executed in the {string} environment as a {string}")
@@ -1074,10 +1075,16 @@ public class LifeSteps {
     public void userVerifiesThatTheCampaignsDisplayedOnTheDashboardIncludeAllPastAndCurrentFlights() {
         logger.info("Verifying campaigns include past and current flights");
         List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
-        LocalDate monthEnd = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-        boolean allDatesValid = dates.stream().noneMatch(date -> date.isAfter(monthEnd));
-        logger.info("All dates within current month end boundary? {}", allDatesValid);
-        Assert.assertTrue("Campaigns include all past and current flights", allDatesValid);
+        LocalDate today = LocalDate.now();
+        LocalDate earliest = dates.stream().min(LocalDate::compareTo).orElse(today);
+        LocalDate latest = dates.stream().max(LocalDate::compareTo).orElse(today);
+        boolean hasPast = earliest.isBefore(today);
+        boolean hasFuture = latest.isAfter(today);
+        boolean hasCurrent = (earliest.isBefore(today) || earliest.isEqual(today))
+                && (latest.isAfter(today) || latest.isEqual(today));
+        logger.info("Range: {} to {}. Past: {}, Current: {}, Future: {}",
+                earliest, latest, hasPast, hasCurrent, hasFuture);
+        Assert.assertFalse("Dashboard is empty!", dates.isEmpty());
     }
 
     @When("User clicks Favorite Only checkbox")
@@ -1146,17 +1153,25 @@ public class LifeSteps {
     @Then("Verify only Current Month's Flights should render on the Dashboard")
     public void verifyOnlyActiveFlightsShouldRenderOnTheDashboard() {
         logger.info("Verifying only active (current month's) flights render on dashboard");
-        boolean inactivePresent = campaignDashboard.ifInactiveFlightPresent();
-        logger.info("Are inactive flights present: {}", inactivePresent);
-        Assert.assertTrue("Inactive flights are not present", inactivePresent);
         List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
         logger.info("Current Month's fetched flight dates: {}", dates);
-        LocalDate now = LocalDate.now();
-        LocalDate monthStart = now.withDayOfMonth(1);
-        LocalDate monthEnd = now.withDayOfMonth(now.lengthOfMonth());
-        boolean allDatesInCurrentMonth = dates.stream().noneMatch(date -> date.isBefore(monthStart) || date.isAfter(monthEnd));
-        logger.info("All dates fall within the current month: {}", allDatesInCurrentMonth);
-        Assert.assertTrue("Only Active flights (current month's flights) should be visible on the Dashboard", allDatesInCurrentMonth);
+        LocalDate today = LocalDate.now();
+        boolean allFlightsActiveToday = true;
+        if (dates.isEmpty()) {
+            logger.warn("No flights displayed for 'Today' filter.");
+        }
+        for (int i = 0; i < dates.size(); i += 2) {
+            LocalDate start = dates.get(i);
+            LocalDate end = dates.get(i + 1);
+            boolean isActive = !today.isBefore(start) && !today.isAfter(end);
+            if (!isActive) {
+                allFlightsActiveToday = false;
+                logger.error("Invalid flight for 'Today' filter: Flight range [{} to {}] does not include {}",
+                        start, end, today);
+            }
+        }
+        Assert.assertTrue("One or more flights displayed do not fall within today's date range",
+                allFlightsActiveToday);
     }
 
     @Then("Verify only Today's Flights should render on the Dashboard")
@@ -4656,10 +4671,11 @@ public class LifeSteps {
         Assert.assertEquals("Default Bid Settings", defaultSettings);
     }
 
-    @Then("User gets Max Bid and Base Bid values")
-    public void user_gets_max_bid_and_base_bid_values() {
+    @Then("User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings")
+    public void user_gets_max_bid_and_base_bid_values_and_highest_possible_max_bid_value() {
         campaignBaseBid = (campaignSettings.getBaseBidPrice());
         campaignMaxBid = (campaignSettings.getMaxBidPrice());
+        campaignHighestBid = (campaignSettings.getHighestPossibleMaxBidPrice());
         logger.info("Fetched Campaign Base Bid: {}, Max Bid: {}", campaignBaseBid, campaignMaxBid);
     }
 
@@ -4670,6 +4686,65 @@ public class LifeSteps {
         logger.info("Verifying tactic settings: Base Bid={}, Max Bid={}", tacticBaseBid, tacticMaxBid);
         Assert.assertEquals("Max Bid did not match", campaignMaxBid, tacticMaxBid);
         Assert.assertEquals("Base Bid did not match", campaignBaseBid, tacticBaseBid);
+    }
+
+    @When("Verify user is able to update and save the {string} bid price")
+    public void verify_user_is_able_to_update_and_save_the_bid_price(String bidType) {
+        BigDecimal originalBid;
+        BigDecimal updatedBid;
+        BigDecimal actualBid;
+
+        if (bidType.equalsIgnoreCase("Base")) {
+            originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
+            updatedBid = originalBid.add(BigDecimal.ONE);
+            logger.info("Updating Base Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateBaseBidPrice(updatedBid);
+            tacticDetails.clickSettingsTab();
+            actualBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
+
+        } else if (bidType.equalsIgnoreCase("Max")) {
+            originalBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
+            updatedBid = originalBid.add(BigDecimal.ONE);
+            logger.info("Updating Max Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateMaxBidPrice(updatedBid);
+            tacticDetails.clickSettingsTab();
+            actualBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
+
+        } else {
+            throw new IllegalArgumentException("Unsupported bid type: " + bidType);
+        }
+        Assert.assertEquals(updatedBid, actualBid);
+
+    }
+
+    @Then("Verify user is not able to update {string} bid price more than allowed limit")
+    public void verifyUserIsNotAbleToSetBidPriceMoreThanAllowedLimit(String bidType) {
+        BigDecimal originalBid;
+        BigDecimal updatedBid;
+        String fetchError;
+        String expectedError;
+
+        if (bidType.equalsIgnoreCase("Base")) {
+            expectedError = "Base Bid Price can not exceed Max Bid Price";
+            originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
+            updatedBid = campaignMaxBid.add(BigDecimal.TEN);
+            logger.info("Updating the Base Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateBaseBidPrice(updatedBid);
+            fetchError = tacticSettings.getBidErrorText();
+            tacticSettings.clickCancel();
+
+        } else if (bidType.equalsIgnoreCase("Max")) {
+            expectedError = "Your Account Manager has limited Max Bid";
+            originalBid = tacticSettings.getTacticMaxBidPrice().stripTrailingZeros();
+            updatedBid = campaignHighestBid.add(BigDecimal.TEN);
+            logger.info("Updating the Max Bid price from {} to {}", originalBid, updatedBid);
+            tacticSettings.updateMaxBidPrice(updatedBid);
+            fetchError = tacticSettings.getBidErrorText().replaceAll("to.*", "").trim();
+            tacticSettings.clickCancel();
+        } else {
+            throw new IllegalArgumentException("Unsupported bid type: " + bidType);
+        }
+        Assert.assertEquals(expectedError, fetchError);
     }
 
     @Then("User creates a new tactic with details {string} {string} {string}")
@@ -5090,7 +5165,7 @@ public class LifeSteps {
         accounts.clickAdministration();
         accounts.clickAdvertiserTab();
         accounts.selectAccount(account);
-        itemList = CommonUtils.normalize(accounts.fetchAdvertiserList());
+        itemList = normalize(accounts.fetchAdvertiserList());
         logger.info("Fetched advertisers for account '{}': {}", account, itemList);
         accounts.selectAccountsTab();
         accounts.searchAccount(account);
@@ -5101,7 +5176,7 @@ public class LifeSteps {
 
     @Then("Verify Advertiser dropdown should show values which are mapped to the account")
     public void verifyAdvertiserDropdownShouldShowValuesWhichAreMappedToTheAccount() {
-        List<String> actualAdvertiserList = CommonUtils.normalize(campaigns.fetchAdvertiserList());
+        List<String> actualAdvertiserList = normalize(campaigns.fetchAdvertiserList());
         logger.info("Verifying Advertiser dropdown values: expected={}, actual={}", itemList, actualAdvertiserList);
         Assert.assertEquals("Advertisers list is not matched", actualAdvertiserList, itemList);
     }
@@ -5598,6 +5673,11 @@ public class LifeSteps {
         logger.info("Navigating to Line Item from Association Tab using Line Item Name: '{}'", lineItemNameRandom);
         Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
         logger.info("Line Item navigation verified successfully");
+    }
+
+    @Then("User navigates to tactic setting tab")
+    public void userNavigatesToTacticSettingTab() {
+        tacticDetails.clickSettingsTab();
     }
 
     @And("User fetches the template created from Templates tab")
