@@ -129,19 +129,33 @@ public class StudioSteps {
     @And("User navigates to workspace permissions")
     public void User_navigates_to_workspace_permissions() {
         logger.info("Navigating to workspace permissions");
-        accounts.enableStudio();
+        if(accounts.studioToggleActive().isVisible()){
+            logger.info("Studio toggle is already active for the account");
+        } else {
+            logger.info("Studio toggle is not active, enabling it now");
+             accounts.enableStudio();
+        }
     }
 
     @When("User selects the workspace types and saves the settings")
     public void user_selects_the_workspace_types_and_saves_the_settings() {
         logger.info("Selecting workspace types and saving settings");
-        accounts.workSpaceSettings();
+        if(accounts.studioToggleActive().isVisible()){
+            logger.info("Studio toggle is active, skipping work space settings");
+        } else {
+            accounts.workSpaceSettings();
+        }
     }
 
     @Then("Studio should be enabled for that account")
     public void Studio_should_be_enabled_for_that_account() {
         logger.info("Saving Studio settings for account");
-        accounts.saveStudioSettings();
+        if(accounts.studioToggleActive().isVisible()){
+            logger.info("Studio toggle is active, settings are already saved");
+        } else {
+            accounts.saveStudioSettings();
+        }
+
     }
 
     @And("User should be able to see the enabled workspaces for {string} account under Studio")
@@ -153,6 +167,14 @@ public class StudioSteps {
         String permission = accounts.verifyWorkspacePermission();
         logger.info("Workspace permission: {}", permission);
         Assert.assertEquals("HCP Explorer", permission);
+    }
+    @And("User verifies if Studio appears in submenu for {string} account")
+    public void userVerifiesIfStudioAppearsInSubmenuForAccount (String accountName) {
+        logger.info("Verifying if studio opiton is visible in submenu for account: {}", accountName);
+        navigation.clickPulsePointLogo();
+        navigation.refreshPage();
+        navigation.clickSubMenu();
+        Assert.assertTrue(navigation.isStudioTitleVisible());
     }
 
     @And("User disables the studio permission for {string} account")
