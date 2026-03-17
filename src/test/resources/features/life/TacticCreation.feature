@@ -53,7 +53,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
   Scenario Outline: Verify Base bid price and Max bid price populates correctly for a tactic
     When User clicks on Campaign Settings
     Then Verify user is on default bid settings page
-    And  User gets Max Bid and Base Bid values
+    And  User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings
     And Navigate to Campaign Dashboard and clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -62,6 +62,28 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     And  Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |
+
+
+  @regression
+  Scenario Outline: Verify user is not able to set Base bid price and Max Bid higher than the allowed limit for a tactic
+    When User clicks on Campaign Settings
+    Then Verify user is on default bid settings page
+    And  User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings
+    And Navigate to Campaign Dashboard and clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    Then Verify user is able to update and save the "base" bid price
+    Then Verify user is able to update and save the "max" bid price
+    Then Verify user is not able to update "base" bid price more than allowed limit
+    Then Verify user is not able to update "max" bid price more than allowed limit
+
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |
@@ -158,3 +180,61 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Tactic      | 3     |
+
+  @todo
+  Scenario Outline: Verify all Bid Multipliers Rules under categories and Create a tactic by adding all Bid multipliers Rules
+    And User clicks on create new Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+    Then User navigates to tactic setting tab
+    Then User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules
+    And User configures targeting rules as below
+      | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
+      | Day of the Week    | Monday, Tuesday, Friday                                            |
+      | Speciality         | Anesthesiology,Genetics & Genomics                                 |
+      | Practitioner Type  | Physician, Chiropractor, Pharmacist                                |
+      | NPI                | AutoSmartList954103283                                             |
+      | Age                | 35-39, 55-59, 18-24,65+                                            |
+      | Gender             | Male, Female                                                       |
+      | Geo Targets        | New York, California                                               |
+      | Browser            | Chrome, EDGE, Opera, Safari                                        |
+      | Device             | Mobile, Tablet, Connected Device                                   |
+      | Operating System   | Windows, macOS, Blackberry                                         |
+      | Inventory Source   | New Report                                                         |
+      | Domains/Apps       | APP Regular, updaedList106043912                                   |
+    Then Verify Bid multiplier panel with all options under below categories
+      | AUDIENCE ATTRIBUTE |
+      | DEMOGRAPHICS       |
+      | GEOGRAPHY          |
+      | MEDIA SUPPLY       |
+    And Verify Bid type with respect to category
+      | AUDIENCE ATTRIBUTE | Behavioral Segment,Day of The Week,Speciality,Practitioner Type,NPI |
+      | DEMOGRAPHICS       | Age,Gender                                                          |
+      | GEOGRAPHY          | Geo Targets                                                         |
+      | MEDIA SUPPLY       | Browser,Device,Operating System,Inventory Source,Domains and Apps   |
+    And User configures Bid multiplier rules as below
+      | Behavioral Segment | AutoSegment18577650                 |
+      | Day of the Week    | Monday, Tuesday, Friday             |
+      | Speciality         | Anesthesiology,Genetics & Genomics  |
+      | Practitioner Type  | Physician, Chiropractor, Pharmacist |
+      | NPI                | AutoSmartList954103283              |
+      | Age                | 35-39, 55-59, 18-24,65+             |
+      | Gender             | Male, Female                        |
+      | Geo Targets        | New York, California                |
+      | Browser            | Chrome, EDGE, Opera, Safari         |
+      | Device             | Mobile, Tablet, Connected Device    |
+      | Operating System   | Windows, macOS, Blackberry          |
+      | Inventory Source   | New Report                          |
+      | Domains/Apps       | APP Regular, updaedList106043912    |
+    Then Verify the configured Bid multiplier rules
+    When User saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |
