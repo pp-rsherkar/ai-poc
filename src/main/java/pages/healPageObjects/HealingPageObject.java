@@ -85,6 +85,7 @@ public class HealingPageObject {
     private final Locator FILTER_APPLIED_ICON;
     private final Locator RESET_FILTER_ICON;
     private final Locator NO_CAMPAIGN_AVAILABLE_TEXT;
+    private final Locator PRE_LOADER;
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
     int startDay = currentDateTime.getDayOfMonth();
@@ -176,6 +177,7 @@ public class HealingPageObject {
         this.FILTER_APPLIED_ICON = page.locator("//div[contains(@class,'filterApplied')]");
         this.RESET_FILTER_ICON = page.locator("//span[contains(text(),'Reset All Filters')]");
         this.NO_CAMPAIGN_AVAILABLE_TEXT = page.locator("//p[contains(text(), 'No campaigns matching filtering criteria found')]");
+        this.PRE_LOADER = page.locator("//div[contains(@class,'preloader')]");
     }
 
     public void navigateToUrl(String url) {
@@ -213,9 +215,9 @@ public class HealingPageObject {
 
     public void selectAccount(String account) {
         healingActions.safeWaitUntilLocatorVisible(OPTIONS_HEADER, "The campaign table header options including the filter funnel, gear icons and Lifetime button");
-        Locator safeLocate = healingActions.safeLocate(ACCOUNT_NAME, "The account name or username like profile name on top right corner of the page");
-        if (safeLocate.innerText().contains("buyer2")) {
-            safeLocate.click();
+        Locator safeLocator = healingActions.safeLocate(ACCOUNT_NAME, "The account name or username like profile name on top right corner of the page");
+        if (safeLocator.innerText().contains("buyer2")) {
+            safeLocator.click();
             healingActions.safeFill(ACCOUNT_SEARCH, account, "The Search input field");
             page.waitForLoadState(LoadState.LOAD);
             healingActions.safeClick(ACCOUNT_ITEM, "The search result item containing the text " + account);
@@ -224,10 +226,11 @@ public class HealingPageObject {
     }
 
     public String isCampaignDashboardVisibleWithTitle(String text) {
-        waitUtility.waitUntilSpinnerHidden();
-        waitUtility.waitUntilPreLoaderHidden();
-        page.waitForCondition(() -> CAMPAIGN_PAGE_TEXT.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
-        return CAMPAIGN_PAGE_TEXT.innerText();
+        healingActions.safeWaitUntilSpinnerHidden(SPINNER, "Loading spinner");
+        healingActions.safeWaitUntilSpinnerHidden(PRE_LOADER, "Pre Loader spinner");
+        Locator safeLocator = healingActions.safeLocate(CAMPAIGN_PAGE_TEXT, "Campaigns page title");
+        page.waitForCondition(() -> safeLocator.filter(new Locator.FilterOptions().setHasText(text)).count() == 1);
+        return safeLocator.innerText();
     }
 
     public void createCampaign() {

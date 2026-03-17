@@ -11,11 +11,10 @@ import org.slf4j.LoggerFactory;
 import utils.ConfigReader;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class HealingActions {
     private final Page page;
-    private static final int TIMEOUT = 10000;
+    double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
     private static final Logger logger = LoggerFactory.getLogger(HealingActions.class);
 
     public HealingActions(Page page) {
@@ -24,13 +23,13 @@ public class HealingActions {
 
     public void safeClick(Locator locator, String humanIntent) {
         executeWithHealing(
-                () -> locator.click(new Locator.ClickOptions().setTimeout(TIMEOUT)),
-                healedLocator -> healedLocator.click(), humanIntent);
+                locator::click,
+                Locator::click, humanIntent);
     }
 
     public void safeFill(Locator locator, String value, String humanIntent) {
         executeWithHealing(
-                () -> locator.fill(value, new Locator.FillOptions().setTimeout(TIMEOUT)),
+                () -> locator.fill(value),
                 healedLocator -> healedLocator.fill(value), humanIntent);
     }
 
@@ -38,8 +37,9 @@ public class HealingActions {
         final Locator[] capturedLocator = new Locator[1];
         executeWithHealing(
                 () -> {
-                    locator.elementHandle(new Locator.ElementHandleOptions().setTimeout(2000));
-                    capturedLocator[0] = locator;},
+                    locator.elementHandle(new Locator.ElementHandleOptions().setTimeout(timeout));
+                    capturedLocator[0] = locator;
+                },
                 healedLocator -> {
                     capturedLocator[0] = healedLocator;
                 },
@@ -50,14 +50,14 @@ public class HealingActions {
 
     public void safeWaitUntilLocatorVisible(Locator locator, String humanIntent) {
         executeWithHealing(
-                () -> locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(Double.parseDouble(ConfigReader.getProperty("timeout")))),
-                healedLocator -> healedLocator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(TIMEOUT)), humanIntent);
+                () -> locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(timeout)),
+                healedLocator -> healedLocator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(timeout)), humanIntent);
     }
 
     public void safeWaitUntilSpinnerHidden(Locator locator, String humanIntent) {
         executeWithHealing(
-                () -> locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(Double.parseDouble(ConfigReader.getProperty("timeout")))),
-                healedLocator -> healedLocator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(TIMEOUT)), humanIntent);
+                () -> locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(timeout)),
+                healedLocator -> healedLocator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(timeout)), humanIntent);
     }
 
     private String capturePageHtml() {
@@ -111,7 +111,6 @@ public class HealingActions {
                     }
                 } catch (Exception ignored) {}
             }
-
             throw originalException;
         }
     }
