@@ -188,8 +188,8 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
-        Locator SELECT_ACCOUNT = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName(accountName));
-        SELECT_ACCOUNT.click();
+        Locator selectAccount = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName(accountName));
+        selectAccount.click();
         STUDIO_TOGGLE_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
         page.reload();
