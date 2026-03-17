@@ -605,7 +605,7 @@ public class StudioSteps {
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
-    public void userDeletesTheWebhookFromTheWorkspaceList() {
+    public void userDeletesTheWebhookFromTheWorkspaceList() throws InterruptedException {
         logger.info("Attempting to delete workspace with active webhook: {}", workspaceName);
         workspace.goToWorkspaceList();
         workspaceCreation.clickMoreActionsMenu(workspaceName);
@@ -744,7 +744,7 @@ public class StudioSteps {
     }
 
     @And("User searches the workspace created to perform Actions from More menu")
-    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() {
+    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() throws InterruptedException {
         logger.info("Verifying Studio workspace frame is visible before searching for workspace");
         workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
