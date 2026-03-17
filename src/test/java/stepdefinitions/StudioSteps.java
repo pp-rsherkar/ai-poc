@@ -147,6 +147,7 @@ public class StudioSteps {
         }
     }
 
+    //Removed this line from scenario: "enable Studio for an Account for internal users" since permission sync takes 5-7 mins, causing script fail.
     @And("User should be able to see the enabled workspaces for {string} account under Studio")
     public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
         logger.info("Verifying enabled workspaces under Studio for account: {}", accountName);
