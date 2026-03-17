@@ -158,16 +158,6 @@ public class StudioSteps {
 
     }
 
-    @And("User should be able to see the enabled workspaces for {string} account under Studio")
-    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
-        logger.info("Verifying enabled workspaces under Studio for account: {}", accountName);
-        accounts.switchAccount(accountName);
-        navigation.navigateToStudio();
-        workspaceCreation.createWorkspace();
-        String permission = accounts.verifyWorkspacePermission();
-        logger.info("Workspace permission: {}", permission);
-        Assert.assertEquals("HCP Explorer", permission);
-    }
     @And("User verifies if Studio appears in submenu for {string} account")
     public void userVerifiesIfStudioAppearsInSubmenuForAccount (String accountName) {
         logger.info("Verifying if studio opiton is visible in submenu for account: {}", accountName);
@@ -180,7 +170,6 @@ public class StudioSteps {
     @And("User disables the studio permission for {string} account")
     public void userDisablesTheStudioPermissionForAnAccount(String accountName) {
         logger.info("Disabling Studio permission for account: {}", accountName);
-        navigation.clickSubMenu();
         accounts.disableStudioForAccount(accountName);
     }
 

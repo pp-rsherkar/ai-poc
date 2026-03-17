@@ -5,7 +5,7 @@ Feature: Enable Studio permissions for an account,advertiser and external users
   3. It covers logging in, navigating through accounts, advertisers, and users, enabling permissions, and confirming that the external user can see the assigned Studio permissions in the workspace after logging in.
   4. Multiple permission types and advertisers are validated using example data.
 
-  @regression @reg
+  @regression
   Scenario Outline: Enable Studio for an Account for internal users
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -14,7 +14,6 @@ Feature: Enable Studio permissions for an account,advertiser and external users
     When User selects the workspace types and saves the settings
     Then Studio should be enabled for that account
     Then User verifies if Studio appears in submenu for "<ACCOUNT_NAME>" account
-    #Then User should be able to see the enabled workspaces for "<ACCOUNT_NAME>" account under Studio
     When User disables the studio permission for "<ACCOUNT_NAME>" account
     Then User should not be able to see the studio permission for that account
     Examples:
