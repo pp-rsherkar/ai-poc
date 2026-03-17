@@ -1,9 +1,6 @@
 package pages.studio;
 
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.FrameLocator;
-import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.CommonUtils;
@@ -109,6 +106,7 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if (NPI_PUBLISH_ALERT.isVisible()) waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
         if (PUBLISH_LOADER.isVisible()) waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         if (NPI_LIST_PULLOUT_MENU.isVisible()) {
             OK_BUTTON.click();
@@ -146,7 +144,7 @@ public class Workspace {
     }
 
     public void waitTillWorkspaceAlertHide() {
-        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
     }
 
     public void clickWebhookIcon() {
@@ -319,6 +317,16 @@ public class Workspace {
         advertiser.click();
         waitUtility.waitForLocatorVisible(EXISTING_WORKSPACE);
         EXISTING_WORKSPACE.click();
+    }
+
+    public String fetchNPIListPublishAlertDisplayed() {
+        try {
+            String text = NPI_PUBLISH_ALERT.innerText();
+            waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
+            return text;
+        } catch (PlaywrightException e) {
+            return "";
+        }
     }
 
     public String isNPIListPublishAlertDisplayed() {

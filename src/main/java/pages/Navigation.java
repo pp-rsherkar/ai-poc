@@ -57,8 +57,8 @@ public class Navigation {
         this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
         this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
-        this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo/div[@class='logo-holder']");
         this.TARGETING_TEMPLATE_HEADER = page.locator("//div[contains(text(),'Targeting Templates') and contains(@class,'section-name')]");
+        this.PULSEPOINT_LOGO = page.locator("//div[contains(@class, 'dynamic-logo')] | //app-buyer-logo/div[@class='logo-holder']");
     }
 
     public void navigateToUrl(String url) {
