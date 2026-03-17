@@ -147,6 +147,17 @@ public class StudioSteps {
         }
     }
 
+    @And("User should be able to see the enabled workspaces for {string} account under Studio")
+    public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
+        logger.info("Verifying enabled workspaces under Studio for account: {}", accountName);
+        accounts.switchAccount(accountName);
+        navigation.navigateToStudio();
+        workspaceCreation.createWorkspace();
+        String permission = accounts.verifyWorkspacePermission();
+        logger.info("Workspace permission: {}", permission);
+        Assert.assertEquals("HCP Explorer", permission);
+    }
+
     @Then("Studio should be enabled for that account")
     public void Studio_should_be_enabled_for_that_account() {
         logger.info("Saving Studio settings for account");
