@@ -172,7 +172,7 @@ public class StudioSteps {
 
     @And("User verifies if Studio appears in submenu for {string} account")
     public void userVerifiesIfStudioAppearsInSubmenuForAccount (String accountName) {
-        logger.info("Verifying if studio opiton is visible in submenu for account: {}", accountName);
+        logger.info("Verifying if studio option is visible in submenu for account: {}", accountName);
         navigation.clickPulsePointLogo();
         navigation.refreshPage();
         navigation.clickSubMenu();
@@ -605,7 +605,7 @@ public class StudioSteps {
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
-    public void userDeletesTheWebhookFromTheWorkspaceList() throws InterruptedException {
+    public void userDeletesTheWebhookFromTheWorkspaceList() {
         logger.info("Attempting to delete workspace with active webhook: {}", workspaceName);
         workspace.goToWorkspaceList();
         workspaceCreation.clickMoreActionsMenu(workspaceName);
@@ -744,7 +744,7 @@ public class StudioSteps {
     }
 
     @And("User searches the workspace created to perform Actions from More menu")
-    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() throws InterruptedException {
+    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() {
         logger.info("Verifying Studio workspace frame is visible before searching for workspace");
         workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
