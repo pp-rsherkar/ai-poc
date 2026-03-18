@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Campaign
 
-  @regression @prs
+  @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -198,7 +198,7 @@ Feature: LIFE Regression - Create a Campaign
       | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
       | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000     | Test               |
 
-  @regression @prs
+  @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
     And "Life" application is logged in successfully with Account "buyer2@ppcom"
