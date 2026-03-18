@@ -116,7 +116,7 @@ public class Navigation {
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public  void refreshPage() {
+    public void refreshPage() {
         page.reload();
         waitUtility.waitUntilSpinnerHidden();
     }

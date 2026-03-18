@@ -129,18 +129,18 @@ public class StudioSteps {
     @And("User navigates to workspace permissions")
     public void User_navigates_to_workspace_permissions() {
         logger.info("Navigating to workspace permissions");
-        if(accounts.studioToggleActive().isVisible()){
+        if (accounts.studioToggleActive().isVisible()) {
             logger.info("Studio toggle is already active for the account");
         } else {
             logger.info("Studio toggle is not active, enabling it now");
-             accounts.enableStudio();
+            accounts.enableStudio();
         }
     }
 
     @When("User selects the workspace types and saves the settings")
     public void user_selects_the_workspace_types_and_saves_the_settings() {
         logger.info("Selecting workspace types and saving settings");
-        if(accounts.studioToggleActive().isVisible()){
+        if (accounts.studioToggleActive().isVisible()) {
             logger.info("Studio toggle is active, skipping work space settings");
         } else {
             accounts.workSpaceSettings();
@@ -162,16 +162,15 @@ public class StudioSteps {
     @Then("Studio should be enabled for that account")
     public void Studio_should_be_enabled_for_that_account() {
         logger.info("Saving Studio settings for account");
-        if(accounts.studioToggleActive().isVisible()){
+        if (accounts.studioToggleActive().isVisible()) {
             logger.info("Studio toggle is active, settings are already saved");
         } else {
             accounts.saveStudioSettings();
         }
-
     }
 
     @And("User verifies if Studio appears in submenu for {string} account")
-    public void userVerifiesIfStudioAppearsInSubmenuForAccount (String accountName) {
+    public void userVerifiesIfStudioAppearsInSubmenuForAccount(String accountName) {
         logger.info("Verifying if studio option is visible in submenu for account: {}", accountName);
         navigation.clickPulsePointLogo();
         navigation.refreshPage();
