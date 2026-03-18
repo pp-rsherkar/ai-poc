@@ -480,7 +480,7 @@ public class LifeSteps {
         logger.info("Navigating to Campaign Dashboard to verify 'Running' status");
         tacticCreatives.navigateToCampaignDashboard();
         campaignDashboard.resetFiltersIfApplied();
-        String status = tacticCreatives.verifyCampaignRunning();
+        String status = tacticCreatives.getCampaignStatus();
         logger.info("Campaign status: {}", status);
         Assert.assertEquals("Running", status);
         logger.info("Campaign is in Running state");
@@ -490,6 +490,23 @@ public class LifeSteps {
     public void verifyCreativeDetailsAreSaved() {
         logger.info("Verifying creative save success");
         assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
+    }
+
+    @Then("Verify that the campaign is in {string} state")
+    public void verifyTheCampaignState(String expectedStatus) {
+        logger.info("Navigating to Campaign Dashboard to verify 'Pending Approval' status");
+        tacticCreatives.navigateToCampaignDashboard();
+        Assert.assertEquals(expectedStatus, tacticCreatives.getCampaignStatus());
+        logger.info("Campaign status verified as: {}", expectedStatus);
+    }
+
+    @Then("Verify that the approval status of the campaign is {string}")
+    public void verifyThatTheApprovalStatusOfTheCampaignIs(String expectedStatus) {
+        logger.info("Navigating to Campaign Dashboard to verify approval status: {}", expectedStatus);
+        tacticCreatives.navigateToCampaignDashboard();
+        campaigns.clickCampaignDetailsTab();
+        Assert.assertEquals(expectedStatus, tacticCreatives.getCampaignApprovalStatus());
+        logger.info("Campaign approval status verified as: {}", expectedStatus);
     }
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")

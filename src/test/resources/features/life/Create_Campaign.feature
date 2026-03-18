@@ -1,6 +1,6 @@
 Feature: LIFE Regression - Create a Campaign
 
-  @regression
+  @regression @prs
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -198,7 +198,7 @@ Feature: LIFE Regression - Create a Campaign
       | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
       | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000     | Test               |
 
-  @regression
+  @regression @prs
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
     And "Life" application is logged in successfully with Account "buyer2@ppcom"
@@ -214,11 +214,12 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify creative details are saved
+    Then Verify that the campaign is in "Pending Appr" state
     Then Verify that the approval status of the campaign is "Pending Appr"
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Examples:
-      | ADVERTISER       | CP_NAME        | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     | RULE_TYPE          | CREATIVE          |
-      | 1Demo Advertiser | External_Auto_ | Regular | 10000     | External_Line | 500         | External_Tactic | Behavioral Segment | External_Creative |
+      | ADVERTISER       | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     | RULE_TYPE          | CREATIVE          |
+      | 1Demo Advertiser | External_Auto | Regular | 10000     | External_Line | 500         | External_Tactic | Behavioral Segment | External_Creative |
 
 #  @regression
 #  Scenario Outline: API Sample Test
