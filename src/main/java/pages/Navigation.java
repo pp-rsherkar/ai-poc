@@ -89,11 +89,16 @@ public class Navigation {
     }
 
     public void navigateToStudio() {
+        PULSEPOINT_LOGO.click();
         waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
         waitUtility.waitForLocatorVisible(STUDIO_TITLE);
+    }
+
+    public boolean isStudioTitleVisible() {
+        return STUDIO_TITLE.isVisible();
     }
 
     public String verifyStudioTitle() {
@@ -108,6 +113,11 @@ public class Navigation {
             page.waitForLoadState(LoadState.LOAD);
             ACCOUNT_ITEM.click();
         }
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void refreshPage() {
+        page.reload();
         waitUtility.waitUntilSpinnerHidden();
     }
 

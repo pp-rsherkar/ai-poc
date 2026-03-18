@@ -73,6 +73,8 @@ public class Accounts {
     private final Locator EXPORT_OPTIONS_DIALOG;
     private final Locator RUN_BUTTON;
     private final Locator TEST_ACCESS_FAILED_TEXT;
+    private final Locator STUDIO_TOGGLE_ACTIVE;
+
     WaitUtility waitUtility;
 
     public Accounts(Page page) {
@@ -92,7 +94,7 @@ public class Accounts {
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
-        this.DISABLE_STUDIO_OK_BUTTON = page.locator("sui-dimmer div").filter(new Locator.FilterOptions().setHasText("Ok")).nth(4);
+        this.DISABLE_STUDIO_OK_BUTTON = page.locator("//div[contains(@class,'approveButtonText')]");
         this.PULSEPOINT_ICON = page.locator("//app-buyer-logo/div[@class='logo-holder']");
         this.SWITCH_ACCOUNT = page.locator(".left > div:nth-child(2)").first();
         this.SWITCH_SEARCH_ACCOUNT = page.getByPlaceholder("Search");
@@ -139,6 +141,7 @@ public class Accounts {
         this.EXPORT_OPTIONS_DIALOG = page.locator("//div[text()='Choose file size to test access']");
         this.RUN_BUTTON = page.locator("//button[text()='Run']");
         this.TEST_ACCESS_FAILED_TEXT = page.locator("//span[text()='Access Test Failed']");
+        this.STUDIO_TOGGLE_ACTIVE = page.locator("//div[contains(@class,'button-active')]//span[text()='Studio']");
     }
 
     public void clickAdministration() {
@@ -167,6 +170,10 @@ public class Accounts {
         STUDIO_TOGGLE_BUTTON.click();
     }
 
+    public Locator studioToggleActive() {
+        return STUDIO_TOGGLE_ACTIVE;
+    }
+
     public void workSpaceSettings() {
         EXPANSION_TOGGLE.click();
     }
@@ -181,7 +188,8 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
-        SELECT_ACCOUNT.click();
+        Locator selectAccount = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName(accountName));
+        selectAccount.click();
         STUDIO_TOGGLE_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
         page.reload();
