@@ -177,7 +177,7 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | Campaign | Regular | 50000     | % + CPM        | Glynase   | Test              | Automation test | 35      | 300    | PHM Chicago |
 
   @regression
-  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence    And User clicks on Create Campaign
+  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
