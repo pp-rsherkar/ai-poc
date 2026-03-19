@@ -175,9 +175,8 @@ public class WorkspaceCreation {
     }
 
     public void clickMoreActionsMenu(String workspaceName) {
-        Locator locator = WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first();
-        waitUtility.waitForLocatorVisible(locator);
-        locator.click();
+        waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
+        WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().click();
     }
 
     public void deleteWorkspace() {
