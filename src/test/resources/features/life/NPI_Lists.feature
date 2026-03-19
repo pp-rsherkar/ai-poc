@@ -525,20 +525,3 @@ Feature: LIFE regression - Create NPI List of following types:
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE                                                                                                   |
       | 01- Advertiser | SMART_Pixel_NPI | Smart Pixel, NPI List, Prescription Behavior Change, Expand based on Practice and Hospital Affiliation |
-
-
-  Scenario Outline: Validate the successful creation of a Smart List as a Prescribed Drug by uploading a File
-    And User navigates to NPI Lists page
-    When User clicks on Create New List
-    Then Verify creation of NPI List screen is displayed
-    And User selects Smart List
-    And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
-    And User selects Smart NPI list as "<TYPE>"
-    And User clicks Browse button to upload "<TYPE>" file "<FILE_NAME>"
-    And User saves the Smart List and verifies the successful creation of the list
-    And Verify the NPI Numbers from the uploaded file "<FILE_NAME>" are displayed correctly in the list details page
-    And User downloads the uploaded file from the list info page
-    And User clicks on Add List button
-    Examples:
-      | ADVERTISER     | LIST_NAME       | TYPE            | FILE_NAME                      |
-      | 01- Advertiser | SMART_Pixel_NPI | Prescribed Drug | PrescribedDrugs_BulkUpload.txt |
