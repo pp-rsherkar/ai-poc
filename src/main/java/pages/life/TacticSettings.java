@@ -43,7 +43,7 @@ public class TacticSettings {
     private final Locator GEO_TARGETS_BULK_UPLOAD;
     private final Locator GEO_TARGETS_UPLOAD_BUTTON;
     private final Locator GEO_TARGETS_TEXTBOX;
-    private final Locator AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID;
+    private final Locator BRAND_SAFETY_PROFILE_SEGMENT_ID;
     private final Locator RULE_APP_BUNDLES_LISTS_OPTION;
     private final Locator VIEW_ABILITY_PERCENTAGE_BOX;
     private final Locator KEYWORDS_TEXTBOX;
@@ -112,7 +112,7 @@ public class TacticSettings {
         this.GEO_TARGETS_BULK_UPLOAD = page.locator("//span[text()='Bulk Upload']");
         this.GEO_TARGETS_UPLOAD_BUTTON = page.locator("//button[normalize-space()='Upload']");
         this.GEO_TARGETS_TEXTBOX = page.locator("//textarea[@id='geotargetedItemsTA']");
-        this.AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID = page.locator("//span[contains(text(),'DoubleVerify Authentic Brand Suitability ID')]/parent::div/following-sibling::div//input[@type='text']");
+        this.BRAND_SAFETY_PROFILE_SEGMENT_ID = page.locator("//span[contains(text(),'DoubleVerify Authentic Brand Suitability ID')]/parent::div/following-sibling::div//input[@type='text']");
         this.RULE_APP_BUNDLES_LISTS_OPTION = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'App Bundles Lists')]");
         this.VIEW_ABILITY_PERCENTAGE_BOX = page.locator("//div[contains(@class, 'rightLabel')]//input[contains(@class, 'form-control-percent-mini-right')]");
         this.KEYWORDS_TEXTBOX = page.locator("//div[contains(@class,'text-area-container')]//textarea");
@@ -405,7 +405,7 @@ public class TacticSettings {
                     break;
                 case "Brand Safety Profile":
                     String segmentID = ruleValues.get(0);
-                    AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID.fill(segmentID);
+                    BRAND_SAFETY_PROFILE_SEGMENT_ID.fill(segmentID);
                     page.locator("body").click();
                     clickRuleTypeOkButton();
                     break;

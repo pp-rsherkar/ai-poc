@@ -328,10 +328,4 @@ public class Workspace {
             return "";
         }
     }
-
-    public String isNPIListPublishAlertDisplayed() {
-            String text = NPI_PUBLISH_ALERT.innerText();
-            waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
-            return text;
-    }
 }
