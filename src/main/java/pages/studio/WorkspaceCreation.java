@@ -143,7 +143,7 @@ public class WorkspaceCreation {
         waitForStudioWorkspacePage(CREATE_WORKSPACE);
     }
 
-    private void waitForStudioWorkspacePage(Locator locator){
+    private void waitForStudioWorkspacePage(Locator locator) {
         long startTime = System.currentTimeMillis();
         long timeout = Long.parseLong(ConfigReader.getProperty("timeout"));
         while (System.currentTimeMillis() - startTime < timeout) {
