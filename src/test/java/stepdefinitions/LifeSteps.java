@@ -106,8 +106,8 @@ public class LifeSteps {
             url = ConfigReader.getProperty("demoURL");
             if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
                 logger.info("Selecting Demo External User credentials");
-                username = ConfigReader.getProperty("demoExternalUser");
-                password = ConfigReader.getProperty("demoExternalPassword");
+                username = ConfigReader.getExternalDemoUsername();
+                password = ConfigReader.getExternalDemoPassword();
             } else {
                 logger.info("Selecting Demo Internal User credentials");
                 username = ConfigReader.getInternalDemoUsername();
@@ -118,8 +118,8 @@ public class LifeSteps {
             url = ConfigReader.getProperty("preReleaseURL");
             if (user != null && user.toLowerCase().contains("external")) {
                 logger.info("Selecting Pre-release External User credentials");
-                username = ConfigReader.getProperty("preReleaseExternalUser");
-                password = ConfigReader.getProperty("preReleaseExternalPassword");
+                username = ConfigReader.getExternalPreReleaseUsername();
+                password = ConfigReader.getExternalPreReleasePassword();
             } else {
                 logger.info("Selecting Pre-release Internal User credentials");
                 username = ConfigReader.getInternalPreReleaseUsername();
