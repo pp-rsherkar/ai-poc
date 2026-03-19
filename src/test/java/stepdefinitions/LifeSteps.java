@@ -489,7 +489,7 @@ public class LifeSteps {
     @Then("Verify creative details are saved")
     public void verifyCreativeDetailsAreSaved() {
         logger.info("Verifying creative save success");
-        assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
+        Assert.assertTrue("Tactic creatives success message should contain 'Success!'", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
     }
 
     @Then("Verify that the campaign is in {string} state")
