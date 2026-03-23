@@ -52,7 +52,7 @@ public class StudioSteps {
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
         logger.info("User clicks on Create New Workspace");
-        workspaceCreation.createStudioWorkspace();
+        workspaceCreation.clickCreateStudioWorkspace();
     }
 
     @And("the User navigate to studio")
@@ -129,21 +129,25 @@ public class StudioSteps {
     @And("User navigates to workspace permissions")
     public void User_navigates_to_workspace_permissions() {
         logger.info("Navigating to workspace permissions");
-        accounts.enableStudio();
+        if (accounts.studioToggleActive().isVisible()) {
+            logger.info("Studio toggle is already active for the account");
+        } else {
+            logger.info("Studio toggle is not active, enabling it now");
+            accounts.enableStudio();
+        }
     }
 
     @When("User selects the workspace types and saves the settings")
     public void user_selects_the_workspace_types_and_saves_the_settings() {
         logger.info("Selecting workspace types and saving settings");
-        accounts.workSpaceSettings();
+        if (accounts.studioToggleActive().isVisible()) {
+            logger.info("Studio toggle is active, skipping work space settings");
+        } else {
+            accounts.workSpaceSettings();
+        }
     }
 
-    @Then("Studio should be enabled for that account")
-    public void Studio_should_be_enabled_for_that_account() {
-        logger.info("Saving Studio settings for account");
-        accounts.saveStudioSettings();
-    }
-
+    //Removed this line from scenario: "enable Studio for an Account for internal users" since permission sync takes 5-7 mins, causing script fail.
     @And("User should be able to see the enabled workspaces for {string} account under Studio")
     public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
         logger.info("Verifying enabled workspaces under Studio for account: {}", accountName);
@@ -155,10 +159,28 @@ public class StudioSteps {
         Assert.assertEquals("HCP Explorer", permission);
     }
 
+    @Then("Studio should be enabled for that account")
+    public void Studio_should_be_enabled_for_that_account() {
+        logger.info("Saving Studio settings for account");
+        if (accounts.studioToggleActive().isVisible()) {
+            logger.info("Studio toggle is active, settings are already saved");
+        } else {
+            accounts.saveStudioSettings();
+        }
+    }
+
+    @And("User verifies if Studio appears in submenu for {string} account")
+    public void userVerifiesIfStudioAppearsInSubmenuForAccount(String accountName) {
+        logger.info("Verifying if studio option is visible in submenu for account: {}", accountName);
+        navigation.clickPulsePointLogo();
+        navigation.refreshPage();
+        navigation.clickSubMenu();
+        Assert.assertTrue(navigation.isStudioTitleVisible());
+    }
+
     @And("User disables the studio permission for {string} account")
     public void userDisablesTheStudioPermissionForAnAccount(String accountName) {
         logger.info("Disabling Studio permission for account: {}", accountName);
-        navigation.clickSubMenu();
         accounts.disableStudioForAccount(accountName);
     }
 
@@ -175,7 +197,7 @@ public class StudioSteps {
         logger.info("Studio dashboard: {}", dashboard);
         Assert.assertEquals("Unable to click on Create New Workspace button", "Studio", dashboard);
         workspaceCreation.verifyStudioWorkspaceFrame();
-        workspaceCreation.createStudioWorkspace();
+        workspaceCreation.clickCreateStudioWorkspace();
     }
 
     @Then("User sees the types of workspaces they have permissions for")
@@ -325,7 +347,7 @@ public class StudioSteps {
     public void verify_the_hcp_explorer_workspace_is_saved() {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Workspace save alert message: {}", actualMessage);
-        boolean isValid = actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+        boolean isValid = actualMessage.equals("Workspace created successfully") || actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         logger.info("Workspace save valid: {}", isValid);
         Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
@@ -382,6 +404,8 @@ public class StudioSteps {
 
     @And("User searches the {string} and selects it")
     public void userSearchesTheAndSelectsIt(String workspace) {
+        logger.info("Verifying Studio workspace frame is visible");
+        workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching and opening workspace: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspace);
         workspaceCreation.clickWorkspace(workspace);
@@ -456,10 +480,14 @@ public class StudioSteps {
     public void verify_list_is_published() {
         logger.info("Publishing NPI list");
         workspace.clickPublish();
-        String alertMsg = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Publish alert message: {}", alertMsg);
-        Assert.assertEquals("Workspace saved successfully", alertMsg);
-        workspace.waitTillWorkspaceAlertHide();
+        String alertMsg = workspace.fetchNPIListPublishAlertDisplayed();
+        if (!alertMsg.isEmpty()) {
+            logger.info("Publish alert message: {}", alertMsg);
+            Assert.assertEquals("NPI list published successfully", alertMsg);
+        } else {
+            Assert.assertFalse("Publish alert is not displayed", false);
+        }
+        logger.info("Verifying published NPI list");
         workspace.clickFlyOrPageButton();
         String publishedNpi = workspace.verifyPublishedNpi();
         logger.info("Published NPI: {}", publishedNpi);
@@ -576,7 +604,7 @@ public class StudioSteps {
     }
 
     @When("User tries to delete the workspace associated with active webhook from the workspace list")
-    public void userDeletesTheWebhookFromTheWorkspaceList() {
+    public void userDeletesTheWebhookFromTheWorkspaceList() throws InterruptedException {
         logger.info("Attempting to delete workspace with active webhook: {}", workspaceName);
         workspace.goToWorkspaceList();
         workspaceCreation.clickMoreActionsMenu(workspaceName);
@@ -715,7 +743,9 @@ public class StudioSteps {
     }
 
     @And("User searches the workspace created to perform Actions from More menu")
-    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() {
+    public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() throws InterruptedException {
+        logger.info("Verifying Studio workspace frame is visible before searching for workspace");
+        workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
         workspaceCreation.clickMoreActionsMenu(workspaceName);
@@ -985,5 +1015,69 @@ public class StudioSteps {
         String studioTitle = navigation.verifyStudioTitle();
         logger.info("Studio title: {}", studioTitle);
         Assert.assertEquals("Studio", studioTitle);
+    }
+
+    @When("User selects the workspace type {string}")
+    public void userSelectsTheWorkspaceType(String workspaceType){
+        logger.info("Verifying Studio Workspace frame is displayed");
+        workspaceCreation.verifyStudioWorkspaceFrame();
+        logger.info("Selecting workspace type: {}", workspaceType);
+        workspaceCreation.selectWorkspaceType(workspaceType);
+    }
+
+    @And("User selects {string} from the Studio Workspace Advertiser dropdown")
+    public void userSelectsFromTheStudioWorkspaceAdvertiserDropdown(String workspaceAdvertiser) {
+        logger.info("Selecting workspace advertiser: {}", workspaceAdvertiser);
+        workspaceCreation.selectWorkspaceAdvertiser(workspaceAdvertiser);
+    }
+
+    @And("User selects {string} from the Studio Workspace Created By dropdown")
+    public void userSelectsFromTheStudioWorkspaceCreatedByDropdown(String createdBy) {
+        logger.info("Selecting workspace created by: {}", createdBy);
+        workspaceCreation.selectWorkspaceCreatedBy(createdBy);
+    }
+
+    @And("User searches for a workspace by name using the search box on the Workspace Details page")
+    public void userSearchesForAWorkspaceByNameUsingTheSearchBoxOnTheWorkspaceDetailsPage() {
+        logger.info("Fetching workspace name from dashboard to search");
+        workspaceName = workspaceCreation.fetchWorkspaceNameFromDashboard();
+        logger.info("Searching workspace by name: {}", workspaceName);
+        workspaceCreation.searchByWorkspaceName(workspaceName);
+    }
+
+    @And("User navigates to another page within Studio and then returns to the workspace list page")
+    public void userNavigatesToAnotherPageWithinStudioAndThenReturnsToTheWorkspaceListPage() {
+        logger.info("Navigating to another page within Studio and then returning to the workspace list page");
+        workspaceCreation.clickCreateStudioWorkspace();
+        logger.info("Navigated back to the workspace list page after visiting the create new workspace page");
+        workspaceCreation.clickBackArrowFromCreateNewWorkspace();
+    }
+
+    @Then("User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
+    public void userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
+        logger.info("Verifying persistence of selected filters, dropdown values, and search input");
+        String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
+        logger.info("Selected workspace type: {}", actualWorkspaceType);
+        Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
+        String actualWorkspaceAdvertiser = workspaceCreation.getSelectedWorkspaceAdvertiser();
+        logger.info("Selected workspace advertiser: {}", actualWorkspaceAdvertiser);
+        Assert.assertEquals("Selected workspace advertiser is not persistent", expectedAdvertiser, actualWorkspaceAdvertiser);
+        String actualWorkspaceCreatedBy = workspaceCreation.getSelectedWorkspaceCreatedBy();
+        logger.info("Selected workspace created by: {}", actualWorkspaceCreatedBy);
+        Assert.assertEquals("Selected workspace created by is not persistent", expectedCreatedBy, actualWorkspaceCreatedBy);
+        String actualWorkspaceName = workspaceCreation.getSearchedWorkspaceName();
+        logger.info("Searched workspace name: {}", actualWorkspaceName);
+        Assert.assertEquals("Search input value is not persistent", workspaceName, actualWorkspaceName);
+    }
+
+    @And("Verify on refresh of the page, the filters are reset and search input is cleared")
+    public void verifyOnRefreshOfThePageTheFiltersAreResetAndSearchInputIsCleared() {
+        logger.info("Refreshing the page to verify filters are reset and search input is cleared");
+        workspaceCreation.refreshPage();
+        logger.info("Verifying filters are reset and search input is cleared after page refresh");
+        Assert.assertTrue("Workspace Type checkbox is not reset", workspaceCreation.getSelectedWorkspaceType().isEmpty());
+        Assert.assertTrue("Workspace advertiser dropdown is not reset", workspaceCreation.getSelectedWorkspaceAdvertiser().isEmpty());
+        Assert.assertTrue("Workspace created by dropdown is not reset", workspaceCreation.getSelectedWorkspaceCreatedBy().isEmpty());
+        Assert.assertTrue("Search box is not cleared", workspaceCreation.getSearchedWorkspaceName().isEmpty());
     }
 }

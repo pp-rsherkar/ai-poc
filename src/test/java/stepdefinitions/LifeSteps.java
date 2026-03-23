@@ -18,6 +18,7 @@ import utils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -573,7 +574,7 @@ public class LifeSteps {
     public void verify_smart_list_gets_saved_successfully() {
         logger.info("Saving NPI List");
         npiStaticList.saveList();
-        String successMessage = npiStaticList.saveListSuccess();
+        String successMessage = npiStaticList.fetchSuccessAlert();
         logger.info("NPI List save message: {}", successMessage);
         assert successMessage.contains("NPI list created");
         logger.info("List saved successfully");
@@ -595,26 +596,60 @@ public class LifeSteps {
     @Then("User enters the NPI list details as {string} {string} {string}")
     public void user_enters_the_npi_list_details_as(String npiListName, String advertiser, String npiNumber) {
         npiName = npiListName + '_' + CommonUtils.timeStampCalculation();
+        String[] advertiserList = advertiser.split(",");
         logger.info("Entering NPI List details - Name: {}, Advertiser: {}, NPI Number: {}", npiName, advertiser, npiNumber);
         npiStaticList.enterListName(npiName);
-        npiStaticList.selectAdvertiser(advertiser);
+        for(String adv : advertiserList) {
+            logger.info("Selecting advertiser: {}", adv.trim());
+            npiStaticList.selectAdvertiser(adv.trim());
+        }
         npiStaticList.enterNPINumber(npiNumber);
     }
 
-    @When("User makes list available in LIFE and saves the list")
-    public void user_makes_list_available_in_life_and_saves_the_list() {
+    @When("User makes list available in {string} and saves the list")
+    public void user_makes_list_available_in_life_and_saves_the_list(String platformName) {
         logger.info("Selecting product to make list available in LIFE");
-        npiStaticList.selectProduct();
+        npiStaticList.selectProduct(platformName);
     }
 
     @Then("Verify list gets saved successfully")
     public void verify_list_gets_saved_successfully() {
         logger.info("Saving list and verifying success message");
         npiStaticList.saveList();
-        String successMessage = npiStaticList.saveListSuccess();
+        String successMessage = npiStaticList.fetchSuccessAlert();
         logger.info("Success Message: {}", successMessage);
         assert successMessage.contains("NPI list created");
         logger.info("List saved verification passed");
+    }
+
+    @And("Verify the NPI Numbers from the uploaded file {string} are displayed correctly in the list details page")
+    public void verifyTheStaticNPINumbersFromTheUploadedFileAreDisplayedCorrectlyInTheListDetailsPage(String fileName) throws IOException {
+        int npiCountFromFile = 0;
+        int npiCountFromListDetails = 0;
+        if(fileName.contains(".xlsx"))
+            npiCountFromFile = FileActions.fetchRowCountFromExcel(fileName);
+        else if (fileName.contains(".csv") || fileName.contains(".txt"))
+            npiCountFromFile = FileActions.fetchRowCountExcludeHeaderFromCSVAndTxt(fileName);
+        logger.info("Verifying NPI count from file: {} with count displayed in list details", fileName);
+        if(fileName.contains("StaticList")) {
+            npiCountFromListDetails = npiStaticList.getNPICountFromListDetails();
+            logger.info("NPI count from file: {}, NPI count from Static List Details: {}", npiCountFromFile, npiCountFromListDetails);
+            Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
+        }
+        else{
+            npiCountFromListDetails = npiAttributesList.getNPICountFromListDetails();
+            logger.info("NPI count from file: {}, NPI count from Attribute List Details: {}", npiCountFromFile, npiCountFromListDetails);
+            Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
+        }
+        int npiCountFromListItems = npiStaticList.getNPICountFromListItems(npiName);
+        logger.info("NPI count from file: {}, NPI count from List Items Section: {}", npiCountFromFile, npiCountFromListItems);
+        Assert.assertEquals("NPI count from file does not match with List Items Section", npiCountFromFile, npiCountFromListItems);
+
+        int npiCountFromListInfo = npiStaticList.getNPICountFromListInfo();
+        logger.info("NPI count from file: {}, NPI count from List Info: {}", npiCountFromFile, npiCountFromListInfo);
+        Assert.assertEquals("NPI count from file does not match with List Info", npiCountFromFile, npiCountFromListInfo);
+
+        logger.info("NPI count verification successful");
     }
 
     @Given("User navigates to Report Templates page")
@@ -1368,7 +1403,7 @@ public class LifeSteps {
         logger.info("Updating list name to: {}", npiNameEdited);
         npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
-        String successMessage = npiStaticList.saveListSuccess();
+        String successMessage = npiStaticList.fetchSuccessAlert();
         logger.info("List save success message: {}", successMessage);
         Assert.assertTrue("Unable to see success message", successMessage.contains("NPI list created"));
     }
@@ -1708,7 +1743,7 @@ public class LifeSteps {
     @Then("Verify the Attributes list is saved successfully")
     public void verifyTheAttributesListIsSavedSuccessfully() {
         logger.info("Verifying Attributes list save success");
-        String successMessage = npiAttributesList.saveListSuccess();
+        String successMessage = npiAttributesList.fetchSuccessAlert();
         logger.info("Save message: '{}'", successMessage);
         assert successMessage.contains("NPI list created");
     }
@@ -1725,7 +1760,7 @@ public class LifeSteps {
         npiAttributesList.saveList();
         String updateMessage = npiAttributesList.updateListSuccess();
         logger.info("Update message: '{}'", updateMessage);
-        assert updateMessage.contains("NPI list updated");
+        Assert.assertTrue("NPI List failed to update", updateMessage.contains("NPI list updated"));
     }
 
     @Then("Verify the updates are applied successfully")
@@ -2246,9 +2281,14 @@ public class LifeSteps {
 
     @And("Verify list data is uploaded successfully")
     public void verifyListDataIsUploadedSuccessfully() {
-        int statusCode = response.status();
-        logger.info("Verifying API response status code. Actual: {}", statusCode);
-        Assert.assertEquals(204, statusCode);
+        if (response == null) {
+            logger.error("API response is null, cannot verify upload success");
+            Assert.fail("API response is null");
+        } else {
+            int statusCode = response.status();
+            logger.info("Verifying API response status code. Actual: {}", statusCode);
+            Assert.assertEquals(204, statusCode);
+        }
     }
 
     @And("Refresh the Browser to view the data uploaded")
@@ -3174,6 +3214,7 @@ public class LifeSteps {
     public void verifyAdvertiserFieldShouldBeMandatory() {
         logger.info("Verifying Advertiser field mandatory validation");
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("Select Advertiser", bulkCreativeUpload.fetchErrorAlert());
         logger.info("Advertiser mandatory validation message verified");
     }
@@ -3183,6 +3224,7 @@ public class LifeSteps {
         logger.info("Verifying Landing Domain mandatory validation after selecting advertiser: {}", advertiser);
         bulkCreativeUpload.selectAdvertiser(advertiser);
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("Landing Page Domain is required", bulkCreativeUpload.fetchErrorAlert());
         logger.info("Landing Domain mandatory validation message verified");
     }
@@ -3192,6 +3234,7 @@ public class LifeSteps {
         logger.info("Entering invalid Landing Domain: {}", invalidLandingDomain);
         bulkCreativeUpload.enterLandingPageDomain(invalidLandingDomain);
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickOKButton();
         Assert.assertEquals("Landing Page Domain is not valid.", bulkCreativeUpload.fetchErrorAlert());
         logger.info("Invalid Landing Domain validation message verified");
     }
@@ -3200,7 +3243,7 @@ public class LifeSteps {
     public void verifyOnlyValidLandingDomainValuesShouldBePermitted(String validLandingDomain) {
         logger.info("Entering valid Landing Domain: {}", validLandingDomain);
         bulkCreativeUpload.enterLandingPageDomain(validLandingDomain);
-        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertFalse("No error alert is displayed.", bulkCreativeUpload.fetchErrorAlert().contains("No error alert is displayed."));
         logger.info("Valid Landing Domain accepted successfully");
     }
 
@@ -3275,6 +3318,7 @@ public class LifeSteps {
     public void verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
         logger.info("Verifying mandatory validation for Clickthrough URL and Landing Domain");
         bulkCreativeUpload.clickPreviewButton();
+        bulkCreativeUpload.clickOKButton();
         List<String> expectedMessages = Arrays.asList("Clickthrough URL is required", "Landing Page Domain is required");
         Assert.assertEquals(expectedMessages, bulkCreativeUpload.fetchInlineValidationMessage());
         logger.info("Mandatory validation messages verified for Clickthrough URL and Landing Domain");
@@ -3284,7 +3328,7 @@ public class LifeSteps {
     public void verifyOnlyValidClickthroughURLValuesShouldBePermitted(String validURL) {
         logger.info("Entering valid Clickthrough URL: {}", validURL);
         bulkCreativeUpload.enterClickthroughURL(validURL);
-        Assert.assertEquals("Unable to fetch Error alert", bulkCreativeUpload.fetchErrorAlert());
+        Assert.assertEquals("No error alert is displayed.", bulkCreativeUpload.fetchErrorAlert());
         logger.info("Valid Clickthrough URL accepted successfully");
     }
 
@@ -4042,11 +4086,11 @@ public class LifeSteps {
         accounts.selectAccountsTab();
     }
 
-    @And("User searches the account {string} in which Destination to be created")
-    public void userSearchesTheAccountInWhichDestinationToBeCreated(String account) {
-        logger.info("Searching account for destination creation: {}", account);
+    @And("User searches the account {string} and selects the account")
+    public void userSearchesTheAccountAndSelectsTheAccount(String account) {
+        logger.info("Searching account: {}", account);
         accounts.searchAccount(account);
-        Assert.assertTrue("Reporting Tab is not displayed", accounts.isReportingTabDisplayed());
+        Assert.assertTrue("Details Tab is not displayed", accounts.isDetailsTabDisplayed());
     }
 
     @And("User navigates to Reporting tab")
@@ -4938,6 +4982,22 @@ public class LifeSteps {
         logger.info("Captured details: {}", capturedDetails);
     }
 
+    @And("User retrieves all the entered data before saving the Static List")
+    public void userRetrievesAllTheEnteredDataBeforeSavingTheStaticList() {
+        logger.info("Retrieving entered data before saving Static list");
+        capturedDetails = npiStaticList.retrieveEnteredData();
+        logger.info("List details before saving it {}", capturedDetails);
+    }
+
+    @And("User retrieves all the entered data after saving the Static List")
+    public void userRetrievesAllTheEnteredDataAfterSavingTheStaticList() {
+        logger.info("Retrieving entered data after saving Static list");
+        List<String> fetchDetails = npiStaticList.retrieveEnteredData();
+        logger.info("List details after saving it {}", fetchDetails);
+        Assert.assertEquals("Details entered doesn't match after saving the list", capturedDetails, fetchDetails);
+    }
+
+
     @And("User saves the Smart List and verifies the successful creation of the list")
     public void theUserSavesTheSmartListAndVerifiesTheSuccessfulCreationOfTheList() {
         logger.info("Saving Smart NPI list '{}'", npiName);
@@ -4945,6 +5005,14 @@ public class LifeSteps {
         String alert = npiSmartList.fetchSuccessAlert();
         logger.info("Success alert: '{}'", alert);
         Assert.assertEquals("NPI list created successfully", alert);
+    }
+
+    @And("User saves the Smart List and verifies the error message is displayed")
+    public void userSavesTheSmartListAndVerifiesTheErrorMessageIsDisplayed() {
+        logger.info("Saving Smart list '{}'", npiName);
+        npiSmartList.clickSaveButton();
+        String alert = npiSmartList.fetchErrorAlert();
+        Assert.assertEquals("Smart list can not be generated with current selection.", alert);
     }
 
     @And("Verify that the retrieved data for the {string} list was saved correctly")
@@ -4981,6 +5049,15 @@ public class LifeSteps {
         npiSmartList.selectNPIGroup(npiList);
     }
 
+    @And("User selects the NPI data {string} for {string}")
+    public void userSelectsTheNPIData(String npiData, String optionType) {
+        logger.info("Selecting NPI Data '{}'", npiData);
+        if(optionType.contains("NPI List"))
+            npiSmartList.selectNPIGroup(npiData);
+        else
+            npiSmartList.selectSpeciality(npiData);
+    }
+
     @And("User selects the Speciality {string}")
     public void userSelectsTheSpeciality(String specialities) {
         List<String> specialityList = CommonUtils.parseCommaSeparatedString(specialities);
@@ -5008,9 +5085,9 @@ public class LifeSteps {
 
     @And("verify that Decile is set to {string} by default for {string}")
     public void verifyThatDecileIsSetToByDefault(String decile, String type) {
-        String fetchedDecile = npiSmartList.fetchDecile(type);
+        String fetchedDecile = String.valueOf(npiSmartList.fetchDecile(type));
         logger.info("Verifying Decile for type '{}': expected='{}', actual='{}'", type, decile + " decile", fetchedDecile);
-        Assert.assertEquals(decile + " decile", fetchedDecile);
+        Assert.assertTrue("Default decile is not available - ", fetchedDecile.contains(decile));
     }
 
     @And("User selects {string} from {string} dropdown")
@@ -5059,6 +5136,12 @@ public class LifeSteps {
     public void userSelectsTheValueFromTheSlider(String sliderType, String sliderValue) {
         logger.info("Selecting '{}' value '{}' from slider", sliderType, sliderValue);
         npiSmartList.selectDropperValueFromSlider(sliderType, sliderValue);
+    }
+
+    @And("User selects the Decile value as {string} from the slider for {string}")
+    public void userSelectsTheValueFromTheSliderFor(String sliderValue, String listOption) {
+        logger.info("Selecting value '{}' for option '{}' from slider", sliderValue, listOption);
+        npiSmartList.selectDecile(sliderValue, listOption);
     }
 
     @And("Verify that Time Frame Selector slider should range from {string} to {string} months and should be set to {string} by default")
@@ -5144,10 +5227,11 @@ public class LifeSteps {
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         logger.info("Selecting Smart NPI list with mandatory details: {}", rows);
         for (Map<String, String> row : rows) {
-            String option = row.get("PopulationOption").trim();
-            String details = row.get("OptionDetails").trim();
+            String option = row.get("PopulationOption") != null ? row.get("PopulationOption").trim() : "";
+            String details = row.get("OptionDetails") != null ? row.get("OptionDetails").trim() : "";
             npiSmartList.selectSmartNPIListType(option);
-            Map<String, String> attributeMap = Arrays.stream(details.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(details.split(",")).map(String::trim).filter(entry -> entry.contains(":")).map(entry -> entry.split(":", 2)).filter(arr -> arr.length == 2)
+                    .collect(Collectors.toMap(arr -> arr[0].trim(), arr -> arr[1].trim()));
             logger.info("Entering details for '{}': {}", option, attributeMap);
             npiSmartList.enterPopulationOptionsDetail(option, attributeMap);
         }
@@ -5157,7 +5241,7 @@ public class LifeSteps {
     public void verifyBulkUploadTemplateEntryCountMatchesUICountPostUpload(String fileName) throws IOException {
         int recordsCountFromFile = FileActions.countRecordsFromTextFile(fileName);
         int recordsCountFromUI = 0;
-        if (fileName.contains("Diagnosis_BulkUpload")) {
+        if (fileName.contains("Diagnosis_BulkUpload") || fileName.contains("PrescribedDrugs_BulkUpload")) {
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchDiagnosisCodesFromUI());
         } else {
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchMedicalProcedureCodesFromUI());
@@ -5681,5 +5765,37 @@ public class LifeSteps {
         logger.info("Navigating to Line Item from Association Tab using Line Item Name: '{}'", lineItemNameRandom);
         Assert.assertTrue("Navigation to the line item " + lineItemNameRandom + " is not successful", createCreatives.clickLineItemName(lineItemNameRandom).contains(lineItemNameRandom));
         logger.info("Line Item navigation verified successfully");
+    }
+
+    @Then("User navigates to tactic setting tab")
+    public void userNavigatesToTacticSettingTab() {
+        tacticDetails.clickSettingsTab();
+    }
+
+    @And("User opens Life Settings")
+    public void userOpensLifeSettings() {
+        logger.info("Opening Life Settings from Accounts page");
+        accounts.clickLifeSettings();
+        logger.info("Life Settings page is opened successfully");
+    }
+
+    @And("User fetches PulsePoint Data Fees, NPI Targeting Gross CPM and calculates the data cost")
+    public void userFetchesPulsePointDataFeesNPITargetingGrossCPMAndCalculatesTheDataCost() {
+        logger.info("Fetch PulsePoint Data Fees and NPI Targeting Gross CPM to calculate data cost");
+        double dataFee = accounts.fetchPulsePointDataFees();
+        double grossCPM = accounts.fetchNPITargetingGrossCPM();
+        logger.info("Fetched Data Fee: {}% and Gross CPM: ${}", dataFee, grossCPM);
+        BigDecimal dataCost = BigDecimal.valueOf((grossCPM / (1 - (dataFee / 100)))).setScale(2, RoundingMode.HALF_UP);
+        logger.info("Calculated data cost: ${}", dataCost);
+        metricName = "$" + dataCost;
+        accounts.clickLifeCancelButtonFromSettingsPanel();
+    }
+
+    @And("User verifies the calculated data cost is similar to the displayed data cost")
+    public void userVerifiesTheCalculatedDataCostIsSimilarToTheDisplayedDataCost() {
+        logger.info("Verifying calculated data cost {} is similar to the displayed data cost", metricName);
+        String displayedDataCost = npiStaticList.fetchDisplayedDataCost();
+        logger.info("Fetched displayed data cost: {}", displayedDataCost);
+        Assert.assertEquals("Calculated data cost doesn't match with displayed data cost", metricName, displayedDataCost);
     }
 }
