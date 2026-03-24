@@ -107,8 +107,8 @@ public class LifeSteps {
             url = ConfigReader.getProperty("demoURL");
             if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
                 logger.info("Selecting Demo External User credentials");
-                username = ConfigReader.getProperty("demoExternalUser");
-                password = ConfigReader.getProperty("demoExternalPassword");
+                username = ConfigReader.getExternalDemoUsername();
+                password = ConfigReader.getExternalDemoPassword();
             } else {
                 logger.info("Selecting Demo Internal User credentials");
                 username = ConfigReader.getInternalDemoUsername();
@@ -119,8 +119,8 @@ public class LifeSteps {
             url = ConfigReader.getProperty("preReleaseURL");
             if (user != null && user.toLowerCase().contains("external")) {
                 logger.info("Selecting Pre-release External User credentials");
-                username = ConfigReader.getProperty("preReleaseExternalUser");
-                password = ConfigReader.getProperty("preReleaseExternalPassword");
+                username = ConfigReader.getExternalPreReleaseUsername();
+                password = ConfigReader.getExternalPreReleasePassword();
             } else {
                 logger.info("Selecting Pre-release Internal User credentials");
                 username = ConfigReader.getInternalPreReleaseUsername();
@@ -136,9 +136,12 @@ public class LifeSteps {
         navigation.enterPassword(password);
         navigation.clickLogin();
         logger.info("Navigating to specific application module: {}", application);
+
         switch (application) {
             case "Life":
-                navigation.navigateToLife();
+                if (userType.equals("User")) {
+                    navigation.navigateToLife();
+                }
                 break;
             case "HCP":
                 navigation.navigateToHCP();
@@ -150,8 +153,13 @@ public class LifeSteps {
                 navigation.navigateToStudio();
                 break;
         }
-        logger.info("Selecting account: {}", account);
-        navigation.selectAccount(account);
+
+        if (userType.equals("User")) {
+            logger.info("Selecting account: {}", account);
+            navigation.selectAccount(account);
+        } else {
+            logger.info("Default account for External user: {}", account);
+        }
     }
 
     @Given("User clicks on Create Campaign")
@@ -172,6 +180,32 @@ public class LifeSteps {
         campaigns.enterCampaignName(campaignNameRandom);
         campaigns.setCampaignType(campaign_type);
         campaigns.enterBudget(budget);
+        logger.info("Saving campaign details");
+        campaigns.saveCampaign();
+    }
+
+    @When("User enters the campaign details as {string} {string} {string} {string}")
+    public void userEntersTheCampaignDetailsAs(String advertiser, String campaignName, String campaignType, String budget) {
+        campaignNameRandom = campaignName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Entering campaign details - Advertiser: {}, Name: {}, Type: {}, Budget: {}", advertiser, campaignNameRandom, campaignType, budget);
+        campaigns.selectAdvertiser(advertiser);
+        campaigns.enterCampaignName(campaignNameRandom);
+        campaigns.setCampaignType(campaignType);
+        campaigns.enterBudget(budget);
+    }
+
+    @Then("Verify that the campaign budget status is {string} and is greyed out")
+    public void verifyThatTheBudgetStatusIs(String campaignBudgetStatus) {
+        logger.info("Verifying campaign budget status. Expected: {}", campaignBudgetStatus);
+        Assert.assertEquals(campaignBudgetStatus, campaigns.getCampaignBudgetStatus());
+        logger.info("Verified campaign budget status is greyed out");
+        Assert.assertEquals("rgba(34, 34, 34, 0.09)", campaigns.checkBackgroundColorOfCampaignBudgetStatus());
+        logger.info("Verifying campaign budget status options count");
+        Assert.assertEquals(1, campaigns.getCampaignBudgetStatusOptionsCount());
+    }
+
+    @And("User saves the campaign")
+    public void userSavesTheCampaign() {
         logger.info("Saving campaign details");
         campaigns.saveCampaign();
     }
@@ -417,6 +451,12 @@ public class LifeSteps {
         navigation.clickOnIcon("Add Targeting Rule");
     }
 
+    @When("User clicks on Add Targeting Rule")
+    public void userClicksOnAddTargetingRule() {
+        logger.info("Adding Targeting Rule");
+        navigation.clickOnIcon("Add Targeting Rule");
+    }
+
     @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
     public void user_configures_the_targeting_rules_and_saves_the_settings(String ruleType) {
         logger.info("Selecting rule type: {}", ruleType);
@@ -467,10 +507,33 @@ public class LifeSteps {
         logger.info("Navigating to Campaign Dashboard to verify 'Running' status");
         tacticCreatives.navigateToCampaignDashboard();
         campaignDashboard.resetFiltersIfApplied();
-        String status = tacticCreatives.verifyCampaignRunning();
+        String status = tacticCreatives.getCampaignStatus();
         logger.info("Campaign status: {}", status);
         Assert.assertEquals("Running", status);
         logger.info("Campaign is in Running state");
+    }
+
+    @Then("Verify creative details are saved")
+    public void verifyCreativeDetailsAreSaved() {
+        logger.info("Verifying creative save success");
+        Assert.assertTrue("Tactic creatives success message should contain 'Success!'", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
+    }
+
+    @Then("Verify that the campaign is in {string} state")
+    public void verifyTheCampaignState(String expectedStatus) {
+        logger.info("Navigating to Campaign Dashboard to verify 'Pending Approval' status");
+        tacticCreatives.navigateToCampaignDashboard();
+        Assert.assertEquals(expectedStatus, tacticCreatives.getCampaignStatus());
+        logger.info("Campaign status verified as: {}", expectedStatus);
+    }
+
+    @Then("Verify that the approval status of the campaign is {string}")
+    public void verifyThatTheApprovalStatusOfTheCampaignIs(String expectedStatus) {
+        logger.info("Navigating to Campaign Dashboard to verify approval status: {}", expectedStatus);
+        tacticCreatives.navigateToCampaignDashboard();
+        campaigns.clickCampaignDetailsTab();
+        Assert.assertEquals(expectedStatus, tacticCreatives.getCampaignApprovalStatus());
+        logger.info("Campaign approval status verified as: {}", expectedStatus);
     }
 
     @Then("Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name")

@@ -56,6 +56,22 @@ public class ConfigReader {
     public static String getInternalPreReleasePassword() throws Exception {
         return EncryptionDecryption.decrypt(getProperty("preReleasePassword"));
     }
+
+    public static String getExternalDemoUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("demoExternalUser"));
+    }
+
+    public static String getExternalDemoPassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("demoExternalPassword"));
+    }
+
+    public static String getExternalPreReleaseUsername() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("preReleaseExternalUser"));
+    }
+
+    public static String getExternalPreReleasePassword() throws Exception {
+        return EncryptionDecryption.decrypt(getProperty("preReleaseExternalPassword"));
+    }
 }
 
 
