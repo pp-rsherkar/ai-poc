@@ -4,6 +4,7 @@ import com.microsoft.playwright.APIResponse;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -180,6 +181,32 @@ public class LifeSteps {
         campaigns.enterCampaignName(campaignNameRandom);
         campaigns.setCampaignType(campaign_type);
         campaigns.enterBudget(budget);
+        logger.info("Saving campaign details");
+        campaigns.saveCampaign();
+    }
+
+    @When("User enters the campaign details as {string} {string} {string} {string}")
+    public void userEntersTheCampaignDetailsAs(String advertiser, String campaignName, String campaignType, String budget) {
+        campaignNameRandom = campaignName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Entering campaign details - Advertiser: {}, Name: {}, Type: {}, Budget: {}", advertiser, campaignNameRandom, campaignType, budget);
+        campaigns.selectAdvertiser(advertiser);
+        campaigns.enterCampaignName(campaignNameRandom);
+        campaigns.setCampaignType(campaignType);
+        campaigns.enterBudget(budget);
+    }
+
+    @Then("Verify that the campaign budget status is {string} and is greyed out")
+    public void verifyThatTheBudgetStatusIs(String campaignBudgetStatus) {
+        logger.info("Verifying campaign budget status. Expected: {}", campaignBudgetStatus);
+        Assert.assertEquals(campaignBudgetStatus, campaigns.getCampaignBudgetStatus());
+        logger.info("Verified campaign budget status is greyed out");
+        Assert.assertEquals("rgba(34, 34, 34, 0.09)", campaigns.checkBackgroundColorOfCampaignBudgetStatus());
+        logger.info("Verifying campaign budget status options count");
+        Assert.assertEquals(1, campaigns.getCampaignBudgetStatusOptionsCount());
+    }
+
+    @And("User saves the campaign")
+    public void userSavesTheCampaign() {
         logger.info("Saving campaign details");
         campaigns.saveCampaign();
     }
