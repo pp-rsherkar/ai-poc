@@ -74,6 +74,7 @@ public class Campaigns {
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT;
+    private final Locator BUDGET_STATUS_EXTERNAL;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -141,6 +142,7 @@ public class Campaigns {
         this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
         this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
+        this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
     }
 
     public void createCampaign() {
@@ -523,5 +525,18 @@ public class Campaigns {
         String text = EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT);
         return text;
+    }
+
+    public String getCampaignBudgetStatus() {
+        return BUDGET_STATUS_EXTERNAL.innerText().trim();
+    }
+
+    public String checkBackgroundColorOfCampaignBudgetStatus() {
+        return BUDGET_STATUS_EXTERNAL.evaluate("element => getComputedStyle(element).backgroundColor").toString();
+    }
+
+    public int getCampaignBudgetStatusOptionsCount() {
+        waitUtility.waitForLocatorVisible(BUDGET_STATUS_EXTERNAL);
+        return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span").count();
     }
 }
