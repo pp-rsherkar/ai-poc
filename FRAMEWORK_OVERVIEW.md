@@ -52,7 +52,7 @@ qa-automation/
 | JUnit | — | Test runner integration |
 | Apache POI | 5.4.0 | Excel/CSV file handling |
 | OpenCSV | 5.9 | CSV parsing |
-| SQL Server JDBC | 12.8.1 | Database validation queries |
+| SQL Server JDBC | 12.8.1.jre11 | Database validation queries |
 | SLF4J + Logback | 2.0.9 / 1.5.27 | Logging |
 
 ---
