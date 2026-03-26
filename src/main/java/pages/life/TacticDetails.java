@@ -232,6 +232,7 @@ public class TacticDetails {
     }
 
     public void clickTargetingRuleIcon() {
+        waitUtility.waitForLocatorVisible(TARGETING_RULES_ICON);
         TARGETING_RULES_ICON.click();
     }
 

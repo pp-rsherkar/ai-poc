@@ -10,6 +10,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @e2e
   Scenario Outline: Create a Targeting Template and import the template in Tactic

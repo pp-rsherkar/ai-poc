@@ -748,6 +748,7 @@ public class StudioSteps {
         workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
+        logger.info("Clicking More Actions menu for workspace: {}", workspaceName);
         workspaceCreation.clickMoreActionsMenu(workspaceName);
     }
 

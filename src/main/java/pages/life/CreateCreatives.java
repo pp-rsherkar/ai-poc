@@ -238,6 +238,7 @@ public class CreateCreatives {
 
     public String verifyCreativeLibraryPageTitle() {
         waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_PAGE_TITLE);
         return CREATIVE_PAGE_TITLE.innerText().trim();
     }
 

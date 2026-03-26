@@ -150,6 +150,10 @@ public class Campaigns {
         waitUtility.waitUntilSpinnerHidden();
     }
 
+    public boolean isCreateCampaignButtonVisible() {
+        return CREATE_CAMPAIGN.isVisible();
+    }
+
     public void selectCampaign() {
         CAMPAIGN_TAB.first().click();
         waitUtility.waitUntilSpinnerHidden();

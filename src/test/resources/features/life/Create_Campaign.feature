@@ -113,28 +113,28 @@ Feature: LIFE Regression - Create a Campaign
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability      |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
-      | Behavioral Segment          | AutoSegment18577650                                     |
-      | NPI                         | AutoSmartList954103283                                  |
-      | HCP by Specialty            | Radiology, Aerospace Medicine                           |
-      | Health Populations          | Anesthesia and Analgesia                                |
-      | Keyword Populations         | CustomTextForKeywordPopulations, KeywordPopulationsTest |
-      | Practice Staff              | SMART_Pixel_NPI_20250701_155147                         |
-      | Health Pages                | Animal Diseases                                         |
-      | Keywords                    | Custom_Keyword, TestingKeyword, Qwerty123               |
-      | Endemics                    | Endemic + EHR                                           |
-      | Geo Targets                 | New York, California                                    |
-      | Postal Codes                | 123456, 10001, 987654                                   |
-      | Weather Signals             | Below 15F degrees, Outdoor Activity                     |
-      | Authentic Brand Suitability | 51246802                                                |
-      | Brand Safety & Suitability  | Unknown Brand Safety, Highly Illicit Do Not Monetize    |
-      | Browser                     | Chrome, EDGE, Opera, Safari                             |
-      | Device                      | Mobile, Tablet, Connected Device                        |
-      | Domains/Apps                | APP Regular, updaedList106043912                        |
-      | Inventory Source            | New Report                                              |
-      | Operating System            | Windows, macOS, Blackberry                              |
-      | Viewability                 | 50                                                      |
-      | Legal Pages                 | Emancipation                                            |
-      | Legal Populations           | Adoption                                                |
+      | Behavioral Segment   | AutoSegment18577650                                     |
+      | NPI                  | AutoSmartList954103283                                  |
+      | HCP by Specialty     | Radiology, Aerospace Medicine                           |
+      | Health Populations   | Anesthesia and Analgesia                                |
+      | Keyword Populations  | CustomTextForKeywordPopulations, KeywordPopulationsTest |
+      | Practice Staff       | SMART_Pixel_NPI_20250701_155147                         |
+      | Health Pages         | Animal Diseases                                         |
+      | Keywords             | Custom_Keyword, TestingKeyword, Qwerty123               |
+      | Endemics             | Endemic + EHR                                           |
+      | Geo Targets          | New York, California                                    |
+      | Postal Codes         | 123456, 10001, 987654                                   |
+      | Weather Signals      | Below 15F degrees, Outdoor Activity                     |
+      | Brand Safety Profile | 51246802                                                |
+      | Brand Suitability    | Unknown Brand Safety, Highly Illicit Do Not Monetize    |
+      | Browser              | Chrome, EDGE, Opera, Safari                             |
+      | Device               | Mobile, Tablet, Connected Device                        |
+      | Domains/Apps         | APP Regular, updaedList106043912                        |
+      | Inventory Source     | New Report                                              |
+      | Operating System     | Windows, macOS, Blackberry                              |
+      | Viewability          | 50                                                      |
+      | Legal Pages          | Emancipation                                            |
+      | Legal Populations    | Adoption                                                |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab

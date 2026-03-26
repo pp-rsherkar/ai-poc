@@ -143,7 +143,7 @@ public class WorkspaceCreation {
         waitForStudioWorkspacePage(CREATE_WORKSPACE);
     }
 
-    private void waitForStudioWorkspacePage(Locator locator){
+    private void waitForStudioWorkspacePage(Locator locator) {
         long startTime = System.currentTimeMillis();
         long timeout = Long.parseLong(ConfigReader.getProperty("timeout"));
         while (System.currentTimeMillis() - startTime < timeout) {
@@ -177,7 +177,7 @@ public class WorkspaceCreation {
     public void clickMoreActionsMenu(String workspaceName) {
         waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
         WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().click();
-   }
+    }
 
     public void deleteWorkspace() {
         MORE_ACTION_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -230,6 +230,7 @@ public class WorkspaceCreation {
     }
 
     public boolean searchWorkspaceName(String workspaceName) {
+        waitUtility.waitForLocatorVisible(SEARCH_WORKSPACE);
         page.waitForCondition(() -> SEARCH_WORKSPACE.filter().count() == 1);
         if (WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible()) {
             return true;
