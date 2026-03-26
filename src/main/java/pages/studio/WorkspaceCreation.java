@@ -230,6 +230,7 @@ public class WorkspaceCreation {
     }
 
     public boolean searchWorkspaceName(String workspaceName) {
+        waitUtility.waitForLocatorVisible(SEARCH_WORKSPACE);
         page.waitForCondition(() -> SEARCH_WORKSPACE.filter().count() == 1);
         if (WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible()) {
             return true;
