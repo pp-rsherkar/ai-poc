@@ -32,9 +32,9 @@ qa-automation/
             │   └── config.properties  # URLs, credentials, browser settings
             ├── features/              # Gherkin .feature files (35 total)
             │   ├── api/               # API tests (NPI)
-            │   ├── e2e/               # Cross-app end-to-end workflows (11 features)
+            │   ├── e2e/               # Cross-app end-to-end workflows
             │   ├── hcp/               # HCP platform tests
-            │   ├── life/              # LIFE platform tests (19 features)
+            │   ├── life/              # LIFE platform tests
             │   └── studio/            # Studio platform tests
             └── logback.xml            # Logging configuration
 ```
