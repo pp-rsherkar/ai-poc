@@ -109,7 +109,7 @@ The @After hook automatically captures screenshots and Playwright trace .zip fil
 | Utility | Purpose |
 | :--- | :--- |
 | CommonUtils.java | Timestamps, random strings, JSON reading, element helpers |
-| ConfigReader.java | Reads & decrypts config.properties properties |
+| ConfigReader.java | Reads & decrypts config.properties |
 | EncryptionDecryption.java | AES encrypt/decrypt for credentials |
 | WaitUtility.java | Explicit waits (spinner hidden, element visible/hidden) |
 | DatabaseActions.java | SQL Server query execution for data validation |
