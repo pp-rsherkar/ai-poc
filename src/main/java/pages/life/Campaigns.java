@@ -75,6 +75,8 @@ public class Campaigns {
     private final Locator EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT;
     private final Locator BUDGET_STATUS_EXTERNAL;
+    private final Locator CAMPAIGN_APPROVAL_STATUS;
+    private final Locator CAMPAIGN_STATUS_APPROVED_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -143,6 +145,8 @@ public class Campaigns {
         this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
         this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
+        this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
+        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
     }
 
     public void createCampaign() {
@@ -538,5 +542,12 @@ public class Campaigns {
     public int getCampaignBudgetStatusOptionsCount() {
         waitUtility.waitForLocatorVisible(BUDGET_STATUS_EXTERNAL);
         return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span").count();
+    }
+
+    public void approveCampaign() {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_APPROVAL_STATUS);
+        CAMPAIGN_STATUS_APPROVED_BUTTON.click();
+        SAVE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 }

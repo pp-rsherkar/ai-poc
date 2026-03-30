@@ -31,6 +31,7 @@ public class Navigation {
     private final Locator MENU_ANGLE;
     private final Locator PULSEPOINT_LOGO;
     private final Locator TARGETING_TEMPLATE_HEADER;
+    private final Locator LOGOUT_BUTTON;
     WaitUtility waitUtility;
     CampaignDashboard campaignDashboard;
 
@@ -59,6 +60,7 @@ public class Navigation {
         this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
         this.TARGETING_TEMPLATE_HEADER = page.locator("//div[contains(text(),'Targeting Templates') and contains(@class,'section-name')]");
         this.PULSEPOINT_LOGO = page.locator("//div[contains(@class, 'dynamic-logo')] | //app-buyer-logo/div[@class='logo-holder']");
+        this.LOGOUT_BUTTON = page.locator("//div[text()='Sign Out']");
     }
 
     public void navigateToUrl(String url) {
@@ -196,5 +198,11 @@ public class Navigation {
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
+    }
+
+    public void logout() {
+        waitUtility.waitForLocatorVisible(ACCOUNT_NAME);
+        ACCOUNT_NAME.click();
+        LOGOUT_BUTTON.click();
     }
 }

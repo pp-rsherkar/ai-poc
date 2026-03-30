@@ -4,6 +4,7 @@ import com.microsoft.playwright.APIResponse;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -524,7 +525,7 @@ public class LifeSteps {
 
     @Then("Verify that the campaign is in {string} state")
     public void verifyTheCampaignState(String expectedStatus) {
-        logger.info("Navigating to Campaign Dashboard to verify 'Pending Approval' status");
+        logger.info("Navigating to Campaign Dashboard to verify {} status", expectedStatus);
         tacticCreatives.navigateToCampaignDashboard();
         Assert.assertEquals(expectedStatus, tacticCreatives.getCampaignStatus());
         logger.info("Campaign status verified as: {}", expectedStatus);
@@ -5830,5 +5831,25 @@ public class LifeSteps {
         String displayedDataCost = npiStaticList.fetchDisplayedDataCost();
         logger.info("Fetched displayed data cost: {}", displayedDataCost);
         Assert.assertEquals("Calculated data cost doesn't match with displayed data cost", metricName, displayedDataCost);
+    }
+
+    @And("User logs out from the application")
+    public void logsOutFromTheApplication() {
+        logger.info("Logging out from the application");
+        navigation.logout();
+    }
+
+    @And("User navigates to the created campaign")
+    public void userNavigatesToTheCreatedCampaign() {
+        logger.info("Navigating to the created campaign '{}'", campaignNameRandom);
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        campaignDashboard.navigateToCampaign(campaignNameRandom);
+    }
+
+    @And("Admin user approves the campaign")
+    public void adminUserApprovesTheCampaign() {
+        logger.info("Admin user approving the campaign '{}'", campaignNameRandom);
+        campaigns.clickCampaignDetailsTab();
+        campaigns.approveCampaign();
     }
 }
