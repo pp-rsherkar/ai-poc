@@ -243,7 +243,10 @@ public class CommonUtils {
         int startDay;
         int endDay;
          do {
-            if (today >= maxDay - 1) {
+             if (today <= 1) {
+                 startDay = 1;
+                 endDay = Math.min(2, maxDay);
+             } else if (today >= maxDay - 1) {
                 startDay = maxDay - 1;
                 endDay = maxDay;
             } else {

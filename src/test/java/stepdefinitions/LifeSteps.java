@@ -5897,13 +5897,6 @@ public class LifeSteps {
         Assert.assertEquals("Calculated data cost doesn't match with displayed data cost", metricName, displayedDataCost);
     }
 
-    @And("User fetches the template created from Templates tab")
-    public void userFetchesTheTemplateCreatedUnder(){
-        logger.info("Navigating to Templates tab to fetch the created template");
-        //nameList = reportTemplates.fetchTemplateNameFromUI();
-        logger.info("Fetched template name: '{}'", metricName);
-    }
-
     @And("User fetches the logged in username")
     public void userFetchesTheLoggedInUsername() {
         logger.info("Fetching logged in username");
@@ -5914,7 +5907,7 @@ public class LifeSteps {
     @And("Verify that {string} tab is selected as Delivery method by default")
     public void verifyThatTabIsSelectedByDefault(String deliveryTab) {
         logger.info("Verifying default selected delivery tab: '{}'", deliveryTab);
-        Assert.assertTrue(deliveryTab + "is not default Delivery Method", runReportPanel.fetchDefaultDeliveryTab(deliveryTab));
+        Assert.assertTrue(deliveryTab + " is not default Delivery Method", runReportPanel.fetchDefaultDeliveryTab(deliveryTab));
     }
 
     @And("Verify that {string} field is pre-populated with logged in user email and user should be able to edit the email address {string}")
