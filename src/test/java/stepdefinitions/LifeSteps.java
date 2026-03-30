@@ -3462,7 +3462,7 @@ public class LifeSteps {
     public void userShouldAbleToGenerateTheReport() {
         String fileName = "Custom Report";
         logger.info("Generating report with file name: {}", fileName);
-        metricName = runReportPanel.fetchFileName();
+        metricName = runReportPanel.fetchFileNameFromUI();
         runReportPanel.clickRunButton(fileName);
         Assert.assertEquals("You will get the report on your email", runReportPanel.fetchSuccessAlert());
         logger.info("Report generation triggered successfully");
@@ -3533,8 +3533,10 @@ public class LifeSteps {
         nameList.add(timeZone);
     }
 
-    @And("Verify the default value of the Report Format field is {string}")
+    @And("Verify the presence of Report Format field and default value - {string}")
     public void verifyTheDefaultValueOfTheTheReportFormatFieldIsCSV(String fileFormat) {
+        logger.info("Verifying presence of Report Format field");
+        Assert.assertTrue("Report Format field is not available", runReportPanel.isReportFormatFieldAvailable());
         logger.info("Verifying default Report Format value: {}", fileFormat);
         Assert.assertEquals(fileFormat, runReportPanel.fetchDefaultReportFormat());
     }
@@ -3549,8 +3551,10 @@ public class LifeSteps {
         }
     }
 
-    @And("Verify by default the Text Qualifier checkbox is checked")
+    @And("Verify the presence of Text Qualifier checkbox and by default it should be checked")
     public void verifyByDefaultTheTextQualifierCheckboxIsChecked() {
+        logger.info("Verifying presence of Text Qualifier checkbox");
+        Assert.assertTrue("Text Qualifier checkbox is not available", runReportPanel.isTextQualifierCheckboxAvailable());
         logger.info("Verifying Text Qualifier checkbox is checked by default");
         Assert.assertTrue("Text Qualifier is not checked by default", runReportPanel.isTextQualifierCheckboxChecked());
     }
@@ -3810,13 +3814,6 @@ public class LifeSteps {
         Assert.assertTrue("Deliver To Users field is not available", scheduleReport.isDeliveryToUserAvailable());
     }
 
-    @And("User should be able to specify multiple users in Deliver to Users field")
-    public void userShouldAbleToSpecifyMultipleUsersInDeliverToUsersField(DataTable dataTable) {
-        List<String> userLists = dataTable.asList(String.class);
-        logger.info("Adding multiple users for delivery: {}", userLists);
-        scheduleReport.selectUsersForDelivery(userLists);
-    }
-
     @And("Verify that Add Emails link is available below Deliver to Users")
     public void verifyThatAddEmailsLinkIsAvailableBelowDeliverToUsers() {
         logger.info("Verifying Add Emails link availability");
@@ -3845,14 +3842,41 @@ public class LifeSteps {
 
     @And("Verify {string} button is available in Destination dropdown field")
     public void verifyAddDestinationButtonIsAvailableInDestinationDropdownField(String buttonName) {
-        logger.info("Verifying Add Destination button: {}", buttonName);
-        Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
+        if(buttonName.contains("Add Destination")){
+            logger.info("Verifying Add Destination button: {}", buttonName);
+            Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
+        }else{
+            logger.info("Verifying Edit Destination button: {}", buttonName);
+            Assert.assertTrue("Edit Destination field is not available", runReportPanel.isEditDestinationAvailable());
+        }
     }
 
     @When("User clicks {string} button")
     public void userClicksAddDestinationButton(String buttonName) {
         logger.info("User clicks Destination button: {}", buttonName);
         scheduleReport.clickAddDestination(buttonName);
+    }
+
+    @And("User clicks Edit button from Destination dropdown field")
+    public void userClicksEditButtonFromDestinationDropdownField() {
+        logger.info("User clicks Edit button in Destination dropdown");
+        runReportPanel.clickEditDestination();
+        logger.info("Waiting for custom destination fields to be available");
+        Assert.assertTrue("Custom destination fields are not available", runReportPanel.isDestinationNameAvailable());
+    }
+
+    @And("User verifies the custom destination fields - Destination Name, Destination Type, Host, Username, Password, Port textfields, Test Access, Create and Cancel buttons")
+    public void userVerifiesTheCustomDestinationFieldsDestinationNameDestinationTypeHostUsernamePasswordPortTextfieldsTestAccessCreateAndCancelButtons() {
+        logger.info("Verifying custom destination fields and buttons");
+        Assert.assertTrue("Destination Name field is not available", runReportPanel.isDestinationNameAvailable());
+        Assert.assertTrue("Destination Type field is not available", runReportPanel.isDestinationTypeAvailable());
+        Assert.assertTrue("Host field is not available", runReportPanel.isHostFieldAvailable());
+        Assert.assertTrue("Username field is not available", runReportPanel.isUsernameFieldAvailable());
+        Assert.assertTrue("Password field is not available", runReportPanel.isPasswordFieldAvailable());
+        Assert.assertTrue("Port field is not available", runReportPanel.isPortFieldAvailable());
+        Assert.assertTrue("Test Access button is not available", runReportPanel.isTestAccessButtonAvailable());
+        Assert.assertTrue("Create button is not available", runReportPanel.isCreateButtonAvailable());
+        Assert.assertTrue("Cancel button is not available", runReportPanel.isCancelButtonAvailable());
     }
 
     @Then("Verify Destination Name, Destination Type fields are displayed")
@@ -3947,10 +3971,22 @@ public class LifeSteps {
         Assert.assertEquals("Success!", successMsg);
     }
 
-    @And("User searches the report and checks the report panel retains the entered data")
-    public void userSearchesTheReportAndChecksTheReportPanelRetainsTheEnteredData() {
-        logger.info("Searching scheduled report and verifying retained data for report: {}", metricName);
+    @And("User searches the report and verify the details in report listing page - Template name, {string}, {string} and Generated By")
+    public void userSearchesTheReportAndVerifyTheDetailsInReportListingPageTemplateNameAndGeneratedBy(String frequency, String reportingPeriod) {
+        logger.info("Searching scheduled report: {}", metricName);
         scheduleReport.searchReport(metricName);
+        logger.info("Fetching report details from listing page for report: {}", metricName);
+        List<String> actualDetails = scheduleReport.fetchListingPageDetails(metricName);
+        logger.info("Fetched Scheduled report details: {}", actualDetails);
+        Assert.assertTrue("Template name is not displayed in listing page", actualDetails.contains(templateNameRandom));
+        Assert.assertTrue("Frequency is not displayed in listing page", actualDetails.contains(frequency));
+        Assert.assertTrue("Reporting Period is not displayed in listing page", actualDetails.contains(reportingPeriod));
+        Assert.assertTrue("Generated By is not displayed in listing page", actualDetails.contains(userType));
+    }
+
+    @And("Verify the report panel retains the entered data")
+    public void userSearchesTheReportAndChecksTheReportPanelRetainsTheEnteredData() {
+        logger.info("Verifying retained data for report: {}", metricName);
         scheduleReport.clickReportName(metricName);
         capturedDetails.addAll(runReportPanel.fetchTemplateValue());
         capturedDetails.addAll(runReportPanel.fetchAdvertiserName());
@@ -5702,6 +5738,7 @@ public class LifeSteps {
 
     @And("Verify that {string} field is pre-populated with logged in user email and user should be able to edit the email address {string}")
     public void verifyThatFieldIsPrePopulatedWithLoggedInUserEmailAndUserShouldBeAbleToEditTheEmailAddress(String fieldName, String newEmail) {
+        String[] emails = newEmail.split(",");
         logger.info("Verifying that '{}' field is pre-populated with logged in user email and is editable", fieldName);
         List<String> fetchScheduleReportValue = runReportPanel.fetchScheduleReportInputValue(fieldName);
         logger.info("Fetched value from '{}' field: '{}'", fieldName, fetchScheduleReportValue);
@@ -5709,15 +5746,134 @@ public class LifeSteps {
             logger.info("Checking if fetched value '{}' contains logged in username '{}'", value, userType);
             Assert.assertTrue(fieldName + " field is not pre-populated with logged in user email", userType.contains(value));
         }
-        logger.info("Verifying that '{}' field is editable", fieldName);
-        runReportPanel.enterDataInScheduleReport(fieldName, newEmail);
-        logger.info("Entered new email '{}' in '{}' field", newEmail, fieldName);
-        nameList.addAll(runReportPanel.fetchScheduleReportInputValue(fieldName));
+        for (String email : emails) {
+            logger.info("Verifying that '{}' field is editable", fieldName);
+            runReportPanel.enterDataInScheduleReport(fieldName, email);
+            logger.info("Entered new email '{}' in '{}' field", email, fieldName);
+            nameList.addAll(runReportPanel.fetchScheduleReportInputValue(fieldName));
+        }
+    }
+
+    @And("Verify that user is not able to remove the pre-populated logged in user email from {string} field")
+    public void verifyThatUserIsNotAbleToRemoveThePrePopulatedLoggedInUserEmailFromField(String fieldName) {
+        logger.info("Verifying that user is not able to remove the pre-populated logged in user email from '{}' field", fieldName);
+        String toolTipText = runReportPanel.verifyEmailNotRemovable(fieldName, userType);
+        logger.info("Fetched tooltip text when trying to remove email from '{}': '{}'", fieldName, toolTipText);
+        Assert.assertEquals("Tooltip text mismatch when trying to remove email from " + fieldName, "Creator can't be removed.", toolTipText);
     }
 
     @And("Verify File Name field is available on report panel")
     public void verifyFileNameFieldIsAvailableOnReportPanel() {
         logger.info("Verifying File Name field is available on report panel");
         Assert.assertTrue("File Name field is not available on report panel", runReportPanel.isFileNameFieldAvailable());
+    }
+
+    @And("Verify the presence of Advanced Export checkbox and by default it should be unchecked")
+    public void verifyThePresenceOfAdvancedExportCheckboxAndByDefaultItShouldBeUnchecked() {
+        logger.info("Verifying presence of Advanced Export checkbox and its default state");
+        Assert.assertTrue("Advanced Export checkbox is not available", runReportPanel.isAdvancedExportCheckboxAvailable());
+        logger.info("Verifying default state of Advanced Export checkbox is unchecked");
+        Assert.assertFalse("Advanced Export checkbox is checked by default", runReportPanel.isAdvancedExportCheckboxChecked());
+    }
+
+    @And("Verify Line Coding field is available with below options and default value is {string}")
+    public void verifyLineCodingFieldIsAvailableWithBelowOptionsAndDefaultValueIs(String defaultValue, DataTable dataTable) {
+        List<String> expectedTypes = dataTable.asList(String.class);
+        logger.info("Clicking on Advanced Delivery Setting link to verify Line Coding field");
+        runReportPanel.clickAdvancedDeliverySettingLink();
+        logger.info("Verifying Line Coding field is available");
+        Assert.assertTrue("Line Coding field is not available", runReportPanel.isLineCodingFieldAvailable());
+        logger.info("Verifying default Line Coding type is '{}'", defaultValue);
+        Assert.assertTrue("None is not selected by default", runReportPanel.checkDefaultLineCodingType(defaultValue));
+        List<String> actualTypes = runReportPanel.fetchLineCodingTypes();
+        logger.info("Expected Line Coding types: {}", expectedTypes);
+        logger.info("Available Line Coding types: {}", actualTypes);
+        Assert.assertEquals(new HashSet<>(expectedTypes), new HashSet<>(actualTypes));
+    }
+
+    @And("User enters Destination name {string}, Destination Type {string} and other required details - {string}, {string}, {string}")
+    public void userEntersDestinationNameDestinationTypeAndOtherRequiredDetails(String destinationName, String destinationType, String host, String port, String serverPath) throws Exception {
+        logger.info("Fetching destination details from config for Destination Name='{}', Destination Type='{}'", destinationName, destinationType);
+        username = ConfigReader.getCustomDestinationUsername();
+        password = ConfigReader.getCustomDestinationPassword();
+        dimensionName = destinationName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Entering destination details: Name='{}', Type='{}', Host='{}', Port='{}', Server Path='{}'", destinationName, destinationType, host, port, serverPath);
+        runReportPanel.enterDestinationDetails(destinationName, destinationType, host, username, password, port, serverPath);
+    }
+
+    @Then("User runs the connection test and creates the destination")
+    public void userRunsTheConnectionTestAndCreatesTheDestination() {
+        logger.info("Running connection test and creating destination");
+        runReportPanel.clickTestAccessButton();
+        runReportPanel.clickCreateDestinationButton();
+    }
+
+    @And("Verify destination created should populate in the Destination dropdown field")
+    public void verifyDestinationCreatedShouldPopulateInTheDestinationDropdownField() {
+        logger.info("Verifying created destination '{}' is populated in the Destination dropdown field", dimensionName);
+        String destinationOptions = scheduleReport.fetchDestinationOptions();
+        logger.info("Fetched destination options from UI: {}", destinationOptions);
+        Assert.assertTrue("Created destination is not available in the dropdown", destinationOptions.contains(dimensionName));
+    }
+
+    @And("Validate that the template name matches the file name, and ensure the help text displays the file name in the {string} format")
+    public void validateThatTheTemplateNameMatchesTheFileNameAndEnsureTheHelpTextDisplaysTheFileNameInTheCsvFormat(String extensionType) {
+        logger.info("Fetching the file name and help text from UI to validate against expected file name with extension '{}'", extensionType);
+        String actualFileName = runReportPanel.fetchFileNameFromUI();
+        Assert.assertEquals("File name is not populated with template name", templateNameRandom, actualFileName);
+        logger.info("Fetching help text for file name field to validate it contains the expected file name with extension '{}'", extensionType);
+        String expectedFileName = templateNameRandom + extensionType;
+        String helpText = runReportPanel.fetchFileNameHelpText();
+        logger.info("Expected file name: '{}', Help text: '{}'", expectedFileName, helpText);
+        Assert.assertEquals("Fetched help text does not match expected file name", expectedFileName, helpText);
+    }
+
+    @And("Verify Report Period field is available with default value {string}")
+    public void verifyReportPeriodFieldIsAvailableWithDefaultValue(String defaultValue) {
+        logger.info("Verifying Report Period field is available with default value '{}'", defaultValue);
+        Assert.assertTrue("Report Period field is not available", scheduleReport.isReportPeriodFieldAvailable());
+        Assert.assertEquals("Default value of Report Period field is not " + defaultValue, defaultValue, scheduleReport.fetchDefaultReportPeriodValue());
+    }
+
+    @And("Verify that Report Period field has below options")
+    public void verifyThatReportPeriodFieldHasBelowOptions(DataTable dataTable) {
+        List<String> expectedOptions = dataTable.asList(String.class);
+        logger.info("Verifying Report Period field has expected options: {}", expectedOptions);
+        List<String> actualOptions = scheduleReport.fetchReportPeriodOptions();
+        logger.info("Fetched Report Period options from UI: {}", actualOptions);
+        Assert.assertEquals(new HashSet<>(expectedOptions), new HashSet<>(actualOptions));
+    }
+
+    @And("Verify Report Timing checkbox is available and by default it is unchecked")
+    public void verifyReportTimingCheckboxIsAvailableAndByDefaultItIsUnchecked() {
+        logger.info("Verifying Report Timing checkbox is available and unchecked by default");
+        Assert.assertTrue("Report Timing checkbox is not available", scheduleReport.isReportTimingCheckboxAvailable());
+        Assert.assertTrue("Report Timing checkbox is unchecked by default", scheduleReport.isReportTimingCheckboxChecked());
+    }
+
+    @And("User clicks the three-dot menu, selects the General variable - {string} and Time variable - {string} with Date-Time format {string}")
+    public void userClicksTheThreeDotMenuSelectsTheGeneralAndTimeVariables(String generalVariable, String timeVariable, String dateTimeFormat) {
+        logger.info("Clicking the three-dot menu to select General variable and Time variable for file name");
+        scheduleReport.clickThreeDotMenuForFileName();
+        scheduleReport.selectGeneralVariableFromThreeDotMenu(generalVariable);
+        if(generalVariable.contains("$CampaignName$"))
+            customFieldName = runReportPanel.fetchCampaignName().getFirst();
+        else if(generalVariable.contains("$LineItemName$"))
+            customFieldName = runReportPanel.fetchLineItemName().getFirst();
+        else if(generalVariable.contains("AdvertiserName"))
+            customFieldName = runReportPanel.fetchAdvertiserName().getFirst();
+        scheduleReport.selectTimeVariableFromThreeDotMenu(timeVariable, dateTimeFormat);
+        scheduleReport.closeThreeDotMenu();
+        logger.info("Selected General variable and Time variable from three-dot menu successfully");
+    }
+
+    @And("User verifies that the help text displays the file name with the value of General and Time variables")
+    public void userVerifiesThatTheHelpTextDisplaysTheFileNameWithTheValueOfGeneralAndTimeVariables() {
+        logger.info("Verifying that the help text for file name displays the expected file name with General and Time variable values");
+        String helpText = runReportPanel.fetchFileNameHelpText();
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String expectedFileName = templateNameRandom + "_" + customFieldName + "_" + date + ".csv";
+        logger.info("Expected file name in help text: '{}', Actual help text: '{}'", expectedFileName, helpText);
+        Assert.assertEquals("Help text does not display the expected file name with General and Time variable values", expectedFileName, helpText);
     }
 }

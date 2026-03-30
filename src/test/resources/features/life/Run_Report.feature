@@ -14,9 +14,6 @@ Feature: LIFE Regression - Run Report fields verification and report generation
   @regression
   Scenario Outline: Validate Run Report panel's field verification on Reports Page and allow report generation
     And User navigates to Administrative section and fetches the advertiser for the account "automation@pulsepoint"
-#    And User navigates to Report Templates page
-#    Then Verify the tabs displayed on the Report Templates page
-#    And User fetches the template created from Templates tab
     And User fetches the logged in username
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
@@ -59,13 +56,17 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify that "Email" tab is selected as Delivery method by default
     And Verify that "Deliver to Users" field is pre-populated with logged in user email and user should be able to edit the email address "<USER_EMAIL>"
     And Verify that "Notify User for Failures" field is pre-populated with logged in user email and user should be able to edit the email address "<USER_EMAIL>"
+    And Verify that user is not able to remove the pre-populated logged in user email from "Notify User for Failures" field
     And Verify File Name field is available on report panel
+    And Validate that the template name matches the file name, and ensure the help text displays the file name in the ".csv" format
+    And User clicks the three-dot menu, selects the General variable - "$LineItemName$" and Time variable - "$ReportDateTime[Date/Timestamp]$" with Date-Time format "%Y-%m-%d"
+    And User verifies that the help text displays the file name with the value of General and Time variables
     And User should be able to generate the report
     And Validate report details such as Created By, Reporting period, Report Name from Report Listing page
     And Confirms that the report panel retains the entered data
     Examples:
-      | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | USER_EMAIL          |
-      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | automationUserInter |
+      | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | USER_EMAIL                 |
+      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | automationUserInter, Lista |
 
   @regression
   Scenario Outline: Verify Run Now tab's field options and their selection behavior
@@ -111,9 +112,12 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify that user is able to select start date and end date when Custom Dates option is selected
     And Verify that user is able to select start "12:00" and end time "09:00" when Custom Dates option is selected
     And Verify that user is able to select Timezone field value "<TIME_ZONE>"
-    And Verify the default value of the Report Format field is "CSV"
+    And Verify the presence of Report Format field and default value - "CSV"
     And Verify the availability of various options of the Report Format field - "<REPORT_FORMATS>"
-    And Verify by default the Text Qualifier checkbox is checked
+    And Verify the presence of Text Qualifier checkbox and by default it should be checked
+    And Verify Line Coding field is available with below options and default value is "Unix (LF)"
+      | Unix (LF)  |
+      | DOS (CRLF) |
     And User should be able to generate the report
     And Confirms that the report panel retains the entered data
     Examples:
@@ -203,3 +207,66 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Single File         |
       | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Per Advertiser      |
       | AutoTemplate20 | Z_automation   | Auto              | Line               | Tactic          | Creative          | Per Campaign        |
+
+  @regression
+  Scenario Outline: Verify fields under Custom Destination tab in Run Report's Delivery Method section
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Custom Destination" tab as Delivery Method
+    Then Verify Destination dropdown field is available
+    And Verify "Edit" button is available in Destination dropdown field
+    And User clicks Edit button from Destination dropdown field
+    And User verifies the custom destination fields - Destination Name, Destination Type, Host, Username, Password, Port textfields, Test Access, Create and Cancel buttons
+    And Verify "Add Destination" button is available in Destination dropdown field
+    When User clicks "Add Destination" button
+    Then Verify Destination Name, Destination Type fields are displayed
+    And Verify that Destination Type has values "<DESTINATION_TYPE>"
+    And Verify File Path field is available
+    And Verify File Name field is available
+    And Verify the presence of Report Format field and default value - "CSV"
+    And Verify the availability of various options of the Report Format field - "<REPORT_FORMATS>"
+    And Verify the presence of Text Qualifier checkbox and by default it should be checked
+    And Verify Compression field is available with below options and default value is "None"
+      | Zip  |
+      | BZip |
+      | GZip |
+      | None |
+    And Verify Control File checkbox is present and by default it should be unchecked
+    And Verify the presence of Advanced Export checkbox and by default it should be unchecked
+    And Verify Line Coding field is available with below options and default value is "Unix (LF)"
+      | Unix (LF)  |
+      | DOS (CRLF) |
+    Examples:
+      | DESTINATION_TYPE   | REPORT_FORMATS                                                             |
+      | FTP, SFTP, S3, GCP | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
+
+  @regression
+  Scenario Outline: Verify that user is able to create custom destinations from Run Report panel and generate report
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    And User should be able to select template "<TEMPLATE>" from the dropdown
+    And User should be able to select advertiser as "<ADVERTISER>"
+    When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+    Then User should be able to select value from dropdown
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+    Then User should be able to select value from dropdown
+    When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+    Then User should be able to select value from dropdown
+    When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+    Then User should be able to select value from dropdown
+    And Verify that by default "Custom Dates" option is selected for Report Period Field
+    And Verify that user is able to select start date and end date when Custom Dates option is selected
+    And Verify that user is able to select start "12:00" and end time "09:00" when Custom Dates option is selected
+    And Verify that user is able to select Timezone field value "<TIME_ZONE>"
+    When User clicks on "Custom Destination" tab as Delivery Method
+    Then Verify Destination dropdown field is available
+    And Verify "Add Destination" button is available in Destination dropdown field
+    When User clicks "Add Destination" button
+    And User enters Destination name "<DESTINATION_NAME>", Destination Type "<DESTINATION_TYPE>" and other required details - "<HOST>", "<PORT>", "<SERVER_PATH>"
+    Then User runs the connection test and creates the destination
+    And Verify destination created should populate in the Destination dropdown field
+    And User should be able to generate the report
+    And Confirms that the report panel retains the entered data
+    Examples:
+      | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | DESTINATION_NAME | DESTINATION_TYPE | HOST                | PORT | SERVER_PATH                    |
+      | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | Run_Destination_ | SFTP             | ma2-qa-automation01 | 22   | /home/NPIAutoImport/Automation |

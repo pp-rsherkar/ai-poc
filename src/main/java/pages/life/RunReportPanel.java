@@ -53,7 +53,6 @@ public class RunReportPanel {
     private final Locator TEXT_QUALIFIER_CHECKBOX;
     private final Locator FETCHED_DIMENSIONS_AND_METRICS;
     private final Locator DIMENSION_LABEL;
-    private final Locator FILE_NAME_TEXTAREA;
     private final Locator FILE_NAME_ERROR;
     private final Locator DEFAULT_FLIGHT_DETAILS;
     private final Locator FLIGHT_DETAILS_DROPDOWN;
@@ -70,6 +69,25 @@ public class RunReportPanel {
     private final Locator CREATED_BY;
     private final Locator REPORTING_PERIOD;
     private final Locator REPORT_NAME;
+    private final Locator TOOL_TIP;
+    private final Locator ADVANCED_EXPORT_CHECKBOX;
+    private final Locator ADVANCED_DELIVERY_SETTING_LINK;
+    private final Locator LINE_CODING;
+    private final Locator LINE_CODING_OPTIONS;
+    private final Locator DESTINATION_NAME;
+    private final Locator DESTINATION_TYPE;
+    private final Locator HOST;
+    private final Locator USERNAME;
+    private final Locator PASSWORD;
+    private final Locator PORT;
+    private final Locator SERVER_PATH;
+    private final Locator EDIT_DESTINATION_BUTTON;
+    private final Locator TEST_ACCESS_BUTTON;
+    private final Locator CUSTOM_DESTINATION_RUN_BUTTON;
+    private final Locator CUSTOM_DESTINATION_CREATE_BUTTON;
+    private final Locator CUSTOM_DESTINATION_CANCEL_BUTTON;
+    private final Locator DESTINATION_DROPDOWN;
+    private final Locator FILE_NAME_HELP_TEXT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public RunReportPanel(Page page) {
@@ -111,7 +129,6 @@ public class RunReportPanel {
         this.TEXT_QUALIFIER_CHECKBOX = page.locator("//div[text()='Text Qualifier']/following-sibling::div/sui-checkbox");
         this.FETCHED_DIMENSIONS_AND_METRICS = page.locator("//div[@class='field customTemplate']//span");
         this.DIMENSION_LABEL = page.locator("//label[contains(text(),'Dimensions')]");
-        this.FILE_NAME_TEXTAREA = page.locator("//textarea[@placeholder='File Name']");
         this.FILE_NAME_ERROR = page.locator("//div[contains(@class,'run-report-error') and contains(text(),'Invalid file Name')]");
         this.DEFAULT_FLIGHT_DETAILS = page.locator("//div[@id='date-option-dropdown']/div[contains(@class, 'text')]");
         this.FLIGHT_DETAILS_DROPDOWN = page.locator("//div[@id='date-option-dropdown']");
@@ -128,6 +145,25 @@ public class RunReportPanel {
         this.CREATED_BY = page.locator("//label[contains(text(),'Created by:')]/following-sibling::div");
         this.REPORTING_PERIOD = page.locator("//label[contains(text(),'Reporting Period:')]/following-sibling::div");
         this.REPORT_NAME = page.locator("//div[contains(@class,'name-section')]");
+        this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
+        this.ADVANCED_EXPORT_CHECKBOX = page.locator("//label[contains(text(),'Advanced Export')]/following-sibling::div//sui-checkbox");
+        this.ADVANCED_DELIVERY_SETTING_LINK = page.locator("//label[@class='advanceSettings' and contains(text(),'Show Advanced Delivery Settings')]");
+        this.LINE_CODING = page.locator("//div[@class='line-endings']");
+        this.LINE_CODING_OPTIONS = page.locator("//div[@class='line-endings']//sui-radio-button[@name='reportLineEndings']");
+        this.DESTINATION_NAME = page.locator("//label[contains(text(),'Destination Name')]/following-sibling::input");
+        this.DESTINATION_TYPE = page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select");
+        this.HOST = page.locator("//label[contains(text(),'Host')]/following-sibling::input");
+        this.USERNAME = page.locator("//label[contains(text(),'Username')]/following-sibling::input");
+        this.PASSWORD = page.locator("//input[@type='password']");
+        this.PORT = page.locator("//label[contains(text(),'Port')]/following-sibling::input");
+        this.SERVER_PATH = page.locator("//label[contains(text(),'Path on the server')]/following-sibling::input");
+        this.EDIT_DESTINATION_BUTTON = page.locator("//div[@class='destination-name']/following-sibling::div//img[contains(@src,'edit-simple.svg')]");
+        this.TEST_ACCESS_BUTTON = page.locator("//span[contains(text(),'Test Access')]");
+        this.CUSTOM_DESTINATION_RUN_BUTTON = page.locator("//div[contains(text(),'Choose file size to test access')]/parent::div/following-sibling::div//button[contains(text(),'Run')]");
+        this.CUSTOM_DESTINATION_CREATE_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Create')]");
+        this.CUSTOM_DESTINATION_CANCEL_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Cancel')]");
+        this.DESTINATION_DROPDOWN = page.locator("//div[contains(text(),'Destination')]/following-sibling::sui-select");
+        this.FILE_NAME_HELP_TEXT = page.locator("//span[@class='custom-destination-example-texr']//span");
     }
 
     public boolean isRunReportPanelOpened() {
@@ -270,7 +306,7 @@ public class RunReportPanel {
     public void clickRunButton(String fileName) {
         RUN_BUTTON.click();
         if (FILE_NAME_ERROR.isVisible()) {
-            FILE_NAME_TEXTAREA.fill(fileName);
+            FILE_NAME.fill(fileName);
             RUN_BUTTON.click();
         }
     }
@@ -455,6 +491,9 @@ public class RunReportPanel {
         return reportFormatValues;
     }
 
+    public boolean isTextQualifierCheckboxAvailable() {
+        return TEXT_QUALIFIER_CHECKBOX.isVisible();
+    }
 
     public boolean isTextQualifierCheckboxChecked() {
         return TEXT_QUALIFIER_CHECKBOX.getAttribute("class").contains("checked");
@@ -555,8 +594,8 @@ public class RunReportPanel {
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
     }
 
-    public String fetchFileName() {
-        return FILE_NAME_TEXTAREA.inputValue().trim();
+    public String fetchFileNameFromUI() {
+        return FILE_NAME.inputValue().trim();
     }
 
     public void clickSearchButton() {
@@ -626,5 +665,120 @@ public class RunReportPanel {
         fetchReportDetails.add(REPORT_NAME.first().textContent().split("from")[0].trim());
         return fetchReportDetails;
     }
-}
 
+    public String verifyEmailNotRemovable(String fieldName, String loggedInUser) {
+        String usernameText = loggedInUser.split("\\(")[0];
+        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span[contains(text(),'%s')]", fieldName, usernameText));
+        locator.click();
+        String tooltipText = TOOL_TIP.innerText().trim();
+        page.keyboard().press("Escape");
+        return tooltipText;
+    }
+
+    public boolean isReportFormatFieldAvailable() {
+        return REPORT_FORMAT_SELECTED_VALUE.isVisible();
+    }
+
+    public boolean isAdvancedExportCheckboxAvailable() {
+        return ADVANCED_EXPORT_CHECKBOX.isVisible();
+    }
+
+    public boolean isAdvancedExportCheckboxChecked() {
+        return !TEXT_QUALIFIER_CHECKBOX.getAttribute("class").contains("checked");
+    }
+
+    public void clickAdvancedDeliverySettingLink() {
+        ADVANCED_DELIVERY_SETTING_LINK.click();
+    }
+
+    public boolean isLineCodingFieldAvailable() {
+        return LINE_CODING.isVisible();
+    }
+
+    public boolean checkDefaultLineCodingType(String defaultLineCodingType) {
+        Locator locator = LINE_CODING_OPTIONS.locator("xpath=/label");
+        for (int i = 0; i < LINE_CODING_OPTIONS.count(); i++) {
+            if (locator.nth(i).innerText().contains(defaultLineCodingType) && LINE_CODING_OPTIONS.nth(i).getAttribute("class").contains("checked")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<String> fetchLineCodingTypes() {
+        return LINE_CODING_OPTIONS.locator("xpath=/label").allInnerTexts();
+    }
+
+    public void enterDestinationDetails(String destinationName, String destinationType, String host, String username, String password, String port, String serverPath) {
+        DESTINATION_NAME.fill(destinationName);
+        DESTINATION_TYPE.click();
+        String destinationXpath = String.format("//sui-select-option//span[text()='%s']", destinationType);
+        DESTINATION_TYPE.locator("xpath=" + destinationXpath).click();
+        HOST.fill(host);
+        USERNAME.fill(username);
+        PASSWORD.fill(password);
+        PORT.fill(port);
+        SERVER_PATH.fill(serverPath);
+    }
+
+    public boolean isEditDestinationAvailable() {
+        DESTINATION_DROPDOWN.click();
+        return EDIT_DESTINATION_BUTTON.first().isVisible();
+    }
+
+    public void clickEditDestination() {
+        EDIT_DESTINATION_BUTTON.first().click();
+        waitUtility.waitForLocatorVisible(DESTINATION_NAME);
+    }
+
+    public void clickTestAccessButton() {
+        TEST_ACCESS_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CUSTOM_DESTINATION_RUN_BUTTON);
+        CUSTOM_DESTINATION_RUN_BUTTON.click();
+    }
+
+    public void clickCreateDestinationButton() {
+        CUSTOM_DESTINATION_CREATE_BUTTON.click();
+    }
+
+    public boolean isDestinationNameAvailable() {
+        return DESTINATION_NAME.isVisible() && !DESTINATION_NAME.inputValue().isEmpty();
+    }
+
+    public boolean isDestinationTypeAvailable() {
+        return DESTINATION_TYPE.isVisible() && !DESTINATION_TYPE.locator("xpath=//div[@class='text']//span[2]").textContent().isEmpty();
+    }
+
+    public boolean isHostFieldAvailable() {
+        return HOST.isVisible() && !HOST.inputValue().isEmpty();
+    }
+
+    public boolean isUsernameFieldAvailable() {
+        return USERNAME.isVisible() && !USERNAME.inputValue().isEmpty();
+    }
+
+    public boolean isPasswordFieldAvailable() {
+        return PASSWORD.isVisible() && !PASSWORD.inputValue().isEmpty();
+    }
+
+    public boolean isPortFieldAvailable() {
+        return PORT.isVisible() && !PORT.inputValue().isEmpty();
+    }
+
+    public boolean isTestAccessButtonAvailable() {
+        return TEST_ACCESS_BUTTON.isVisible();
+    }
+
+    public boolean isCreateButtonAvailable() {
+        return CUSTOM_DESTINATION_CREATE_BUTTON.isVisible();
+    }
+
+    public boolean isCancelButtonAvailable() {
+        return CUSTOM_DESTINATION_CANCEL_BUTTON.isVisible();
+    }
+
+    public String fetchFileNameHelpText() {
+        FILE_NAME_HELP_TEXT.first().scrollIntoViewIfNeeded();
+        return FILE_NAME_HELP_TEXT.first().textContent().trim();
+    }
+}
