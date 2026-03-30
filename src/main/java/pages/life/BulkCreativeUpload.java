@@ -187,13 +187,12 @@ public class BulkCreativeUpload {
     }
 
     public String fetchErrorAlert() {
-        if (!ERROR_ALERT.isVisible()) {
-            return "";
-        } else {
-            String text = ERROR_ALERT.innerText().trim();
+        String text = "No error alert is displayed.";
+        if (ERROR_ALERT.isVisible()) {
+            text = ERROR_ALERT.innerText().trim();
             waitUtility.waitForLocatorHidden(ERROR_ALERT);
-            return text;
         }
+        return text;
     }
 
     public List<String> fetchInlineValidationMessage() {
@@ -355,8 +354,8 @@ public class BulkCreativeUpload {
     public void selectFileTypeAndUploadFile(String fileType, String fileName) throws IOException {
         String locatorValue = "//div[@title='%s']";
         FILE_DROPDOWN.click();
-        FILE_DROPDOWN_VALUE.locator("text=" + fileType).click();
-        if (fileType.contains("PulsePoint")) {
+        FILE_DROPDOWN_VALUE.locator("text=" + fileType).first().click();
+        if (fileType.contains("PulsePoint") && fileName.equalsIgnoreCase("Download Template")) {
             waitUtility.waitForLocatorVisible(DOWNLOAD_BULK_UPLOAD_TEMPLATE);
             Download download = page.waitForDownload(DOWNLOAD_BULK_UPLOAD_TEMPLATE::click);
             CommonUtils.downloadFileAndMoveToSystemFolder(download);
@@ -364,6 +363,7 @@ public class BulkCreativeUpload {
             fileName = latestFile.getFileName().toString();
         }
         CommonUtils.uploadFile(page, 0, locatorValue, fileName);
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void selectAndClickDirection(String direction) {
@@ -372,6 +372,7 @@ public class BulkCreativeUpload {
     }
 
     public List<String> enterCreativeName(String name) {
+        waitUtility.waitUntilSpinnerHidden();
         List<String> nameList = new ArrayList<>();
         for (int i = 0; i < HTML_CREATIVE_NAME.count(); i++) {
             String newName = name + "_" + CommonUtils.timeStampCalculation() + "_" + CommonUtils.randomFourDigitNumber();

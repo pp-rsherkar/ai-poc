@@ -11,6 +11,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User fetches the logged in username
     When User navigates to Schedule report from mega menu of the life application
     And User clicks Schedule Report button

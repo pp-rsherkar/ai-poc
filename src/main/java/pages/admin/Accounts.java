@@ -67,12 +67,19 @@ public class Accounts {
     private final Locator STUDIO_SETTINGS_ICON;
     private final Locator STUDIO_SETTINGS_PANEL;
     private final Locator WORKSPACE_PERMISSION_TOGGLE_BUTTON;
-    private final Locator SETTINGS_PANEL_CANCEL_BUTTON;
+    private final Locator STUDIO_SETTINGS_PANEL_CANCEL_BUTTON;
     private final Locator ERROR_ALERT;
     private final Locator ALERT;
     private final Locator EXPORT_OPTIONS_DIALOG;
     private final Locator RUN_BUTTON;
     private final Locator TEST_ACCESS_FAILED_TEXT;
+    private final Locator STUDIO_TOGGLE_ACTIVE;
+
+    private final Locator DETAILS_TAB;
+    private final Locator LIFE_SETTINGS;
+    private final Locator PULSEPOINT_DATA_FEE;
+    private final Locator NPI_TARGETING_GROSS_CPM;
+    private final Locator LIFE_SETTINGS_PANEL_CANCEL_BUTTON;
     WaitUtility waitUtility;
 
     public Accounts(Page page) {
@@ -92,7 +99,7 @@ public class Accounts {
         this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
-        this.DISABLE_STUDIO_OK_BUTTON = page.locator("sui-dimmer div").filter(new Locator.FilterOptions().setHasText("Ok")).nth(4);
+        this.DISABLE_STUDIO_OK_BUTTON = page.locator("//div[contains(@class,'approveButtonText')]");
         this.PULSEPOINT_ICON = page.locator("//app-buyer-logo/div[@class='logo-holder']");
         this.SWITCH_ACCOUNT = page.locator(".left > div:nth-child(2)").first();
         this.SWITCH_SEARCH_ACCOUNT = page.getByPlaceholder("Search");
@@ -105,6 +112,7 @@ public class Accounts {
         this.SEARCH_BUTTON = page.locator("//span[text()='Search']");
         this.ADVERTISER_LIST = page.locator("//td[contains(@class,'gaTableRow')]//div");
         this.REPORTING_TAB = page.locator("//a[@routerlink='reporting']");
+        this.DETAILS_TAB = page.locator("//a[@routerlink='details']");
         this.CUSTOM_DESTINATION_SECTION = page.locator("//div[@id='custom-destinations']");
         this.ADD_DESTINATION_BUTTON = page.locator("//app-icon-lable-link[@text='Add Destination']//div");
         this.ENTER_DESTINATION_NAME = page.locator("//input[@placeholder='Enter Destination Name']");
@@ -133,15 +141,21 @@ public class Accounts {
         this.STUDIO_SETTINGS_ICON = page.locator("//span[@class='header-name' and text()='Studio']/following-sibling::span");
         this.STUDIO_SETTINGS_PANEL = page.locator("//div[@class='bsHeaderContainer']//div[contains(text(),'Studio Settings')]");
         this.WORKSPACE_PERMISSION_TOGGLE_BUTTON = page.locator("//div[@class='secondtablewrapper']//div[contains(@class,'toggle-wrapper-withLabel')]//sui-checkbox");
-        this.SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
+        this.STUDIO_SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
+        this.LIFE_SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-account-fee//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
         this.ERROR_ALERT = page.locator("//div[@aria-label='Error while saving.']");
         this.ALERT = page.locator("//div[@role='alert']");
         this.EXPORT_OPTIONS_DIALOG = page.locator("//div[text()='Choose file size to test access']");
         this.RUN_BUTTON = page.locator("//button[text()='Run']");
         this.TEST_ACCESS_FAILED_TEXT = page.locator("//span[text()='Access Test Failed']");
+        this.STUDIO_TOGGLE_ACTIVE = page.locator("//div[contains(@class,'button-active')]//span[text()='Studio']");
+        this.LIFE_SETTINGS = page.locator("//span[text()='Life Platform']/following-sibling::span");
+        this.PULSEPOINT_DATA_FEE = page.locator("//input[@name='ppDataMargin']");
+        this.NPI_TARGETING_GROSS_CPM = page.locator("//input[@name='NPITargeting']");
     }
 
     public void clickAdministration() {
+        waitUtility.waitForLocatorVisible(ADMINISTRATION);
         ADMINISTRATION.click();
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -167,6 +181,10 @@ public class Accounts {
         STUDIO_TOGGLE_BUTTON.click();
     }
 
+    public Locator studioToggleActive() {
+        return STUDIO_TOGGLE_ACTIVE;
+    }
+
     public void workSpaceSettings() {
         EXPANSION_TOGGLE.click();
     }
@@ -181,7 +199,8 @@ public class Accounts {
         waitUtility.waitForLocatorVisible(ACCOUNTS_TAB_TEXT);
         SEARCH_ACCOUNT.fill(accountName);
         SEARCH_ICON.click();
-        SELECT_ACCOUNT.click();
+        Locator selectAccount = page.getByRole(AriaRole.CELL, new Page.GetByRoleOptions().setName(accountName));
+        selectAccount.click();
         STUDIO_TOGGLE_BUTTON.click();
         DISABLE_STUDIO_OK_BUTTON.click();
         page.reload();
@@ -205,6 +224,7 @@ public class Accounts {
     }
 
     public void clickAdvertiserTab() {
+        waitUtility.waitForLocatorVisible(ADVERTISER_TAB);
         ADVERTISER_TAB.click();
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST.first());
     }
@@ -221,8 +241,8 @@ public class Accounts {
         return ADVERTISER_LIST.allInnerTexts();
     }
 
-    public boolean isReportingTabDisplayed() {
-        return REPORTING_TAB.isVisible();
+    public boolean isDetailsTabDisplayed() {
+        return DETAILS_TAB.isVisible();
     }
 
     public void clickReportingTab() {
@@ -440,8 +460,25 @@ public class Accounts {
         return workspaceNameList;
     }
 
-    public void clickCancelButtonFromSettingsPanel() {
-        SETTINGS_PANEL_CANCEL_BUTTON.click();
+    public void clickCancelButtonFromSettingsPanel(){
+        STUDIO_SETTINGS_PANEL_CANCEL_BUTTON.click();
     }
 
+    public void clickLifeSettings() {
+        LIFE_SETTINGS.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(PULSEPOINT_DATA_FEE);
+    }
+
+    public double fetchPulsePointDataFees() {
+        return Double.parseDouble(PULSEPOINT_DATA_FEE.inputValue().trim());
+    }
+
+    public double fetchNPITargetingGrossCPM() {
+        return Double.parseDouble(NPI_TARGETING_GROSS_CPM.inputValue().trim());
+    }
+
+    public void clickLifeCancelButtonFromSettingsPanel() {
+        LIFE_SETTINGS_PANEL_CANCEL_BUTTON.click();
+    }
 }

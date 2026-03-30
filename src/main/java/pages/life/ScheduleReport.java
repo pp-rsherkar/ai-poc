@@ -102,6 +102,7 @@ public class ScheduleReport {
 
     public void clickScheduleReportButton() {
         SCHEDULE_REPORT_BUTTON.click();
+        waitUtility.waitForLocatorVisible(SCHEDULE_REPORT_PANEL_HEADER);
     }
 
     public boolean isScheduleReportPanelOpened() {

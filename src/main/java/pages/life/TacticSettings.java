@@ -43,7 +43,7 @@ public class TacticSettings {
     private final Locator GEO_TARGETS_BULK_UPLOAD;
     private final Locator GEO_TARGETS_UPLOAD_BUTTON;
     private final Locator GEO_TARGETS_TEXTBOX;
-    private final Locator AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID;
+    private final Locator BRAND_SAFETY_PROFILE_SEGMENT_ID;
     private final Locator RULE_APP_BUNDLES_LISTS_OPTION;
     private final Locator VIEW_ABILITY_PERCENTAGE_BOX;
     private final Locator KEYWORDS_TEXTBOX;
@@ -79,6 +79,7 @@ public class TacticSettings {
     private final Locator NEW_TACTIC;
     private final Locator BASE_BID_ERROR;
     private final Locator CANCEL_BUTTON;
+    private final Locator NPI_TREE_VIEW_NODE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -111,7 +112,7 @@ public class TacticSettings {
         this.GEO_TARGETS_BULK_UPLOAD = page.locator("//span[text()='Bulk Upload']");
         this.GEO_TARGETS_UPLOAD_BUTTON = page.locator("//button[normalize-space()='Upload']");
         this.GEO_TARGETS_TEXTBOX = page.locator("//textarea[@id='geotargetedItemsTA']");
-        this.AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID = page.locator("//div[@class='input']/input[@type='text']");
+        this.BRAND_SAFETY_PROFILE_SEGMENT_ID = page.locator("//span[contains(text(),'DoubleVerify Authentic Brand Suitability ID')]/parent::div/following-sibling::div//input[@type='text']");
         this.RULE_APP_BUNDLES_LISTS_OPTION = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'App Bundles Lists')]");
         this.VIEW_ABILITY_PERCENTAGE_BOX = page.locator("//div[contains(@class, 'rightLabel')]//input[contains(@class, 'form-control-percent-mini-right')]");
         this.KEYWORDS_TEXTBOX = page.locator("//div[contains(@class,'text-area-container')]//textarea");
@@ -148,6 +149,7 @@ public class TacticSettings {
         this.NEW_TACTIC = page.locator("app-icon-lable-link").filter(new Locator.FilterOptions().setHasText("New Tactic")).locator("img");
         this.BASE_BID_ERROR = page.locator("//div[contains(normalize-space(@aria-label), 'Base Bid Price can not exceed Max Bid Price') or contains(normalize-space(@aria-label), 'Your Account Manager has limited Max Bid')]");
         this.CANCEL_BUTTON = page.locator("//div[contains(@class,'gaCancel')]");
+        this.NPI_TREE_VIEW_NODE = page.locator("//div[@class='npi-list']//div[contains(@class,'treeviewNode')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -309,6 +311,7 @@ public class TacticSettings {
                     break;
                 case "Practice Staff":
                     HOUSEHOLD_TAB.click();
+                    waitUtility.waitForLocatorVisible(NPI_TREE_VIEW_NODE.first());
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format("(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'itemWrapper')]//div[contains(@class, 'include-default')])[1]", val);
@@ -400,16 +403,16 @@ public class TacticSettings {
                     }
                     clickRuleTypeOkButton();
                     break;
-                case "Authentic Brand Suitability":
+                case "Brand Safety Profile":
                     String segmentID = ruleValues.get(0);
-                    AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID.fill(segmentID);
+                    BRAND_SAFETY_PROFILE_SEGMENT_ID.fill(segmentID);
                     page.locator("body").click();
                     clickRuleTypeOkButton();
                     break;
-                case "Brand Safety & Suitability":
+                case "Brand Suitability":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
-                        String xpath = String.format("//mark[contains(text(),'%s')]/ancestor::div[@class='left name-icon ng-star-inserted']/preceding-sibling::div[contains(@class,'custom_checkbox')]", val);
+                        String xpath = String.format("//mark[contains(text(),'%s')]/ancestor::div[contains(@class,'left name-icon')]/preceding-sibling::div[contains(@class,'custom_checkbox')]", val);
                         isElementVisible(xpath);
                     }
                     clickRuleTypeOkButton();

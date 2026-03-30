@@ -1,11 +1,9 @@
 Feature: LIFE Regression - Create a Campaign
 
-  Background:
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -26,6 +24,8 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -54,6 +54,8 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Create a Campaign and add and verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -84,6 +86,8 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Verify all Targeting Rules under categories and Create a campaign by adding all Targeting Rules
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -109,28 +113,28 @@ Feature: LIFE Regression - Create a Campaign
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability      |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
-      | Behavioral Segment          | AutoSegment18577650                                     |
-      | NPI                         | AutoSmartList954103283                                  |
-      | HCP by Specialty            | Radiology, Aerospace Medicine                           |
-      | Health Populations          | Anesthesia and Analgesia                                |
-      | Keyword Populations         | CustomTextForKeywordPopulations, KeywordPopulationsTest |
-      | Practice Staff              | SMART_Pixel_NPI_20250701_155147                         |
-      | Health Pages                | Animal Diseases                                         |
-      | Keywords                    | Custom_Keyword, TestingKeyword, Qwerty123               |
-      | Endemics                    | Endemic + EHR                                           |
-      | Geo Targets                 | New York, California                                    |
-      | Postal Codes                | 123456, 10001, 987654                                   |
-      | Weather Signals             | Below 15F degrees, Outdoor Activity                     |
-      | Authentic Brand Suitability | 51246802                                                |
-      | Brand Safety & Suitability  | Unknown Brand Safety, Highly Illicit Do Not Monetize    |
-      | Browser                     | Chrome, EDGE, Opera, Safari                             |
-      | Device                      | Mobile, Tablet, Connected Device                        |
-      | Domains/Apps                | APP Regular, updaedList106043912                        |
-      | Inventory Source            | New Report                                              |
-      | Operating System            | Windows, macOS, Blackberry                              |
-      | Viewability                 | 50                                                      |
-      | Legal Pages                 | Emancipation                                            |
-      | Legal Populations           | Adoption                                                |
+      | Behavioral Segment   | AutoSegment18577650                                     |
+      | NPI                  | AutoSmartList954103283                                  |
+      | HCP by Specialty     | Radiology, Aerospace Medicine                           |
+      | Health Populations   | Anesthesia and Analgesia                                |
+      | Keyword Populations  | CustomTextForKeywordPopulations, KeywordPopulationsTest |
+      | Practice Staff       | SMART_Pixel_NPI_20250701_155147                         |
+      | Health Pages         | Animal Diseases                                         |
+      | Keywords             | Custom_Keyword, TestingKeyword, Qwerty123               |
+      | Endemics             | Endemic + EHR                                           |
+      | Geo Targets          | New York, California                                    |
+      | Postal Codes         | 123456, 10001, 987654                                   |
+      | Weather Signals      | Below 15F degrees, Outdoor Activity                     |
+      | Brand Safety Profile | 51246802                                                |
+      | Brand Suitability    | Unknown Brand Safety, Highly Illicit Do Not Monetize    |
+      | Browser              | Chrome, EDGE, Opera, Safari                             |
+      | Device               | Mobile, Tablet, Connected Device                        |
+      | Domains/Apps         | APP Regular, updaedList106043912                        |
+      | Inventory Source     | New Report                                              |
+      | Operating System     | Windows, macOS, Blackberry                              |
+      | Viewability          | 50                                                      |
+      | Legal Pages          | Emancipation                                            |
+      | Legal Populations    | Adoption                                                |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
@@ -143,6 +147,8 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Verify campaign creation, check field-level validation and default values of the fields
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to Administrative section and fetches the advertisers and client value for the account "automation@pulsepoint"
     And User clicks on Create Campaign
     Then Verify Advertiser dropdown should show values which are mapped to the account
@@ -171,7 +177,9 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | Campaign | Regular | 50000     | % + CPM        | Glynase   | Test              | Automation test | 35      | 300    | PHM Chicago |
 
   @regression
-  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence    And User clicks on Create Campaign
+  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     And User verifies if Add Custom Field button is available
     When User adds a custom field with "<FIELD_NAME>" on the campaign creation page successfully
@@ -189,6 +197,31 @@ Feature: LIFE Regression - Create a Campaign
     Examples:
       | FIELD_NAME  | NEW_FIELD_NAME | ADVERTISER     | CP_NAME  | CP_TYPE | CP_BUDGET | CUSTOM_FIELD_VALUE |
       | CustomField | NewCustomField | 01- Advertiser | Campaign | Regular | 50000     | Test               |
+
+  @regression
+  Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
+    Given This scenario will be executed in the "Demo" environment as a "External User"
+    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+    Then Verify that the campaign budget status is "Pending Appr" and is greyed out
+    And User saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User clicks on Add Targeting Rule
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify creative details are saved
+    Then Verify that the campaign is in "Pending Appr" state
+    Then Verify that the approval status of the campaign is "Pending Appr"
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Examples:
+      | ADVERTISER       | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     | RULE_TYPE          | CREATIVE          |
+      | 1Demo Advertiser | External_Auto | Regular | 10000     | External_Line | 500         | External_Tactic | Behavioral Segment | External_Creative |
 
 #  @regression
 #  Scenario Outline: API Sample Test

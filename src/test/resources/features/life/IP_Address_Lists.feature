@@ -5,6 +5,7 @@ Feature: LIFE Regression – Generate IP Address Lists in the following ways:
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to the "IP Address Lists" page
     And Verify that the search option is present on the "IP Lists" tab
     When User clicks on Create New List
