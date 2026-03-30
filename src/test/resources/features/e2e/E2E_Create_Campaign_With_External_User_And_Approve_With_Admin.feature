@@ -3,7 +3,7 @@ Feature: E2E workflow for creating a campaign with an external user and approvin
   2. Approval of the created Campaign with an Admin User
   3. Verification of the approved Campaign with the External User
 
-  @e2e @prs
+  @e2e
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
     And "Life" application is logged in successfully with Account "buyer2@ppcom"
