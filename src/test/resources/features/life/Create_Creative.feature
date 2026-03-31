@@ -13,6 +13,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
 
@@ -26,8 +27,8 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Creative Type   | Image, Video   |
     And Check Activity buttons "Archived" and verify following filters are available and working
       | Advertiser      | Amgen       |
-      | Creative Status | Denied      |
-      | Ad Sizes        | 1024x576    |
+      | Creative Status | Approved    |
+      | Ad Sizes        | 320x50      |
       | CreatedBy       | Anand       |
       | Creative Type   | Html, Video |
     And Verify the following sort options are available and working
@@ -38,7 +39,6 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Last Updated-Asc  |
       | Last Updated-Desc |
     And Verify Search Box is available and working
-      | 337728           |
       | VideoURLCreative |
       | Manual           |
       | BulkUpload       |
@@ -51,7 +51,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   Scenario Outline: Verify filter's (Creative Status, Ad Sizes, Creative Type) list of value available under Active and Archived tabs
     When User clicks on "<ACTIVITY_TAB_NAME>" tab and verify following filters value
       | Creative Status | PendingApproval, Approved, Denied                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-      | Ad Sizes        | 1024x576, 1025x800, 1040x875, 1050x800, 1050x880, 1200x200, 1200x750, 120x20, 120x240, 120x600, 123x123, 125x125, 1280x720, 1500x900, 160x600, 168x28, 170x130, 180x150, 1920x1080, 200x200, 200x600, 216x36, 234x60, 250x250, 300x100, 300x250, 300x50, 300x600, 301x601, 320x480, 320x50, 333x333, 336x280, 400x400, 468x60, 480x320, 640x100, 640x360, 640x480, 700x500, 728x200, 728x90, 768x576, 800x200, 800x250, 800x600, 854x480, 970x250, 970x30, 970x550 |
+      | Ad Sizes        | 1024x576, 1025x800, 1040x875, 1050x800, 1050x880, 1200x200, 1200x750, 120x20, 120x240, 120x600, 123x123, 125x125, 1280x720, 1500x900, 160x600, 168x28, 170x130, 180x150, 1920x1080, 200x200, 200x600, 216x36, 234x60, 250x250, 300x100, 300x250, 300x50, 300x600, 301x601, 320x100, 320x480, 320x50, 333x333, 336x280, 400x400, 468x60, 480x320, 640x100, 640x360, 640x480, 700x500, 728x200, 728x90, 768x576, 800x200, 800x250, 800x600, 854x480, 970x250, 970x30, 970x550 |
       | Creative Type   | Image, Html, Video, Search Extension, Html5, Audio, Native Display, Native Video                                                                                                                                                                                                                                                                                                                                                                                   |
     Examples:
       | ACTIVITY_TAB_NAME |
@@ -280,7 +280,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File     | Video_DCM.xls           |
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DoubleVerify | Video_DoubleVerify.xls  |
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Flashtalking | Video_FlashTalking.xlsx |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Innovid      | VideoINNOVID.xlsx       |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Innovid      | Video_INNOVID.xlsx       |
 
 
   @regression

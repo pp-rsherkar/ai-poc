@@ -7,6 +7,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
   Scenario Outline: Create multiple tactics and verify its tabs and status
@@ -83,7 +84,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify user is able to update and save the "max" bid price
     Then Verify user is not able to update "base" bid price more than allowed limit
     Then Verify user is not able to update "max" bid price more than allowed limit
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      |

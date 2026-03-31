@@ -139,6 +139,6 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
     Examples:
       | Campaign ID          | STATUS       |
-      | Auto_20251101_024109 | Approved     |
-      | Auto_20251101_032528 | Pending Appr |
-      | Auto_20251103_024348 | Denied       |
+      | Auto_20260311_152006 | Approved     |
+      | Auto_20260311_151754 | Pending Appr |
+      | Auto_20260311_142337 | Denied       |
