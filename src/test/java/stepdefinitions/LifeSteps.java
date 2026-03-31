@@ -5850,5 +5850,6 @@ public class LifeSteps {
         logger.info("Admin user approving the campaign '{}'", campaignNameRandom);
         campaigns.clickCampaignDetailsTab();
         campaigns.approveCampaign();
+        Assert.assertEquals("Campaign " + campaignNameRandom + " updated.", campaigns.campaignSuccess());
     }
 }
