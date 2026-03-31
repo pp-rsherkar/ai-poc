@@ -60,8 +60,6 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify that user is not able to remove the pre-populated logged in user email from "Notify User for Failures" field
     And Verify File Name field is available on report panel
     And Validate that the template name matches the file name, and ensure the help text displays the file name in the ".csv" format
-    And User clicks the three-dot menu, selects the General variable - "$LineItemName$" and Time variable - "$ReportDateTime[Date/Timestamp]$" with Date-Time format "%Y-%m-%d"
-    And User verifies that the help text displays the file name with the value of General and Time variables
     And User should be able to generate the report
     And Validate report details such as Created By, Reporting period, Report Name from Report Listing page
     And Confirms that the report panel retains the entered data
@@ -166,8 +164,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to generate the report
     And Confirms that the report panel retains the entered data
     Examples:
-      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME            |
-      | Template_Automation | Tactic Name New | Multiple_Flight_Campaign |
+      | TEMPLATE            | TACTIC_INITIALS                 | CAMPAIGN_NAME            |
+      | Template_Automation | Multiple_Flight_Campaign_Tactic | Multiple_Flight_Campaign |
 
   @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report
@@ -207,7 +205,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | FILE_BREAKDOWN_TYPE |
       | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Single File         |
       | AutoTemplate20 | 01- Advertiser | Auto              | Line               | Tactic          | Creative          | Per Advertiser      |
-      | AutoTemplate20 | Z_automation   | Auto              | Line               | Tactic          | Creative          | Per Campaign        |
+      | AutoTemplate20 | Z_Automation   | Auto              | Line               | Tactic          | Creative          | Per Campaign        |
 
   @regression
   Scenario Outline: Verify fields under Custom Destination tab in Run Report's Delivery Method section

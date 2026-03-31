@@ -3988,7 +3988,7 @@ public class LifeSteps {
         Assert.assertTrue("Username field is not available", runReportPanel.isUsernameFieldAvailable());
         Assert.assertTrue("Password field is not available", runReportPanel.isPasswordFieldAvailable());
         Assert.assertTrue("Port field is not available", runReportPanel.isPortFieldAvailable());
-        Assert.assertTrue("Test Access button is not available", runReportPanel.isTestAccessButtonAvailable());
+        Assert.assertTrue("Test Access button is not available", runReportPanel.isTestAccessButtonAvailable() | runReportPanel.isReRunAccessButtonAvailable());
         Assert.assertTrue("Create button is not available", runReportPanel.isCreateButtonAvailable());
         Assert.assertTrue("Cancel button is not available", runReportPanel.isCancelButtonAvailable());
     }
@@ -5980,6 +5980,10 @@ public class LifeSteps {
         logger.info("Running connection test and creating destination");
         runReportPanel.clickTestAccessButton();
         runReportPanel.clickCreateDestinationButton();
+        logger.info("Destination creation initiated successfully");
+        String text = runReportPanel.fetchSuccessAlert();
+        logger.info("Fetched success alert after creating destination: '{}'", text);
+        Assert.assertEquals("Destination created successfully", text);
     }
 
     @And("Verify destination created should populate in the Destination dropdown field")

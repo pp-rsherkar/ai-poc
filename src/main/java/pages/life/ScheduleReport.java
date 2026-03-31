@@ -460,13 +460,11 @@ public class ScheduleReport {
     }
 
     public void selectGeneralVariableFromThreeDotMenu(String generalVariable) {
-        REPORT_NAME.scrollIntoViewIfNeeded();
         GENERAL_AND_TIME_VARIABLE.getByText(generalVariable).click();
     }
 
     public void selectTimeVariableFromThreeDotMenu(String timeVariable, String dateTimeFormat) {
         List<String> options = List.of(dateTimeFormat.split("-"));
-        REPORT_NAME.scrollIntoViewIfNeeded();
         GENERAL_AND_TIME_VARIABLE.getByText(timeVariable).click();
         for (String option : options) {
             DATE_TIME_FORMAT_OPTIONS.getByText(option, new Locator.GetByTextOptions().setExact(true)).click();
@@ -474,7 +472,6 @@ public class ScheduleReport {
     }
 
     public void closeThreeDotMenu() {
-        REPORT_NAME.scrollIntoViewIfNeeded();
         THREE_DOT_MENU_CLOSE_BUTTON.click();
         THREE_DOT_MENU.scrollIntoViewIfNeeded();
     }

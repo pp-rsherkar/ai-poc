@@ -88,6 +88,7 @@ public class RunReportPanel {
     private final Locator CUSTOM_DESTINATION_CANCEL_BUTTON;
     private final Locator DESTINATION_DROPDOWN;
     private final Locator FILE_NAME_HELP_TEXT;
+    private final Locator RE_RUN_ACCESS_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public RunReportPanel(Page page) {
@@ -164,6 +165,7 @@ public class RunReportPanel {
         this.CUSTOM_DESTINATION_CANCEL_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Cancel')]");
         this.DESTINATION_DROPDOWN = page.locator("//div[contains(text(),'Destination')]/following-sibling::sui-select");
         this.FILE_NAME_HELP_TEXT = page.locator("//span[@class='custom-destination-example-texr']//span");
+        this.RE_RUN_ACCESS_BUTTON = page.locator("//span[contains(text(),'Re-run Access')]");
     }
 
     public boolean isRunReportPanelOpened() {
@@ -767,6 +769,10 @@ public class RunReportPanel {
 
     public boolean isTestAccessButtonAvailable() {
         return TEST_ACCESS_BUTTON.isVisible();
+    }
+
+    public boolean isReRunAccessButtonAvailable() {
+        return RE_RUN_ACCESS_BUTTON.isVisible();
     }
 
     public boolean isCreateButtonAvailable() {
