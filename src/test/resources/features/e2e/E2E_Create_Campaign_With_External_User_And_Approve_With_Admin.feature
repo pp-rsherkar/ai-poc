@@ -1,7 +1,7 @@
 Feature: E2E workflow for creating a campaign with an external user and approving it with an admin user
-  1. Creation of Campaign with an External User
-  2. Approval of the created Campaign with an Admin User
-  3. Verification of the approved Campaign with the External User
+  1. Creation of a campaign by an external user
+  2. Approval of the created campaign by an admin user
+  3. Verification of the approved campaign by the external user
 
   @e2e
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
@@ -39,5 +39,3 @@ Feature: E2E workflow for creating a campaign with an external user and approvin
     Examples:
       | ADVERTISER       | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     | RULE_TYPE          | CREATIVE          |
       | 1Demo Advertiser | External_Auto | Regular | 10000     | External_Line | 500         | External_Tactic | Behavioral Segment | External_Creative |
-
-
