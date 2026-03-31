@@ -204,5 +204,6 @@ public class Navigation {
         waitUtility.waitForLocatorVisible(ACCOUNT_NAME);
         ACCOUNT_NAME.click();
         LOGOUT_BUTTON.click();
+        waitUtility.waitForLocatorVisible(USERNAME);
     }
 }

@@ -546,6 +546,7 @@ public class Campaigns {
 
     public void approveCampaign() {
         waitUtility.waitForLocatorVisible(CAMPAIGN_APPROVAL_STATUS);
+        waitUtility.waitForLocatorVisible(CAMPAIGN_STATUS_APPROVED_BUTTON);
         CAMPAIGN_STATUS_APPROVED_BUTTON.click();
         SAVE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
