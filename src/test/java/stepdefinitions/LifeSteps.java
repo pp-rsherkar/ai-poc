@@ -2373,6 +2373,7 @@ public class LifeSteps {
             navigation.clickSubMenu();
             sharedList.clickDomainListFromMenu(pageName);
         } catch (PlaywrightException e) {
+            logger.info("Encountered PlaywrightException, attempting navigation again");
             if (campaigns.isCreateCampaignButtonVisible())
                 navigation.clickSubMenu();
             sharedList.clickDomainListFromMenu(pageName);

@@ -325,7 +325,6 @@ public class TacticDetails {
             tacticDetailsSuccess();
         } catch (PlaywrightException e) {
             saveTacticDetails();
-            waitUtility.waitUntilSpinnerHidden();
             tacticDetailsSuccess();
         }
     }
