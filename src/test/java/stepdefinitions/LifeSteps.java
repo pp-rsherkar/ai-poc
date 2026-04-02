@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.PlaywrightException;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -2367,11 +2368,16 @@ public class LifeSteps {
      * Domain List*/
     @Given("User navigates to the {string} page")
     public void userNavigatesToTheDomainListPage(String pageName) {
-        logger.info("Navigating to Shared List type: {}", pageName);
-        navigation.clickSubMenu();
-        if(campaigns.isCreateCampaignButtonVisible())
+        try {
+            logger.info("Navigating to Shared List type: {}", pageName);
             navigation.clickSubMenu();
-        sharedList.clickDomainListFromMenu(pageName);
+            sharedList.clickDomainListFromMenu(pageName);
+        } catch (PlaywrightException e) {
+            logger.info("Encountered PlaywrightException, attempting navigation again");
+            if (campaigns.isCreateCampaignButtonVisible())
+                navigation.clickSubMenu();
+            sharedList.clickDomainListFromMenu(pageName);
+        }
     }
 
     @And("Verify that the search option is present on the {string} tab")
