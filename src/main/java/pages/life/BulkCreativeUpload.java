@@ -171,7 +171,6 @@ public class BulkCreativeUpload {
     }
 
     public void enterAdvertiserDSA(String advertiserDSA) {
-        waitUtility.waitForElementVisible("//h3[contains(text(),'DSA Requirements')]");
         createCreatives.ADVERTISER_DSA.fill(advertiserDSA);
     }
 
