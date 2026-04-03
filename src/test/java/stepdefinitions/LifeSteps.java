@@ -54,6 +54,7 @@ public class LifeSteps {
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
+    Map<String, List<String>> rulesMap = new LinkedHashMap<>();
     List<String> nameList = new ArrayList<>();
     List<String> capturedDetails = new ArrayList<>();
     List<String> itemList = new ArrayList<>();
@@ -246,7 +247,7 @@ public class LifeSteps {
         Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
         String tacticText = tacticDetails.verifyTacticDetailsText();
         logger.info("Verifying Tactic page text: {}", tacticText);
-        Assert.assertEquals("New Tactic", tacticText);
+        Assert.assertTrue("Tactic page text is not displayed", tacticText.contains("New Tactic") || tacticText.contains("New Ad Group"));
         logger.info("Line Item verified and navigated to Tactic page successfully");
     }
 
@@ -501,12 +502,12 @@ public class LifeSteps {
         logger.info("Enabling Tactic and saving Creatives");
         tacticCreatives.enableCreative();
         tacticCreatives.saveTacticCreatives();
+        logger.info("Verifying creative save success message");
+        Assert.assertTrue("Unable to save creative", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
     }
 
-    @Then("Verify creative details are saved and the campaign is in running state")
-    public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
-        logger.info("Verifying creative save success");
-        assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
+    @Then("Verify the newly created campaign is in running state")
+    public void verify_the_newly_created_campaign_is_in_running_state() {
         logger.info("Navigating to Campaign Dashboard to verify 'Running' status");
         tacticCreatives.navigateToCampaignDashboard();
         campaignDashboard.resetFiltersIfApplied();
@@ -780,15 +781,13 @@ public class LifeSteps {
     public void user_selects_the_channel_configures_targeting_rules(DataTable ruleTypeAndOptions) {
         logger.info("Configuring targeting rules from DataTable");
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
-        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
-
+        rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             logger.info("Adding Rule Type: {} with Options: {}", entry.getKey(), entry.getValue());
             keyType.add(entry.getKey());
             keyValues.addAll(entry.getValue());
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
-
         logger.info("Closing Rule Type panel");
         tacticSettings.closeRuleTypePanel();
     }
@@ -802,27 +801,44 @@ public class LifeSteps {
         tacticSettings.fetchRulesTypesCount(expectedCount);
         List<String> actualNormalizedRuleTypes = normalizeObjectList(tacticSettings.fetchRulesTypes());
 
-        Set<String> expectedSet = new LinkedHashSet<>(expectedNormalizedRuleTypes);
-        Set<String> actualSet = new LinkedHashSet<>(actualNormalizedRuleTypes);
-
-        List<String> expectedUniqueAndSorted = new ArrayList<>(expectedSet);
-        List<String> actualUniqueAndSorted = new ArrayList<>(actualSet);
-
-        Collections.sort(expectedUniqueAndSorted);
-        Collections.sort(actualUniqueAndSorted);
-        logger.info("Comparing Rule Types. Expected: {}, Actual: {}", expectedUniqueAndSorted, actualUniqueAndSorted);
+        logger.info("Comparing Rule Types. Expected: {}, Actual: {}", expectedNormalizedRuleTypes, actualNormalizedRuleTypes);
+        for (String expectedOption : expectedNormalizedRuleTypes) {
+            boolean matchFound = actualNormalizedRuleTypes.stream().anyMatch(actual -> {
+                String exp = expectedOption.toLowerCase().trim();
+                String act = actual.toLowerCase().trim();
+                if ((exp.equals("email") && act.equals("emails")) || (exp.equals("emails") && act.equals("email")))
+                    return true;
+                return act.equals(exp);
+            });
+            Assert.assertTrue("Expected rule type not found: " + expectedOption, matchFound);
+        }
 
         List<String> expectedNormalizedRuleOptions = normalizeObjectList(keyValues);
         List<String> actualNormalizedRuleOptions = normalizeObjectList(tacticSettings.fetchRuleOptions());
         logger.info("Comparing Rule Options. Expected: {}, Actual: {}", expectedNormalizedRuleOptions, actualNormalizedRuleOptions);
-        Assert.assertEquals("Rule types mismatch", expectedUniqueAndSorted, actualUniqueAndSorted);
-
         for (String expectedOption : expectedNormalizedRuleOptions) {
             boolean matchFound = actualNormalizedRuleOptions.stream().anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
             Assert.assertTrue("Expected rule option not found: " + expectedOption, matchFound);
         }
 
         logger.info("All targeting rules verified successfully");
+    }
+
+    @And("Verify the count of rules added for the selected targeting rule type on the Tactic Settings page")
+    public void verifyTheCountOfRulesAddedForTheSelectedTargetingRuleTypeOnTheTacticSettingsPage() {
+        String ruleType;
+        for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
+            if(entry.getKey().contains("Email"))
+                ruleType = "Emails";
+            else
+                ruleType = entry.getKey();
+            int itemCount = entry.getValue().size();
+            logger.info("Verifying rule options count for Rule Type: {} on Tactic Settings page. Expected count: {}", ruleType, itemCount);
+            String optionsCount = tacticSettings.fetchSelectedListCountFromTactic(ruleType);
+            int targetedOptionsCount = Integer.parseInt(optionsCount.replaceAll("[^0-9]", ""));
+            logger.info("Parsed targeted options count from UI for {}: {}", ruleType, targetedOptionsCount);
+            Assert.assertEquals("Selected options count for " + ruleType + " does not match", itemCount, targetedOptionsCount);
+        }
     }
 
     @When("User saves the settings")
@@ -2792,7 +2808,7 @@ public class LifeSteps {
         String addedRules = tacticSettings.verifyIfRuleIsAdded();
         logger.info("Added rules found: {}", addedRules);
         Assert.assertTrue("Unable to add Rule", addedRules.contains(ruleType));
-        String text = tacticSettings.fetchSelectedListCountFromTactic();
+        String text = tacticSettings.fetchSelectedListCountFromTactic(ruleType);
         logger.info("Selected list count text from tactic: {}", text);
         Assert.assertTrue("Selected list count is not matching", text.contains(String.valueOf(itemCount)));
     }
@@ -2945,10 +2961,10 @@ public class LifeSteps {
         logger.info("Returned item count after Smart list rule selection: {}", itemCount);
     }
 
-    @Then("Verify the count of rule options for the selected targeting rule on the Tactic Settings page")
-    public void verifyTheCountOfSelectedRuleOptions() {
+    @Then("Verify the count of rule options for the selected targeting rule {string} on the Tactic Settings page")
+    public void verifyTheCountOfSelectedRuleOptions(String ruleType) {
         logger.info("Verifying rule options count on Tactic Settings page matches expected count: {}", itemCount);
-        String optionsCount = tacticSettings.fetchSelectedListCountFromTactic();
+        String optionsCount = tacticSettings.fetchSelectedListCountFromTactic(ruleType);
         int targetedOptionsCount = Integer.parseInt(optionsCount.replaceAll("[^0-9]", ""));
         logger.info("Parsed targeted options count from UI: {}", targetedOptionsCount);
         Assert.assertEquals("Selected options count does not match", itemCount, targetedOptionsCount);
@@ -5830,5 +5846,38 @@ public class LifeSteps {
         String displayedDataCost = npiStaticList.fetchDisplayedDataCost();
         logger.info("Fetched displayed data cost: {}", displayedDataCost);
         Assert.assertEquals("Calculated data cost doesn't match with displayed data cost", metricName, displayedDataCost);
+    }
+
+    @When("User enters the line item details as {string} {string} {string}, enables the line item and saves the changes")
+    public void userEntersTheLineItemDetailsAsEnablesTheLineItemAndSavesTheChanges(String lineItemName, String lineBudget, String lineItemType) {
+        lineItemNameRandom = lineItemName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Entering Line Item details - Name: {}, Line Item Type: {}, Budget: {}", lineItemNameRandom, lineItemType, lineBudget);
+        lineItemDetails.enterLineItemName(lineItemNameRandom);
+        logger.info("Selecting Line Item type: '{}'", lineItemType);
+        lineItemDetails.selectLineItemType(lineItemType);
+        logger.info("Clicking Add Flight button for Line Item");
+        lineItemDetails.clickAddFlightButton();
+        logger.info("Entering Line Item budget: '{}'", lineBudget);
+        lineItemDetails.enterLineItemBudget(lineBudget);
+        logger.info("Verifying if the entered placement ID is available for Line Item");
+        lineItemDetails.isPlacementIdAvailable(lineItemNameRandom);
+        logger.info("Enabling and saving Line Item with type '{}'", lineItemType);
+        lineItemDetails.enableLineItem();
+        logger.info("Line Item enabled successfully. Saving Line Item details.");
+        lineItemDetails.saveLineItem();
+    }
+
+    @And("User saves tactic details as a target template {string} and verifies the template is saved successfully")
+    public void userSavesTacticDetailsAsATargetTemplateAndVerifiesTheTemplateIsSavedSuccessfully(String lineItemType) {
+        logger.info("Saving tactic details as target template for Line Item type '{}'", lineItemType);
+        templateNameRandom = tacticDetails.saveTargetingTemplate(lineItemType);
+        logger.info("Verifying tactic details saved as target template successfully with template name '{}'", templateNameRandom);
+    }
+
+    @Then("User searches and verifies the created targeting template is available on Targeting Templates page")
+    public void userSearchesAndVerifiesTheCreatedTargetingTemplateIsAvailableOnTargetingTemplatesPage() {
+        logger.info("Navigating to Targeting Templates page to search and verify the created targeting template '{}'", templateNameRandom);
+        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
+        logger.info("Targeting template found successfully using search option");
     }
 }

@@ -145,7 +145,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign is in running state
     Then Verify that user is able to export the audit log for "campaign"
     When User navigates to "line item" page
     Then Verify that user is able to export the audit log for "line item"

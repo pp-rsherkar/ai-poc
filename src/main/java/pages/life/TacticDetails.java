@@ -63,6 +63,8 @@ public class TacticDetails {
     private final Locator NAVIGATION_COMMENT;
     private final Locator COMMENT_TEXT_BOX;
     private final Locator COMMENT_SUCCESS_ALERT;
+    private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
+    private final Locator CONTINUE_BUTTON;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -75,7 +77,7 @@ public class TacticDetails {
 
     public TacticDetails(Page page) {
         this.page = page;
-        this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
+        this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic' or text()='New Ad Group']");
         this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
         this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Tactic')]");
@@ -126,6 +128,8 @@ public class TacticDetails {
         this.NAVIGATION_COMMENT = page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
         this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
+        this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
+        this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
     }
 
     public void clickNewTactic() {
@@ -341,16 +345,18 @@ public class TacticDetails {
         return labelCountMap;
     }
 
-    private String saveTargetingTemplate(String lineItemType) {
+    public String saveTargetingTemplate(String lineItemType) {
         String templateName = lineItemType + "_Template_" + CommonUtils.timeStampCalculation();
         TACTIC_SETTINGS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
         tacticSettings.verifyTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
-        SAVE_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if(TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
+            CONTINUE_BUTTON.click();
+        waitUtility.waitForLocatorVisible(SAVE_TEMPLATE_DIALOG);
         TEMPLATE_NAME_TEXT.fill(templateName);
         SAVE_BUTTON.click();
-        TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(TEMPLATE_SAVED_SUCCESS_ALERT);
         return templateName;
     }
 
