@@ -14,13 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Hooks {
-    private static final Logger logger = Logger.getLogger(Hooks.class.getName());
     private static final long MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
-
     private static final Logger logger = LoggerFactory.getLogger(Hooks.class);
     public DriverFactory driverFactory;
     public Page page;
@@ -66,7 +62,7 @@ public class Hooks {
                 Files.deleteIfExists(videoPath);
             }
         } catch (Exception e) {
-            logger.warning("Video handling failed: " + e);
+            logger.warn("Video handling failed: {}", String.valueOf(e));
         }
     }
 
@@ -110,8 +106,7 @@ public class Hooks {
 
     // Method to handle and log errors globally
     private void handleError(String message, Exception e, Scenario scenario) {
-        String errorDetails = message + ": " + e.getMessage();
-        logger.info("Taking screenshot for failed scenario: {}", scenario.getName());
+        logger.error(message, e);
         if (scenario != null) {
             scenario.log(message + ": " + e.getMessage());
         }
