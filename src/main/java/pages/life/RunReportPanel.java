@@ -652,7 +652,7 @@ public class RunReportPanel {
     public boolean verifyReportPeriodRelatedFields(String option) {
         return switch (option) {
             case "Custom Dates" ->
-                    START_DATE.isVisible() && END_DATE.isVisible() && START_TIME.isVisible() && END_TIME.isVisible() && TIME_ZONE.isVisible() && TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
+                    START_DATE.isVisible() && END_DATE.isVisible() && START_TIME.isVisible() && END_TIME.isVisible() && TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
             case "Lifetime" ->
                     TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
             case "Flights" -> FLIGHT_DETAILS_DROPDOWN.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
