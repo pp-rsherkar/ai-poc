@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import factory.DriverFactory;
 import pages.life.CampaignDashboard;
 import utils.WaitUtility;
 
@@ -31,6 +30,8 @@ public class Navigation {
     private final Locator CREATIVE_LIBRARY_ICON;
     private final Locator MENU_ANGLE;
     private final Locator PULSEPOINT_LOGO;
+    private final Locator TARGETING_TEMPLATE_HEADER;
+    private final Locator LOGOUT_BUTTON;
     WaitUtility waitUtility;
     CampaignDashboard campaignDashboard;
 
@@ -57,7 +58,9 @@ public class Navigation {
         this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
         this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
-        this.PULSEPOINT_LOGO = page.locator("//app-buyer-logo/div[@class='logo-holder']");
+        this.TARGETING_TEMPLATE_HEADER = page.locator("//div[contains(text(),'Targeting Templates') and contains(@class,'section-name')]");
+        this.PULSEPOINT_LOGO = page.locator("//div[contains(@class, 'dynamic-logo')] | //app-buyer-logo/div[@class='logo-holder']");
+        this.LOGOUT_BUTTON = page.locator("//div[text()='Sign Out']");
     }
 
     public void navigateToUrl(String url) {
@@ -90,11 +93,16 @@ public class Navigation {
     }
 
     public void navigateToStudio() {
+        PULSEPOINT_LOGO.click();
         waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
         waitUtility.waitForLocatorVisible(STUDIO_TITLE);
+    }
+
+    public boolean isStudioTitleVisible() {
+        return STUDIO_TITLE.isVisible();
     }
 
     public String verifyStudioTitle() {
@@ -112,7 +120,13 @@ public class Navigation {
         waitUtility.waitUntilSpinnerHidden();
     }
 
+    public void refreshPage() {
+        page.reload();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
     public void clickSubMenu() {
+        waitUtility.waitForLocatorVisible(SUB_MENU);
         SUB_MENU.click();
     }
 
@@ -135,7 +149,6 @@ public class Navigation {
 
     public void clickScheduledReport() {
         SCHEDULED_REPORT.click();
-
     }
 
     public void clickReportTemplate() {
@@ -145,6 +158,7 @@ public class Navigation {
     public void clickTargetingTemplate() {
         TARGETING_TEMPLATE_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(TARGETING_TEMPLATE_HEADER);
     }
 
     public void clickCampaigns() {
@@ -153,6 +167,7 @@ public class Navigation {
     }
 
     public void clickCreativeLibrary() {
+        waitUtility.waitForLocatorVisible(CREATIVE_LIBRARY_ICON);
         CREATIVE_LIBRARY_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -183,5 +198,12 @@ public class Navigation {
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
+    }
+
+    public void logout() {
+        waitUtility.waitForLocatorVisible(ACCOUNT_NAME);
+        ACCOUNT_NAME.click();
+        LOGOUT_BUTTON.click();
+        waitUtility.waitForLocatorVisible(USERNAME);
     }
 }

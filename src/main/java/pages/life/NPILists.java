@@ -11,7 +11,7 @@ import java.util.List;
 public class NPILists {
     private final Page page;
     private final Locator NPI_LISTS;
-    private final Locator NPI_LISTS_STG;
+    private final Locator NPI_LISTS_HEADER;
     private final Locator CREATE_NPI_LIST;
     private final Locator STATIC_LIST;
     private final Locator AVAILABLE_IN_CHECKBOX;
@@ -28,7 +28,7 @@ public class NPILists {
     public NPILists(Page page) {
         this.page = page;
         this.NPI_LISTS = page.locator("//div[contains(@class, 'menu') and contains(text(),'NPI Lists')]");
-        this.NPI_LISTS_STG = page.getByText("NPI Lists");
+        this.NPI_LISTS_HEADER = page.locator("//span[contains(@class,'header-title') and contains(text(),'NPI Lists')]");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
         this.SEARCH_NPI_LISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
@@ -46,10 +46,11 @@ public class NPILists {
         waitUtility.waitForLocatorVisible(NPI_LISTS);
         NPI_LISTS.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(NPI_LISTS_HEADER);
     }
 
     public void clickNPIListsStg() {
-        NPI_LISTS_STG.click();
+        NPI_LISTS.click();
     }
 
     public void clickCreateNewList() {
@@ -105,6 +106,7 @@ public class NPILists {
         waitUtility.waitForLocatorVisible(CREATE_NEW_LIST);
         SEARCH_BOX.first().fill(listName);
         SEARCH_BOX.first().press("Enter");
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void openSearchedList(String listName) {

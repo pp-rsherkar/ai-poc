@@ -9,7 +9,10 @@ import utils.WaitUtility;
 import java.math.BigDecimal;
 import java.util.*;
 
+
 public class TacticSettings {
+    public final Set<String> SELECTED_TARGET_RULE = new HashSet<>();
+    public final Set<String> SAVED_TARGET_RULE = new HashSet<>();
     public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
     public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
@@ -40,7 +43,7 @@ public class TacticSettings {
     private final Locator GEO_TARGETS_BULK_UPLOAD;
     private final Locator GEO_TARGETS_UPLOAD_BUTTON;
     private final Locator GEO_TARGETS_TEXTBOX;
-    private final Locator AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID;
+    private final Locator BRAND_SAFETY_PROFILE_SEGMENT_ID;
     private final Locator RULE_APP_BUNDLES_LISTS_OPTION;
     private final Locator VIEW_ABILITY_PERCENTAGE_BOX;
     private final Locator KEYWORDS_TEXTBOX;
@@ -65,13 +68,18 @@ public class TacticSettings {
     private final Locator PRACTICE_IP;
     private final Locator TACTIC_MAX_BID_PRICE;
     private final Locator TACTIC_BASE_BID_PRICE;
-    private final Locator VERIFY_TACTIC_NAME;
+    private final Locator TACTIC_NAME;
+    private final Locator DISPLAY_TACTIC_NAME;
     private final Locator SELECTED_TARGET;
     private final Locator BLOCKED_TARGET;
     private final Locator SELECTED_TARGET_HP;
     private final Locator BLOCKED_TARGET_HP;
     private final Locator TARGET;
     private final Locator BLOCK;
+    private final Locator NEW_TACTIC;
+    private final Locator BASE_BID_ERROR;
+    private final Locator CANCEL_BUTTON;
+    private final Locator NPI_TREE_VIEW_NODE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;
@@ -104,7 +112,7 @@ public class TacticSettings {
         this.GEO_TARGETS_BULK_UPLOAD = page.locator("//span[text()='Bulk Upload']");
         this.GEO_TARGETS_UPLOAD_BUTTON = page.locator("//button[normalize-space()='Upload']");
         this.GEO_TARGETS_TEXTBOX = page.locator("//textarea[@id='geotargetedItemsTA']");
-        this.AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID = page.locator("//div[@class='input']/input[@type='text']");
+        this.BRAND_SAFETY_PROFILE_SEGMENT_ID = page.locator("//span[contains(text(),'DoubleVerify Authentic Brand Suitability ID')]/parent::div/following-sibling::div//input[@type='text']");
         this.RULE_APP_BUNDLES_LISTS_OPTION = page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'App Bundles Lists')]");
         this.VIEW_ABILITY_PERCENTAGE_BOX = page.locator("//div[contains(@class, 'rightLabel')]//input[contains(@class, 'form-control-percent-mini-right')]");
         this.KEYWORDS_TEXTBOX = page.locator("//div[contains(@class,'text-area-container')]//textarea");
@@ -129,7 +137,7 @@ public class TacticSettings {
         this.PRACTICE_IP = page.locator("//button[normalize-space(text())='Practice IP']");
         this.TACTIC_MAX_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='maxBidPrice' and @id='maxBidPrice']");
         this.TACTIC_BASE_BID_PRICE = page.locator("//input[@type='text' and @formcontrolname='cost' and @id='maxBod']");
-        this.VERIFY_TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
+        this.TACTIC_NAME = page.locator("#lidcBody div").filter(new Locator.FilterOptions()).first();
         this.SELECTED_ONLY_TAB = page.locator("//span[contains(text(),'Selected Only')]");
         this.BLOCKED_TARGET = page.locator("//div[contains(@class,'danger')]");
         this.SELECTED_TARGET = page.locator("//div[contains(@class,'success')]");
@@ -137,6 +145,11 @@ public class TacticSettings {
         this.BLOCKED_TARGET_HP = page.locator("//div[contains(@class,'targetRed')]");
         this.TARGET = page.locator("//div[contains(@class,'text-target')]");
         this.BLOCK = page.locator("//div[contains(@class,'text-block')]");
+        this.DISPLAY_TACTIC_NAME = page.locator("//div[@class='tactic-main-details']");
+        this.NEW_TACTIC = page.locator("app-icon-lable-link").filter(new Locator.FilterOptions().setHasText("New Tactic")).locator("img");
+        this.BASE_BID_ERROR = page.locator("//div[contains(normalize-space(@aria-label), 'Base Bid Price can not exceed Max Bid Price') or contains(normalize-space(@aria-label), 'Your Account Manager has limited Max Bid')]");
+        this.CANCEL_BUTTON = page.locator("//div[contains(@class,'gaCancel')]");
+        this.NPI_TREE_VIEW_NODE = page.locator("//div[@class='npi-list']//div[contains(@class,'treeviewNode')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -144,6 +157,7 @@ public class TacticSettings {
     }
 
     public void selectChannel(String channel) {
+        page.waitForLoadState(LoadState.LOAD);
         if (SELECT_CHANNEL.isVisible()) {
             SELECT_CHANNEL.click();
             SELECT_CHANNEL.locator("text=" + channel).first().click();
@@ -297,6 +311,7 @@ public class TacticSettings {
                     break;
                 case "Practice Staff":
                     HOUSEHOLD_TAB.click();
+                    waitUtility.waitForLocatorVisible(NPI_TREE_VIEW_NODE.first());
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format("(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'itemWrapper')]//div[contains(@class, 'include-default')])[1]", val);
@@ -388,16 +403,16 @@ public class TacticSettings {
                     }
                     clickRuleTypeOkButton();
                     break;
-                case "Authentic Brand Suitability":
+                case "Brand Safety Profile":
                     String segmentID = ruleValues.get(0);
-                    AUTHENTIC_BRAND_SUITABILITY_SEGMENT_ID.fill(segmentID);
+                    BRAND_SAFETY_PROFILE_SEGMENT_ID.fill(segmentID);
                     page.locator("body").click();
                     clickRuleTypeOkButton();
                     break;
-                case "Brand Safety & Suitability":
+                case "Brand Suitability":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
-                        String xpath = String.format("//mark[contains(text(),'%s')]/ancestor::div[@class='left name-icon ng-star-inserted']/preceding-sibling::div[contains(@class,'custom_checkbox')]", val);
+                        String xpath = String.format("//mark[contains(text(),'%s')]/ancestor::div[contains(@class,'left name-icon')]/preceding-sibling::div[contains(@class,'custom_checkbox')]", val);
                         isElementVisible(xpath);
                     }
                     clickRuleTypeOkButton();
@@ -538,6 +553,10 @@ public class TacticSettings {
         RULE_TYPE_CLOSE.click();
     }
 
+    public void clickCancel() {
+        CANCEL_BUTTON.click();
+    }
+
     public String verifyNPIRule() {
         return VERIFY_NPI.innerText();
     }
@@ -653,9 +672,30 @@ public class TacticSettings {
         return new BigDecimal(TACTIC_MAX_BID_PRICE.evaluate("el => el.value").toString());
     }
 
-    public String verifyTacticName() {
-        return VERIFY_TACTIC_NAME.innerText();
+    public void updateBaseBidPrice(BigDecimal updatedBaseBidPrice) {
+        TACTIC_BASE_BID_PRICE.fill(String.valueOf(updatedBaseBidPrice));
+        SAVE_TACTIC_SETTINGS.click();
     }
 
-}
+    public void updateMaxBidPrice(BigDecimal updatedMaxBidPrice) {
+        TACTIC_MAX_BID_PRICE.fill(String.valueOf(updatedMaxBidPrice));
+        SAVE_TACTIC_SETTINGS.click();
+    }
 
+    public String getBidErrorText() {
+        return BASE_BID_ERROR.innerText();
+    }
+
+    public String getTacticName() {
+        return DISPLAY_TACTIC_NAME.innerText();
+    }
+
+    public String verifyTacticName() {
+        return TACTIC_NAME.innerText();
+    }
+
+
+    public void clickNewTactic() {
+        NEW_TACTIC.click();
+    }
+}

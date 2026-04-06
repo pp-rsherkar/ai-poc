@@ -6,7 +6,11 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import utils.CommonUtils;
+import utils.ConfigReader;
 import utils.WaitUtility;
+
+import java.util.Collections;
 import java.util.List;
 
 public class WorkspaceCreation {
@@ -43,6 +47,12 @@ public class WorkspaceCreation {
     private final Locator REMOVE_WORKSPACE_BUTTON;
     private final Locator DELETE_WORKSPACE_ERROR_TEXT;
     private final Locator WORKSPACE_TYPE_LIST;
+    private final Locator WORKSPACE_ADVERTISER_DROPDOWN;
+    private final Locator WORKSPACE_TYPE;
+    private final Locator WORKSPACE_CREATED_BY_DROPDOWN;
+    private final Locator DROPDOWN_LIST_ITEMS;
+    private final Locator FETCH_WORKSPACE_NAME_FROM_DASHBOARD;
+    private final Locator BACK_ARROW;
     WaitUtility waitUtility;
     int counter = 0;
 
@@ -80,6 +90,12 @@ public class WorkspaceCreation {
         this.REMOVE_WORKSPACE_BUTTON = WORKSPACE_FRAME.locator("//button/div[text()='Remove']");
         this.DELETE_WORKSPACE_ERROR_TEXT = WORKSPACE_FRAME.locator("//p[contains(text(),\"Deletion blocked by Life. Message: This list can't be deleted\")]");
         this.WORKSPACE_TYPE_LIST = WORKSPACE_FRAME.locator("//p[contains(text(),'Workspace Type')]/following-sibling::div//p[not(@color)]");
+        this.WORKSPACE_ADVERTISER_DROPDOWN = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspaces-advertiser-filter']//input");
+        this.WORKSPACE_TYPE = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspaces-types-filter']//div[@role='img']//following-sibling::span");
+        this.WORKSPACE_CREATED_BY_DROPDOWN = WORKSPACE_FRAME.locator("//div[@data-tour-id='workspaces-created-by-filter']//input");
+        this.DROPDOWN_LIST_ITEMS = WORKSPACE_FRAME.locator("//div[@role='dialog']//li//span");
+        this.FETCH_WORKSPACE_NAME_FROM_DASHBOARD = WORKSPACE_FRAME.locator("//td[@role='gridcell' and contains(@id,'workspace_name')]//span");
+        this.BACK_ARROW = WORKSPACE_FRAME.locator("//button[@color='textPrimary']");
     }
 
     public String studioDashboard() {
@@ -87,7 +103,7 @@ public class WorkspaceCreation {
         return this.page.title();
     }
 
-    public List<String> fetchWorkspaceTypes(){
+    public List<String> fetchWorkspaceTypes() {
         return WORKSPACE_TYPE_LIST.allTextContents();
     }
 
@@ -116,11 +132,7 @@ public class WorkspaceCreation {
         }
     }
 
-    public void createStudioWorkspace() {
-        while (!CREATE_WORKSPACE.first().isEnabled()) {
-            MENU_ICON.click();
-            page.keyboard().press("Escape");
-        }
+    public void clickCreateStudioWorkspace() {
         CREATE_WORKSPACE.first().click();
         waitUtility.waitForLocatorVisible(WORKSPACE_TYPE_TITLE);
     }
@@ -128,6 +140,19 @@ public class WorkspaceCreation {
     public void verifyStudioWorkspaceFrame() {
         OUTER_FRAME.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitForStudioWorkspacePage(CREATE_WORKSPACE);
+    }
+
+    private void waitForStudioWorkspacePage(Locator locator) {
+        long startTime = System.currentTimeMillis();
+        long timeout = Long.parseLong(ConfigReader.getProperty("timeout"));
+        while (System.currentTimeMillis() - startTime < timeout) {
+            if (locator.count() > 0 && locator.first().isVisible()) {
+                break;
+            }
+            MENU_ICON.click();
+            page.keyboard().press("Escape");
+        }
     }
 
     public void retryCreateWorkspace(boolean clickFlag) {
@@ -150,8 +175,8 @@ public class WorkspaceCreation {
     }
 
     public void clickMoreActionsMenu(String workspaceName) {
-        if (WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().isVisible())
-            WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().click();
+        waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
+        WORKSPACE_FRAME.locator(String.format("//td[contains(@id,'%s')]//button", workspaceName)).first().click();
     }
 
     public void deleteWorkspace() {
@@ -205,10 +230,7 @@ public class WorkspaceCreation {
     }
 
     public boolean searchWorkspaceName(String workspaceName) {
-        while (!CREATE_WORKSPACE.first().isEnabled()) {
-            MENU_ICON.click();
-            page.keyboard().press("Escape");
-        }
+        waitUtility.waitForLocatorVisible(SEARCH_WORKSPACE);
         page.waitForCondition(() -> SEARCH_WORKSPACE.filter().count() == 1);
         if (WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible()) {
             return true;
@@ -216,6 +238,7 @@ public class WorkspaceCreation {
             SEARCH_WORKSPACE.fill(workspaceName);
             page.keyboard().press("Enter");
             waitUtility.waitForLocatorVisible(PAGINATION.first());
+            waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
             return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
         }
     }
@@ -256,5 +279,73 @@ public class WorkspaceCreation {
         String errorText = DELETE_WORKSPACE_ERROR_TEXT.innerText();
         waitUtility.waitForLocatorHidden(REMOVAL_CONFIRMATION_POPUP);
         return errorText;
+    }
+
+    public void selectWorkspaceType(String workspaceType) {
+        waitForStudioWorkspacePage(WORKSPACE_TYPE);
+        waitUtility.waitForLocatorVisible(WORKSPACE_TYPE.last());
+        CommonUtils.selectAndClickElement(WORKSPACE_TYPE, Collections.singletonList(workspaceType));
+        waitUtility.waitForLocatorVisible(PAGINATION.first());
+    }
+
+    public void selectWorkspaceAdvertiser(String advertiser) {
+        WORKSPACE_ADVERTISER_DROPDOWN.click();
+        waitUtility.waitForLocatorVisible(DROPDOWN_LIST_ITEMS.locator("text = " + advertiser));
+        DROPDOWN_LIST_ITEMS.locator("text=" + advertiser).click();
+        page.keyboard().press("Escape");
+        waitUtility.waitForLocatorVisible(PAGINATION.first());
+    }
+
+    public void selectWorkspaceCreatedBy(String createdBy) {
+        WORKSPACE_CREATED_BY_DROPDOWN.click();
+        waitUtility.waitForLocatorVisible(DROPDOWN_LIST_ITEMS.locator("text = " + createdBy));
+        DROPDOWN_LIST_ITEMS.locator("text=" + createdBy).click();
+        page.keyboard().press("Escape");
+        waitUtility.waitForLocatorVisible(PAGINATION.first());
+    }
+
+    public String fetchWorkspaceNameFromDashboard() {
+        return FETCH_WORKSPACE_NAME_FROM_DASHBOARD.first().textContent().trim();
+    }
+
+    public void searchByWorkspaceName(String workspaceName) {
+        SEARCH_WORKSPACE.fill(workspaceName);
+        page.keyboard().press("Enter");
+        waitUtility.waitForLocatorVisible(PAGINATION.first());
+        waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
+    }
+
+    public void clickBackArrowFromCreateNewWorkspace() {
+        BACK_ARROW.click();
+        CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        waitUtility.waitForLocatorVisible(PAGINATION.first());
+    }
+
+    public String getSelectedWorkspaceType() {
+        Locator locator = WORKSPACE_TYPE.locator("xpath=/ancestor::label/preceding-sibling::div//input");
+        for (int i = 0; i < WORKSPACE_TYPE.count(); i++) {
+            if (locator.nth(i).getAttribute("aria-checked").equals("true")) {
+                return WORKSPACE_TYPE.nth(i).innerText();
+            }
+        }
+        return "";
+    }
+
+    public String getSelectedWorkspaceAdvertiser() {
+        return WORKSPACE_ADVERTISER_DROPDOWN.getAttribute("value").trim();
+    }
+
+    public String getSelectedWorkspaceCreatedBy() {
+        return WORKSPACE_CREATED_BY_DROPDOWN.getAttribute("value").trim();
+    }
+
+    public String getSearchedWorkspaceName() {
+        return SEARCH_WORKSPACE.getAttribute("value").trim();
+    }
+
+    public void refreshPage() {
+        page.reload();
+        waitUtility.waitForLocatorVisible(CREATE_WORKSPACE.first());
+        waitUtility.waitForLocatorVisible(PAGINATION.first());
     }
 }

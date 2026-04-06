@@ -15,9 +15,21 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateCreatives {
-    private final Page page;
-    Page newTab;
     public final Locator CLICK_THROUGH_URL;
+    public final Locator ADVERTISER_DSA;
+    public final Locator FINANCER;
+    public final Locator SELECTED_AD_CHOICES_ICON;
+    public final Locator CREATIVE_WIDTH_TYPE;
+    public final Locator CREATIVE_STATUS_FROM_CREATIVE_TILE;
+    public final Locator CREATED_BY_FROM_CREATIVE_TILE;
+    public final Locator SOURCE_FROM_CREATIVE_TILE;
+    public final Locator LAST_UPDATED_FROM_CREATIVE_TILE;
+    public final Locator ASSOCIATIONS_TAB;
+    public final Locator COLUMN_SELECTION_ICON;
+    public final Locator COLUMN_NAME_FROM_SELECTION_ICON;
+    public final Locator ASSOCIATIONS_TAB_COLUMN_NAME;
+    public final Locator MENU_BUTTONS_FROM_ASSOCIATION_ICON;
+    private final Page page;
     private final Locator CREATIVE_PAGE_TITLE;
     private final Locator UNARCHIVED_BUTTON;
     private final Locator ENABLED_ARCHIVED_BUTTON;
@@ -42,8 +54,6 @@ public class CreateCreatives {
     private final Locator ADVERTISER_DROPDOWN;
     private final Locator ADVERTISER_DROPDOWN_VALUES;
     private final Locator CREATIVE_NAME;
-    public final Locator ADVERTISER_DSA;
-    public final Locator FINANCER;
     private final Locator CREATIVE_TYPE;
     private final Locator CREATIVE_HTML_CODE;
     private final Locator MACROS_CHECKBOX;
@@ -96,14 +106,23 @@ public class CreateCreatives {
     private final Locator PREVIEW_LINK;
     private final Locator UPLOADING_PROGRESS_BAR;
     private final Locator UPLOAD_DELETE_ICON;
-    public final Locator SELECTED_AD_CHOICES_ICON;
-    public final Locator CREATIVE_WIDTH_TYPE;
     private final Locator DOMAIN_LANDING_FROM_CREATIVE_TILE;
     private final Locator ADSIZE_FROM_CREATIVE_TILE;
-    public final Locator CREATIVE_STATUS_FROM_CREATIVE_TILE;
-    public final Locator CREATED_BY_FROM_CREATIVE_TILE;
-    public final Locator SOURCE_FROM_CREATIVE_TILE;
-    public final Locator LAST_UPDATED_FROM_CREATIVE_TILE;
+    private final Locator FILTER_ICON;
+    private final Locator NO_FILTER_TEXT;
+    private final Locator FILTER_BUTTONS;
+    private final Locator SELECTED_FILTER_NAME;
+    private final Locator FILTER_VALUE;
+    private final Locator FILTER_START_DATE;
+    private final Locator FILTER_END_DATE;
+    private final Locator ASSOCIATIONS_TAB_LINE_ITEM_NAME;
+    private final Locator ASSOCIATIONS_TAB_CAMPAIGN_NAME;
+    private final Locator FILTERED_RECORD_COUNT;
+    private final Locator CALENDAR_TITLE;
+    private final Locator CALENDAR_MONTH;
+    private final Locator CALENDAR_DATE;
+    private final Locator LINE_ITEM_PAGE_TITLE;
+    Page newTab;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     String imageTextLocator = "//span[contains(text(),'%s')]";
 
@@ -196,10 +215,30 @@ public class CreateCreatives {
         this.CREATED_BY_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Created by :')]/following-sibling::span");
         this.SOURCE_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Source:')]/following-sibling::span");
         this.LAST_UPDATED_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Last updated:')]/following-sibling::span");
+        this.ASSOCIATIONS_TAB = page.locator("//div[@class='creativeContainer']//a[contains(text(),'Associations')]");
+        this.COLUMN_SELECTION_ICON = page.locator("//span[@class='icon-bars']");
+        this.COLUMN_NAME_FROM_SELECTION_ICON = page.locator("//span[@class='icon-bars']/following-sibling::div//div[contains(@class,'item')]");
+        this.ASSOCIATIONS_TAB_COLUMN_NAME = page.locator("//div[@class='filter-container']");
+        this.MENU_BUTTONS_FROM_ASSOCIATION_ICON = page.locator("//div[@class='menuButtons']/button[contains(@class,'button small')]");
+        this.FILTER_ICON = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link");
+        this.NO_FILTER_TEXT = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//p");
+        this.FILTER_BUTTONS = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//button");
+        this.SELECTED_FILTER_NAME = page.locator("//table[contains(@class,'filterTable')]//div[@class='text']");
+        this.FILTER_VALUE = page.locator("//input[@value='Enter Value']");
+        this.FILTER_START_DATE = page.locator("//td[not(@hidden)]//input[contains(@placeholder,'Start Date')]");
+        this.FILTER_END_DATE = page.locator("//td[not(@hidden)]//input[contains(@placeholder,'End Date')]");
+        this.ASSOCIATIONS_TAB_LINE_ITEM_NAME = page.locator("//td[contains(@class,'gaTableRow creativeNames')]");
+        this.ASSOCIATIONS_TAB_CAMPAIGN_NAME = page.locator("//td[contains(@class,'multiline-wrapper')]//div[contains(@class,'ellipsediv')]");
+        this.FILTERED_RECORD_COUNT = page.locator("//td[contains(@class,'total-record-counts')]");
+        this.CALENDAR_TITLE = page.locator("//sui-calendar-view-title//span[@class='title link']");
+        this.CALENDAR_MONTH = page.locator("//sui-calendar-month-view//tbody//td");
+        this.CALENDAR_DATE = page.locator("//sui-calendar-date-view//tbody//td");
+        this.LINE_ITEM_PAGE_TITLE = page.locator("//div[contains(@class,'lineitem-name')]");
     }
 
     public String verifyCreativeLibraryPageTitle() {
         waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_PAGE_TITLE);
         return CREATIVE_PAGE_TITLE.innerText().trim();
     }
 
@@ -232,7 +271,7 @@ public class CreateCreatives {
 
     public String clickArchiveButton() {
         String text = "";
-        if(CREATIVE_NAME_LIST.first().isVisible()){
+        if (CREATIVE_NAME_LIST.first().isVisible()) {
             text = CREATIVE_NAME_LIST.first().textContent().trim();
         }
         Locator archiveXpath = page.locator(String.format("//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='archive']", text));
@@ -243,7 +282,7 @@ public class CreateCreatives {
 
     public String clickUnarchiveButton() {
         String text = "";
-        if(CREATIVE_NAME_LIST.first().isVisible()){
+        if (CREATIVE_NAME_LIST.first().isVisible()) {
             text = CREATIVE_NAME_LIST.first().textContent().trim();
         }
         Locator archiveXpath = page.locator(String.format("//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='unarchive']", text));
@@ -323,26 +362,20 @@ public class CreateCreatives {
         SORT_DROPDOWN.click();
         return switch (column) {
             case "Name" -> {
-                if (ascending)
-                    SORT_BY_NAME_ASC.click();
-                else
-                    SORT_BY_NAME_DESC.click();
+                if (ascending) SORT_BY_NAME_ASC.click();
+                else SORT_BY_NAME_DESC.click();
                 waitUtility.waitUntilPreLoaderHidden();
                 yield isColumnOrderCorrect(CREATIVE_NAME_LIST, column, ascending);
             }
             case "ID" -> {
-                if (ascending)
-                    SORT_BY_ID_ASC.click();
-                else
-                    SORT_BY_ID_DESC.click();
+                if (ascending) SORT_BY_ID_ASC.click();
+                else SORT_BY_ID_DESC.click();
                 waitUtility.waitUntilPreLoaderHidden();
                 yield isColumnOrderCorrect(CREATIVE_ID_LIST, column, ascending);
             }
             case "Last Updated" -> {
-                if (ascending)
-                    SORT_BY_LAST_UPDATED_ASC.click();
-                else
-                    SORT_BY_LAST_UPDATED_DESC.click();
+                if (ascending) SORT_BY_LAST_UPDATED_ASC.click();
+                else SORT_BY_LAST_UPDATED_DESC.click();
                 waitUtility.waitUntilPreLoaderHidden();
                 yield isColumnOrderCorrect(CREATIVE_LAST_UPDATED_LIST, column, ascending);
             }
@@ -352,15 +385,15 @@ public class CreateCreatives {
 
     public boolean isColumnOrderCorrect(Locator creativeListType, String columnType, boolean ascending) {
         List<String> values = creativeListType.allTextContents().stream().map(text -> {
-                    text = text.trim();
-                    if (columnType.equals("Name") && text.contains("|")) {
-                        String[] parts = text.split("\\|");
-                        if (parts.length > 5) {
-                            return parts[5].trim();
-                        }
-                    }
-                    return text;
-                }).toList();
+            text = text.trim();
+            if (columnType.equals("Name") && text.contains("|")) {
+                String[] parts = text.split("\\|");
+                if (parts.length > 5) {
+                    return parts[5].trim();
+                }
+            }
+            return text;
+        }).toList();
 
         for (int i = 0; i < values.size() - 1; i++) {
             boolean valid = false;
@@ -387,7 +420,7 @@ public class CreateCreatives {
     }
 
     public boolean checkSearchedValue(String searchValue) {
-        Locator[] locators = { CREATIVE_NAME_LIST, CREATIVE_ID_LIST, CREATIVE_AD_SIZE_LIST, CREATIVE_SOURCE_LIST};
+        Locator[] locators = {CREATIVE_NAME_LIST, CREATIVE_ID_LIST, CREATIVE_AD_SIZE_LIST, CREATIVE_SOURCE_LIST};
         for (Locator locator : locators) {
             if (locator.filter(new Locator.FilterOptions().setHasText(searchValue)).count() > 0) {
                 return true;
@@ -396,13 +429,11 @@ public class CreateCreatives {
         return false;
     }
 
-
     public void searchCreative(String searchValue) {
         SEARCH_BOX.fill(searchValue);
         page.keyboard().press("Enter");
         waitUtility.waitUntilPreLoaderHidden();
-        if(CREATIVE_NAME_LIST.last().isVisible())
-            waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+        if (CREATIVE_NAME_LIST.last().isVisible()) waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
     public void clearSearchBox() {
@@ -421,7 +452,7 @@ public class CreateCreatives {
     }
 
     public void clickSearchedCreative(String creativeName) {
-        for(int i=0; i<CREATIVE_NAME_LIST.count(); i++) {
+        for (int i = 0; i < CREATIVE_NAME_LIST.count(); i++) {
             if (CREATIVE_NAME_LIST.nth(i).textContent().equalsIgnoreCase(creativeName)) {
                 CREATIVE_NAME_LIST.nth(i).click();
                 page.waitForTimeout(2000);
@@ -494,12 +525,11 @@ public class CreateCreatives {
                     } else {
                         waitUtility.waitUntilSpinnerHidden();
                     }
-                }
-                else if (type.contains("Audio URL") || type.contains("Video URL")) URL.fill(attributeMap.get("URL"));
+                } else if (type.contains("Audio URL") || type.contains("Video URL")) URL.fill(attributeMap.get("URL"));
                 else if (type.contains("VAST URL")) URL.fill(attributeMap.get("VASTURL"));
                 else VAST_XML_TEXTAREA.fill(attributeMap.get("VASTXML"));
                 if (type.contains("Audio URL") || type.contains("Video URL") || type.contains("VAST URL") || type.contains("VAST XML")) {
-                    if(CREATIVE_WIDTH_TYPE.first().isVisible()) {
+                    if (CREATIVE_WIDTH_TYPE.first().isVisible()) {
                         CommonUtils.selectAndClickElement(CREATIVE_TYPE_ICON, Collections.singletonList(attributeMap.get("Type")));
                     }
                     DURATION.fill(attributeMap.get("Durations"));
@@ -559,7 +589,7 @@ public class CreateCreatives {
         return locator.innerText().equalsIgnoreCase(name);
     }
 
-    public String fetchRecordsNumberAfterSearch(){
+    public String fetchRecordsNumberAfterSearch() {
         return page.locator("//div[contains(@class,'total-record')]").textContent().trim();
     }
 
@@ -592,8 +622,8 @@ public class CreateCreatives {
         waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
-    public void navigateToNextCreativePage(){
-        if(PAGINATION_NEXT_BUTTON.locator("xpath=./parent::button").getAttribute("class").contains("disabledButton")){
+    public void navigateToNextCreativePage() {
+        if (PAGINATION_NEXT_BUTTON.locator("xpath=./parent::button").getAttribute("class").contains("disabledButton")) {
             return;
         }
         PAGINATION_NEXT_BUTTON.click();
@@ -601,9 +631,9 @@ public class CreateCreatives {
         waitUtility.waitForLocatorVisible(page.locator("//td[contains(normalize-space(.), 'of')]"));
     }
 
-    public void navigateToFirstCreativePage(){
+    public void navigateToFirstCreativePage() {
         Locator pageLocator = page.locator("//td[contains(normalize-space(.), 'of')]");
-        while(!pageLocator.textContent().trim().contains("1 of")){
+        while (!pageLocator.textContent().trim().contains("1 of")) {
             PAGINATION_PREVIOUS_BUTTON.click();
             waitUtility.waitUntilPreLoaderHidden();
         }
@@ -616,56 +646,47 @@ public class CreateCreatives {
     public List<String> fetchCreativeDetails() {
         List<String> creativeDetails = new ArrayList<>();
         creativeDetails.add(ADVERTISER_DROPDOWN.locator("xpath = ./following-sibling::span").textContent().trim());
-        if(CREATIVE_NAME.isVisible())
-            creativeDetails.add(CREATIVE_NAME.inputValue().trim());
-        for(int i=0; i<APPROVAL_STATUS_BUTTON.count(); i++){
-            if(APPROVAL_STATUS_BUTTON.nth(i).getAttribute("class").contains("active")){
+        if (CREATIVE_NAME.isVisible()) creativeDetails.add(CREATIVE_NAME.inputValue().trim());
+        for (int i = 0; i < APPROVAL_STATUS_BUTTON.count(); i++) {
+            if (APPROVAL_STATUS_BUTTON.nth(i).getAttribute("class").contains("active")) {
                 creativeDetails.add(APPROVAL_STATUS_BUTTON.nth(i).textContent().trim());
                 break;
             }
         }
         creativeDetails.add(ADVERTISER_DSA.inputValue().trim());
         creativeDetails.add(FINANCER.inputValue().trim());
-        for(int i=0; i<CREATIVE_TYPE.count(); i++){
-            if(CREATIVE_TYPE.locator("xpath = ./parent::div").nth(i).getAttribute("class").contains("active")){
+        for (int i = 0; i < CREATIVE_TYPE.count(); i++) {
+            if (CREATIVE_TYPE.locator("xpath = ./parent::div").nth(i).getAttribute("class").contains("active")) {
                 creativeDetails.add(CREATIVE_TYPE.nth(i).textContent().trim());
                 break;
             }
         }
-        for(int i=0; i<CREATIVE_FREQUENCY_OPTIONS.count(); i++){
-            if(CREATIVE_FREQUENCY_OPTIONS.nth(i).getAttribute("class").contains("active")){
+        for (int i = 0; i < CREATIVE_FREQUENCY_OPTIONS.count(); i++) {
+            if (CREATIVE_FREQUENCY_OPTIONS.nth(i).getAttribute("class").contains("active")) {
                 creativeDetails.add(CREATIVE_FREQUENCY_OPTIONS.nth(i).textContent().trim());
                 break;
             }
         }
-        if(SELECTED_AD_SIZE.isVisible())
-            creativeDetails.add(SELECTED_AD_SIZE.textContent().trim());
-        if(CLICK_THROUGH_URL.isVisible() && CLICK_THROUGH_URL.isEnabled())
+        if (SELECTED_AD_SIZE.isVisible()) creativeDetails.add(SELECTED_AD_SIZE.textContent().trim());
+        if (CLICK_THROUGH_URL.isVisible() && CLICK_THROUGH_URL.isEnabled())
             creativeDetails.add(CLICK_THROUGH_URL.inputValue().trim());
-        if(DOMAIN_LANDING.isVisible())
-            creativeDetails.add(DOMAIN_LANDING.inputValue().trim());
-        if(DURATION.isVisible()) {
+        if (DOMAIN_LANDING.isVisible()) creativeDetails.add(DOMAIN_LANDING.inputValue().trim());
+        if (DURATION.isVisible()) {
             String duration = DURATION.inputValue();
             creativeDetails.add((duration == null || duration.trim().isEmpty()) ? "0" : duration.trim());
         }
-        if(SELECTED_IAB_CATEGORY.first().isVisible())
+        if (SELECTED_IAB_CATEGORY.first().isVisible())
             creativeDetails.add(SELECTED_IAB_CATEGORY.first().textContent().trim());
-        if(HEIGHT.isVisible() && WIDTH.isVisible()) {
+        if (HEIGHT.isVisible() && WIDTH.isVisible()) {
             creativeDetails.add(HEIGHT.inputValue().trim());
             creativeDetails.add(WIDTH.inputValue().trim());
         }
-        if(HEADLINE.isVisible())
-            creativeDetails.add(HEADLINE.inputValue().trim());
-        if(SPONSORED_BY.isVisible())
-            creativeDetails.add(SPONSORED_BY.inputValue().trim());
-        if(DESCRIPTION.isVisible())
-            creativeDetails.add(DESCRIPTION.inputValue().trim());
-        if(PRODUCT_DESCRIPTION.isVisible())
-            creativeDetails.add(PRODUCT_DESCRIPTION.inputValue().trim());
-        if(SELECTED_AD_CHOICES_ICON.isVisible())
-            creativeDetails.add(SELECTED_AD_CHOICES_ICON.textContent().trim());
-        if(DISPLAY_URL.isVisible())
-            creativeDetails.add(DISPLAY_URL.inputValue().trim());
+        if (HEADLINE.isVisible()) creativeDetails.add(HEADLINE.inputValue().trim());
+        if (SPONSORED_BY.isVisible()) creativeDetails.add(SPONSORED_BY.inputValue().trim());
+        if (DESCRIPTION.isVisible()) creativeDetails.add(DESCRIPTION.inputValue().trim());
+        if (PRODUCT_DESCRIPTION.isVisible()) creativeDetails.add(PRODUCT_DESCRIPTION.inputValue().trim());
+        if (SELECTED_AD_CHOICES_ICON.isVisible()) creativeDetails.add(SELECTED_AD_CHOICES_ICON.textContent().trim());
+        if (DISPLAY_URL.isVisible()) creativeDetails.add(DISPLAY_URL.inputValue().trim());
         return creativeDetails;
     }
 
@@ -678,25 +699,19 @@ public class CreateCreatives {
         return switch (key) {
             case "Creative Status" -> {
                 CREATIVE_STATUS.click();
-                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
-                        .map(String::trim)
-                        .toList();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream().map(String::trim).toList();
                 page.keyboard().press("Escape");
                 yield values;
             }
             case "Ad Sizes" -> {
                 SELECT_AD_SIZE.click();
-                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
-                        .map(String::trim)
-                        .toList();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream().map(String::trim).toList();
                 page.keyboard().press("Escape");
                 yield values;
             }
             case "Creative Type" -> {
                 SELECT_CREATIVE_TYPE.click();
-                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
-                        .map(String::trim)
-                        .toList();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream().map(String::trim).toList();
                 page.keyboard().press("Escape");
                 yield values;
             }
@@ -704,11 +719,11 @@ public class CreateCreatives {
         };
     }
 
-    public String selectCheckboxWithArchiveButton(){
+    public String selectCheckboxWithArchiveButton() {
         return clickCheckboxAndFetchCreativeName(ENABLED_ARCHIVED_BUTTON);
     }
 
-    public String selectCheckboxWithCreativeStatusLabel(){
+    public String selectCheckboxWithCreativeStatusLabel() {
         return clickCheckboxAndFetchCreativeName(CREATIVE_STATUS_LABEL);
     }
 
@@ -731,25 +746,25 @@ public class CreateCreatives {
         return text;
     }
 
-    public void clickPreviewLinkFromCreativeDetailsPage(){
+    public void clickPreviewLinkFromCreativeDetailsPage() {
         newTab = DriverFactory.getContext().waitForPage(PREVIEW_LINK::click);
         newTab.waitForLoadState();
         newTab.bringToFront();
         DriverFactory.threadLocalDriver.set(newTab);
     }
 
-    public void checkIfCreativeIsPresent(Locator locator){
-        while(locator.count() == 0) {
+    public void checkIfCreativeIsPresent(Locator locator) {
+        while (locator.count() == 0) {
             PAGINATION_NEXT_BUTTON.click();
             waitUtility.waitUntilPreLoaderHidden();
             waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
         }
     }
 
-    public String clickCheckboxAndFetchCreativeName(Locator locator){
+    public String clickCheckboxAndFetchCreativeName(Locator locator) {
         checkIfCreativeIsPresent(locator);
-        for(int i = 0; i< locator.count(); i++){
-            if(locator.nth(i).isVisible()){
+        for (int i = 0; i < locator.count(); i++) {
+            if (locator.nth(i).isVisible()) {
                 Locator checkBoxLocator = locator.nth(i).locator("xpath=.//ancestor::div[contains(@class,'content-section')]/preceding-sibling::div//sui-checkbox");
                 String checkboxClass = checkBoxLocator.getAttribute("class");
                 if (checkboxClass != null && checkboxClass.contains("checked")) {
@@ -767,10 +782,9 @@ public class CreateCreatives {
     }
 
     public void selectBulkActionsOption(String bulkAssign) {
-        if(bulkAssign.contains("Bulk Assign") || bulkAssign.contains("Bulk Edit"))
+        if (bulkAssign.contains("Bulk Assign") || bulkAssign.contains("Bulk Edit"))
             BULK_ACTIONS_BUTTON.locator("xpath=//div//a//div[normalize-space(.)='" + bulkAssign + "']").click();
-        else
-            BULK_ACTIONS_BUTTON.locator("xpath=//div//a[normalize-space(.)='" + bulkAssign + "']").click();
+        else BULK_ACTIONS_BUTTON.locator("xpath=//div//a[normalize-space(.)='" + bulkAssign + "']").click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
@@ -783,8 +797,8 @@ public class CreateCreatives {
         }
         Collections.shuffle(indices);
         int selectCount = Math.min(10, count);
-        for(int i = 0; i< selectCount; i++){
-            if(BULK_ASSIGN_CHECKBOX.nth(i).isVisible()){
+        for (int i = 0; i < selectCount; i++) {
+            if (BULK_ASSIGN_CHECKBOX.nth(i).isVisible()) {
                 BULK_ASSIGN_CHECKBOX.nth(i).click();
             }
         }
@@ -802,9 +816,9 @@ public class CreateCreatives {
 
     public String deleteCreative() {
         String text = "";
-        if(DELETE_ICON.getAttribute("class").contains("disabled"))
+        if (DELETE_ICON.getAttribute("class").contains("disabled"))
             text = "Delete icon is disabled, cannot delete the creative.";
-        else{
+        else {
             DELETE_ICON.click();
             waitUtility.waitForLocatorVisible(REMOVAL_CONFIRMATION_POP_UP);
             text = REMOVAL_CONFIRMATION_TEXT.textContent().trim();
@@ -818,19 +832,18 @@ public class CreateCreatives {
         return NO_CREATIVE_FOUND_MESSAGE.textContent().trim();
     }
 
-    public void selectCreativeStatus(List<String> statusList){
+    public void selectCreativeStatus(List<String> statusList) {
         selectDropdownAndFill(CREATIVE_STATUS, statusList);
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
-    public boolean performBulkApproval(){
+    public boolean performBulkApproval() {
         boolean flag = false;
         waitUtility.waitForLocatorVisible(APPROVE_ALL_BUTTON);
         APPROVE_ALL_BUTTON.click();
-        for(int i=0; i<APPROVED_BUTTON.count(); i++) {
-            if (APPROVED_BUTTON.nth(i).getAttribute("class").contains("active"))
-                flag = true;
+        for (int i = 0; i < APPROVED_BUTTON.count(); i++) {
+            if (APPROVED_BUTTON.nth(i).getAttribute("class").contains("active")) flag = true;
         }
         OK_BUTTON.click();
         page.waitForTimeout(2000);
@@ -839,7 +852,7 @@ public class CreateCreatives {
         return flag;
     }
 
-    public String fetchCreativeStatusLabel(){
+    public String fetchCreativeStatusLabel() {
         return CREATIVE_STATUS_LABEL.first().textContent().trim();
     }
 
@@ -866,15 +879,128 @@ public class CreateCreatives {
         return creativeDetails;
     }
 
-    public String fetchCreatedByFromCreativeTile(){
+    public String fetchCreatedByFromCreativeTile() {
         return CREATED_BY_FROM_CREATIVE_TILE.textContent().trim();
     }
 
-    public String fetchSourceFromCreativeTile(){
+    public String fetchSourceFromCreativeTile() {
         return SOURCE_FROM_CREATIVE_TILE.textContent().trim();
     }
 
-    public String fetchLastUpdatedTimeFromCreativeTile(){
+    public String fetchLastUpdatedTimeFromCreativeTile() {
         return LAST_UPDATED_FROM_CREATIVE_TILE.textContent().trim();
+    }
+
+    public void clickAssociationTab() {
+        ASSOCIATIONS_TAB.click();
+    }
+
+    public void clickColumnSelectionIcon() {
+        if (!COLUMN_NAME_FROM_SELECTION_ICON.first().isVisible()) COLUMN_SELECTION_ICON.click();
+    }
+
+    public List<String> fetchColumnNamesFromSelectionIconList() {
+        List<String> columnNames = new ArrayList<>();
+        for (int i = 0; i < COLUMN_NAME_FROM_SELECTION_ICON.count(); i++) {
+            columnNames.add(COLUMN_NAME_FROM_SELECTION_ICON.nth(i).textContent().trim());
+        }
+        return columnNames;
+    }
+
+    public void deselectColumnNamesFromSelectionIconList(List<String> unselectedColumnNames) {
+        for (String columnName : unselectedColumnNames) {
+            for (int i = 0; i < COLUMN_NAME_FROM_SELECTION_ICON.count(); i++) {
+                if (COLUMN_NAME_FROM_SELECTION_ICON.nth(i).textContent().trim().equalsIgnoreCase(columnName)) {
+                    COLUMN_NAME_FROM_SELECTION_ICON.nth(i).click();
+                    break;
+                }
+            }
+        }
+        page.keyboard().press("Escape");
+    }
+
+    public List<String> fetchColumnNamesFromAssociationsTab() {
+        List<String> columnNames = new ArrayList<>();
+        for (int i = 0; i < ASSOCIATIONS_TAB_COLUMN_NAME.count(); i++) {
+            Locator columnHeader = ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).locator("xpath=./parent::th");
+            if (columnHeader.getAttribute("hidden") == null)
+                columnNames.add(ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).textContent().trim());
+        }
+        return columnNames;
+    }
+
+    public void clickMenuButtonFromColumnSelection(String buttonName) {
+        for (int i = 0; i < MENU_BUTTONS_FROM_ASSOCIATION_ICON.count(); i++) {
+            if (MENU_BUTTONS_FROM_ASSOCIATION_ICON.nth(i).textContent().trim().equalsIgnoreCase(buttonName)) {
+                MENU_BUTTONS_FROM_ASSOCIATION_ICON.nth(i).click();
+                break;
+            }
+        }
+    }
+
+    public void clickFilterIcon() {
+        FILTER_ICON.click();
+    }
+
+    public List<String> fetchFilterFields() {
+        List<String> filterFields = new ArrayList<>();
+        filterFields.add(NO_FILTER_TEXT.textContent().trim());
+        for (int i = 0; i < FILTER_BUTTONS.count(); i++) {
+            filterFields.add(FILTER_BUTTONS.nth(i).textContent().trim());
+        }
+        return filterFields;
+    }
+
+    public void clickFilterButton(String buttonName) {
+        FILTER_BUTTONS.getByText(buttonName).scrollIntoViewIfNeeded();
+        FILTER_BUTTONS.getByText(buttonName).click();
+    }
+
+    public void selectFilterName(String name) {
+        for (int i = 0; i < SELECTED_FILTER_NAME.count(); i++) {
+            String text = SELECTED_FILTER_NAME.nth(i).textContent().trim();
+            if (text.equalsIgnoreCase(name)) {
+                return;
+            }
+        }
+    }
+
+    public String fetchLineItemFromAssociation() {
+        return ASSOCIATIONS_TAB_LINE_ITEM_NAME.first().textContent().trim();
+    }
+
+    public String fetchCampaignFromAssociation() {
+        return ASSOCIATIONS_TAB_CAMPAIGN_NAME.first().textContent().trim();
+    }
+
+    public void enterFilterValue(String name) {
+        for (int i = 0; i < FILTER_VALUE.count(); i++) {
+            if (FILTER_VALUE.nth(i).inputValue().isEmpty()) FILTER_VALUE.nth(i).fill(name);
+        }
+    }
+
+    public void enterDates() {
+        FILTER_START_DATE.click();
+        CALENDAR_TITLE.click();
+        CALENDAR_MONTH.getByText("Jan").click();
+        CALENDAR_DATE.getByText("1", new Locator.GetByTextOptions().setExact(true)).first().click();
+
+        FILTER_END_DATE.click();
+        CALENDAR_TITLE.click();
+        CALENDAR_MONTH.getByText("Dec").scrollIntoViewIfNeeded();
+        CALENDAR_MONTH.getByText("Dec").click();
+        CALENDAR_DATE.getByText("31", new Locator.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
+        CALENDAR_DATE.getByText("31", new Locator.GetByTextOptions().setExact(true)).first().click();
+    }
+
+    public String fetchFilteredRecordsCount() {
+        waitUtility.waitUntilSpinnerHidden();
+        return FILTERED_RECORD_COUNT.textContent().trim();
+    }
+
+    public String clickLineItemName(String lineItemName) {
+        page.locator(String.format("//div[contains(@title,'%s')]", lineItemName)).click();
+        waitUtility.waitForLocatorVisible(LINE_ITEM_PAGE_TITLE);
+        return LINE_ITEM_PAGE_TITLE.textContent().trim();
     }
 }

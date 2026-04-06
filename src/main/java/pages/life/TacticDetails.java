@@ -2,7 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
@@ -53,9 +53,13 @@ public class TacticDetails {
     private final Locator TACTIC_REMOVE_BUTTON;
     private final Locator EXIT_BULK_MODE;
     private final Locator ENABLE_TACTIC;
+    private final Locator DISABLE_TACTIC;
     private final Locator BULK_ACTION;
     private final Locator TACTIC_GLOBAL_SEARCH_TEXT;
     private final Locator TACTIC_TAB;
+    private final Locator CLOSE_GLOBAL_SEARCH;
+    private final Locator OPEN_GLOBAL_SEARCH;
+    private final Locator GLOBAL_SEARCH_INPUT_FIELD;
     private final Locator HEADER_COMMENT;
     private final Locator NAVIGATION_COMMENT;
     private final Locator COMMENT_TEXT_BOX;
@@ -111,10 +115,14 @@ public class TacticDetails {
         this.TACTIC_OPTIONS = page.locator("//div[contains(@class, 'tactic-app-action')]//span[@title='options']");
         this.TACTIC_DELETE_BUTTON = page.getByText("Delete");
         this.TACTIC_REMOVE_BUTTON = page.getByText("Remove");
-        this.EXIT_BULK_MODE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit Bulk edit mode"));
+        this.EXIT_BULK_MODE = page.locator("//button[normalize-space()='Exit Bulk edit mode']");
         this.ENABLE_TACTIC = page.locator("//div[@class='bulk-icon addBulkOpActive']").first();
-        this.BULK_ACTION = page.locator(".pointer.inlineDiv.iconSprite").first();
-        this.TACTIC_GLOBAL_SEARCH_TEXT = page.getByText("Nothing found...");
+        this.DISABLE_TACTIC = page.locator("//div[contains(text(),'Disable Tactics')]");
+        this.BULK_ACTION = page.locator("//span[@class='pointer inlineDiv iconSprite bulkEdit']");
+        this.TACTIC_GLOBAL_SEARCH_TEXT = page.locator("//div[contains(text(),'Nothing found...')]");
+        this.CLOSE_GLOBAL_SEARCH = page.locator("//div[@class='ui image close-white-40 pointer']");
+        this.OPEN_GLOBAL_SEARCH = page.locator("//div[@class='iconSprite search-overlay-lens']");
+        this.GLOBAL_SEARCH_INPUT_FIELD = page.locator("//input[@id='global_search_input']");
         this.HEADER_COMMENT = page.locator("//div[@class='notes-dashboard left']");
         this.NAVIGATION_COMMENT = page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
         this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
@@ -128,6 +136,7 @@ public class TacticDetails {
     public Locator customFieldValue(String customFieldName) {
         return page.locator(String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
     }
+
     public List<String> getAllTactics() {
         return SAVED_TACTICS.allInnerTexts();
     }
@@ -224,6 +233,7 @@ public class TacticDetails {
     }
 
     public void clickTargetingRuleIcon() {
+        waitUtility.waitForLocatorVisible(TARGETING_RULES_ICON);
         TARGETING_RULES_ICON.click();
     }
 
@@ -260,6 +270,7 @@ public class TacticDetails {
             Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
             labelCountMapList.add(labelCountMap);
             saveTacticDetails();
+            tacticDetailsSuccess();
         }
         ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
         labelCountMapList.sort(Comparator.comparing(Object::toString));
@@ -307,9 +318,15 @@ public class TacticDetails {
     }
 
     private void createTactic(String tacticName) {
-        enterTacticName(tacticName);
-        saveTacticDetails();
-        waitUtility.waitUntilSpinnerHidden();
+        try {
+            enterTacticName(tacticName);
+            saveTacticDetails();
+            waitUtility.waitUntilSpinnerHidden();
+            tacticDetailsSuccess();
+        } catch (PlaywrightException e) {
+            saveTacticDetails();
+            tacticDetailsSuccess();
+        }
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
@@ -361,7 +378,9 @@ public class TacticDetails {
         return tacticCreatives.verifyCreativeAssigned(CreativeName);
     }
 
-    public void deleteTactic() {
+    public void deleteTactic(String tacticName) {
+        Locator tacticNameXpath = page.getByText(tacticName);
+        tacticNameXpath.click();
         TACTIC_OPTIONS.click();
         TACTIC_DELETE_BUTTON.click();
         TACTIC_REMOVE_BUTTON.click();
@@ -375,18 +394,52 @@ public class TacticDetails {
         EXIT_BULK_MODE.click();
     }
 
+    public void bulkDisableTactics(String tacticName) {
+        Locator tacticNameXpath = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']/ancestor::div[contains(@class,'tactic-list')]/preceding-sibling::div/sui-checkbox", tacticName));
+        BULK_ACTION.click();
+        tacticNameXpath.click();
+        DISABLE_TACTIC.click();
+        EXIT_BULK_MODE.click();
+    }
+
     public boolean getToggleClass(String tacticName) {
         Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
         return TACTIC_TOGGLE_CLASS.getAttribute("class").contains("toggle-enabled");
     }
 
+    public boolean getToggleIcon(String tacticName) {
+        Locator TACTIC_NAME = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]", tacticName));
+        TACTIC_NAME.click();
+        Locator TACTIC_TOGGLE = page.locator(("//label[normalize-space()='Enabled']/preceding-sibling::input"));
+        return TACTIC_TOGGLE.isChecked();
+    }
+
+    public boolean getDisabledToggleClass(String tacticName) {
+        Locator TACTIC_TOGGLE_CLASS = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]/ancestor::div[contains(@class,'item-list-wrapper tactic-list')]//div[contains(@class,'item-list-control-toggle')]", tacticName));
+        String cls = TACTIC_TOGGLE_CLASS.getAttribute("class");
+        return !cls.contains("toggle-enabled");
+    }
+
+    public boolean getToggleDisabledIcon(String tacticName) {
+        Locator TACTIC_NAME = page.locator(String.format("//div[@class='tactic-main-details' and contains(text(), '%s')]", tacticName));
+        TACTIC_NAME.click();
+        Locator TACTIC_TOGGLE = page.locator(("//*[@id='actionComponent']/div/div/span/sui-checkbox"));
+        String cls = TACTIC_TOGGLE.getAttribute("class");
+        return !cls.contains("checked");
+    }
+
     public void globalSearchDeletedTactic(String tacticName) {
-        page.locator(".iconSprite").first().click();
-        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).fill(tacticName);
-        page.getByRole(AriaRole.SEARCHBOX, new Page.GetByRoleOptions().setName("Search")).press("Enter");
+        OPEN_GLOBAL_SEARCH.click();
+        GLOBAL_SEARCH_INPUT_FIELD.fill(tacticName);
+        GLOBAL_SEARCH_INPUT_FIELD.press("Enter");
     }
 
     public String getSearchText() {
         return TACTIC_GLOBAL_SEARCH_TEXT.innerText();
     }
+
+    public void closeGlobalSearch() {
+        CLOSE_GLOBAL_SEARCH.click();
+    }
 }
+

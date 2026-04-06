@@ -10,6 +10,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
   Scenario Outline: Validate Run Report panel's field verification on Reports Page and allow report generation
@@ -108,8 +109,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to generate the report
     And Confirms that the report panel retains the entered data
     Examples:
-      | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | DIMENSIONS                                                 | METRICS             | TIME_ZONE                |
-      | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT-06:00) Central Time |
+      | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | DIMENSIONS                                                 | METRICS             | TIME_ZONE                       |
+      | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT+05:30) India Standard Time |
 
   @regression
   Scenario Outline:  Validate One time report section's field verification and generate One time report by entering Tactic and Flight option from Run Now
@@ -126,8 +127,8 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And User should be able to generate the report
     And Confirms that the report panel retains the entered data
     Examples:
-      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME                           |
-      | Template_Automation | Tactic Name New | Automation_Multiple_Flight_Campaign_New |
+      | TEMPLATE            | TACTIC_INITIALS | CAMPAIGN_NAME            |
+      | Template_Automation | Tactic Name New | Multiple_Flight_Campaign |
 
   @regression
   Scenario: Validate Dimensions and Metrics of New Template creation with Run Report

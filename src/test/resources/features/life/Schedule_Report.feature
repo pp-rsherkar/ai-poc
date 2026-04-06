@@ -11,6 +11,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     When User navigates to Schedule report from mega menu of the life application
     And User clicks Schedule Report button
     Then Verify Schedule Report panel should be opened
@@ -25,7 +26,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | Monthly |
     And Verify default value of the Frequency field is "Weekly"
     And Verify that user is able to select Schedule start date and Schedule end date
-    And Verify default value of Data Timezone is "(GMT-05:00) Eastern Time"
+    And Verify default value of Data Timezone is "(GMT-04:00) Eastern Time"
     And Verify that user is able to select Data Timezone field value "<TIME_ZONE>"
     And The Send On field should contain all days of the week when "Weekly" is selected as Frequency
       | Sun |

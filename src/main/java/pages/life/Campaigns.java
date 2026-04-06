@@ -74,6 +74,9 @@ public class Campaigns {
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT;
+    private final Locator BUDGET_STATUS_EXTERNAL;
+    private final Locator CAMPAIGN_APPROVAL_STATUS;
+    private final Locator CAMPAIGN_STATUS_APPROVED_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -141,11 +144,18 @@ public class Campaigns {
         this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
         this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
+        this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
+        this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
+        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
     }
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public boolean isCreateCampaignButtonVisible() {
+        return CREATE_CAMPAIGN.isVisible();
     }
 
     public void selectCampaign() {
@@ -428,12 +438,12 @@ public class Campaigns {
         return text;
     }
 
-    public void clickCampaignTile(){
+    public void clickCampaignTile() {
         CAMPAIGN_TILE.click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void clickLineItemTile(){
+    public void clickLineItemTile() {
         LINE_ITEM_TILE.click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
@@ -489,12 +499,7 @@ public class Campaigns {
     public void exportCampaignSettings() {
         waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS);
 
-        page.evaluate("() => { " +
-                "if (window.isPatched) return; " +
-                "const o = Element.prototype.setAttribute; " +
-                "Element.prototype.setAttribute = function(n, v) { " +
-                "if (n !== ']') o.apply(this, arguments); " +
-                "}; window.isPatched = true; }");
+        page.evaluate("() => { " + "if (window.isPatched) return; " + "const o = Element.prototype.setAttribute; " + "Element.prototype.setAttribute = function(n, v) { " + "if (n !== ']') o.apply(this, arguments); " + "}; window.isPatched = true; }");
 
         EXPORT_CAMPAIGN_SETTINGS.evaluate("el => el.click()");
         waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS_POPUP);
@@ -524,5 +529,26 @@ public class Campaigns {
         String text = EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT);
         return text;
+    }
+
+    public String getCampaignBudgetStatus() {
+        return BUDGET_STATUS_EXTERNAL.innerText().trim();
+    }
+
+    public String checkBackgroundColorOfCampaignBudgetStatus() {
+        return BUDGET_STATUS_EXTERNAL.evaluate("element => getComputedStyle(element).backgroundColor").toString();
+    }
+
+    public int getCampaignBudgetStatusOptionsCount() {
+        waitUtility.waitForLocatorVisible(BUDGET_STATUS_EXTERNAL);
+        return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span").count();
+    }
+
+    public void approveCampaign() {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_APPROVAL_STATUS);
+        waitUtility.waitForLocatorVisible(CAMPAIGN_STATUS_APPROVED_BUTTON);
+        CAMPAIGN_STATUS_APPROVED_BUTTON.click();
+        SAVE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 }

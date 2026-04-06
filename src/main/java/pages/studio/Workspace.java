@@ -1,12 +1,8 @@
 package pages.studio;
 
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.FrameLocator;
-import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
@@ -56,6 +52,7 @@ public class Workspace {
     private final Locator ADVERTISER_SELECTOR_DROPDOWN;
     private final Locator NPI_LIST_PULLOUT_MENU;
     private final Locator OK_BUTTON;
+    private final Locator NPI_PUBLISH_ALERT;
     WaitUtility waitUtility;
 
     public Workspace(Page page) {
@@ -83,7 +80,7 @@ public class Workspace {
         this.WEBHOOK_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Webhook setup successfully')]");
         this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
-        this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //h3[contains(text(),'Error occurred while saving workspace or editing webhook')]");
+        this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //p[contains(text(),'Error occurred while saving workspace or editing webhook')]");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.BEFORE_YOU_LEAVE_DIALOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
         this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
@@ -100,6 +97,7 @@ public class Workspace {
         this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
         this.NPI_LIST_PULLOUT_MENU = WORKSPACE_FRAME.locator("//ul[@data-tour-id='npi-list-pullout-menu']");
         this.OK_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'OK')]");
+        this.NPI_PUBLISH_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(), 'NPI list published successfully')]");
     }
 
     public void studio() {
@@ -108,6 +106,7 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if (NPI_PUBLISH_ALERT.isVisible()) waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
         if (PUBLISH_LOADER.isVisible()) waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         if (NPI_LIST_PULLOUT_MENU.isVisible()) {
             OK_BUTTON.click();
@@ -138,9 +137,6 @@ public class Workspace {
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        while (!WORKSPACE_CREATED_ALERT.isVisible()) {
-            page.waitForTimeout(5000);
-        }
     }
 
     public String verifyPublishedNpi() {
@@ -148,7 +144,7 @@ public class Workspace {
     }
 
     public void waitTillWorkspaceAlertHide() {
-        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
     }
 
     public void clickWebhookIcon() {
@@ -195,7 +191,7 @@ public class Workspace {
 
     public void addMacros(String textType, String param, List<String> macrosList) {
         for (String macros : macrosList) {
-            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'StyledCustomTextAreaContainer')]//p[contains(text(),'%s')]", textType, macros);
+            String xpath = String.format("//label[text()='%s']/ancestor::div[contains(@class, 'FieldTextArea')]/following-sibling::div//p[contains(text(),'%s')]", textType, macros);
             Locator MACROS = WORKSPACE_FRAME.locator(xpath);
             if (MACROS.innerText().contains(macros)) {
                 MACROS.click();
@@ -321,5 +317,15 @@ public class Workspace {
         advertiser.click();
         waitUtility.waitForLocatorVisible(EXISTING_WORKSPACE);
         EXISTING_WORKSPACE.click();
+    }
+
+    public String fetchNPIListPublishAlertDisplayed() {
+        try {
+            String text = NPI_PUBLISH_ALERT.innerText();
+            waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
+            return text;
+        } catch (PlaywrightException e) {
+            return "";
+        }
     }
 }

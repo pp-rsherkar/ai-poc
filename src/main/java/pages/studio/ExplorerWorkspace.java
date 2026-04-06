@@ -58,6 +58,8 @@ public class ExplorerWorkspace {
     private final Locator ADVERTISER_LIST;
     private final Locator SEARCH_ADVERTISER;
     private final Locator ADVERTISER_BUTTON;
+    private final Locator SPECIALITY_PANEL;
+    private final Locator INCLUDE_EXCLUDE_CHECK;
     WaitUtility waitUtility;
 
     public ExplorerWorkspace(Page page) {
@@ -107,6 +109,8 @@ public class ExplorerWorkspace {
         this.ADVERTISER_LIST = WORKSPACE_FRAME.locator("//p[text()='Advertisers']");
         this.SEARCH_ADVERTISER = WORKSPACE_FRAME.locator("//input[@placeholder='Search']");
         this.ADVERTISER_BUTTON = WORKSPACE_FRAME.locator("//button[contains(@data-tour-id,'workspace-advertiser')]");
+        this.SPECIALITY_PANEL = WORKSPACE_FRAME.locator("//div[@id='panel-speciality_all']");
+        this.INCLUDE_EXCLUDE_CHECK = WORKSPACE_FRAME.locator("//button[@data-testid='bi-include-exclude-check']");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -114,11 +118,11 @@ public class ExplorerWorkspace {
         WORKSPACE_NAME.fill(workspaceName);
     }
 
-    public void selectAdvertiser(String advertiser){
+    public void selectAdvertiser(String advertiser) {
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST);
         SEARCH_ADVERTISER.fill(advertiser);
-        for(int i=0; i<ADVERTISER_BUTTON.count(); i++){
-            if(ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)){
+        for (int i = 0; i < ADVERTISER_BUTTON.count(); i++) {
+            if (ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)) {
                 ADVERTISER_BUTTON.nth(i).click();
                 break;
             }
@@ -151,18 +155,20 @@ public class ExplorerWorkspace {
         SEARCH_FILTER.fill(filter);
         WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", filter)).first().click();
         switch (filter) {
-            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name", "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
-                if (filter.equals("Specialty"))
+            case "NPI List Name", "Medical School", "Profession", "Specialty", "State", "Facility Name",
+                 "Patient Facility", "Prescriptions", "Prescribing behavior", "Diagnoses", "Procedures", "IAB", "MeSH":
+                if (filter.equals("Specialty")) {
                     WORKSPACE_FRAME.locator("//span[contains(text(),'All Specialties')]").click();
+                    waitUtility.waitForLocatorVisible(SPECIALITY_PANEL);
+                }
                 for (String option : options) {
+                    waitUtility.waitForLocatorVisible(INCLUDE_EXCLUDE_CHECK.last());
                     Locator locator = WORKSPACE_FRAME.locator(String.format("//p[contains(text(),'%s')]/preceding-sibling::div/button[@data-testid='bi-include-exclude-check']", option.trim()));
                     TAB_PANEL_SEARCH.fill(option.trim());
-                    locator.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+                    waitUtility.waitForLocatorVisible(locator.first());
                     page.waitForTimeout(1000);
-                    if(SELECT_DESELECT_ALL.isVisible())
-                        SELECT_DESELECT_ALL.click();
-                    else
-                        locator.first().click();
+                    if (SELECT_DESELECT_ALL.isVisible()) SELECT_DESELECT_ALL.click();
+                    else locator.first().click();
                 }
                 break;
             case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
@@ -195,7 +201,7 @@ public class ExplorerWorkspace {
         }
     }
 
-    public void clickFilterOKButton(){
+    public void clickFilterOKButton() {
         FILTER_OK_BUTTON.click();
     }
 
@@ -245,7 +251,7 @@ public class ExplorerWorkspace {
     public void hoverOverNPIVisualsIcon(List<String> npiVisualList) {
         for (String s : npiVisualList) {
             String visual = s.trim();
-            boolean isInView = false;
+            boolean isInView;
             switch (s.trim()) {
                 case "NPI Geographic Location", "NPI Facilities Geography", "NPI ZIP Codes":
                     Locator MAP_TILE = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame().locator(String.format("//h2[@data-title='%s']/parent::div/following-sibling::div//div[contains(@style,'z-index: 3;')]", visual));
