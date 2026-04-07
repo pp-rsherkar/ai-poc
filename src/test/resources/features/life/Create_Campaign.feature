@@ -156,7 +156,7 @@ Feature: LIFE Regression - Create a Campaign
       | Ethnicity                | Asian, Arab                                                           |
       | Gender                   | Male                                                                  |
       | Age                      | 25-29, 35-39                                                          |
-      | Geo Radius               | 35.5::122.42::400::California                                            |
+      | Geo Radius               | 35.5::122.42::400::California                                         |
     Then Verify the configured targeting rules
     And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
     When User saves the settings
