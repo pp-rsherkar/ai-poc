@@ -53,7 +53,7 @@ public class CommonUtils {
     }
 
     public static List<String> normalizeObjectList(List<Object> list) {
-        return list.stream().map(Object::toString).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
+        return list.stream().map(Object::toString).flatMap(s -> Arrays.stream(s.split("::"))).flatMap(s -> Arrays.stream(s.split(","))).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
     }
 
     public static List<String> parseCommaSeparatedString(String input) {

@@ -146,9 +146,17 @@ Feature: LIFE Regression - Create a Campaign
       | IAB Categories           | Agriculture                                                           |
       | IAB Categories New       | Communication                                                         |
       | Language                 | English, Spanish                                                      |
+#      | Custom Targeting Bundle  | 546546, 768687                                                        |
 #      | IAS Context Control      | Pollution                                                             |
       | Invalid Traffic          | Sites/Apps with Insufficient Fraud & IVT Stats, Fraudulent Sites/Apps |
       | Inventory Type           | App, Site                                                             |
+      | Health Populations+      | Dental Polishing, Dental Cavity Preparation                           |
+      | In Condition             | Liver Diseases                                                        |
+      | Bespoke                  | AutoSegment384105361                                                  |
+      | Ethnicity                | Asian, Arab                                                           |
+      | Gender                   | Male                                                                  |
+      | Age                      | 25-29, 35-39                                                          |
+      | Geo Radius               | 35.5::122.42::400::California                                            |
     Then Verify the configured targeting rules
     And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
     When User saves the settings

@@ -80,7 +80,7 @@ public class TacticSettings {
     private final Locator NPI_FACILITY_AFFILIATION_SEARCH;
     private final Locator APP_TREE_VIEW_NODE;
     private final Locator TARGETING_SEGMENT;
-    private final Locator SEARCH_KEYWORDS_TEXTAREA;
+    private final Locator TARGETING_PANEL_TEXTAREA;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
     public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
@@ -156,7 +156,7 @@ public class TacticSettings {
         this.NPI_FACILITY_AFFILIATION_SEARCH = page.locator("//input[contains(@id,'searchTextId')]");
         this.APP_TREE_VIEW_NODE = page.locator("//app-treeview//div[contains(@class,'treeviewNode')]");
         this.TARGETING_SEGMENT = page.locator("//div[contains(text(),'Targeting Segments')]");
-        this.SEARCH_KEYWORDS_TEXTAREA = page.locator("//div[contains(@class,'editableTextarea')]");
+        this.TARGETING_PANEL_TEXTAREA = page.locator("//div[contains(@class,'editableTextarea')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -293,9 +293,10 @@ public class TacticSettings {
                         isElementVisible(xpath);
                     }
                     break;
-                case "Health Populations":
+                case "Health Populations", "Health Populations+":
                     HOUSEHOLD_IP_TAB.click();
                     HEALTH_POPULATIONS_TREATMENTS_OPTION.click();
+                    waitUtility.waitForLocatorVisible(APP_TREE_VIEW_NODE.last());
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format("(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/button[@title='Target'])[1]", val);
@@ -334,7 +335,7 @@ public class TacticSettings {
                         isElementVisible(xpath);
                     }
                     break;
-                case "Age", "Browser", "Invalid Traffic":
+                case "Age", "Browser", "Invalid Traffic", "Ethnicity", "Gender":
                     for (String val : ruleValues) {
                         String xpath = String.format("//label[contains(text(),'%s')]", val);
                         isElementVisible(xpath);
@@ -368,26 +369,30 @@ public class TacticSettings {
                     GEO_TARGETS_UPLOAD_BUTTON.click();
                     break;
                 case "Geo Radius":
-                    String pointName = "GeoPointName";
-                    String latitude = ruleValues.get(0).trim();
-                    String longitude = ruleValues.get(1).trim();
-                    String distance = ruleValues.get(2).trim();
                     GEO_RADIUS_ADD_POINT.click();
-                    GEO_RADIUS_LAT.fill(latitude);
-                    GEO_RADIUS_LONG.fill(longitude);
-                    GEO_RADIUS_DISTANCE.fill(distance);
-                    GEO_RADIUS_POINT_NAME.fill(pointName);
-                    GEO_RADIUS_SAVE.click();
+                    for (String val : ruleValues) {
+                        String[] parts = val.split("::");
+                        String latitude = parts[0].trim();
+                        String longitude = parts[1].trim();
+                        String distance = parts[2].trim();
+                        String pointName = parts[3].trim();
+                        GEO_RADIUS_LAT.fill(latitude);
+                        GEO_RADIUS_LONG.fill(longitude);
+                        GEO_RADIUS_DISTANCE.fill(distance);
+                        GEO_RADIUS_POINT_NAME.fill(pointName);
+                        GEO_RADIUS_SAVE.click();
+                    }
                     break;
                 case "Postal Codes":
-                    RULE_POSTAL_CODES_TEXTBOX.click();
+                    TARGETING_PANEL_TEXTAREA.click();
                     for (String val : ruleValues) {
-                        RULE_POSTAL_CODES_TEXTBOX.type(val.trim());
-                        RULE_POSTAL_CODES_TEXTBOX.press("Enter");
+                        TARGETING_PANEL_TEXTAREA.type(val.trim());
+                        TARGETING_PANEL_TEXTAREA.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
                     break;
                 case "Weather Signals":
+                    waitUtility.waitForLocatorVisible(APP_TREE_VIEW_NODE.last());
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format("(//mark[contains(text(),'%s')]/ancestor::div[contains(@class,'treeviewNode')]//div[contains(@class,'include-default')])[1]", val);
@@ -526,13 +531,22 @@ public class TacticSettings {
                     }
                     break;
                 case "Video Skipping":
-                    String xpath = String.format("//sui-radio-button//label[text()='%s']", ruleValues.getFirst());
-                    isElementVisible(xpath);
-                    break;
-                case "Search Keywords":
                     for (String val : ruleValues) {
-                        SEARCH_KEYWORDS_TEXTAREA.type(val.trim());
-                        SEARCH_KEYWORDS_TEXTAREA.press("Enter");
+                        String xpath = String.format("//sui-radio-button//label[text()='%s']", val);
+                        isElementVisible(xpath);
+                    }
+                    break;
+                case "Search Keywords", "Area Codes", "Custom Targeting Bundle":
+                    for (String val : ruleValues) {
+                        TARGETING_PANEL_TEXTAREA.type(val.trim());
+                        TARGETING_PANEL_TEXTAREA.press("Enter");
+                    }
+                    break;
+                case "Bespoke":
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath= String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
+                        isElementVisible(xpath);
                     }
                     break;
             }
@@ -584,6 +598,7 @@ public class TacticSettings {
     public List<Object> fetchRuleOptions() {
         ruleOptions = new ArrayList<>();
         for (int i = 0; i < FETCH_TARGET_RULE_OPTIONS.count(); i++) {
+            FETCH_TARGET_RULE_OPTIONS.nth(i).scrollIntoViewIfNeeded();
             String text = FETCH_TARGET_RULE_OPTIONS.nth(i).innerText();
             text = text.replaceAll("≥", "").trim();
             ruleOptions.add(text);
