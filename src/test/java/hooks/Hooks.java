@@ -21,6 +21,7 @@ public class Hooks {
     @Before(value = "@e2e or @regression")
     public void launchBrowser(Scenario scenario) {
         try {
+            System.out.println("Thread ID: " + Thread.currentThread().getId());
             double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
             String browserName = ConfigReader.getProperty("browser"); //Fetching browser value from config file
             logger.info("Launching browser: {} with timeout: {}", browserName, timeout);
@@ -38,9 +39,9 @@ public class Hooks {
     public void quitBrowser(Scenario scenario) {
         try {
             logger.info("Quitting browser after scenario: {}", scenario.getName());
-            if (page != null) page.close();
-            if (DriverFactory.getContext() != null) DriverFactory.getContext().close(); // Close context
-            if (DriverFactory.getBrowser() != null) DriverFactory.getBrowser().close(); // Close browser
+            if (driverFactory != null) {
+                driverFactory.quitDriver(); // Cleans up Page, Context, Browser, Playwright for this thread
+            }
         } catch (Exception e) {
             handleError("Error during browser cleanup", e, scenario);
             throw new RuntimeException("Error during browser cleanup: ", e);
@@ -49,7 +50,7 @@ public class Hooks {
 
     @After(value = "@e2e or @regression", order = 1)
     public void takeScreenshotAndTrace(Scenario scenario) {
-        if (scenario.isFailed()) {
+        if (page != null && scenario.isFailed()) {
             try {
                 logger.info("Taking screenshot for failed scenario: {}", scenario.getName());
                 String screenshotName = scenario.getName().replaceAll("\\s+", "_");

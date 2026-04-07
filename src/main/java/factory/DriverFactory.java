@@ -6,59 +6,101 @@ import utils.ConfigReader;
 import java.util.List;
 
 public class DriverFactory {
-    public static ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>(); //For Parallel execution
-    public static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
-    public static ThreadLocal<Browser> threadLocalBrowser = new ThreadLocal<>();
-    private static Playwright playwright;
 
-    public static synchronized Playwright createPlaywright() {
-        if (playwright == null) {
-            playwright = Playwright.create();
+    // ThreadLocal for parallel execution
+    public static final ThreadLocal<Playwright> threadLocalPlaywright = new ThreadLocal<>();
+    public static final ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>();
+    public static final ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
+    public static final ThreadLocal<Browser> threadLocalBrowser = new ThreadLocal<>();
+
+    /**
+     * Create or return Playwright instance for the current thread
+     */
+    public static Playwright createPlaywright() {
+        if (threadLocalPlaywright.get() == null) {
+            threadLocalPlaywright.set(Playwright.create());
         }
-        return playwright;
+        return threadLocalPlaywright.get();
     }
 
-    public static synchronized Page getPage() {
-        return threadLocalDriver.get(); // Will return Initialized Thread Local Driver
+    /** Get Page for the current thread */
+    public static Page getPage() {
+        return threadLocalDriver.get();
     }
 
-    public static synchronized BrowserContext getContext() {
+    /** Get BrowserContext for the current thread */
+    public static BrowserContext getContext() {
         return threadLocalContext.get();
     }
 
-    public static synchronized Browser getBrowser() {
+    /** Get Browser for the current thread */
+    public static Browser getBrowser() {
         return threadLocalBrowser.get();
     }
 
-    //Launches Browser as set by user in config file
+    /**
+     * Initialize browser and page based on config
+     * Thread-safe: Each thread gets its own Playwright, Browser, Context, and Page
+     */
     public Page initDriver(String browserName) {
-        BrowserType browserType = null;
         boolean headless = Boolean.parseBoolean(ConfigReader.getProperty("headless"));
         int delay = Integer.parseInt(ConfigReader.getProperty("delay"));
-        playwright = createPlaywright();
-        Browser browser = null;
-        switch (browserName) {
-            case "firefox":
-                browserType = playwright.firefox();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
-                break;
-            case "chrome":
-                browserType = playwright.chromium();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chromium").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
-                break;
-            case "webkit":
-                browserType = playwright.webkit();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
-                break;
+
+        Playwright playwright = createPlaywright();
+        Browser browser;
+
+        switch (browserName.toLowerCase()) {
+            case "firefox" -> browser = playwright.firefox()
+                    .launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
+            case "chrome", "chromium" -> browser = playwright.chromium()
+                    .launch(new BrowserType.LaunchOptions()
+                            .setChannel("chromium")
+                            .setHeadless(headless)
+                            .setArgs(List.of("--start-maximized"))
+                            .setSlowMo(delay));
+            case "webkit" -> browser = playwright.webkit()
+                    .launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
+            default -> throw new IllegalArgumentException("Unsupported browser type: " + browserName);
         }
-        if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);
+
+        // Store browser in ThreadLocal
         threadLocalBrowser.set(browser);
+
+        // Create browser context
         BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
-        //Below line is used to start the trace file
+        // Start tracing
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
+        threadLocalContext.set(context);
+
+        // Create Page
         Page page = context.newPage();
         threadLocalDriver.set(page);
-        threadLocalContext.set(context);
+
         return page;
+    }
+
+    /** Clean up all resources for the current thread */
+    public void quitDriver() {
+        // Close the Page
+        Page page = getPage();
+        if (page != null) page.close();
+
+        // Close the BrowserContext
+        BrowserContext context = getContext();
+        if (context != null) context.close();
+
+        // Close the Browser
+        Browser browser = getBrowser();
+        if (browser != null) browser.close();
+
+        // Close the Playwright instance
+        Playwright playwright = threadLocalPlaywright.get();
+        if (playwright != null) playwright.close();
+
+        // Remove ThreadLocal references to avoid memory leaks
+        threadLocalDriver.remove();
+        threadLocalContext.remove();
+        threadLocalBrowser.remove();
+        threadLocalPlaywright.remove();
     }
 }
