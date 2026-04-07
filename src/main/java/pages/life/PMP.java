@@ -196,7 +196,7 @@ public class PMP {
     }
 
     public String verifyTacticIsSaved() {
-        return SUCCESS_ALERT.innerText();
+        return ALERT.innerText();
     }
 
     public void selectDealFromListAndAssign(String dealName) {

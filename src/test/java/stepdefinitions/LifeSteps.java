@@ -1578,7 +1578,7 @@ public class LifeSteps {
         logger.info("Verifying deals are successfully assigned to the Tactic");
         String saveResult = pmp.verifyTacticIsSaved().trim();
         logger.info("Tactic save result: {}", saveResult);
-        Assert.assertEquals("Success!", saveResult);
+        Assert.assertEquals("Tactic " + tacticNameRandom + " updated.", saveResult);
     }
 
     /*Roshani Sherkar
