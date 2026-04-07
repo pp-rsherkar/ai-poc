@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
@@ -269,6 +270,7 @@ public class TacticDetails {
             Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
             labelCountMapList.add(labelCountMap);
             saveTacticDetails();
+            tacticDetailsSuccess();
         }
         ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
         labelCountMapList.sort(Comparator.comparing(Object::toString));
@@ -316,9 +318,15 @@ public class TacticDetails {
     }
 
     private void createTactic(String tacticName) {
-        enterTacticName(tacticName);
-        saveTacticDetails();
-        waitUtility.waitUntilSpinnerHidden();
+        try {
+            enterTacticName(tacticName);
+            saveTacticDetails();
+            waitUtility.waitUntilSpinnerHidden();
+            tacticDetailsSuccess();
+        } catch (PlaywrightException e) {
+            saveTacticDetails();
+            tacticDetailsSuccess();
+        }
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {

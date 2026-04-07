@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.PlaywrightException;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
@@ -524,7 +525,7 @@ public class LifeSteps {
 
     @Then("Verify that the campaign is in {string} state")
     public void verifyTheCampaignState(String expectedStatus) {
-        logger.info("Navigating to Campaign Dashboard to verify 'Pending Approval' status");
+        logger.info("Navigating to Campaign Dashboard to verify {} status", expectedStatus);
         tacticCreatives.navigateToCampaignDashboard();
         Assert.assertEquals(expectedStatus, tacticCreatives.getCampaignStatus());
         logger.info("Campaign status verified as: {}", expectedStatus);
@@ -2367,11 +2368,16 @@ public class LifeSteps {
      * Domain List*/
     @Given("User navigates to the {string} page")
     public void userNavigatesToTheDomainListPage(String pageName) {
-        logger.info("Navigating to Shared List type: {}", pageName);
-        navigation.clickSubMenu();
-        if(campaigns.isCreateCampaignButtonVisible())
+        try {
+            logger.info("Navigating to Shared List type: {}", pageName);
             navigation.clickSubMenu();
-        sharedList.clickDomainListFromMenu(pageName);
+            sharedList.clickDomainListFromMenu(pageName);
+        } catch (PlaywrightException e) {
+            logger.info("Encountered PlaywrightException, attempting navigation again");
+            if (campaigns.isCreateCampaignButtonVisible())
+                navigation.clickSubMenu();
+            sharedList.clickDomainListFromMenu(pageName);
+        }
     }
 
     @And("Verify that the search option is present on the {string} tab")
@@ -5895,6 +5901,27 @@ public class LifeSteps {
         String displayedDataCost = npiStaticList.fetchDisplayedDataCost();
         logger.info("Fetched displayed data cost: {}", displayedDataCost);
         Assert.assertEquals("Calculated data cost doesn't match with displayed data cost", metricName, displayedDataCost);
+    }
+
+    @And("User logs out from the application")
+    public void logsOutFromTheApplication() {
+        logger.info("Logging out from the application");
+        navigation.logout();
+    }
+
+    @And("User navigates to the created campaign")
+    public void userNavigatesToTheCreatedCampaign() {
+        logger.info("Navigating to the created campaign '{}'", campaignNameRandom);
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        campaignDashboard.navigateToCampaign(campaignNameRandom);
+    }
+
+    @And("Admin user approves the campaign")
+    public void adminUserApprovesTheCampaign() {
+        logger.info("Admin user approving the campaign '{}'", campaignNameRandom);
+        campaigns.clickCampaignDetailsTab();
+        campaigns.approveCampaign();
+        Assert.assertEquals("Campaign " + campaignNameRandom + " updated.", campaigns.campaignSuccess());
     }
 
     @And("User fetches the logged in username")
