@@ -247,6 +247,7 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
+        waitUtility.waitForLocatorVisible(SAVE_TACTIC_DETAILS);
         SAVE_TACTIC_DETAILS.click();
     }
 
@@ -305,6 +306,7 @@ public class TacticDetails {
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
         waitUtility.waitUntilSpinnerHidden();
+        campaigns.campaignSuccess();
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -315,6 +317,7 @@ public class TacticDetails {
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
         waitUtility.waitUntilSpinnerHidden();
+        lineItemDetails.lineItemSuccess();
     }
 
     private void createTactic(String tacticName) {
