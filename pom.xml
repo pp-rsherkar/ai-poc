@@ -109,11 +109,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
+                    <rerunFailingTestsCount>2</rerunFailingTestsCount>
                     <parallel>methods</parallel>
                     <useUnlimitedThreads>false</useUnlimitedThreads>
 <!--                    <forkCount>2</forkCount>-->
 <!--                    <threadCount>3</threadCount> &lt;!&ndash; control browsers &ndash;&gt;-->
                     <reuseForks>false</reuseForks>
+                    <properties>
+                        <configurationParameters>
+                            cucumber.junit-platform.naming-strategy=long
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
         </plugins>

@@ -53,11 +53,7 @@ public class DriverFactory {
             case "firefox" -> browser = playwright.firefox()
                     .launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
             case "chrome", "chromium" -> browser = playwright.chromium()
-                    .launch(new BrowserType.LaunchOptions()
-                            .setChannel("chromium")
-                            .setHeadless(headless)
-                            .setArgs(List.of("--start-maximized"))
-                            .setSlowMo(delay));
+                    .launch(new BrowserType.LaunchOptions().setChannel("chromium").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
             case "webkit" -> browser = playwright.webkit()
                     .launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
             default -> throw new IllegalArgumentException("Unsupported browser type: " + browserName);
