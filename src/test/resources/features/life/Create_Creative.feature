@@ -72,6 +72,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify deletion on creatives associated with a Campaign and on creatives that are not associated with any Campaign
     When User assigns a campaign to the creative using "Bulk Assign" option
+      | 01- Advertiser |
     Then Verify user is not able to delete a creative associated with a Campaign and appropriate error message is displayed
     And User deletes a creative not associated with any Campaign
     And Verify the creative is removed from the Creative Library page
@@ -286,6 +287,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative
     When User assigns a campaign to the creative using "Bulk Assign" option
+      | 01- Advertiser |
     Then User navigates to creative details and clicks Association tab
     And Verify column selection icon is available and upon clicking it below columns should display
       | Line Item Name |
@@ -309,6 +311,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
     When User assigns a campaign to the creative using "Bulk Assign" option
+      | 01- Advertiser |
     Then User navigates to creative details and clicks Association tab
     And Verify filter icon is available and upon clicking it "Add Filter", "Done" and "No Filters applied." text should display
     And User clicks "Add Filter", selects below filters and apply using "Done" button

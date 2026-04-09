@@ -507,7 +507,7 @@ public class LifeSteps {
     @Then("Verify creative details are saved and the campaign is in running state")
     public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
         logger.info("Verifying creative save success");
-        assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
+        Assert.assertTrue("Unable to save Creatives tab", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
         logger.info("Navigating to Campaign Dashboard to verify 'Running' status");
         tacticCreatives.navigateToCampaignDashboard();
         campaignDashboard.resetFiltersIfApplied();
@@ -629,7 +629,7 @@ public class LifeSteps {
         String[] advertiserList = advertiser.split(",");
         logger.info("Entering NPI List details - Name: {}, Advertiser: {}, NPI Number: {}", npiName, advertiser, npiNumber);
         npiStaticList.enterListName(npiName);
-        for(String adv : advertiserList) {
+        for (String adv : advertiserList) {
             logger.info("Selecting advertiser: {}", adv.trim());
             npiStaticList.selectAdvertiser(adv.trim());
         }
@@ -656,17 +656,16 @@ public class LifeSteps {
     public void verifyTheStaticNPINumbersFromTheUploadedFileAreDisplayedCorrectlyInTheListDetailsPage(String fileName) throws IOException {
         int npiCountFromFile = 0;
         int npiCountFromListDetails = 0;
-        if(fileName.contains(".xlsx"))
+        if (fileName.contains(".xlsx"))
             npiCountFromFile = FileActions.fetchRowCountFromExcel(fileName);
         else if (fileName.contains(".csv") || fileName.contains(".txt"))
             npiCountFromFile = FileActions.fetchRowCountExcludeHeaderFromCSVAndTxt(fileName);
         logger.info("Verifying NPI count from file: {} with count displayed in list details", fileName);
-        if(fileName.contains("StaticList")) {
+        if (fileName.contains("StaticList")) {
             npiCountFromListDetails = npiStaticList.getNPICountFromListDetails();
             logger.info("NPI count from file: {}, NPI count from Static List Details: {}", npiCountFromFile, npiCountFromListDetails);
             Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
-        }
-        else{
+        } else {
             npiCountFromListDetails = npiAttributesList.getNPICountFromListDetails();
             logger.info("NPI count from file: {}, NPI count from Attribute List Details: {}", npiCountFromFile, npiCountFromListDetails);
             Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
@@ -1997,11 +1996,21 @@ public class LifeSteps {
     }
 
     @When("User assigns a campaign to the creative using {string} option")
-    public void userAssignsACampaignToTheCreative(String bulkActionOption) {
+    public void userAssignsACampaignToTheCreative(String bulkActionOption, DataTable filters) {
+        List<String> filtersList = filters.asList(String.class);
         logger.info("Assigning campaign to creative via bulk action: {}", bulkActionOption);
         metricName = createCreatives.selectCheckboxWithArchiveButton();
         createCreatives.clickBulkActionsButton();
         createCreatives.selectBulkActionsOption(bulkActionOption);
+        if (createCreatives.isNoCampaignFoundMessageDisplayed()) {
+            logger.info("No campaign found message is displayed when trying to assign campaign to creative without any campaign available");
+            logger.info("Select the advertiser in the filter and verify the campaign is displayed for assignment");
+            createCreatives.clickBulkPanelCancelButton();
+            createCreatives.selectAdvertiser(filtersList);
+            metricName = createCreatives.selectCheckboxWithArchiveButton();
+            createCreatives.clickBulkActionsButton();
+            createCreatives.selectBulkActionsOption(bulkActionOption);
+        }
         Assert.assertEquals("Bulk Assign Successful", createCreatives.assignCampaignToCreative());
         logger.info("Campaign assigned to creative successfully");
     }
@@ -3962,10 +3971,10 @@ public class LifeSteps {
 
     @And("Verify {string} button is available in Destination dropdown field")
     public void verifyAddDestinationButtonIsAvailableInDestinationDropdownField(String buttonName) {
-        if(buttonName.contains("Add Destination")){
+        if (buttonName.contains("Add Destination")) {
             logger.info("Verifying Add Destination button: {}", buttonName);
             Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
-        }else{
+        } else {
             logger.info("Verifying Edit Destination button: {}", buttonName);
             Assert.assertTrue("Edit Destination field is not available", runReportPanel.isEditDestinationAvailable());
         }
@@ -5156,7 +5165,7 @@ public class LifeSteps {
     @And("User selects the NPI data {string} for {string}")
     public void userSelectsTheNPIData(String npiData, String optionType) {
         logger.info("Selecting NPI Data '{}'", npiData);
-        if(optionType.contains("NPI List"))
+        if (optionType.contains("NPI List"))
             npiSmartList.selectNPIGroup(npiData);
         else
             npiSmartList.selectSpeciality(npiData);
@@ -5943,7 +5952,7 @@ public class LifeSteps {
         logger.info("Verifying that '{}' field is pre-populated with logged in user email and is editable", fieldName);
         List<String> fetchScheduleReportValue = runReportPanel.fetchScheduleReportInputValue(fieldName);
         logger.info("Fetched value from '{}' field: '{}'", fieldName, fetchScheduleReportValue);
-        for(String value : fetchScheduleReportValue){
+        for (String value : fetchScheduleReportValue) {
             logger.info("Checking if fetched value '{}' contains logged in username '{}'", value, userType);
             Assert.assertTrue(fieldName + " field is not pre-populated with logged in user email", userType.contains(value));
         }
@@ -6061,11 +6070,11 @@ public class LifeSteps {
         logger.info("Clicking the three-dot menu to select General variable and Time variable for file name");
         scheduleReport.clickThreeDotMenuForFileName();
         scheduleReport.selectGeneralVariableFromThreeDotMenu(generalVariable);
-        if(generalVariable.contains("$CampaignName$"))
+        if (generalVariable.contains("$CampaignName$"))
             customFieldName = runReportPanel.fetchCampaignName().getFirst();
-        else if(generalVariable.contains("$LineItemName$"))
+        else if (generalVariable.contains("$LineItemName$"))
             customFieldName = runReportPanel.fetchLineItemName().getFirst();
-        else if(generalVariable.contains("AdvertiserName"))
+        else if (generalVariable.contains("AdvertiserName"))
             customFieldName = runReportPanel.fetchAdvertiserName().getFirst();
         scheduleReport.selectTimeVariableFromThreeDotMenu(timeVariable, dateTimeFormat);
         scheduleReport.closeThreeDotMenu();
@@ -6080,5 +6089,39 @@ public class LifeSteps {
         String expectedFileName = templateNameRandom + "_" + customFieldName + "_" + date + ".csv";
         logger.info("Expected file name in help text: '{}', Actual help text: '{}'", expectedFileName, helpText);
         Assert.assertEquals("Help text does not display the expected file name with General and Time variable values", expectedFileName, helpText);
+    }
+
+    @And("User searches the campaign created in the above steps")
+    public void userSearchesTheCampaignCreatedInTheAboveSteps() {
+        logger.info("Searching for the campaign created in the above steps with name '{}'", campaignNameRandom);
+        userEntersAndClickSearchButton(campaignNameRandom);
+    }
+
+    @And("User clicks New Tactic button, create tactic with details - {string}, {string}")
+    public void userClicksNewTacticButtonCreateTacticWithDetails(String ruleType, String creative) {
+        logger.info("Clicking New Tactic button to create a new tactic under campaign '{}'", campaignNameRandom);
+        for (String name : nameList) {
+            logger.info("Navigating to Line Item '{}' details page", name);
+            lineItemDetails.clickLineItem(name);
+            logger.info("Clicking New Tactic button for Line Item '{}'", name);
+            tacticDetails.clickNewTacticForLineItem(name);
+            tacticNameRandom = "Tactic" + '_' + CommonUtils.timeStampCalculation();
+            logger.info("Entering tactic details for name: {}", tacticNameRandom);
+            tacticDetails.createTactic(tacticNameRandom);
+            Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
+            logger.info("Adding Targeting Rule for line item '{}'", name);
+            navigation.clickOnIcon("Add Targeting Rule");
+            tacticSettings.selectRuleType(ruleType);
+            tacticSettings.saveTacticSettings();
+            logger.info("Verifying settings save success and navigation to Creatives tab for line item '{}'", name);
+            Assert.assertTrue("Unable to save Tactic Settings page", tacticSettings.tacticSettingsSuccess().contains("Success!"));
+            Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
+            logger.info("Assigning creative '{}' to tactic for line item '{}'", creative, name);
+            navigation.clickOnIcon("Assign Existing Creatives");
+            tacticCreatives.assignCreatives(creative);
+            logger.info("Enabling Tactic and saving Creatives");
+            tacticCreatives.enableCreative();
+            tacticCreatives.saveTacticCreatives();
+        }
     }
 }
