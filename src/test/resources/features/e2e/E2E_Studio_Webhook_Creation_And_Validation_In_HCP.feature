@@ -17,7 +17,6 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
 
-
   @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the GET request URL and body
     #1
@@ -58,7 +57,6 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     Examples:
       | ADVERTISER | WORKSPACE_NAME | PARAM   | INVALID_WEBHOOK_DATA | ERROR_DATA                             |
       | Abbvie     | Explorer       | Param 4 | Test                 | https:www.google.com, WebhookData.json |
-
 
   @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the POST request URL and body
