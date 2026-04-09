@@ -426,7 +426,7 @@ public class NPISmartList {
                 break;
             case "Diagnosis Code":
                 ADD_DIAGNOSIS_BUTTON.scrollIntoViewIfNeeded();
-                ADD_DIAGNOSIS_BUTTON.click();
+                ADD_DIAGNOSIS_BUTTON.click(new Locator.ClickOptions().setForce(true));
                 break;
             case "Medical Procedure Code":
                 ADD_MEDICAL_PROCEDURE_BUTTON.scrollIntoViewIfNeeded();
