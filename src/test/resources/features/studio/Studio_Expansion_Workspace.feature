@@ -83,10 +83,22 @@ Feature: HCP Audience Workspace in Studio Application
   @todo
   Scenario Outline: Create and save Private/Public HCP Audience Expansion workspace and check workspace is visible in respective user accordingly
     #get it from HCP explorer feature file
+    Given This scenario will be executed in the "Pre-release" environment as a "User"
+    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User selects the advertiser "<ADVERTISER>"
+    Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+    And User selects "<EXPANDED_AUDIENCE>"
+    Then User verifies the expanded audience count
+    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User saves the workspace
+    Then Verify the Workspace is saved
+    
 
   @todo
   Scenario Outline: Create Private HCP Audience Expansion workspace then save and publish the workspace then check the change in status
-
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
