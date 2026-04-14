@@ -225,25 +225,26 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | WORKSPACE_TYPE | ADVERTISER | CREATED_BY                     |
       | HCP Explorer   | Abbvie     | ppqa_automation@pulsepoint.com |
 
-  @todo
+  @np
   Scenario Outline: Create and save a Draft workspace with specific filters and verify visibility with External User
     When User clicks on Create New Workspace
-    Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Explorer"
-    And User selects the advertiser as "<ADVERTISER>"
-    And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
-    And User selects the Draft option as "<DRAFT_OPTION>"
+    And User clicks on HCP Explorer workspace
+    And User selects the advertiser "<ADVERTISER>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     Then User applies the filter and selects option
       | FilterName | Option                                                        |
       | NPI Age    | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
+    And User selects the Draft option as "<DRAFT_OPTION>"
     And User saves the workspace
+    Then Verify the HCP Explorer Workspace is saved
+    And "Internal user" logs out from the "Studio" application
     Given This scenario will be executed in the "Pre-release" environment as a "External User"
     And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
-    When External user Searches the "<WORKSPACE_NAME>" in studio application
-    Then External user Verifies whether the "<WORKSPACE_NAME>" is visible in workspace management page
+    When External user Searches the workspace name in studio application with "<DRAFT_OPTION>" draft option
+    Then External user Verifies whether the workspace with "<DRAFT_OPTION>" is visible in workspace management page
     Examples:
-      | ADVERTISER |  | DRAFT_OPTION | WORKSPACE_NAME |
-      | Abbvie     |  | Public       | Explorer       |
-      | Abbvie     |  | Private      | Explorer       |
+      | ADVERTISER |  | DRAFT_OPTION | WORKSPACE_NAME | ACCOUNT_NAME        |
+      | Abbvie     |  | Public       | Explorer       | PP engineering test |
+      | Abbvie     |  | Private      | Explorer       | PP engineering test |
