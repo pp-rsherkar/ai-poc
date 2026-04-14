@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import pages.Navigation;
 import pages.admin.Accounts;
 import pages.life.*;
+import pages.studio.WorkspaceCreation;
 import utils.*;
 
 import java.io.IOException;
@@ -85,6 +86,7 @@ public class LifeSteps {
     ScheduleReport scheduleReport = new ScheduleReport(DriverFactory.getPage());
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
     CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
+    WorkspaceCreation workspaceCreation = new WorkspaceCreation(DriverFactory.getPage());
     Constants constants = new Constants();
     int itemCount = 0;
     int totalListCount = 0;
@@ -4184,6 +4186,7 @@ public class LifeSteps {
 
     @When("User navigates to Administrative section and go to Accounts Tab")
     public void userNavigatesToAdministrativeSectionAndGoToTab() throws Exception {
+        workspaceCreation.closeAIPanel();
         logger.info("Navigating to Administrative section - Accounts tab");
         navigation.clickSubMenu();
         accounts.clickAdministration();

@@ -53,6 +53,8 @@ public class WorkspaceCreation {
     private final Locator DROPDOWN_LIST_ITEMS;
     private final Locator FETCH_WORKSPACE_NAME_FROM_DASHBOARD;
     private final Locator BACK_ARROW;
+    private final Locator AI_PANEL;
+    private final Locator AI_PANEL_CLOSE_BUTTON;
     WaitUtility waitUtility;
     int counter = 0;
 
@@ -96,6 +98,8 @@ public class WorkspaceCreation {
         this.DROPDOWN_LIST_ITEMS = WORKSPACE_FRAME.locator("//div[@role='dialog']//li//span");
         this.FETCH_WORKSPACE_NAME_FROM_DASHBOARD = WORKSPACE_FRAME.locator("//td[@role='gridcell' and contains(@id,'workspace_name')]//span");
         this.BACK_ARROW = WORKSPACE_FRAME.locator("//button[@color='textPrimary']");
+        this.AI_PANEL = page.locator("//div[@class='ai-assistant-panel open']");
+        this.AI_PANEL_CLOSE_BUTTON = page.locator("//button[@aria-label='Close AI Assistant' and @class='ai-icon-btn']");
     }
 
     public String studioDashboard() {
@@ -347,5 +351,13 @@ public class WorkspaceCreation {
         page.reload();
         waitUtility.waitForLocatorVisible(CREATE_WORKSPACE.first());
         waitUtility.waitForLocatorVisible(PAGINATION.first());
+    }
+
+    public void closeAIPanel() {
+        page.waitForTimeout(3000);
+        if (AI_PANEL_CLOSE_BUTTON.isVisible()) {
+            AI_PANEL_CLOSE_BUTTON.click();
+            waitUtility.waitForLocatorDetached(AI_PANEL);
+        }
     }
 }

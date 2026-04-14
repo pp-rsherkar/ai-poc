@@ -798,6 +798,7 @@ public class StudioSteps {
 
     @And("User searches the created workspace")
     public void userSearchesTheCreatedWorkspace() {
+        workspaceCreation.closeAIPanel();
         logger.info("Searching created workspace: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
         workspaceCreation.selectMoreActionsMenu(workspaceName);
@@ -982,6 +983,7 @@ public class StudioSteps {
     public void userNavigatesToStudioApplication() {
         logger.info("Navigating to Studio application");
         navigation.navigateToStudio();
+        workspaceCreation.closeAIPanel();
     }
 
     @And("User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
