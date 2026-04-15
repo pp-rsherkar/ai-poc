@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pages.Navigation;
 import pages.admin.Accounts;
+import pages.admin.Setup;
 import pages.life.*;
 import pages.studio.WorkspaceCreation;
 import utils.*;
@@ -59,6 +60,7 @@ public class LifeSteps {
     List<String> nameList = new ArrayList<>();
     List<String> capturedDetails = new ArrayList<>();
     List<String> itemList = new ArrayList<>();
+    Map<String, List<String>> itemMap = new HashMap<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -87,6 +89,8 @@ public class LifeSteps {
     LineItemFlights lineItemFlights = new LineItemFlights(DriverFactory.getPage());
     CampaignSettings campaignSettings = new CampaignSettings(DriverFactory.getPage());
     WorkspaceCreation workspaceCreation = new WorkspaceCreation(DriverFactory.getPage());
+    Setup setup = new Setup(DriverFactory.getPage());
+    CuratedMarket curatedMarket = new CuratedMarket(DriverFactory.getPage());
     Constants constants = new Constants();
     int itemCount = 0;
     int totalListCount = 0;
@@ -631,7 +635,7 @@ public class LifeSteps {
         String[] advertiserList = advertiser.split(",");
         logger.info("Entering NPI List details - Name: {}, Advertiser: {}, NPI Number: {}", npiName, advertiser, npiNumber);
         npiStaticList.enterListName(npiName);
-        for(String adv : advertiserList) {
+        for (String adv : advertiserList) {
             logger.info("Selecting advertiser: {}", adv.trim());
             npiStaticList.selectAdvertiser(adv.trim());
         }
@@ -658,17 +662,16 @@ public class LifeSteps {
     public void verifyTheStaticNPINumbersFromTheUploadedFileAreDisplayedCorrectlyInTheListDetailsPage(String fileName) throws IOException {
         int npiCountFromFile = 0;
         int npiCountFromListDetails = 0;
-        if(fileName.contains(".xlsx"))
+        if (fileName.contains(".xlsx"))
             npiCountFromFile = FileActions.fetchRowCountFromExcel(fileName);
         else if (fileName.contains(".csv") || fileName.contains(".txt"))
             npiCountFromFile = FileActions.fetchRowCountExcludeHeaderFromCSVAndTxt(fileName);
         logger.info("Verifying NPI count from file: {} with count displayed in list details", fileName);
-        if(fileName.contains("StaticList")) {
+        if (fileName.contains("StaticList")) {
             npiCountFromListDetails = npiStaticList.getNPICountFromListDetails();
             logger.info("NPI count from file: {}, NPI count from Static List Details: {}", npiCountFromFile, npiCountFromListDetails);
             Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
-        }
-        else{
+        } else {
             npiCountFromListDetails = npiAttributesList.getNPICountFromListDetails();
             logger.info("NPI count from file: {}, NPI count from Attribute List Details: {}", npiCountFromFile, npiCountFromListDetails);
             Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
@@ -1497,7 +1500,8 @@ public class LifeSteps {
     @When("User searches the deal and assign it from the deal list")
     public void userSelectsTheDealFromTheDealList() {
         logger.info("Searching and assigning deal from list: {}", dealNameRandom);
-        pmp.selectDealFromListAndAssign(dealNameRandom);
+        pmp.searchDealFromList(dealNameRandom);
+        pmp.assignDealFromList(dealNameRandom);
     }
 
     @Then("Selected Deals should appear in Applied Deals panel")
@@ -3964,10 +3968,10 @@ public class LifeSteps {
 
     @And("Verify {string} button is available in Destination dropdown field")
     public void verifyAddDestinationButtonIsAvailableInDestinationDropdownField(String buttonName) {
-        if(buttonName.contains("Add Destination")){
+        if (buttonName.contains("Add Destination")) {
             logger.info("Verifying Add Destination button: {}", buttonName);
             Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
-        }else{
+        } else {
             logger.info("Verifying Edit Destination button: {}", buttonName);
             Assert.assertTrue("Edit Destination field is not available", runReportPanel.isEditDestinationAvailable());
         }
@@ -4184,12 +4188,17 @@ public class LifeSteps {
         runReportPanel.downloadScheduledReport();
     }
 
-    @When("User navigates to Administrative section and go to Accounts Tab")
-    public void userNavigatesToAdministrativeSectionAndGoToTab() throws Exception {
+    @When("User navigates to Administrative section")
+    public void userNavigatesToAdministrativeSection() {
         workspaceCreation.closeAIPanel();
-        logger.info("Navigating to Administrative section - Accounts tab");
+        logger.info("Navigating to Administrative section");
         navigation.clickSubMenu();
         accounts.clickAdministration();
+    }
+
+    @And("User navigates to Accounts Tab")
+    public void userNavigatesToAccountsTab() {
+        logger.info("Navigating to Accounts tab");
         accounts.selectAccountsTab();
     }
 
@@ -5159,7 +5168,7 @@ public class LifeSteps {
     @And("User selects the NPI data {string} for {string}")
     public void userSelectsTheNPIData(String npiData, String optionType) {
         logger.info("Selecting NPI Data '{}'", npiData);
-        if(optionType.contains("NPI List"))
+        if (optionType.contains("NPI List"))
             npiSmartList.selectNPIGroup(npiData);
         else
             npiSmartList.selectSpeciality(npiData);
@@ -5946,7 +5955,7 @@ public class LifeSteps {
         logger.info("Verifying that '{}' field is pre-populated with logged in user email and is editable", fieldName);
         List<String> fetchScheduleReportValue = runReportPanel.fetchScheduleReportInputValue(fieldName);
         logger.info("Fetched value from '{}' field: '{}'", fieldName, fetchScheduleReportValue);
-        for(String value : fetchScheduleReportValue){
+        for (String value : fetchScheduleReportValue) {
             logger.info("Checking if fetched value '{}' contains logged in username '{}'", value, userType);
             Assert.assertTrue(fieldName + " field is not pre-populated with logged in user email", userType.contains(value));
         }
@@ -6064,11 +6073,11 @@ public class LifeSteps {
         logger.info("Clicking the three-dot menu to select General variable and Time variable for file name");
         scheduleReport.clickThreeDotMenuForFileName();
         scheduleReport.selectGeneralVariableFromThreeDotMenu(generalVariable);
-        if(generalVariable.contains("$CampaignName$"))
+        if (generalVariable.contains("$CampaignName$"))
             customFieldName = runReportPanel.fetchCampaignName().getFirst();
-        else if(generalVariable.contains("$LineItemName$"))
+        else if (generalVariable.contains("$LineItemName$"))
             customFieldName = runReportPanel.fetchLineItemName().getFirst();
-        else if(generalVariable.contains("AdvertiserName"))
+        else if (generalVariable.contains("AdvertiserName"))
             customFieldName = runReportPanel.fetchAdvertiserName().getFirst();
         scheduleReport.selectTimeVariableFromThreeDotMenu(timeVariable, dateTimeFormat);
         scheduleReport.closeThreeDotMenu();
@@ -6083,5 +6092,299 @@ public class LifeSteps {
         String expectedFileName = templateNameRandom + "_" + customFieldName + "_" + date + ".csv";
         logger.info("Expected file name in help text: '{}', Actual help text: '{}'", expectedFileName, helpText);
         Assert.assertEquals("Help text does not display the expected file name with General and Time variable values", expectedFileName, helpText);
+    }
+
+    @And("Verify Deal Type field is available with default value as {string}")
+    public void verifyDealTypeFieldIsAvailableWithDefaultValueAs(String defaultValue) {
+        logger.info("Verifying Deal Type field is available with default value '{}'", defaultValue);
+        Assert.assertTrue("Deal Type field is not available", pmp.isDealTypeFieldAvailable());
+        Assert.assertEquals("Default value of Deal Type field is not " + defaultValue, defaultValue, pmp.fetchDefaultDealTypeValue());
+    }
+
+    @And("Verify Curator field is available with default value as {string}")
+    public void verifyCuratorFieldIsAvailableWithDefaultValueAs(String defaultValue) {
+        logger.info("Verifying Curator field is available with default value '{}'", defaultValue);
+        Assert.assertTrue("Curator field is not available", pmp.isCuratorFieldAvailable());
+        Assert.assertEquals("Default value of Curator field is not " + defaultValue, defaultValue, pmp.fetchDefaultCuratorValue());
+    }
+
+    @And("Verify Pricing Type field is available with default value as {string}")
+    public void verifyPricingTypeFieldIsAvailableWithDefaultValueAs(String defaultValue) {
+        logger.info("Verifying Pricing Type field is available with default value '{}'", defaultValue);
+        Assert.assertTrue("Pricing Type field is not available", pmp.isPricingTypeFieldAvailable());
+        Assert.assertEquals("Default value of Pricing Type field is not " + defaultValue, defaultValue, pmp.fetchDefaultPricingTypeValue());
+    }
+
+    @Then("Verify Edit icon availability for the deals listed under {} Deals tab")
+    public void verifyEditIconIsAvailableForThePrivateDealCreated(String dealType) {
+        if (dealType.contains("Private")) {
+            logger.info("Verifying Edit icon is available for the private deal created with name '{}'", dealNameRandom);
+            Assert.assertTrue("Edit icon is not available for the created private deal", pmp.isEditIconAvailableForDeals());
+            logger.info("Clicking the Edit icon for the created private deal to verify it's clickable");
+            Assert.assertTrue("Edit icon is not clickable for the created private deal", pmp.clickEditButtonForCreatedPrivateDeal(dealNameRandom));
+            logger.info("Edit icon is verified successfully for the created private deal");
+            pmp.closePMPDealEditPanel();
+        } else {
+            logger.info("Verifying Edit icon is not available for Life Marketplace Deals");
+            Assert.assertFalse("Edit icon is available for the created programmatic deal", pmp.isEditIconAvailableForDeals());
+            logger.info("Verified Edit icon is not available for the created programmatic deal successfully");
+        }
+    }
+
+    @And("Verify Clearing Price field is available and fetch the tool-tip details on hover for the field")
+    public void verifyClearingPriceFieldIsAvailableAndFetchTheToolTipDetailsOnHoverForTheField() {
+        logger.info("Verifying Clearing Price field is available and fetching tooltip details on hover");
+        Assert.assertTrue("Clearing Price field is not available", pmp.isClearingPriceFieldAvailable());
+        String toolTipText = pmp.fetchClearingPriceFieldToolTip();
+        logger.info("Fetched tooltip text for Clearing Price field: '{}'", toolTipText);
+        Assert.assertEquals("Tooltip text mismatch for Clearing Price field", "Clearing Price is the average clearing bid price seen for the deal by the DSP. To ensure scale, when targeting a deal, we recommend bidding above the clearing price.", toolTipText);
+    }
+
+    @And("Verify that {string} and {string} buttons are available and by default {string} button is selected")
+    public void verifyThatActiveAndArchivedButtonsAreAvailableAndByDefaultButtonIsSelected(String activeText, String archivedText, String defaultValue) {
+        logger.info("Verifying Active and Archived buttons are available and default selected button is '{}'", defaultValue);
+        Assert.assertTrue("Active button is not available", pmp.isActiveArchivedButtonAvailable(activeText));
+        Assert.assertTrue("Archived button is not available", pmp.isActiveArchivedButtonAvailable(archivedText));
+        Assert.assertEquals("Default value of Pricing Type field is not " + defaultValue, defaultValue, pmp.isDefaultStatusButtonSelected());
+    }
+
+    @And("Verify that {string} should not display in deals listing under Life Marketplace Deals Deals tab")
+    public void verifyThatShouldNotDisplayInDealsListingUnderDealsTab(String exchangeType) {
+        logger.info("Verifying that deals with exchange type '{}' are not displayed in the deals listing under Life Marketplace Deals tab", exchangeType);
+        List<String> dealExchangeTypes = pmp.fetchDealExchangeTypesFromDealsListing();
+        logger.info("Fetched exchange types for deals listed under Life Marketplace Deals tab: {}", dealExchangeTypes);
+        boolean isExchangeTypePresent = dealExchangeTypes.contains(exchangeType);
+        logger.info("Is exchange type '{}' present in deals listing: {}", exchangeType, isExchangeTypePresent);
+        Assert.assertFalse("Deals with exchange type " + exchangeType + " are displayed in the deals listing under Life Marketplace Deals tab", isExchangeTypePresent);
+    }
+
+    @And("User clicks 3 dot menu and selects Archive button for the active deal from the deal listing")
+    public void userClicksArchiveButtonForTheActiveDealFromTheDealListing() {
+        logger.info("Clicking Archive button for the active deal '{}'", dealNameRandom);
+        pmp.clickArchiveButtonForCreatedPrivateDeal(dealNameRandom);
+        logger.info("Clicked Archive button successfully for the active deal '{}'", dealNameRandom);
+        Assert.assertTrue("Archive Confirmation Dialog is not displayed", pmp.isArchiveConfirmationDialogDisplayed());
+    }
+
+    @And("User clicks {string} button from the search section of deal listing page")
+    public void userClicksButtonFromTheDealListing(String buttonType) {
+        logger.info("Clicking '{}' button from deal listing", buttonType);
+        pmp.clickActiveArchivedButtonAvailable(buttonType);
+    }
+
+    @Then("Verify that the deal is moved to archived deal section")
+    public void verifyThatTheDealIsMovedToArchivedSectionAndNotListedUnderActiveDealSection() {
+        logger.info("Searching for the deal '{}' in archive tab", dealNameRandom);
+        pmp.searchDealFromList(dealNameRandom);
+        Assert.assertTrue("Deal is not listed in the Archived Deal Listing page", pmp.isDealAvailable(dealNameRandom));
+    }
+
+    @And("Verify Archive option is available based on the campaign state")
+    public void verifyArchiveOptionIsAvailableBasedOnTheCampaignState() {
+        logger.info("Verifying Archive option availability based on campaign state for deal '{}'", dealNameRandom);
+        if (pmp.isArchiveButtonAvailableOnConfirmationDialog()) {
+            pmp.clickArchiveButtonFromConfirmationDialog();
+            logger.info("Confirmed archiving the deal successfully for the deal '{}'", dealNameRandom);
+            Assert.assertEquals("Success alert is not displayed", "Deal Archived Successfully", pmp.fetchDealArchiveSuccessAlert());
+        } else if (pmp.isRemoveAssociationTextDisplayed()) {
+            logger.info("Fetching the text displayed when Archive option is not available");
+            Assert.assertEquals("This deal cannot be archived; one of the associated Tactics is currently live.Remove Assoctiation to proceed.", pmp.fetchRemoveAssociationText());
+        }
+    }
+
+    @And("Verify the Tactic Link is available in the confirmation pop-up")
+    public void verifyTheTacticLinkIsAvailableInTheConfirmationPopUp() {
+        logger.info("Verifying the presence of Tactic Link in the confirmation pop-up");
+        Assert.assertTrue("Tactic Link is not available in the confirmation pop-up", pmp.isTacticLinkAvailable());
+    }
+
+    @And("Verify the Tactic Link is clickable and navigates to the respective tactic page")
+    public void verifyTheTacticLinkIsClickableAndNavigatesToTheRespectiveTacticPage() {
+        logger.info("Verifying the Tactic Link is clickable and navigates to the respective tactic page");
+        String tacticNameFromLink = pmp.fetchTacticLinkText();
+        logger.info("Fetched tactic name from the link: '{}'", tacticNameFromLink);
+        Assert.assertTrue("Tactic Name is not available in the Tactic Link fetched", tacticNameFromLink.contains(tacticNameRandom));
+        logger.info("Navigating to the tactic page by clicking the Tactic Link");
+        String tacticNameFromPage = pmp.clickTacticLink();
+        logger.info("Fetched tactic name from the tactic page: '{}'", tacticNameFromPage);
+        Assert.assertTrue("Navigation to the tactic page is not successful", tacticNameFromPage.contains(tacticNameRandom));
+    }
+
+    @And("User unassigns active deal from the applied deals section of All Deals tab")
+    public void userUnassignsActiveDealFromTheAppliedDealsSectionOfAllDealsTab() {
+        logger.info("Unassigning active deal '{}' from the applied deals section of All Deals tab", dealNameRandom);
+        Assert.assertTrue("Deal is available on the Applied Deal panel", pmp.unassignDealFromAppliedDealsSection(dealNameRandom));
+        logger.info("Clicked unassign option successfully for the active deal '{}'", dealNameRandom);
+    }
+
+    @And("Verify only life marketplace tab is displayed under Targeting templates section for {string} rule type")
+    public void verifyOnlyLifeMarketplaceTabIsDisplayedUnderTargetingTemplatesSectionForRuleType(String ruleType) {
+        logger.info("Verifying only Life Marketplace tab is displayed under Targeting templates section");
+        targetingTemplate.clickAddTargetingRule();
+        tacticSettings.searchAndSelectRuleType(ruleType);
+        Assert.assertTrue("Life Marketplace Tab is not available", pmp.isLifeMarketplaceDealsTabVisible());
+    }
+
+    @And("User navigates to Setup Tab")
+    public void userNavigatesToSetupTab() {
+        logger.info("Navigating to Setup Tab");
+        setup.clickSetupTab();
+        logger.info("Clicking on curated market subtab under setup tab");
+        setup.curatedMarketSubtab();
+    }
+
+    @When("User clicks Create Curated Market link")
+    public void userClicksCreateCuratedMarketLink() {
+        logger.info("Clicking Create Curated Market link");
+        setup.clickCuratedMarketLink();
+    }
+
+    @And("User creates a curated market with details {string}, {string}, {string}, {string}")
+    public void userCreatesACuratedMarketWithDetails(String marketName, String accountName, String description, String marginKPIAndBenchmark) {
+        logger.info("Creating a curated market with details - Market Name: '{}', Account Name: '{}', Description: '{}', Margin KPI and Benchmark: '{}'", marketName, accountName, description, marginKPIAndBenchmark);
+        templateNameRandom = marketName + '_' + CommonUtils.timeStampCalculation();
+        setup.enterCuratedMarketDetails(templateNameRandom, accountName, description, marginKPIAndBenchmark);
+        setup.clickSaveButton();
+        logger.info("Curated market '{}' created successfully", templateNameRandom);
+        Assert.assertEquals("Curated Market created successfully", setup.getAlertMessage());
+        metricName = setup.fetchCuratedMarketId();
+        logger.info("Curated market ID: '{}'", metricName);
+    }
+
+    @And("User clicks {string} tab")
+    public void userClicksTab(String tabName) {
+        logger.info("Clicking '{}' tab", tabName);
+        setup.clickTabName(tabName);
+    }
+
+    @And("User clicks Import Deals button")
+    public void userClicksImportDealsButton() {
+        logger.info("Clicking Import Deals button");
+        setup.clickImportDealsButton();
+    }
+
+    @Then("Verify Import Deal panel is opened")
+    public void verifyImportDealPanelIsOpened() {
+        logger.info("Verifying Import Deal panel is opened");
+        Assert.assertTrue("Import Deals panel is not opened", setup.isImportDealsPanelOpened());
+    }
+
+    @And("User downloads the curated market template")
+    public void userDownloadsTheCuratedMarketTemplate() throws IOException {
+        logger.info("Downloading the curated market template");
+        targetFilePath = setup.downloadCuratedMarketTemplate();
+        logger.info("Curated market template downloaded successfully '{}'", targetFilePath);
+    }
+
+    @And("User fills the template with deal details and uploads the template")
+    public void userFillsTheTemplateWithDealDetailsAndUploadsTheTemplate(DataTable dataTable) throws Exception {
+        logger.info("Reading deal details from the data table to fill the template and upload. Deal details include - DEAL_NAME, EXCHANGE, MEDIA_TYPE, CURATOR, DEAL_PRICE, PRICING_TYPE, MPC_DEAL_TYPE");
+        List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
+        for (Map<String, String> templateDate : data) {
+            String dealName = templateDate.get("DEAL_NAME") + '_' + CommonUtils.timeStampCalculation() + '_' + new Random().nextInt(100);
+            String exchange = templateDate.get("EXCHANGE");
+            String mediaType = templateDate.get("MEDIA_TYPE");
+            String curator = templateDate.get("CURATOR");
+            String dealPrice = templateDate.get("DEAL_PRICE");
+            String pricingType = templateDate.get("PRICING_TYPE");
+            String mpcDealType = templateDate.get("MPC_DEAL_TYPE");
+            itemMap.computeIfAbsent("DEAL_NAME", k -> new ArrayList<>()).add(dealName);
+            itemMap.computeIfAbsent("EXCHANGE", k -> new ArrayList<>()).add(exchange);
+            itemMap.computeIfAbsent("MEDIA_TYPE", k -> new ArrayList<>()).add(mediaType);
+            itemMap.computeIfAbsent("CURATOR", k -> new ArrayList<>()).add(curator);
+            itemMap.computeIfAbsent("DEAL_PRICE", k -> new ArrayList<>()).add(dealPrice);
+            itemMap.computeIfAbsent("PRICING_TYPE", k -> new ArrayList<>()).add(pricingType);
+            itemMap.computeIfAbsent("MPC_DEAL_TYPE", k -> new ArrayList<>()).add(mpcDealType);
+            logger.info("Filling the template with deal details and uploading the template. Deal details - Deal Name: '{}', Exchange: '{}', Media Type: '{}', Curator: '{}', Deal Price: '{}', Pricing Type: '{}', MPC Deal Type: '{}'", dealName, exchange, mediaType, curator, dealPrice, pricingType, mpcDealType);
+            setup.fillCuratedMarketTemplate(targetFilePath, metricName, dealName, exchange, mediaType, curator, dealPrice, pricingType, mpcDealType);
+        }
+        logger.info("Expected file name to be uploaded: '{}'", targetFilePath.getFileName().toString());
+        setup.browseCuratedMarketTemplate(targetFilePath);
+        logger.info("Verifying the uploaded deal details in the preview");
+        setup.clickPreviewButton();
+        Assert.assertTrue("Complete Deal details are not available", setup.isDealAddedSuccessTextVisible());
+        setup.clickUploadButton();
+        Assert.assertTrue("Unable to upload deals successfully", setup.getAlertMessage().contains("Deals added to"));
+    }
+
+    @Then("Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template")
+    public void verifyTheImportedDealIsDisplayedInTheDealsTabOnAdminSCuratedMarketPageWithDetailsMatchingTheUploadedTemplate() {
+        logger.info("Verifying the imported deal is displayed in the Deals Tab on Admin's Curated Market page");
+        Assert.assertTrue("Deal Name does not match", setup.fetchDealNameFromDealTab().containsAll(itemMap.get("DEAL_NAME")));
+        Assert.assertTrue("Deal Id does not match", setup.fetchDealIdFromDealTab().containsAll(itemMap.get("DEAL_NAME")));
+        Assert.assertTrue("Exchange does not match", setup.fetchExchangeTypeFromDealTab().containsAll(itemMap.get("EXCHANGE")));
+        Assert.assertTrue("Deal Price does not match", setup.fetchDealPriceFromDealTab().containsAll(itemMap.get("DEAL_PRICE")));
+        Assert.assertTrue("Pricing type does not match", setup.fetchPricingTypeFromDealTab().containsAll(itemMap.get("PRICING_TYPE")));
+        Assert.assertTrue("Media type does not match", setup.fetchMediaTypeFromDealTab().containsAll(itemMap.get("MEDIA_TYPE")));
+        Assert.assertTrue("Curator does not match", setup.fetchCuratorFromDealTab().containsAll(itemMap.get("CURATOR")));
+        Assert.assertTrue("MPC Deal type does not match", setup.fetchMPCDealTypeFromDealTab().containsAll(itemMap.get("MPC_DEAL_TYPE")));
+    }
+
+    @And("User fetches floor price for the imported deal")
+    public void userFetchesFloorPriceForTheImportedDeal() {
+        logger.info("Fetching floor price for the imported deal '{}'", itemMap.get("DEAL_NAME"));
+        itemList = setup.fetchFloorPriceForImportedDeal();
+        logger.info("Fetched floor price for the imported deal: {}", itemList);
+    }
+
+    @And("User enables the Curated Market created")
+    public void userEnablesTheCuratedMarketCreated() {
+        logger.info("Enabling the curated market '{}' created with ID '{}'", templateNameRandom, metricName);
+        setup.enableCuratedMarket();
+        Assert.assertEquals("Market updated successfully", setup.getAlertMessage());
+    }
+
+    @And("User navigates to Curated Markets section")
+    public void userNavigatesToCuratedMarketsSection() {
+        logger.info("Navigating to Curated Markets section");
+        navigation.clickSubMenu();
+        navigation.navigateToCuratedMarket();
+    }
+
+    @And("Verify Curated Market tab is displayed")
+    public void verifyCuratedMarketTabIsDisplayed() {
+        logger.info("Verifying Curated Market tab is displayed");
+        Assert.assertTrue("Curated Market tab is not displayed", curatedMarket.isCuratedMarketTabDisplayed());
+    }
+
+    @And("User searches for the created Curated Market")
+    public void userSearchesForTheCreatedCuratedMarket() {
+        logger.info("Searching for the created Curated Market '{}'", templateNameRandom);
+        curatedMarket.searchCuratedMarket(templateNameRandom);
+        logger.info("Verifying the created Curated Market is displayed in the search result");
+        Assert.assertTrue("Created Curated Market is not displayed in the search result", curatedMarket.isCuratedMarketCreatedAvailable(templateNameRandom));
+    }
+
+    @Then("Verify the market id, media type, and floor price displayed in Curated Markets section matches the media type in Admin Setup for the same market")
+    public void verifyTheMediaTypeDisplayedInCuratedMarketsSectionMatchesTheMediaTypeInAdminSetupForTheSameMarket() {
+        logger.info("Verifying the market id displayed in Curated Markets section matches the market id fetched from Admin Setup for the same market '{}'", templateNameRandom);
+        String marketIdInCuratedMarket = curatedMarket.fetchMarketIdForCuratedMarket(templateNameRandom);
+        logger.info("Fetched market id from Curated Market section: '{}', Fetched market id from Admin Setup: '{}'", marketIdInCuratedMarket, metricName);
+        Assert.assertEquals("Market ID mismatch between Curated Market section and Admin Setup for the same market", metricName, marketIdInCuratedMarket);
+
+        logger.info("Verifying the media type displayed in Curated Markets section matches the media type in Admin Setup for the same market '{}'", templateNameRandom);
+        String mediaTypeInCuratedMarket = curatedMarket.fetchMediaTypeForCuratedMarket(templateNameRandom);
+        Set<String> curatedSet = Arrays.stream(mediaTypeInCuratedMarket.split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toSet());
+        Set<String> adminSet = itemMap.get("MEDIA_TYPE").stream().map(String::trim).collect(Collectors.toSet());
+        logger.info("Curated Market Media Types: {}", curatedSet);
+        logger.info("Admin Media Types: {}", adminSet);
+        Assert.assertEquals("Media type mismatch", adminSet, curatedSet);
+
+        logger.info("Verifying the floor price displayed in Curated Markets section matches the floor price fetched from Admin Setup for the same market '{}'", templateNameRandom);
+        String floorPriceInCuratedMarket = curatedMarket.fetchFloorPriceForCuratedMarket(templateNameRandom);
+        logger.info("Fetched floor price from Curated Market section: '{}', Fetched floor price from Admin Setup: '{}'", floorPriceInCuratedMarket, itemList);
+        if (floorPriceInCuratedMarket.contains("-")) {
+            String[] range = floorPriceInCuratedMarket.split("-");
+            double uiMin = Double.parseDouble(range[0].trim());
+            double uiMax = Double.parseDouble(range[1].trim());
+
+            List<Double> adminPrices = itemList.stream().filter(Objects::nonNull).map(String::trim).filter(s -> !s.isEmpty()).map(Double::parseDouble).toList();
+            double adminMin = adminPrices.stream().mapToDouble(Double::doubleValue).min().orElseThrow();
+            double adminMax = adminPrices.stream().mapToDouble(Double::doubleValue).max().orElseThrow();
+            Assert.assertEquals("Minimum floor price mismatch", BigDecimal.valueOf(adminMin), BigDecimal.valueOf(uiMin));
+            Assert.assertEquals("Maximum floor price mismatch", BigDecimal.valueOf(adminMax), BigDecimal.valueOf(uiMax));
+        } else {
+            Assert.assertTrue("Floor price mismatch between Curated Market section and Admin Setup for the same market", itemList.contains(floorPriceInCuratedMarket));
+        }
     }
 }
