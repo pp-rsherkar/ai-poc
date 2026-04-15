@@ -121,7 +121,6 @@ public class Setup {
     public String getAlertMessage() {
         String alertText = ALERT.textContent().trim();
         waitUtility.waitForLocatorHidden(ALERT);
-        System.out.println("Alert Message: " + alertText);
         return alertText;
     }
 
