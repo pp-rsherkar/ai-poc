@@ -744,6 +744,8 @@ public class StudioSteps {
 
     @And("User searches the workspace created to perform Actions from More menu")
     public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() throws InterruptedException {
+        logger.info("Checking if AI assistant panel is displayed");
+        workspaceCreation.closeAIPanel();
         logger.info("Verifying Studio workspace frame is visible before searching for workspace");
         workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
