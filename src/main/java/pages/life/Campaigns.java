@@ -139,7 +139,7 @@ public class Campaigns {
         this.EXPORT_AUDIT_LOG_POPUP_CONTENT = page.locator("//div[contains(@class,'popup-content')]/span");
         this.EXPORT_AUDIT_LOG_POPUP_OK_BUTTON = page.locator("//span[@class='text' and text()='Ok']");
         this.EXPORT_AUDIT_LOG_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Audit Log request created')]");
-        this.EXPORT_CAMPAIGN_SETTINGS = page.locator("//app-icon-lable-link[@icon='20-export.svg']//div[@class='icolink']");
+        this.EXPORT_CAMPAIGN_SETTINGS = page.locator("//app-icon-lable-link[@title='Export Settings']//div[contains(@class,'icolink')]");
         this.EXPORT_CAMPAIGN_SETTINGS_POPUP = page.locator("//div[@class='rightPanelHeader2' and text()='Export Campaign Settings']");
         this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
         this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
