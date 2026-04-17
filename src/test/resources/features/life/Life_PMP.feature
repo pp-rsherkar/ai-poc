@@ -40,7 +40,7 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then user should navigate to PMP Deals Panel
     When User clicks "Life Marketplace Deals" Deals Tab
     And Verify Edit icon availability for the deals listed under "Life Marketplace" Deals tab
-    And Verify that "Premium Publisher" should not display in deals listing under Life Marketplace Deals Deals tab
+    And Verify that "Premium Publisher" should not display in deals listing under Life Marketplace Deals tab
     When User enters below details in respective search field, verify that the deal list appears based on the selected filters
       | SearchByName     | Deal     |
       | SearchByExchange | Pubmatic |

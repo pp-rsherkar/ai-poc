@@ -6115,7 +6115,7 @@ public class LifeSteps {
         Assert.assertEquals("Default value of Pricing Type field is not " + defaultValue, defaultValue, pmp.fetchDefaultPricingTypeValue());
     }
 
-    @Then("Verify Edit icon availability for the deals listed under {} Deals tab")
+    @Then("Verify Edit icon availability for the deals listed under {string} Deals tab")
     public void verifyEditIconIsAvailableForThePrivateDealCreated(String dealType) {
         if (dealType.contains("Private")) {
             logger.info("Verifying Edit icon is available for the private deal created with name '{}'", dealNameRandom);
@@ -6148,7 +6148,7 @@ public class LifeSteps {
         Assert.assertEquals("Default value of Pricing Type field is not " + defaultValue, defaultValue, pmp.isDefaultStatusButtonSelected());
     }
 
-    @And("Verify that {string} should not display in deals listing under Life Marketplace Deals Deals tab")
+    @And("Verify that {string} should not display in deals listing under Life Marketplace Deals tab")
     public void verifyThatShouldNotDisplayInDealsListingUnderDealsTab(String exchangeType) {
         logger.info("Verifying that deals with exchange type '{}' are not displayed in the deals listing under Life Marketplace Deals tab", exchangeType);
         List<String> dealExchangeTypes = pmp.fetchDealExchangeTypesFromDealsListing();
