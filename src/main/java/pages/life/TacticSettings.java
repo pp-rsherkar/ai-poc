@@ -172,18 +172,14 @@ public class TacticSettings {
     }
 
     public void selectRuleType(String ruleType) {
-        SEARCH_RULE_TYPE.fill(ruleType);
-        SEARCH_RULE_TYPE.press("Enter");
-        SELECT_RULE_TYPE.click();
+        searchAndSelectRuleType(ruleType);
         SELECT_OPTION.click();
         clickOk();
         clickClose();
     }
 
     public int selectRuleType(String ruleType, String ruleOption) {
-        SEARCH_RULE_TYPE.fill(ruleType);
-        SEARCH_RULE_TYPE.press("Enter");
-        SELECT_RULE_TYPE.click();
+        searchAndSelectRuleType(ruleType);
         SEARCH_RULE_OPTION.fill(ruleOption);
 
         String pixelXpath;
@@ -210,13 +206,17 @@ public class TacticSettings {
 
     public void saveTacticSettings() {
         SAVE_TACTIC_SETTINGS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
-    public void addTargetingRules(String ruleType) {
+    public void searchAndSelectRuleType(String ruleType) {
         SEARCH_RULE_TYPE.fill(ruleType);
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
+    }
 
+    public void addTargetingRules(String ruleType) {
+        searchAndSelectRuleType(ruleType);
         switch (ruleType) {
             case "Health Population":
                 HOUSEHOLD_IP_TAB.click();

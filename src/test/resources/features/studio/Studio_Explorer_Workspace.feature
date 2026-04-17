@@ -8,7 +8,8 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
-    When User navigates to Administrative section and go to Accounts Tab
+    When User navigates to Administrative section
+    And User navigates to Accounts Tab
     And User searches the account "PP engineering test" and checks Studio permissions
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
