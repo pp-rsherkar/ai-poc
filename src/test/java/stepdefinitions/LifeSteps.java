@@ -139,7 +139,7 @@ public class LifeSteps {
         navigation.enterPassword(password);
         navigation.clickLogin();
         logger.info("Navigating to specific application module: {}", application);
-
+        navigation.selectAndClickExternalUserApplicationType();
         switch (application) {
             case "Life":
                 if (userType.equals("User")) {
@@ -156,7 +156,6 @@ public class LifeSteps {
                 navigation.navigateToStudio();
                 break;
         }
-
         if (userType.equals("User")) {
             logger.info("Selecting account: {}", account);
             navigation.selectAccount(account);
