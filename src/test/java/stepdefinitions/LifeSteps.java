@@ -6293,6 +6293,16 @@ public class LifeSteps {
         metricName = setup.fetchCuratedMarketId();
         logger.info("Curated market ID: '{}'", metricName);
     }
+    @And("User creates a curated market with only {string}")
+    public void userCreatesACuratedMarketWithOnlyDescription(String description){
+        logger.info("Creating a curated market with only description - Description: '{}'", description);
+        setup.enterCuratedMarketDetailsOnlyDescription(description);
+        setup.clickSaveButton();
+        Assert.assertEquals("3 error(s) found.", setup.getAlertMessage());
+        Assert.assertTrue("Account is required",setup.isMarketNameErrorTextVisible());
+        Assert.assertTrue("Account is required",setup.isAccountsErrorTextVisible());
+        Assert.assertTrue("Market KPI and Benchmark is required",setup.isMarketKPIErrorVisible());
+    }
 
     @And("User clicks {string} tab")
     public void userClicksTab(String tabName) {
