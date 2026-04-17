@@ -503,4 +503,10 @@ public class LineItemDetails {
             PLACEMENT_ID.fill(lineItemNameRandom);
         }
     }
+
+    public void clickLineItem(String name) {
+        String xpath = String.format("//div[text()='%s']", name);
+        page.locator(xpath).click();
+        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
 }

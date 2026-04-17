@@ -33,6 +33,7 @@ public class Navigation {
     private final Locator TARGETING_TEMPLATE_HEADER;
     private final Locator LOGOUT_BUTTON;
     private final Locator CURATED_MARKET;
+    private final Locator BUYING_PLATFORM;
     WaitUtility waitUtility;
     CampaignDashboard campaignDashboard;
 
@@ -63,6 +64,7 @@ public class Navigation {
         this.PULSEPOINT_LOGO = page.locator("//div[contains(@class, 'dynamic-logo')] | //app-buyer-logo/div[@class='logo-holder']");
         this.LOGOUT_BUTTON = page.locator("//div[text()='Sign Out']");
         this.CURATED_MARKET = page.locator("//div[contains(@class, 'menuLabel') and contains(text(), 'Curated Markets')]");
+        this.BUYING_PLATFORM = page.locator("//div[contains(@class,'portalSelectionLabel') and contains(text(),'BUYING PLATFORM')]");
     }
 
     public void navigateToUrl(String url) {
@@ -207,6 +209,14 @@ public class Navigation {
         ACCOUNT_NAME.click();
         LOGOUT_BUTTON.click();
         waitUtility.waitForLocatorVisible(USERNAME);
+    }
+
+    public void selectAndClickExternalUserApplicationType() {
+        page.waitForURL(url -> url.contains("AdminDashBoard.aspx") || url.contains("LifePortalSelector.aspx"));
+        if ( page.url().contains("LifePortalSelector.aspx")) {
+            BUYING_PLATFORM.click();
+            waitUtility.waitUntilSpinnerHidden();
+        }
     }
 
     public void navigateToCuratedMarket(){

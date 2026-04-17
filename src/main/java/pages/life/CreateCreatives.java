@@ -122,6 +122,8 @@ public class CreateCreatives {
     private final Locator CALENDAR_MONTH;
     private final Locator CALENDAR_DATE;
     private final Locator LINE_ITEM_PAGE_TITLE;
+    private final Locator NO_CAMPAIGN_FOUND_MESSAGE;
+    private final Locator BULK_PANEL_CANCEL_BUTTON;
     Page newTab;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     String imageTextLocator = "//span[contains(text(),'%s')]";
@@ -234,6 +236,8 @@ public class CreateCreatives {
         this.CALENDAR_MONTH = page.locator("//sui-calendar-month-view//tbody//td");
         this.CALENDAR_DATE = page.locator("//sui-calendar-date-view//tbody//td");
         this.LINE_ITEM_PAGE_TITLE = page.locator("//div[contains(@class,'lineitem-name')]");
+        this.NO_CAMPAIGN_FOUND_MESSAGE = page.locator("//div[@class='creative_message']//div[@class='no_campaings']");
+        this.BULK_PANEL_CANCEL_BUTTON = page.locator("//div[@class='targetingFooterActions']//button[contains(text(),'Cancel')]");
     }
 
     public String verifyCreativeLibraryPageTitle() {
@@ -755,6 +759,7 @@ public class CreateCreatives {
 
     public void checkIfCreativeIsPresent(Locator locator) {
         while (locator.count() == 0) {
+            PAGINATION_NEXT_BUTTON.scrollIntoViewIfNeeded();
             PAGINATION_NEXT_BUTTON.click();
             waitUtility.waitUntilPreLoaderHidden();
             waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
@@ -786,6 +791,7 @@ public class CreateCreatives {
             BULK_ACTIONS_BUTTON.locator("xpath=//div//a//div[normalize-space(.)='" + bulkAssign + "']").click();
         else BULK_ACTIONS_BUTTON.locator("xpath=//div//a[normalize-space(.)='" + bulkAssign + "']").click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(BULK_ASSIGN_CREATIVE_HEADER);
     }
 
     public String assignCampaignToCreative() {
@@ -796,8 +802,8 @@ public class CreateCreatives {
             indices.add(i);
         }
         Collections.shuffle(indices);
-        int selectCount = Math.min(10, count);
-        for (int i = 0; i < selectCount; i++) {
+        int selectCount = Math.min(5, count);
+        for (int i = count - 1; i >= count - selectCount; i--) {
             if (BULK_ASSIGN_CHECKBOX.nth(i).isVisible()) {
                 BULK_ASSIGN_CHECKBOX.nth(i).click();
             }
@@ -986,6 +992,7 @@ public class CreateCreatives {
         CALENDAR_DATE.getByText("1", new Locator.GetByTextOptions().setExact(true)).first().click();
 
         FILTER_END_DATE.click();
+        CALENDAR_TITLE.scrollIntoViewIfNeeded();
         CALENDAR_TITLE.click();
         CALENDAR_MONTH.getByText("Dec").scrollIntoViewIfNeeded();
         CALENDAR_MONTH.getByText("Dec").click();
@@ -1002,5 +1009,23 @@ public class CreateCreatives {
         page.locator(String.format("//div[contains(@title,'%s')]", lineItemName)).click();
         waitUtility.waitForLocatorVisible(LINE_ITEM_PAGE_TITLE);
         return LINE_ITEM_PAGE_TITLE.textContent().trim();
+    }
+
+    public boolean isNoCampaignFoundMessageDisplayed() {
+        return NO_CAMPAIGN_FOUND_MESSAGE.isVisible();
+    }
+
+    public void selectAdvertiser(List<String> advertiser) {
+        SELECT_ADVERTISER.click();
+        DROPDOWN_VALUES.locator("text=" + advertiser.getFirst()).click();
+        page.keyboard().press("Escape");
+        page.waitForTimeout(1000);
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
+    }
+
+    public void clickBulkPanelCancelButton(){
+        BULK_PANEL_CANCEL_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 }

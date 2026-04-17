@@ -143,7 +143,7 @@ public class LifeSteps {
         navigation.enterPassword(password);
         navigation.clickLogin();
         logger.info("Navigating to specific application module: {}", application);
-
+        navigation.selectAndClickExternalUserApplicationType();
         switch (application) {
             case "Life":
                 if (userType.equals("User")) {
@@ -160,7 +160,6 @@ public class LifeSteps {
                 navigation.navigateToStudio();
                 break;
         }
-
         if (userType.equals("User")) {
             logger.info("Selecting account: {}", account);
             navigation.selectAccount(account);
@@ -513,7 +512,7 @@ public class LifeSteps {
     @Then("Verify creative details are saved and the campaign is in running state")
     public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
         logger.info("Verifying creative save success");
-        assert tacticCreatives.tacticCreativesSuccess().contains("Success!");
+        Assert.assertTrue("Unable to save Creatives tab", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
         logger.info("Navigating to Campaign Dashboard to verify 'Running' status");
         tacticCreatives.navigateToCampaignDashboard();
         campaignDashboard.resetFiltersIfApplied();
@@ -2003,11 +2002,21 @@ public class LifeSteps {
     }
 
     @When("User assigns a campaign to the creative using {string} option")
-    public void userAssignsACampaignToTheCreative(String bulkActionOption) {
+    public void userAssignsACampaignToTheCreative(String bulkActionOption, DataTable filters) {
+        List<String> filtersList = filters.asList(String.class);
         logger.info("Assigning campaign to creative via bulk action: {}", bulkActionOption);
         metricName = createCreatives.selectCheckboxWithArchiveButton();
         createCreatives.clickBulkActionsButton();
         createCreatives.selectBulkActionsOption(bulkActionOption);
+        if (createCreatives.isNoCampaignFoundMessageDisplayed()) {
+            logger.info("No campaign found message is displayed when trying to assign campaign to creative without any campaign available");
+            logger.info("Select the advertiser in the filter and verify the campaign is displayed for assignment");
+            createCreatives.clickBulkPanelCancelButton();
+            createCreatives.selectAdvertiser(filtersList);
+            metricName = createCreatives.selectCheckboxWithArchiveButton();
+            createCreatives.clickBulkActionsButton();
+            createCreatives.selectBulkActionsOption(bulkActionOption);
+        }
         Assert.assertEquals("Bulk Assign Successful", createCreatives.assignCampaignToCreative());
         logger.info("Campaign assigned to creative successfully");
     }
@@ -6092,6 +6101,40 @@ public class LifeSteps {
         String expectedFileName = templateNameRandom + "_" + customFieldName + "_" + date + ".csv";
         logger.info("Expected file name in help text: '{}', Actual help text: '{}'", expectedFileName, helpText);
         Assert.assertEquals("Help text does not display the expected file name with General and Time variable values", expectedFileName, helpText);
+    }
+
+    @And("User searches the campaign created in the above steps")
+    public void userSearchesTheCampaignCreatedInTheAboveSteps() {
+        logger.info("Searching for the campaign created in the above steps with name '{}'", campaignNameRandom);
+        userEntersAndClickSearchButton(campaignNameRandom);
+    }
+
+    @And("User clicks New Tactic button, create tactic with details - {string}, {string}")
+    public void userClicksNewTacticButtonCreateTacticWithDetails(String ruleType, String creative) {
+        logger.info("Clicking New Tactic button to create a new tactic under campaign '{}'", campaignNameRandom);
+        for (String name : nameList) {
+            logger.info("Navigating to Line Item '{}' details page", name);
+            lineItemDetails.clickLineItem(name);
+            logger.info("Clicking New Tactic button for Line Item '{}'", name);
+            tacticDetails.clickNewTacticForLineItem(name);
+            tacticNameRandom = "Tactic" + '_' + CommonUtils.timeStampCalculation();
+            logger.info("Entering tactic details for name: {}", tacticNameRandom);
+            tacticDetails.createTactic(tacticNameRandom);
+            Assert.assertEquals("Bid Strategy", tacticSettings.verifyTacticSettingsText());
+            logger.info("Adding Targeting Rule for line item '{}'", name);
+            navigation.clickOnIcon("Add Targeting Rule");
+            tacticSettings.selectRuleType(ruleType);
+            tacticSettings.saveTacticSettings();
+            logger.info("Verifying settings save success and navigation to Creatives tab for line item '{}'", name);
+            Assert.assertTrue("Unable to save Tactic Settings page", tacticSettings.tacticSettingsSuccess().contains("Success!"));
+            Assert.assertEquals("Creative(s)", tacticCreatives.verifyTacticCreativesText());
+            logger.info("Assigning creative '{}' to tactic for line item '{}'", creative, name);
+            navigation.clickOnIcon("Assign Existing Creatives");
+            tacticCreatives.assignCreatives(creative);
+            logger.info("Enabling Tactic and saving Creatives");
+            tacticCreatives.enableCreative();
+            tacticCreatives.saveTacticCreatives();
+        }
     }
 
     @And("Verify Deal Type field is available with default value as {string}")

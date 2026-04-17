@@ -354,8 +354,8 @@ public class WorkspaceCreation {
     }
 
     public void closeAIPanel() {
-        page.waitForTimeout(3000);
-        if (AI_PANEL_CLOSE_BUTTON.isVisible()) {
+        page.waitForTimeout(5000);
+        if (AI_PANEL.isVisible() && AI_PANEL_CLOSE_BUTTON.isVisible()) {
             AI_PANEL_CLOSE_BUTTON.click();
             waitUtility.waitForLocatorDetached(AI_PANEL);
         }
