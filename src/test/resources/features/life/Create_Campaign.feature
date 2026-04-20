@@ -146,7 +146,7 @@ Feature: LIFE Regression - Create a Campaign
       | IAB Categories           | Agriculture                                                           |
       | IAB Categories New       | Communication                                                         |
       | Language                 | English, Spanish                                                      |
-#      | Custom Targeting Bundle  | 546546, 768687                                                        |
+      | Custom Targeting Bundle  | 203397, 203396                                                        |
 #      | IAS Context Control      | Pollution                                                             |
       | Invalid Traffic          | Sites/Apps with Insufficient Fraud & IVT Stats, Fraudulent Sites/Apps |
       | Inventory Type           | App, Site                                                             |

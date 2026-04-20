@@ -822,7 +822,7 @@ public class LifeSteps {
         List<String> actualNormalizedRuleOptions = normalizeObjectList(tacticSettings.fetchRuleOptions());
         logger.info("Comparing Rule Options. Expected: {}, Actual: {}", expectedNormalizedRuleOptions, actualNormalizedRuleOptions);
         for (String expectedOption : expectedNormalizedRuleOptions) {
-            boolean matchFound = actualNormalizedRuleOptions.stream().anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
+            boolean matchFound = actualNormalizedRuleOptions.stream().anyMatch(actual -> actual.equalsIgnoreCase(expectedOption) || actual.matches(".*\\(" + expectedOption + "\\).*"));
             Assert.assertTrue("Expected rule option not found: " + expectedOption, matchFound);
         }
 
