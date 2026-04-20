@@ -117,7 +117,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify that the count of items in the downloaded "NPI" list is the same as the item count displayed in the UI
     Examples:
       | LIST_NAME             |
-      | AutoNPIAdmin192021372 |
+      | AutoNPIAdmin257977008 |
 
   @regression
   Scenario Outline: Verify export option is not available for Email list created by uploading a file
@@ -156,12 +156,49 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
 
   @regression
-  Scenario Outline: Verify user is able to export settings of the campaign having "<LINE_ITEM_TYPE>" line items
-    And User searches and selects the campaign "<CAMPAIGN_NAME>"
-    Then Verify that the campaign page is displayed
+  Scenario Outline: Verify user is able to export settings of the campaign having "Single" line items
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User creates line items with below line types and other details, enables the line item and saves the changes
+      | LINE_TYPE | LINE_ITEM_DETAILS                                                                                                                       |
+      | Display   | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60 |
+    And User clicks New Tactic button, create tactic with details - "<RULE_TYPE>", "<CREATIVE>"
+    And User navigates to campaign
     Then Verify that user is able to export the campaign settings
     Examples:
-      | CAMPAIGN_NAME        | LINE_ITEM_TYPE |
-      | Single_Line_Item     | Single         |
-      | Multiple_Line_Items  | Multiple       |
-      | Different_Line_Items | Different      |
+      | CAMPAIGN_NAME      | RULE_TYPE          | CREATIVE           |
+      | Single_LI_Campaign | Behavioral Segment | Please_Dont_Delete |
+
+  @regression
+  Scenario Outline: Verify user is able to export settings of the campaign having "Multiple" line items
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User creates line items with below line types and other details, enables the line item and saves the changes
+      | LINE_TYPE | LINE_ITEM_DETAILS                                                                                                                       |
+      | Display   | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60 |
+      | Display   | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60    |
+    And User clicks New Tactic button, create tactic with details - "<RULE_TYPE>", "<CREATIVE>"
+    And User navigates to campaign
+    Then Verify that user is able to export the campaign settings
+    Examples:
+      | CAMPAIGN_NAME        | RULE_TYPE          | CREATIVE           |
+      | Multiple_LI_Campaign | Behavioral Segment | Please_Dont_Delete |
+
+  @regression
+  Scenario Outline: Verify user is able to export settings of the campaign having "Different" line items
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User creates line items with below line types and other details, enables the line item and saves the changes
+      | LINE_TYPE      | LINE_ITEM_DETAILS                                                                                                                          |
+      | Audio          | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60           |
+      | Video          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
+      | Native Display | LineName:LineItem, LineBudget:500, CostModel:CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60          |
+    And User clicks New Tactic button, create tactic with details - "<RULE_TYPE>", "<CREATIVE>"
+    And User navigates to campaign
+    Then Verify that user is able to export the campaign settings
+    Examples:
+      | CAMPAIGN_NAME         | RULE_TYPE          | CREATIVE           |
+      | Different_LI_Campaign | Behavioral Segment | Please_Dont_Delete |

@@ -744,6 +744,8 @@ public class StudioSteps {
 
     @And("User searches the workspace created to perform Actions from More menu")
     public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() throws InterruptedException {
+        logger.info("Checking if AI assistant panel is displayed");
+        workspaceCreation.closeAIPanel();
         logger.info("Verifying Studio workspace frame is visible before searching for workspace");
         workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
@@ -798,6 +800,7 @@ public class StudioSteps {
 
     @And("User searches the created workspace")
     public void userSearchesTheCreatedWorkspace() {
+        workspaceCreation.closeAIPanel();
         logger.info("Searching created workspace: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
         workspaceCreation.selectMoreActionsMenu(workspaceName);
@@ -982,6 +985,7 @@ public class StudioSteps {
     public void userNavigatesToStudioApplication() {
         logger.info("Navigating to Studio application");
         navigation.navigateToStudio();
+        workspaceCreation.closeAIPanel();
     }
 
     @And("User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")

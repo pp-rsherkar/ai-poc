@@ -27,6 +27,7 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then user should navigate to PMP Deals Panel
     When User clicks "Private" Deals Tab
     Then User should see Add New Deal button, filters such as Exchange, Search
+    And Verify that "Active" and "Archived" buttons are available and by default "Active" button is selected
     When User enters below details in respective search field, verify that the deal list appears based on the selected filters
       | SearchByName     | Deal                  |
       | SearchByExchange | PulsePoint, JW Player |
@@ -38,11 +39,13 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     When User add new targeting rule for Rule Type "Deals"
     Then user should navigate to PMP Deals Panel
     When User clicks "Life Marketplace Deals" Deals Tab
+    And Verify Edit icon availability for the deals listed under "Life Marketplace" Deals tab
+    And Verify that "Premium Publisher" should not display in deals listing under Life Marketplace Deals tab
     When User enters below details in respective search field, verify that the deal list appears based on the selected filters
       | SearchByName     | Deal     |
       | SearchByExchange | Pubmatic |
 
-  @regression @e2e
+  @regression
   Scenario Outline: Add New Private Deals with deal price type "<DEAL_PRICE_TYPE>", pricing strategy "<PRICING_STRATEGY>" and assign to a tactic
     When User clicks Tactic Setting tab
     Then User should navigate to respective Tactic Setting tab
@@ -50,8 +53,13 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then user should navigate to PMP Deals Panel
     When User clicks "Private" Deals Tab
     And User clicks on Add New Deal button
+    And Verify Deal Type field is available with default value as "PMP"
+    And Verify Curator field is available with default value as "Client"
+    And Verify Pricing Type field is available with default value as "Floor"
     Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
     When User searches the deal and assign it from the deal list
+    Then Verify Edit icon availability for the deals listed under "Private" Deals tab
+    And Verify Clearing Price field is available and fetch the tool-tip details on hover for the field
     Then Selected Deals should appear in Applied Deals panel
     When User clicks on OK button
     Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
@@ -65,3 +73,85 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Flat             | 35    |
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Floor           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Floor+           |       |
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 34             | 60            | 01- Advertiser | PulsePoint (Direct Integrations) | Default          |       |
+
+  @regression
+  Scenario Outline: Verify active deal moves to archived while campaign is not running state
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User clicks "Private" Deals Tab
+    And User clicks on Add New Deal button
+    And Verify Deal Type field is available with default value as "PMP"
+    And Verify Curator field is available with default value as "Client"
+    And Verify Pricing Type field is available with default value as "Floor"
+    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    When User searches the deal and assign it from the deal list
+    And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
+    And Verify Archive option is available based on the campaign state
+    And User clicks "Archived" button from the search section of deal listing page
+    Then Verify that the deal is moved to archived deal section
+    Examples:
+      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | ADVERTISER     | CURATOR                          |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 01- Advertiser | PulsePoint (Direct Integrations) |
+
+  @regression
+  Scenario Outline: Verify active deal should not be deleted while campaign is running state
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User clicks "Private" Deals Tab
+    And User clicks on Add New Deal button
+    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    When User searches the deal and assign it from the deal list
+    When User clicks on OK button
+    Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+    And User saves the settings
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User searches the deal and assign it from the deal list
+    And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
+    And Verify Archive option is available based on the campaign state
+    And Verify the Tactic Link is available in the confirmation pop-up
+    And Verify the Tactic Link is clickable and navigates to the respective tactic page
+    Examples:
+      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | ADVERTISER     | CURATOR                          | CREATIVE      |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 01- Advertiser | PulsePoint (Direct Integrations) | Auto_Creative |
+
+  @regression
+  Scenario Outline: Verify that after deleting an active deal from targeting, the user is able to delete the deal while the campaign is in a running state
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User clicks "Private" Deals Tab
+    And User clicks on Add New Deal button
+    Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+    When User searches the deal and assign it from the deal list
+    When User clicks on OK button
+    Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+    And User saves the settings
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User searches the deal and assign it from the deal list
+    And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
+    And Verify Archive option is available based on the campaign state
+    And Verify the Tactic Link is available in the confirmation pop-up
+    And Verify the Tactic Link is clickable and navigates to the respective tactic page
+    When User searches the deal and assign it from the deal list
+    And User unassigns active deal from the applied deals section of All Deals tab
+    When User clicks on OK button
+    And User saves the settings
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User searches the deal and assign it from the deal list
+    And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
+    And Verify Archive option is available based on the campaign state
+    And User clicks "Archived" button from the search section of deal listing page
+    Then Verify that the deal is moved to archived deal section
+    Examples:
+      | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | ADVERTISER     | CURATOR                          | CREATIVE      |
+      | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 01- Advertiser | PulsePoint (Direct Integrations) | Auto_Creative |

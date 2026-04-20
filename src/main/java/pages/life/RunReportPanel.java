@@ -7,7 +7,6 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,13 +53,42 @@ public class RunReportPanel {
     private final Locator TEXT_QUALIFIER_CHECKBOX;
     private final Locator FETCHED_DIMENSIONS_AND_METRICS;
     private final Locator DIMENSION_LABEL;
-    private final Locator FILE_NAME_TEXTAREA;
     private final Locator FILE_NAME_ERROR;
     private final Locator DEFAULT_FLIGHT_DETAILS;
     private final Locator FLIGHT_DETAILS_DROPDOWN;
     private final Locator FLIGHT_DETAILS_DROPDOWN_VALUE;
     private final Locator FILE_BREAKDOWN_TYPE;
     private final Locator ALERT_MESSAGE;
+    private final Locator CALENDAR_TITLE;
+    private final Locator CALENDAR_DATA;
+    private final Locator DELIVERY_METHOD;
+    private final Locator LOGGED_IN_USERNAME;
+    private final Locator SCHEDULE_REPORT_USERNAME_LIST;
+    private final Locator FILE_NAME;
+    private final Locator REPORT_TIMING_CHECKBOX;
+    private final Locator CREATED_BY;
+    private final Locator REPORTING_PERIOD;
+    private final Locator REPORT_NAME;
+    private final Locator TOOL_TIP;
+    private final Locator ADVANCED_EXPORT_CHECKBOX;
+    private final Locator ADVANCED_DELIVERY_SETTING_LINK;
+    private final Locator LINE_CODING;
+    private final Locator LINE_CODING_OPTIONS;
+    private final Locator DESTINATION_NAME;
+    private final Locator DESTINATION_TYPE;
+    private final Locator HOST;
+    private final Locator USERNAME;
+    private final Locator PASSWORD;
+    private final Locator PORT;
+    private final Locator SERVER_PATH;
+    private final Locator EDIT_DESTINATION_BUTTON;
+    private final Locator TEST_ACCESS_BUTTON;
+    private final Locator CUSTOM_DESTINATION_RUN_BUTTON;
+    private final Locator CUSTOM_DESTINATION_CREATE_BUTTON;
+    private final Locator CUSTOM_DESTINATION_CANCEL_BUTTON;
+    private final Locator DESTINATION_DROPDOWN;
+    private final Locator FILE_NAME_HELP_TEXT;
+    private final Locator RE_RUN_ACCESS_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public RunReportPanel(Page page) {
@@ -102,13 +130,42 @@ public class RunReportPanel {
         this.TEXT_QUALIFIER_CHECKBOX = page.locator("//div[text()='Text Qualifier']/following-sibling::div/sui-checkbox");
         this.FETCHED_DIMENSIONS_AND_METRICS = page.locator("//div[@class='field customTemplate']//span");
         this.DIMENSION_LABEL = page.locator("//label[contains(text(),'Dimensions')]");
-        this.FILE_NAME_TEXTAREA = page.locator("//textarea[@placeholder='File Name']");
         this.FILE_NAME_ERROR = page.locator("//div[contains(@class,'run-report-error') and contains(text(),'Invalid file Name')]");
         this.DEFAULT_FLIGHT_DETAILS = page.locator("//div[@id='date-option-dropdown']/div[contains(@class, 'text')]");
         this.FLIGHT_DETAILS_DROPDOWN = page.locator("//div[@id='date-option-dropdown']");
         this.FLIGHT_DETAILS_DROPDOWN_VALUE = page.locator("//div[@id='date-option-dropdown']/div[@class='menu transition visible']/div");
         this.FILE_BREAKDOWN_TYPE = page.locator("//label[contains(text(),'File Breakdown')]/following-sibling::div/button");
         this.ALERT_MESSAGE = page.locator("//div[@role='alert']");
+        this.CALENDAR_TITLE = page.locator("//span[contains(@class,'title link')]");
+        this.CALENDAR_DATA = page.locator("//td[contains(@class,'link')]");
+        this.DELIVERY_METHOD = page.locator("//div[contains(@class,'delivery-method-navbar')]/a");
+        this.LOGGED_IN_USERNAME = page.locator("//div[@class='username']");
+        this.SCHEDULE_REPORT_USERNAME_LIST = page.locator("//div[@class='menu transition visible']//span");
+        this.FILE_NAME = page.locator("//textarea[@placeholder='File Name']");
+        this.REPORT_TIMING_CHECKBOX = page.locator("//div[contains(text(),'Report Timing')]/following-sibling::div/sui-checkbox[contains(@class,'evtLevelReport')]");
+        this.CREATED_BY = page.locator("//label[contains(text(),'Created by:')]/following-sibling::div");
+        this.REPORTING_PERIOD = page.locator("//label[contains(text(),'Reporting Period:')]/following-sibling::div");
+        this.REPORT_NAME = page.locator("//div[contains(@class,'name-section')]");
+        this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
+        this.ADVANCED_EXPORT_CHECKBOX = page.locator("//label[contains(text(),'Advanced Export')]/following-sibling::div//sui-checkbox");
+        this.ADVANCED_DELIVERY_SETTING_LINK = page.locator("//label[@class='advanceSettings' and contains(text(),'Show Advanced Delivery Settings')]");
+        this.LINE_CODING = page.locator("//div[@class='line-endings']");
+        this.LINE_CODING_OPTIONS = page.locator("//div[@class='line-endings']//sui-radio-button[@name='reportLineEndings']");
+        this.DESTINATION_NAME = page.locator("//label[contains(text(),'Destination Name')]/following-sibling::input");
+        this.DESTINATION_TYPE = page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select");
+        this.HOST = page.locator("//label[contains(text(),'Host')]/following-sibling::input");
+        this.USERNAME = page.locator("//label[contains(text(),'Username')]/following-sibling::input");
+        this.PASSWORD = page.locator("//input[@type='password']");
+        this.PORT = page.locator("//label[contains(text(),'Port')]/following-sibling::input");
+        this.SERVER_PATH = page.locator("//label[contains(text(),'Path on the server')]/following-sibling::input");
+        this.EDIT_DESTINATION_BUTTON = page.locator("//div[@class='destination-name']/following-sibling::div//img[contains(@src,'edit-simple.svg')]");
+        this.TEST_ACCESS_BUTTON = page.locator("//span[contains(text(),'Test Access')]");
+        this.CUSTOM_DESTINATION_RUN_BUTTON = page.locator("//div[contains(text(),'Choose file size to test access')]/parent::div/following-sibling::div//button[contains(text(),'Run')]");
+        this.CUSTOM_DESTINATION_CREATE_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Create')]");
+        this.CUSTOM_DESTINATION_CANCEL_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Cancel')]");
+        this.DESTINATION_DROPDOWN = page.locator("//div[contains(text(),'Destination')]/following-sibling::sui-select");
+        this.FILE_NAME_HELP_TEXT = page.locator("//span[@class='custom-destination-example-texr']//span");
+        this.RE_RUN_ACCESS_BUTTON = page.locator("//span[contains(text(),'Re-run Access')]");
     }
 
     public boolean isRunReportPanelOpened() {
@@ -223,25 +280,15 @@ public class RunReportPanel {
         return checkboxLocator.isVisible();
     }
 
-    public String fetchFilterReportCheckboxLabel(String checkboxLabel) {
-        for (int i = 0; i < FILTER_REPORT_CHECKBOX_LABEL.count(); i++) {
-            String labelText = FILTER_REPORT_CHECKBOX_LABEL.nth(i).innerText().trim();
-            if (labelText.contains(checkboxLabel)) {
-                FILTER_REPORT_CHECKBOX_LABEL.nth(i).click();
-                return labelText;
-            }
-        }
-        return " ";
+    public String fetchAndClickFilterReportCheckboxLabel(String checkboxLabel) {
+        Locator locator = FILTER_REPORT_CHECKBOX_LABEL.locator("text=" + checkboxLabel);
+        locator.click();
+        return locator.innerText().trim();
     }
 
     public boolean isFilterReportCheckboxAvailable(String checkboxLabel) {
-        for (int i = 0; i < FILTER_REPORT_CHECKBOX_LABEL.count(); i++) {
-            String labelText = FILTER_REPORT_CHECKBOX_LABEL.nth(i).innerText().trim();
-            if (labelText.contains(checkboxLabel)) {
-                return true;
-            }
-        }
-        return false;
+        Locator locator = FILTER_REPORT_CHECKBOX_LABEL.locator("text=" + checkboxLabel);
+        return locator.isVisible();
     }
 
     public boolean isRunNowAndScheduleTabsAvailable(String runNowTab, String scheduleTab) {
@@ -261,7 +308,7 @@ public class RunReportPanel {
     public void clickRunButton(String fileName) {
         RUN_BUTTON.click();
         if (FILE_NAME_ERROR.isVisible()) {
-            FILE_NAME_TEXTAREA.fill(fileName);
+            FILE_NAME.fill(fileName);
             RUN_BUTTON.click();
         }
     }
@@ -278,14 +325,22 @@ public class RunReportPanel {
         return text;
     }
 
-    public void clickModifyOption(String templateName) {
+    public void searchReportName(String templateName){
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
-        if (!templateName.contains("Custom Template")) {
-            SEARCH_REPORT.fill(templateName);
-            SEARCH_BUTTON.click();
-        }
+        SEARCH_REPORT.fill(templateName);
+        SEARCH_BUTTON.click();
+    }
+
+    public void clickModifyOption(String templateName) {
         Locator templateElements = page.locator(String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
+        if(!templateElements.first().isVisible()) {
+            waitUtility.waitUntilPreLoaderHidden();
+            waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
+            if (!templateName.contains("Custom Template")) {
+                searchReportName(templateName);
+            }
+        }
         waitUtility.waitForLocatorVisible(templateElements.first());
         templateElements.first().click();
         waitUtility.waitForLocatorVisible(REPORT_MODIFY_OPTION.first());
@@ -343,22 +398,39 @@ public class RunReportPanel {
     }
 
     public boolean selectStartAndEndDate() {
-        CommonUtils.generateScheduleDaysIfNeeded();
-        boolean startSelected = selectDate(START_DATE, CommonUtils.startDay);
-        boolean endSelected = selectDate(END_DATE, CommonUtils.endDay);
+        String[] dates = CommonUtils.generateStartAndEndDates();
+        boolean startSelected = selectDate(START_DATE,  dates[0]);
+        boolean endSelected = selectDate(END_DATE,  dates[1]);
         return startSelected && endSelected;
     }
 
-    private boolean selectDate(Locator input, int day) {
-        String dayToSelect = String.valueOf(day);
+    public boolean selectDate(Locator input, String date) {
+        String[] parts = date.split("-");
+        String dd = parts[0];
+        String mm = parts[1];
+        String yyyy = parts[2];
         try {
             input.click();
+            while (!CALENDAR_TITLE.textContent().trim().equalsIgnoreCase(yyyy)) {
+                CALENDAR_TITLE.click();
+            }
+            CommonUtils.selectCalendarData(CALENDAR_DATA, yyyy);
+            CommonUtils.selectCalendarData(CALENDAR_DATA, mm);
             CALENDAR_VIEW.waitFor(new Locator.WaitForOptions().setTimeout(3000));
-            Locator dayCells = CALENDAR_VIEW.locator("//td[normalize-space()='" + dayToSelect + "']");
-            Locator correctDay = dayCells.nth(0);
-            int maxDay = YearMonth.now().lengthOfMonth();
-            if (day >= 1 && day <= maxDay) {
+            Locator dayCells = CALENDAR_VIEW.locator("//td[normalize-space()='" + dd + "']");
+            int count = dayCells.count();
+            int day = Integer.parseInt(dd);
+            Locator correctDay;
+            if (day < 15) {
+                correctDay = dayCells.first();
+            } else if (day > 20) {
                 correctDay = dayCells.last();
+            } else {
+                if (count == 3) {
+                    correctDay = dayCells.nth(1);
+                } else {
+                    correctDay = dayCells.first();
+                }
             }
             correctDay.click();
             waitUtility.waitForLocatorDetached(CALENDAR_VIEW);
@@ -421,6 +493,9 @@ public class RunReportPanel {
         return reportFormatValues;
     }
 
+    public boolean isTextQualifierCheckboxAvailable() {
+        return TEXT_QUALIFIER_CHECKBOX.isVisible();
+    }
 
     public boolean isTextQualifierCheckboxChecked() {
         return TEXT_QUALIFIER_CHECKBOX.getAttribute("class").contains("checked");
@@ -521,13 +596,195 @@ public class RunReportPanel {
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown", 60000);
     }
 
-    public String fetchFileName() {
-        return FILE_NAME_TEXTAREA.inputValue().trim();
+    public String fetchFileNameFromUI() {
+        return FILE_NAME.inputValue().trim();
     }
 
     public void clickSearchButton() {
         SEARCH_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
-}
 
+    public boolean fetchDefaultDeliveryTab(String deliveryTab) {
+        for (int i = 0; i < DELIVERY_METHOD.count(); i++) {
+            if (DELIVERY_METHOD.nth(i).textContent().trim().equalsIgnoreCase(deliveryTab) && DELIVERY_METHOD.nth(i).getAttribute("class").contains("active")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<String> fetchScheduleReportInputValue(String fieldName) {
+        Locator locator;
+        List<String> capturedValues = new ArrayList<>();
+        if (fieldName.contains("Deliver to Users"))
+            locator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//div[contains(@class,'transition ui label')]//span", fieldName));
+        else
+            locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span", fieldName));
+        for(int i =0; i< locator.count(); i++){
+            if (locator.nth(i).isVisible()) {
+                locator.nth(i).scrollIntoViewIfNeeded();
+                capturedValues.add(locator.nth(i).textContent().trim());
+            }
+        }
+        return capturedValues;
+    }
+
+    public String fetchLoggedInUsername() {
+        return LOGGED_IN_USERNAME.innerText().trim();
+    }
+
+    public void enterDataInScheduleReport(String fieldName, String newEmail) {
+        Locator locator;
+        if (fieldName.contains("Deliver to Users"))
+            locator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//i", fieldName));
+        else
+            locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//i", fieldName));
+        locator.click();
+        SCHEDULE_REPORT_USERNAME_LIST.locator("text=" + newEmail).click();
+        page.keyboard().press("Escape");
+    }
+
+    public boolean isFileNameFieldAvailable() {
+        return FILE_NAME.isVisible();
+    }
+
+    public boolean verifyReportPeriodRelatedFields(String option) {
+        return switch (option) {
+            case "Custom Dates" ->
+                    START_DATE.isVisible() && END_DATE.isVisible() && START_TIME.isVisible() && END_TIME.isVisible() && TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
+            case "Lifetime" ->
+                    TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
+            case "Flights" -> FLIGHT_DETAILS_DROPDOWN.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
+            default -> false;
+        };
+    }
+
+    public List<String> fetchReportDetailsFromListingPage() {
+        List<String> fetchReportDetails = new ArrayList<>();
+        fetchReportDetails.add(CREATED_BY.first().textContent().trim());
+        fetchReportDetails.add(REPORTING_PERIOD.first().textContent().split("—")[0].trim());
+        fetchReportDetails.add(REPORT_NAME.first().textContent().split("from")[0].trim());
+        return fetchReportDetails;
+    }
+
+    public String verifyEmailNotRemovable(String fieldName, String loggedInUser) {
+        String usernameText = loggedInUser.split("\\(")[0];
+        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span[contains(text(),'%s')]", fieldName, usernameText));
+        locator.click();
+        String tooltipText = TOOL_TIP.innerText().trim();
+        page.keyboard().press("Escape");
+        return tooltipText;
+    }
+
+    public boolean isReportFormatFieldAvailable() {
+        return REPORT_FORMAT_SELECTED_VALUE.isVisible();
+    }
+
+    public boolean isAdvancedExportCheckboxAvailable() {
+        return ADVANCED_EXPORT_CHECKBOX.isVisible();
+    }
+
+    public boolean isAdvancedExportCheckboxChecked() {
+        return !TEXT_QUALIFIER_CHECKBOX.getAttribute("class").contains("checked");
+    }
+
+    public void clickAdvancedDeliverySettingLink() {
+        ADVANCED_DELIVERY_SETTING_LINK.click();
+    }
+
+    public boolean isLineCodingFieldAvailable() {
+        return LINE_CODING.isVisible();
+    }
+
+    public boolean checkDefaultLineCodingType(String defaultLineCodingType) {
+        Locator locator = LINE_CODING_OPTIONS.locator("xpath=/label");
+        for (int i = 0; i < LINE_CODING_OPTIONS.count(); i++) {
+            if (locator.nth(i).innerText().contains(defaultLineCodingType) && LINE_CODING_OPTIONS.nth(i).getAttribute("class").contains("checked")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<String> fetchLineCodingTypes() {
+        return LINE_CODING_OPTIONS.locator("xpath=/label").allInnerTexts();
+    }
+
+    public void enterDestinationDetails(String destinationName, String destinationType, String host, String username, String password, String port, String serverPath) {
+        DESTINATION_NAME.fill(destinationName);
+        DESTINATION_TYPE.click();
+        String destinationXpath = String.format("//sui-select-option//span[text()='%s']", destinationType);
+        DESTINATION_TYPE.locator("xpath=" + destinationXpath).click();
+        HOST.fill(host);
+        USERNAME.fill(username);
+        PASSWORD.fill(password);
+        PORT.fill(port);
+        SERVER_PATH.fill(serverPath);
+    }
+
+    public boolean isEditDestinationAvailable() {
+        DESTINATION_DROPDOWN.click();
+        return EDIT_DESTINATION_BUTTON.first().isVisible();
+    }
+
+    public void clickEditDestination() {
+        EDIT_DESTINATION_BUTTON.first().click();
+        waitUtility.waitForLocatorVisible(DESTINATION_NAME);
+    }
+
+    public void clickTestAccessButton() {
+        TEST_ACCESS_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CUSTOM_DESTINATION_RUN_BUTTON);
+        CUSTOM_DESTINATION_RUN_BUTTON.click();
+    }
+
+    public void clickCreateDestinationButton() {
+        CUSTOM_DESTINATION_CREATE_BUTTON.click();
+    }
+
+    public boolean isDestinationNameAvailable() {
+        return DESTINATION_NAME.isVisible() && !DESTINATION_NAME.inputValue().isEmpty();
+    }
+
+    public boolean isDestinationTypeAvailable() {
+        return DESTINATION_TYPE.isVisible() && !DESTINATION_TYPE.locator("xpath=//div[@class='text']//span[2]").textContent().isEmpty();
+    }
+
+    public boolean isHostFieldAvailable() {
+        return HOST.isVisible() && !HOST.inputValue().isEmpty();
+    }
+
+    public boolean isUsernameFieldAvailable() {
+        return USERNAME.isVisible() && !USERNAME.inputValue().isEmpty();
+    }
+
+    public boolean isPasswordFieldAvailable() {
+        return PASSWORD.isVisible() && !PASSWORD.inputValue().isEmpty();
+    }
+
+    public boolean isPortFieldAvailable() {
+        return PORT.isVisible() && !PORT.inputValue().isEmpty();
+    }
+
+    public boolean isTestAccessButtonAvailable() {
+        return TEST_ACCESS_BUTTON.isVisible();
+    }
+
+    public boolean isReRunAccessButtonAvailable() {
+        return RE_RUN_ACCESS_BUTTON.isVisible();
+    }
+
+    public boolean isCreateButtonAvailable() {
+        return CUSTOM_DESTINATION_CREATE_BUTTON.isVisible();
+    }
+
+    public boolean isCancelButtonAvailable() {
+        return CUSTOM_DESTINATION_CANCEL_BUTTON.isVisible();
+    }
+
+    public String fetchFileNameHelpText() {
+        FILE_NAME_HELP_TEXT.first().scrollIntoViewIfNeeded();
+        return FILE_NAME_HELP_TEXT.first().textContent().trim();
+    }
+}
