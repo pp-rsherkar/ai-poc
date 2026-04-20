@@ -27,7 +27,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     When User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the created pixel
     Then Verify the selected targeting rule "<RULE_TYPE>"
-    Then Verify the count of rule options for the selected targeting rule on the Tactic Settings page
+    Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     Examples:
@@ -62,7 +62,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     When User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the created Smart list
     Then Verify the selected targeting rule "<RULE_TYPE>" for Smart list
-    Then Verify the count of rule options for the selected targeting rule on the Tactic Settings page
+    Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     Examples:
@@ -91,7 +91,7 @@ Feature: End to End workflow for all types of Pixel creation and targeting at Ta
     When User selects the "<CHANNEL>" as channel
     And User selects "<RULE_TYPE>" as rule type and selects the created pixel
     Then Verify the selected targeting rule "<RULE_TYPE>"
-    Then Verify the count of rule options for the selected targeting rule on the Tactic Settings page
+    Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     Examples:

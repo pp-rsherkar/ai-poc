@@ -22,7 +22,7 @@ Feature: End to End Workflow of Report Generation.
     And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     # 2
     And User navigates to Report Templates page
