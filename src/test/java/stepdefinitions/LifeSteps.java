@@ -401,14 +401,10 @@ public class LifeSteps {
 
     @Then("Verify settings details are saved and user is navigated to the creatives tab")
     public void verify_settings_details_are_saved_and_user_is_navigated_to_creatives_tab() {
-        logger.info("Verifying settings save success and navigation to Creatives");
         String successMessage = tacticSettings.tacticSettingsSuccess();
-        logger.info("Save Message: {}", successMessage);
         assert successMessage.contains("Success!");
         String creativesText = tacticCreatives.verifyTacticCreativesText();
-        logger.info("Creatives tab text: {}", creativesText);
         Assert.assertEquals("Creative(s)", creativesText);
-        logger.info("Settings saved and navigated to Creatives successfully");
     }
 
     @Then("User clicks on first tactic and goes to details tab")
@@ -903,16 +899,14 @@ public class LifeSteps {
 
     @And("User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using {string} and verifies the same status in the respective Line Item and Tactic pages")
     public void userFetchesTheLineItemsAndTacticsEnabledDisabledStatusFromCampaignDashboardAndVerifiesTheSameStatusInTheRespectiveLineItemAndTacticPages(String campaignID) {
-        logger.info("Fetching toggle status from dashboard");
+        logger.info("Campaign ID: {}", campaignID);
         List<String> expectedStatus = campaignDashboard.fetchLineAndTacticToggleStatus();
         List<String> actualStatus = new ArrayList<>();
-        logger.info("Navigating to pages to verify status. Campaign ID: {}", campaignID);
         campaignDashboard.navigateToCampaign(campaignID);
         campaigns.clickLineItemTile();
         actualStatus.add(campaigns.fetchToggleStatus());
         campaigns.clickTacticTile();
         actualStatus.add(campaigns.fetchToggleStatus());
-        logger.info("Comparing statuses. Dashboard: {}, Individual Pages: {}", expectedStatus, actualStatus);
         Assert.assertEquals(expectedStatus, actualStatus);
     }
 
@@ -1000,12 +994,9 @@ public class LifeSteps {
 
     @And("User removes all the filters applied on the Dashboard and verifies the data is reset to default state")
     public void userRemovesAllTheFiltersAppliedOnTheDashboardAndVerifiesTheDataIsResetToDefaultState() {
-        logger.info("Resetting dashboard filters and verifying data change");
         String campaignCountBeforeFilterRemoval = campaignDashboard.fetchCampaignDataCountFromPagination();
-        logger.info("Count before reset: {}", campaignCountBeforeFilterRemoval);
         campaignDashboard.clickResetAllFilters();
         String campaignCountAfterFilterRemoval = campaignDashboard.fetchCampaignDataCountFromPagination();
-        logger.info("Count after reset: {}", campaignCountAfterFilterRemoval);
         Assert.assertNotEquals(campaignCountBeforeFilterRemoval, campaignCountAfterFilterRemoval);
     }
 
@@ -1075,9 +1066,7 @@ public class LifeSteps {
 
     @Then("Verify only Current Month's Flights should render on the Dashboard")
     public void verifyOnlyActiveFlightsShouldRenderOnTheDashboard() {
-        logger.info("Verifying only active (current month's) flights render on dashboard");
         List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
-        logger.info("Current Month's fetched flight dates: {}", dates);
         LocalDate today = LocalDate.now();
         boolean allFlightsActiveToday = true;
         if (dates.isEmpty()) {
@@ -1099,7 +1088,6 @@ public class LifeSteps {
 
     @Then("Verify only Today's Flights should render on the Dashboard")
     public void verifyOnlyTodaySFlightsShouldRenderOnTheDashboard() {
-        logger.info("Verifying only today's flights render on dashboard");
         List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
         LocalDate today = LocalDate.now();
         boolean allDatesToday = dates.stream().allMatch(date -> date.isEqual(today));
@@ -1114,22 +1102,17 @@ public class LifeSteps {
 
     @And("Verify only Custom date range Flights from {string} to {string} should render on the Dashboard if available")
     public void verifyOnlyCustomDateRangeFlightsShouldRenderOnTheDashboardIfAvailable(String startDate, String endDate) {
-        logger.info("Verifying dashboard reflects flights for custom date range: {} to {}", startDate, endDate);
+        logger.info("Custom date range: {} to {}", startDate, endDate);
         boolean flag = campaignDashboard.isCampaignDataAvailableInCustomDateRange();
-        logger.info("Is campaign data empty/unavailable in custom date range: {}", flag);
 
         if (flag) {
-            logger.info("No campaign data is available in range, bypassing date bounds verification");
             Assert.assertTrue("No campaign data is available", true);
         } else {
             List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
-            logger.info("Fetched flight dates from dashboard: {}", dates);
             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             LocalDate start = LocalDate.parse(startDate, inputFormatter);
             LocalDate end = LocalDate.parse(endDate, inputFormatter);
-            logger.info("Parsed validation bounds - Start: {}, End: {}", start, end);
             boolean allDatesInCurrentMonth = dates.stream().noneMatch(date -> date.isBefore(start) || date.isAfter(end));
-            logger.info("All dates fall within the custom range: {}", allDatesInCurrentMonth);
             Assert.assertTrue("Only flights within the selected date range should be visible on the Dashboard", allDatesInCurrentMonth);
         }
     }
@@ -1137,13 +1120,10 @@ public class LifeSteps {
     @When("User clicks the Settings icon and selects the following group by options and verify dashboard data is grouped accordingly")
     public void userClicksTheSettingsIconAndSelectsTheFollowingGroupByOptions(DataTable dataTable) {
         List<String> groupByOption = dataTable.asList(String.class);
-        logger.info("Initiating dashboard grouping verification for options: {}", groupByOption);
 
         for (String option : groupByOption) {
             campaignDashboard.clickSettingIcon();
-            logger.info("Selecting '{}' and validating dashboard data grouping", option);
             boolean isGrouped = campaignDashboard.clickGroupByOptionsAndCheckDashboardData(option);
-            logger.info("Data grouped correctly for '{}': {}", option, isGrouped);
             Assert.assertTrue("Dashboard data is not grouped by the selected options - " + option, isGrouped);
         }
     }
@@ -1424,14 +1404,12 @@ public class LifeSteps {
 
     @When("User creates Targeting template {string} for the line items {string} with channel {string} and Targeting Rules")
     public void userCreatesTargetingTemplateForTheLineItemsWithChannelAndTargetingRules(String templateName, String lineItems, String channel, DataTable ruleTypeAndOptions) {
-        logger.info("Creating Targeting Template: {} for Line Items: {} and Channel: {}", templateName, lineItems, channel);
+        logger.info("Template: {}, Line Items: {}, Channel: {}", templateName, lineItems, channel);
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
-        logger.info("Processed Targeting Rules: {}", rulesMap);
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
         keyValueMap = targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
-        logger.info("Targeting template created. Returned Key-Value Map: {}", keyValueMap);
     }
 
     @Then("User searches and verifies the already created targeting template using the search option")
@@ -1477,13 +1455,11 @@ public class LifeSteps {
 
     @And("Create a tactic with {string} line items and other details {string} {string} {string} {string} {string} {string} {string} and import the template in Tactic")
     public void createATacticWithLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName) {
-        logger.info("Creating a tactic and importing template. Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}", lineItemType, advertiser, campaign_name, tacticName);
+        logger.info("Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}", lineItemType, advertiser, campaign_name, tacticName);
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).toList();
         List<String> templateList = new ArrayList<>(keyValueMap.keySet());
         List<Map<String, String>> ruleCountAndValueList = new ArrayList<>(keyValueMap.values());
-        logger.info("Importing templates: {}", templateList);
         flag = tacticDetails.createTacticWithLineItemsAndImport(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, templateList, ruleCountAndValueList);
-        logger.info("Tactic creation and template import flag result: {}", flag);
     }
 
     @Then("Verify the template created can be imported in the Tactic")
@@ -1587,13 +1563,11 @@ public class LifeSteps {
      * */
     @And("Create a tactic with below targeting rules and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
     public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(String lineItemType, String advertiser, String campaign_name, String campaign_type, String budget, String lineItemName, String lineBudget, String tacticName, DataTable ruleTypeAndOptions) {
-        logger.info("Creating a tactic with inline targeting rules. Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}", lineItemType, advertiser, campaign_name, tacticName);
+        logger.info("Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}", lineItemType, advertiser, campaign_name, tacticName);
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
-        logger.info("Processed targeting rules: {}", rulesMap);
         List<String> lineItemTypeList = Arrays.stream(lineItemType.split(",")).map(String::trim).toList();
         List<String> templateNameList = tacticDetails.createTacticWithLineItemsAndTargetingRules(lineItemTypeList, advertiser, campaign_name, campaign_type, budget, lineItemName, lineBudget, tacticName, rulesMap);
-        logger.info("Returned Template Names from tactic creation: {}", templateNameList);
 
         for (String templateName : templateNameList) {
             keyValueMap.put(templateName, new HashMap<>());
