@@ -75,9 +75,9 @@ public class Setup {
         this.UPLOADED_TEXT = page.locator("//span[@class='uploaded-result-text']");
         this.PREVIEW_BUTTON = page.locator("//button[contains(text(),'Preview')]");
         this.DEAL_ADDED_SUCCESS_TEXT = page.locator("//span[contains(@class,'deal-add-count success')]");
-        this.MARKET_NAME_ERROR_TEXT=page.locator("//p[normalize-space()='Name is required']");
-        this.ACCOUNT_ERROR_TEXT=page.locator("//div[contains(text(),'Account is required')]");
-        this.MARKET_KPI_ERROR_TEXT=page.locator("//p[normalize-space()='Market KPI and Benchmark is required']");
+        this.MARKET_NAME_ERROR_TEXT = page.locator("//p[normalize-space()='Name is required']");
+        this.ACCOUNT_ERROR_TEXT = page.locator("//div[contains(text(),'Account is required')]");
+        this.MARKET_KPI_ERROR_TEXT = page.locator("//p[normalize-space()='Market KPI and Benchmark is required']");
         this.UPLOAD_BUTTON = page.locator("//button[contains(text(),'Upload')]");
         this.DEAL_NAME_FROM_DEALS_TAB = page.locator("//input[@placeholder='Deal Name']");
         this.DEAL_ID_FROM_DEALS_TAB = page.locator("//div[contains(@class,'id-col')]/span[@class='deal-name-text']");
@@ -120,7 +120,6 @@ public class Setup {
     }
 
     public void enterCuratedMarketDetailsOnlyDescription(String description) {
-
         page.keyboard().press("Escape");
         DESCRIPTION.fill(description);
     }
