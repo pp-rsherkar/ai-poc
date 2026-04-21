@@ -759,40 +759,32 @@ public class LifeSteps {
 
     @Then("Verify drug details are added")
     public void verify_drug_details_are_added() {
-        logger.info("Verifying added drug details");
         String actualDrug = npiSmartList.fetchDrugName();
-        logger.info("Fetched Drug name: {}", actualDrug);
         Assert.assertEquals("Glynase", actualDrug);
     }
 
     @When("User makes list available in LIFE, HCP365 and saves the list")
     public void user_makes_list_available_in_life_hcp365_and_saves_the_list() {
-        logger.info("Selecting product to make list available in LIFE and HCP365");
         npiSmartList.selectProduct();
     }
 
     @Then("User navigates to Campaign Dashboard")
     public void user_navigates_to_campaign_dashboard() {
-        logger.info("Navigating to Campaign Dashboard");
         navigation.clickSubMenu();
         navigation.clickCampaigns();
         String dashboardTitle = campaigns.campaignDashboard();
-        logger.info("Campaign Dashboard title: {}", dashboardTitle);
         Assert.assertEquals("Life", dashboardTitle);
     }
 
     @Then("Verify list is targeted in the tactic successfully")
     public void verify_list_is_targeted_in_the_tactic_successfully() {
-        logger.info("Verifying NPI rule targeting in tactic");
         tacticSettings.verifyNPIRule();
         String npiRule = tacticSettings.verifyNPIRule();
-        logger.info("NPI Rule found: {}", npiRule);
         Assert.assertTrue("Rule does not contain 'NPI'", npiRule.contains("NPI"));
     }
 
     @Then("User saves the targeting")
     public void u_ser_saves_the_targeting() {
-        logger.info("Saving targeting settings");
         tacticSettings.saveTacticSettings();
     }
 
@@ -809,7 +801,6 @@ public class LifeSteps {
 
     @And("User navigates to run report from mega menu of the life application")
     public void user_navigate_to_run_report() {
-        logger.info("Navigating to Run Report via mega menu");
         navigation.clickSubMenu();
         navigation.clickMenuAngle();
         navigation.clickRunReport();
@@ -823,16 +814,13 @@ public class LifeSteps {
 
     @Then("User verifies the selected campaign,line item, tactic and runs report by clicking on Run button")
     public void user_verifies_the_selected_details() {
-        logger.info("Verifying auto-populated details before running report");
         Assert.assertEquals(campaignNameRandom, reportTemplates.verifyAutopopulatedCampaign(campaignNameRandom));
         Assert.assertEquals(lineItemNameRandom, reportTemplates.verifyAutopopulatedLineitem(lineItemNameRandom));
-        logger.info("Details verified. Clicking Run button.");
         reportTemplates.runReport();
     }
 
     @Then("User navigates to generate report field and verifies the report name by campaign name")
     public void user_navigate_to_generate_report_page() {
-        logger.info("Navigating to Generated Reports page");
         navigation.clickSubMenu();
         navigation.clickScheduledReport();
         navigation.clickSubMenu();
@@ -847,16 +835,13 @@ public class LifeSteps {
         navigation.clickSubMenu();
         navigation.clickMenuAngle();
         navigation.clickReportTemplate();
-        logger.info("Verifying report columns against template");
         Assert.assertTrue("Report headers match expected values!", reportTemplates.verifyColumnsOfReport(templateNameRandom, filePath));
-        logger.info("Report data verification successful");
     }
 
     /*Roshani Sherkar - 18-06-2025
      * Campaign Dashbaord Features Start*/
     @And("Verify Campaign Dashboard is displayed with title {string}")
     public void verifyCampaignDashboardIsDisplayedWithTitle(String title) {
-        logger.info("Checking if Campaign Dashboard is displayed with title: {}", title);
         Assert.assertEquals(title, campaignDashboard.isCampaignDashboardVisibleWithTitle(title));
     }
 
@@ -893,10 +878,8 @@ public class LifeSteps {
         logger.info("Verifying comment icon color matches: {}", colour);
         List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
         Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
-        logger.info("Verifying stored comments text");
         List<String> expectedComments = normalize(Collections.singletonList(keyValues.toString()));
         List<String> actualComments = normalize(Collections.singletonList(String.valueOf(campaignDashboard.verifyCommentIconText())));
-        logger.info("Expected: {}, Actual: {}", expectedComments, actualComments);
         Assert.assertEquals(expectedComments, actualComments);
     }
 
@@ -930,13 +913,11 @@ public class LifeSteps {
 
     @When("User toggles the Enabled button for Line Items and Tactics")
     public void userTogglesEnabledButtonForLineItemsAndTacticFromDashboard() {
-        logger.info("Toggling Enabled/Disabled status for Line Items and Tactics from dashboard");
         campaignDashboard.clickLineAndTacticToggleButton();
     }
 
     @Then("Verify that Line Items and Tactics reflect the correct enabled or disabled state")
     public void verifyLineItemsAndTacticsAreEnabledDisabledAccordingly() {
-        logger.info("Verifying Line Items and Tactics toggle status functionality");
         Assert.assertTrue("Buttons are clickable and functional", campaignDashboard.verifyLineTacticToggleStatus());
     }
 
@@ -960,21 +941,18 @@ public class LifeSteps {
         logger.info("Verifying navigation flow for Campaign ID: {}", campaignID);
         campaignDashboard.navigateToCampaign(campaignID);
         Assert.assertTrue("Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
-        logger.info("Campaign page verified");
         campaigns.navigateToCampaignDashboard();
         campaignDashboard.searchCreatedCampaign(campaignID);
         campaignDashboard.expandCreatedLineItem();
 
         campaignDashboard.navigateToLineItemDetails();
         Assert.assertTrue("Navigation to Line Item details page is not successful", campaignDashboard.isLineItemPageDisplayed());
-        logger.info("Line Item page verified");
         campaigns.navigateToCampaignDashboard();
         campaignDashboard.searchCreatedCampaign(campaignID);
         campaignDashboard.expandCreatedLineItem();
 
         campaignDashboard.navigateToTacticDetails();
         Assert.assertTrue("Navigation to Tactic details page is not successful", campaignDashboard.isTacticPageDisplayed());
-        logger.info("Tactic page verified");
     }
 
     @When("User clicks Menu option and selects column names")
@@ -988,21 +966,17 @@ public class LifeSteps {
 
     @Then("Verify dashboard is customized and only selected columns are displayed")
     public void verifyDashboardIsCustomizedAndOnlySelectedColumnsAreDisplayed() {
-        logger.info("Verifying displayed dashboard columns match selection");
         List<String> columnName = campaignDashboard.fetchDashboardColumns();
-        logger.info("Fetched Columns: {}", columnName);
         Assert.assertEquals(keyValues.stream().map(o -> ((String) o).toLowerCase()).collect(Collectors.toSet()), columnName.stream().map(String::toLowerCase).collect(Collectors.toSet()));
     }
 
     @And("User clicks HideAll option from Menu and verifies Dashboard columns are hidden accordingly")
     public void userClicksHideAllAndShowAllOptionsFromMenu() {
-        logger.info("Clicking 'Hide All' columns option");
         Assert.assertTrue("Columns are not hidden successfully", campaignDashboard.clickHideAllOption());
     }
 
     @And("User clicks ShowAll option from Menu and verifies Dashboard columns are shown accordingly")
     public void userClicksShowAllOptionFromMenuAndVerifiesDashboardColumnsAreShownAccordingly() {
-        logger.info("Clicking 'Show All' columns option");
         Assert.assertTrue("Columns are not shown successfully", campaignDashboard.clickShowAllOption());
     }
 
@@ -1024,21 +998,16 @@ public class LifeSteps {
 
     @And("Verify the filter list displays only the selected filter values")
     public void verifyTheFilterListDisplaysOnlyTheSelectedFilterValues() {
-        logger.info("Verifying selected filter values in UI");
         List<String> selectedFilterLabels = campaignDashboard.fetchSelectedFilterLabels();
         List<String> cleanedActual = selectedFilterLabels.stream().map(s -> s.replaceAll(":$", "")).toList();
-        logger.info("Labels found: {}", cleanedActual);
         Assert.assertEquals(keyType, cleanedActual);
         List<String> normalizedExpected = keyValues.stream().map(obj -> obj.toString().toLowerCase().trim()).toList();
         List<String> normalizedActual = campaignDashboard.fetchSelectedFilterValues().stream().map(s -> s.trim().toLowerCase()).toList();
-        logger.info("Values found: {}", normalizedActual);
         Assert.assertEquals(normalizedExpected, normalizedActual);
     }
 
     @Then("Verify the Campaign Dashboard data should filter as per the selected filter values")
     public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
-        logger.info("Verifying dashboard data reflects applied filters");
-
         for (Object o : keyType) {
             Assert.assertTrue("Campaign Dashboard data is not filtered as per the selected filter values", campaignDashboard.isCampaignDataFilteredAccordingToSelectedFilters(o.toString(), keyValues));
         }
@@ -1046,7 +1015,6 @@ public class LifeSteps {
 
     @And("Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
     public void filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(String iconColor) {
-        logger.info("Verifying filter icon indicator color is: {}", iconColor);
         String filterIconColor = campaignDashboard.verifyFilterIcon();
         Assert.assertEquals(iconColor, filterIconColor);
     }
@@ -1080,59 +1048,45 @@ public class LifeSteps {
 
     @When("User clicks Favorite Only checkbox")
     public void userClicksFavoriteOnlyCheckbox() {
-        logger.info("Clicking 'Favorite Only' checkbox");
         campaignDashboard.clickFavoriteOnlyCheckbox();
     }
 
     @Then("Verify the dashboard results should show only campaigns which are marked as favorite")
     public void verifyTheDashboardResultsShouldShowOnlyCampaignsWhichAreMarkedAsFavorite() {
-        logger.info("Verifying displayed campaigns are marked as Favorite");
         Assert.assertTrue("Dashboard data has campaign details marked as favorite", campaignDashboard.isFavoriteCampaignShown());
     }
 
     @And("User unchecks Favorite Only checkbox")
     public void userUnchecksFavoriteOnlyCheckbox() {
-        logger.info("Unchecking 'Favorite Only' checkbox");
         campaignDashboard.unselectFavoriteCheckboxIfSelected();
     }
 
     @And("Verify the dashboard results should show campaigns which are marked as favorite and nonfavorite")
     public void verifyTheDashboardResultsShouldShowCampaignsWhichAreMarkedAsFavoriteAndNonfavorite() {
-        logger.info("Verifying dashboard results show both favorite and non-favorite campaigns");
         boolean isAvailable = campaignDashboard.isFavoriteNonFavoriteCampaignAvailable();
-        logger.info("Favorite and non-favorite campaigns available: {}", isAvailable);
         Assert.assertTrue("Dashboard data has campaign details marked as favorite", isAvailable);
-        logger.info("Verified successfully that both campaign types are shown");
     }
 
     @When("User clicks Hide Finished checkbox")
     public void userClicksHideFinishedCheckbox() {
-        logger.info("Clicking 'Hide Finished' checkbox");
         campaignDashboard.clickHideFinishedCheckbox();
     }
 
     @Then("Verify the dashboard data should not reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldNotReflectCampaignsWithFinishedStatus() {
-        logger.info("Verifying dashboard data does not reflect campaigns with Finished status");
         boolean isHidden = campaignDashboard.isFinishedCampaignListHidden();
-        logger.info("Finished campaigns hidden status: {}", isHidden);
         Assert.assertTrue("Campaigns with Finished Status are hidden", isHidden);
-        logger.info("Verified successfully that finished campaigns are hidden");
     }
 
     @And("User unchecks Hide Finished checkbox")
     public void userUnchecksHideFinishedCheckbox() {
-        logger.info("Unchecking 'Hide Finished' checkbox");
         campaignDashboard.unselectHideFinishedCheckboxIfSelected();
     }
 
     @And("Verify the dashboard data should reflect campaigns with Finished status")
     public void verifyTheDashboardDataShouldReflectCampaignsWithFinishedStatus() {
-        logger.info("Verifying dashboard data reflects campaigns with Finished status");
         boolean isShown = campaignDashboard.isFinishedCampaignListShownWithOtherStatus();
-        logger.info("Finished campaigns shown status: {}", isShown);
         Assert.assertTrue("Campaigns with Finished Status are hidden", isShown);
-        logger.info("Verified successfully that finished campaigns are shown");
     }
 
     @And("User clicks {string} filter")
@@ -1169,10 +1123,8 @@ public class LifeSteps {
     public void verifyOnlyTodaySFlightsShouldRenderOnTheDashboard() {
         logger.info("Verifying only today's flights render on dashboard");
         List<LocalDate> dates = campaignDashboard.fetchFlightStartAndEndDate();
-        logger.info("Fetched flight dates: {}", dates);
         LocalDate today = LocalDate.now();
         boolean allDatesToday = dates.stream().allMatch(date -> date.isEqual(today));
-        logger.info("All dates match today: {}", allDatesToday);
         Assert.assertTrue("Only today's flights should be visible on the Dashboard", allDatesToday);
     }
 
@@ -1248,9 +1200,7 @@ public class LifeSteps {
 
     @Then("User should navigate to respective Tactic Setting tab")
     public void userShouldNavigateToRespectiveTacticSettingTab() {
-        logger.info("Verifying navigation to Tactic Settings tab");
         pmp.verifyTacticSettingsText();
-        logger.info("Tactic settings text verified successfully");
     }
 
     @When("User add new targeting rule for Rule Type {string}")
@@ -1323,7 +1273,6 @@ public class LifeSteps {
         npiStaticList.editListName(npiNameEdited);
         npiStaticList.saveList();
         String successMessage = npiStaticList.fetchSuccessAlert();
-        logger.info("List save success message: {}", successMessage);
         Assert.assertTrue("Unable to see success message", successMessage.contains("NPI list created"));
     }
 
@@ -1333,7 +1282,6 @@ public class LifeSteps {
         npiStaticList.clickBackToNPILists();
         npiLists.searchList(npiNameEdited);
         npiLists.openSearchedList(npiNameEdited);
-        logger.info("Updated list found and opened successfully");
     }
 
     @When("User deletes the created list")
@@ -1344,9 +1292,7 @@ public class LifeSteps {
 
     @Then("Verify list gets deleted successfully")
     public void verify_list_gets_deleted_successfully() {
-        logger.info("Verifying list deletion success message");
         String successMessage = npiStaticList.deleteSuccess();
-        logger.info("Delete success message: {}", successMessage);
         assert successMessage.contains("NPI List Deleted");
     }
 
@@ -1390,9 +1336,7 @@ public class LifeSteps {
 
     @Then("Selected Deals should appear in Applied Deals panel")
     public void selectedDealsShouldAppearInAppliedDealsPanel() {
-        logger.info("Verifying selected deals appear in Applied Deals panel");
         boolean assigned = pmp.verifyAsignedDealsList();
-        logger.info("Deals assigned status: {}", assigned);
         Assert.assertTrue("Unable to assign deals", assigned);
     }
 
@@ -1406,17 +1350,13 @@ public class LifeSteps {
 
     @When("User clicks on OK button")
     public void userClicksOnOKButton() {
-        logger.info("Clicking OK button to save assigned deals");
         pmp.saveDealsAssigned();
     }
 
     @Then("Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status")
     public void dealDetailsShouldAppearOnTacticSettingsTab() {
-        logger.info("Verifying deal details appear on Tactic Settings tab under Targeting and Curated Markets/Deals sections");
         boolean areDealsPresent = pmp.verifyAssignedDealsOnTactic(dealNameRandom);
-        logger.info("Are assigned deals present on tactic: {}", areDealsPresent);
         Assert.assertTrue("Assigned Deals are not present under targeting and deals section", areDealsPresent);
-        logger.info("Deal details verification completed successfully");
     }
 
     @And("Verify Delete icon is disabled and error message {string}")
@@ -1459,7 +1399,6 @@ public class LifeSteps {
 
     @When("User clicks Save button from Tactic Setting tab")
     public void userClicksSaveButtonFromTacticSettingTab() {
-        logger.info("Clicking Save button from Tactic Setting tab");
         pmp.saveTacticSettings();
     }
 
@@ -1467,7 +1406,6 @@ public class LifeSteps {
     public void dealsShouldGetAssignedToTheTactic() {
         logger.info("Verifying deals are successfully assigned to the Tactic");
         String saveResult = pmp.verifyTacticIsSaved().trim();
-        logger.info("Tactic save result: {}", saveResult);
         Assert.assertEquals("Tactic " + tacticNameRandom + " updated.", saveResult);
     }
 
@@ -1478,9 +1416,7 @@ public class LifeSteps {
         List<String> targetCategoryList = targetCategory.asList(String.class);
         logger.info("Verifying targeting panel contains the following categories: {}", targetCategoryList);
         boolean isMatched = tacticSettings.fetchAndVerifyTargetCategoryName(targetCategoryList);
-        logger.info("Target category match result: {}", isMatched);
         Assert.assertTrue("Category names are not matched", isMatched);
-        logger.info("Targeting categories verified successfully");
     }
 
     @And("Verify target type with respect to category")
