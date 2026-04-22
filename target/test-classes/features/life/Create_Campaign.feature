@@ -389,6 +389,12 @@ Feature: LIFE Regression - Create a Campaign
 
   @regression
   Scenario Outline: Create Campaign with Multiple Line Item Types and Multiple Tactics with Different Rule Types
+    # This scenario demonstrates a complex campaign setup with:
+    # - 5 different line item types (Display, Audio, Video, Native Display, Native Video)
+    # - Each line item has 3 tactics
+    # - Each tactic has different channels and multiple targeting rule types
+    # - All tactics share the same creative
+    # - Total: 5 line items x 3 tactics = 15 tactics with diverse targeting rules
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
