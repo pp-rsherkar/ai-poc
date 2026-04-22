@@ -6539,8 +6539,21 @@ public class LifeSteps {
     private void createMultipleTacticsForLineItem(Map<String, String> row) {
         logger.info("Creating multiple tactics for current line item");
         
-        // Create 3 tactics per line item (Tactic 1, 2, and 3)
-        for (int tacticNum = 1; tacticNum <= 3; tacticNum++) {
+        // Determine the number of tactics dynamically by checking which TACTIC_X_NAME keys exist
+        int maxTactics = 10; // Maximum possible tactics to check
+        int actualTacticCount = 0;
+        
+        // Count how many tactics are defined in the data table
+        for (int i = 1; i <= maxTactics; i++) {
+            if (row.containsKey("TACTIC_" + i + "_NAME") && row.get("TACTIC_" + i + "_NAME") != null && !row.get("TACTIC_" + i + "_NAME").trim().isEmpty()) {
+                actualTacticCount = i;
+            }
+        }
+        
+        logger.info("Found {} tactics to create for this line item", actualTacticCount);
+        
+        // Create tactics based on actual count
+        for (int tacticNum = 1; tacticNum <= actualTacticCount; tacticNum++) {
             String tacticNameKey = "TACTIC_" + tacticNum + "_NAME";
             String tacticChannelKey = "TACTIC_" + tacticNum + "_CHANNEL";
             String tacticRulesKey = "TACTIC_" + tacticNum + "_RULES";
@@ -6581,7 +6594,7 @@ public class LifeSteps {
                 logger.info("Tactic {} created and configured successfully", tacticName);
                 
                 // Create next tactic if not the last one
-                if (tacticNum < 3) {
+                if (tacticNum < actualTacticCount) {
                     tacticDetails.clickNewTactic();
                 }
             }
