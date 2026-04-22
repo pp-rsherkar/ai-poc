@@ -6506,7 +6506,7 @@ public class LifeSteps {
             lineItemNameRandom = lineItemName + '_' + CommonUtils.timeStampCalculation();
             logger.info("Creating Line Item {} of type: {}", lineItemNameRandom, lineType);
             
-            // Create line item with basic details
+            // Create line item with basic details using the existing createLineItem method
             Map<String, String> attributeMap = new HashMap<>();
             attributeMap.put("LineBudget", lineBudget);
             attributeMap.put("CostModel", "CPM");
@@ -6515,15 +6515,8 @@ public class LifeSteps {
             attributeMap.put("PacingMode", "Even");
             attributeMap.put("PacingPercentage", "60");
             
-            lineItemDetails.enterLineItemName(lineItemNameRandom);
-            lineItemDetails.selectLineItemType(lineType);
-            lineItemDetails.selectCostModel(attributeMap.get("CostModel"), attributeMap.get("CPMAmount"));
-            lineItemDetails.selectBudgetDistribution(attributeMap.get("BudgetDistribution"));
-            lineItemDetails.clickAddFlightButton();
-            lineItemDetails.enterLineItemBudget(attributeMap.get("LineBudget"));
-            lineItemDetails.selectPacingMode(attributeMap.get("PacingMode"), attributeMap.get("PacingPercentage"));
-            lineItemDetails.enableLineItem();
-            lineItemDetails.saveLineItem();
+            // Use the existing createLineItem method which handles all the private methods internally
+            lineItemDetails.createLineItem(lineType, lineItemNameRandom, attributeMap);
             
             // Verify line item creation
             Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
