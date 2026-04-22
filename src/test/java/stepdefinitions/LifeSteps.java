@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
-import static stepdefinitions.StudioSteps.workspaceName;
 
 public class LifeSteps {
 
@@ -498,14 +497,14 @@ public class LifeSteps {
 
     @And("User searches the workspace in LIFE and selects it")
     public void userSearchesTheInLIFEAndSelectsIt() {
-        logger.info("Searching for workspace: {}", workspaceName);
-        npiLists.searchNPILists(workspaceName);
+        logger.info("Searching for workspace: {}", StudioSteps.workspaceName);
+        npiLists.searchNPILists(StudioSteps.workspaceName);
     }
 
     @And("User clicks on the published workspace")
     public void userClicksOnThePublished() {
-        logger.info("Selecting published workspace: {}", workspaceName);
-        npiLists.selectPublishedList(workspaceName);
+        logger.info("Selecting published workspace: {}", StudioSteps.workspaceName);
+        npiLists.selectPublishedList(StudioSteps.workspaceName);
     }
 
     @Then("User Verify the list is displayed in the Life")
@@ -4166,16 +4165,16 @@ public class LifeSteps {
 
     @When("User selects {string} as rule type and selects the published Studio list")
     public void userSelectsRuleTypeAndSelectsThePublishedStudioList(String ruleType) {
-        logger.info("Selecting rule type '{}' and published Studio list '{}'", ruleType, workspaceName);
-        itemCount = tacticSettings.selectRuleType(ruleType, workspaceName);
+        logger.info("Selecting rule type '{}' and published Studio list '{}'", ruleType, StudioSteps.workspaceName);
+        itemCount = tacticSettings.selectRuleType(ruleType, StudioSteps.workspaceName);
         logger.info("Item count: {}", itemCount);
     }
 
     @Then("Verify the selected targeting rule {string} and rule option")
     public void verifyTheSelectedTargetingRuleAndRuleOption(String ruleType) {
         Assert.assertEquals(ruleType, tacticSettings.verifyRuleType());
-        Assert.assertEquals(workspaceName, tacticSettings.verifyRuleOption());
-        logger.info("Targeting rule '{}' and rule option '{}' verified", ruleType, workspaceName);
+        Assert.assertEquals(StudioSteps.workspaceName, tacticSettings.verifyRuleOption());
+        logger.info("Targeting rule '{}' and rule option '{}' verified", ruleType, StudioSteps.workspaceName);
     }
 
     // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
