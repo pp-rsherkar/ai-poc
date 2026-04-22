@@ -1733,7 +1733,7 @@ public class LifeSteps {
      * Creatives creation*/
     @And("User clicks Creative Library options present under Activation tab")
     public void userClicksCreativeLibraryOptionsPresentUnderActivationTab() {
-        logger.info("Verifying: the template created are saved");
+        logger.info("User clicks Creative Library options present under Activation tab");
         navigation.clickSubMenu();
         navigation.clickCreativeLibrary();
     }
