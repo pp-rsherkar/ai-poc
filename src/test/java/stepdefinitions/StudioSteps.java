@@ -262,13 +262,11 @@ public class StudioSteps {
 
     @And("User selects the advertiser {string}")
     public void userSelectsTheAdvertiser(String advertiser) {
-        logger.info("Selecting advertiser '{}' in Explorer Workspace", advertiser);
+        logger.info("Selecting advertiser: {}", advertiser);
         explorerWorkspace.selectAdvertiser(advertiser);
-        logger.info("Verifying workspace creation success alert");
         String alertText = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Fetched alert text: '{}'", alertText);
+        logger.info("Alert text: {}", alertText);
         Assert.assertEquals("Workspace created successfully", alertText);
-        logger.info("Advertiser selected and workspace created successfully");
     }
 
     @And("User updates the workspace name as {string}")
@@ -311,11 +309,9 @@ public class StudioSteps {
 
     @Then("Verify that the applied filters are displayed correctly")
     public void verify_that_the_applied_filters_are_displayed_correctly() {
-        logger.info("Verifying applied filters are displayed correctly");
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
-        logger.info("Displayed filters from UI: {}", displayedFilters);
+        logger.info("Displayed filters: {}", displayedFilters);
         for (String appliedFilter : appliedFilterEntries) {
-            logger.info("Validating displayed filter for: {}", appliedFilter);
             String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
             boolean matchFound = displayedFilters.stream().anyMatch(displayed -> {
                 String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
@@ -326,13 +322,12 @@ public class StudioSteps {
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
 
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
-                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]", appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
+                    logger.info("Match found - Applied: '{}', Displayed: '{}'", appliedNorm, displayedNorm);
                     return true;
                 }
 
                 return false;
             });
-            logger.info("Filter '{}' match found: {}", appliedFilter, matchFound);
             Assert.assertTrue("Applied filter not displayed: " + appliedFilter, matchFound);
         }
     }
@@ -478,16 +473,14 @@ public class StudioSteps {
 
     @Then("Verify list is published")
     public void verify_list_is_published() {
-        logger.info("Publishing NPI list");
         workspace.clickPublish();
         String alertMsg = workspace.fetchNPIListPublishAlertDisplayed();
         if (!alertMsg.isEmpty()) {
-            logger.info("Publish alert message: {}", alertMsg);
+            logger.info("Publish alert: {}", alertMsg);
             Assert.assertEquals("NPI list published successfully", alertMsg);
         } else {
             Assert.assertFalse("Publish alert is not displayed", false);
         }
-        logger.info("Verifying published NPI list");
         workspace.clickFlyOrPageButton();
         String publishedNpi = workspace.verifyPublishedNpi();
         logger.info("Published NPI: {}", publishedNpi);
@@ -744,13 +737,10 @@ public class StudioSteps {
 
     @And("User searches the workspace created to perform Actions from More menu")
     public void userSearchesTheWorkspaceCreatedToPerformDuplicateOperation() throws InterruptedException {
-        logger.info("Checking if AI assistant panel is displayed");
         workspaceCreation.closeAIPanel();
-        logger.info("Verifying Studio workspace frame is visible before searching for workspace");
         workspaceCreation.verifyStudioWorkspaceFrame();
-        logger.info("Searching workspace to perform actions from More menu: {}", workspaceName);
+        logger.info("Searching workspace: {}", workspaceName);
         workspaceCreation.searchWorkspaceName(workspaceName);
-        logger.info("Clicking More Actions menu for workspace: {}", workspaceName);
         workspaceCreation.clickMoreActionsMenu(workspaceName);
     }
 
@@ -1060,18 +1050,14 @@ public class StudioSteps {
 
     @Then("User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
     public void userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
-        logger.info("Verifying persistence of selected filters, dropdown values, and search input");
         String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
-        logger.info("Selected workspace type: {}", actualWorkspaceType);
+        logger.info("Workspace type: {}, Advertiser: {}, Created by: {}", actualWorkspaceType, workspaceCreation.getSelectedWorkspaceAdvertiser(), workspaceCreation.getSelectedWorkspaceCreatedBy());
         Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
         String actualWorkspaceAdvertiser = workspaceCreation.getSelectedWorkspaceAdvertiser();
-        logger.info("Selected workspace advertiser: {}", actualWorkspaceAdvertiser);
         Assert.assertEquals("Selected workspace advertiser is not persistent", expectedAdvertiser, actualWorkspaceAdvertiser);
         String actualWorkspaceCreatedBy = workspaceCreation.getSelectedWorkspaceCreatedBy();
-        logger.info("Selected workspace created by: {}", actualWorkspaceCreatedBy);
         Assert.assertEquals("Selected workspace created by is not persistent", expectedCreatedBy, actualWorkspaceCreatedBy);
         String actualWorkspaceName = workspaceCreation.getSearchedWorkspaceName();
-        logger.info("Searched workspace name: {}", actualWorkspaceName);
         Assert.assertEquals("Search input value is not persistent", workspaceName, actualWorkspaceName);
     }
 
