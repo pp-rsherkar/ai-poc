@@ -786,4 +786,20 @@ public class TacticSettings {
     public void clickNewTactic() {
         NEW_TACTIC.click();
     }
+
+    public void selectFirstAvailableOption() {
+        // Wait for options to load
+        waitUtility.waitUntilSpinnerHidden();
+        
+        // Try to select the first available option
+        if (SELECT_OPTION.isVisible()) {
+            SELECT_OPTION.first().click();
+        } else {
+            // If no specific option selector, try to click first targeting item
+            Locator targetingItem = page.locator("(//div[contains(@class,'include-default')])[1]");
+            if (targetingItem.isVisible()) {
+                targetingItem.click();
+            }
+        }
+    }
 }

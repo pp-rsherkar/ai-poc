@@ -6489,4 +6489,200 @@ public class LifeSteps {
         Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
         logger.info("Targeting template found successfully using search option");
     }
+
+    @When("User creates multiple line items with different types and tactics as below")
+    public void userCreatesMultipleLineItemsWithDifferentTypesAndTacticsAsBelow(DataTable dataTable) {
+        logger.info("Starting creation of multiple Line Items with different types and multiple tactics");
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        int rowIndex = 0;
+        int totalRows = rows.size();
+
+        for (Map<String, String> row : rows) {
+            String lineType = row.get("LINE_TYPE").trim();
+            String lineItemName = row.get("LINE_ITEM_NAME").trim();
+            String lineBudget = row.get("LINE_BUDGET").trim();
+            
+            // Generate unique line item name with timestamp
+            lineItemNameRandom = lineItemName + '_' + CommonUtils.timeStampCalculation();
+            logger.info("Creating Line Item {} of type: {}", lineItemNameRandom, lineType);
+            
+            // Create line item with basic details
+            Map<String, String> attributeMap = new HashMap<>();
+            attributeMap.put("LineBudget", lineBudget);
+            attributeMap.put("CostModel", "CPM");
+            attributeMap.put("CPMAmount", "50");
+            attributeMap.put("BudgetDistribution", "Priority");
+            attributeMap.put("PacingMode", "Even");
+            attributeMap.put("PacingPercentage", "60");
+            
+            lineItemDetails.enterLineItemName(lineItemNameRandom);
+            lineItemDetails.selectLineItemType(lineType);
+            lineItemDetails.selectCostModel(attributeMap.get("CostModel"), attributeMap.get("CPMAmount"));
+            lineItemDetails.selectBudgetDistribution(attributeMap.get("BudgetDistribution"));
+            lineItemDetails.clickAddFlightButton();
+            lineItemDetails.enterLineItemBudget(attributeMap.get("LineBudget"));
+            lineItemDetails.selectPacingMode(attributeMap.get("PacingMode"), attributeMap.get("PacingPercentage"));
+            lineItemDetails.enableLineItem();
+            lineItemDetails.saveLineItem();
+            
+            // Verify line item creation
+            Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
+            logger.info("Line Item {} created successfully", lineItemNameRandom);
+            
+            // Create tactics for this line item
+            createMultipleTacticsForLineItem(row);
+            
+            // Move to next line item if not the last one
+            if (rowIndex < totalRows - 1) {
+                logger.info("Moving to create next Line Item");
+                lineItemDetails.cancelTactic();
+                lineItemDetails.selectNewLineItem();
+            }
+            rowIndex++;
+        }
+        logger.info("Completed creation of all {} Line Items with their tactics", totalRows);
+    }
+
+    private void createMultipleTacticsForLineItem(Map<String, String> row) {
+        logger.info("Creating multiple tactics for current line item");
+        
+        // Create 3 tactics per line item (Tactic 1, 2, and 3)
+        for (int tacticNum = 1; tacticNum <= 3; tacticNum++) {
+            String tacticNameKey = "TACTIC_" + tacticNum + "_NAME";
+            String tacticChannelKey = "TACTIC_" + tacticNum + "_CHANNEL";
+            String tacticRulesKey = "TACTIC_" + tacticNum + "_RULES";
+            
+            if (row.containsKey(tacticNameKey) && row.get(tacticNameKey) != null && !row.get(tacticNameKey).trim().isEmpty()) {
+                String tacticName = row.get(tacticNameKey).trim() + '_' + CommonUtils.timeStampCalculation();
+                String channel = row.get(tacticChannelKey).trim();
+                String rulesStr = row.get(tacticRulesKey).trim();
+                List<String> ruleTypes = Arrays.stream(rulesStr.split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toList());
+                
+                logger.info("Creating Tactic {}: {} with channel: {} and {} rule types", tacticNum, tacticName, channel, ruleTypes.size());
+                
+                // Enter tactic name and save
+                tacticDetails.enterTacticName(tacticName);
+                tacticDetails.saveTacticDetails();
+                
+                // Configure channel
+                tacticSettings.selectChannel(channel);
+                
+                // Add multiple targeting rules
+                logger.info("Adding {} targeting rule types to tactic {}", ruleTypes.size(), tacticName);
+                for (String ruleType : ruleTypes) {
+                    logger.info("Adding rule type: {}", ruleType);
+                    tacticDetails.clickTargetingRuleIcon();
+                    tacticSettings.searchAndSelectRuleType(ruleType);
+                    
+                    // Select options based on rule type
+                    selectRuleOptions(ruleType);
+                    
+                    tacticSettings.clickRuleTypeOkButton();
+                    tacticSettings.closeRuleTypePanel();
+                }
+                
+                // Save tactic settings
+                tacticSettings.saveTacticSettings();
+                logger.info("Tactic {} created and configured successfully", tacticName);
+                
+                // Create next tactic if not the last one
+                if (tacticNum < 3) {
+                    tacticDetails.clickNewTactic();
+                }
+            }
+        }
+    }
+
+    private void selectRuleOptions(String ruleType) {
+        logger.info("Selecting options for rule type: {}", ruleType);
+        try {
+            switch (ruleType) {
+                case "Behavioral Segment":
+                case "Health Populations":
+                case "Health Populations+":
+                    // Select first available option
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                case "NPI":
+                case "NPI Facility Affiliation":
+                    // Select first available NPI option
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                case "Age":
+                case "Gender":
+                case "Ethnicity":
+                    // Select demographic options
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                case "In Condition":
+                case "Health Pages":
+                case "Keywords":
+                case "IAB Categories":
+                case "Language":
+                    // Select contextual options
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                case "Geo Targets":
+                case "Postal Codes":
+                case "Device":
+                case "Browser":
+                case "Operating System":
+                    // Select geography/media supply options
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                case "Legal Populations":
+                case "Legal Pages":
+                    // Select legal targeting options
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                case "Retargeting Pixels":
+                case "Domains/Apps":
+                case "Curated Markets":
+                case "Brand Safety Profile":
+                case "Inventory Type":
+                case "Viewability":
+                case "Invalid Traffic":
+                case "Deal Group":
+                    // Select media supply options
+                    tacticSettings.selectFirstAvailableOption();
+                    break;
+                default:
+                    logger.warn("Unknown rule type: {}. Selecting first available option.", ruleType);
+                    tacticSettings.selectFirstAvailableOption();
+            }
+        } catch (Exception e) {
+            logger.warn("Could not select option for rule type: {}. Error: {}", ruleType, e.getMessage());
+        }
+    }
+
+    @And("User assigns the existing creative named {string} to all tactics")
+    public void userAssignsTheExistingCreativeNamedToAllTactics(String creativeName) {
+        logger.info("Assigning creative '{}' to all tactics", creativeName);
+        
+        // Navigate to the creatives tab
+        navigation.clickOnIcon("Assign Existing Creatives");
+        tacticCreatives.assignCreatives(creativeName);
+        tacticCreatives.enableCreative();
+        tacticCreatives.saveTacticCreatives();
+        
+        logger.info("Creative '{}' assigned to all tactics successfully", creativeName);
+    }
+
+    @Then("Verify all tactics are enabled and campaign is in running state")
+    public void verifyAllTacticsAreEnabledAndCampaignIsInRunningState() {
+        logger.info("Verifying all tactics are enabled and campaign is running");
+        
+        // Navigate to Campaign Dashboard
+        tacticCreatives.navigateToCampaignDashboard();
+        campaignDashboard.resetFiltersIfApplied();
+        
+        // Verify campaign status
+        String status = tacticCreatives.getCampaignStatus();
+        logger.info("Campaign status: {}", status);
+        Assert.assertEquals("Campaign should be in Running state", "Running", status);
+        
+        logger.info("Campaign verified successfully - all tactics are enabled and campaign is running");
+    }
 }

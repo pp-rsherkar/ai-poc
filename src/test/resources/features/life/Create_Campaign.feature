@@ -387,6 +387,26 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS       | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Search Extension | Tactic      | Auto_Creative |
 
+  @regression
+  Scenario Outline: Create Campaign with Multiple Line Item Types and Multiple Tactics with Different Rule Types
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User creates multiple line items with different types and tactics as below
+      | LINE_TYPE        | LINE_ITEM_NAME | LINE_BUDGET | TACTIC_1_NAME       | TACTIC_1_CHANNEL | TACTIC_1_RULES                                        | TACTIC_2_NAME        | TACTIC_2_CHANNEL | TACTIC_2_RULES                                      | TACTIC_3_NAME       | TACTIC_3_CHANNEL | TACTIC_3_RULES                                         |
+      | Display          | LineItem_Type1 | 500         | Tactic_Type1_A      | Display Advanced | Behavioral Segment,Age,Health Pages                   | Tactic_Type1_B       | Display Advanced | In Condition,Gender,Keywords                        | Tactic_Type1_C      | Display Advanced | Device,Postal Codes,Legal Populations                  |
+      | Audio            | LineItem_Type2 | 500         | Tactic_Type2_A      | Audio            | Health Populations,Ethnicity,IAB Categories           | Tactic_Type2_B       | Audio            | NPI,Age,Language                                    | Tactic_Type2_C      | Audio            | Geo Targets,Browser,Brand Safety Profile               |
+      | Video            | LineItem_Type3 | 500         | Tactic_Type3_A      | Video            | Retargeting Pixels,Gender,Domains/Apps                | Tactic_Type3_B       | Video            | Behavioral Segment,Health Pages,Device              | Tactic_Type3_C      | Video            | Postal Codes,Operating System,Legal Pages              |
+      | Native Display   | LineItem_Type4 | 500         | Tactic_Type4_A      | Native Display   | In Condition,Age,Curated Markets                      | Tactic_Type4_B       | Native Display   | Health Populations,Keywords,Inventory Type          | Tactic_Type4_C      | Native Display   | NPI,Ethnicity,Viewability                              |
+      | Native Video     | LineItem_Type5 | 500         | Tactic_Type5_A      | Native Video     | Behavioral Segment,Gender,Geo Targets                 | Tactic_Type5_B       | Native Video     | In Condition,Device,Invalid Traffic                 | Tactic_Type5_C      | Native Video     | Age,IAB Categories,Deal Group                          |
+    And User assigns the existing creative named "<CREATIVE>" to all tactics
+    Then Verify all tactics are enabled and campaign is in running state
+    Examples:
+      | ADVERTISER     | CP_NAME             | CP_TYPE | CP_BUDGET | CREATIVE      |
+      | 01- Advertiser | MultiLineItemCampaign | Regular | 20000     | Auto_Creative |
 
 #  @regression
 #  Scenario Outline: API Sample Test
