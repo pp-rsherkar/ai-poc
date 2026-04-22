@@ -1900,7 +1900,7 @@ public class LifeSteps {
 
     @And("Verify the creative is removed from the Creative Library page")
     public void verifyTheCreativeIsRemovedFromTheCreativeLibraryPage() {
-        logger.info("User deletes a creative not associated with any Campaign");
+        logger.info("Verifying deleted creative is no longer present by searching for it and confirming 'Nothing Found' is displayed");
         createCreatives.searchCreative(metricName);
         String notFoundMessage = createCreatives.fetchNoCreativeFoundMessage();
         Assert.assertEquals("Nothing Found", notFoundMessage);
