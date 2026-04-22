@@ -117,7 +117,7 @@ public class TargetingTemplate {
     }
 
     public void addTargetingRules(Map<String, List<String>> rulesMap) {
-        ADD_TARGETING_RULE_BUTTON.click();
+        clickAddTargetingRule();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
         }
@@ -148,7 +148,7 @@ public class TargetingTemplate {
         String alert = " ";
         NEW_TEMPLATE_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
-        ADD_TARGETING_RULE_BUTTON.click();
+        clickAddTargetingRule();
         tacticSettings.selectRuleType(targetingRule);
         SAVE_BUTTON.click();
         alert = TEMPLATE_NAME_ERROR.innerText().trim();
@@ -200,5 +200,9 @@ public class TargetingTemplate {
         String text = TEMPLATE_DELETED_ALERT.innerText().trim();
         waitUtility.waitUntilSpinnerHidden();
         return text;
+    }
+
+    public void clickAddTargetingRule(){
+        ADD_TARGETING_RULE_BUTTON.click();
     }
 }

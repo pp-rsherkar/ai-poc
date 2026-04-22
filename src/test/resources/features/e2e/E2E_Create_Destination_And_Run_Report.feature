@@ -5,7 +5,8 @@ Feature: Create a Destination in Admin and run below report against it.
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    When User navigates to Administrative section and go to Accounts Tab
+    When User navigates to Administrative section
+    And User navigates to Accounts Tab
     And User searches the account "automation@pulsepoint" and selects the account
     And User navigates to Reporting tab
     Then User clicks Add Destination button
