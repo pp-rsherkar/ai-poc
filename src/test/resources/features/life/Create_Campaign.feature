@@ -392,10 +392,13 @@ Feature: LIFE Regression - Create a Campaign
     # This scenario demonstrates a complex campaign setup with:
     # - 2 line item types: Audio, Video
     # - Each line item has 2 tactics
-    # - Each tactic has 10 different targeting rule types with 10 rule options each
+    # - Each tactic has 10 different targeting rule types
+    # - Each rule type automatically selects the first 10 available options
     # - Different channels: Standard and EHR
     # - All tactics share the same creative
     # - Total: 2 line items x 2 tactics = 4 tactics with diverse targeting rules
+    # - Automated option selection: Uses selectFirstNOptions(10) to select first 10 available options per rule type
+    # Note: Tactic settings are saved automatically after rule configuration
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -417,10 +420,13 @@ Feature: LIFE Regression - Create a Campaign
     # This scenario demonstrates a complex campaign setup with:
     # - 2 line item types: Native Display, Search Extension
     # - Each line item has 2 tactics
-    # - Each tactic has 10 different targeting rule types with 10 rule options each
+    # - Each tactic has 10 different targeting rule types
+    # - Each rule type automatically selects the first 10 available options
     # - Different channels: Display Advanced and Email
     # - All tactics share the same creative
     # - Total: 2 line items x 2 tactics = 4 tactics with diverse targeting rules
+    # - Automated option selection: Uses selectFirstNOptions(10) to select first 10 available options per rule type
+    # Note: Tactic settings are saved automatically after rule configuration
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -442,10 +448,13 @@ Feature: LIFE Regression - Create a Campaign
     # This scenario demonstrates a complex campaign setup with:
     # - 2 line item types: DOOH, Universal
     # - Each line item has 2 tactics
-    # - Each tactic has 10 different targeting rule types with 10 rule options each
+    # - Each tactic has 10 different targeting rule types
+    # - Each rule type automatically selects the first 10 available options
     # - Different channels: Standard and Display Advanced
     # - All tactics share the same creative
     # - Total: 2 line items x 2 tactics = 4 tactics with diverse targeting rules
+    # - Automated option selection: Uses selectFirstNOptions(10) to select first 10 available options per rule type
+    # Note: Tactic settings are saved automatically after rule configuration
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
