@@ -2995,7 +2995,7 @@ public class LifeSteps {
 
     @And("User is able to delete third-party tracking pixel entries")
     public void userIsAbleToDeleteThirdPartyTrackingPixelEntries() {
-        logger.info("Verifying: user is able to add a Doublepixel");
+        logger.info("Deleting third-party tracking pixel entries");
         Assert.assertTrue("Unable to delete Third Party Tracking Pixel", bulkCreativeUpload.deleteThirdPartyTrackingPixel());
     }
 
