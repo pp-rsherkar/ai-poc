@@ -1,0 +1,22 @@
+# Build artifacts
+target/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Documentation files (use README.md for permanent docs)
+*_IMPLEMENTATION.md
+*_SUMMARY.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test results
+test-output/
+*.log
