@@ -802,4 +802,28 @@ public class TacticSettings {
             }
         }
     }
+
+    public List<String> getFirstNAvailableOptions(int count) {
+        List<String> options = new ArrayList<>();
+        waitUtility.waitUntilSpinnerHidden();
+        
+        try {
+            // Get all available options
+            Locator allOptions = page.locator("//div[contains(@class,'include-default')]/ancestor::div[contains(@class,'name') or contains(@class,'segmentname') or contains(@class,'npilist-itemWrapper')]//span[not(contains(@class,'icon'))]");
+            
+            int availableCount = allOptions.count();
+            int optionsToSelect = Math.min(count, availableCount);
+            
+            for (int i = 0; i < optionsToSelect; i++) {
+                String optionText = allOptions.nth(i).textContent().trim();
+                if (!optionText.isEmpty()) {
+                    options.add(optionText);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error getting available options: " + e.getMessage());
+        }
+        
+        return options;
+    }
 }
