@@ -1908,7 +1908,7 @@ public class LifeSteps {
 
     @When("User clicks on Preview icon for a creative from Creative Library page")
     public void userClicksOnPreviewIconForACreative() {
-        logger.info("Verifying: the creative is removed from the Creative Library page");
+        logger.info("Clicking Preview icon for a creative from Creative Library page");
         metricName = createCreatives.clickCreativeTypeIconAndFetchCreativeName();
         logger.info("Previewing creative: {}", metricName);
     }
