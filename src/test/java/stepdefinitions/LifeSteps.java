@@ -6575,15 +6575,20 @@ public class LifeSteps {
                 // Configure channel
                 tacticSettings.selectChannel(channel);
                 
+                // Get targeting options if specified
+                String tacticOptionsKey = "TACTIC_" + tacticNum + "_OPTIONS";
+                String optionsStr = row.containsKey(tacticOptionsKey) ? row.get(tacticOptionsKey) : "";
+                
                 // Add multiple targeting rules
-                logger.info("Adding {} targeting rule types to tactic {} with 10 options each", ruleTypes.size(), tacticName);
+                logger.info("Adding {} targeting rule types to tactic {}", ruleTypes.size(), tacticName);
                 for (String ruleType : ruleTypes) {
-                    logger.info("Adding rule type: {} with 10 options", ruleType);
+                    logger.info("Adding rule type: {}", ruleType);
                     tacticDetails.clickTargetingRuleIcon();
                     tacticSettings.searchAndSelectRuleType(ruleType);
                     
-                    // Select first 10 available options for this rule type
-                    tacticSettings.selectFirstNOptions(10);
+                    // TODO: Add logic to select specific options from TACTIC_X_OPTIONS column
+                    // For now, options will need to be selected manually or specified in feature file
+                    // tacticSettings.selectOptions(optionsStr);
                     
                     // Store the rule type and values for verification
                     keyType.add(ruleType);

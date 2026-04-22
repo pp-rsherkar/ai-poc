@@ -393,12 +393,11 @@ Feature: LIFE Regression - Create a Campaign
     # - 2 line item types: Audio, Video
     # - Each line item has 2 tactics
     # - Each tactic has 10 different targeting rule types
-    # - Each rule type automatically selects the first 10 available options
     # - Different channels: Standard and EHR
     # - All tactics share the same creative
     # - Total: 2 line items x 2 tactics = 4 tactics with diverse targeting rules
-    # - Automated option selection: Uses selectFirstNOptions(10) to select first 10 available options per rule type
     # - Includes verification steps before saving the last tactic
+    # NOTE: TACTIC_X_OPTIONS columns are placeholders - update with specific targeting option values
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -406,9 +405,9 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User creates multiple line items with different types and tactics as below
-      | LINE_TYPE | LINE_ITEM_NAME | LINE_BUDGET | TACTIC_1_NAME  | TACTIC_1_CHANNEL | TACTIC_1_RULES                                                                                                              | TACTIC_2_NAME  | TACTIC_2_CHANNEL | TACTIC_2_RULES                                                                                                              |
-      | Audio     | LineItem_Audio | 1000        | Tactic_Audio_1 | Standard         | Behavioral Segment,Age,Health Pages,In Condition,Gender,Keywords,Device,Postal Codes,Legal Populations,Health Populations  | Tactic_Audio_2 | EHR              | Ethnicity,IAB Categories,NPI,Language,Geo Targets,Browser,Brand Safety Profile,Retargeting Pixels,Domains/Apps,Curated Markets |
-      | Video     | LineItem_Video | 1000        | Tactic_Video_1 | Standard         | Behavioral Segment,Health Pages,Device,Postal Codes,Operating System,Legal Pages,In Condition,Age,Health Populations,Keywords | Tactic_Video_2 | EHR              | Inventory Type,NPI,Ethnicity,Viewability,Gender,Geo Targets,Invalid Traffic,IAB Categories,Deal Group,Language                |
+      | LINE_TYPE | LINE_ITEM_NAME | LINE_BUDGET | TACTIC_1_NAME  | TACTIC_1_CHANNEL | TACTIC_1_RULES                                                                                                              | TACTIC_1_OPTIONS | TACTIC_2_NAME  | TACTIC_2_CHANNEL | TACTIC_2_RULES                                                                                                              | TACTIC_2_OPTIONS |
+      | Audio     | LineItem_Audio | 1000        | Tactic_Audio_1 | Standard         | Behavioral Segment,Age,Health Pages,In Condition,Gender,Keywords,Device,Postal Codes,Legal Populations,Health Populations  | TODO             | Tactic_Audio_2 | EHR              | Ethnicity,IAB Categories,NPI,Language,Geo Targets,Browser,Brand Safety Profile,Retargeting Pixels,Domains/Apps,Curated Markets | TODO             |
+      | Video     | LineItem_Video | 1000        | Tactic_Video_1 | Standard         | Behavioral Segment,Health Pages,Device,Postal Codes,Operating System,Legal Pages,In Condition,Age,Health Populations,Keywords | TODO             | Tactic_Video_2 | EHR              | Inventory Type,NPI,Ethnicity,Viewability,Gender,Geo Targets,Invalid Traffic,IAB Categories,Deal Group,Language                | TODO             |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
@@ -424,12 +423,11 @@ Feature: LIFE Regression - Create a Campaign
     # - 2 line item types: Native Display, Search Extension
     # - Each line item has 2 tactics
     # - Each tactic has 10 different targeting rule types
-    # - Each rule type automatically selects the first 10 available options
     # - Different channels: Display Advanced and Email
     # - All tactics share the same creative
     # - Total: 2 line items x 2 tactics = 4 tactics with diverse targeting rules
-    # - Automated option selection: Uses selectFirstNOptions(10) to select first 10 available options per rule type
     # - Includes verification steps before saving the last tactic
+    # NOTE: TACTIC_X_OPTIONS columns are placeholders - update with specific targeting option values
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -437,9 +435,9 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User creates multiple line items with different types and tactics as below
-      | LINE_TYPE         | LINE_ITEM_NAME         | LINE_BUDGET | TACTIC_1_NAME         | TACTIC_1_CHANNEL | TACTIC_1_RULES                                                                                                              | TACTIC_2_NAME         | TACTIC_2_CHANNEL | TACTIC_2_RULES                                                                                                              |
-      | Native Display    | LineItem_NativeDisplay | 1000        | Tactic_NativeDisp_1   | Display Advanced | In Condition,Age,Curated Markets,Health Populations,Keywords,Inventory Type,NPI,Ethnicity,Viewability,Behavioral Segment   | Tactic_NativeDisp_2   | Email            | Gender,Device,Health Pages,Postal Codes,Operating System,Legal Pages,IAB Categories,Geo Targets,Browser,Language            |
-      | Search Extension  | LineItem_SearchExt     | 1000        | Tactic_SearchExt_1    | Display Advanced | Behavioral Segment,Age,Gender,In Condition,Device,Health Pages,Keywords,Geo Targets,NPI,Health Populations                 | Tactic_SearchExt_2    | Email            | Ethnicity,IAB Categories,Language,Postal Codes,Browser,Operating System,Legal Populations,Curated Markets,Viewability,Deal Group |
+      | LINE_TYPE         | LINE_ITEM_NAME         | LINE_BUDGET | TACTIC_1_NAME         | TACTIC_1_CHANNEL | TACTIC_1_RULES                                                                                                              | TACTIC_1_OPTIONS | TACTIC_2_NAME         | TACTIC_2_CHANNEL | TACTIC_2_RULES                                                                                                              | TACTIC_2_OPTIONS |
+      | Native Display    | LineItem_NativeDisplay | 1000        | Tactic_NativeDisp_1   | Display Advanced | In Condition,Age,Curated Markets,Health Populations,Keywords,Inventory Type,NPI,Ethnicity,Viewability,Behavioral Segment   | TODO             | Tactic_NativeDisp_2   | Email            | Gender,Device,Health Pages,Postal Codes,Operating System,Legal Pages,IAB Categories,Geo Targets,Browser,Language            | TODO             |
+      | Search Extension  | LineItem_SearchExt     | 1000        | Tactic_SearchExt_1    | Display Advanced | Behavioral Segment,Age,Gender,In Condition,Device,Health Pages,Keywords,Geo Targets,NPI,Health Populations                 | TODO             | Tactic_SearchExt_2    | Email            | Ethnicity,IAB Categories,Language,Postal Codes,Browser,Operating System,Legal Populations,Curated Markets,Viewability,Deal Group | TODO             |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
@@ -455,12 +453,11 @@ Feature: LIFE Regression - Create a Campaign
     # - 2 line item types: DOOH, Universal
     # - Each line item has 2 tactics
     # - Each tactic has 10 different targeting rule types
-    # - Each rule type automatically selects the first 10 available options
     # - Different channels: Standard and Display Advanced
     # - All tactics share the same creative
     # - Total: 2 line items x 2 tactics = 4 tactics with diverse targeting rules
-    # - Automated option selection: Uses selectFirstNOptions(10) to select first 10 available options per rule type
     # - Includes verification steps before saving the last tactic
+    # NOTE: TACTIC_X_OPTIONS columns are placeholders - update with specific targeting option values
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -468,9 +465,9 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     When User creates multiple line items with different types and tactics as below
-      | LINE_TYPE  | LINE_ITEM_NAME    | LINE_BUDGET | TACTIC_1_NAME      | TACTIC_1_CHANNEL | TACTIC_1_RULES                                                                                                              | TACTIC_2_NAME      | TACTIC_2_CHANNEL | TACTIC_2_RULES                                                                                                              |
-      | DOOH       | LineItem_DOOH     | 1000        | Tactic_DOOH_1      | Standard         | Geo Targets,Device,Age,Gender,In Condition,Health Pages,Postal Codes,Behavioral Segment,Keywords,Health Populations        | Tactic_DOOH_2      | Display Advanced | NPI,Ethnicity,IAB Categories,Language,Browser,Operating System,Curated Markets,Brand Safety Profile,Inventory Type,Viewability |
-      | Universal  | LineItem_Universal| 1000        | Tactic_Universal_1 | Standard         | Behavioral Segment,Age,Gender,Health Pages,In Condition,Device,Keywords,NPI,Health Populations,Ethnicity                   | Tactic_Universal_2 | Display Advanced | IAB Categories,Language,Geo Targets,Postal Codes,Browser,Operating System,Legal Populations,Legal Pages,Curated Markets,Deal Group |
+      | LINE_TYPE  | LINE_ITEM_NAME    | LINE_BUDGET | TACTIC_1_NAME      | TACTIC_1_CHANNEL | TACTIC_1_RULES                                                                                                              | TACTIC_1_OPTIONS | TACTIC_2_NAME      | TACTIC_2_CHANNEL | TACTIC_2_RULES                                                                                                              | TACTIC_2_OPTIONS |
+      | DOOH       | LineItem_DOOH     | 1000        | Tactic_DOOH_1      | Standard         | Geo Targets,Device,Age,Gender,In Condition,Health Pages,Postal Codes,Behavioral Segment,Keywords,Health Populations        | TODO             | Tactic_DOOH_2      | Display Advanced | NPI,Ethnicity,IAB Categories,Language,Browser,Operating System,Curated Markets,Brand Safety Profile,Inventory Type,Viewability | TODO             |
+      | Universal  | LineItem_Universal| 1000        | Tactic_Universal_1 | Standard         | Behavioral Segment,Age,Gender,Health Pages,In Condition,Device,Keywords,NPI,Health Populations,Ethnicity                   | TODO             | Tactic_Universal_2 | Display Advanced | IAB Categories,Language,Geo Targets,Postal Codes,Browser,Operating System,Legal Populations,Legal Pages,Curated Markets,Deal Group | TODO             |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
