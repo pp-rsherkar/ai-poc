@@ -6585,17 +6585,25 @@ public class LifeSteps {
                     // Select first 10 available options for this rule type
                     tacticSettings.selectFirstNOptions(10);
                     
+                    // Store the rule type and values for verification
+                    keyType.add(ruleType);
+                    
                     tacticSettings.clickRuleTypeOkButton();
                     tacticSettings.closeRuleTypePanel();
                 }
                 
-                // Save tactic settings
-                tacticSettings.saveTacticSettings();
-                logger.info("Tactic {} created and configured successfully", tacticName);
+                // Note: Tactic settings are NOT saved here - verification steps should be added in feature file
+                // to verify configured rules before saving
+                logger.info("Tactic {} configured with {} rules - ready for verification and save", tacticName, ruleTypes.size());
                 
                 // Create next tactic if not the last one
                 if (tacticNum < actualTacticCount) {
+                    // Save current tactic before moving to next
+                    tacticSettings.saveTacticSettings();
                     tacticDetails.clickNewTactic();
+                } else {
+                    // For the last tactic, don't save yet - let verification steps handle it
+                    logger.info("Last tactic configured - waiting for verification steps before save");
                 }
             }
         }
