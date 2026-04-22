@@ -1,0 +1,63 @@
+Line 1781: Verifying: the following sort options are available and working
+Line 1790: Verify Search Box is available and working
+Line 1795: Verifying: search Box is available and working
+Line 2004: Verifying: data persistence when user creates and saves {} creative using details {} as Advertiser, {} as Creative Name, {}, {} and below Creative attributes
+Line 2045: Verifying: the newly created creative is displayed in the Creative Library page
+Line 2089: User selects the Auto-Imported List
+Line 2118: User makes list available in LIFE and HCP365 module
+Line 2177: Pass token in the API Header and run it to upload the data into the list
+Line 2204: Verifying: the Total NPI count displayed in Matched NPI section is similar to NPI records present in {}
+Line 2218: User clicks on Reload Now button
+Line 2254: Verifying: that the sub-tabs {} on the left navigation panel are available and {} is selected by default
+Line 2794: Verifying: the availability of below Creative Type options and the Default option is {}
+Line 2802: Verifying: the availability of below Creative Type options and the Default option is {}
+Line 3114: Verifying: user is able to type in {} categories
+Line 3192: Data Granularity should have default value {}
+Line 3215: Advertiser drop-down should list advertisers mapped to {}
+Line 3252: Campaign should load for selection when user types campaign initials {} in {} field
+Line 3279: Creative of selected tactic should load when user types creative names initials {} in {} field
+Line 3299: {} and {} tabs should be present in the Run Report pop-up
+Line 3515: {} section should be visible with label {}, {}, {} checkbox
+Line 3571: Verifying: default value of the Frequency field is {}
+Line 3607: Verifying: default value of Send On is {}
+Line 3649: Verifying: deliver to Users field is available
+Line 3676: Verifying: {} button is available in Destination dropdown field
+Line 3699: User clicks Edit button from Destination dropdown field
+Line 3713: User verifies the custom destination fields - Destination Name, Destination Type, Host, Username, Password, Port textfields, Test Access, Create and Cancel buttons
+Line 3735: Verifying: file Path field is available
+Line 3750: Verifying: compression field is available with below options and default value is {}
+Line 4212: Verifying: line Item page has below tabs
+Line 4306: Verifying: that Sequential flights should be added based on the start month
+Line 4524: Verifying: user is on default bid settings page
+Line 4548: Verify user is able to update and save the {} bid price
+Line 4580: Verifying: user is not able to update {} bid price more than allowed limit
+Line 4608: User creates a new tactic with details {} {} {}
+Line 4638: User deletes the tactic and verifies it
+Line 4691: Verifying: smart List Creation Panel should display the following List Population Options
+Line 4803: Verifying: that the retrieved data for the {} list was saved correctly
+Line 5006: The user saves the Smart List without selecting any other Population options and verifies error message
+Line 5025: Verifying: bulk Upload template {} records count matches UI count post upload
+Line 5076: Verifying: that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {}
+Line 5104: Verifying: that Budget Status has the below options, and the default status is {}
+Line 5115: Verifying: that Budget Status has the below options, and the default status is {}
+Line 5169: Verifying: that the saved Campaign data matches the entered data
+Line 5224: Verifying: that the custom field value {} is saved and displayed in the campaign details page
+Line 5239: User deletes the custom field for which campaign is created and verifies if it is deleted
+Line 5263: Verifying: that user is able to download the uploaded {} list
+Line 5279: Verifying: that the count of items in the downloaded {} list is the same as the item count displayed in the UI
+Line 5516: User navigates to Line item from Association Tab
+Line 5522: User navigates to tactic setting tab
+Line 5601: Verifying: that user is not able to remove the pre-populated logged in user email from {} field
+Line 5614: Verify Line Coding field is available with below options and default value is {}
+Line 5670: Verifying: report Period field is available with default value {}
+Line 5701: User clicks the three-dot menu, selects the General variable - {} and Time variable - {} with Date-Time format {}
+Line 5765: Verifying: edit icon availability for the deals listed under {} Deals tab
+Line 5800: Verifying: that {} should not display in deals listing under Life Marketplace Deals tab
+Line 5813: User clicks {} button from the search section of deal listing page
+Line 5821: Verifying: archive option is available based on the campaign state
+Line 5837: Verifying: the Tactic Link is available in the confirmation pop-up
+Line 5846: Verifying: the Tactic Link is clickable and navigates to the respective tactic page
+Line 5860: Verifying: only life marketplace tab is displayed under Targeting templates section for {} rule type
+Line 5896: User clicks Import Deals button
+Line 5912: User fills the template with deal details and uploads the template
+Line 5974: User navigates to Curated Markets section

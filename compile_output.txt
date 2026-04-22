@@ -1,0 +1,43 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< org:Pulsepoint >---------------------------
+[INFO] Building Pulsepoint 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ Pulsepoint ---
+[INFO] Copying 49 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ Pulsepoint ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 50 source files to /home/runner/work/qa-automation/qa-automation/target/classes
+[INFO] /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/SharedList.java: Some input files use or override a deprecated API.
+[INFO] /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/SharedList.java: Recompile with -Xlint:deprecation for details.
+[INFO] /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/SharedList.java: /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/SharedList.java uses unchecked or unsafe operations.
+[INFO] /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/SharedList.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/CreateCreatives.java:[1020,53] cannot find symbol
+  symbol:   method getFirst()
+  location: variable advertiser of type java.util.List<java.lang.String>
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.643 s
+[INFO] Finished at: 2026-04-22T08:40:43Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project Pulsepoint: Compilation failure
+[ERROR] /home/runner/work/qa-automation/qa-automation/src/main/java/pages/life/CreateCreatives.java:[1020,53] cannot find symbol
+[ERROR]   symbol:   method getFirst()
+[ERROR]   location: variable advertiser of type java.util.List<java.lang.String>
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

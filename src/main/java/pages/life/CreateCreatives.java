@@ -1017,7 +1017,7 @@ public class CreateCreatives {
 
     public void selectAdvertiser(List<String> advertiser) {
         SELECT_ADVERTISER.click();
-        DROPDOWN_VALUES.locator("text=" + advertiser.getFirst()).click();
+        DROPDOWN_VALUES.locator("text=" + advertiser.get(0)).click();
         page.keyboard().press("Escape");
         page.waitForTimeout(1000);
         waitUtility.waitUntilPreLoaderHidden();
