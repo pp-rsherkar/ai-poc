@@ -1740,7 +1740,7 @@ public class LifeSteps {
 
     @Then("Verify Creative Library page is displayed")
     public void verifyCreativeLibraryPageIsDisplayed() {
-        logger.info("User clicks Creative Library options present under Activation tab");
+        logger.info("Verifying Creative Library page title is displayed");
         String pageTitle = createCreatives.verifyCreativeLibraryPageTitle();
         Assert.assertEquals("Creatives", pageTitle);
     }
