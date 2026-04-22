@@ -826,4 +826,29 @@ public class TacticSettings {
         
         return options;
     }
+
+    public void selectFirstNOptions(int count) {
+        waitUtility.waitUntilSpinnerHidden();
+        
+        try {
+            // Get all available include/target buttons
+            Locator targetButtons = page.locator("//div[contains(@class,'include-default')]");
+            
+            int availableCount = targetButtons.count();
+            int optionsToSelect = Math.min(count, availableCount);
+            
+            System.out.println("Selecting first " + optionsToSelect + " options out of " + availableCount + " available");
+            
+            for (int i = 0; i < optionsToSelect; i++) {
+                try {
+                    targetButtons.nth(i).click();
+                    page.waitForTimeout(200); // Small delay between clicks
+                } catch (Exception e) {
+                    System.out.println("Error clicking option " + i + ": " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error selecting first N options: " + e.getMessage());
+        }
+    }
 }

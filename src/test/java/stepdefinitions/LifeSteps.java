@@ -6576,23 +6576,14 @@ public class LifeSteps {
                 tacticSettings.selectChannel(channel);
                 
                 // Add multiple targeting rules
-                logger.info("Adding {} targeting rule types to tactic {}", ruleTypes.size(), tacticName);
+                logger.info("Adding {} targeting rule types to tactic {} with 10 options each", ruleTypes.size(), tacticName);
                 for (String ruleType : ruleTypes) {
                     logger.info("Adding rule type: {} with 10 options", ruleType);
                     tacticDetails.clickTargetingRuleIcon();
                     tacticSettings.searchAndSelectRuleType(ruleType);
                     
-                    // Get first 10 available options for this rule type
-                    List<String> ruleOptions = tacticSettings.getFirstNAvailableOptions(10);
-                    logger.info("Found {} options for rule type: {}", ruleOptions.size(), ruleType);
-                    
-                    // Select multiple options using selectMultipleRuleTypes
-                    if (!ruleOptions.isEmpty()) {
-                        tacticSettings.selectMultipleRuleTypes(ruleType, ruleOptions);
-                    } else {
-                        logger.warn("No options found for rule type: {}, using selectFirstAvailableOption as fallback", ruleType);
-                        selectRuleOptions(ruleType);
-                    }
+                    // Select first 10 available options for this rule type
+                    tacticSettings.selectFirstNOptions(10);
                     
                     tacticSettings.clickRuleTypeOkButton();
                     tacticSettings.closeRuleTypePanel();
