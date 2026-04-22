@@ -23,7 +23,7 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
 
-  @regression @ps
+  @regression @prs
   Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -417,6 +417,151 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS       | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Search Extension | Tactic      | Auto_Creative |
 
+  @regression @ps
+    Scenario Outline: Create a Campaign with multiple Targeting Rules and multiple targeting options for Line Item type - <LINE_ITEMS>
+      Given This scenario will be executed in the "Demo" environment as a "User"
+      And "Life" application is logged in successfully with Account "automation@pulsepoint"
+      And User clicks on Create Campaign
+      When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+      Then Verify campaign details are saved and user is navigated to the line item page
+      When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+      Then Verify line item details are saved and user is navigated to the tactic page
+      When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+      Then Verify tactic details are saved and user is navigated to the settings tab
+      When User selects the "<CHANNEL>" as channel
+      And User clicks on Add Targeting Rule
+      And User configures targeting rules as below
+        | Behavioral Segment       | AutoSegment18577650, 10136 Testing, AutoSegment356027, AutoSegment129907552, abc, ABC_Segment_Swoop_001 |
+        | NPI                      | AutoSmartList954103283, ATTRIBUTE_20260212_024329, Auto_Imported_20260310_184839|
+        | HCP by Specialty         | Radiology, Aerospace Medicine, Allergy & Immunology                                        |
+        | Health Populations       | Anesthesia and Analgesia                                              |
+        | Keyword Populations      | CustomTextForKeywordPopulations, KeywordPopulationsTest               |
+        | Practice Staff           | SMART_Pixel_NPI_20250701_155147                                       |
+        | Health Pages             | Animal Diseases                                                       |
+        | Keywords                 | Custom_Keyword, TestingKeyword, Qwerty123                             |
+        | Endemics                 | Endemic + EHR                                                         |
+        | Geo Targets              | New York, California                                                  |
+      Then Verify the configured targeting rules
+      And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
+      When User saves the settings
+      Then Verify settings details are saved and user is navigated to the creatives tab
+      And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+      Then Verify the newly created campaign is in running state
+      Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+      Examples:
+        | CAMPAIGN_NAME           | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CHANNEL          | CREATIVE      |
+        | Multiple_Rules_Campaign | Line      | 120         | Audio      | Tactic      | Display Advanced | Auto_Creative |
+        | Multiple_Rules_Campaign | Line      | 120         | Video      | Tactic      | Standard         | Auto_Creative |
+
+  @regression @ps
+  Scenario Outline: Create a Campaign with multiple Targeting Rules and multiple targeting options for Line Item type - <LINE_ITEMS>
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User clicks on Add Targeting Rule
+    And User configures targeting rules as below
+      | Postal Codes             | 123456, 10001, 987654                                                 |
+      | Weather Signals          | Below 15F degrees, Outdoor Activity                                   |
+      | Brand Safety Profile     | 51246802                                                              |
+      | Brand Suitability        | Unknown Brand Safety, Highly Illicit Do Not Monetize                  |
+      | Browser                  | Chrome, EDGE, Opera, Safari                                           |
+      | Device                   | Mobile, Tablet, Connected Device                                      |
+      | Domains/Apps             | APP Regular, updaedList106043912                                      |
+      | Inventory Source         | New Report                                                            |
+      | Operating System         | Windows, macOS, Blackberry                                            |
+      | Viewability              | 50                                                                    |
+    Then Verify the configured targeting rules
+    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
+    When User saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify the newly created campaign is in running state
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Examples:
+      | CAMPAIGN_NAME           | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CHANNEL          | CREATIVE      |
+      | Multiple_Rules_Campaign | Line      | 120         | Native Display      | Tactic      | EHR | Auto_Creative |
+      | Multiple_Rules_Campaign | Line      | 120         | Search Extension      | Tactic      | Email         | Auto_Creative |
+
+  @regression @ps
+  Scenario Outline: Create a Campaign with multiple Targeting Rules and multiple targeting options for Line Item type - <LINE_ITEMS>
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User clicks on Add Targeting Rule
+    And User configures targeting rules as below
+      | Legal Pages              | Emancipation                                                          |
+      | Legal Populations        | Adoption                                                              |
+      | NPI Facility Affiliation | NEW AGE DERMATOLOGY CENTER PA (NC)                                    |
+      | Retargeting Pixels       | Retargeting_20250814_011101                                           |
+      | OTC Populations          | Dental/Oral Care                                                      |
+      | IP                       | AutoIP101602041                                                       |
+      | Clickers                 | Auto_20260210_150825                                                  |
+      | Email                    | AutoEmail120220716113986417                                           |
+      | Sensitive Areas          | Anxiety Disorders                                                     |
+      | IAB Categories           | Agriculture                                                           |
+    Then Verify the configured targeting rules
+    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
+    When User saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify the newly created campaign is in running state
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Examples:
+      | CAMPAIGN_NAME           | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CHANNEL          | CREATIVE      |
+      | Multiple_Rules_Campaign | Line      | 120         | DOOH      | Tactic      | Display Advanced | Auto_Creative |
+      | Multiple_Rules_Campaign | Line      | 120         | Universal      | Tactic      | Email         | Auto_Creative |
+
+  @regression @ps
+  Scenario Outline: Create a Campaign with multiple Targeting Rules and multiple targeting options for Line Item type - <LINE_ITEMS>
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User clicks on Add Targeting Rule
+    And User configures targeting rules as below
+      | IAB Categories New       | Communication                                                         |
+      | Language                 | English, Spanish                                                      |
+      | Custom Targeting Bundle  | 203397, 203396                                                        |
+      | Invalid Traffic          | Sites/Apps with Insufficient Fraud & IVT Stats, Fraudulent Sites/Apps |
+      | Inventory Type           | App, Site                                                             |
+      | Health Populations+      | Dental Polishing, Dental Cavity Preparation                           |
+      | In Condition             | Liver Diseases                                                        |
+      | Bespoke                  | AutoSegment384105361                                                  |
+      | Ethnicity                | Asian, Arab                                                           |
+      | Gender                   | Male                                                                  |
+      | Age                      | 25-29, 35-39                                                          |
+      | Geo Radius               | 35.5::122.42::400::California                                         |
+    Then Verify the configured targeting rules
+    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
+    When User saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify the newly created campaign is in running state
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Examples:
+      | CAMPAIGN_NAME           | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CHANNEL          | CREATIVE      |
+      | Multiple_Rules_Campaign | Line      | 120         | Display      | Tactic      | EHR | Auto_Creative |
+      | Multiple_Rules_Campaign | Line      | 120         | Native Video      | Tactic      | Standard         | Auto_Creative |
 
 #  @regression
 #  Scenario Outline: API Sample Test
