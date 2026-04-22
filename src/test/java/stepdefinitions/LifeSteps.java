@@ -251,7 +251,6 @@ public class LifeSteps {
         List<String> expectedTactic = new ArrayList<>();
 
         for (Map<String, String> tacticData : tactics) {
-        logger.info("User creates below tactics under same line item and verifies it", dataTable);
             String tacticName = tacticData.get("Tactic Name");
             metricName = tacticName;
             String channel = tacticData.get("Channel");
@@ -723,7 +722,7 @@ public class LifeSteps {
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         rulesMap = CommonUtils.processDataTable(rawMap);
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-        logger.info("User configures targeting rules as below", ruleTypeAndOptions);
+            logger.info("Adding Rule Type: {} with Options: {}", entry.getKey(), entry.getValue());
             keyType.add(entry.getKey());
             keyValues.addAll(entry.getValue());
             tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
@@ -1376,7 +1375,7 @@ public class LifeSteps {
 
     @When("User enters below details in respective search field, verify that the deal list appears based on the selected filters")
     public void userEntersBelowDetailsInRespectiveSearchField(DataTable filterBy) {
-        logger.info("User enters below details in respective search field, verify that the deal list appears based on the selected filters", filterBy);
+        logger.info("Applying filters and verifying deal list appears accordingly");
         Map<String, String> rawMap = filterBy.asMap(String.class, String.class);
         Map<String, List<String>> filterMap = CommonUtils.processDataTable(rawMap);
 
@@ -1500,7 +1499,6 @@ public class LifeSteps {
         Map<String, List<String>> categoryNameAndTypeMap = CommonUtils.processDataTable(rawMap);
 
         for (Map.Entry<String, List<String>> entry : categoryNameAndTypeMap.entrySet()) {
-        logger.info("Verifying: target type with respect to category", categoryNameAndType);
             String key = entry.getKey();
             List<String> expectedValues = entry.getValue();
             logger.info("Checking category '{}' for expected target types: {}", key, expectedValues);
@@ -1776,9 +1774,9 @@ public class LifeSteps {
     @And("Verify the following sort options are available and working")
     public void verifyTheFollowingSortOptionsAreAvailableAndWorking(DataTable sortOptions) {
         List<String> sortOptionsList = sortOptions.asList(String.class);
+        logger.info("Verifying sort options: {}", sortOptionsList);
 
         for (String sortOption : sortOptionsList) {
-        logger.info("Verifying: the following sort options are available and working", sortOptions);
             boolean isWorking = createCreatives.checkSortingOrder(sortOption);
             Assert.assertTrue(sortOption + " is not working correctly", isWorking);
         }
@@ -1787,12 +1785,11 @@ public class LifeSteps {
 
     @And("Verify Search Box is available and working")
     public void verifySearchBoxIsAvailableAndWorking(DataTable searchValues) {
-        logger.info("Verify Search Box is available and working", searchValues);
         List<String> searchValuesList = searchValues.asList(String.class);
+        logger.info("Verifying search functionality for values: {}", searchValuesList);
         createCreatives.clickActivityButton("Active");
 
         for (String searchValue : searchValuesList) {
-        logger.info("Verifying: search Box is available and working", searchValues);
             createCreatives.searchCreative(searchValue);
             boolean isFound = createCreatives.checkSearchedValue(searchValue);
             Assert.assertTrue("Search is not working for value: " + searchValue, isFound);
@@ -1837,13 +1834,12 @@ public class LifeSteps {
 
     @When("User clicks on {string} tab and verify following filters value")
     public void userClicksOnTabAndVerifyFollowingFiltersValue(String tabName, DataTable filters) {
-        logger.info("User clicks on {} tab and verify following filters value", tabName, filters);
+        logger.info("Verifying filters on '{}' tab", tabName);
         Map<String, String> rawFilters = filters.asMap(String.class, String.class);
         Map<String, List<String>> filtersMap = CommonUtils.processDataTable(rawFilters);
         createCreatives.clickActivityButton(tabName);
 
         for (Map.Entry<String, List<String>> entry : filtersMap.entrySet()) {
-        logger.info("User clicks on {} tab and verify following filters value", tabName, filters);
             List<String> fetchedFilterValues = createCreatives.fetchFilterValues(entry.getKey());
             Assert.assertEquals("Creative details are not matched", entry.getValue(), fetchedFilterValues);
         }
@@ -1996,12 +1992,11 @@ public class LifeSteps {
 
     @And("Verify data persistence when user creates and saves {string} creative using details {string} as Advertiser, {string} as Creative Name, {string}, {string} and below Creative attributes")
     public void userCreatesAndSavesCreativeUsingDetailsAsAdvertiserAsCreativeNameAndBelowCreativeAttributes(String creativeType, String advertiser, String creativeName, String advertiserDSA, String financer, DataTable dataTable) {
-        logger.info("Verify data persistence when user creates and saves {} creative using details {} as Advertiser, {} as Creative Name, {}, {} and below Creative attributes", creativeType, advertiser, creativeName, advertiserDSA, financer, dataTable);
+        logger.info("Creating {} creatives and verifying data persistence. Advertiser: {}, Base Name: {}", creativeType, advertiser, creativeName);
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         nameList.clear();
 
         for (Map<String, String> row : rows) {
-        logger.info("Verifying: data persistence when user creates and saves {} creative using details {} as Advertiser, {} as Creative Name, {}, {} and below Creative attributes", creativeType, advertiser, creativeName, advertiserDSA, financer, dataTable);
             String type = row.get("CreativeType").trim();
             String attributes = row.get("CreativeAttributes").trim();
 
@@ -2036,6 +2031,7 @@ public class LifeSteps {
             createCreatives.clickCancelButton();
         }
 
+        logger.info("Data persistence verified successfully for all created creatives");
     }
 
     @Then("Verify the newly created creative is displayed in the Creative Library page")
@@ -2793,8 +2789,8 @@ public class LifeSteps {
 
     @And("Verify the availability of below Creative Type options and the Default option is {string}")
     public void verifyTheAvailabilityOfBelowCreativeTypeOptionsAndTheDefaultOptionIsDisplay(String defaultOption, DataTable dataTable) {
-        logger.info("Verify the availability of below Creative Type options and the Default option is {}", defaultOption, dataTable);
         List<String> creativeTypeOptions = dataTable.asList(String.class);
+        logger.info("Verifying Creative Type options {} and default option '{}'", creativeTypeOptions, defaultOption);
         Assert.assertEquals("All creative type options are available.", bulkCreativeUpload.verifyCreativeTypeOptions(creativeTypeOptions));
         Assert.assertTrue("Expected 'Display' to be the default selected creative type.", bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
     }
@@ -3591,7 +3587,7 @@ public class LifeSteps {
 
     @And("The Send On field should contain all days of the week when {string} is selected as Frequency")
     public void theSendOnFieldShouldContainAllDaysOfTheWeekWhenIsSelectedAsFrequency(String frequencyOption, DataTable dataTable) {
-        logger.info("The Send On field should contain all days of the week when {} is selected as Frequency", frequencyOption, dataTable);
+        logger.info("Verifying Send On field for Frequency: {}", frequencyOption);
         List<String> expectedDays = dataTable.asList(String.class);
         Assert.assertTrue("Weekly is not selected by default", scheduleReport.checkDefaultFrequencyOption(frequencyOption));
         List<String> actualDays = scheduleReport.fetchWeekDays();
@@ -3740,7 +3736,7 @@ public class LifeSteps {
 
     @And("Verify Compression field is available with below options and default value is {string}")
     public void verifyCompressionFieldIsAvailableWithBelowOptions(String defaultCompressionType, DataTable dataTable) {
-        logger.info("Verify Compression field is available with below options and default value is {}", defaultCompressionType, dataTable);
+        logger.info("Verifying Compression field with default value: {}", defaultCompressionType);
         List<String> expectedTypes = dataTable.asList(String.class);
         Assert.assertTrue("None is not selected by default", scheduleReport.checkDefaultCompression(defaultCompressionType));
         List<String> actualTypes = scheduleReport.fetchCompressionTypes();
@@ -4204,8 +4200,8 @@ public class LifeSteps {
 
     @And("Verify Line Item page has below tabs")
     public void verifyLineItemPageHasBelowTabs(DataTable dataTable) {
-        logger.info("Verify Line Item page has below tabs", dataTable);
         List<String> tabNames = dataTable.asList(String.class);
+        logger.info("Verifying Line Item page tabs: {}", tabNames);
         Assert.assertTrue("Line Item tabs are not available", lineItemDetails.verifyLineItemTabs(tabNames));
     }
 
@@ -4374,7 +4370,6 @@ public class LifeSteps {
         int currentRowIndex = 0;
         int totalRows = rows.size();
         for (Map<String, String> row : rows) {
-        logger.info("User creates line items with below line types and other details, enables the line item and saves the changes", dataTable);
             String type = row.get("LINE_TYPE").trim();
             String attributes = row.get("LINE_ITEM_DETAILS").trim();
             Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
@@ -4687,12 +4682,13 @@ public class LifeSteps {
 
     @Then("Verify Smart List Creation Panel should display the following List Population Options")
     public void verifySmartListCreationPanelShouldDisplayTheFollowingListPopulationOptions(DataTable dataTable) {
-        logger.info("User clicks on create new Campaign");
         List<String> listPopulationOptions = dataTable.asList(String.class);
+        logger.info("Verifying Smart List Population Options: {}", listPopulationOptions);
+
         for (String option : listPopulationOptions) {
-        logger.info("Verifying: smart List Creation Panel should display the following List Population Options", dataTable);
             Assert.assertTrue("List Population Option - " + option + " is not available in Smart List Container", npiSmartList.verifyListPopulationOptions(option.trim()));
         }
+
     }
 
     @And("User selects the {string} and fetches Smart pixel list")
@@ -4895,10 +4891,12 @@ public class LifeSteps {
     @And("Verify that Prescribed Behavior Change should display below tabs")
     public void verifyThatPrescribedBehaviorChangeShouldDisplayDroppersAndNewPrescribersTabs(DataTable dataTable) {
         List<String> tabList = dataTable.asList(String.class);
+        logger.info("Verifying Prescribed Behavior Change tabs: {}", tabList);
+
         for (String tabName : tabList) {
-        logger.info("Verifying: that Prescribed Behavior Change should display below tabs", dataTable);
             Assert.assertTrue(tabName + " is not available", npiSmartList.fetchPrescriptionBehaviourTab(tabName));
         }
+
     }
 
     @And("Verify that {string} tab should be selected by default")
@@ -5103,12 +5101,13 @@ public class LifeSteps {
 
     @And("Verify that Budget Status has the below options, and the default status is {string}")
     public void verifyThatBudgetStatusHasTheOptionsAndAndTheDefaultStatusIs(String defaultButton, DataTable dataTable) {
-        logger.info("Verify that Budget Status has the below options, and the default status is {}", defaultButton, dataTable);
         List<String> expectedOptions = dataTable.asList(String.class);
         List<String> actualOptions = campaigns.fetchBudgetStatus();
+        logger.info("Verifying Budget Status options: expected={}, actual={}", expectedOptions, actualOptions);
         Assert.assertEquals("Budget status has different options", expectedOptions, actualOptions);
 
         String actualDefault = campaigns.fetchDefaultBudgetStatus();
+        logger.info("Verifying default Budget Status button: expected='{}', actual='{}'", defaultButton, actualDefault);
         Assert.assertEquals(defaultButton + " button is not set as default", defaultButton, actualDefault);
     }
 
@@ -5411,8 +5410,8 @@ public class LifeSteps {
 
     @And("Verify column selection icon is available and upon clicking it below columns should display")
     public void verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(DataTable dataTable) {
-        logger.info("Verify column selection icon is available and upon clicking it below columns should display", dataTable);
         List<String> expectedColumnNames = dataTable.asList(String.class);
+        logger.info("Verifying column selection icon and expected available columns: {}", expectedColumnNames);
         createCreatives.clickColumnSelectionIcon();
         List<String> actualColumnNames = createCreatives.fetchColumnNamesFromSelectionIconList();
         Assert.assertEquals("Column names do not match", expectedColumnNames, actualColumnNames);
@@ -5612,10 +5611,11 @@ public class LifeSteps {
 
     @And("Verify Line Coding field is available with below options and default value is {string}")
     public void verifyLineCodingFieldIsAvailableWithBelowOptionsAndDefaultValueIs(String defaultValue, DataTable dataTable) {
-        logger.info("Verify Line Coding field is available with below options and default value is {}", defaultValue, dataTable);
         List<String> expectedTypes = dataTable.asList(String.class);
         runReportPanel.clickAdvancedDeliverySettingLink();
+        logger.info("Verifying Line Coding field is available");
         Assert.assertTrue("Line Coding field is not available", runReportPanel.isLineCodingFieldAvailable());
+        logger.info("Verifying default Line Coding type is '{}'", defaultValue);
         Assert.assertTrue("None is not selected by default", runReportPanel.checkDefaultLineCodingType(defaultValue));
         List<String> actualTypes = runReportPanel.fetchLineCodingTypes();
         Assert.assertEquals(new HashSet<>(expectedTypes), new HashSet<>(actualTypes));
@@ -5911,7 +5911,6 @@ public class LifeSteps {
         logger.info("Reading deal details from the data table to fill the template and upload. Deal details include - DEAL_NAME, EXCHANGE, MEDIA_TYPE, CURATOR, DEAL_PRICE, PRICING_TYPE, MPC_DEAL_TYPE");
         List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
         for (Map<String, String> templateDate : data) {
-        logger.info("User fills the template with deal details and uploads the template", dataTable);
             String dealName = templateDate.get("DEAL_NAME") + '_' + CommonUtils.timeStampCalculation() + '_' + new Random().nextInt(100);
             String exchange = templateDate.get("EXCHANGE");
             String mediaType = templateDate.get("MEDIA_TYPE");
