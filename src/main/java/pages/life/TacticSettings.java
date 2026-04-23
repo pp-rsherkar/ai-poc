@@ -321,7 +321,7 @@ public class TacticSettings {
                         isElementVisible(xpath);
                     }
                     break;
-                case "IP Address":
+                case "IP":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format("(//div[contains(text(), '%s')]/ancestor::div[contains(@class, 'left cliptext')]/preceding-sibling::div[contains(@class, 'left iconsWrapper')]//div[contains(@class, 'include-default')])[1]", val);
