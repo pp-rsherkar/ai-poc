@@ -4,12 +4,21 @@ Feature: Curated Markets - Verify Deal Import, Validation, and Tactic Assignment
   3. Verify imported deals are correctly associated and visible in the Curated Markets page for the selected market
   4. Verify floor price display logic in Curated Markets (single value for same prices, range for different prices)
   5. Verify a curated market can be selected and successfully added to a tactic, and is reflected in the targeting section
+  6. Verify the error messages for mandatory fields - market name, accounts and market KPI and benchmark
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     When User navigates to Administrative section
     And User navigates to Setup Tab
+
+  @regression
+  Scenario Outline: Verify the error messages for mandatory fields - market name, accounts and market KPI and benchmark
+    When User clicks Create Curated Market link
+    And User creates a curated market with only "<DESCRIPTION>"
+    Examples:
+      | DESCRIPTION                |
+      | Curated Market Description |
 
   @regression
   Scenario Outline: Create a Curated Market from Admin settings by importing a deal using a template and verify its details in the Admin Deals tab and Curated Markets section of the Supply module
