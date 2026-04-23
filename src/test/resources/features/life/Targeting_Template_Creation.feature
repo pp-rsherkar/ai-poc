@@ -22,7 +22,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
       | Behavioral Segment | AutoSegment |
       | Age                | 25-29       |
-      | IP Address         | AutoIP      |
+      | IP                 | AutoIP      |
       | Postal Codes       | 112233      |
     Then User searches and verifies the already created targeting template using the search option
     #3
@@ -42,7 +42,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
       | Behavioral Segment | AutoSegment |
       | Age                | 25-29       |
-      | IP Address         | AutoIP      |
+      | IP                 | AutoIP      |
       | Postal Codes       | 112233      |
     Then User searches and verifies the already created targeting template using the search option
     #3
@@ -65,7 +65,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     And Create a tactic with below targeting rules and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
       | Behavioral Segment | AutoSegment |
       | Age                | 25-29       |
-      | IP Address         | AutoIP      |
+      | IP                 | AutoIP      |
       | Postal Codes       | 112233      |
     Then Verify the template created are saved
     #2
