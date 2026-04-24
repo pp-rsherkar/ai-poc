@@ -253,6 +253,7 @@ public class TacticDetails {
     public void saveTacticDetails() {
         waitUtility.waitForLocatorVisible(SAVE_TACTIC_DETAILS);
         SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String tacticDetailsSuccess() {

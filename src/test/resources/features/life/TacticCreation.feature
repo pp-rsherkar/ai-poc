@@ -248,7 +248,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And User saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
     And Verify line item inherits campaign management fee as "<CAMPAIGN_DISPLAY_VALUE>"
-
     When User overrides line item management fee as "<LINEITEM_FEE_OPTION>" "<LINEITEM_PERCENT>" "<LINEITEM_AMOUNT>"
     And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page

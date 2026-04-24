@@ -274,6 +274,8 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void verify_line_item_details_are_saved_and_user_is_navigated_to_tactic_page() {
         logger.info("Verifying Line Item creation and navigation to Tactic page");
         Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
+        String tacticText = tacticDetails.verifyTacticDetailsText();
+        Assert.assertTrue("Tactic page text is not displayed", tacticText.contains("New Tactic") || tacticText.contains("New Ad Group"));
     }
 
     @Then("User creates below tactics under same line item and verifies it")
