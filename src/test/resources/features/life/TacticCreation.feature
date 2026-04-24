@@ -238,3 +238,22 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |
+
+
+  @regression
+  Scenario Outline: Verify campaign management fee is reflected in line item and line item override is reflected in tactic
+    When User clicks on Create Campaign
+    And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+    And User sets campaign management fee as "<CAMPAIGN_FEE_OPTION>" "<CAMPAIGN_PERCENT>" "<CAMPAIGN_AMOUNT>"
+    And User saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    And Verify line item inherits campaign management fee as "<CAMPAIGN_DISPLAY_VALUE>"
+
+    When User overrides line item management fee as "<LINEITEM_FEE_OPTION>" "<LINEITEM_PERCENT>" "<LINEITEM_AMOUNT>"
+    And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    And Verify tactic reflects line item management fee as "<LINEITEM_DISPLAY_VALUE>"
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | LINEITEM_FEE_OPTION | LINEITEM_PERCENT | LINEITEM_AMOUNT | LINEITEM_DISPLAY_VALUE |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                |                 | + 5 %                  | Percentage         | 7                |                 | + 7 %                  |

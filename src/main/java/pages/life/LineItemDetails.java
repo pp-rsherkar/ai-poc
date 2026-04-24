@@ -70,6 +70,11 @@ public class LineItemDetails {
     private final Locator FLAT_CPM;
     private final Locator PACING_MODE_INPUT;
     private final Locator PLACEMENT_ID;
+    private final Locator MANAGEMENT_FEE_LABEL_VALUE;
+    private final Locator MANAGEMENT_FEE_OVERRIDE;
+    private final Locator MANAGEMENT_FEE_OPTIONS;
+    private final Locator PERCENT_TYPE_FEE_INPUT;
+    private final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -146,6 +151,11 @@ public class LineItemDetails {
         this.FLAT_CPM = page.locator("//input[@formcontrolname='flatCPM']");
         this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
         this.PLACEMENT_ID = page.locator("//label[contains(text(),'PlacementId')]/following-sibling::input");
+        this.MANAGEMENT_FEE_LABEL_VALUE = page.locator("//span[contains(@class, 'fee-value')]");
+        this.MANAGEMENT_FEE_OVERRIDE = page.locator("//label[contains(text(),'Override')]");
+        this.MANAGEMENT_FEE_OPTIONS = page.locator("//div[contains(@class,'management-fee-contanier')]//div//button");
+        this.PERCENT_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
+        this.DOLLAR_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
     }
 
     public String verifyLineItemText() {
@@ -217,6 +227,46 @@ public class LineItemDetails {
             }
         }
         return true;
+    }
+
+    public boolean isManagementFeeSectionVisible() {
+        return MANAGEMENT_FEE_LABEL_VALUE.isVisible();
+    }
+
+    public String fetchDisplayedManagementFeeValue() {
+        return MANAGEMENT_FEE_LABEL_VALUE.textContent().trim();
+    }
+
+    public void enableManagementFeeOverride() {
+            MANAGEMENT_FEE_OVERRIDE.click();
+        }
+
+
+    public String fetchSelectedManagementFeeOption() {
+        for (int i = 0; i < MANAGEMENT_FEE_OPTIONS.count(); i++) {
+            String classAttr = MANAGEMENT_FEE_OPTIONS.nth(i).getAttribute("class");
+            if (classAttr != null && classAttr.contains("active")) {
+                return MANAGEMENT_FEE_OPTIONS.nth(i).textContent().trim();
+            }
+        }
+        return "";
+    }
+
+    public void selectManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount) {
+        MANAGEMENT_FEE_OPTIONS.locator("text=" + managementFeeOption).click();
+        if (PERCENT_TYPE_FEE_INPUT.isVisible() && percent != null && !percent.isBlank()) {
+            PERCENT_TYPE_FEE_INPUT.fill(percent);
+        }
+        if (DOLLAR_TYPE_FEE_INPUT.isVisible() && amount != null && !amount.isBlank()) {
+            DOLLAR_TYPE_FEE_INPUT.fill(amount);
+        }
+    }
+
+    public List<String> fetchEnteredManagementFeeValues() {
+        List<String> values = new ArrayList<>();
+        if (PERCENT_TYPE_FEE_INPUT.isVisible()) values.add(PERCENT_TYPE_FEE_INPUT.inputValue().trim());
+        if (DOLLAR_TYPE_FEE_INPUT.isVisible()) values.add(DOLLAR_TYPE_FEE_INPUT.inputValue().trim());
+        return values;
     }
 
     public String verifyLineItemStatus() {
@@ -298,6 +348,8 @@ public class LineItemDetails {
             enterLineItemBudget(budget);
         }
     }
+
+
 
     public List<String> fetchFlightDetails() {
         List<String> flightDetail = new ArrayList<>();

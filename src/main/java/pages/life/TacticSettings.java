@@ -81,6 +81,11 @@ public class TacticSettings {
     private final Locator APP_TREE_VIEW_NODE;
     private final Locator TARGETING_SEGMENT;
     private final Locator TARGETING_PANEL_TEXTAREA;
+    private final Locator MANAGEMENT_FEE_LABEL_VALUE;
+    private final Locator MANAGEMENT_FEE_OVERRIDE;
+    private final Locator MANAGEMENT_FEE_OPTIONS;
+    private final Locator PERCENT_TYPE_FEE_INPUT;
+    private final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
     public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
@@ -157,6 +162,11 @@ public class TacticSettings {
         this.APP_TREE_VIEW_NODE = page.locator("//app-treeview//div[contains(@class,'treeviewNode')]");
         this.TARGETING_SEGMENT = page.locator("//div[contains(text(),'Targeting Segments')]");
         this.TARGETING_PANEL_TEXTAREA = page.locator("//div[contains(@class,'editableTextarea')]");
+        this.MANAGEMENT_FEE_LABEL_VALUE = page.locator("//span[contains(@class,'fee-value')]");
+        this.MANAGEMENT_FEE_OVERRIDE = page.locator("//label[contains(text(),'Override')]");
+        this.MANAGEMENT_FEE_OPTIONS = page.locator("//div[contains(@class,'management-fee-contanier')]//div//button");
+        this.PERCENT_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
+        this.DOLLAR_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -214,6 +224,35 @@ public class TacticSettings {
         SEARCH_RULE_TYPE.press("Enter");
         SELECT_RULE_TYPE.click();
     }
+
+public boolean isManagementFeeSectionVisible() {
+    return MANAGEMENT_FEE_LABEL_VALUE.isVisible();
+}
+
+public String fetchDisplayedManagementFeeValue() {
+    return MANAGEMENT_FEE_LABEL_VALUE.innerText().trim();
+}
+
+public boolean isManagementFeeOverrideVisible() {
+    return MANAGEMENT_FEE_OVERRIDE.isVisible();
+}
+
+public String fetchSelectedManagementFeeOption() {
+    for (int i = 0; i < MANAGEMENT_FEE_OPTIONS.count(); i++) {
+        String classAttr = MANAGEMENT_FEE_OPTIONS.nth(i).getAttribute("class");
+        if (classAttr != null && classAttr.contains("active")) {
+            return MANAGEMENT_FEE_OPTIONS.nth(i).innerText().trim();
+        }
+    }
+    return "";
+}
+
+public List<String> fetchEnteredManagementFeeValues() {
+    List<String> values = new ArrayList<>();
+    if (PERCENT_TYPE_FEE_INPUT.isVisible()) values.add(PERCENT_TYPE_FEE_INPUT.inputValue().trim());
+    if (DOLLAR_TYPE_FEE_INPUT.isVisible()) values.add(DOLLAR_TYPE_FEE_INPUT.inputValue().trim());
+    return values;
+}
 
     public void addTargetingRules(String ruleType) {
         searchAndSelectRuleType(ruleType);

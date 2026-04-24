@@ -327,6 +327,17 @@ public class Campaigns {
         ACTION_ITEM_MENU.click();
     }
 
+    public String fetchSelectedManagementFeeOption() {
+    return fetchDefaultValue(MANAGEMENT_FEE_OPTIONS);
+}
+
+public List<String> fetchEnteredManagementFeeValues() {
+    List<String> values = new ArrayList<>();
+    if (PERCENT_TYPE_FEE_INPUT.isVisible()) values.add(PERCENT_TYPE_FEE_INPUT.inputValue().trim());
+    if (DOLLAR_TYPE_FEE_INPUT.isVisible()) values.add(DOLLAR_TYPE_FEE_INPUT.inputValue().trim());
+    return values;
+}
+
     public boolean isGenerateReportOptionAvailable(String reportOption) {
         Locator reportOptionXpath = page.locator(String.format("//app-icon-lable-link[contains(@title,'%s')]//div", reportOption));
         waitUtility.waitForLocatorVisible(reportOptionXpath);

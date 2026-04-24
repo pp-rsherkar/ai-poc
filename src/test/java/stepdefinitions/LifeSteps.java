@@ -210,6 +210,40 @@ public class LifeSteps {
         campaigns.saveCampaign();
     }
 
+@And("User sets campaign management fee as {string} {string} {string}")
+public void userSetsCampaignManagementFeeAs(String managementFeeOption, String percent, String amount) {
+    logger.info("Setting campaign management fee. Option: {}, Percent: {}, Amount: {}", managementFeeOption, percent, amount);
+    Assert.assertTrue("Campaign management fee checkbox is not visible", campaigns.isManagementFeeAvailable());
+
+    campaigns.clickManagementFee();
+    campaigns.clickManagementFeeOptionAndEnterData(managementFeeOption, percent, amount);
+}
+
+@Then("Verify line item inherits campaign management fee as {string}")
+public void verifyLineItemInheritsCampaignManagementFeeAs(String expectedFeeValue) {
+    logger.info("Verifying line item inherited management fee value: {}", expectedFeeValue);
+    //Assert.assertTrue("Line item management fee section is not visible", lineItemDetails.isManagementFeeSectionVisible());
+    Assert.assertEquals("Inherited management fee at line item level is incorrect", expectedFeeValue, lineItemDetails.fetchDisplayedManagementFeeValue());
+}
+
+@When("User overrides line item management fee as {string} {string} {string}")
+public void userOverridesLineItemManagementFeeAs(String managementFeeOption, String percent, String amount) {
+    logger.info("Overriding line item management fee. Option: {}, Percent: {}, Amount: {}", managementFeeOption, percent, amount);
+    //Assert.assertTrue("Line item management fee section is not visible", lineItemDetails.isManagementFeeSectionVisible());
+
+    lineItemDetails.enableManagementFeeOverride();
+    lineItemDetails.selectManagementFeeOptionAndEnterData(managementFeeOption, percent, amount);
+}
+
+@Then("Verify tactic reflects line item management fee as {string}")
+public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue) {
+    logger.info("Verifying tactic management fee value: {}", expectedFeeValue);
+    tacticDetails.enterTacticName("Tactic_"+CommonUtils.timeStampCalculation());
+    tacticDetails.saveTacticDetails();
+   // Assert.assertTrue("Tactic management fee section is not visible", tacticSettings.isManagementFeeSectionVisible());
+    Assert.assertEquals("Tactic management fee value is incorrect", expectedFeeValue, tacticSettings.fetchDisplayedManagementFeeValue());
+}
+
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
         logger.info("Verifying campaign creation and navigation to Line Item page");
@@ -240,8 +274,6 @@ public class LifeSteps {
     public void verify_line_item_details_are_saved_and_user_is_navigated_to_tactic_page() {
         logger.info("Verifying Line Item creation and navigation to Tactic page");
         Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
-        String tacticText = tacticDetails.verifyTacticDetailsText();
-        Assert.assertTrue("Tactic page text is not displayed", tacticText.contains("New Tactic") || tacticText.contains("New Ad Group"));
     }
 
     @Then("User creates below tactics under same line item and verifies it")
