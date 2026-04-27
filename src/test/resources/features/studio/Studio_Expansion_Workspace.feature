@@ -224,4 +224,3 @@ Feature: HCP Audience Workspace in Studio Application
       | ADVERTISER | SOURCE_AUDIENCE  | OPTIONS | EXPANDED_AUDIENCE             | WORKSPACE_NAME |
       | Abbvie     | Studio Workspace | PB_Test | Expand with Care Team         | HCP_Expansion  |
       | Abbvie     | Studio Workspace | PB_Test | Expand with Affiliation Graph | HCP_Expansion  |
-
