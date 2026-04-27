@@ -3,10 +3,9 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
-import utils.WaitUtility;
-
 import java.util.ArrayList;
 import java.util.List;
+import utils.WaitUtility;
 
 public class LineItemFlights {
     private final Page page;
@@ -20,8 +19,10 @@ public class LineItemFlights {
         this.page = page;
         this.FLIGHT_TAB = page.locator("//a[contains(@class,'gaTabFlights')]");
         this.FLIGHT_TABLE = page.locator("//div[contains(@id,'parentTable')]");
-        this.FLIGHTS_DATES = page.locator("//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 2]/div");
-        this.FLIGHTS_DETAILS = page.locator("//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 4]/div");
+        this.FLIGHTS_DATES = page.locator(
+                "//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 2]/div");
+        this.FLIGHTS_DETAILS = page.locator(
+                "//tr[contains(@class,'highlighted no-hover-effect')]/td[contains(@class,'active-flight') or contains(@class, '')][position() <= 4]/div");
     }
 
     public void clickFlightTab() {
@@ -46,5 +47,4 @@ public class LineItemFlights {
     public List<String> fetchFlightDetailsFromFlightTab() {
         return FLIGHTS_DETAILS.allInnerTexts();
     }
-
 }

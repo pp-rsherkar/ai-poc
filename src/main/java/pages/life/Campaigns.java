@@ -4,10 +4,9 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
-import utils.WaitUtility;
-
 import java.util.ArrayList;
 import java.util.List;
+import utils.WaitUtility;
 
 public class Campaigns {
     private final Page page;
@@ -89,33 +88,46 @@ public class Campaigns {
         this.CAMPAIGN_TYPE = page.locator("//label[contains(text(),'Campaign Type')]/following-sibling::div//button");
         this.BUDGET = page.locator("//input[@id='budgetcap']");
         this.SAVE_CAMPAIGN = page.locator("//span[text()='Save']");
-        this.CAMPAIGN_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Campaign')]");
+        this.CAMPAIGN_SUCCESS = page.locator(
+                "//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Campaign')]");
         this.CAMPAIGN_DASHBOARD = page.locator("//span[@class='breadCrumbRoot']");
         this.LIFE_TIME_FILTER = page.locator("//button[@data-title='Lifetime']");
         this.CAMPAIGN_ENTRIES = page.locator("//div[contains(@class,'name-section-wrapper')]");
-        this.ADVERTISER_DROPDOWN_VALUES = page.locator("//input[@placeholder='Select Advertiser']/following-sibling::div[@class='menu transition visible']//div");
+        this.ADVERTISER_DROPDOWN_VALUES = page.locator(
+                "//input[@placeholder='Select Advertiser']/following-sibling::div[@class='menu transition visible']//div");
         this.MANDATORY_FIELD_ERROR = page.locator("//div[contains(@class,'errorsWrapper')]//p");
         this.CAMPAIGN_DESCRIPTION = page.locator("//textarea[@placeholder='Description']");
         this.SEARCH_DRUG = page.locator("//input[@placeholder='Drug']");
-        this.BUDGET_STATUS = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//button | //label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button");
+        this.BUDGET_STATUS = page.locator(
+                "//label[contains(text(),'Budget Status')]/following-sibling::div//button | //label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button");
         this.MANAGEMENT_FEE = page.locator("//label[contains(text(),'Apply Management Fee')]//parent::sui-checkbox");
         this.MANAGEMENT_FEE_OPTIONS = page.locator("//button[contains(@class,'fee-type-button')]");
-        this.PERCENT_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'fee-inputs')]//input[contains(@class,'percent-img')]");
-        this.DOLLAR_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'fee-inputs')]//input[contains(@class,'doller-img')]");
+        this.PERCENT_TYPE_FEE_INPUT =
+                page.locator("//div[contains(@class,'fee-inputs')]//input[contains(@class,'percent-img')]");
+        this.DOLLAR_TYPE_FEE_INPUT =
+                page.locator("//div[contains(@class,'fee-inputs')]//input[contains(@class,'doller-img')]");
         this.ACTION_ITEM_MENU = page.locator("//span[contains(@title,'options')]");
-        this.SELECTED_ADVERTISER = page.locator("//label[text()='Advertiser']/following-sibling::div//input//following-sibling::span | //label[text()='Advertiser']/following-sibling::span");
+        this.SELECTED_ADVERTISER = page.locator(
+                "//label[text()='Advertiser']/following-sibling::div//input//following-sibling::span | //label[text()='Advertiser']/following-sibling::span");
         this.SELECTED_DRUG = page.locator("//div[@id='drugLookup']/following-sibling::div//input");
         this.CAMPAIGN_DETAILS_TAB = page.locator("//a[contains(@class,'gaTabDetails') and contains(text(),'Details')]");
-        this.CLIENT_DROPDOWN = page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]");
-        this.CLIENT_DROPDOWN_VALUE = page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]//div[@class='menu transition visible']/div");
-        this.SELECTED_CLIENT_VALUE = page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]//div[@class='text']");
+        this.CLIENT_DROPDOWN =
+                page.locator("//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]");
+        this.CLIENT_DROPDOWN_VALUE = page.locator(
+                "//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]//div[@class='menu transition visible']/div");
+        this.SELECTED_CLIENT_VALUE = page.locator(
+                "//label[text()='Client']/following-sibling::div[contains(@class,'dropdown')]//div[@class='text']");
         this.ADD_CUSTOM_FIELD_BUTTON = page.locator("//span[text()='Add Custom Field']");
         this.CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
         this.SAVE_CUSTOM_FIELD = page.locator("//button[normalize-space()='Save']");
-        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator("//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted the Field :')]");
-        this.CUSTOM_FIELD_DELETE_ICON = page.locator("//div[contains(@class,'campaign-height-popover')]//app-icon-lable-link[@text='Delete']");
-        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Custom Field Will Be Deleted') or normalize-space(text())=\"Custom Field Can't Be Removed\"]");
-        this.CUSTOM_FIELD_DELETE_BUTTON = page.locator("//span[contains(text(),'Delete Field') or contains(text(),'Ok')]");
+        this.CUSTOM_FIELD_SUCCESS_ALERT = page.locator(
+                "//div[contains(text(),'Successfully created custom Field :')] | //div[contains(text(),'Successfully updated custom Field :')] | //div[contains(text(),'Successfully deleted the Field :')]");
+        this.CUSTOM_FIELD_DELETE_ICON =
+                page.locator("//div[contains(@class,'campaign-height-popover')]//app-icon-lable-link[@text='Delete']");
+        this.CUSTOM_FIELD_DELETE_CONFIRMATION_POP_UP = page.locator(
+                "//div[contains(text(),'Custom Field Will Be Deleted') or normalize-space(text())=\"Custom Field Can't Be Removed\"]");
+        this.CUSTOM_FIELD_DELETE_BUTTON =
+                page.locator("//span[contains(text(),'Delete Field') or contains(text(),'Ok')]");
         this.COMMENT_BOX_FROM_TITLE = page.locator("//span[@class='notes-dark-icon-provided']");
         this.COMMENT_BOX_FROM_DASHBOARD = page.locator("//span[contains(@class,'notes-icon-provided-dashboard')]");
         this.LINE_ITEM_TILE = page.locator("//div[contains(@class,'listitembox')]");
@@ -131,22 +143,31 @@ public class Campaigns {
         this.FREQUENCY_CAP_VALUE = page.locator("//input[@id='windowLimit' or @id='freqWindowLimit']");
         this.GET_FREQUENCY_CAP_TEXT = page.locator("//p[contains(@class,'display-block')]");
         this.LINE_ITEM_TAB = page.locator("//div[contains(@class,'listitembox')]");
-        this.FREQUENCY_CAP = page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
+        this.FREQUENCY_CAP =
+                page.locator("//label[contains(text(),'Frequency Cap')]/following-sibling::div//sui-checkbox");
         this.TIMES_PER_HOURS_VALUE = page.locator("//input[@formcontrolname='hour']");
         this.CAMPAIGN_OPTIONS = page.locator("//div[contains(@class, 'action-items')]//span[@title='options']");
         this.EXPORT_AUDIT_LOG = page.locator("//span[text()='Export Audit Log']");
         this.EXPORT_AUDIT_LOG_POPUP = page.locator("//div[@class='popup-header' and text()='Export Audit Log']");
         this.EXPORT_AUDIT_LOG_POPUP_CONTENT = page.locator("//div[contains(@class,'popup-content')]/span");
         this.EXPORT_AUDIT_LOG_POPUP_OK_BUTTON = page.locator("//span[@class='text' and text()='Ok']");
-        this.EXPORT_AUDIT_LOG_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Audit Log request created')]");
-        this.EXPORT_CAMPAIGN_SETTINGS = page.locator("//app-icon-lable-link[@title='Export Settings']//div[contains(@class,'icolink')]");
-        this.EXPORT_CAMPAIGN_SETTINGS_POPUP = page.locator("//div[@class='rightPanelHeader2' and text()='Export Campaign Settings']");
-        this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
-        this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
-        this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
-        this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
+        this.EXPORT_AUDIT_LOG_SUCCESS_ALERT =
+                page.locator("//div[@role='alert' and contains(text(),'Audit Log request created')]");
+        this.EXPORT_CAMPAIGN_SETTINGS =
+                page.locator("//app-icon-lable-link[@title='Export Settings']//div[contains(@class,'icolink')]");
+        this.EXPORT_CAMPAIGN_SETTINGS_POPUP =
+                page.locator("//div[@class='rightPanelHeader2' and text()='Export Campaign Settings']");
+        this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON =
+                page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
+        this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON =
+                page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
+        this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT =
+                page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
+        this.BUDGET_STATUS_EXTERNAL =
+                page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
         this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
-        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
+        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator(
+                "//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
     }
 
     public void createCampaign() {
@@ -202,13 +223,17 @@ public class Campaigns {
     }
 
     public String getSavedFrequencyCap(String level) {
-        String frequencyCapValue = GET_FREQUENCY_CAP_TEXT.first().innerText().trim().toUpperCase();
+        String frequencyCapValue =
+                GET_FREQUENCY_CAP_TEXT.first().innerText().trim().toUpperCase();
         if (level.contains("Line Item")) {
-            frequencyCapValue = GET_FREQUENCY_CAP_TEXT.filter(new Locator.FilterOptions().setHasText("Line item")).innerText().trim().toUpperCase();
+            frequencyCapValue = GET_FREQUENCY_CAP_TEXT
+                    .filter(new Locator.FilterOptions().setHasText("Line item"))
+                    .innerText()
+                    .trim()
+                    .toUpperCase();
         }
         return frequencyCapValue;
     }
-
 
     public String campaignDashboard() {
         page.waitForLoadState(LoadState.DOMCONTENTLOADED);
@@ -274,7 +299,8 @@ public class Campaigns {
     public void selectDrug(String drugName) {
         SEARCH_DRUG.click();
         SEARCH_DRUG.fill(drugName);
-        Locator option = SEARCH_DRUG.locator(String.format("//following-sibling::div//div[contains(@title,'%s')]", drugName));
+        Locator option =
+                SEARCH_DRUG.locator(String.format("//following-sibling::div//div[contains(@title,'%s')]", drugName));
         option.first().click();
     }
 
@@ -298,7 +324,8 @@ public class Campaigns {
 
     public String fetchDefaultValue(Locator locator) {
         for (int i = 0; i < locator.count(); i++) {
-            if (locator.nth(i).getAttribute("class") != null && locator.nth(i).getAttribute("class").contains("active"))
+            if (locator.nth(i).getAttribute("class") != null
+                    && locator.nth(i).getAttribute("class").contains("active"))
                 return locator.nth(i).textContent().trim();
         }
         return "";
@@ -328,15 +355,19 @@ public class Campaigns {
     }
 
     public boolean isGenerateReportOptionAvailable(String reportOption) {
-        Locator reportOptionXpath = page.locator(String.format("//app-icon-lable-link[contains(@title,'%s')]//div", reportOption));
+        Locator reportOptionXpath =
+                page.locator(String.format("//app-icon-lable-link[contains(@title,'%s')]//div", reportOption));
         waitUtility.waitForLocatorVisible(reportOptionXpath);
-        return reportOptionXpath.isVisible() && !reportOptionXpath.getAttribute("class").contains("disabled");
+        return reportOptionXpath.isVisible()
+                && !reportOptionXpath.getAttribute("class").contains("disabled");
     }
 
     public boolean isDeleteOptionAvailable(String deleteOption) {
-        Locator reportOptionXpath = page.locator(String.format("//app-icon-lable-link[contains(@title,'%s')]//div", deleteOption));
+        Locator reportOptionXpath =
+                page.locator(String.format("//app-icon-lable-link[contains(@title,'%s')]//div", deleteOption));
         waitUtility.waitForLocatorVisible(reportOptionXpath);
-        return reportOptionXpath.isVisible() && reportOptionXpath.getAttribute("class").contains("disabled");
+        return reportOptionXpath.isVisible()
+                && reportOptionXpath.getAttribute("class").contains("disabled");
     }
 
     public List<String> fetchCampaignDetails() {
@@ -356,7 +387,8 @@ public class Campaigns {
     }
 
     public void clickSavedCampaign(String campaignName) {
-        Locator savedCampaignXpath = page.locator(String.format("//div[contains(@class,'campaign-title') and contains(text(),'%s')]", campaignName));
+        Locator savedCampaignXpath = page.locator(
+                String.format("//div[contains(@class,'campaign-title') and contains(text(),'%s')]", campaignName));
         savedCampaignXpath.click();
         waitUtility.waitUntilSpinnerHidden();
     }
@@ -375,7 +407,9 @@ public class Campaigns {
         if (!isDisabled) {
             CLIENT_DROPDOWN.scrollIntoViewIfNeeded();
             CLIENT_DROPDOWN.click();
-            CLIENT_DROPDOWN_VALUE.filter(new Locator.FilterOptions().setHasText(clientName)).click();
+            CLIENT_DROPDOWN_VALUE
+                    .filter(new Locator.FilterOptions().setHasText(clientName))
+                    .click();
             state = "Enabled";
         } else {
             state = "Disabled";
@@ -407,28 +441,35 @@ public class Campaigns {
     }
 
     public boolean isAddedCustomFieldAvailable(String metricName) {
-        return page.locator(String.format("//label[normalize-space(text())='%s']", metricName)).isVisible();
+        return page.locator(String.format("//label[normalize-space(text())='%s']", metricName))
+                .isVisible();
     }
 
     public void clickCustomFieldLabel(String metricName) {
-        page.locator(String.format("//label[normalize-space(text())='%s']//img", metricName)).click();
+        page.locator(String.format("//label[normalize-space(text())='%s']//img", metricName))
+                .click();
     }
 
     public void enterCustomFieldData(String customFieldName, String customFieldData) {
-        page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName)).fill(customFieldData);
+        page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName))
+                .fill(customFieldData);
     }
 
     public void navigateToCampaign(String campaignName) {
-        page.locator(String.format("//div[normalize-space(text())='%s']", campaignName)).click();
+        page.locator(String.format("//div[normalize-space(text())='%s']", campaignName))
+                .click();
         waitUtility.waitUntilSpinnerHidden();
     }
 
     public String fetchCustomFieldData(String customFieldName) {
-        return page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName)).inputValue();
+        return page.locator(String.format(
+                        "//label[normalize-space(text())='%s']/following-sibling::input", customFieldName))
+                .inputValue();
     }
 
     public String deleteCustomField(String customFieldName) {
-        page.locator(String.format("//label[normalize-space(text())='%s']//img", customFieldName)).click();
+        page.locator(String.format("//label[normalize-space(text())='%s']//img", customFieldName))
+                .click();
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_ICON);
         CUSTOM_FIELD_DELETE_ICON.click();
         waitUtility.waitUntilSpinnerHidden();
@@ -499,7 +540,9 @@ public class Campaigns {
     public void exportCampaignSettings() {
         waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS);
 
-        page.evaluate("() => { " + "if (window.isPatched) return; " + "const o = Element.prototype.setAttribute; " + "Element.prototype.setAttribute = function(n, v) { " + "if (n !== ']') o.apply(this, arguments); " + "}; window.isPatched = true; }");
+        page.evaluate("() => { " + "if (window.isPatched) return; " + "const o = Element.prototype.setAttribute; "
+                + "Element.prototype.setAttribute = function(n, v) { " + "if (n !== ']') o.apply(this, arguments); "
+                + "}; window.isPatched = true; }");
 
         EXPORT_CAMPAIGN_SETTINGS.evaluate("el => el.click()");
         waitUtility.waitForLocatorVisible(EXPORT_CAMPAIGN_SETTINGS_POPUP);
@@ -536,12 +579,15 @@ public class Campaigns {
     }
 
     public String checkBackgroundColorOfCampaignBudgetStatus() {
-        return BUDGET_STATUS_EXTERNAL.evaluate("element => getComputedStyle(element).backgroundColor").toString();
+        return BUDGET_STATUS_EXTERNAL
+                .evaluate("element => getComputedStyle(element).backgroundColor")
+                .toString();
     }
 
     public int getCampaignBudgetStatusOptionsCount() {
         waitUtility.waitForLocatorVisible(BUDGET_STATUS_EXTERNAL);
-        return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span").count();
+        return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span")
+                .count();
     }
 
     public void approveCampaign() {

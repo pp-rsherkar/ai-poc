@@ -1,0 +1,31 @@
+name: Format check
+
+# Verifies that the repository is correctly formatted on every pull request
+# and on pushes to the default branch. Run `mvn spotless:apply` locally to
+# fix any violations reported here.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  spotless:
+    name: Spotless check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Run Spotless check
+        run: mvn -B -ntp spotless:check

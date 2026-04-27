@@ -3,10 +3,9 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
-import utils.WaitUtility;
-
 import java.time.LocalDateTime;
 import java.util.*;
+import utils.WaitUtility;
 
 public class LineItemDetails {
     private final Page page;
@@ -89,9 +88,11 @@ public class LineItemDetails {
         this.VERIFY_LINE_ITEM_PAGE = page.locator("//div[text()='New Line Item']");
         this.LINE_ITEM_NAME = page.locator("//input[@placeholder='Line Item Name']");
         this.LINE_ITEM_BUDGET = page.locator("//input[contains(@class,'gaFlightBudget')]");
-        this.ENABLE_LINE_ITEM = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
+        this.ENABLE_LINE_ITEM =
+                page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_LINE_ITEM = page.locator("//span[text()='Save']");
-        this.LINE_ITEM_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Lineitem')]");
+        this.LINE_ITEM_SUCCESS = page.locator(
+                "//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Lineitem')]");
         this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[contains(@class,'lineItemType')]");
         this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@class,'gaCostType')]/div");
         this.ADD_FLIGHT_BUTTON = page.locator("//app-icon-lable-link[contains(@text,'Add Flight')]");
@@ -99,7 +100,8 @@ public class LineItemDetails {
         this.TACTIC_ITEM_DETAILS = page.locator("//div[contains(@class,'tactic item-details pointer')]");
         this.LINE_ITEM_STATUS = page.locator("//span[contains(@class,'status-label')]/span");
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
-        this.ERROR_ALERT = page.locator("//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.')]");
+        this.ERROR_ALERT = page.locator(
+                "//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.')]");
         this.UNACCOUNTED_BUDGET = page.locator("//span[contains(text(), 'Use Unaccounted Budget')]");
         this.FLIGHT_CONTAINER = page.locator("//div[contains(@class,'flight-container')]");
         this.FLIGHT_START_DATE = page.locator("//input[contains(@class,'gaFlightStartDate')]");
@@ -109,22 +111,26 @@ public class LineItemDetails {
         this.CALENDER_NEXT_BUTTON = page.locator("//sui-calendar-view-title/span[@class='next link']");
         this.CALENDER_CURRENT_YEAR = page.locator("//sui-calendar-year-view//tbody//td[contains(@class,'today')]");
         this.CALENDER_CURRENT_MONTH = page.locator("//sui-calendar-month-view//tbody//td[contains(@class,'today')]");
-        this.CALENDER_DATE = page.locator("//sui-calendar-date-view//tbody//td[contains(@class,'today') or contains(@class,'link')]");
+        this.CALENDER_DATE = page.locator(
+                "//sui-calendar-date-view//tbody//td[contains(@class,'today') or contains(@class,'link')]");
         this.FLIGHT_OVERLAP_INLINE_ERROR = page.locator("//p[text()='Flight overlap with other flights.']");
         this.MAX_DAILY_SPEND = page.locator("//label[contains(@class, 'daily-spent-label')]");
         this.DELETE_FLIGHT = page.locator("//div[@title='delete']/img");
         this.GENERATE_SEQUENTIAL_FLIGHT = page.locator("//app-icon-lable-link[@text='Generate Sequential Flights']");
         this.GENERATE_FLIGHTS = page.locator("//span[text()='Generate Flights']");
-        this.SEQUENTIAL_START_MONTH = page.locator("//label[text()='Start Month']/following-sibling::div//input[contains(@placeholder,'Start Date')]");
+        this.SEQUENTIAL_START_MONTH = page.locator(
+                "//label[text()='Start Month']/following-sibling::div//input[contains(@placeholder,'Start Date')]");
         this.NUMBER_OF_MONTHS = page.locator("//label[text()='Number of Months']/following-sibling::div//sui-select");
-        this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']").last();
+        this.LINE_ITEM_PANEL_NAME = page.locator("//div[@class='item-detials']/div[@class='main-details']")
+                .last();
         this.CANCEL_TACTIC = page.locator("#lidcBody").getByText("Cancel");
         this.NEW_LINE_ITEM = page.locator("//app-icon-lable-link[@text='New Line Item']//div");
         this.NOTES_ICON = page.locator("//div[contains(@class,'notes-dashboard')]//span");
         this.NOTES_TEXTAREA = page.locator("//textarea[@placeholder='Notes']");
         this.NOTES_OK_BUTTON = page.locator("//span[@class='okText']");
         this.NOTES_SUCCESS_ALERT = page.locator("//div[text()='Notes saved successfully.']");
-        this.LINE_ITEMS_OPTIONS = page.locator("//div[contains(@class, 'lineItem-app-action')]//span[@title='options']");
+        this.LINE_ITEMS_OPTIONS =
+                page.locator("//div[contains(@class, 'lineItem-app-action')]//span[@title='options']");
         this.BULK_EDIT_MODE = page.locator("//span[contains(@tooltip, 'Bulk Edit Mode')]");
         this.BULK_EDIT_CHECKBOX = page.locator("//div[contains(@class, 'bulkEditModeWrapper')]//sui-checkbox");
         this.BULK_DISABLE_LINE_ITEM = page.locator("//div[contains(text(), 'Disable Line Items')]");
@@ -259,9 +265,11 @@ public class LineItemDetails {
 
     public void selectFlightDates(Locator locator, int day) {
         locator.click();
-        while (CALENDER_TITLE.first().isVisible() && !CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear))) {
+        while (CALENDER_TITLE.first().isVisible()
+                && !CALENDER_TITLE.first().innerText().trim().equals(String.valueOf(currentYear))) {
             CALENDER_TITLE.first().click();
-            Locator yearLocator = page.locator(String.format("//sui-calendar-year-view//td[contains(text(),'%s')]", currentYear));
+            Locator yearLocator =
+                    page.locator(String.format("//sui-calendar-year-view//td[contains(text(),'%s')]", currentYear));
             if (yearLocator.isVisible() && yearLocator.getAttribute("class").contains("today")) {
                 CALENDER_TITLE.first().click();
                 CALENDER_PREV_BUTTON.click();
@@ -317,7 +325,8 @@ public class LineItemDetails {
     }
 
     public void navigateToLineItemDetails(String lineItemName) {
-        page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName)).click();
+        page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName))
+                .click();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
     }
 
@@ -339,15 +348,23 @@ public class LineItemDetails {
         List<String> sequentialFlights = new ArrayList<>();
         int initialFlightCount = FLIGHT_CONTAINER.count();
         GENERATE_SEQUENTIAL_FLIGHT.click();
-        String startMonthValue = SEQUENTIAL_START_MONTH.evaluate("el => el.value").toString();
+        String startMonthValue =
+                SEQUENTIAL_START_MONTH.evaluate("el => el.value").toString();
         sequentialFlights.add(startMonthValue);
         NUMBER_OF_MONTHS.click();
-        page.locator(String.format("//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']", numberOfMonths)).click();
+        page.locator(String.format(
+                        "//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']",
+                        numberOfMonths))
+                .click();
         enterLineItemBudget(budget);
         GENERATE_FLIGHTS.click();
         int totalFlightCount = FLIGHT_CONTAINER.count();
         for (int i = initialFlightCount + 1; i <= totalFlightCount; i++) {
-            String flightStartDate = page.locator(String.format("//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightStartDate')]", i)).evaluate("el => el.value").toString();
+            String flightStartDate = page.locator(String.format(
+                            "//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightStartDate')]",
+                            i))
+                    .evaluate("el => el.value")
+                    .toString();
             sequentialFlights.add(flightStartDate);
         }
         return sequentialFlights;
@@ -364,13 +381,16 @@ public class LineItemDetails {
     }
 
     public void clickBulkEditMode() {
-        BULK_EDIT_MODE.evaluate("el => { const container = el.closest('.tacticListContainer'); if (container) { container.scrollTop = el.offsetTop - container.offsetTop; } }");
+        BULK_EDIT_MODE.evaluate(
+                "el => { const container = el.closest('.tacticListContainer'); if (container) { container.scrollTop = el.offsetTop - container.offsetTop; } }");
         BULK_EDIT_MODE.click();
         waitUtility.waitForLocatorVisible(BULK_EDIT_CHECKBOX.first());
     }
 
     public void selectLineItemUsingBulkEdit(String lineItemName) {
-        Locator lineItemXpath = page.locator(String.format("//div[@class='main-details' and text()='%s']/ancestor::div[contains(@class,'li-list item-list-wrapper')]/preceding-sibling::div/sui-checkbox", lineItemName));
+        Locator lineItemXpath = page.locator(String.format(
+                "//div[@class='main-details' and text()='%s']/ancestor::div[contains(@class,'li-list item-list-wrapper')]/preceding-sibling::div/sui-checkbox",
+                lineItemName));
         if (!lineItemXpath.getAttribute("class").contains("checked")) {
             lineItemXpath.click();
             waitUtility.waitUntilSpinnerHidden();
@@ -393,7 +413,8 @@ public class LineItemDetails {
     public void clickLineItemOptions(String option) {
         LINE_ITEMS_OPTIONS.scrollIntoViewIfNeeded();
         LINE_ITEMS_OPTIONS.click();
-        Locator optionXpath = page.locator(String.format("//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
+        Locator optionXpath = page.locator(String.format(
+                "//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
         waitUtility.waitForLocatorVisible(optionXpath);
         optionXpath.click();
     }
@@ -446,18 +467,24 @@ public class LineItemDetails {
 
     public List<String> fetchLineItemDetails() {
         List<String> originalLineItemDetails = new ArrayList<>();
-        originalLineItemDetails.add(COST_MODEL.locator("xpath=./descendant::div[contains(@class, 'text')]").textContent());
+        originalLineItemDetails.add(COST_MODEL
+                .locator("xpath=./descendant::div[contains(@class, 'text')]")
+                .textContent());
         if (FLAT_CPM.isVisible()) originalLineItemDetails.add(FLAT_CPM.innerText());
         Locator budgetXpath = BUDGET_DISTRIBUTION.locator("xpath=//button");
         for (int i = 0; i < budgetXpath.count(); i++) {
             if (budgetXpath.nth(i).getAttribute("class").contains("active")) {
-                originalLineItemDetails.add(budgetXpath.nth(i).innerText().trim().split(" ")[0]);
+                originalLineItemDetails.add(
+                        budgetXpath.nth(i).innerText().trim().split(" ")[0]);
                 break;
             }
         }
         originalLineItemDetails.add(FLIGHT_START_DATE.inputValue());
         originalLineItemDetails.add(FLIGHT_END_DATE.inputValue());
-        originalLineItemDetails.add(PACING_MODE.locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]").textContent().trim());
+        originalLineItemDetails.add(PACING_MODE
+                .locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]")
+                .textContent()
+                .trim());
         if (PACING_MODE_INPUT.isVisible()) originalLineItemDetails.add(PACING_MODE_INPUT.innerText());
         return originalLineItemDetails;
     }
@@ -476,7 +503,8 @@ public class LineItemDetails {
     }
 
     public void selectCostModel(String costModel, String cpm) {
-        String optionXPath = String.format("//div[contains(@class, 'gaCostType') and normalize-space(text())='%s']", costModel);
+        String optionXPath =
+                String.format("//div[contains(@class, 'gaCostType') and normalize-space(text())='%s']", costModel);
         if (!COST_MODEL.getAttribute("class").contains("disabled")) {
             COST_MODEL.click();
             COST_MODEL.locator(optionXPath).click();
@@ -486,7 +514,8 @@ public class LineItemDetails {
 
     private void selectBudgetDistribution(String budgetDistribution) {
         if (!BUDGET_DISTRIBUTION.getAttribute("class").contains("disabled")) {
-            Locator xpath = BUDGET_DISTRIBUTION.locator("xpath=//button[normalize-space(.)='" + budgetDistribution + "']");
+            Locator xpath =
+                    BUDGET_DISTRIBUTION.locator("xpath=//button[normalize-space(.)='" + budgetDistribution + "']");
             xpath.click();
         }
     }

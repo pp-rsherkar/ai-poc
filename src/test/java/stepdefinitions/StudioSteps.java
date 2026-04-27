@@ -5,6 +5,13 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +25,6 @@ import utils.CommonUtils;
 import utils.ConfigReader;
 import utils.Constants;
 import utils.FileActions;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 public class StudioSteps {
     private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
@@ -144,7 +143,8 @@ public class StudioSteps {
         }
     }
 
-    //Removed this line from scenario: "enable Studio for an Account for internal users" since permission sync takes 5-7 mins, causing script fail.
+    // Removed this line from scenario: "enable Studio for an Account for internal users" since permission sync takes
+    // 5-7 mins, causing script fail.
     @And("User should be able to see the enabled workspaces for {string} account under Studio")
     public void userShouldBeAbleToSeeTheEnabledWorkspacesForThatAccountUnderStudio(String accountName) {
         logger.info("Verifying enabled workspaces under Studio for account: {}", accountName);
@@ -203,42 +203,42 @@ public class StudioSteps {
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 
-/*
-    @Then("User selects the Workspace Type as {string}")
-    public void user_selects_the_workspace_type_as(String string) {
+    /*
+        @Then("User selects the Workspace Type as {string}")
+        public void user_selects_the_workspace_type_as(String string) {
 
-    }
+        }
 
-    @Then("User selects the advertiser as {string}")
-    public void user_selects_the_advertiser_as(String string) {
+        @Then("User selects the advertiser as {string}")
+        public void user_selects_the_advertiser_as(String string) {
 
-    }
+        }
 
-    @Then("User selects Source Audience details as {string},{string}")
-    public void user_selects_source_audience_details_as(String string, String string2) {
+        @Then("User selects Source Audience details as {string},{string}")
+        public void user_selects_source_audience_details_as(String string, String string2) {
 
-    }
+        }
 
-    @Then("User selects {string}")
-    public void user_selects(String string) {
+        @Then("User selects {string}")
+        public void user_selects(String string) {
 
-    }
+        }
 
-    @Then("User applies filters to the workspace")
-    public void user_applies_filters_to_the_workspace() {
+        @Then("User applies filters to the workspace")
+        public void user_applies_filters_to_the_workspace() {
 
-    }
+        }
 
-    @Then("User clicks on Edit button to rename the workspace to {string}")
-    public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
+        @Then("User clicks on Edit button to rename the workspace to {string}")
+        public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
 
-    }
+        }
 
-    @Then("Verify the workspace in workspace management page")
-    public void verify_the_workspace_in_workspace_management_page() {
+        @Then("Verify the workspace in workspace management page")
+        public void verify_the_workspace_in_workspace_management_page() {
 
-    }
-*/
+        }
+    */
 
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
@@ -307,17 +307,28 @@ public class StudioSteps {
         logger.info("Displayed filters from UI: {}", displayedFilters);
         for (String appliedFilter : appliedFilterEntries) {
             logger.info("Validating displayed filter for: {}", appliedFilter);
-            String appliedNorm = appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+            String appliedNorm =
+                    appliedFilter.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
             boolean matchFound = displayedFilters.stream().anyMatch(displayed -> {
-                String displayedNorm = displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+                String displayedNorm =
+                        displayed.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
                 boolean exactMatch = displayedNorm.equals(appliedNorm);
                 boolean singularPlural = displayedNorm.startsWith(appliedNorm.replaceAll("s$", ""));
-                boolean wordMatch = Arrays.stream(appliedNorm.split(" ")).anyMatch(word -> word.length() > 3 && displayedNorm.contains(word));
+                boolean wordMatch = Arrays.stream(appliedNorm.split(" "))
+                        .anyMatch(word -> word.length() > 3 && displayedNorm.contains(word));
                 boolean prescriptionRoot = appliedNorm.contains("prescri") && displayedNorm.contains("prescri");
                 boolean diagnosisRoot = appliedNorm.contains("diagnos") && displayedNorm.contains("diagnos");
 
                 if (exactMatch || singularPlural || wordMatch || prescriptionRoot || diagnosisRoot) {
-                    logger.info("Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]", appliedNorm, displayedNorm, exactMatch, singularPlural, wordMatch, prescriptionRoot, diagnosisRoot);
+                    logger.info(
+                            "Match found → Applied: '{}' | Displayed: '{}' | Rules [exact={}, plural={}, word={}, prescriptionRoot={}, diagnosisRoot={}]",
+                            appliedNorm,
+                            displayedNorm,
+                            exactMatch,
+                            singularPlural,
+                            wordMatch,
+                            prescriptionRoot,
+                            diagnosisRoot);
                     return true;
                 }
 
@@ -338,7 +349,10 @@ public class StudioSteps {
     public void verify_the_hcp_explorer_workspace_is_saved() {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Save alert: {}", actualMessage);
-        boolean isValid = actualMessage.equals("Workspace created successfully") || actualMessage.equals("Workspace saved successfully") || actualMessage.equals("Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+        boolean isValid = actualMessage.equals("Workspace created successfully")
+                || actualMessage.equals("Workspace saved successfully")
+                || actualMessage.equals(
+                        "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
@@ -372,7 +386,7 @@ public class StudioSteps {
         logger.info("Reading downloaded CSV file content");
         fileContent = FileActions.readAllDataAtOnce(ConfigReader.getProperty("csvFilePath"));
         fileContentData = new ArrayList<>();
-        //To display the data from csv- Separate logic
+        // To display the data from csv- Separate logic
         /*for (int i = 1; i < fileContent.size(); i++) {
            // System.out.println("Row " + i + ": " + String.join(", ", fileContent.get(i)));
             String data= Arrays.toString(fileContent.get(i));
@@ -527,7 +541,9 @@ public class StudioSteps {
     public void verifyIfMacrosAppendedToTheURL() {
         logger.info("Verifying macros are appended to webhook URL");
         String text = workspace.verifyMacrosAppendedToURL();
-        Assert.assertTrue("Macros are not correctly appended to the URL", text.matches(Pattern.quote(Constants.WEBHOOK_URL) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%"));
+        Assert.assertTrue(
+                "Macros are not correctly appended to the URL",
+                text.matches(Pattern.quote(Constants.WEBHOOK_URL) + "%%NPI%%%%URL%%%%Channel%%%%PARAM\\d+%%"));
     }
 
     @And("User selects content type {string}")
@@ -537,7 +553,8 @@ public class StudioSteps {
     }
 
     @And("User adds valid body {string} and append Macros with {string} to the {string} as follow")
-    public void userAddsBodyAndAppendMacrosToTheBodyAsFollow(String jsonFile, String param, String textType, DataTable macros) throws IOException {
+    public void userAddsBodyAndAppendMacrosToTheBodyAsFollow(
+            String jsonFile, String param, String textType, DataTable macros) throws IOException {
         logger.info("Adding webhook body from file: {}", jsonFile);
         List<String> macrosList = macros.asList(String.class);
         workspace.addBody(jsonFile);
@@ -572,7 +589,9 @@ public class StudioSteps {
     public void verifyInlineErrorMessageForTheInvalidWebhookEntries(String invalidData) {
         logger.info("Verifying inline error message for invalid webhook data");
         String inlineError = String.valueOf(workspace.verifyInlineErrorMessage(invalidData));
-        Assert.assertTrue("Inline error message is not displayed", (inlineError.contains("URL is invalidBody is invalid") || inlineError.contains("URL is invalid")));
+        Assert.assertTrue(
+                "Inline error message is not displayed",
+                (inlineError.contains("URL is invalidBody is invalid") || inlineError.contains("URL is invalid")));
     }
 
     @And("Verify error message when webhook setup is failed using {string}")
@@ -580,7 +599,9 @@ public class StudioSteps {
         logger.info("Verifying webhook failure error message");
         List<String> mediaTypeList = CommonUtils.parseCommaSeparatedString(errorData);
         String errorMessage = workspace.verifyErrorMsgWhenAPIFailed(mediaTypeList);
-        Assert.assertTrue("Error message is not displayed", errorMessage.contains("Error occurred while saving workspace or editing webhook"));
+        Assert.assertTrue(
+                "Error message is not displayed",
+                errorMessage.contains("Error occurred while saving workspace or editing webhook"));
     }
 
     @Then("Check the webhook icon is highlighted in green color")
@@ -602,11 +623,22 @@ public class StudioSteps {
     @Then("Verify user receives a warning when attempting to delete a workspace with an active webhook")
     public void verifyUserReceivesAWarningWhenAttemptingToDeleteAWorkspaceWithAnActiveWebhook() {
         logger.info("Verifying delete warning for workspace with active webhook");
-        String actual = workspaceCreation.verifyDeletePopUp().replaceAll("\r\n|\r|\n", "\n").replaceAll(" +", " ").trim();
+        String actual = workspaceCreation
+                .verifyDeletePopUp()
+                .replaceAll("\r\n|\r|\n", "\n")
+                .replaceAll(" +", " ")
+                .trim();
         logger.info("Delete popup message: {}", actual);
-        Assert.assertTrue("Message should warn about deleting the workspace", actual.contains("You are trying to delete the workspace " + workspaceName + "."));
-        Assert.assertTrue("Message should mention that webhooks are enabled", actual.contains("Webhooks are enabled for this workspace."));
-        Assert.assertTrue("Message should mention that deletion is irreversible and will delete the webhook", actual.contains("Deleting the workspace will delete the webhook as well. This action cannot be undone."));
+        Assert.assertTrue(
+                "Message should warn about deleting the workspace",
+                actual.contains("You are trying to delete the workspace " + workspaceName + "."));
+        Assert.assertTrue(
+                "Message should mention that webhooks are enabled",
+                actual.contains("Webhooks are enabled for this workspace."));
+        Assert.assertTrue(
+                "Message should mention that deletion is irreversible and will delete the webhook",
+                actual.contains(
+                        "Deleting the workspace will delete the webhook as well. This action cannot be undone."));
         Assert.assertTrue("Message should confirm user wants to proceed", actual.contains("Do you want to proceed?"));
         String deleteMsg = workspaceCreation.deleteWorkspaceWithActiveWebhook().trim();
         logger.info("Delete workspace message: {}", deleteMsg);
@@ -658,12 +690,18 @@ public class StudioSteps {
             explorerWorkspace.clickFilterOKButton();
             explorerWorkspace.applyFilter();
             List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
-            //explorerWorkspace.deleteFilter();
+            // explorerWorkspace.deleteFilter();
             if (previousNpiDetails != null) {
                 if (currentNpiDetails.equals(previousNpiDetails)) {
-                    Assert.assertEquals("Filter '" + filterName + "' with options '" + filterOption + "' did not refine the audience (NPI details remained the same)", currentNpiDetails, previousNpiDetails);
+                    Assert.assertEquals(
+                            "Filter '" + filterName + "' with options '" + filterOption
+                                    + "' did not refine the audience (NPI details remained the same)",
+                            currentNpiDetails,
+                            previousNpiDetails);
                 } else {
-                    Assert.assertTrue("Filter '" + filterName + "' refined the audience as expected", currentNpiDetails.size() <= previousNpiDetails.size());
+                    Assert.assertTrue(
+                            "Filter '" + filterName + "' refined the audience as expected",
+                            currentNpiDetails.size() <= previousNpiDetails.size());
                 }
             }
             previousNpiDetails = currentNpiDetails;
@@ -682,9 +720,14 @@ public class StudioSteps {
         List<String> currentNpiDetails = explorerWorkspace.checkNPIDetails();
         if (previousNpiDetails != null) {
             if (currentNpiDetails.equals(previousNpiDetails)) {
-                Assert.assertEquals("Filter with options did not refine the audience (NPI details remained the same)", currentNpiDetails, previousNpiDetails);
+                Assert.assertEquals(
+                        "Filter with options did not refine the audience (NPI details remained the same)",
+                        currentNpiDetails,
+                        previousNpiDetails);
             } else {
-                Assert.assertTrue("Filter refined the audience as expected", currentNpiDetails.size() <= previousNpiDetails.size());
+                Assert.assertTrue(
+                        "Filter refined the audience as expected",
+                        currentNpiDetails.size() <= previousNpiDetails.size());
             }
         }
         previousNpiDetails = currentNpiDetails;
@@ -719,7 +762,8 @@ public class StudioSteps {
         logger.info("Verifying dashboard filters are merged with primary filters");
         List<String> displayedFilters = explorerWorkspace.verifyAllSelectedFilters();
         for (String mergedFilter : appliedFilterEntries) {
-            boolean matchFound = displayedFilters.stream().anyMatch(displayed -> displayed.equalsIgnoreCase(mergedFilter));
+            boolean matchFound =
+                    displayedFilters.stream().anyMatch(displayed -> displayed.equalsIgnoreCase(mergedFilter));
             Assert.assertTrue("Merged filter not displayed: " + mergedFilter, matchFound);
         }
     }
@@ -777,10 +821,16 @@ public class StudioSteps {
         logger.info("Verifying delete confirmation for workspace: {}", workspaceName);
         String text = workspaceCreation.verifyDeletePopUp().trim();
         logger.info("Delete popup message: {}", text);
-        Assert.assertTrue("Message should contain warning about deleting workspace", text.contains("You are trying to delete the workspace " + workspaceName));
-        Assert.assertTrue("Message should mention irreversible deletion", text.contains("This action cannot be undone – all deleted data will be lost."));
+        Assert.assertTrue(
+                "Message should contain warning about deleting workspace",
+                text.contains("You are trying to delete the workspace " + workspaceName));
+        Assert.assertTrue(
+                "Message should mention irreversible deletion",
+                text.contains("This action cannot be undone – all deleted data will be lost."));
         Assert.assertTrue("Message should ask for confirmation", text.contains("Do you want to proceed?"));
-        Assert.assertEquals("Workspace deleted successfully", workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
+        Assert.assertEquals(
+                "Workspace deleted successfully",
+                workspaceCreation.deleteWorkspaceWithActiveWebhook().trim());
     }
 
     @And("User searches the created workspace")
@@ -808,7 +858,9 @@ public class StudioSteps {
     public void verifyThatTheWorkspaceCannotBeDeletedAndAppropriateMessageIsDisplayedToTheUser() {
         logger.info("Verifying workspace deletion is blocked");
         workspaceCreation.clickRemoveWorkspaceButton();
-        Assert.assertTrue(workspaceCreation.verifyDeleteWorkspaceErrorMessage().contains("Deletion blocked by Life. Message: This list can't be deleted"));
+        Assert.assertTrue(workspaceCreation
+                .verifyDeleteWorkspaceErrorMessage()
+                .contains("Deletion blocked by Life. Message: This list can't be deleted"));
     }
 
     @When("Locate an account {string} with external user permission and select it")
@@ -827,7 +879,8 @@ public class StudioSteps {
     @Then("User turns on studio toggle for external users and verifies that it is enabled")
     public void user_turns_on_studio_toggle_for_external_users_and_verifies_that_it_is_enabled() {
         logger.info("Enabling Studio toggle for external user");
-        Assert.assertTrue("Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
+        Assert.assertTrue(
+                "Studio toggle for external user was not turned on", accounts.turnStudioToggleForExternalUser());
         accounts.internalUserLogout();
     }
 
@@ -849,7 +902,8 @@ public class StudioSteps {
     public void userClicksOnPublishedButtonAndVerifiesThe(String listType, String engagingText) {
         logger.info("Verifying Published NPI list details");
         workspace.clickPublishedButton();
-        Assert.assertTrue(listType + " is not displayed", workspace.verifyListTypeAfterPublished(listType.toLowerCase()));
+        Assert.assertTrue(
+                listType + " is not displayed", workspace.verifyListTypeAfterPublished(listType.toLowerCase()));
         String text = workspace.verifyNPIsEngagingText();
         Assert.assertTrue("NPIs engaging text is not available", text.contains(engagingText));
     }
@@ -889,7 +943,8 @@ public class StudioSteps {
 
     @And("User enables the {string} permission for the {string} for an external user")
     public void userEnablesThePermissionForTheForAnExternalUser(String studioPermissions, String accountName) {
-        logger.info("Enabling studio permission '{}' for external user on account '{}'", studioPermissions, accountName);
+        logger.info(
+                "Enabling studio permission '{}' for external user on account '{}'", studioPermissions, accountName);
         accounts.externalUserPermissions(studioPermissions, accountName);
         accounts.internalUserLogout();
     }
@@ -973,8 +1028,11 @@ public class StudioSteps {
         workspaceCreation.closeAIPanel();
     }
 
-    @And("User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
-    public void userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(String filterType, DataTable dataTable) {
+    @And(
+            "User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
+    public void
+            userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
+                    String filterType, DataTable dataTable) {
         logger.info("Applying '{}' filter and verifying clinical recency values", filterType);
         List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
 
@@ -994,8 +1052,14 @@ public class StudioSteps {
                 explorerWorkspace.clickFilterOKButton();
             }
             explorerWorkspace.applyFilter();
-            logger.info("Expected recency: '{}' | Actual recency: '{}'", recency, explorerWorkspace.fetchRecencyValue(filterType));
-            Assert.assertEquals(filterType + " recency value is not matched", recency, explorerWorkspace.fetchRecencyValue(filterType));
+            logger.info(
+                    "Expected recency: '{}' | Actual recency: '{}'",
+                    recency,
+                    explorerWorkspace.fetchRecencyValue(filterType));
+            Assert.assertEquals(
+                    filterType + " recency value is not matched",
+                    recency,
+                    explorerWorkspace.fetchRecencyValue(filterType));
         }
     }
 
@@ -1043,17 +1107,22 @@ public class StudioSteps {
         workspaceCreation.clickBackArrowFromCreateNewWorkspace();
     }
 
-    @Then("User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
-    public void userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
+    @Then(
+            "User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
+    public void
+            userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
+                    String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
         String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
         logger.info("Workspace type: {}", actualWorkspaceType);
         Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
         String actualWorkspaceAdvertiser = workspaceCreation.getSelectedWorkspaceAdvertiser();
         logger.info("Workspace advertiser: {}", actualWorkspaceAdvertiser);
-        Assert.assertEquals("Selected workspace advertiser is not persistent", expectedAdvertiser, actualWorkspaceAdvertiser);
+        Assert.assertEquals(
+                "Selected workspace advertiser is not persistent", expectedAdvertiser, actualWorkspaceAdvertiser);
         String actualWorkspaceCreatedBy = workspaceCreation.getSelectedWorkspaceCreatedBy();
         logger.info("Created by: {}", actualWorkspaceCreatedBy);
-        Assert.assertEquals("Selected workspace created by is not persistent", expectedCreatedBy, actualWorkspaceCreatedBy);
+        Assert.assertEquals(
+                "Selected workspace created by is not persistent", expectedCreatedBy, actualWorkspaceCreatedBy);
         String actualWorkspaceName = workspaceCreation.getSearchedWorkspaceName();
         logger.info("Workspace name: {}", actualWorkspaceName);
         Assert.assertEquals("Search input value is not persistent", workspaceName, actualWorkspaceName);
@@ -1064,9 +1133,17 @@ public class StudioSteps {
         logger.info("Refreshing the page to verify filters are reset and search input is cleared");
         workspaceCreation.refreshPage();
         logger.info("Verifying filters are reset and search input is cleared after page refresh");
-        Assert.assertTrue("Workspace Type checkbox is not reset", workspaceCreation.getSelectedWorkspaceType().isEmpty());
-        Assert.assertTrue("Workspace advertiser dropdown is not reset", workspaceCreation.getSelectedWorkspaceAdvertiser().isEmpty());
-        Assert.assertTrue("Workspace created by dropdown is not reset", workspaceCreation.getSelectedWorkspaceCreatedBy().isEmpty());
-        Assert.assertTrue("Search box is not cleared", workspaceCreation.getSearchedWorkspaceName().isEmpty());
+        Assert.assertTrue(
+                "Workspace Type checkbox is not reset",
+                workspaceCreation.getSelectedWorkspaceType().isEmpty());
+        Assert.assertTrue(
+                "Workspace advertiser dropdown is not reset",
+                workspaceCreation.getSelectedWorkspaceAdvertiser().isEmpty());
+        Assert.assertTrue(
+                "Workspace created by dropdown is not reset",
+                workspaceCreation.getSelectedWorkspaceCreatedBy().isEmpty());
+        Assert.assertTrue(
+                "Search box is not cleared",
+                workspaceCreation.getSearchedWorkspaceName().isEmpty());
     }
 }

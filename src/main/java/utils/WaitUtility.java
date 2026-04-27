@@ -28,7 +28,9 @@ public class WaitUtility {
     }
 
     public void waitUntilPreLoaderHidden(double timeout) {
-        PRE_LOADER.first().waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
+        PRE_LOADER
+                .first()
+                .waitFor(new Locator.WaitForOptions().setTimeout(timeout).setState(WaitForSelectorState.HIDDEN));
     }
 
     public void waitForLocatorVisible(Locator locator) {
@@ -56,7 +58,11 @@ public class WaitUtility {
     }
 
     public void waitForElementVisible(String xpath, double timeout) {
-        page.waitForSelector(xpath, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(timeout));
+        page.waitForSelector(
+                xpath,
+                new Page.WaitForSelectorOptions()
+                        .setState(WaitForSelectorState.VISIBLE)
+                        .setTimeout(timeout));
     }
 
     public void waitForElementHidden(String xpath) {

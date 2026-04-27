@@ -1,18 +1,17 @@
 package pages.life;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.SelectOption;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class RunReportPanel {
     private final Page page;
@@ -98,22 +97,33 @@ public class RunReportPanel {
         this.DIMENSION_DROPDOWN = page.locator("//input[@placeholder='All Dimensions']");
         this.METRICS_DROPDOWN = page.locator("//input[@placeholder='All Metrics']");
         this.DATA_GRANULARITY_DROPDOWN = page.locator("//sui-select[@placeholder='Data Granularity']");
-        this.DATA_GRANULARITY_SELECTED_VALUE = page.locator("//sui-select[@placeholder='Data Granularity']//div[@class='text']/span[normalize-space()]");
-        this.DATA_GRANULARITY_DROPDOWN_VALUES = page.locator("//sui-select[@placeholder='Data Granularity']//div[@class='menu transition visible']//span[normalize-space()]");
+        this.DATA_GRANULARITY_SELECTED_VALUE = page.locator(
+                "//sui-select[@placeholder='Data Granularity']//div[@class='text']/span[normalize-space()]");
+        this.DATA_GRANULARITY_DROPDOWN_VALUES = page.locator(
+                "//sui-select[@placeholder='Data Granularity']//div[@class='menu transition visible']//span[normalize-space()]");
         this.ADVERTISER_DROPDOWN = page.locator("//sui-multi-select[@placeholder='Select Advertiser']");
-        this.ADVERTISER_DROPDOWN_VALUES = page.locator("//sui-multi-select[@placeholder='Select Advertiser']//div[@class='menu transition visible']//span[normalize-space()]");
-        this.ADVERTISER_SELECTED = page.locator("//sui-multi-select[@placeholder='Select Advertiser']//sui-multi-select-label");
+        this.ADVERTISER_DROPDOWN_VALUES = page.locator(
+                "//sui-multi-select[@placeholder='Select Advertiser']//div[@class='menu transition visible']//span[normalize-space()]");
+        this.ADVERTISER_SELECTED =
+                page.locator("//sui-multi-select[@placeholder='Select Advertiser']//sui-multi-select-label");
         this.DROPDOWN_LIST = page.locator("//div[contains(@class,'menu transition visible')]");
-        this.SELECTED_VALUES_FROM_DROPDOWN = page.locator("//div[contains(@class,'menu transition visible')]//div[contains(@class,'item active filtered')]");
+        this.SELECTED_VALUES_FROM_DROPDOWN = page.locator(
+                "//div[contains(@class,'menu transition visible')]//div[contains(@class,'item active filtered')]");
         this.DROPDOWN_LOADER = page.locator("//div[contains(@class,'loading')]");
-        this.FILTER_REPORT_CHECKBOX_LABEL = page.locator("//sui-checkbox[contains(@class,'advancedSettingsCheck')]//label");
-        this.ADVANCED_SETTING_LINK = page.locator("//label[@class='advanceSettings' and contains(text(),'Show Advanced Settings')]");
-        this.REPORT_PERIOD_BUTTONS = page.locator("//label[contains(text(),'Report Period')]/following-sibling::div//button");
+        this.FILTER_REPORT_CHECKBOX_LABEL =
+                page.locator("//sui-checkbox[contains(@class,'advancedSettingsCheck')]//label");
+        this.ADVANCED_SETTING_LINK =
+                page.locator("//label[@class='advanceSettings' and contains(text(),'Show Advanced Settings')]");
+        this.REPORT_PERIOD_BUTTONS =
+                page.locator("//label[contains(text(),'Report Period')]/following-sibling::div//button");
         this.RUN_BUTTON = page.locator("//button[contains(@class, 'okButton') and contains(text(),'Run')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
-        this.REPORT_MODIFY_OPTION = page.locator("//div[@class='icon report-progress']/ancestor::div[@class='left icon-section']/following-sibling::div//img/following-sibling::div//span[contains(text(),'Modify and Re-run')]");
-        this.FETCHED_TEMPLATE_NAME = page.locator("//label[text()='Template']//following-sibling::app-single-select-dropdown//input/following-sibling::span");
-        this.FETCHED_ADVERTISER_NAME = page.locator("//sui-multi-select[@placeholder='Select Advertiser']//sui-multi-select-label//span[2]");
+        this.REPORT_MODIFY_OPTION = page.locator(
+                "//div[@class='icon report-progress']/ancestor::div[@class='left icon-section']/following-sibling::div//img/following-sibling::div//span[contains(text(),'Modify and Re-run')]");
+        this.FETCHED_TEMPLATE_NAME = page.locator(
+                "//label[text()='Template']//following-sibling::app-single-select-dropdown//input/following-sibling::span");
+        this.FETCHED_ADVERTISER_NAME =
+                page.locator("//sui-multi-select[@placeholder='Select Advertiser']//sui-multi-select-label//span[2]");
         this.FETCHED_CAMPAIGN_NAME = page.locator("//input[@name='campaignLookupInp']/following-sibling::a");
         this.FETCHED_LINE_ITEM_NAME = page.locator("//input[@name='lineItemLookupInp']/following-sibling::a");
         this.FETCHED_TACTIC_NAME = page.locator("//input[@name='tacticLookupInp']/following-sibling::a");
@@ -125,16 +135,21 @@ public class RunReportPanel {
         this.START_TIME = page.locator("input[formcontrolname='startTime']");
         this.END_TIME = page.locator("input[formcontrolname='endTime']");
         this.TIME_ZONE = page.locator("//select[@formcontrolname='stimeZone']");
-        this.REPORT_FORMAT_SELECTED_VALUE = page.locator("//div[text()='Report Format']/following-sibling::div//div[@class='text']");
+        this.REPORT_FORMAT_SELECTED_VALUE =
+                page.locator("//div[text()='Report Format']/following-sibling::div//div[@class='text']");
         this.CALENDAR_VIEW = page.locator("sui-calendar-date-view");
-        this.TEXT_QUALIFIER_CHECKBOX = page.locator("//div[text()='Text Qualifier']/following-sibling::div/sui-checkbox");
+        this.TEXT_QUALIFIER_CHECKBOX =
+                page.locator("//div[text()='Text Qualifier']/following-sibling::div/sui-checkbox");
         this.FETCHED_DIMENSIONS_AND_METRICS = page.locator("//div[@class='field customTemplate']//span");
         this.DIMENSION_LABEL = page.locator("//label[contains(text(),'Dimensions')]");
-        this.FILE_NAME_ERROR = page.locator("//div[contains(@class,'run-report-error') and contains(text(),'Invalid file Name')]");
+        this.FILE_NAME_ERROR =
+                page.locator("//div[contains(@class,'run-report-error') and contains(text(),'Invalid file Name')]");
         this.DEFAULT_FLIGHT_DETAILS = page.locator("//div[@id='date-option-dropdown']/div[contains(@class, 'text')]");
         this.FLIGHT_DETAILS_DROPDOWN = page.locator("//div[@id='date-option-dropdown']");
-        this.FLIGHT_DETAILS_DROPDOWN_VALUE = page.locator("//div[@id='date-option-dropdown']/div[@class='menu transition visible']/div");
-        this.FILE_BREAKDOWN_TYPE = page.locator("//label[contains(text(),'File Breakdown')]/following-sibling::div/button");
+        this.FLIGHT_DETAILS_DROPDOWN_VALUE =
+                page.locator("//div[@id='date-option-dropdown']/div[@class='menu transition visible']/div");
+        this.FILE_BREAKDOWN_TYPE =
+                page.locator("//label[contains(text(),'File Breakdown')]/following-sibling::div/button");
         this.ALERT_MESSAGE = page.locator("//div[@role='alert']");
         this.CALENDAR_TITLE = page.locator("//span[contains(@class,'title link')]");
         this.CALENDAR_DATA = page.locator("//td[contains(@class,'link')]");
@@ -142,27 +157,36 @@ public class RunReportPanel {
         this.LOGGED_IN_USERNAME = page.locator("//div[@class='username']");
         this.SCHEDULE_REPORT_USERNAME_LIST = page.locator("//div[@class='menu transition visible']//span");
         this.FILE_NAME = page.locator("//textarea[@placeholder='File Name']");
-        this.REPORT_TIMING_CHECKBOX = page.locator("//div[contains(text(),'Report Timing')]/following-sibling::div/sui-checkbox[contains(@class,'evtLevelReport')]");
+        this.REPORT_TIMING_CHECKBOX = page.locator(
+                "//div[contains(text(),'Report Timing')]/following-sibling::div/sui-checkbox[contains(@class,'evtLevelReport')]");
         this.CREATED_BY = page.locator("//label[contains(text(),'Created by:')]/following-sibling::div");
         this.REPORTING_PERIOD = page.locator("//label[contains(text(),'Reporting Period:')]/following-sibling::div");
         this.REPORT_NAME = page.locator("//div[contains(@class,'name-section')]");
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
-        this.ADVANCED_EXPORT_CHECKBOX = page.locator("//label[contains(text(),'Advanced Export')]/following-sibling::div//sui-checkbox");
-        this.ADVANCED_DELIVERY_SETTING_LINK = page.locator("//label[@class='advanceSettings' and contains(text(),'Show Advanced Delivery Settings')]");
+        this.ADVANCED_EXPORT_CHECKBOX =
+                page.locator("//label[contains(text(),'Advanced Export')]/following-sibling::div//sui-checkbox");
+        this.ADVANCED_DELIVERY_SETTING_LINK = page.locator(
+                "//label[@class='advanceSettings' and contains(text(),'Show Advanced Delivery Settings')]");
         this.LINE_CODING = page.locator("//div[@class='line-endings']");
-        this.LINE_CODING_OPTIONS = page.locator("//div[@class='line-endings']//sui-radio-button[@name='reportLineEndings']");
+        this.LINE_CODING_OPTIONS =
+                page.locator("//div[@class='line-endings']//sui-radio-button[@name='reportLineEndings']");
         this.DESTINATION_NAME = page.locator("//label[contains(text(),'Destination Name')]/following-sibling::input");
-        this.DESTINATION_TYPE = page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select");
+        this.DESTINATION_TYPE =
+                page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select");
         this.HOST = page.locator("//label[contains(text(),'Host')]/following-sibling::input");
         this.USERNAME = page.locator("//label[contains(text(),'Username')]/following-sibling::input");
         this.PASSWORD = page.locator("//input[@type='password']");
         this.PORT = page.locator("//label[contains(text(),'Port')]/following-sibling::input");
         this.SERVER_PATH = page.locator("//label[contains(text(),'Path on the server')]/following-sibling::input");
-        this.EDIT_DESTINATION_BUTTON = page.locator("//div[@class='destination-name']/following-sibling::div//img[contains(@src,'edit-simple.svg')]");
+        this.EDIT_DESTINATION_BUTTON = page.locator(
+                "//div[@class='destination-name']/following-sibling::div//img[contains(@src,'edit-simple.svg')]");
         this.TEST_ACCESS_BUTTON = page.locator("//span[contains(text(),'Test Access')]");
-        this.CUSTOM_DESTINATION_RUN_BUTTON = page.locator("//div[contains(text(),'Choose file size to test access')]/parent::div/following-sibling::div//button[contains(text(),'Run')]");
-        this.CUSTOM_DESTINATION_CREATE_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Create')]");
-        this.CUSTOM_DESTINATION_CANCEL_BUTTON = page.locator("//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Cancel')]");
+        this.CUSTOM_DESTINATION_RUN_BUTTON = page.locator(
+                "//div[contains(text(),'Choose file size to test access')]/parent::div/following-sibling::div//button[contains(text(),'Run')]");
+        this.CUSTOM_DESTINATION_CREATE_BUTTON = page.locator(
+                "//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Create')]");
+        this.CUSTOM_DESTINATION_CANCEL_BUTTON = page.locator(
+                "//div[contains(@class,'test-connection')]/following-sibling::div//button[contains(text(),'Cancel')]");
         this.DESTINATION_DROPDOWN = page.locator("//div[contains(text(),'Destination')]/following-sibling::sui-select");
         this.FILE_NAME_HELP_TEXT = page.locator("//span[@class='custom-destination-example-texr']//span");
         this.RE_RUN_ACCESS_BUTTON = page.locator("//span[contains(text(),'Re-run Access')]");
@@ -247,7 +271,9 @@ public class RunReportPanel {
     }
 
     public boolean isDropdownValueLoadedForInitials(String initials, String fieldName) {
-        Locator locator = page.locator(String.format("//label[text()='%s']/following-sibling::div//input[contains(@placeholder,'%s')]", fieldName, fieldName));
+        Locator locator = page.locator(String.format(
+                "//label[text()='%s']/following-sibling::div//input[contains(@placeholder,'%s')]",
+                fieldName, fieldName));
         locator.click();
         locator.type(initials);
         try {
@@ -255,7 +281,8 @@ public class RunReportPanel {
         } catch (Exception ignored) {
         }
         waitUtility.waitForLocatorHidden(DROPDOWN_LOADER);
-        assertThat(locator.locator("xpath=./following-sibling::div")).hasAttribute("class", Pattern.compile(".*visible.*"));
+        assertThat(locator.locator("xpath=./following-sibling::div"))
+                .hasAttribute("class", Pattern.compile(".*visible.*"));
         return locator.locator("xpath=./following-sibling::div/div").count() > 0;
     }
 
@@ -276,7 +303,8 @@ public class RunReportPanel {
     }
 
     public boolean isFilterReportSectionAvailable(String checkboxName) {
-        Locator checkboxLocator = page.locator(String.format("//label[contains(text(),'%s')]/following-sibling::div", checkboxName));
+        Locator checkboxLocator =
+                page.locator(String.format("//label[contains(text(),'%s')]/following-sibling::div", checkboxName));
         return checkboxLocator.isVisible();
     }
 
@@ -333,7 +361,9 @@ public class RunReportPanel {
     }
 
     public void clickModifyOption(String templateName) {
-        Locator templateElements = page.locator(String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
+        Locator templateElements = page.locator(String.format(
+                "//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]",
+                templateName));
         if (!templateElements.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
@@ -390,7 +420,8 @@ public class RunReportPanel {
 
     public boolean isReportPeriodSelected(String buttonName) {
         for (int i = 0; i < REPORT_PERIOD_BUTTONS.count(); i++) {
-            if (REPORT_PERIOD_BUTTONS.nth(i).innerText().contains(buttonName) && REPORT_PERIOD_BUTTONS.nth(i).getAttribute("class").contains("active")) {
+            if (REPORT_PERIOD_BUTTONS.nth(i).innerText().contains(buttonName)
+                    && REPORT_PERIOD_BUTTONS.nth(i).getAttribute("class").contains("active")) {
                 return true;
             }
         }
@@ -471,7 +502,8 @@ public class RunReportPanel {
     }
 
     public String fetchTimeZone() {
-        if (TIME_ZONE.isVisible()) return TIME_ZONE.locator("option:checked").textContent().trim();
+        if (TIME_ZONE.isVisible())
+            return TIME_ZONE.locator("option:checked").textContent().trim();
         return " ";
     }
 
@@ -561,14 +593,18 @@ public class RunReportPanel {
 
     public List<String> clickDimensionDropdownAndFetchValues() {
         DIMENSION_DROPDOWN.click();
-        List<String> values = DIMENSION_DROPDOWN.locator("xpath=/following-sibling::div/div[@class='item']").allInnerTexts();
+        List<String> values = DIMENSION_DROPDOWN
+                .locator("xpath=/following-sibling::div/div[@class='item']")
+                .allInnerTexts();
         page.keyboard().press("Escape");
         return values;
     }
 
     public List<String> clickMetricDropdownAndFetchValues() {
         METRICS_DROPDOWN.click();
-        List<String> values = METRICS_DROPDOWN.locator("xpath=/following-sibling::div/div[@class='item']").allInnerTexts();
+        List<String> values = METRICS_DROPDOWN
+                .locator("xpath=/following-sibling::div/div[@class='item']")
+                .allInnerTexts();
         page.keyboard().press("Escape");
         return values;
     }
@@ -607,7 +643,8 @@ public class RunReportPanel {
 
     public boolean fetchDefaultDeliveryTab(String deliveryTab) {
         for (int i = 0; i < DELIVERY_METHOD.count(); i++) {
-            if (DELIVERY_METHOD.nth(i).textContent().trim().equalsIgnoreCase(deliveryTab) && DELIVERY_METHOD.nth(i).getAttribute("class").contains("active")) {
+            if (DELIVERY_METHOD.nth(i).textContent().trim().equalsIgnoreCase(deliveryTab)
+                    && DELIVERY_METHOD.nth(i).getAttribute("class").contains("active")) {
                 return true;
             }
         }
@@ -618,9 +655,13 @@ public class RunReportPanel {
         Locator locator;
         List<String> capturedValues = new ArrayList<>();
         if (fieldName.contains("Deliver to Users"))
-            locator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//div[contains(@class,'transition ui label')]//span", fieldName));
+            locator = page.locator(String.format(
+                    "//div[contains(text(),'%s')]/following-sibling::div//div[contains(@class,'transition ui label')]//span",
+                    fieldName));
         else
-            locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span", fieldName));
+            locator = page.locator(String.format(
+                    "//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span",
+                    fieldName));
         for (int i = 0; i < locator.count(); i++) {
             if (locator.nth(i).isVisible()) {
                 locator.nth(i).scrollIntoViewIfNeeded();
@@ -639,7 +680,8 @@ public class RunReportPanel {
         if (fieldName.contains("Deliver to Users"))
             locator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//i", fieldName));
         else
-            locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//i", fieldName));
+            locator = page.locator(
+                    String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//i", fieldName));
         locator.click();
         SCHEDULE_REPORT_USERNAME_LIST.locator("text=" + newEmail).click();
         page.keyboard().press("Escape");
@@ -651,8 +693,12 @@ public class RunReportPanel {
 
     public boolean verifyReportPeriodRelatedFields(String option) {
         return switch (option) {
-            case "Custom Dates" ->
-                    START_DATE.isVisible() && END_DATE.isVisible() && START_TIME.isVisible() && END_TIME.isVisible() && TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
+            case "Custom Dates" -> START_DATE.isVisible()
+                    && END_DATE.isVisible()
+                    && START_TIME.isVisible()
+                    && END_TIME.isVisible()
+                    && TIME_ZONE.isVisible()
+                    && REPORT_TIMING_CHECKBOX.isVisible();
             case "Lifetime" -> TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
             case "Flights" -> FLIGHT_DETAILS_DROPDOWN.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
             default -> false;
@@ -662,14 +708,18 @@ public class RunReportPanel {
     public List<String> fetchReportDetailsFromListingPage() {
         List<String> fetchReportDetails = new ArrayList<>();
         fetchReportDetails.add(CREATED_BY.first().textContent().trim());
-        fetchReportDetails.add(REPORTING_PERIOD.first().textContent().split("—")[0].trim());
-        fetchReportDetails.add(REPORT_NAME.first().textContent().split("from")[0].trim());
+        fetchReportDetails.add(
+                REPORTING_PERIOD.first().textContent().split("—")[0].trim());
+        fetchReportDetails.add(
+                REPORT_NAME.first().textContent().split("from")[0].trim());
         return fetchReportDetails;
     }
 
     public String verifyEmailNotRemovable(String fieldName, String loggedInUser) {
         String usernameText = loggedInUser.split("\\(")[0];
-        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span[contains(text(),'%s')]", fieldName, usernameText));
+        Locator locator = page.locator(String.format(
+                "//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span[contains(text(),'%s')]",
+                fieldName, usernameText));
         locator.click();
         String tooltipText = TOOL_TIP.innerText().trim();
         page.keyboard().press("Escape");
@@ -699,7 +749,8 @@ public class RunReportPanel {
     public boolean checkDefaultLineCodingType(String defaultLineCodingType) {
         Locator locator = LINE_CODING_OPTIONS.locator("xpath=/label");
         for (int i = 0; i < LINE_CODING_OPTIONS.count(); i++) {
-            if (locator.nth(i).innerText().contains(defaultLineCodingType) && LINE_CODING_OPTIONS.nth(i).getAttribute("class").contains("checked")) {
+            if (locator.nth(i).innerText().contains(defaultLineCodingType)
+                    && LINE_CODING_OPTIONS.nth(i).getAttribute("class").contains("checked")) {
                 return true;
             }
         }
@@ -710,7 +761,14 @@ public class RunReportPanel {
         return LINE_CODING_OPTIONS.locator("xpath=/label").allInnerTexts();
     }
 
-    public void enterDestinationDetails(String destinationName, String destinationType, String host, String username, String password, String port, String serverPath) {
+    public void enterDestinationDetails(
+            String destinationName,
+            String destinationType,
+            String host,
+            String username,
+            String password,
+            String port,
+            String serverPath) {
         DESTINATION_NAME.fill(destinationName);
         DESTINATION_TYPE.click();
         String destinationXpath = String.format("//sui-select-option//span[text()='%s']", destinationType);
@@ -747,7 +805,11 @@ public class RunReportPanel {
     }
 
     public boolean isDestinationTypeAvailable() {
-        return DESTINATION_TYPE.isVisible() && !DESTINATION_TYPE.locator("xpath=//div[@class='text']//span[2]").textContent().isEmpty();
+        return DESTINATION_TYPE.isVisible()
+                && !DESTINATION_TYPE
+                        .locator("xpath=//div[@class='text']//span[2]")
+                        .textContent()
+                        .isEmpty();
     }
 
     public boolean isHostFieldAvailable() {

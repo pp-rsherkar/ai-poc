@@ -57,14 +57,20 @@ public class Navigation {
         this.ACCOUNT_ITEM = page.locator("//div[@id='accountSwitcher']//div[@class='item']");
         this.STUDIO_TITLE = page.locator("//div[text()='Studio']");
         this.TARGETING_TEMPLATE_ICON = page.locator("//div[contains(@class,'targetTemplateIcon')]");
-        this.CAMPAIGNS = page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
+        this.CAMPAIGNS =
+                page.locator("//div[contains(@class,'pull-left primaryMenuText') and contains(text(),'Campaigns')]");
         this.CREATIVE_LIBRARY_ICON = page.locator("//div[contains(@class,'crtlibIcon')]");
-        this.MENU_ANGLE = page.locator("//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
-        this.TARGETING_TEMPLATE_HEADER = page.locator("//div[contains(text(),'Targeting Templates') and contains(@class,'section-name')]");
-        this.PULSEPOINT_LOGO = page.locator("//div[contains(@class, 'dynamic-logo')] | //app-buyer-logo/div[@class='logo-holder']");
+        this.MENU_ANGLE = page.locator(
+                "//div[text()='Campaign Reporting']/following-sibling::i[contains(@class,'parentMenuFaAngle')]");
+        this.TARGETING_TEMPLATE_HEADER =
+                page.locator("//div[contains(text(),'Targeting Templates') and contains(@class,'section-name')]");
+        this.PULSEPOINT_LOGO =
+                page.locator("//div[contains(@class, 'dynamic-logo')] | //app-buyer-logo/div[@class='logo-holder']");
         this.LOGOUT_BUTTON = page.locator("//div[text()='Sign Out']");
-        this.CURATED_MARKET = page.locator("//div[contains(@class, 'menuLabel') and contains(text(), 'Curated Markets')]");
-        this.BUYING_PLATFORM = page.locator("//div[contains(@class,'portalSelectionLabel') and contains(text(),'BUYING PLATFORM')]");
+        this.CURATED_MARKET =
+                page.locator("//div[contains(@class, 'menuLabel') and contains(text(), 'Curated Markets')]");
+        this.BUYING_PLATFORM =
+                page.locator("//div[contains(@class,'portalSelectionLabel') and contains(text(),'BUYING PLATFORM')]");
     }
 
     public void navigateToUrl(String url) {
@@ -181,7 +187,8 @@ public class Navigation {
         waitUtility.waitForLocatorVisible(SUB_MENU);
     }
 
-    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin landing page after login.
+    // The methods below are slight variations of existing ones used to navigate to Life, HCP and Studio from the Admin
+    // landing page after login.
     // These are specifically defined to navigate back to Life, HCP and Studio from other modules.
     public void navigateBackToLife() {
         waitUtility.waitForLocatorVisible(SUB_MENU);

@@ -8,13 +8,12 @@ import com.microsoft.playwright.Request;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.opencsv.exceptions.CsvValidationException;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.ExcelActions;
-import utils.WaitUtility;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import utils.CommonUtils;
+import utils.ExcelActions;
+import utils.WaitUtility;
 
 public class NPIAutoImportedList {
 
@@ -90,17 +89,20 @@ public class NPIAutoImportedList {
     }
 
     public void selectListType(String listType) {
-        page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", listType)).click();
+        page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", listType))
+                .click();
     }
 
     public void enterColumnName(String npiColumn, String columnName) {
-        Locator locator = page.locator(String.format("//div[@class='selection' and contains(text(),'%s')]/parent::button", npiColumn));
+        Locator locator = page.locator(
+                String.format("//div[@class='selection' and contains(text(),'%s')]/parent::button", npiColumn));
         if (!locator.getAttribute("class").contains("active")) locator.click();
         NPI_COLUMN.fill(columnName);
     }
 
     public void selectImportType(String importType) {
-        Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", importType));
+        Locator locator =
+                page.locator(String.format("//div[contains(text(),'%s')]/ancestor::mat-radio-button", importType));
         if (!locator.getAttribute("class").contains("mat-radio-checked")) locator.click();
     }
 

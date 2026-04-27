@@ -4,13 +4,12 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class ScheduleReport {
 
@@ -67,22 +66,29 @@ public class ScheduleReport {
         this.SCHEDULE_END_DATE = page.locator("//input[@id='scheduleEndDate']");
         this.CALENDAR_VIEW = page.locator("sui-calendar-date-view");
         this.TIME_ZONE = page.locator("//div[contains(@class, 'gaTimezone')]//div[contains(@class,'dropdown')]");
-        this.DEFAULT_TIME_ZONE = page.locator("//div[contains(@class, 'gaTimezone')]/div[contains(@class,'dropdown')]/div[@class='text']");
+        this.DEFAULT_TIME_ZONE = page.locator(
+                "//div[contains(@class, 'gaTimezone')]/div[contains(@class,'dropdown')]/div[@class='text']");
         this.WEEK_DAYS_BUTTON = page.locator("//button[@name='reportScheduleWeekDayTYpe']");
-        this.SEND_AT_TIME = page.locator("//label[contains(text(),'Send At')]/following-sibling::div/input[@type='time']");
+        this.SEND_AT_TIME =
+                page.locator("//label[contains(text(),'Send At')]/following-sibling::div/input[@type='time']");
         this.DELIVERY_METHODS = page.locator("//div[contains(@class,'delivery-method-navbar')]/a");
-        this.DELIVERY_TO_USER = page.locator("//div[contains(text(),'Deliver to Users')]/following-sibling::div/app-multi-select");
+        this.DELIVERY_TO_USER =
+                page.locator("//div[contains(text(),'Deliver to Users')]/following-sibling::div/app-multi-select");
         this.ADD_EMAILS_LINK = page.locator("//label[contains(text(),'Add Emails')]");
-        this.DELIVER_TO_EXTERNAL_EMAILS = page.locator("//div[contains(text(),'Deliver to External Emails')]/following-sibling::textarea");
+        this.DELIVER_TO_EXTERNAL_EMAILS =
+                page.locator("//div[contains(text(),'Deliver to External Emails')]/following-sibling::textarea");
         this.DESTINATION_DROPDOWN = page.locator("//div[contains(text(),'Destination')]/following-sibling::sui-select");
         this.DESTINATION_NAME = page.locator("//label[contains(text(),'Destination Name')]/following-sibling::input");
-        this.DESTINATION_TYPE = page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select");
-        this.DESTINATION_TYPE_VALUES = page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select//sui-select-option/span[normalize-space()]");
+        this.DESTINATION_TYPE =
+                page.locator("//label[contains(text(),'Destination Type')]/following-sibling::sui-select");
+        this.DESTINATION_TYPE_VALUES = page.locator(
+                "//label[contains(text(),'Destination Type')]/following-sibling::sui-select//sui-select-option/span[normalize-space()]");
         this.FILE_PATH = page.locator("//div[contains(text(),'File Path')]/following-sibling::textarea");
         this.FILE_NAME = page.locator("//div[contains(text(),'File Name')]/following-sibling::textarea");
         this.COMPRESSION_BUTTON = page.locator("//div[contains(text(),'Compression')]/following-sibling::div/button");
         this.CONTROL_FILE = page.locator("//label[contains(text(),'Control File')]/following-sibling::sui-checkbox");
-        this.REPORT_PERIOD = page.locator("//div[text()='Report Period']/following-sibling::div//div[contains(@class,'reportPeriodDropdown')]");
+        this.REPORT_PERIOD = page.locator(
+                "//div[text()='Report Period']/following-sibling::div//div[contains(@class,'reportPeriodDropdown')]");
         this.START_DATE = page.locator("//input[@placeholder='Start Date']");
         this.END_DATE = page.locator("//input[@placeholder='End Date']");
         this.SCHEDULE_START_TIME = page.locator("//input[@formcontrolname='scheduleDataStartTime']");
@@ -91,7 +97,8 @@ public class ScheduleReport {
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']");
         this.SEARCH_TEXTBOX = page.locator("//input[contains(@class,'gaTableSearch')]");
         this.SEARCH_ICON = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
-        this.FETCHED_TEMPLATE_NAME = page.locator("//label[text()='Template']//following-sibling::app-single-select-dropdown//input/following-sibling::span");
+        this.FETCHED_TEMPLATE_NAME = page.locator(
+                "//label[text()='Template']//following-sibling::app-single-select-dropdown//input/following-sibling::span");
         this.SEND_ON_DROPDOWN = page.locator("//label[contains(text(),'Send On')]/following-sibling::div");
         this.REPORT_TIMING_CHECKBOX = page.locator("//div[contains(@class,'report-timing-container')]//sui-checkbox");
         this.GENERAL_AND_TIME_VARIABLE = page.locator("//div[contains(@class,'variablesContainer')]//a");
@@ -124,7 +131,8 @@ public class ScheduleReport {
 
     public boolean checkDefaultFrequencyOption(String defaultValue) {
         for (int i = 0; i < FREQUENCY_BUTTON.count(); i++) {
-            if (FREQUENCY_BUTTON.nth(i).innerText().contains(defaultValue) && FREQUENCY_BUTTON.nth(i).getAttribute("class").contains("active")) {
+            if (FREQUENCY_BUTTON.nth(i).innerText().contains(defaultValue)
+                    && FREQUENCY_BUTTON.nth(i).getAttribute("class").contains("active")) {
                 return true;
             }
         }
@@ -182,7 +190,8 @@ public class ScheduleReport {
 
     public boolean checkDefaultWeekDay(String defaultValue) {
         for (int i = 0; i < WEEK_DAYS_BUTTON.count(); i++) {
-            if (WEEK_DAYS_BUTTON.nth(i).innerText().contains(defaultValue) && WEEK_DAYS_BUTTON.nth(i).getAttribute("class").contains("active")) {
+            if (WEEK_DAYS_BUTTON.nth(i).innerText().contains(defaultValue)
+                    && WEEK_DAYS_BUTTON.nth(i).getAttribute("class").contains("active")) {
                 return true;
             }
         }
@@ -211,7 +220,8 @@ public class ScheduleReport {
 
     public void clickDeliveryTab(String tabName) {
         for (int i = 0; i < DELIVERY_METHODS.count(); i++) {
-            if (DELIVERY_METHODS.nth(i).innerText().contains(tabName)) DELIVERY_METHODS.nth(i).click();
+            if (DELIVERY_METHODS.nth(i).innerText().contains(tabName))
+                DELIVERY_METHODS.nth(i).click();
         }
     }
 
@@ -274,7 +284,8 @@ public class ScheduleReport {
 
     public boolean checkDefaultCompression(String defaultCompressionType) {
         for (int i = 0; i < COMPRESSION_BUTTON.count(); i++) {
-            if (COMPRESSION_BUTTON.nth(i).innerText().contains(defaultCompressionType) && COMPRESSION_BUTTON.nth(i).getAttribute("class").contains("active")) {
+            if (COMPRESSION_BUTTON.nth(i).innerText().contains(defaultCompressionType)
+                    && COMPRESSION_BUTTON.nth(i).getAttribute("class").contains("active")) {
                 return true;
             }
         }
@@ -364,7 +375,8 @@ public class ScheduleReport {
     }
 
     public String fetchTimeZone() {
-        if (TIME_ZONE.isVisible()) return TIME_ZONE.locator("xpath=/div[@class='text']").innerText().trim();
+        if (TIME_ZONE.isVisible())
+            return TIME_ZONE.locator("xpath=/div[@class='text']").innerText().trim();
         return " ";
     }
 
@@ -392,8 +404,13 @@ public class ScheduleReport {
 
     public boolean selectDayOfTheMonth(String dayOfTheMonth) {
         SEND_ON_DROPDOWN.click();
-        SEND_ON_DROPDOWN.getByText(dayOfTheMonth, new Locator.GetByTextOptions().setExact(true)).click();
-        return SEND_ON_DROPDOWN.locator("xpath=//div[@class='text']").innerText().contains(dayOfTheMonth);
+        SEND_ON_DROPDOWN
+                .getByText(dayOfTheMonth, new Locator.GetByTextOptions().setExact(true))
+                .click();
+        return SEND_ON_DROPDOWN
+                .locator("xpath=//div[@class='text']")
+                .innerText()
+                .contains(dayOfTheMonth);
     }
 
     public boolean selectWeekDay(String weekDay) {
@@ -425,7 +442,8 @@ public class ScheduleReport {
     }
 
     public List<String> fetchReportPeriodOptions() {
-        Locator options = REPORT_PERIOD.locator("xpath=//div[contains(@class,'item') and not(contains(@class,'hidden'))]");
+        Locator options =
+                REPORT_PERIOD.locator("xpath=//div[contains(@class,'item') and not(contains(@class,'hidden'))]");
         REPORT_PERIOD.click();
         List<String> optionTexts = options.allInnerTexts();
         page.keyboard().press("Escape");
@@ -442,13 +460,20 @@ public class ScheduleReport {
 
     public List<String> fetchListingPageDetails(String reportName) {
         List<String> fetchedData = new ArrayList<>();
-        Locator tableHeader = page.locator(String.format("//div[@title='%s']/ancestor::div[contains(@class,'firsttablewrapper')]/following-sibling::div//tr//th//div[@class='filter-container']", reportName));
+        Locator tableHeader = page.locator(String.format(
+                "//div[@title='%s']/ancestor::div[contains(@class,'firsttablewrapper')]/following-sibling::div//tr//th//div[@class='filter-container']",
+                reportName));
         int index = 0;
         for (int i = 0; i < tableHeader.count(); i++) {
             String headerText = tableHeader.nth(i).innerText().trim();
-            if (headerText.equals("Template Name") || headerText.equals("Frequency") || headerText.equals("Reporting Period") || headerText.equals("Generated By")) {
+            if (headerText.equals("Template Name")
+                    || headerText.equals("Frequency")
+                    || headerText.equals("Reporting Period")
+                    || headerText.equals("Generated By")) {
                 index = i;
-                Locator tableRow = page.locator(String.format("//div[@title='%s']/ancestor::div[contains(@class,'firsttablewrapper')]/following-sibling::div//td[%d]//div", reportName, index + 1));
+                Locator tableRow = page.locator(String.format(
+                        "//div[@title='%s']/ancestor::div[contains(@class,'firsttablewrapper')]/following-sibling::div//td[%d]//div",
+                        reportName, index + 1));
                 fetchedData.add(tableRow.textContent().trim());
             }
         }
@@ -467,7 +492,9 @@ public class ScheduleReport {
         List<String> options = List.of(dateTimeFormat.split("-"));
         GENERAL_AND_TIME_VARIABLE.getByText(timeVariable).click();
         for (String option : options) {
-            DATE_TIME_FORMAT_OPTIONS.getByText(option, new Locator.GetByTextOptions().setExact(true)).click();
+            DATE_TIME_FORMAT_OPTIONS
+                    .getByText(option, new Locator.GetByTextOptions().setExact(true))
+                    .click();
         }
     }
 
