@@ -239,7 +239,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |
 
-
   @regression
   Scenario Outline: Verify campaign management fee is reflected in line item and line item override is reflected in tactic
     When User clicks on Create Campaign
