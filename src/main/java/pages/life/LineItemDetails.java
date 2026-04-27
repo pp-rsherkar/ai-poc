@@ -231,8 +231,6 @@ public class LineItemDetails {
 
        if (!checkboxInput.isChecked()) {
             MANAGEMENT_FEE_OVERRIDE.click();
-        } else {
-            System.out.println("Override is already checked. Skipping click.");
         }
     }
 
