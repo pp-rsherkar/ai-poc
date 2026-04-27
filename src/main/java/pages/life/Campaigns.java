@@ -74,6 +74,9 @@ public class Campaigns {
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON;
     private final Locator EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT;
+    private final Locator BUDGET_STATUS_EXTERNAL;
+    private final Locator CAMPAIGN_APPROVAL_STATUS;
+    private final Locator CAMPAIGN_STATUS_APPROVED_BUTTON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -136,16 +139,23 @@ public class Campaigns {
         this.EXPORT_AUDIT_LOG_POPUP_CONTENT = page.locator("//div[contains(@class,'popup-content')]/span");
         this.EXPORT_AUDIT_LOG_POPUP_OK_BUTTON = page.locator("//span[@class='text' and text()='Ok']");
         this.EXPORT_AUDIT_LOG_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Audit Log request created')]");
-        this.EXPORT_CAMPAIGN_SETTINGS = page.locator("//app-icon-lable-link[@icon='20-export.svg']//div[@class='icolink']");
+        this.EXPORT_CAMPAIGN_SETTINGS = page.locator("//app-icon-lable-link[@title='Export Settings']//div[contains(@class,'icolink')]");
         this.EXPORT_CAMPAIGN_SETTINGS_POPUP = page.locator("//div[@class='rightPanelHeader2' and text()='Export Campaign Settings']");
         this.EXPORT_CAMPAIGN_SETTINGS_SELECT_ALL_BUTTON = page.locator("//app-icon-lable-link[@icon='20-select-all.svg']/div");
         this.EXPORT_CAMPAIGN_SETTINGS_EXPORT_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Export')]");
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
+        this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
+        this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
+        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
     }
 
     public void createCampaign() {
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public boolean isCreateCampaignButtonVisible() {
+        return CREATE_CAMPAIGN.isVisible();
     }
 
     public void selectCampaign() {
@@ -519,5 +529,26 @@ public class Campaigns {
         String text = EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT.innerText().trim();
         waitUtility.waitForLocatorHidden(EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT);
         return text;
+    }
+
+    public String getCampaignBudgetStatus() {
+        return BUDGET_STATUS_EXTERNAL.innerText().trim();
+    }
+
+    public String checkBackgroundColorOfCampaignBudgetStatus() {
+        return BUDGET_STATUS_EXTERNAL.evaluate("element => getComputedStyle(element).backgroundColor").toString();
+    }
+
+    public int getCampaignBudgetStatusOptionsCount() {
+        waitUtility.waitForLocatorVisible(BUDGET_STATUS_EXTERNAL);
+        return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span").count();
+    }
+
+    public void approveCampaign() {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_APPROVAL_STATUS);
+        waitUtility.waitForLocatorVisible(CAMPAIGN_STATUS_APPROVED_BUTTON);
+        CAMPAIGN_STATUS_APPROVED_BUTTON.click();
+        SAVE_CAMPAIGN.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 }

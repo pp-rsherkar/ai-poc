@@ -1,9 +1,6 @@
 package pages.studio;
 
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.FrameLocator;
-import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import utils.CommonUtils;
@@ -55,6 +52,7 @@ public class Workspace {
     private final Locator ADVERTISER_SELECTOR_DROPDOWN;
     private final Locator NPI_LIST_PULLOUT_MENU;
     private final Locator OK_BUTTON;
+    private final Locator NPI_PUBLISH_ALERT;
     WaitUtility waitUtility;
 
     public Workspace(Page page) {
@@ -99,6 +97,7 @@ public class Workspace {
         this.PUBLISH_LOADER = WORKSPACE_FRAME.locator("//div[contains(@data-tour-id,'hcp-workspace-actions-container')]/div[contains(@data-testid, 'loading-spinner')]");
         this.NPI_LIST_PULLOUT_MENU = WORKSPACE_FRAME.locator("//ul[@data-tour-id='npi-list-pullout-menu']");
         this.OK_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'OK')]");
+        this.NPI_PUBLISH_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(), 'NPI list published successfully')]");
     }
 
     public void studio() {
@@ -107,6 +106,7 @@ public class Workspace {
     }
 
     public void clickFlyOrPageButton() {
+        if (NPI_PUBLISH_ALERT.isVisible()) waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
         if (PUBLISH_LOADER.isVisible()) waitUtility.waitForLocatorHidden(PUBLISH_LOADER);
         if (NPI_LIST_PULLOUT_MENU.isVisible()) {
             OK_BUTTON.click();
@@ -137,9 +137,6 @@ public class Workspace {
 
     public void clickPublish() {
         PUBLISH_BUTTON.click();
-        while (!WORKSPACE_CREATED_ALERT.isVisible()) {
-            page.waitForTimeout(5000);
-        }
     }
 
     public String verifyPublishedNpi() {
@@ -147,7 +144,7 @@ public class Workspace {
     }
 
     public void waitTillWorkspaceAlertHide() {
-        WORKSPACE_CREATED_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(WORKSPACE_CREATED_ALERT);
     }
 
     public void clickWebhookIcon() {
@@ -320,5 +317,15 @@ public class Workspace {
         advertiser.click();
         waitUtility.waitForLocatorVisible(EXISTING_WORKSPACE);
         EXISTING_WORKSPACE.click();
+    }
+
+    public String fetchNPIListPublishAlertDisplayed() {
+        try {
+            String text = NPI_PUBLISH_ALERT.innerText();
+            waitUtility.waitForLocatorHidden(NPI_PUBLISH_ALERT);
+            return text;
+        } catch (PlaywrightException e) {
+            return "";
+        }
     }
 }

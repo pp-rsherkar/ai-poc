@@ -10,6 +10,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @e2e
   Scenario Outline: Create a Targeting Template and import the template in Tactic
@@ -21,7 +22,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
       | Behavioral Segment | AutoSegment |
       | Age                | 25-29       |
-      | IP Address         | AutoIP      |
+      | IP                 | AutoIP      |
       | Postal Codes       | 112233      |
     Then User searches and verifies the already created targeting template using the search option
     #3
@@ -41,7 +42,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
       | Behavioral Segment | AutoSegment |
       | Age                | 25-29       |
-      | IP Address         | AutoIP      |
+      | IP                 | AutoIP      |
       | Postal Codes       | 112233      |
     Then User searches and verifies the already created targeting template using the search option
     #3
@@ -64,7 +65,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     And Create a tactic with below targeting rules and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
       | Behavioral Segment | AutoSegment |
       | Age                | 25-29       |
-      | IP Address         | AutoIP      |
+      | IP                 | AutoIP      |
       | Postal Codes       | 112233      |
     Then Verify the template created are saved
     #2
@@ -73,7 +74,13 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     And Verify Targeting template section opens by clicking New Template button
     #3
     Then User searches and verifies the already created targeting template using the search option
-
     Examples:
       | LINE_ITEMS                                                                  | ADVERTISER     | CP_NAME           | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     |
       | Display, Video, Native Display, Audio, Search Extension, DOOH, Native Video | 01- Advertiser | TargetingTemplate | Regular | 20000     | TargetingLine | 500         | TargetingTactic |
+
+  @regression
+  Scenario: Verify only life marketplace tab should be displayed under Targeting templates from Activation section
+    When User navigates to Targeting template page by clicking the icon from Activation section
+    Then Verify New Template button is present above the Search option
+    And Verify Targeting template section opens by clicking New Template button
+    And Verify only life marketplace tab is displayed under Targeting templates section for "Deals" rule type

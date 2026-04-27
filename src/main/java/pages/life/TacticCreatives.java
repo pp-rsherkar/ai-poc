@@ -16,7 +16,7 @@ public class TacticCreatives {
     private final Locator SAVE_TACTIC_CREATIVES;
     private final Locator TACTIC_CREATIVE_SUCCESS;
     private final Locator NAVIGATE_TO_CAMPAIGN_DASHBOARD;
-    private final Locator VERIFY_CAMPAIGN_RUNNING;
+    private final Locator CAMPAIGN_STATUS;
     private final Locator ASSIGN_CREATIVE_TITLE;
     private final Locator CREATIVE_TAB;
     private final Locator ASSIGN_EXISTING_CREATIVE;
@@ -24,6 +24,7 @@ public class TacticCreatives {
     private final Locator CREATIVE_STATUS;
     private final Locator CLEAR_SEARCH_BOX;
     private final Locator CREATIVES_TABLE;
+    private final Locator CAMPAIGN_APPROVAL_STATUS;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public TacticCreatives(Page page) {
@@ -36,7 +37,7 @@ public class TacticCreatives {
         this.SAVE_TACTIC_CREATIVES = page.locator("//span[text()='Save']");
         this.TACTIC_CREATIVE_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.NAVIGATE_TO_CAMPAIGN_DASHBOARD = page.locator("//div[contains(@class,'campaign-tile')]");
-        this.VERIFY_CAMPAIGN_RUNNING = page.locator("//span[@class='status-label running']");
+        this.CAMPAIGN_STATUS = page.locator("//span[contains(@class,'status-label')]/span");
         this.ASSIGN_CREATIVE_TITLE = page.locator("//div[contains(text(),'Assign Creatives')]");
         this.CREATIVE_TAB = page.locator("//a[contains(text(),'Creatives')]");
         this.ASSIGN_EXISTING_CREATIVE = page.locator("//span[contains(text(),'Assign Existing Creatives')]");
@@ -44,6 +45,7 @@ public class TacticCreatives {
         this.CREATIVE_STATUS = page.locator("//td[contains(@class,'status-label')]");
         this.CLEAR_SEARCH_BOX = page.locator("//div[contains(@class,'clear-search-close')]");
         this.CREATIVES_TABLE = page.locator("//div[@id='parentTable']");
+        this.CAMPAIGN_APPROVAL_STATUS = page.locator("//div[contains(@class,'inlineDiv status-label')]/span");
     }
 
     public String verifyTacticCreativesText() {
@@ -83,8 +85,14 @@ public class TacticCreatives {
         return TACTIC_CREATIVE_SUCCESS.innerText();
     }
 
-    public String verifyCampaignRunning() {
-        return VERIFY_CAMPAIGN_RUNNING.innerText();
+    public String getCampaignStatus() {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_STATUS);
+        return CAMPAIGN_STATUS.innerText();
+    }
+
+    public String getCampaignApprovalStatus() {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_APPROVAL_STATUS);
+        return CAMPAIGN_APPROVAL_STATUS.innerText();
     }
 
     public void navigateToCampaignDashboard() {
@@ -105,15 +113,23 @@ public class TacticCreatives {
     }
 
     public void selectAndAssignCreativeByStatus(String status) {
-        Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
-        while (!statusLocator.first().isVisible()) {
+        int maxAttempts = 3;
+        waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
+        for (int i = 0; i < maxAttempts; i++) {
+            Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
+            if (statusLocator.first().isVisible()) {
+                int rowIndex = (int) statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
+                Locator selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
+                selectCreative.click();
+                ASSIGN_CREATIVE_OK_BUTTON.click();
+                return;
+            }
+            if (!SHOW_MORE_BUTTON.isVisible() || !SHOW_MORE_BUTTON.isEnabled()) {
+                break;
+            }
             SHOW_MORE_BUTTON.scrollIntoViewIfNeeded();
             SHOW_MORE_BUTTON.click();
             waitUtility.waitForLocatorVisible(SEARCH_CREATIVE);
         }
-        int rowIndex = (int) statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
-        Locator selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
-        selectCreative.click();
-        ASSIGN_CREATIVE_OK_BUTTON.click();
     }
 }

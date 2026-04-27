@@ -6,7 +6,8 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
   Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
-    When User navigates to Administrative section and go to Accounts Tab
+    When User navigates to Administrative section
+    And User navigates to Accounts Tab
     And User searches the account "PP engineering test" and checks Studio permissions
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
@@ -42,6 +43,10 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User searches the workspace in LIFE and selects it
     And User clicks on the published workspace
     Then User Verify the list is displayed in the Life
+    And User navigates to "Studio" application
+    And User searches the workspace created to perform Actions from More menu
+    When User selects the "Delete" option by clicking More Actions menu
+    And Verify user is able to delete the workspace
     Examples:
       | ADVERTISER | WORKSPACE_NAME | LIST_TYPE |
       | Abbvie     | Explorer       | Static    |
@@ -71,6 +76,10 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User select the platform to publish the list
     Then Verify list is published
     And User clicks on Published button, verifies the "<LIST_TYPE>" and "NPIs engaging" text are displayed
+    And Navigate to workspace dashboard
+    And User searches the workspace created to perform Actions from More menu
+    And User selects the "Delete" option by clicking More Actions menu
+    And Verify user is able to delete the workspace
     Examples:
       | WORKSPACE_NAME | ADVERTISER | LIST_TYPE | NPI_RETENTION_OPTION |
       | Explorer       | Abbvie     | Live      | indefinitely         |
@@ -110,6 +119,10 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And Fetch and verify that NPI details are refined
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
+    And Navigate to workspace dashboard
+    And User searches the workspace created to perform Actions from More menu
+    And User selects the "Delete" option by clicking More Actions menu
+    And Verify user is able to delete the workspace
     Examples:
       | ADVERTISER | WORKSPACE_NAME | AI_PROMPT                                                                                | PRIMARY_FILTERS |
       | Abbvie     | Explorer       | Find doctors within certain age ranges, with specific professions, and narrow by wealth. | Profession      |

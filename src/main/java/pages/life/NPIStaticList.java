@@ -10,6 +10,11 @@ import utils.WaitUtility;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NPIStaticList {
     private final Page page;
@@ -27,17 +32,24 @@ public class NPIStaticList {
     private final Locator DELETE_LIST_BUTTON;
     private final Locator DELETE_SUCCESS;
     private final Locator DOWNLOAD_ICON;
-    private final Locator ITEM_COUNT_UI;
+    private final Locator NPI_COUNT_FROM_LIST_INFO;
     private final Locator EDIT_NPI_LIST_ICON;
+    private final Locator LIST_NAME_FROM_HEADER;
+    private final Locator ADVERTISER_NAME_FROM_HEADER;
+    private final Locator FETCH_SELECTED_ADVERTISER;
+    private final Locator FETCH_SELECTED_AVAILABLE_IN;
+    private final Locator TOTAL_NPI;
+    private final Locator FETCH_DATA_COST;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
+    NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
 
     public NPIStaticList(Page page) {
         this.page = page;
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
-        this.SEARCH_ADVERTISER = page.locator("//div[text()= 'Select Advertiser']");
+        this.SEARCH_ADVERTISER = page.locator("//ng-select[@placeholder='Select Advertiser']//input");
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.NPI_NUMBER = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
-        this.AVAILABLE_IN = page.locator(".mat-checkbox-inner-container").first();
+        this.AVAILABLE_IN = page.locator("//div[contains(@class,'npiGroupAvailableSettingContainer')]//span");
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(text(),'List Name is required')]");
@@ -47,8 +59,14 @@ public class NPIStaticList {
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
         this.DOWNLOAD_ICON = page.locator("//span[contains(@class,'image download')]");
-        this.ITEM_COUNT_UI = page.locator("//div[text()='Total NPI']/preceding-sibling::div[1]");
+        this.NPI_COUNT_FROM_LIST_INFO = page.locator("//div[text()='Total NPI']/preceding-sibling::div[1]");
         this.EDIT_NPI_LIST_ICON = page.locator("//img[@alt='edit'  and contains(@src,'edit-inline.svg')]");
+        this.LIST_NAME_FROM_HEADER = page.locator("//div[contains(@class,'header-name')]");
+        this.ADVERTISER_NAME_FROM_HEADER = page.locator("//span[@class='header-adv']/span");
+        this.FETCH_SELECTED_ADVERTISER = page.locator("//span[@class='ng-value-label']");
+        this.FETCH_SELECTED_AVAILABLE_IN = page.locator("//div[contains(text(),'Available In ')]//following-sibling::div//mat-checkbox");
+        this.TOTAL_NPI = page.locator("//span[contains(text(),'Total NPI')]/preceding-sibling::span");
+        this.FETCH_DATA_COST = page.locator("//div[contains(@class,'data-cost')]");
     }
 
     public void enterListName(String npiListName) {
@@ -65,16 +83,18 @@ public class NPIStaticList {
         NPI_NUMBER.fill(npiNumber);
     }
 
-    public void selectProduct() {
-        AVAILABLE_IN.click();
+    public void selectProduct(String platformName) {
+        CommonUtils.selectAndClickElement(AVAILABLE_IN, Collections.singletonList(platformName));
     }
 
     public void saveList() {
         SAVE_BUTTON.click();
     }
 
-    public String saveListSuccess() {
-        return LIST_SUCCESS.innerText();
+    public String fetchSuccessAlert() {
+        String alertMessage = LIST_SUCCESS.innerText();
+        waitUtility.waitForLocatorHidden(LIST_SUCCESS);
+        return alertMessage;
     }
 
     public String listNameError() {
@@ -119,7 +139,58 @@ public class NPIStaticList {
     }
 
     public String fetchSharedListCountFromUI() {
-        String itemCountText = ITEM_COUNT_UI.first().innerText().trim();
+        String itemCountText = NPI_COUNT_FROM_LIST_INFO.first().innerText().trim();
         return itemCountText.replaceAll("[^0-9]", "");
+    }
+
+    public List<String> retrieveEnteredData() {
+        List<String> enteredData = new ArrayList<>();
+        if (LIST_NAME.isVisible())
+            enteredData.add(LIST_NAME.inputValue());
+        else if (LIST_NAME_FROM_HEADER.isVisible())
+            enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
+        if (!EDIT_NPI_LIST_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible()) {
+            for (int i = 0; i < FETCH_SELECTED_ADVERTISER.count(); i++) {
+                enteredData.add(FETCH_SELECTED_ADVERTISER.nth(i).textContent());
+            }
+        } else if (ADVERTISER_NAME_FROM_HEADER.first().isVisible()) {
+            String text = ADVERTISER_NAME_FROM_HEADER.first().textContent().replace("Advertiser: ", "").trim();
+            if (text.contains(",")) {
+                String[] parts = text.split(",");
+                for (String part : parts) {
+                    enteredData.add(part.trim());
+                }
+            } else {
+                enteredData.add(text);
+            }
+        }
+        if (NPI_NUMBER.isVisible())
+            enteredData.add(NPI_NUMBER.inputValue().trim());
+        npiSmartList.getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
+        return enteredData;
+    }
+
+    public int getNPICountFromListDetails() {
+        return Integer.parseInt(TOTAL_NPI.textContent().trim());
+    }
+
+    public int getNPICountFromListItems(String listName) {
+        Locator npiCount = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div[contains(@class,'list-item-counter')]", listName));
+        return Integer.parseInt(npiCount.textContent().trim());
+    }
+
+    public int getNPICountFromListInfo() {
+        return Integer.parseInt(NPI_COUNT_FROM_LIST_INFO.textContent().trim());
+    }
+
+    public String fetchDisplayedDataCost() {
+        String fullText = FETCH_DATA_COST.textContent().trim();
+        Pattern pattern = Pattern.compile("\\$\\d+(\\.\\d+)?");
+        Matcher matcher = pattern.matcher(fullText);
+        String price = "";
+        if (matcher.find()) {
+            price = matcher.group();
+        }
+        return price;
     }
 }

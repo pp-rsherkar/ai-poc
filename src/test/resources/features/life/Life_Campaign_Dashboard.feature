@@ -75,7 +75,6 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User clicks Lifetime filter
     And User verifies that the campaigns displayed on the Dashboard include all past and current flights
     And User clicks "Today" filter
-    #Then Verify only Today's Flights should render on the Dashboard
     Then Verify only Current Month's Flights should render on the Dashboard
     And User clicks "Yesterday" filter
     Then Verify only Current Month's Flights should render on the Dashboard
@@ -130,16 +129,24 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
-    And User clicks Lifetime filter
-    When User enters "<Campaign ID>" and click Search button
-    Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+    And User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Then User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
     When User navigates to Tactic and assigns creative of status "<STATUS>" to the Tactic
     And User navigates to Campaign Dashboard
-    When User enters "<Campaign ID>" and click Search button
+    And User searches the campaign created in the above steps
     And User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
     Examples:
-      | Campaign ID          | STATUS       |
-      | Auto_20251101_024109 | Approved     |
-      | Auto_20251101_032528 | Pending Appr |
-      | Auto_20251103_024348 | Denied       |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | STATUS       |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Approved     |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
