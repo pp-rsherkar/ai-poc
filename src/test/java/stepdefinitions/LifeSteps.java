@@ -264,7 +264,6 @@ public class LifeSteps {
         logger.info("Verifying tactic management fee value: {}", expectedFeeValue);
         tacticDetails.enterTacticName("Tactic_" + CommonUtils.timeStampCalculation());
         tacticDetails.saveTacticDetails();
-        // Assert.assertTrue("Tactic management fee section is not visible", tacticSettings.isManagementFeeSectionVisible());
         Assert.assertEquals("Tactic management fee value is incorrect", expectedFeeValue, tacticSettings.fetchDisplayedManagementFeeValue());
     }
 
