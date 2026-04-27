@@ -6501,55 +6501,29 @@ public class LifeSteps {
 
     @And("User verifies the targeting rules and its options retrieved from the test-data file with the targeting rules and its options retrieved from UI for each line item and tactic of the campaign")
     public void userVerifiesTheTargetingRulesAndItsOptionsRetrievedFromTheTestDataFileWithTheTargetingRulesAndItsOptionsRetrievedFromUIForEachLineItemAndTacticOfTheCampaign() {
-        List<Throwable> errors = new ArrayList<>();
-
+        SoftAssertUtil soft = new SoftAssertUtil();
         for (String key : rulesMap.keySet()) {
-
             List<String> expectedValues = rulesMap.getOrDefault(key, List.of()).stream()
                     .map(s -> s == null ? "" : s.trim())
-                    .map(s -> s.replace("-", ""))
+                    .map(s -> s.equals("—") ? "" : s)
                     .filter(s -> !s.isEmpty())
-                    .toList();;
+                    .toList();
             List<String> actualValues = itemMap.get(key);
 
             if (actualValues == null) {
-                errors.add(new AssertionError("Missing key in actual: " + key));
+                soft.assertTrue("Missing key in actual: " + key, false);
                 continue;
             }
 
-            try {
-                Assert.assertEquals(
-                        "Options Count mismatch for key: " + key +
-                                " | Expected=" + expectedValues.size() +
-                                " Actual=" + actualValues.size(),
-                        expectedValues.size(),
-                        actualValues.size()
-                );
-            } catch (Throwable t) {
-                errors.add(t);
-            }
+            soft.assertEquals("Options Count mismatch for key: " + key, expectedValues.size(), actualValues.size());
 
             List<String> expectedSorted = new ArrayList<>(expectedValues);
             List<String> actualSorted = new ArrayList<>(actualValues);
-
             Collections.sort(expectedSorted);
             Collections.sort(actualSorted);
 
-            try {
-                Assert.assertEquals("Value mismatch for key: " + key, expectedSorted, actualSorted);
-            } catch (Throwable t) {
-                errors.add(t);
-            }
+            soft.assertEquals("Value mismatch for key: " + key, expectedSorted, actualSorted);
         }
-
-        if (!errors.isEmpty()) {
-            StringBuilder sb = new StringBuilder("Assertion Failures:\n");
-
-            for (Throwable t : errors) {
-                sb.append("- ").append(t.getMessage()).append("\n");
-            }
-
-            throw new AssertionError(sb.toString());
-        }
+        soft.collectAll();
     }
 }
