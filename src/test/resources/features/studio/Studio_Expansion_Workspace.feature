@@ -3,6 +3,16 @@ Feature: HCP Audience Workspace in Studio Application
   2. Verify the source audience selection and expansion options.
   3. Verify the filters application in HCP Audience Expansion workspace.
   4. Verify the publishing of the expanded audience list to LIFE application.
+  5. Verify NPI list's download and scheduling
+  6. Verify Report download and scheduling
+
+  Background:
+    Given This scenario will be executed in the "Pre-release" environment as a "User"
+    And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+    When User navigates to Administrative section and go to Accounts Tab
+    And User searches the account "PP engineering test" and checks Studio permissions
+    And User clicks PulsePoint icon to navigate back to Life
+    And User navigates to Studio application
 
   #@regression
   Scenario Outline: Create and save an HCP Audience Expansion workspace with Expansion Audience
@@ -15,7 +25,7 @@ Feature: HCP Audience Workspace in Studio Application
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     Then User verifies the expanded audience count
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the workspace is visible in workspace management page
     Examples:
@@ -25,19 +35,15 @@ Feature: HCP Audience Workspace in Studio Application
       | Abbvie     | HCP_Expansion  | NPI List         | PB_Test_List | Expand with Care Team         |
       | Abbvie     | HCP_Expansion  | NPI List         | PB_Test_List | Expand with Affiliation Graph |
 
-    #@e2e added hash tags before tags for future reference, it will be removed once all stpes are implemented
   Scenario Outline: Create and save an HCP Audience Expansion workspace and publish the workspace
-      #1
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User selects the Workspace Type as "HCP Audience Expansion"
     And User selects the advertiser "<ADVERTISER>"
-      #2
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
-      #3
     And User applies the following filters one by one and checks that NPI details are refined after each filter:
       | FilterName         | Option                                                                                                                  |
       | NPI Age            | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above                                                           |
@@ -57,9 +63,8 @@ Feature: HCP Audience Workspace in Studio Application
       | Medical School     | New York College
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
-      #4
     Then Verify the Workspace is saved
     And Download button is enabled to the user
     And User clicks on Publish NPI List
@@ -91,13 +96,15 @@ Feature: HCP Audience Workspace in Studio Application
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     Then User selects Draft option as "<DRAFT>"
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the Workspace is saved
     And Internal User is able to view "<WORKSPACE_NAME>" in workspace management page
     And "Internal User" logs out from the "Studio" application
-    And "Studio" application is logged in successfully with "External User"
-    And "External User" searches "<WORKSPACE_NAME>" in workspace management page
+    Given This scenario will be executed in the "Pre-release" environment as a "External User"
+    And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
+    When External user Searches the workspace name in studio application with "<DRAFT_OPTION>" draft option
+    Then External user Verifies whether the workspace with "<DRAFT_OPTION>" is visible in workspace management page
     Examples:
       | ADVERTISER | SOURCE_AUDIENCE  | OPTIONS | EXPANDED_AUDIENCE             | DRAFT   | WORKSPACE_NAME |
       | Abbvie     | Studio Workspace | PB_Test | Expand with Care Team         | PRIVATE | HCP_Expansion  |
@@ -115,7 +122,7 @@ Feature: HCP Audience Workspace in Studio Application
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     Then User verifies the expanded audience count
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the Workspace is saved
     And Download button is enabled to the user
@@ -143,7 +150,7 @@ Feature: HCP Audience Workspace in Studio Application
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the Workspace is saved
     And Download button is enabled to the user
@@ -165,7 +172,7 @@ Feature: HCP Audience Workspace in Studio Application
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the Workspace is saved
     And Download button is enabled to the user
@@ -186,7 +193,7 @@ Feature: HCP Audience Workspace in Studio Application
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the Workspace is saved
     And Report button is enabled to the user
@@ -207,7 +214,7 @@ Feature: HCP Audience Workspace in Studio Application
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
-    And User clicks on Edit button to rename the workspace to "<WORKSPACE_NAME>"
+    And User updates the workspace name as "<WORKSPACE_NAME>"
     And User saves the workspace
     Then Verify the Workspace is saved
     And Report button is enabled to the user
@@ -218,4 +225,3 @@ Feature: HCP Audience Workspace in Studio Application
       | Abbvie     | Studio Workspace | PB_Test | Expand with Care Team         | HCP_Expansion  |
       | Abbvie     | Studio Workspace | PB_Test | Expand with Affiliation Graph | HCP_Expansion  |
 
-  Scenario Outline: WebHook
