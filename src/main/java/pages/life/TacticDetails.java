@@ -66,6 +66,8 @@ public class TacticDetails {
     private final Locator COMMENT_SUCCESS_ALERT;
     private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
     private final Locator CONTINUE_BUTTON;
+    private final Locator PERCENT_TYPE_FEE_INPUT;
+    private final Locator DOLLAR_TYPE_FEE_INPUT;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -131,10 +133,16 @@ public class TacticDetails {
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.PERCENT_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
+        this.DOLLAR_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
     }
 
     public void clickNewTactic() {
         NEW_TACTIC_BUTTON.click();
+    }
+
+    public void clickNewTactic(int i) {
+        NEW_TACTIC_BUTTON.nth(i).click();
     }
 
     public Locator customFieldValue(String customFieldName) {
@@ -300,6 +308,25 @@ public class TacticDetails {
             templateNameList.add(saveTargetingTemplate(lineItemType.trim()));
         }
         return templateNameList;
+    }
+
+    public void selectManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount, String expectedFeeValue) {
+        String optionXPath = String.format("//div[contains(@class,'management-fee-contanier')]//div//button[normalize-space(text())='%s']", managementFeeOption);
+        page.locator(optionXPath).click();
+        switch (managementFeeOption) {
+            case "Percentage" -> PERCENT_TYPE_FEE_INPUT.fill(percent);
+            case "CPM", "Fixed CPM" -> DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            case "% + CPM"    -> {
+                PERCENT_TYPE_FEE_INPUT.fill(percent);
+                DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            }
+            default -> throw new IllegalArgumentException("Unexpected fee type: " + managementFeeOption);
+        }
+        saveTacticDetails();
+        waitUtility.waitForElementVisible("//span[contains(@class,'strike-text')]");
+        clickFirstTacticTab();
+        clickSettingsTab();
+        waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
     }
 
     private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {

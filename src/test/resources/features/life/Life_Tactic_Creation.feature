@@ -247,12 +247,21 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And User sets campaign management fee as "<CAMPAIGN_FEE_OPTION>" "<CAMPAIGN_PERCENT>" "<CAMPAIGN_AMOUNT>"
     And User saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
-    And Verify line item inherits campaign management fee as "<CAMPAIGN_DISPLAY_VALUE>"
-    When User overrides line item management fee as "<LINEITEM_FEE_OPTION>" "<LINEITEM_PERCENT>" "<LINEITEM_AMOUNT>"
     And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    And Verify tactic reflects line item management fee as "<LINEITEM_DISPLAY_VALUE>"
+    Then User navigates to line item and clicks on details tab
+    And Verify management fee is set as "<CAMPAIGN_DISPLAY_VALUE>"
+    Then User clicks on create new tactic
+    Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+    Then User navigates to tactic setting tab
+    And Verify management fee is set as "<CAMPAIGN_DISPLAY_VALUE>"
+    When User overrides line item management fee and verifies tactic reflection for the following fee types
+      | Fee Option | Percent | Amount | Expected Display |
+      | Percentage | 7       |        | + 7 %            |
+      | CPM        |         | 10     | + $10            |
+      | % + CPM    | 7       | 10     | + 7 % + $10      |
+      | Fixed CPM  |         | 11     | $11              |
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | LINEITEM_FEE_OPTION | LINEITEM_PERCENT | LINEITEM_AMOUNT | LINEITEM_DISPLAY_VALUE |
-      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                |                 | + 5 %                  | Percentage         | 7                |                 | + 7 %                  |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | CHANNEL | TACTIC_NAME | COUNT |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                | 5               | + 5 %                  | Email   | Tactic      | 1     |
