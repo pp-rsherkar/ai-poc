@@ -649,7 +649,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         else if (fileName.contains(".csv") || fileName.contains(".txt"))
             npiCountFromFile = FileActions.fetchRowCountExcludeHeaderFromCSVAndTxt(fileName);
         if (fileName.contains("StaticList")) {
-        logger.info("Verifying: the NPI Numbers from the uploaded file {} are displayed correctly in the list details page", fileName);
+            logger.info("Verifying: the NPI Numbers from the uploaded file {} are displayed correctly in the list details page", fileName);
             npiCountFromListDetails = npiStaticList.getNPICountFromListDetails();
             Assert.assertEquals("NPI count from file does not match with UI", npiCountFromFile, npiCountFromListDetails);
         } else {
@@ -801,8 +801,8 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         logger.info("Verifying count of rules added for targeting rule types");
         String ruleType;
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-        logger.info("Verifying: the count of rules added for the selected targeting rule type on the Tactic Settings page");
-            if(entry.getKey().contains("Email"))
+            logger.info("Verifying: the count of rules added for the selected targeting rule type on the Tactic Settings page");
+            if (entry.getKey().contains("Email"))
                 ruleType = "Emails";
             else
                 ruleType = entry.getKey();
@@ -1118,7 +1118,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void verifyTheDataShouldFilterAsPerTheSelectedFilterValues() {
         logger.info("Verifying Campaign Dashboard data is filtered as per selected values");
         for (Object o : keyType) {
-        logger.info("Verifying: the Campaign Dashboard data should filter as per the selected filter values");
+            logger.info("Verifying: the Campaign Dashboard data should filter as per the selected filter values");
             Assert.assertTrue("Campaign Dashboard data is not filtered as per the selected filter values", campaignDashboard.isCampaignDataFilteredAccordingToSelectedFilters(o.toString(), keyValues));
         }
     }
@@ -2072,7 +2072,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPage() {
 
         for (String name : nameList) {
-        logger.info("Verifying: the newly created creative is displayed in the Creative Library page");
+            logger.info("Verifying: the newly created creative is displayed in the Creative Library page");
             Assert.assertTrue("Creative " + name + " is not found in the library", createCreatives.verifyCreativesInLibrary(name));
             Assert.assertEquals("1 records", createCreatives.fetchRecordsNumberAfterSearch());
         }
@@ -2206,7 +2206,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void verifyListDataIsUploadedSuccessfully() {
         logger.info("Pass token in the API Header and run it to upload the data into the list");
         if (response == null) {
-        logger.info("Verifying: list data is uploaded successfully");
+            logger.info("Verifying: list data is uploaded successfully");
             Assert.fail("API response is null");
         } else {
             int statusCode = response.status();
@@ -2282,7 +2282,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         List<String> subTabsList = CommonUtils.convertStringToList(subTabs);
 
         for (String tab : subTabsList) {
-        logger.info("Verifying: that the sub-tabs {} on the left navigation panel are available and {} is selected by default", subTabs, defaultTabName);
+            logger.info("Verifying: that the sub-tabs {} on the left navigation panel are available and {} is selected by default", subTabs, defaultTabName);
             boolean isPresent = sharedList.verifySubTabs(tab);
             Assert.assertTrue(tab + " Tab is not present", isPresent);
         }
@@ -2928,7 +2928,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         logger.info("User saves the creative");
 
         for (String name : nameList) {
-        logger.info("Verifying: the newly created creative is displayed in the Creative Library page and contains all the details entered during creation");
+            logger.info("Verifying: the newly created creative is displayed in the Creative Library page and contains all the details entered during creation");
             createCreatives.searchCreative(name);
             createCreatives.clickSearchedCreative(name);
             List<String> fetchSavedCreativeDetails = createCreatives.fetchCreativeDetails();
@@ -3426,7 +3426,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         List<String> expectedFormats = CommonUtils.convertStringToList(reportFormats);
         List<String> reportFormatValues = runReportPanel.fetchReportFormatList();
         for (String format : expectedFormats) {
-        logger.info("Verifying: the availability of various options of the Report Format field - {}", reportFormats);
+            logger.info("Verifying: the availability of various options of the Report Format field - {}", reportFormats);
             Assert.assertTrue("Missing report format: " + format, reportFormatValues.contains(format));
         }
     }
@@ -3544,7 +3544,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void sectionShouldBeVisibleWithLabelCheckbox(String filterReportSection, String checkboxLabel1, String checkboxLabel2, String checkboxLabel3) {
         Assert.assertTrue("Report Filter checkbox is not available", runReportPanel.isFilterReportSectionAvailable(filterReportSection));
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel1)) {
-        logger.info("{} section should be visible with label {}, {}, {} checkbox", filterReportSection, checkboxLabel1, checkboxLabel2, checkboxLabel3);
+            logger.info("{} section should be visible with label {}, {}, {} checkbox", filterReportSection, checkboxLabel1, checkboxLabel2, checkboxLabel3);
             Assert.assertEquals(checkboxLabel1.trim(), runReportPanel.fetchAndClickFilterReportCheckboxLabel(checkboxLabel1));
         }
         if (runReportPanel.isFilterReportCheckboxAvailable(checkboxLabel2)) {
@@ -3706,7 +3706,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @And("Verify {string} button is available in Destination dropdown field")
     public void verifyAddDestinationButtonIsAvailableInDestinationDropdownField(String buttonName) {
         if (buttonName.contains("Add Destination")) {
-        logger.info("Verifying: {} button is available in Destination dropdown field", buttonName);
+            logger.info("Verifying: {} button is available in Destination dropdown field", buttonName);
             Assert.assertTrue("Add Destination field is not available", scheduleReport.isAddDestinationAvailable(buttonName));
         } else {
             Assert.assertTrue("Edit Destination field is not available", runReportPanel.isEditDestinationAvailable());
@@ -4049,7 +4049,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @Then("Verify the {string} gets updated successfully")
     public void verifyPixelUpdated(String pixelType) {
         if (pixelType.equals("Retargeting Pixel") || pixelType.equals("Conversion Pixel")) {
-        logger.info("Verifying: the {} gets updated successfully", pixelType);
+            logger.info("Verifying: the {} gets updated successfully", pixelType);
             Assert.assertEquals("PIXEL UPDATED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
         } else if (pixelType.equals("Smart Pixel")) {
             Assert.assertEquals("SAVED SUCCESSFULLY", pixels.verifyUpdateSuccess().toUpperCase());
@@ -4335,7 +4335,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         int startYear = Integer.parseInt(parts[1]);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         for (int i = 1; i < capturedDetails.size(); i++) {
-        logger.info("Verifying: that Sequential flights should be added based on the start month");
+            logger.info("Verifying: that Sequential flights should be added based on the start month");
             String dateStr = capturedDetails.get(i);
             LocalDate actualDate = LocalDate.parse(dateStr, formatter);
             LocalDate expectedDate = LocalDate.of(startYear, startMonth, 1).plusMonths(i - 1);
@@ -4426,7 +4426,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void userAddsCommentsOrNotesToEachLineItem(String notes) {
         logger.info("Adding comments/notes to each Line Item");
         for (String name : nameList) {
-        logger.info("User adds Comments or Notes {} to each line item", notes);
+            logger.info("User adds Comments or Notes {} to each line item", notes);
             lineItemDetails.navigateToLineItemDetails(name);
             String newNotes = name + " " + notes;
             logger.info("Adding notes to {}: {}", name, newNotes);
@@ -4438,7 +4438,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @And("Verify the notes added to each line item")
     public void verifyTheNotesAddedToEachLineItem() {
         for (String name : nameList) {
-        logger.info("Verifying: the notes added to each line item");
+            logger.info("Verifying: the notes added to each line item");
             lineItemDetails.navigateToLineItemDetails(name);
             String notes = lineItemDetails.fetchLineItemNotes();
             Assert.assertTrue("Note of '" + name + "' is not available", itemList.stream().anyMatch(item -> item.equalsIgnoreCase(notes)));
@@ -4517,7 +4517,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         navigation.clickGeneratedReport();
         runReportPanel.clickSearchButton();
         for (String name : nameList) {
-        logger.info("Verifying: that the reports generated on the Line Item page are available on the Generate Report page");
+            logger.info("Verifying: that the reports generated on the Line Item page are available on the Generate Report page");
             boolean reportAvailable = reportTemplates.verifyReportGeneratedFromLineItemPage(name);
             Assert.assertTrue("Report generated using line item " + name + " is not available", reportAvailable);
         }
@@ -4576,7 +4576,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         BigDecimal actualBid;
 
         if (bidType.equalsIgnoreCase("Base")) {
-        logger.info("Verify user is able to update and save the {} bid price", bidType);
+            logger.info("Verify user is able to update and save the {} bid price", bidType);
             originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
             updatedBid = originalBid.add(BigDecimal.ONE);
             logger.info("Updating Base Bid price from {} to {}", originalBid, updatedBid);
@@ -4608,7 +4608,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         String expectedError;
 
         if (bidType.equalsIgnoreCase("Base")) {
-        logger.info("Verifying: user is not able to update {} bid price more than allowed limit", bidType);
+            logger.info("Verifying: user is not able to update {} bid price more than allowed limit", bidType);
             expectedError = "Base Bid Price can not exceed Max Bid Price";
             originalBid = tacticSettings.getTacticBaseBidPrice().stripTrailingZeros();
             updatedBid = campaignMaxBid.add(BigDecimal.TEN);
@@ -4636,7 +4636,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         int loopCount = 1;
 
         try {
-        logger.info("User creates a new tactic with details {} {} {}", tacticName, channel, count);
+            logger.info("User creates a new tactic with details {} {} {}", tacticName, channel, count);
             loopCount = Integer.parseInt(count.trim());
             logger.info("Parsed tactic count successfully: {}", loopCount);
         } catch (NumberFormatException e) {
@@ -4666,7 +4666,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @Then("User deletes the tactic and verifies it")
     public void user_deletes_the_tactic_and_verifies_it() {
         for (int i = 0; i < nameList.size() - 1; i++) {
-        logger.info("User deletes the tactic and verifies it");
+            logger.info("User deletes the tactic and verifies it");
             String tacticName = nameList.get(i);
             tacticDetails.deleteTactic(tacticName);
             String currentTacticName = tacticSettings.verifyTacticName();
@@ -4832,7 +4832,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     public void verifyThatTheRetrievedDataForTheListWasSavedCorrectly(String listType) {
         List<String> onListSavedFetchData = new ArrayList<>();
         if (listType.contains(",")) {
-        logger.info("Verifying: that the retrieved data for the {} list was saved correctly", listType);
+            logger.info("Verifying: that the retrieved data for the {} list was saved correctly", listType);
             List<String> listTypes = CommonUtils.parseCommaSeparatedString(listType);
             for (String list : listTypes) {
                 onListSavedFetchData.addAll(npiSmartList.retrieveEnteredData(list));
@@ -5056,7 +5056,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         int recordsCountFromFile = FileActions.countRecordsFromTextFile(fileName);
         int recordsCountFromUI = 0;
         if (fileName.contains("Diagnosis_BulkUpload") || fileName.contains("PrescribedDrugs_BulkUpload")) {
-        logger.info("Verifying: bulk Upload template {} records count matches UI count post upload", fileName);
+            logger.info("Verifying: bulk Upload template {} records count matches UI count post upload", fileName);
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchDiagnosisCodesFromUI());
         } else {
             recordsCountFromUI = Integer.parseInt(npiSmartList.fetchMedicalProcedureCodesFromUI());
@@ -5107,7 +5107,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         boolean isEnabled = metricName.equalsIgnoreCase("None");
         String actualState = campaigns.verifyClientFieldEnabledOrDisabledBasedOnAccount(clientName);
         if (isEnabled) {
-        logger.info("Verifying: that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {}", clientName);
+            logger.info("Verifying: that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {}", clientName);
             Assert.assertEquals("Enabled", actualState);
         } else {
             Assert.assertEquals("Disabled", actualState);
@@ -5295,7 +5295,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @And("Verify that user is able to download the uploaded {string} list")
     public void verifyThatUserIsAbleToDownloadTheUploadedFile(String listType) throws IOException {
         if (listType.equals("NPI")) {
-        logger.info("Verifying: that user is able to download the uploaded {} list", listType);
+            logger.info("Verifying: that user is able to download the uploaded {} list", listType);
             targetFilePath = npiStaticList.clickDownloadIcon();
         } else {
             targetFilePath = sharedList.clickDownloadIcon();
@@ -5798,7 +5798,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @Then("Verify Edit icon availability for the deals listed under {string} Deals tab")
     public void verifyEditIconIsAvailableForThePrivateDealCreated(String dealType) {
         if (dealType.contains("Private")) {
-        logger.info("Verifying: edit icon availability for the deals listed under {} Deals tab", dealType);
+            logger.info("Verifying: edit icon availability for the deals listed under {} Deals tab", dealType);
             Assert.assertTrue("Edit icon is not available for the created private deal", pmp.isEditIconAvailableForDeals());
             Assert.assertTrue("Edit icon is not clickable for the created private deal", pmp.clickEditButtonForCreatedPrivateDeal(dealNameRandom));
             pmp.closePMPDealEditPanel();
@@ -5854,7 +5854,7 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
     @And("Verify Archive option is available based on the campaign state")
     public void verifyArchiveOptionIsAvailableBasedOnTheCampaignState() {
         if (pmp.isArchiveButtonAvailableOnConfirmationDialog()) {
-        logger.info("Verifying: archive option is available based on the campaign state");
+            logger.info("Verifying: archive option is available based on the campaign state");
             pmp.clickArchiveButtonFromConfirmationDialog();
             Assert.assertEquals("Success alert is not displayed", "Deal Archived Successfully", pmp.fetchDealArchiveSuccessAlert());
         } else if (pmp.isRemoveAssociationTextDisplayed()) {
@@ -5914,15 +5914,16 @@ public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue)
         metricName = setup.fetchCuratedMarketId();
         logger.info("Curated market ID: '{}'", metricName);
     }
+
     @And("User creates a curated market with only {string}")
-    public void userCreatesACuratedMarketWithOnlyDescription(String description){
+    public void userCreatesACuratedMarketWithOnlyDescription(String description) {
         logger.info("Creating a curated market with only description - Description: '{}'", description);
         setup.enterCuratedMarketDetailsOnlyDescription(description);
         setup.clickSaveButton();
         Assert.assertEquals("3 error(s) found.", setup.getAlertMessage());
-        Assert.assertTrue("Account is required",setup.isMarketNameErrorTextVisible());
-        Assert.assertTrue("Account is required",setup.isAccountsErrorTextVisible());
-        Assert.assertTrue("Market KPI and Benchmark is required",setup.isMarketKPIErrorVisible());
+        Assert.assertTrue("Account is required", setup.isMarketNameErrorTextVisible());
+        Assert.assertTrue("Account is required", setup.isAccountsErrorTextVisible());
+        Assert.assertTrue("Market KPI and Benchmark is required", setup.isMarketKPIErrorVisible());
     }
 
     @And("User clicks {string} tab")

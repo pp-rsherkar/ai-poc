@@ -1024,7 +1024,7 @@ public class CreateCreatives {
         waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
-    public void clickBulkPanelCancelButton(){
+    public void clickBulkPanelCancelButton() {
         BULK_PANEL_CANCEL_BUTTON.click();
         waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }

@@ -12,6 +12,8 @@ import java.util.*;
 
 public class TacticSettings {
 
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -87,8 +89,6 @@ public class TacticSettings {
     private final Locator PERCENT_TYPE_FEE_INPUT;
     private final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
-    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     List<Object> ruleTypes;
     List<Object> ruleOptions;
 
@@ -584,7 +584,7 @@ public List<String> fetchEnteredManagementFeeValues() {
                 case "Bespoke":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
-                        String xpath= String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
+                        String xpath = String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
                         isElementVisible(xpath);
                     }
                     break;

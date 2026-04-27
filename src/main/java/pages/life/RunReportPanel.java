@@ -325,7 +325,7 @@ public class RunReportPanel {
         return text;
     }
 
-    public void searchReportName(String templateName){
+    public void searchReportName(String templateName) {
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
         SEARCH_REPORT.fill(templateName);
@@ -334,7 +334,7 @@ public class RunReportPanel {
 
     public void clickModifyOption(String templateName) {
         Locator templateElements = page.locator(String.format("//div[contains(@class, 'content-section')][.//div[contains(@class, 'report-progress')] and .//div[contains(@class, 'name-section') and contains(text(), '%s')]]//img[contains(@class, 'icon-image')]", templateName));
-        if(!templateElements.first().isVisible()) {
+        if (!templateElements.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             waitUtility.waitForElementVisible("div.ui.dropdown.selection.sort-option-dropdown");
             if (!templateName.contains("Custom Template")) {
@@ -399,8 +399,8 @@ public class RunReportPanel {
 
     public boolean selectStartAndEndDate() {
         String[] dates = CommonUtils.generateStartAndEndDates();
-        boolean startSelected = selectDate(START_DATE,  dates[0]);
-        boolean endSelected = selectDate(END_DATE,  dates[1]);
+        boolean startSelected = selectDate(START_DATE, dates[0]);
+        boolean endSelected = selectDate(END_DATE, dates[1]);
         return startSelected && endSelected;
     }
 
@@ -621,7 +621,7 @@ public class RunReportPanel {
             locator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//div[contains(@class,'transition ui label')]//span", fieldName));
         else
             locator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[contains(@class,'transition ui label')]//span", fieldName));
-        for(int i =0; i< locator.count(); i++){
+        for (int i = 0; i < locator.count(); i++) {
             if (locator.nth(i).isVisible()) {
                 locator.nth(i).scrollIntoViewIfNeeded();
                 capturedValues.add(locator.nth(i).textContent().trim());
@@ -653,8 +653,7 @@ public class RunReportPanel {
         return switch (option) {
             case "Custom Dates" ->
                     START_DATE.isVisible() && END_DATE.isVisible() && START_TIME.isVisible() && END_TIME.isVisible() && TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
-            case "Lifetime" ->
-                    TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
+            case "Lifetime" -> TIME_ZONE.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
             case "Flights" -> FLIGHT_DETAILS_DROPDOWN.isVisible() && REPORT_TIMING_CHECKBOX.isVisible();
             default -> false;
         };

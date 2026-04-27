@@ -460,7 +460,7 @@ public class Accounts {
         return workspaceNameList;
     }
 
-    public void clickCancelButtonFromSettingsPanel(){
+    public void clickCancelButtonFromSettingsPanel() {
         STUDIO_SETTINGS_PANEL_CANCEL_BUTTON.click();
     }
 
