@@ -202,7 +202,7 @@ public class TargetingTemplate {
         return text;
     }
 
-    public void clickAddTargetingRule(){
+    public void clickAddTargetingRule() {
         ADD_TARGETING_RULE_BUTTON.click();
     }
 }

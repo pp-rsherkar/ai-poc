@@ -213,13 +213,13 @@ public class Navigation {
 
     public void selectAndClickExternalUserApplicationType() {
         page.waitForURL(url -> url.contains("AdminDashBoard.aspx") || url.contains("LifePortalSelector.aspx"));
-        if ( page.url().contains("LifePortalSelector.aspx")) {
+        if (page.url().contains("LifePortalSelector.aspx")) {
             BUYING_PLATFORM.click();
             waitUtility.waitUntilSpinnerHidden();
         }
     }
 
-    public void navigateToCuratedMarket(){
+    public void navigateToCuratedMarket() {
         CURATED_MARKET.click();
         waitUtility.waitUntilSpinnerHidden();
     }

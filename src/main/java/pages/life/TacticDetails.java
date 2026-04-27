@@ -362,7 +362,7 @@ public class TacticDetails {
         waitUtility.waitUntilSpinnerHidden();
         tacticSettings.verifyTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
-        if(TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
+        if (TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
             CONTINUE_BUTTON.click();
         waitUtility.waitForLocatorVisible(SAVE_TEMPLATE_DIALOG);
         TEMPLATE_NAME_TEXT.fill(templateName);

@@ -1008,7 +1008,7 @@ public class StudioSteps {
     }
 
     @When("User selects the workspace type {string}")
-    public void userSelectsTheWorkspaceType(String workspaceType){
+    public void userSelectsTheWorkspaceType(String workspaceType) {
         logger.info("Verifying Studio Workspace frame is displayed");
         workspaceCreation.verifyStudioWorkspaceFrame();
         logger.info("Selecting workspace type: {}", workspaceType);
