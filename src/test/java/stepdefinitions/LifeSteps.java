@@ -512,10 +512,8 @@ public class LifeSteps {
         Assert.assertTrue("Unable to save creative", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
     }
 
-    @Then("Verify creative details are saved and the campaign is in running state")
-    public void verify_creative_details_are_saved_and_the_campaign_is_in_running_state() {
-        logger.info("Verifying creative save success");
-        Assert.assertTrue("Unable to save Creatives tab", tacticCreatives.tacticCreativesSuccess().contains("Success!"));
+    @Then("Verify the newly created campaign is in running state")
+    public void verify_the_newly_created_campaign_is_in_running_state() {
         logger.info("Navigating to Campaign Dashboard to verify 'Running' status");
         tacticCreatives.navigateToCampaignDashboard();
         campaignDashboard.resetFiltersIfApplied();
@@ -664,8 +662,7 @@ public class LifeSteps {
     public void verifyTheStaticNPINumbersFromTheUploadedFileAreDisplayedCorrectlyInTheListDetailsPage(String fileName) throws IOException {
         int npiCountFromFile = 0;
         int npiCountFromListDetails = 0;
-        if (fileName.contains(".xlsx"))
-            npiCountFromFile = FileActions.fetchRowCountFromExcel(fileName);
+        if (fileName.contains(".xlsx")) npiCountFromFile = FileActions.fetchRowCountFromExcel(fileName);
         else if (fileName.contains(".csv") || fileName.contains(".txt"))
             npiCountFromFile = FileActions.fetchRowCountExcludeHeaderFromCSVAndTxt(fileName);
         logger.info("Verifying NPI count from file: {} with count displayed in list details", fileName);
@@ -835,10 +832,8 @@ public class LifeSteps {
     public void verifyTheCountOfRulesAddedForTheSelectedTargetingRuleTypeOnTheTacticSettingsPage() {
         String ruleType;
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            if(entry.getKey().contains("Email"))
-                ruleType = "Emails";
-            else
-                ruleType = entry.getKey();
+            if (entry.getKey().contains("Email")) ruleType = "Emails";
+            else ruleType = entry.getKey();
             int itemCount = entry.getValue().size();
             logger.info("Verifying rule options count for Rule Type: {} on Tactic Settings page. Expected count: {}", ruleType, itemCount);
             String optionsCount = tacticSettings.fetchSelectedListCountFromTactic(ruleType);
@@ -1204,10 +1199,8 @@ public class LifeSteps {
         LocalDate latest = dates.stream().max(LocalDate::compareTo).orElse(today);
         boolean hasPast = earliest.isBefore(today);
         boolean hasFuture = latest.isAfter(today);
-        boolean hasCurrent = (earliest.isBefore(today) || earliest.isEqual(today))
-                && (latest.isAfter(today) || latest.isEqual(today));
-        logger.info("Range: {} to {}. Past: {}, Current: {}, Future: {}",
-                earliest, latest, hasPast, hasCurrent, hasFuture);
+        boolean hasCurrent = (earliest.isBefore(today) || earliest.isEqual(today)) && (latest.isAfter(today) || latest.isEqual(today));
+        logger.info("Range: {} to {}. Past: {}, Current: {}, Future: {}", earliest, latest, hasPast, hasCurrent, hasFuture);
         Assert.assertFalse("Dashboard is empty!", dates.isEmpty());
     }
 
@@ -1290,12 +1283,10 @@ public class LifeSteps {
             boolean isActive = !today.isBefore(start) && !today.isAfter(end);
             if (!isActive) {
                 allFlightsActiveToday = false;
-                logger.error("Invalid flight for 'Today' filter: Flight range [{} to {}] does not include {}",
-                        start, end, today);
+                logger.error("Invalid flight for 'Today' filter: Flight range [{} to {}] does not include {}", start, end, today);
             }
         }
-        Assert.assertTrue("One or more flights displayed do not fall within today's date range",
-                allFlightsActiveToday);
+        Assert.assertTrue("One or more flights displayed do not fall within today's date range", allFlightsActiveToday);
     }
 
     @Then("Verify only Today's Flights should render on the Dashboard")
@@ -2407,8 +2398,7 @@ public class LifeSteps {
             sharedList.clickDomainListFromMenu(pageName);
         } catch (PlaywrightException e) {
             logger.info("Encountered PlaywrightException, attempting navigation again");
-            if (campaigns.isCreateCampaignButtonVisible())
-                navigation.clickSubMenu();
+            if (campaigns.isCreateCampaignButtonVisible()) navigation.clickSubMenu();
             sharedList.clickDomainListFromMenu(pageName);
         }
     }
@@ -5195,10 +5185,8 @@ public class LifeSteps {
     @And("User selects the NPI data {string} for {string}")
     public void userSelectsTheNPIData(String npiData, String optionType) {
         logger.info("Selecting NPI Data '{}'", npiData);
-        if (optionType.contains("NPI List"))
-            npiSmartList.selectNPIGroup(npiData);
-        else
-            npiSmartList.selectSpeciality(npiData);
+        if (optionType.contains("NPI List")) npiSmartList.selectNPIGroup(npiData);
+        else npiSmartList.selectSpeciality(npiData);
     }
 
     @And("User selects the Speciality {string}")
@@ -5373,8 +5361,7 @@ public class LifeSteps {
             String option = row.get("PopulationOption") != null ? row.get("PopulationOption").trim() : "";
             String details = row.get("OptionDetails") != null ? row.get("OptionDetails").trim() : "";
             npiSmartList.selectSmartNPIListType(option);
-            Map<String, String> attributeMap = Arrays.stream(details.split(",")).map(String::trim).filter(entry -> entry.contains(":")).map(entry -> entry.split(":", 2)).filter(arr -> arr.length == 2)
-                    .collect(Collectors.toMap(arr -> arr[0].trim(), arr -> arr[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(details.split(",")).map(String::trim).filter(entry -> entry.contains(":")).map(entry -> entry.split(":", 2)).filter(arr -> arr.length == 2).collect(Collectors.toMap(arr -> arr[0].trim(), arr -> arr[1].trim()));
             logger.info("Entering details for '{}': {}", option, attributeMap);
             npiSmartList.enterPopulationOptionsDetail(option, attributeMap);
         }
@@ -6100,8 +6087,7 @@ public class LifeSteps {
         logger.info("Clicking the three-dot menu to select General variable and Time variable for file name");
         scheduleReport.clickThreeDotMenuForFileName();
         scheduleReport.selectGeneralVariableFromThreeDotMenu(generalVariable);
-        if (generalVariable.contains("$CampaignName$"))
-            customFieldName = runReportPanel.fetchCampaignName().getFirst();
+        if (generalVariable.contains("$CampaignName$")) customFieldName = runReportPanel.fetchCampaignName().getFirst();
         else if (generalVariable.contains("$LineItemName$"))
             customFieldName = runReportPanel.fetchLineItemName().getFirst();
         else if (generalVariable.contains("AdvertiserName"))
@@ -6472,13 +6458,98 @@ public class LifeSteps {
     public void userSavesTacticDetailsAsATargetTemplateAndVerifiesTheTemplateIsSavedSuccessfully(String lineItemType) {
         logger.info("Saving tactic details as target template for Line Item type '{}'", lineItemType);
         templateNameRandom = tacticDetails.saveTargetingTemplate(lineItemType);
-        logger.info("Verifying tactic details saved as target template successfully with template name '{}'", templateNameRandom);
     }
 
     @Then("User searches and verifies the created targeting template is available on Targeting Templates page")
     public void userSearchesAndVerifiesTheCreatedTargetingTemplateIsAvailableOnTargetingTemplatesPage() {
         logger.info("Navigating to Targeting Templates page to search and verify the created targeting template '{}'", templateNameRandom);
         Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
-        logger.info("Targeting template found successfully using search option");
+    }
+
+    @And("User navigates to campaign - {string}")
+    public void userNavigatesToCampaign(String campaignName) {
+        logger.info("Navigating to campaign '{}'", campaignName);
+        campaignDashboard.navigateToCampaign(campaignName);
+    }
+
+    @And("Read the test-data file {string} for the campaign and retrieve the targeting rules and its options configured")
+    public void readTheTestDataFileForTheCampaignAndRetrieveTheTargetingRulesAndItsOptionsConfigured(String fileName) throws IOException {
+        logger.info("Reading test-data file '{}' to retrieve targeting rules and options configured", fileName);
+        rulesMap = tacticSettings.parseTargetingSection(fileName);
+        int ruleTypeCount = rulesMap.size();
+        logger.info("Total count of Rule Types: {}", ruleTypeCount);
+        long totalOptionsCount = rulesMap.values().stream().mapToLong(List::size).sum();
+        logger.info("Total count of all options across all rules: {}", totalOptionsCount);
+        logger.info("Retrieved targeting rules and options data from File: {}", rulesMap);
+    }
+
+    @And("User expands each line item added to the campaign from UI and switches to each tactic added to it and retrieves the targeting rules and its options configured for each tactic")
+    public void userExpandsEachLineItemAddedToTheCampaignFromUIAndSwitchesToEachTacticAddedToItAndRetrievesTheTargetingRulesAndItsOptionsConfiguredForEachTactic() {
+        List<String> lineItems = lineItemDetails.fetchAllLineItemsFromUI();
+        for (String lineItem : lineItems) {
+            logger.info("Expanding Line Item '{}'", lineItem);
+            lineItemDetails.expandLineItem(lineItem);
+            List<String> tactics = tacticDetails.fetchAllTacticsForLineItemFromUI(lineItem);
+            for (String tactic : tactics) {
+                tacticDetails.clickTactic(tactic);
+                itemMap.putAll(tacticSettings.fetchTargetingRulesAndOptionsOfEachTacticFromUI());
+                logger.info("Retrieved targeting rules and options for Tactic '{}': {}", tactic, itemMap);
+            }
+            lineItemDetails.contractLineItem(lineItem);
+        }
+    }
+
+    @And("User verifies the targeting rules and its options retrieved from the test-data file with the targeting rules and its options retrieved from UI for each line item and tactic of the campaign")
+    public void userVerifiesTheTargetingRulesAndItsOptionsRetrievedFromTheTestDataFileWithTheTargetingRulesAndItsOptionsRetrievedFromUIForEachLineItemAndTacticOfTheCampaign() {
+        List<Throwable> errors = new ArrayList<>();
+
+        for (String key : rulesMap.keySet()) {
+
+            List<String> expectedValues = rulesMap.getOrDefault(key, List.of()).stream()
+                    .map(s -> s == null ? "" : s.trim())
+                    .map(s -> s.replace("-", ""))
+                    .filter(s -> !s.isEmpty())
+                    .toList();;
+            List<String> actualValues = itemMap.get(key);
+
+            if (actualValues == null) {
+                errors.add(new AssertionError("Missing key in actual: " + key));
+                continue;
+            }
+
+            try {
+                Assert.assertEquals(
+                        "Options Count mismatch for key: " + key +
+                                " | Expected=" + expectedValues.size() +
+                                " Actual=" + actualValues.size(),
+                        expectedValues.size(),
+                        actualValues.size()
+                );
+            } catch (Throwable t) {
+                errors.add(t);
+            }
+
+            List<String> expectedSorted = new ArrayList<>(expectedValues);
+            List<String> actualSorted = new ArrayList<>(actualValues);
+
+            Collections.sort(expectedSorted);
+            Collections.sort(actualSorted);
+
+            try {
+                Assert.assertEquals("Value mismatch for key: " + key, expectedSorted, actualSorted);
+            } catch (Throwable t) {
+                errors.add(t);
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            StringBuilder sb = new StringBuilder("Assertion Failures:\n");
+
+            for (Throwable t : errors) {
+                sb.append("- ").append(t.getMessage()).append("\n");
+            }
+
+            throw new AssertionError(sb.toString());
+        }
     }
 }

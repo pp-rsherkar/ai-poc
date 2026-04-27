@@ -4,9 +4,14 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
+import org.apache.poi.ss.usermodel.*;
+import utils.FileActions;
 import utils.WaitUtility;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.*;
 
 
@@ -81,6 +86,50 @@ public class TacticSettings {
     private final Locator APP_TREE_VIEW_NODE;
     private final Locator TARGETING_SEGMENT;
     private final Locator TARGETING_PANEL_TEXTAREA;
+    private final Locator TARGETS_LIST;
+    private final Locator ADDED_RULES_FROM_TARGETING_SECTION;
+    private final Locator TARGETING_PANEL_CANCEL_BUTTON;
+    private final Locator ADDED_RULES_OPTIONS_FROM_TARGETING_PANEL;
+    private final Locator NPI_LIST_TAB_FROM_PANEL;
+    private final Locator SELECTED_NPI_LIST;
+    private final Locator NPI_NUMBER_TAB_FROM_PANEL;
+    private final Locator SELECTED_NPI_NUMBER;
+    private final Locator ALL_PROVIDER_TAB;
+    private final Locator PURPLE_LAB_TAB;
+    private final Locator SWOOP_TAB;
+    private final Locator SELECTED_SEGMENT;
+    private final Locator SELECTED_NODES;
+    private final Locator SELECTED_PIXELS;
+    private final Locator SELECTED_SPECIALTIES_TAB;
+    private final Locator COLLAPSED_BUTTON_TARGET_PANEL;
+    private final Locator CONDITIONS_TAB;
+    private final Locator TREATMENTS_TAB;
+    private final Locator SELECTED_CONDITIONS_AND_TREATMENTS;
+    private final Locator SELECTED_IP;
+    private final Locator CONDITION_KEYWORDS_TAB;
+    private final Locator CUSTOM_LISTS_TAB;
+    private final Locator INDIVIDUAL_KEYWORDS_TAB;
+    private final Locator AUDIENCES_TEXTBOX;
+    private final Locator SELECTED_NPI_GROUP_NAME;
+    private final Locator HCP_SPECIALTIES_TAB;
+    private final Locator SELECTED_BESPOKE_SEGMENT;
+    private final Locator OTC_TAB;
+    private final Locator IAS_TAB;
+    private final Locator IAS_TEXTBOX;
+    private final Locator SELECTED_NODES_CHECKBOX;
+    private final Locator INDIVIDUAL_APP_BUNDLES_TAB;
+    private final Locator APP_BUNDLES_LISTS_TAB;
+    private final Locator INDIVIDUAL_DOMAINS_TAB;
+    private final Locator DOMAIN_LISTS_TAB;
+    private final Locator SELECTED_APP_BUNDLES;
+    private final Locator BLOCKED_ITEMS;
+    private final Locator AVOIDANCE_SEGMENT_TAB;
+    private final Locator TARGETING_SEGMENT_TAB;
+    private final Locator SHARED_LISTS_TAB;
+    private final Locator IP_ADDRESS_TAB;
+    private final Locator TIER1_COLLAPSED_BUTTON;
+    private final Locator TIER2_COLLAPSED_BUTTON;
+    private final Locator TREEVIEW_NODE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
     public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
@@ -157,6 +206,50 @@ public class TacticSettings {
         this.APP_TREE_VIEW_NODE = page.locator("//app-treeview//div[contains(@class,'treeviewNode')]");
         this.TARGETING_SEGMENT = page.locator("//div[contains(text(),'Targeting Segments')]");
         this.TARGETING_PANEL_TEXTAREA = page.locator("//div[contains(@class,'editableTextarea')]");
+        this.TARGETS_LIST = page.locator("//div[@class='targets-list']");
+        this.ADDED_RULES_FROM_TARGETING_SECTION = page.locator("//div[contains(@class,'cursor-pointer')]//label[contains(@class,'target-item')]//span[1]");
+        this.TARGETING_PANEL_CANCEL_BUTTON = page.locator("//div[@class='targetingFooterActions']//button[contains(text(),'Cancel')]");
+        this.ADDED_RULES_OPTIONS_FROM_TARGETING_PANEL = page.locator("//div[contains(@class,'npiGroupName')]//span");
+        this.NPI_LIST_TAB_FROM_PANEL = page.locator("//a[contains(text(),'NPI Lists')]");
+        this.SELECTED_NPI_LIST = page.locator("//div[contains(@class,'npiGroupName')]");
+        this.NPI_NUMBER_TAB_FROM_PANEL = page.locator("//a[contains(text(),'NPI Number')]");
+        this.SELECTED_NPI_NUMBER = page.locator("//textarea[@id='targetedItemsTA']");
+        this.ALL_PROVIDER_TAB = page.locator("//span[@class='provider-menu' and contains(text(),'All Providers')]");
+        this.PURPLE_LAB_TAB = page.locator("//span[@class='provider-menu' and contains(text(),'PurpleLab')]");
+        this.SWOOP_TAB = page.locator("//span[@class='provider-menu' and contains(text(),'Swoop')]");
+        this.SELECTED_SEGMENT = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div[contains(@class,'segmentname')]/span");
+        this.SELECTED_NODES = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div/span");
+        this.SELECTED_PIXELS = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div[contains(@class,'nameBody')]");
+        this.SELECTED_SPECIALTIES_TAB = page.locator("//span[contains(text(),'Selected Specialties')]");
+        this.COLLAPSED_BUTTON_TARGET_PANEL = page.locator("//i[contains(@class,'tree-collapsed') and not(@hidden)]");
+        this.TIER1_COLLAPSED_BUTTON = page.locator("//div[contains(@class,'treeview_tier_1')]//i[contains(@class,'tree-collapsed') and not(@hidden)]");
+        this.TIER2_COLLAPSED_BUTTON = page.locator("//div[contains(@class,'treeview_tier_2')]//i[contains(@class,'tree-collapsed') and not(@hidden)]");
+        this.CONDITIONS_TAB = page.locator("//a[contains(text(),'Conditions')]");
+        this.TREATMENTS_TAB = page.locator("//a[contains(text(),'Treatments')]");
+        this.SELECTED_CONDITIONS_AND_TREATMENTS = page.locator("//button[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div/span");
+        this.SELECTED_IP = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div/div");
+        this.CONDITION_KEYWORDS_TAB = page.locator("//a[contains(text(),'Condition Keywords')]");
+        this.CUSTOM_LISTS_TAB = page.locator("//a[contains(text(),'Custom Lists')]");
+        this.INDIVIDUAL_KEYWORDS_TAB = page.locator("//a[contains(text(),'Individual Keywords')]");
+        this.AUDIENCES_TEXTBOX = page.locator("//input[@formcontrolname='audienceName']");
+        this.SELECTED_NPI_GROUP_NAME = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div/div[contains(@class,'npiGroupName')]/span");
+        this.HCP_SPECIALTIES_TAB = page.locator("//a[contains(text(),'HCP Specialties')]");
+        this.SELECTED_BESPOKE_SEGMENT = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div[contains(@class,'segmentname')]");
+        this.OTC_TAB = page.locator("//a[contains(text(),'OTC')]");
+        this.IAS_TAB = page.locator("//button[contains(text(),'IAS')]");
+        this.IAS_TEXTBOX = page.locator("//span[contains(text(),'IAS Quality')]/ancestor::div/following-sibling::div//input[@type='text']");
+        this.SELECTED_NODES_CHECKBOX = page.locator("//div[contains(@class,'treeview_tier')]//sui-checkbox[contains(@class,'checked')]/parent::div/following-sibling::div//span");
+        this.INDIVIDUAL_APP_BUNDLES_TAB = page.locator("//a[contains(text(),'Individual App Bundles')]");
+        this.APP_BUNDLES_LISTS_TAB = page.locator("//a[contains(text(),'App Bundles Lists')]");
+        this.INDIVIDUAL_DOMAINS_TAB = page.locator("//a[contains(text(),'Individual Domains')]");
+        this.DOMAIN_LISTS_TAB = page.locator("//a[contains(text(),'Domain Lists')]");
+        this.SELECTED_APP_BUNDLES = page.locator("//div[contains(@class,'include-selected') or contains(@class,'exclude-selected')]/parent::div/following-sibling::div/span[contains(@class,'list_name')]");
+        this.BLOCKED_ITEMS = page.locator("//div[@id='blockedItemsTA']");
+        this.AVOIDANCE_SEGMENT_TAB = page.locator("//div[contains(text(),'Avoidance Segments')]");
+        this.TARGETING_SEGMENT_TAB = page.locator("//div[contains(text(),'Targeting Segments')]");
+        this.SHARED_LISTS_TAB = page.locator("//a[contains(text(),'Shared Lists')]");
+        this.IP_ADDRESS_TAB = page.locator("//a[contains(text(),'IP Address')]");
+        this.TREEVIEW_NODE = page.locator("//div[@class='treeviewNode']");
     }
 
     public String verifyTacticSettingsText() {
@@ -545,7 +638,7 @@ public class TacticSettings {
                 case "Bespoke":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
-                        String xpath= String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
+                        String xpath = String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
                         isElementVisible(xpath);
                     }
                     break;
@@ -785,5 +878,321 @@ public class TacticSettings {
 
     public void clickNewTactic() {
         NEW_TACTIC.click();
+    }
+
+    public Map<String, List<String>> parseTargetingSection(String fileName) throws IOException {
+        Map<String, List<String>> rulesMap = new LinkedHashMap<>();
+        Path basePath = FileActions.resolvePath(fileName);
+
+        try (FileInputStream fis = new FileInputStream(basePath.toFile());
+             Workbook workbook = WorkbookFactory.create(fis)) {
+
+            Sheet sheet = workbook.getSheet("Tactics");
+            boolean inTargetingSection = false;
+
+            for (Row row : sheet) {
+                Cell firstCell = row.getCell(0);
+                if (firstCell == null) continue;
+
+                String cellValue = firstCell.toString().trim();
+                if (cellValue.equalsIgnoreCase("Targeting")) {
+                    inTargetingSection = true;
+                    continue; // Move to the next row to start collecting data
+                }
+                if (inTargetingSection) {
+                    if (cellValue.equalsIgnoreCase("Creatives") || cellValue.equalsIgnoreCase("Settings")) {
+                        break;
+                    }
+                }
+                if (inTargetingSection) {
+                    Cell optionsCell = row.getCell(1);
+                    if (optionsCell != null && !cellValue.isEmpty() && !cellValue.equalsIgnoreCase("Rule Type")) {
+                        String rawOptions = optionsCell.toString();
+                        List<String> options = Arrays.stream(rawOptions.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+                        rulesMap.put(cellValue, options);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rulesMap;
+    }
+
+    public Map<String, List<String>> fetchTargetingRulesAndOptionsOfEachTacticFromUI() {
+        Map<String, List<String>> uiRulesMap = new LinkedHashMap<>();
+        String rule;
+        waitUtility.waitForLocatorVisible(TARGETS_LIST);
+        for (int i = 0; i < ADDED_RULES_FROM_TARGETING_SECTION.count(); i++) {
+            List<String> options = new ArrayList<>();
+            rule = ADDED_RULES_FROM_TARGETING_SECTION.nth(i).textContent();
+            if(!rule.equalsIgnoreCase("Curated Markets and Deals") && !rule.equalsIgnoreCase("Media Premium Publishers")) {
+                ADDED_RULES_FROM_TARGETING_SECTION.nth(i).click();
+                waitUtility.waitForLocatorVisible(TARGETING_PANEL_CANCEL_BUTTON);
+            }
+            switch (rule) {
+                case "NPI":
+                    NPI_LIST_TAB_FROM_PANEL.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NPI_LIST.count() > 0)
+                        options.addAll(SELECTED_NPI_LIST.allInnerTexts());
+                    NPI_NUMBER_TAB_FROM_PANEL.click();
+                    if (!SELECTED_NPI_NUMBER.allInnerTexts().isEmpty())
+                        options.addAll(SELECTED_NPI_NUMBER.allInnerTexts());
+                    break;
+                case "Behavioral Segment":
+                    ALL_PROVIDER_TAB.click();
+                    waitUtility.waitUntilSpinnerHidden();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_SEGMENT.count() > 0)
+                        options.addAll(SELECTED_SEGMENT.allInnerTexts());
+                    PURPLE_LAB_TAB.click();
+                    waitUtility.waitUntilSpinnerHidden();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_SEGMENT.count() > 0)
+                        options.addAll(SELECTED_SEGMENT.allInnerTexts());
+                    SWOOP_TAB.click();
+                    waitUtility.waitUntilSpinnerHidden();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_SEGMENT.count() > 0)
+                        options.addAll(SELECTED_SEGMENT.allInnerTexts());
+                    break;
+                case "NPI Facility Affiliation":
+                    options.addAll(SELECTED_NODES.allTextContents());
+                    break;
+                case "Retargeting Pixels":
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_PIXELS.count() > 0)
+                        options.addAll(SELECTED_PIXELS.allInnerTexts());
+                    break;
+                case "HCP by Specialty":
+                    SELECTED_SPECIALTIES_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allTextContents());
+                    break;
+                case "Health Populations", "Health Populations+":
+                    CONDITIONS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_CONDITIONS_AND_TREATMENTS.count() > 0)
+                        options.addAll(SELECTED_CONDITIONS_AND_TREATMENTS.allInnerTexts());
+                    TREATMENTS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_CONDITIONS_AND_TREATMENTS.count() > 0)
+                        options.addAll(SELECTED_CONDITIONS_AND_TREATMENTS.allInnerTexts());
+                    break;
+                case "Sensitive Areas":
+                    CONDITIONS_TAB.click();
+                    waitUtility.waitForLocatorVisible(SELECTED_CONDITIONS_AND_TREATMENTS.last());
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_CONDITIONS_AND_TREATMENTS.count() > 0)
+                        options.addAll(SELECTED_CONDITIONS_AND_TREATMENTS.allInnerTexts());
+                    TREATMENTS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_CONDITIONS_AND_TREATMENTS.count() > 0)
+                        options.addAll(SELECTED_CONDITIONS_AND_TREATMENTS.allInnerTexts());
+                    break;
+                case "OTC Populations", "Converters", "Clickers":
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allTextContents());
+                    break;
+                case "Emails":
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_IP.count() > 0)
+                        options.addAll(SELECTED_IP.allInnerTexts());
+                    break;
+                case "IP":
+                    SHARED_LISTS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_IP.count() > 0)
+                        options.addAll(SELECTED_IP.allInnerTexts());
+                    IP_ADDRESS_TAB.click();
+                    String ipCodes = SELECTED_NPI_NUMBER.inputValue().trim();
+                    if (!ipCodes.isEmpty())
+                        options.addAll(ipCodes.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    break;
+                case "Keyword Populations", "Keywords":
+                    CONDITION_KEYWORDS_TAB.click();
+                    SELECTED_ONLY_TAB.first().click();
+                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    CUSTOM_LISTS_TAB.click();
+                    waitUtility.waitForLocatorVisible(TREEVIEW_NODE.first());
+                    SELECTED_ONLY_TAB.last().click();
+                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    INDIVIDUAL_KEYWORDS_TAB.click();
+                    String keywordsTextbox = "";
+                    if(KEYWORDS_TEXTBOX.isVisible())
+                        keywordsTextbox = KEYWORDS_TEXTBOX.inputValue().trim();
+                    if(KEYWORD_POPULATIONS_TEXTBOX.isVisible())
+                        keywordsTextbox = KEYWORD_POPULATIONS_TEXTBOX.inputValue().trim();
+                    if (!keywordsTextbox.isEmpty())
+                        options.addAll(keywordsTextbox.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    break;
+                case "Lookalike Audiences":
+                    options.add(AUDIENCES_TEXTBOX.inputValue().trim());
+                    break;
+                case "Geo Targets", "Inventory Source", "Video Size":
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "Practice Staff":
+                    NPI_LIST_TAB_FROM_PANEL.click();
+                    waitUtility.waitForLocatorVisible(SELECTED_NPI_GROUP_NAME.last());
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NPI_GROUP_NAME.count() > 0)
+                        options.addAll(SELECTED_NPI_GROUP_NAME.allInnerTexts());
+                    NPI_NUMBER_TAB_FROM_PANEL.click();
+                    options.addAll(SELECTED_NPI_NUMBER.allInnerTexts());
+                    HCP_SPECIALTIES_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "Bespoke":
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_BESPOKE_SEGMENT.count() > 0)
+                        options.addAll(SELECTED_BESPOKE_SEGMENT.allTextContents());
+                    break;
+                case "In Condition":
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_CONDITIONS_AND_TREATMENTS.count() > 0)
+                        options.addAll(SELECTED_CONDITIONS_AND_TREATMENTS.allInnerTexts());
+                    break;
+                case "Age", "Ethnicity", "Gender":
+                    Locator locator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div[@class='header']/following-sibling::div//div[@class='field']//input[@checked]/following-sibling::label", rule));
+                    if (locator.count() > 0)
+                        options.addAll(locator.allInnerTexts());
+                    break;
+                case "Health Pages":
+                    CONDITIONS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    TREATMENTS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    OTC_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "IAB Categories":
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "Language", "Weather Signals":
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "Venue Type":
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "Geo Radius", "Invalid Traffic", "Viewability", "Video Placement", "Video Skipping", "Audience Multiplier", "Curated Markets and Deals", "Endemics":
+                    Locator geoLocator = page.locator(String.format("//span[contains(text(),'%s')]/parent::label/following-sibling::div//span[contains(@class,'target-ellipse')]", rule));
+                    if (geoLocator.count() > 0)
+                        options.addAll(geoLocator.allInnerTexts());
+                    break;
+                case "Postal Codes", "Area Codes", "Search Keywords":
+                    String html = RULE_POSTAL_CODES_TEXTBOX.innerHTML();
+                    String postalCodes = html.replaceAll("(?i)<br\\s*/?>", "\n");
+                    options.addAll(Arrays.stream(postalCodes.split("\\R")).map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    break;
+                case "Brand Safety Profile":
+                    if (BRAND_SAFETY_PROFILE_SEGMENT_ID.isVisible() && !BRAND_SAFETY_PROFILE_SEGMENT_ID.inputValue().trim().isEmpty())
+                        options.add(BRAND_SAFETY_PROFILE_SEGMENT_ID.inputValue().trim());
+                    IAS_TAB.click();
+                    if (!IAS_TEXTBOX.inputValue().trim().isEmpty())
+                        options.add(IAS_TEXTBOX.inputValue().trim());
+                    break;
+                case "Brand Suitability":
+                    waitUtility.waitForLocatorVisible(SELECTED_NODES_CHECKBOX.first());
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_NODES_CHECKBOX.count() > 0)
+                        options.addAll(SELECTED_NODES_CHECKBOX.allInnerTexts());
+                    IAS_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER1_COLLAPSED_BUTTON);
+                    if (SELECTED_NODES_CHECKBOX.count() > 0)
+                        options.addAll(SELECTED_NODES_CHECKBOX.allInnerTexts());
+                    break;
+                case "Browser", "Device", "Inventory Type":
+                    Locator browserLocator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div[@class='header']/following-sibling::div//div[contains(@class,'toggle-section')]//input[@checked]/following-sibling::label", rule));
+                    if (browserLocator.count() > 0)
+                        options.addAll(browserLocator.allInnerTexts());
+                    break;
+                case "Domains/Apps":
+                    INDIVIDUAL_APP_BUNDLES_TAB.click();
+                    String targetedBundles = RULE_POSTAL_CODES_TEXTBOX.textContent().trim();
+                    if (!targetedBundles.isEmpty())
+                        options.addAll(targetedBundles.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    String blockedBundles = BLOCKED_ITEMS.textContent().trim();
+                    if (!blockedBundles.isEmpty())
+                        options.addAll(blockedBundles.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    APP_BUNDLES_LISTS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_APP_BUNDLES.count() > 0)
+                        options.addAll(SELECTED_APP_BUNDLES.allInnerTexts());
+                    INDIVIDUAL_DOMAINS_TAB.click();
+                    String targetedDomains = RULE_POSTAL_CODES_TEXTBOX.textContent().trim();
+                    if (!targetedDomains.isEmpty())
+                        options.addAll(targetedDomains.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    String blockedDomains = BLOCKED_ITEMS.textContent().trim();
+                    if (!blockedDomains.isEmpty())
+                        options.addAll(blockedDomains.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    DOMAIN_LISTS_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_APP_BUNDLES.count() > 0)
+                        options.addAll(SELECTED_APP_BUNDLES.allInnerTexts());
+                    break;
+                case "IAS Context Control":
+                    AVOIDANCE_SEGMENT_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    TARGETING_SEGMENT_TAB.click();
+                    SELECTED_ONLY_TAB.click();
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    break;
+                case "Operating System":
+                    Locator osLocator = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::div[@class='header']/following-sibling::div//div[contains(@class,'border')]//input[@checked]/following-sibling::label", rule));
+                    if (osLocator.count() > 0)
+                        options.addAll(osLocator.allInnerTexts());
+                    break;
+                case "Legal Pages", "Legal Populations":
+                    SELECTED_ONLY_TAB.click();
+                    expandAllCollapsedSectionsInTargetingPanel(TIER2_COLLAPSED_BUTTON);
+                    if (SELECTED_CONDITIONS_AND_TREATMENTS.count() > 0)
+                        options.addAll(SELECTED_CONDITIONS_AND_TREATMENTS.allInnerTexts());
+                    break;
+            }
+            page.waitForTimeout(1000);
+            if(TARGETING_PANEL_CANCEL_BUTTON.isVisible())
+                TARGETING_PANEL_CANCEL_BUTTON.click();
+            uiRulesMap.put(rule, options);
+        }
+        return uiRulesMap;
+    }
+
+    private void expandAllCollapsedSectionsInTargetingPanel(Locator locator) {
+        while (locator.count() > 0) {
+            locator.first().click();
+            waitUtility.waitForLocatorVisible(page.locator("//i[contains(@class,'tree-expanded') and not(@hidden)]").last());
+        }
     }
 }

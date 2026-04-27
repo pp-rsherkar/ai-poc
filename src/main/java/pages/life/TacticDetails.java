@@ -66,6 +66,7 @@ public class TacticDetails {
     private final Locator COMMENT_SUCCESS_ALERT;
     private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
     private final Locator CONTINUE_BUTTON;
+    private final Locator SELECT_AD_GROUP_DROPDOWN;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -131,6 +132,7 @@ public class TacticDetails {
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.SELECT_AD_GROUP_DROPDOWN = page.locator("//sui-select/div[text()='Select Ad Group...']/following-sibling::i");
     }
 
     public void clickNewTactic() {
@@ -220,7 +222,16 @@ public class TacticDetails {
     }
 
     public void clickTactic(String tacticName) {
-        TACTIC_TAB.locator("text=" + tacticName).click();
+        Locator adGroupName = page.locator(String.format("//sui-select//sui-select-option//span[text()='%s']", tacticName));
+        Locator tacticTitle = page.locator(String.format("//div[@id='tacticName']//span[contains(text(),'%s')]", tacticName));
+        if (adGroupName.isVisible()) {
+            adGroupName.click();
+            tacticTitle = page.locator(String.format("//div[@id='tacticName' and contains(text(),'%s')]", tacticName));
+        } else
+            TACTIC_TAB.getByText(tacticName, new Locator.GetByTextOptions().setExact(true)).click();
+        waitUtility.waitUntilSpinnerHidden();
+        page.waitForTimeout(2000);
+        waitUtility.waitForLocatorVisible(tacticTitle);
     }
 
     public void clickLastTactic() {
@@ -362,7 +373,7 @@ public class TacticDetails {
         waitUtility.waitUntilSpinnerHidden();
         tacticSettings.verifyTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
-        if(TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
+        if (TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
             CONTINUE_BUTTON.click();
         waitUtility.waitForLocatorVisible(SAVE_TEMPLATE_DIALOG);
         TEMPLATE_NAME_TEXT.fill(templateName);
@@ -454,6 +465,16 @@ public class TacticDetails {
     public void clickNewTacticForLineItem(String name) {
         String xpath = String.format("//div[text()='%s']/ancestor::div[contains(@class,'lineitem-list-wrapper')]//app-icon-lable-link[@class='tactic-new-button']//div", name);
         page.locator(xpath).click();
+    }
+
+    public List<String> fetchAllTacticsForLineItemFromUI(String lineItem) {
+        Locator tacticsUnderLineItem = page.locator(String.format("//div[@class='main-details' and text()='%s']/ancestor::div[@class='listitembox']/following-sibling::div//div[@class='tactic-main-details']", lineItem));
+        if(SELECT_AD_GROUP_DROPDOWN.isVisible()){
+            SELECT_AD_GROUP_DROPDOWN.click();
+            tacticsUnderLineItem = page.locator(String.format("//div[@class='main-details' and text()='%s']/ancestor::div[@class='listitembox']/following-sibling::div//sui-select[@placeholder='Select Ad Group...']//sui-select-option/span[2]", lineItem));
+        }
+        waitUtility.waitForLocatorVisible(tacticsUnderLineItem.last());
+        return tacticsUnderLineItem.allTextContents();
     }
 }
 

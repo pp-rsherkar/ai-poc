@@ -70,6 +70,8 @@ public class LineItemDetails {
     private final Locator FLAT_CPM;
     private final Locator PACING_MODE_INPUT;
     private final Locator PLACEMENT_ID;
+    private final Locator LINE_ITEM_EXPAND_BUTTON;
+    private final Locator LINE_ITEM_DETAILS;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -146,6 +148,8 @@ public class LineItemDetails {
         this.FLAT_CPM = page.locator("//input[@formcontrolname='flatCPM']");
         this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
         this.PLACEMENT_ID = page.locator("//label[contains(text(),'PlacementId')]/following-sibling::input");
+        this.LINE_ITEM_EXPAND_BUTTON = page.locator("//div[@class='listitembox']//div[@class='exp-col']//i[contains(@class,'fa-angle-right')]");
+        this.LINE_ITEM_DETAILS = page.locator("//div[@class='listitembox']//div[@class='main-details']");
     }
 
     public String verifyLineItemText() {
@@ -508,5 +512,23 @@ public class LineItemDetails {
         String xpath = String.format("//div[text()='%s']", name);
         page.locator(xpath).click();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public List<String> fetchAllLineItemsFromUI() {
+        return LINE_ITEM_DETAILS.allTextContents();
+    }
+
+    public void expandLineItem(String lineItem) {
+        Locator expandButton = page.locator(String.format("//div[@class='main-details' and text()='%s']/ancestor::div[contains(@class,'item-list-tile')]/preceding-sibling::div[@class='exp-col']//i[contains(@class,'fa-angle-right')]", lineItem));
+        expandButton.scrollIntoViewIfNeeded();
+        expandButton.click();
+        page.waitForTimeout(2000);
+    }
+
+    public void contractLineItem(String lineItem) {
+        Locator expandButton = page.locator(String.format("//div[@class='main-details' and text()='%s']/ancestor::div[contains(@class,'item-list-tile')]/preceding-sibling::div[@class='exp-col']//i[contains(@class,'fa-angle-down')]", lineItem));
+        expandButton.scrollIntoViewIfNeeded();
+        expandButton.click();
+        page.waitForTimeout(3000);
     }
 }

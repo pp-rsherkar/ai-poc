@@ -78,7 +78,7 @@ public class FileActions {
         }
     }
 
-    private static Path resolvePath(String fileName) throws IOException {
+    public static Path resolvePath(String fileName) throws IOException {
         Path[] paths = {
                 Paths.get("src/main/resources", fileName),
                 Paths.get("src/main/resources/uploadfiles", fileName),

@@ -5,13 +5,11 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
   4. IP Address List
   5. Static NPI List
 
-  Background:
+  @regression
+  Scenario Outline: Verify user is able to export Keyword list created by uploading a file
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
-
-  @regression
-  Scenario Outline: Verify user is able to export Keyword list created by uploading a file
     Given User navigates to the "Keyword Lists" page
     And Verify that the search option is present on the "Keyword Lists" tab
     When User clicks on Create New List
@@ -28,6 +26,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export Domain list created by uploading a file
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     Given User navigates to the "Domain & App Lists" page
     When User clicks on Create New List
     And User selects the "Domains" radio button from create new list page
@@ -44,6 +45,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export App Bundle list created by uploading a file
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     Given User navigates to the "Domain & App Lists" page
     When User clicks on Create New List
     And User selects the "App Bundles" radio button from create new list page
@@ -61,6 +65,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export IP list created by uploading a file
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to the "IP Address Lists" page
     When User clicks on Create New List
     Then Verify that the Create New List screen is displayed
@@ -76,6 +83,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export the Regular NPI list created by uploading a file
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -92,6 +102,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export Smart NPI list
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -111,6 +124,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export PulsePoint Provided NPI list
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to NPI Lists page
     And User searches and selects the NPI List "<LIST_NAME>"
     And Verify that user is able to download the "NPI" list
@@ -121,6 +137,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify export option is not available for Email list created by uploading a file
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to the "Email Lists" page
     When User clicks on Create New List
     Then Verify that the Create New List screen is displayed
@@ -134,6 +153,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export the audit log of a campaign, line item and tactic
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -157,6 +179,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export settings of the campaign having "Single" line items
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -172,6 +197,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export settings of the campaign having "Multiple" line items
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -188,6 +216,9 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
 
   @regression
   Scenario Outline: Verify user is able to export settings of the campaign having "Different" line items
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -202,3 +233,19 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     Examples:
       | CAMPAIGN_NAME         | RULE_TYPE          | CREATIVE           |
       | Different_LI_Campaign | Behavioral Segment | Please_Dont_Delete |
+
+  @regression @e2e
+  Scenario Outline: Verify Targeting Rules and its options from the test-data file and match it with UI
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    When User enters "<CAMPAIGN_NAME>" and click Search button
+    Then Verify Campaigns, line items, tactics names matching the "<CAMPAIGN_NAME>" should display on Dashboard table
+    And User navigates to campaign - "<CAMPAIGN_NAME>"
+    And Read the test-data file "<TEST_DATA_FILE>" for the campaign and retrieve the targeting rules and its options configured
+    And User expands each line item added to the campaign from UI and switches to each tactic added to it and retrieves the targeting rules and its options configured for each tactic
+    And User verifies the targeting rules and its options retrieved from the test-data file with the targeting rules and its options retrieved from UI for each line item and tactic of the campaign
+    Examples:
+      | CAMPAIGN_NAME                  | TEST_DATA_FILE                 |
+      | Automation_Export_DO_NOT_TOUCH | Demo_Export_April_20260414.xls |
