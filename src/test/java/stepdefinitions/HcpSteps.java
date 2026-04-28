@@ -32,9 +32,8 @@ public class HcpSteps {
 
     @Then("Verify smart action creation page is displayed")
     public void verify_smart_action_creation_page_is_displayed() {
-        logger.info("Verifying smart action creation page is displayed");
         String pageHeader = smartActions.getSmartAction();
-        logger.info("Smart action page header: {}", pageHeader);
+        logger.info("Page header: {}", pageHeader);
         Assert.assertEquals("New Smart Action", pageHeader);
     }
 
@@ -54,14 +53,12 @@ public class HcpSteps {
 
     @Then("Verify smart action is saved successfully and navigates to Audience tab")
     public void verify_smart_action_is_saved_successfully_and_navigates_to_audience_tab() {
-        logger.info("Verifying smart action save success and navigation to Audience tab");
         String successMessage = smartActions.getSmartActionSuccessMessage().trim();
         logger.info("Save Message: {}", successMessage);
         Assert.assertEquals("New Smart Action created successfully.", successMessage);
         String audienceTab = smartActions.getAudienceTab();
-        logger.info("Navigated tab: {}", audienceTab);
+        logger.info("Navigated to tab: {}", audienceTab);
         Assert.assertEquals("Audience", audienceTab);
-        logger.info("Smart action saved and navigated to Audience tab successfully");
     }
 
     @When("User clicks on NPI Lists")
@@ -72,9 +69,8 @@ public class HcpSteps {
 
     @Then("Verify NPI list created is present")
     public void verify_npi_list_created_in_life_is_present() {
-        logger.info("Verifying NPI list '{}' is present", LifeSteps.npiName);
         String actualNpiList = smartActions.searchNPIList(LifeSteps.npiName);
-        logger.info("Found NPI list: {}", actualNpiList);
+        logger.info("NPI list: {}", actualNpiList);
         Assert.assertEquals(LifeSteps.npiName, actualNpiList);
     }
 
@@ -92,11 +88,9 @@ public class HcpSteps {
 
     @Then("Verify data is saved successfully")
     public void verify_data_is_saved_successfully() {
-        logger.info("Verifying data save success");
         String savedMessage = smartActions.getSavedMessage().trim();
         logger.info("Save Message: {}", savedMessage);
         Assert.assertEquals("Data saved successfully", savedMessage);
-        logger.info("Data saved successfully verified");
     }
 
     @When("User clicks on Action and enters the details and saves")
@@ -107,11 +101,9 @@ public class HcpSteps {
 
     @Then("Verify Action data is saved successfully")
     public void verify_action_data_is_saved_successfully() {
-        logger.info("Verifying Action data save success");
         String savedMessage = smartActions.getSavedMessage().trim();
         logger.info("Action Save Message: {}", savedMessage);
         Assert.assertEquals("Data saved successfully", savedMessage);
-        logger.info("Action data saved successfully verified");
     }
 
     @When("User clicks on Response and enter the details and creates smart list {string} {string} and saves")
@@ -123,10 +115,8 @@ public class HcpSteps {
 
     @Then("Verify Response data is saved successfully")
     public void verify_response_data_is_saved_successfully() {
-        logger.info("Verifying Response data save success");
         String savedMessage = smartActions.getSavedMessage().trim();
         logger.info("Response Save Message: {}", savedMessage);
         Assert.assertEquals("Data saved successfully", savedMessage);
-        logger.info("Response data saved successfully verified");
     }
 }

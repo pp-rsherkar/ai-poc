@@ -153,8 +153,7 @@ public class NPIStaticList {
             for (int i = 0; i < FETCH_SELECTED_ADVERTISER.count(); i++) {
                 enteredData.add(FETCH_SELECTED_ADVERTISER.nth(i).textContent());
             }
-        }
-        else if (ADVERTISER_NAME_FROM_HEADER.first().isVisible()) {
+        } else if (ADVERTISER_NAME_FROM_HEADER.first().isVisible()) {
             String text = ADVERTISER_NAME_FROM_HEADER.first().textContent().replace("Advertiser: ", "").trim();
             if (text.contains(",")) {
                 String[] parts = text.split(",");
@@ -165,7 +164,7 @@ public class NPIStaticList {
                 enteredData.add(text);
             }
         }
-        if(NPI_NUMBER.isVisible())
+        if (NPI_NUMBER.isVisible())
             enteredData.add(NPI_NUMBER.inputValue().trim());
         npiSmartList.getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
         return enteredData;
@@ -175,12 +174,12 @@ public class NPIStaticList {
         return Integer.parseInt(TOTAL_NPI.textContent().trim());
     }
 
-    public int getNPICountFromListItems(String listName){
-        Locator npiCount = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div[contains(@class,'list-item-counter')]",listName));
+    public int getNPICountFromListItems(String listName) {
+        Locator npiCount = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div[contains(@class,'list-item-counter')]", listName));
         return Integer.parseInt(npiCount.textContent().trim());
     }
 
-    public int getNPICountFromListInfo(){
+    public int getNPICountFromListInfo() {
         return Integer.parseInt(NPI_COUNT_FROM_LIST_INFO.textContent().trim());
     }
 

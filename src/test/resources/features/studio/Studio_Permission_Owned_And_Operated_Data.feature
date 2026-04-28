@@ -7,7 +7,8 @@ Feature: Verify visibility of Owned and Operated Data based on Admin Permission 
   Scenario Outline: Verify that the visibility of Owned and Operated Data in the Cross-Filter section of the Workspace is based on the Admin Permission - "<PERMISSION_FLAG>"
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
-    When User navigates to Administrative section and go to Accounts Tab
+    When User navigates to Administrative section
+    And User navigates to Accounts Tab
     And User searches the account "PP engineering test" and checks Studio permissions
     And User navigates to Advertisers tab
     And User clicks on "HCP365" tab present under Advertisers tab

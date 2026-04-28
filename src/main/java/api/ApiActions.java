@@ -13,10 +13,10 @@ import java.util.Map;
 
 public class ApiActions {
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiActions.class);
     private final Playwright playwright = DriverFactory.createPlaywright();
     APIResponse response;
     private APIRequestContext request;
-    private static final Logger logger = LoggerFactory.getLogger(ApiActions.class);
 
     public APIResponse getRequestWithoutBody(String baseURL, String endpointPath, HashMap<String, String> headers) {
         request = playwright.request().newContext(new APIRequest.NewContextOptions().setBaseURL(baseURL).setExtraHTTPHeaders(headers));

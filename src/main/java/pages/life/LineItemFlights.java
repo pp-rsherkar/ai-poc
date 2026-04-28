@@ -5,6 +5,7 @@ import com.microsoft.playwright.Page;
 import factory.DriverFactory;
 import utils.WaitUtility;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LineItemFlights {
@@ -34,7 +35,12 @@ public class LineItemFlights {
     }
 
     public List<String> fetchFlightDates() {
-        return FLIGHTS_DATES.allInnerTexts();
+        List<String> flightDates = new ArrayList<>();
+        waitUtility.waitForLocatorVisible(FLIGHTS_DATES.first());
+        for (int i = 0; i < FLIGHTS_DATES.count(); i++) {
+            flightDates.add(FLIGHTS_DATES.nth(i).textContent());
+        }
+        return flightDates;
     }
 
     public List<String> fetchFlightDetailsFromFlightTab() {

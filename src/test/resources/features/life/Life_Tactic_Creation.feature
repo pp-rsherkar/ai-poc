@@ -233,7 +233,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |

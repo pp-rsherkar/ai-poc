@@ -2,7 +2,6 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.CommonUtils;
@@ -426,7 +425,7 @@ public class NPISmartList {
                 break;
             case "Diagnosis Code":
                 ADD_DIAGNOSIS_BUTTON.scrollIntoViewIfNeeded();
-                ADD_DIAGNOSIS_BUTTON.click();
+                ADD_DIAGNOSIS_BUTTON.click(new Locator.ClickOptions().setForce(true));
                 break;
             case "Medical Procedure Code":
                 ADD_MEDICAL_PROCEDURE_BUTTON.scrollIntoViewIfNeeded();
@@ -676,7 +675,7 @@ public class NPISmartList {
     }
 
     public void selectDecile(String sliderValue, String listOption) {
-        switch (listOption){
+        switch (listOption) {
             case "Prescribed Drug":
                 PRESCRIBED_DRUG_DECILE.first().click();
                 break;
