@@ -87,7 +87,7 @@ Feature: LIFE Regression - Targetings
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Auto_Creative |
 
   @regression
-  Scenario Outline: Verify list of Targeting Rules available under Video Targeting Category and create a campaign by adding all of them
+  Scenario Outline: Verify list of Targeting Rules available under Video Targeting Category and create a campaign by adding selected Targeting Rules
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -134,7 +134,7 @@ Feature: LIFE Regression - Targetings
       | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Video      | Tactic      | Video Advanced | Auto_Creative |
 
   @regression
-  Scenario Outline: Verify list of Targeting Rules available under Native Video Targeting Category and create a campaign by adding all of them
+  Scenario Outline: Verify list of Targeting Rules available under Native Video Targeting Category and create a campaign by adding selected Targeting Rules
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -180,7 +180,7 @@ Feature: LIFE Regression - Targetings
       | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Native Video | Tactic      | Auto_Creative |
 
   @regression
-  Scenario Outline: Verify list of Targeting Rules available under Search Extension Targeting Category and create a campaign by adding all of them
+  Scenario Outline: Verify list of Targeting Rules available under Search Extension Targeting Category and create a campaign by adding selected Targeting Rules
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
