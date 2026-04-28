@@ -1015,27 +1015,27 @@ public class TacticSettings {
                     if (!ipCodes.isEmpty())
                         options.addAll(ipCodes.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
                     break;
-//                case "Keyword Populations", "Keywords":
-//                    CONDITION_KEYWORDS_TAB.click();
-//                    SELECTED_ONLY_TAB.first().click();
-//                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
-//                    if (SELECTED_NODES.count() > 0)
-//                        options.addAll(SELECTED_NODES.allInnerTexts());
-//                    CUSTOM_LISTS_TAB.click();
-//                    waitUtility.waitForLocatorVisible(TREEVIEW_NODE.first());
-//                    SELECTED_ONLY_TAB.last().click();
-//                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
-//                    if (SELECTED_NODES.count() > 0)
-//                        options.addAll(SELECTED_NODES.allInnerTexts());
-//                    INDIVIDUAL_KEYWORDS_TAB.click();
-//                    String keywordsTextbox = "";
-//                    if(KEYWORDS_TEXTBOX.isVisible())
-//                        keywordsTextbox = KEYWORDS_TEXTBOX.inputValue().trim();
-//                    if(KEYWORD_POPULATIONS_TEXTBOX.isVisible())
-//                        keywordsTextbox = KEYWORD_POPULATIONS_TEXTBOX.inputValue().trim();
-//                    if (!keywordsTextbox.isEmpty())
-//                        options.addAll(keywordsTextbox.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
-//                    break;
+                case "Keyword Populations", "Keywords":
+                    CONDITION_KEYWORDS_TAB.click();
+                    SELECTED_ONLY_TAB.first().click();
+                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    CUSTOM_LISTS_TAB.click();
+                    waitUtility.waitForLocatorVisible(TREEVIEW_NODE.first());
+                    SELECTED_ONLY_TAB.last().click();
+                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+                    if (SELECTED_NODES.count() > 0)
+                        options.addAll(SELECTED_NODES.allInnerTexts());
+                    INDIVIDUAL_KEYWORDS_TAB.click();
+                    String keywordsTextbox = "";
+                    if(KEYWORDS_TEXTBOX.isVisible())
+                        keywordsTextbox = KEYWORDS_TEXTBOX.inputValue().trim();
+                    if(KEYWORD_POPULATIONS_TEXTBOX.isVisible())
+                        keywordsTextbox = KEYWORD_POPULATIONS_TEXTBOX.inputValue().trim();
+                    if (!keywordsTextbox.isEmpty())
+                        options.addAll(keywordsTextbox.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+                    break;
                 case "Lookalike Audiences":
                     options.add(AUDIENCES_TEXTBOX.inputValue().trim());
                     break;
