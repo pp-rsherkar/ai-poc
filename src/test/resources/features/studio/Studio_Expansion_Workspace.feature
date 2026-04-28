@@ -35,6 +35,7 @@ Feature: HCP Audience Workspace in Studio Application
       | Abbvie     | HCP_Expansion  | NPI List         | PB_Test_List | Expand with Care Team         |
       | Abbvie     | HCP_Expansion  | NPI List         | PB_Test_List | Expand with Affiliation Graph |
 
+    @todo
   Scenario Outline: Create and save an HCP Audience Expansion workspace and publish the workspace
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
@@ -86,7 +87,6 @@ Feature: HCP Audience Workspace in Studio Application
 
   @todo
   Scenario Outline: Create and save Private/Public HCP Audience Expansion workspace and check workspace is visible in respective user accordingly
-    #get it from HCP explorer feature file
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
@@ -161,7 +161,7 @@ Feature: HCP Audience Workspace in Studio Application
       | Abbvie     | Studio Workspace | PB_Test | Expand with Care Team         | CSV    | HCP_Expansion  |
       | Abbvie     | Studio Workspace | PB_Test | Expand with Affiliation Graph | EXCEL  | HCP_Expansion  |
 
-  #check with roshani for scehdule npi button
+
   @todo
   Scenario Outline: Create and save an HCP Audience Expansion workspace and Schedule NPI's
     Given This scenario will be executed in the "Pre-release" environment as a "User"
@@ -205,6 +205,7 @@ Feature: HCP Audience Workspace in Studio Application
       | Abbvie     | Studio Workspace | PB_Test | Expand with Care Team         | CSV    | HCP_Expansion  |
       | Abbvie     | Studio Workspace | PB_Test | Expand with Affiliation Graph | EXCEL  | HCP_Expansion  |
 
+    @todo
   Scenario Outline: Create and save an HCP Audience Expansion workspace and Schedule Report
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
