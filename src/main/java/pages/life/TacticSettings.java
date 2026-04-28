@@ -549,6 +549,13 @@ public class TacticSettings {
                         isElementVisible(xpath);
                     }
                     break;
+                case "Venue Type":
+                    for (String val : ruleValues) {
+                        SEARCH_RULE_OPTION.fill(val);
+                        String xpath = String.format("(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target'])[1]", val);
+                        isElementVisible(xpath);
+                    }
+                    break;
             }
             clickRuleTypeOkButton();
         }
