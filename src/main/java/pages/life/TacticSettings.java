@@ -886,35 +886,36 @@ public class TacticSettings {
 
         try (FileInputStream fis = new FileInputStream(basePath.toFile());
              Workbook workbook = WorkbookFactory.create(fis)) {
-
             Sheet sheet = workbook.getSheet("Tactics");
             boolean inTargetingSection = false;
-
             for (Row row : sheet) {
                 Cell firstCell = row.getCell(0);
                 if (firstCell == null) continue;
-
-                String cellValue = firstCell.toString().trim();
-                if (cellValue.equalsIgnoreCase("Targeting")) {
+                String key = firstCell.toString().trim();
+                if (key.equalsIgnoreCase("Targeting")) {
                     inTargetingSection = true;
-                    continue; // Move to the next row to start collecting data
+                    continue;
                 }
                 if (inTargetingSection) {
-                    if (cellValue.equalsIgnoreCase("Creatives") || cellValue.equalsIgnoreCase("Settings")) {
+                    if (key.equalsIgnoreCase("Creatives") || key.equalsIgnoreCase("Settings")) {
                         break;
                     }
-                }
-                if (inTargetingSection) {
-                    Cell optionsCell = row.getCell(1);
-                    if (optionsCell != null && !cellValue.isEmpty() && !cellValue.equalsIgnoreCase("Rule Type")) {
-                        String rawOptions = optionsCell.toString();
-                        List<String> options = Arrays.stream(rawOptions.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
-                        rulesMap.put(cellValue, options);
+                    if (!key.isEmpty() && !key.equalsIgnoreCase("Rule Type")) {
+                        Set<String> allOptions = new LinkedHashSet<>();
+                        //LOOP THROUGH ALL COLUMNS (starting from column 1)
+                        for (int i = 1; i < row.getLastCellNum(); i++) {
+                            Cell cell = row.getCell(i);
+                            if (cell == null) continue;
+                            String raw = cell.toString().trim();
+                            if (!raw.isEmpty() && !raw.equals("—")) {
+                                List<String> values = Arrays.stream(raw.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+                                allOptions.addAll(values);
+                            }
+                        }
+                        rulesMap.put(key, new ArrayList<>(allOptions));
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return rulesMap;
     }
@@ -926,7 +927,7 @@ public class TacticSettings {
         for (int i = 0; i < ADDED_RULES_FROM_TARGETING_SECTION.count(); i++) {
             List<String> options = new ArrayList<>();
             rule = ADDED_RULES_FROM_TARGETING_SECTION.nth(i).textContent();
-            if(!rule.equalsIgnoreCase("Curated Markets and Deals") && !rule.equalsIgnoreCase("Media Premium Publishers")) {
+            if (!rule.equalsIgnoreCase("Curated Markets and Deals") && !rule.equalsIgnoreCase("Media Premium Publishers")) {
                 ADDED_RULES_FROM_TARGETING_SECTION.nth(i).click();
                 waitUtility.waitForLocatorVisible(TARGETING_PANEL_CANCEL_BUTTON);
             }
@@ -1014,27 +1015,27 @@ public class TacticSettings {
                     if (!ipCodes.isEmpty())
                         options.addAll(ipCodes.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
                     break;
-                case "Keyword Populations", "Keywords":
-                    CONDITION_KEYWORDS_TAB.click();
-                    SELECTED_ONLY_TAB.first().click();
-                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
-                    if (SELECTED_NODES.count() > 0)
-                        options.addAll(SELECTED_NODES.allInnerTexts());
-                    CUSTOM_LISTS_TAB.click();
-                    waitUtility.waitForLocatorVisible(TREEVIEW_NODE.first());
-                    SELECTED_ONLY_TAB.last().click();
-                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
-                    if (SELECTED_NODES.count() > 0)
-                        options.addAll(SELECTED_NODES.allInnerTexts());
-                    INDIVIDUAL_KEYWORDS_TAB.click();
-                    String keywordsTextbox = "";
-                    if(KEYWORDS_TEXTBOX.isVisible())
-                        keywordsTextbox = KEYWORDS_TEXTBOX.inputValue().trim();
-                    if(KEYWORD_POPULATIONS_TEXTBOX.isVisible())
-                        keywordsTextbox = KEYWORD_POPULATIONS_TEXTBOX.inputValue().trim();
-                    if (!keywordsTextbox.isEmpty())
-                        options.addAll(keywordsTextbox.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
-                    break;
+//                case "Keyword Populations", "Keywords":
+//                    CONDITION_KEYWORDS_TAB.click();
+//                    SELECTED_ONLY_TAB.first().click();
+//                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+//                    if (SELECTED_NODES.count() > 0)
+//                        options.addAll(SELECTED_NODES.allInnerTexts());
+//                    CUSTOM_LISTS_TAB.click();
+//                    waitUtility.waitForLocatorVisible(TREEVIEW_NODE.first());
+//                    SELECTED_ONLY_TAB.last().click();
+//                    expandAllCollapsedSectionsInTargetingPanel(COLLAPSED_BUTTON_TARGET_PANEL);
+//                    if (SELECTED_NODES.count() > 0)
+//                        options.addAll(SELECTED_NODES.allInnerTexts());
+//                    INDIVIDUAL_KEYWORDS_TAB.click();
+//                    String keywordsTextbox = "";
+//                    if(KEYWORDS_TEXTBOX.isVisible())
+//                        keywordsTextbox = KEYWORDS_TEXTBOX.inputValue().trim();
+//                    if(KEYWORD_POPULATIONS_TEXTBOX.isVisible())
+//                        keywordsTextbox = KEYWORD_POPULATIONS_TEXTBOX.inputValue().trim();
+//                    if (!keywordsTextbox.isEmpty())
+//                        options.addAll(keywordsTextbox.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
+//                    break;
                 case "Lookalike Audiences":
                     options.add(AUDIENCES_TEXTBOX.inputValue().trim());
                     break;
@@ -1102,7 +1103,8 @@ public class TacticSettings {
                     if (SELECTED_NODES.count() > 0)
                         options.addAll(SELECTED_NODES.allInnerTexts());
                     break;
-                case "Geo Radius", "Invalid Traffic", "Viewability", "Video Placement", "Video Skipping", "Audience Multiplier", "Curated Markets and Deals", "Endemics":
+                case "Geo Radius", "Invalid Traffic", "Viewability", "Video Placement", "Video Skipping",
+                     "Audience Multiplier", "Curated Markets and Deals", "Endemics":
                     Locator geoLocator = page.locator(String.format("//span[contains(text(),'%s')]/parent::label/following-sibling::div//span[contains(@class,'target-ellipse')]", rule));
                     if (geoLocator.count() > 0)
                         options.addAll(geoLocator.allInnerTexts());
@@ -1182,7 +1184,7 @@ public class TacticSettings {
                     break;
             }
             page.waitForTimeout(1000);
-            if(TARGETING_PANEL_CANCEL_BUTTON.isVisible())
+            if (TARGETING_PANEL_CANCEL_BUTTON.isVisible())
                 TARGETING_PANEL_CANCEL_BUTTON.click();
             uiRulesMap.put(rule, options);
         }
