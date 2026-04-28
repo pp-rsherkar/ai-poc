@@ -41,7 +41,7 @@ public class Hooks {
         }
     }
 
-    //After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST. So we are quitting browser in order = 0 and then handling video in order = -1 to ensure video is handled before browser is closed.
+    //After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST.
     @After(value = "@e2e or @regression", order = -1)
     public void renameAndAttachVideo(Scenario scenario) {
         if (page.video() == null) {
