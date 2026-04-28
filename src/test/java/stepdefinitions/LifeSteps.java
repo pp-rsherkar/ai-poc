@@ -56,6 +56,8 @@ public class LifeSteps {
     static String userType;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
+    List<Object> keyBidType = new ArrayList<>();
+    List<Object> keyBidValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
     Map<String, List<String>> rulesMap = new LinkedHashMap<>();
     List<String> nameList = new ArrayList<>();
@@ -6049,4 +6051,108 @@ public class LifeSteps {
         logger.info("User searches and verifies the created targeting template is available on Targeting Templates page");
         Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
     }
+
+    @Then("Verify Bid multiplier panel with all options under below categories")
+    public void verifyTargetingPanelWithAllBidmultiplierUnderBelowCategories(DataTable bidCategory) {
+        tacticSettings.clickBidMultipliers();
+        List<String> bidCategoryList = bidCategory.asList(String.class);
+        logger.info("Verifying Bid multiplier panel contains the following categories: {}", bidCategoryList);
+        boolean isMatched = tacticSettings.fetchAndVerifyBidCategoryName(bidCategoryList);
+        logger.info("Bid category match result: {}", isMatched);
+        Assert.assertTrue("Bid multiplier Category names are not matched", isMatched);
+        logger.info("Bid multiplier categories verified successfully");
+    }
+
+    @And("Verify Bid type with respect to category")
+    public void verifyBidTypeWithRespectToCategory(DataTable bidCategoryNameAndType) {
+        logger.info("Verifying Bid types with respect to their categories");
+        Map<String, String> rawMap = bidCategoryNameAndType.asMap(String.class, String.class);
+        Map<String, List<String>> bidCategoryNameAndTypeMap = CommonUtils.processDataTable(rawMap);
+
+        for (Map.Entry<String, List<String>> entry : bidCategoryNameAndTypeMap.entrySet()) {
+            String key = entry.getKey();
+            List<String> bidexpectedValues = entry.getValue();
+            logger.info("Checking category '{}' for expected bid types: {}", key, bidexpectedValues);
+            List<String> actualValues = tacticSettings.getBidTypesForCategory(key);
+            logger.info("Actual Bid types found for '{}': {}", key, actualValues);
+
+            for (String bidexpected : bidexpectedValues) {
+                logger.info("Verifying bid expected value '{}' is present in actual values", bidexpected);
+                Assert.assertTrue("Expected value '" + bidexpected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(bidexpected));
+            }
+        }
+
+        logger.info("All Bid types matched their respective categories successfully");
+    }
+
+    @Given("User configures Bid multiplier rules as below")
+    public void user_selects_the_Bid_multiplier_rules(DataTable bidRuleTypeAndOptions) {
+        logger.info("Configuring Bid multiplier rules from DataTable");
+        Map<String, String> rawMap = bidRuleTypeAndOptions.asMap(String.class, String.class);
+        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
+
+        for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
+            logger.info("Adding Bid Rule Type: {} with Options: {}", entry.getKey(), entry.getValue());
+            keyBidType.add(entry.getKey());
+            keyBidValues.addAll(entry.getValue());
+            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue());
+        }
+
+        logger.info("Closing Bid Rule Type panel");
+        tacticSettings.closeRuleTypePanel();
+    }
+
+    @Then("Verify the configured Bid multiplier rules")
+    public void verify_the_configured_bid_multiplier_rules() {
+        logger.info("Starting verification of configured bid multiplier rules");
+        List<String> expectedNormalizedBidRuleTypes = normalizeObjectList(keyBidType);
+        int expectedBidCount = expectedNormalizedBidRuleTypes.size();
+        logger.info("Fetching actual Bid rule types (Expected Count: {})", expectedBidCount);
+        tacticSettings.fetchBidRulesTypesCount(expectedBidCount);
+        List<String> actualNormalizedBidRuleTypes = normalizeObjectList(tacticSettings.fetchBidRulesTypes());
+
+        Set<String> expectedBidSet = new LinkedHashSet<>(expectedNormalizedBidRuleTypes);
+        Set<String> actualBidSet = new LinkedHashSet<>(actualNormalizedBidRuleTypes);
+
+        List<String> expectedUniqueAndSortedBid = new ArrayList<>(expectedBidSet);
+        List<String> actualUniqueAndSortedBid = new ArrayList<>(actualBidSet);
+
+        Collections.sort(expectedUniqueAndSortedBid);
+        Collections.sort(actualUniqueAndSortedBid);
+        logger.info("Comparing Bid Rule Types. Expected: {}, Actual: {}", expectedUniqueAndSortedBid, actualUniqueAndSortedBid);
+
+        List<String> expectedNormalizedBidRuleOptions = normalizeObjectList(keyBidValues);
+        List<String> actualNormalizedBidRuleOptions = normalizeObjectList(tacticSettings.fetchBidRuleOptions());
+        logger.info("Comparing BidRule Options. Expected: {}, Actual: {}", expectedNormalizedBidRuleOptions, actualNormalizedBidRuleOptions);
+        Assert.assertEquals("Rule types mismatch", expectedUniqueAndSortedBid, actualUniqueAndSortedBid);
+
+        for (String expectedOption : expectedNormalizedBidRuleOptions) {
+            boolean matchFound = actualNormalizedBidRuleOptions.stream().anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
+            Assert.assertTrue("Expected rule option not found: " + expectedOption, matchFound);
+        }
+
+        logger.info("All Bid rules verified successfully");
+    }
+
+    @When("User saves the Bid multiplier settings")
+    public void user_saves_the_bid_multiplier_settings() {
+        logger.info("Saving Tactic and Bid settings");
+        tacticSettings.saveTacticSettings();
+        tacticSettings.clickCreativeTab();
+    }
+    @And("User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules")
+    public void userVerifyBehavioursegmentandNPIareNotAllowedinbidMultiplier() {
+        logger.info("Verifying Behaviour segment and NPI are not allowed in Bid multiplier if the same are not targeted in tactic");
+        String displaySegmentError = tacticSettings.checkErrorofBidMultiplierSegmentRule();
+        Assert.assertEquals("Application allows Behaviour segment in bid multiplier even if its not targeted in tactic", ("No Behavioral Targeting is Selected"), displaySegmentError);
+        String displayNPIError = tacticSettings.checkErrorofBidMultiplierNPIRule();
+        Assert.assertEquals("Application allows NPI in bid multiplier even if its not targeted in tactic", ("No NPI Targeting is Selected"), displayNPIError);
+    }
+
+    @Then("User close the bid panel to add targeting rules")
+    public void userCloseTheBidPanelToAddTargetingRules() {
+        logger.info("Navigating to page to add targeting");
+        tacticSettings.navigateToAddTargeting();
+    }
+
 }
