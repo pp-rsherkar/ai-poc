@@ -224,7 +224,7 @@ Feature: LIFE Regression - Targetings
       | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS       | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Search Extension | Tactic      | Auto_Creative |
 
-  @regression @ps
+  @regression
   Scenario Outline: Verify list of Targeting Rules available under DOOH Targeting Category and create a campaign by adding all of them
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -260,7 +260,7 @@ Feature: LIFE Regression - Targetings
       | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | Campaign_DOOH | Regular | 10000     | Line      | 500         | DOOH       | Tactic      | Auto_Creative |
 
-  @regression @ps
+  @regression
   Scenario Outline: Verify list of Targeting Rules available under Audio Targeting Category and create a campaign by adding all of them
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -287,8 +287,8 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals             |
       | LEGAL TARGETINGS   | Legal Populations                                                                                                                                                                                                            |
     And User configures targeting rules as below
-      | Clickers | Smart_Campaign_20260301_024708, Conversion_Campaign_20260406_235118 |
-      | Age      | 18-24, 50-54, 60-64                                                 |
+      | Clickers | Auto_20260210_164534, TargetingTemplate_20260405_002455 |
+      | Age      | 18-24, 50-54, 60-64                                     |
     Then Verify the configured targeting rules
     And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
     When User saves the settings
