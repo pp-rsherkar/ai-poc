@@ -808,10 +808,10 @@ public class TacticSettings {
         return TACTIC_NAME.innerText();
     }
 
-
     public void clickNewTactic() {
         NEW_TACTIC.click();
     }
+
     public String checkErrorofBidMultiplierSegmentRule() {
         ADD_BID_MULTIPLIER.click();
         BEHAVIOUR_SEGMENT.click();
@@ -822,7 +822,6 @@ public class TacticSettings {
         BID_PANEL_CANCEL_BUTTON.click();
         NPI_BID.click();
         return NPI_ERROR.innerText();
-
     }
 
     public void navigateToAddTargeting() {
@@ -865,7 +864,6 @@ public class TacticSettings {
         return Collections.emptyList();
     }
 
-
     public void selectMultipleBidRuleTypes(String ruleType, List<String> ruleValues) {
 
         switch (ruleType) {
@@ -894,12 +892,12 @@ public class TacticSettings {
                 clickRuleTypeOkButton();
                 break;
         }
-
     }
 
     public void fetchBidRulesTypesCount(int expectedBidCount) {
         FETCH_BID_MULTIPLIER_RULE_TYPES.nth(expectedBidCount-1).waitFor();
     }
+
     public List<Object> fetchBidRulesTypes() {
         ruleTypes = new ArrayList<>();
         FETCH_BID_MULTIPLIER_RULE_TYPES.first().waitFor();

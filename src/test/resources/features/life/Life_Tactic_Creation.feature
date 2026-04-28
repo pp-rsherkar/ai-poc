@@ -181,7 +181,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Tactic      | 3     |
 
-  @todo@regression
+  @todo
   Scenario Outline: Verify all Bid Multipliers Rules under categories and Create a tactic by adding all Bid multipliers Rules
     And User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
@@ -208,7 +208,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And User configures Bid multiplier rules as below
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
       | NPI                | AutoSmartList954103283                                             |
-
     Then Verify the configured Bid multiplier rules
     When User saves the Bid multiplier settings
     Then Verify settings details are saved and user is navigated to the creatives tab

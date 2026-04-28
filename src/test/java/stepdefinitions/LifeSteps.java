@@ -6075,7 +6075,6 @@ public class LifeSteps {
             logger.info("Checking category '{}' for expected bid types: {}", key, bidexpectedValues);
             List<String> actualValues = tacticSettings.getBidTypesForCategory(key);
             logger.info("Actual Bid types found for '{}': {}", key, actualValues);
-
             for (String bidexpected : bidexpectedValues) {
                 logger.info("Verifying bid expected value '{}' is present in actual values", bidexpected);
                 Assert.assertTrue("Expected value '" + bidexpected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(bidexpected));
@@ -6097,7 +6096,6 @@ public class LifeSteps {
             keyBidValues.addAll(entry.getValue());
             tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue());
         }
-
         logger.info("Closing Bid Rule Type panel");
         tacticSettings.closeRuleTypePanel();
     }
@@ -6140,6 +6138,7 @@ public class LifeSteps {
         tacticSettings.saveTacticSettings();
         tacticSettings.clickCreativeTab();
     }
+
     @And("User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules")
     public void userVerifyBehavioursegmentandNPIareNotAllowedinbidMultiplier() {
         logger.info("Verifying Behaviour segment and NPI are not allowed in Bid multiplier if the same are not targeted in tactic");
@@ -6154,5 +6153,4 @@ public class LifeSteps {
         logger.info("Navigating to page to add targeting");
         tacticSettings.navigateToAddTargeting();
     }
-
 }
