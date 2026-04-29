@@ -2,7 +2,7 @@ Feature: POC on healing locators if it gives exceptions and to find the alternat
 
 
   @e2e
-  Scenario Outline: Verify comments addition on Campaign Dashboard and validate it on Campaign, Line Item and Tactic pages
+  Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario is executing in the "Demo" environment as aa "User"
     And "Life" application is logged in with Account as "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with a title as "Campaigns"
