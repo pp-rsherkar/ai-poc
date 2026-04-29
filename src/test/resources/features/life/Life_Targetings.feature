@@ -252,6 +252,7 @@ Feature: LIFE Regression - Targetings
     And User configures targeting rules as below
       | Venue Type              | Transit, Retail, Office Buildings |
       | Custom Targeting Bundle | 203397, 203396                    |
+      | Audience Multiplier     | 6-500                             |
     Then Verify the configured targeting rules
     And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
     When User saves the settings

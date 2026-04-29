@@ -549,6 +549,34 @@ public class TacticSettings {
                         isElementVisible(xpath);
                     }
                     break;
+                case "Audience Multiplier":
+                    if (ruleValues.size() == 1) {
+                        String rangeValue = ruleValues.get(0).trim();
+                        String[] minMax = rangeValue.split("-");
+
+                        if (minMax.length != 2) {
+                            throw new IllegalArgumentException("Audience Multiplier requires a range format like 'Min-Max'. Found: " + rangeValue);
+                        }
+
+                        String minValue = minMax[0].trim();
+                        String maxValue = minMax[1].trim();
+
+                        Locator minHandle = page.locator("span.ngx-slider-pointer-min");
+                        Locator maxHandle = page.locator("span.ngx-slider-pointer-max");
+                        Locator minTarget = page.locator(String.format("//span[contains(@class, 'ngx-slider-tick-legend') and normalize-space()='%s']", minValue));
+                        Locator maxTarget = page.locator(String.format("//span[contains(@class, 'ngx-slider-tick-legend') and normalize-space()='%s']", maxValue));
+
+                        minHandle.dragTo(minTarget);
+                        Locator minSelected = page.locator(String.format("//span[contains(@class, 'ngx-slider-selected') and normalize-space()='%s']", minValue));
+                        waitUtility.waitForLocatorVisible(minSelected);
+
+                        maxHandle.dragTo(maxTarget);
+                        Locator maxSelected = page.locator(String.format("//span[contains(@class, 'ngx-slider-selected') and normalize-space()='%s']", maxValue));
+                        waitUtility.waitForLocatorVisible(maxSelected);
+                    } else {
+                        throw new IllegalArgumentException("Audience Multiplier rule requires exactly 2 values (minimum and maximum). Found: " + ruleValues.size() + " values.");
+                    }
+                    break;
             }
             clickRuleTypeOkButton();
         }
