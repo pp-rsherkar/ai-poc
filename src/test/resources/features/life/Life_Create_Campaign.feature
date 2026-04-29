@@ -1,4 +1,11 @@
 Feature: LIFE Regression - Create a Campaign
+  It ensures creation of a campaign with a line item and a tactic, including:
+  1. Create a campaign with a tactic and a line item
+  2. Create a campaign with multiple targeting rules added to a tactic
+  3. Create a campaign and verify all targetings under categories
+  4. Verify campaign creation, check field-level validation, and default values
+  5. Custom field addition, modification, and deletion on the Campaign creation page
+  6. Create a campaign for an external user
 
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item

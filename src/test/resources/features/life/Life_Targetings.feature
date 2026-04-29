@@ -1,4 +1,9 @@
 Feature: LIFE Regression - Targetings
+  It ensures creation of a campaign with different Targeting Rules:
+  1. Verify all Targeting Rules under categories and create a campaign by adding all Targeting Rules
+  2. Verify list of Targeting Rules available under various LI types
+  3. Verify the created targeting template is available on Targeting Templates page
+  4. Verify the count of rules added for the selected targeting rule type on the tactic settings page
 
   @regression
   Scenario Outline: Verify all Targeting Rules under categories and create a campaign by adding all Targeting Rules
@@ -280,12 +285,12 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       |
       | LEGAL TARGETINGS   |
     And Verify target type with respect to category
-      | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience  |
-      | HEALTH JOURNEY     | Health Populations+,Bespoke,In Condition                                                                                                                                                                                     |
-      | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
-      | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals             |
-      | LEGAL TARGETINGS   | Legal Populations                                                                                                                                                                                                            |
+      | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience |
+      | HEALTH JOURNEY     | Health Populations+,Bespoke,In Condition                                                                                                                                                                                    |
+      | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                        |
+      | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                              |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals            |
+      | LEGAL TARGETINGS   | Legal Populations                                                                                                                                                                                                           |
     And User configures targeting rules as below
       | Clickers | Auto_20260210_164534, TargetingTemplate_20260405_002455 |
       | Age      | 18-24, 50-54, 60-64                                     |
