@@ -228,7 +228,7 @@ public class LifeSteps {
     @Then("User clicks on create new tactic")
     public void userClicksOnCreateNewTactic() {
         logger.info("Clicking on Create New Tactic");
-        tacticDetails.clickNewTactic(0);
+        tacticDetails.clickNewTactic();
     }
 
     @Then("User navigates to line item and clicks on details tab")

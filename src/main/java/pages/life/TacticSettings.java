@@ -86,8 +86,8 @@ public class TacticSettings {
     private final Locator MANAGEMENT_FEE_LABEL_VALUE;
     private final Locator MANAGEMENT_FEE_OVERRIDE;
     private final Locator MANAGEMENT_FEE_OPTIONS;
-    private final Locator PERCENT_TYPE_FEE_INPUT;
-    private final Locator DOLLAR_TYPE_FEE_INPUT;
+    final Locator PERCENT_TYPE_FEE_INPUT;
+    final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
     List<Object> ruleOptions;

@@ -314,8 +314,6 @@ public class LineItemDetails {
         }
     }
 
-
-
     public List<String> fetchFlightDetails() {
         List<String> flightDetail = new ArrayList<>();
         int flightCount = FLIGHT_START_DATE.count();

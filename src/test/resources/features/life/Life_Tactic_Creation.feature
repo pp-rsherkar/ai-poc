@@ -256,11 +256,10 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And Verify management fee is set as "<CAMPAIGN_DISPLAY_VALUE>"
     When User overrides line item management fee and verifies tactic reflection for the following fee types
       | Fee Option | Percent | Amount | Expected Display |
-      | Percentage | 7       |        | + 7 %            |
-      | CPM        |         | 10     | + $10            |
+      | Percentage | 7.15    |        | + 7.15 %         |
+      | CPM        |         | 10.50  | + $10.5          |
       | % + CPM    | 7       | 10     | + 7 % + $10      |
-      | Fixed CPM  |         | 11     | $11              |
-
+      | Fixed CPM  |         | 11.1   | $11.1            |
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                | 5               | + 5 %                  | Email   | Tactic      | 1     |
