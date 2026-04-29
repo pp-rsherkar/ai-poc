@@ -243,9 +243,10 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     When User enters "<CAMPAIGN_NAME>" and click Search button
     Then Verify Campaigns, line items, tactics names matching the "<CAMPAIGN_NAME>" should display on Dashboard table
     And User navigates to campaign - "<CAMPAIGN_NAME>"
-    And Read the test-data file "<TEST_DATA_FILE>" for the campaign and retrieve the targeting rules and its options configured
-    And User expands each line item added to the campaign from UI and switches to each tactic added to it and retrieves the targeting rules and its options configured for each tactic
-    And User verifies the targeting rules and its options retrieved from the test-data file with the targeting rules and its options retrieved from UI for each line item and tactic of the campaign
+#    And Read the test-data file "<TEST_DATA_FILE>" for the campaign and retrieve the targeting rules and its options configured
+#    And User expands each line item added to the campaign from UI and switches to each tactic added to it and retrieves the targeting rules and its options configured for each tactic
+    And User reads "<TEST_DATA_FILE>" and validates targeting rules and options for each line item and tactic against the UI
+#    And User verifies the targeting rules and its options retrieved from the test-data file with the targeting rules and its options retrieved from UI for each line item and tactic of the campaign
     Examples:
       | CAMPAIGN_NAME                  | TEST_DATA_FILE                 |
       | Automation_Export_DO_NOT_TOUCH | Demo_Export_April_20260414.xls |

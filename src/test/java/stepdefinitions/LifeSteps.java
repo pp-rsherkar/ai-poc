@@ -6503,11 +6503,7 @@ public class LifeSteps {
     public void userVerifiesTheTargetingRulesAndItsOptionsRetrievedFromTheTestDataFileWithTheTargetingRulesAndItsOptionsRetrievedFromUIForEachLineItemAndTacticOfTheCampaign() {
         SoftAssertUtil soft = new SoftAssertUtil();
         for (String key : rulesMap.keySet()) {
-            List<String> expectedValues = rulesMap.getOrDefault(key, List.of()).stream()
-                    .map(s -> s == null ? "" : s.trim())
-                    .map(s -> s.equals("—") ? "" : s)
-                    .filter(s -> !s.isEmpty())
-                    .toList();
+            List<String> expectedValues = rulesMap.getOrDefault(key, List.of()).stream().map(s -> s == null ? "" : s.trim()).map(s -> s.equals("—") ? "" : s).filter(s -> !s.isEmpty()).toList();
             List<String> actualValues = itemMap.get(key);
 
             if (actualValues == null) {
@@ -6525,5 +6521,81 @@ public class LifeSteps {
             soft.assertEquals("Value mismatch for key: " + key, expectedSorted, actualSorted);
         }
         soft.collectAll();
+    }
+
+    @And("User reads {string} and validates targeting rules and options for each line item and tactic against the UI")
+    public void userReadsAndValidatesTargetingRulesAndOptionsForEachLineItemAndTacticAgainstTheUI(String fileName) throws IOException {
+        logger.info("Reading test-data file '{}' to retrieve targeting rules and options configured of each line item and tactic", fileName);
+        List<Map<String, Map<String, Map<String, List<String>>>>> dataList = tacticSettings.parseTargetingSectionByLIAndTactic(fileName);
+        List<String> allFailures = new ArrayList<>();
+        for (Map<String, Map<String, Map<String, List<String>>>> data : dataList) {
+
+            for (String lineItem : data.keySet()) {
+
+                lineItemDetails.expandLineItem(lineItem);
+
+                Map<String, Map<String, List<String>>> tacticMap = data.get(lineItem);
+
+                for (String tactic : tacticMap.keySet()) {
+
+                    tacticDetails.clickTactic(tactic);
+
+                    SoftAssertUtil soft = new SoftAssertUtil();
+
+                    Map<String, List<String>> rulesMap = tacticMap.get(tactic);
+
+                    Map<String, List<String>> itemMap =
+                            tacticSettings.fetchTargetingRulesAndOptionsOfEachTacticFromUI();
+
+                    for (String key : rulesMap.keySet()) {
+
+                        List<String> expectedValues = rulesMap.getOrDefault(key, List.of()).stream()
+                                .map(s -> s == null ? "" : s.trim())
+                                .map(s -> s.equals("—") ? "" : s)
+                                .filter(s -> !s.isEmpty())
+                                .toList();
+
+                        List<String> actualValues = itemMap.get(key);
+
+                        if (actualValues == null) {
+                            soft.assertTrue("Missing key: " + key, false);
+                            continue;
+                        }
+
+                        List<String> normalizedActualValues = actualValues.stream()
+                                .map(s -> s == null ? "" : s.trim())
+                                .map(s -> s.equals("—") ? "" : s)
+                                .filter(s -> !s.isEmpty())
+                                .toList();
+
+                        soft.assertEquals("Count mismatch for key: " + key,
+                                expectedValues.size(),
+                                normalizedActualValues.size());
+
+                        List<String> expectedSorted = new ArrayList<>(expectedValues);
+                        List<String> actualSorted = new ArrayList<>(normalizedActualValues);
+
+                        Collections.sort(expectedSorted);
+                        Collections.sort(actualSorted);
+
+                        soft.assertEquals("Value mismatch for key: " + key,
+                                expectedSorted,
+                                actualSorted);
+                    }
+
+                    try {
+                        soft.collectAll();
+                    } catch (AssertionError e) {
+                        allFailures.add("LineItem: " + lineItem + ", Tactic: " + tactic + "\n" + e.getMessage());
+                    }
+                }
+
+                lineItemDetails.contractLineItem(lineItem);
+            }
+        }
+
+        if (!allFailures.isEmpty()) {
+            throw new AssertionError(String.join("\n\n", allFailures));
+        }
     }
 }

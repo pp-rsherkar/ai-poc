@@ -1029,9 +1029,9 @@ public class TacticSettings {
                         options.addAll(SELECTED_NODES.allInnerTexts());
                     INDIVIDUAL_KEYWORDS_TAB.click();
                     String keywordsTextbox = "";
-                    if(KEYWORDS_TEXTBOX.isVisible())
+                    if (KEYWORDS_TEXTBOX.isVisible())
                         keywordsTextbox = KEYWORDS_TEXTBOX.inputValue().trim();
-                    if(KEYWORD_POPULATIONS_TEXTBOX.isVisible())
+                    if (KEYWORD_POPULATIONS_TEXTBOX.isVisible())
                         keywordsTextbox = KEYWORD_POPULATIONS_TEXTBOX.inputValue().trim();
                     if (!keywordsTextbox.isEmpty())
                         options.addAll(keywordsTextbox.lines().map(String::trim).filter(s -> !s.isEmpty()).toList());
@@ -1196,5 +1196,81 @@ public class TacticSettings {
             locator.first().click();
             waitUtility.waitForLocatorVisible(page.locator("//i[contains(@class,'tree-expanded') and not(@hidden)]").last());
         }
+    }
+
+    public List<Map<String, Map<String, Map<String, List<String>>>>> parseTargetingSectionByLIAndTactic(String fileName) throws IOException {
+
+        List<Map<String, Map<String, Map<String, List<String>>>>> result = new ArrayList<>();
+        Path basePath = FileActions.resolvePath(fileName);
+
+        try (FileInputStream fis = new FileInputStream(basePath.toFile());
+             Workbook workbook = WorkbookFactory.create(fis)) {
+
+            Sheet sheet = workbook.getSheet("Tactics");
+
+            Row lineItemRow = sheet.getRow(1); // Line Item Name
+            Row tacticRow   = sheet.getRow(3); // Tactic Name
+
+            int totalColumns = lineItemRow.getLastCellNum();
+
+            for (int col = 1; col < totalColumns; col++) {
+
+                String lineItem = getCellValue(lineItemRow.getCell(col));
+                String tacticId = getCellValue(tacticRow.getCell(col));
+
+                if (lineItem.isEmpty() && tacticId.isEmpty()) continue;
+
+                Map<String, List<String>> targetingMap = new LinkedHashMap<>();
+                boolean inTargeting = false;
+
+                for (Row row : sheet) {
+                    Cell firstCell = row.getCell(0);
+                    if (firstCell == null) continue;
+
+                    String key = firstCell.toString().trim();
+
+                    if (key.equalsIgnoreCase("Targeting")) {
+                        inTargeting = true;
+                        continue;
+                    }
+
+                    if (inTargeting) {
+                        if (key.equalsIgnoreCase("Creatives") || key.equalsIgnoreCase("Settings")) {
+                            break;
+                        }
+
+                        Cell cell = row.getCell(col);
+                        if (cell == null) continue;
+
+                        String raw = cell.toString().trim();
+
+                        if (!raw.isEmpty() && !raw.equals("—")) {
+                            List<String> values = Arrays.stream(raw.split(","))
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .distinct()
+                                    .toList();
+
+                            targetingMap.put(key, values);
+                        }
+                    }
+                }
+
+                //Build nested structure: lineItem - tacticId - targetingMap
+                Map<String, Map<String, List<String>>> tacticMap = new LinkedHashMap<>();
+                tacticMap.put(tacticId, targetingMap);
+
+                Map<String, Map<String, Map<String, List<String>>>> columnData = new LinkedHashMap<>();
+                columnData.put(lineItem, tacticMap);
+
+                result.add(columnData);
+            }
+        }
+        return result;
+    }
+
+
+    private String getCellValue(Cell cell) {
+        return (cell == null) ? "" : cell.toString().trim();
     }
 }
