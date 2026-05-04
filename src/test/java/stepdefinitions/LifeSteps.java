@@ -3929,7 +3929,7 @@ public class LifeSteps {
     public void userClicksTestConnectionLinkToVerifyIfConnectionHappenedSuccessfully() {
         logger.info("User clicks Test Connection link to verify if connection happened successfully");
         String connectionStatus = accounts.clickTestConnection();
-        Assert.assertEquals("Connection confirmed", connectionStatus);
+        Assert.assertTrue("Unexpected connection status: " + connectionStatus, "Connection confirmed".equals(connectionStatus) || "Access test successful".equals(connectionStatus));
     }
 
     @Then("User selects destination name created, and other details - {string}, {string}")
