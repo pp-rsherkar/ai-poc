@@ -5574,6 +5574,20 @@ public class LifeSteps {
         tacticDetails.clickSettingsTab();
     }
 
+    @Then("User verify that the forecast data is not available when no targeting rules are added in the tactic")
+    public void user_verify_that_the_forcast_data_is_not_available_when_no_targeting_rules_are_added_in_the_tactic() {
+        logger.info("Verifying that forecast data is not available when no targeting rules are added in the tactic");
+        Assert.assertTrue("Targeting is added in the tactic", tacticDetails.isTargetingRuleAdded());
+        Assert.assertFalse("Forecast data is displayed even though no targeting rules are added", tacticDetails.isForecastDataAvailable());
+    }
+
+    @Then("The forecast data should be refreshed and generate a forecast for the specified values")
+    public void the_forecast_data_should_be_refreshed_and_generate_a_forecast_for_the_specified_values() {
+        logger.info("Verifying that forecast data is refreshed and generated after targeting rules are added");
+        Assert.assertTrue("Forecast data was not refreshed after adding targeting rules", tacticDetails.isForecastDataAvailable()
+        );
+    }
+
     @And("User opens Life Settings")
     public void userOpensLifeSettings() {
         logger.info("User navigates to tactic setting tab");

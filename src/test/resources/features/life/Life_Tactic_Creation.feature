@@ -263,3 +263,24 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                | 5               | + 5 %                  | Email   | Tactic      | 1     |
+
+  @regression
+  Scenario Outline: Verify forecast is refreshed after adding age gender and geo target rules in a new tactic
+    And User clicks on create new Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then User navigates to tactic setting tab
+    Then User verify that the forecast data is not available when no targeting rules are added in the tactic
+    When User clicks on Add Targeting Rule
+    And User configures targeting rules as below
+      | Age | 35-39, 55-59 |
+    And User saves the settings
+    And User navigates to tactic setting tab
+    Then The forecast data should be refreshed and generate a forecast for the specified values
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      |

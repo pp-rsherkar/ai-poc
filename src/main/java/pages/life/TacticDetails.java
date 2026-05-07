@@ -66,6 +66,7 @@ public class TacticDetails {
     private final Locator COMMENT_SUCCESS_ALERT;
     private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
     private final Locator CONTINUE_BUTTON;
+    private final Locator CLICK_REFRESH_BUTTON;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -131,6 +132,7 @@ public class TacticDetails {
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
     }
 
     public void clickNewTactic() {
@@ -179,6 +181,18 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public boolean isForecastDataAvailable() {
+        CLICK_REFRESH_BUTTON.click();
+        waitUtility.waitForElementHidden("//button[contains(@class,'loading')]");
+        List<String> forecastData = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']").allInnerTexts();
+        return forecastData.getLast().contains("$");
+    }
+
+    public boolean isTargetingRuleAdded() {
+        waitUtility.waitForElementVisible("//span[contains(text(),'Add Targeting Rule')]");
+        return page.locator("//div[contains(text(),'No Targeting Rules set yet')]").isVisible();
     }
 
     public void addComment(String entryPoint, String comment) {
