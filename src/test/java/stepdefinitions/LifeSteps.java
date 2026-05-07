@@ -5575,7 +5575,7 @@ public class LifeSteps {
     }
 
     @Then("User verify that the forecast data is not available when no targeting rules are added in the tactic")
-    public void user_verify_that_the_forcast_data_is_not_available_when_no_targeting_rules_are_added_in_the_tactic() {
+    public void user_verify_that_the_forecast_data_is_not_available_when_no_targeting_rules_are_added_in_the_tactic() {
         logger.info("Verifying that forecast data is not available when no targeting rules are added in the tactic");
         Assert.assertTrue("Targeting is added in the tactic", tacticDetails.isTargetingRuleAdded());
         Assert.assertFalse("Forecast data is displayed even though no targeting rules are added", tacticDetails.isForecastDataAvailable());
