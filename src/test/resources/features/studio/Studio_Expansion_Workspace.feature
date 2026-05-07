@@ -60,7 +60,7 @@ Feature: HCP Audience Workspace in Studio Application
       | Profession         | Physician                                                                                                               |
       | Specialty          | Foot & Ankle Surgery, Internal Medicine                                                                                 |
       | NPI List Name      | Large file test                                                                                                         |
-      | Medical School     | New York College
+      | Medical School     | New York College                                                                                                        |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User updates the workspace name as "<WORKSPACE_NAME>"
