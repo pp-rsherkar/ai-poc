@@ -191,46 +191,25 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
     Then User navigates to tactic setting tab
     Then User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules
+    Then User close the bid panel to add targeting rules
     And User configures targeting rules as below
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
-      | Day of the Week    | Monday, Tuesday, Friday                                            |
-      | Speciality         | Anesthesiology,Genetics & Genomics                                 |
-      | Practitioner Type  | Physician, Chiropractor, Pharmacist                                |
       | NPI                | AutoSmartList954103283                                             |
-      | Age                | 35-39, 55-59, 18-24,65+                                            |
-      | Gender             | Male, Female                                                       |
-      | Geo Targets        | New York, California                                               |
-      | Browser            | Chrome, EDGE, Opera, Safari                                        |
-      | Device             | Mobile, Tablet, Connected Device                                   |
-      | Operating System   | Windows, macOS, Blackberry                                         |
-      | Inventory Source   | New Report                                                         |
-      | Domains/Apps       | APP Regular, updaedList106043912                                   |
     Then Verify Bid multiplier panel with all options under below categories
       | AUDIENCE ATTRIBUTE |
       | DEMOGRAPHICS       |
       | GEOGRAPHY          |
       | MEDIA SUPPLY       |
     And Verify Bid type with respect to category
-      | AUDIENCE ATTRIBUTE | Behavioral Segment,Day of The Week,Speciality,Practitioner Type,NPI |
-      | DEMOGRAPHICS       | Age,Gender                                                          |
-      | GEOGRAPHY          | Geo Targets                                                         |
-      | MEDIA SUPPLY       | Browser,Device,Operating System,Inventory Source,Domains and Apps   |
+      | AUDIENCE ATTRIBUTE | Behavioral Segment,Day of The Week,Speciality,Practitioner Type,NPI              |
+      | DEMOGRAPHICS       | Age,Gender                                                                       |
+      | GEOGRAPHY          | Geo Targets                                                                      |
+      | MEDIA SUPPLY       | Browser,Device,Operating Systems,Inventory Source,Domains and Apps,Creative Size |
     And User configures Bid multiplier rules as below
-      | Behavioral Segment | AutoSegment18577650                 |
-      | Day of the Week    | Monday, Tuesday, Friday             |
-      | Speciality         | Anesthesiology,Genetics & Genomics  |
-      | Practitioner Type  | Physician, Chiropractor, Pharmacist |
-      | NPI                | AutoSmartList954103283              |
-      | Age                | 35-39, 55-59, 18-24,65+             |
-      | Gender             | Male, Female                        |
-      | Geo Targets        | New York, California                |
-      | Browser            | Chrome, EDGE, Opera, Safari         |
-      | Device             | Mobile, Tablet, Connected Device    |
-      | Operating System   | Windows, macOS, Blackberry          |
-      | Inventory Source   | New Report                          |
-      | Domains/Apps       | APP Regular, updaedList106043912    |
+      | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
+      | NPI                | AutoSmartList954103283                                             |
     Then Verify the configured Bid multiplier rules
-    When User saves the settings
+    When User saves the Bid multiplier settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     Then Verify the newly created campaign is in running state
