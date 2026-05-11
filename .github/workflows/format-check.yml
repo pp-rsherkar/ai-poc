@@ -4,6 +4,9 @@ name: Weekly format check
 # If anything is mis-formatted, it auto-applies the fixes and opens a pull
 # request so reviewers can approve the changes.
 on:
+  push:
+    branches:
+      - QA-1209
   schedule:
     # 3:20 AM IST every Tuesday (IST is UTC+5:30, so Monday 21:50 UTC)
     - cron: "50 21 * * 1"
