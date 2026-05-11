@@ -223,4 +223,14 @@ public class Navigation {
         CURATED_MARKET.click();
         waitUtility.waitUntilSpinnerHidden();
     }
+
+    public void selectExternalUserAccount(String account) {
+        if (ACCOUNT_NAME.innerText().contains("buyer2")) {
+            ACCOUNT_NAME.click();
+            String accountXpath = String.format("//li[contains(@class, 'account-item')]//span[contains(@class, 'account-name') and normalize-space(text())='%s']", account);
+            page.locator(accountXpath).click();
+            page.waitForLoadState(LoadState.LOAD);
+            waitUtility.waitUntilSpinnerHidden();
+        }
+    }
 }

@@ -3,10 +3,10 @@ Feature: E2E workflow for creating a campaign with an external user and approvin
   2. Approval of the created campaign by an admin user
   3. Verification of the approved campaign by the external user
 
-  #@e2e
+  @e2e @ps
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
-    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
     Then Verify that the campaign budget status is "Pending Appr" and is greyed out
@@ -26,13 +26,13 @@ Feature: E2E workflow for creating a campaign with an external user and approvin
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     And User logs out from the application
     And This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the created campaign
     And Admin user approves the campaign
     Then Verify that the campaign is in "Running" state
     And User logs out from the application
     Given This scenario will be executed in the "Demo" environment as a "External User"
-    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the created campaign
     Then Verify that the campaign is in "Running" state
     Then Verify that the approval status of the campaign is "Approved"
