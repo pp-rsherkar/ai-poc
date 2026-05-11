@@ -1,15 +1,12 @@
 name: Weekly format check
 
-# Runs every Tuesday and verifies formatting across the repo using Spotless.
+# Runs every Tuesday at 3:20 AM IST and verifies formatting across the repo using Spotless.
 # If anything is mis-formatted, it auto-applies the fixes and opens a pull
 # request so reviewers can approve the changes.
 on:
-  push:
-    branches:
-      - QA-1209
   schedule:
-    # 3:20 AM UTC every Tuesday
-    - cron: "20 3 * * 2"
+    # 3:20 AM IST every Tuesday (IST is UTC+5:30, so Monday 21:50 UTC)
+    - cron: "50 21 * * 1"
   workflow_dispatch:
 
 permissions:
