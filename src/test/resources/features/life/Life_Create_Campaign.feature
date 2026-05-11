@@ -122,7 +122,7 @@ Feature: LIFE Regression - Create a Campaign
       | Practice Staff           | SMART_Pixel_NPI_20250701_155147                                       |
       | Health Pages             | Animal Diseases                                                       |
       | Keywords                 | Custom_Keyword, TestingKeyword, Qwerty123                             |
-      | Endemics                 | Endemic + EHR                                                         |
+      | Endemics                 | Endemic                                                               |
       | Geo Targets              | New York, California                                                  |
       | Postal Codes             | 123456, 10001, 987654                                                 |
       | Weather Signals          | Below 15F degrees, Outdoor Activity                                   |
@@ -140,8 +140,8 @@ Feature: LIFE Regression - Create a Campaign
       | Retargeting Pixels       | Retargeting_20250814_011101                                           |
       | OTC Populations          | Dental/Oral Care                                                      |
       | IP                       | AutoIP101602041                                                       |
-      | Clickers                 | Auto_20260210_150825                                                  |
-      | Email                    | AutoEmail120220716113986417                                           |
+      | Clickers                 | Auto_20260505_122448                                                  |
+      | Email                    | AutoEmail203186876345524554                                           |
       | Sensitive Areas          | Anxiety Disorders                                                     |
       | IAB Categories           | Agriculture                                                           |
       | IAB Categories New       | Communication                                                         |
