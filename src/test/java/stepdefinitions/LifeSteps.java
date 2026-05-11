@@ -2626,7 +2626,9 @@ public class LifeSteps {
         logger.info("Navigate to Campaign Dashboard and clicks on Create Campaign");
         navigation.clickSubMenu();
         navigation.clickCampaigns();
+        Assert.assertTrue("Unable to navigate to Campaign Dashboard", campaigns.isCreateCampaignButtonVisible());
         campaigns.createCampaign();
+        Assert.assertTrue("Unable to navigate to Create New Campaign Page", campaigns.isCreateNewCampaignPageDisplayed());
     }
 
     @And("User add and configure {string} targeting rule and verify list is displayed in the targeting rule")
