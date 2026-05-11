@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  # Required to allow reviewdog to post review comments on the PR
+  pull-requests: write
 
 jobs:
   spotless:
@@ -24,32 +26,19 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Run Spotless check
-        # We don't want the whole job to stop immediately without our summary
-        run: mvn -B -ntp spotless:check
+      - name: Run Spotless apply
+        # We run 'apply' instead of 'check' so that the files are actually fixed locally
+        run: mvn -B -ntp spotless:apply
 
-      - name: Explain formatting changes to user
-        # This step ONLY runs if the check step above fails
-        if: failure()
-        run: |
-          # 1. Apply the fixes so we can capture the raw git diff
-          mvn -B -ntp spotless:apply
-          
-          # 2. Write a friendly explanation to the GitHub UI
-          echo "### 🎨 Formatting Issues Detected" >> $GITHUB_STEP_SUMMARY
-          echo "Spotless found some files that don't quite match the repository's formatting standards. Don't worry, this is easy to fix!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "#### How to fix it 🛠️" >> $GITHUB_STEP_SUMMARY
-          echo "Run this command locally in your terminal to automatically format your code, then commit and push:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "mvn spotless:apply" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "<details><summary><b>Click here to view the specific formatting changes</b></summary>" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
-          git diff >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "</details>" >> $GITHUB_STEP_SUMMARY
+      - name: Suggest formatting changes
+        # This action takes any changed files in the workspace and converts
+        # them into inline PR suggestions. It only posts on Pull Requests.
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: Spotless
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail build if formatting was incorrect
+        # We still want the check to fail if changes were needed,
+        # so the PR cannot be merged until the suggestions are applied.
+        run: mvn -B -ntp spotless:check
