@@ -230,7 +230,7 @@ public class Navigation {
             String accountXpath = String.format("//li[contains(@class, 'account-item')]//span[contains(@class, 'account-name') and normalize-space(text())='%s']", account);
             page.locator(accountXpath).click();
             page.waitForLoadState(LoadState.LOAD);
-            waitUtility.waitUntilSpinnerHidden();
         }
+        waitUtility.waitUntilSpinnerHidden();
     }
 }
