@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
 import utils.WaitUtility;
-
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -70,6 +69,8 @@ public class LineItemDetails {
     private final Locator FLAT_CPM;
     private final Locator PACING_MODE_INPUT;
     private final Locator PLACEMENT_ID;
+    private final Locator MANAGEMENT_FEE_LABEL_VALUE;
+    private final Locator MANAGEMENT_FEE_OVERRIDE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -146,6 +147,8 @@ public class LineItemDetails {
         this.FLAT_CPM = page.locator("//input[@formcontrolname='flatCPM']");
         this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
         this.PLACEMENT_ID = page.locator("//label[contains(text(),'PlacementId')]/following-sibling::input");
+        this.MANAGEMENT_FEE_LABEL_VALUE = page.locator("//span[contains(@class, 'fee-value')]");
+        this.MANAGEMENT_FEE_OVERRIDE = page.locator("//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]");
     }
 
     public String verifyLineItemText() {
@@ -217,6 +220,18 @@ public class LineItemDetails {
             }
         }
         return true;
+    }
+
+    public String fetchDisplayedManagementFeeValue() {
+        return MANAGEMENT_FEE_LABEL_VALUE.textContent().trim();
+    }
+
+    public void enableManagementFeeOverride() {
+       Locator checkboxInput = page.locator("//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]/preceding-sibling::input");
+
+       if (!checkboxInput.isChecked()) {
+            MANAGEMENT_FEE_OVERRIDE.click();
+        }
     }
 
     public String verifyLineItemStatus() {
@@ -510,3 +525,5 @@ public class LineItemDetails {
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
     }
 }
+
+

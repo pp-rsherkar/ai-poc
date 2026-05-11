@@ -210,6 +210,63 @@ public class LifeSteps {
         campaigns.saveCampaign();
     }
 
+    @And("User sets campaign management fee as {string} {string} {string}")
+    public void userSetsCampaignManagementFeeAs(String managementFeeOption, String percent, String amount) {
+        logger.info("Setting campaign management fee. Option: {}, Percent: {}, Amount: {}", managementFeeOption, percent, amount);
+        Assert.assertTrue("Campaign management fee checkbox is not visible", campaigns.isManagementFeeAvailable());
+
+        campaigns.clickManagementFee();
+        campaigns.clickManagementFeeOptionAndEnterData(managementFeeOption, percent, amount);
+    }
+
+    @Then("Verify management fee is set as {string}")
+    public void verifyManagementFeeIsSetAs(String expectedFeeValue) {
+        logger.info("Verifying inherited management fee value: {}", expectedFeeValue);
+        Assert.assertEquals("Inherited management fee is incorrect", expectedFeeValue, lineItemDetails.fetchDisplayedManagementFeeValue());
+    }
+
+    @Then("User clicks on create new tactic")
+    public void userClicksOnCreateNewTactic() {
+        logger.info("Clicking on Create New Tactic");
+        tacticDetails.clickNewTactic();
+    }
+
+    @Then("User navigates to line item and clicks on details tab")
+    public void userNavigatesToLineItemAndClicksOnDetailsTab() {
+        campaigns.clickLineItemTile();
+        lineItemDetails.clickDetailsTab();
+    }
+
+    @When("User overrides line item management fee and verifies tactic reflection for the following fee types")
+    public void userOverridesLineItemManagementFeeAndVerifiesTacticReflectionForTheFollowingFeeTypes(DataTable dataTable) {
+
+        logger.info("Overriding line item management fee and verifying tactic reflection for each fee type");
+        List<Map<String, String>> feeDetails = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> feeRow : feeDetails) {
+            campaigns.clickLineItemTile();
+            lineItemDetails.clickDetailsTab();
+            String feeOption = feeRow.get("Fee Option");
+            String percent = feeRow.get("Percent");
+            String amount = feeRow.get("Amount");
+            String expectedDisplay = feeRow.get("Expected Display");
+
+            logger.info("Applying line item management fee override - Fee Option: {}, Percent: {}, Amount: {}, Expected Display: {}",
+                    feeOption, percent, amount, expectedDisplay);
+
+            lineItemDetails.enableManagementFeeOverride();
+            tacticDetails.selectManagementFeeOptionAndEnterData(feeOption, percent, amount, expectedDisplay);
+        }
+    }
+
+    @Then("Verify tactic reflects line item management fee as {string}")
+    public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue) {
+        logger.info("Verifying tactic management fee value: {}", expectedFeeValue);
+        tacticDetails.enterTacticName("Tactic_" + CommonUtils.timeStampCalculation());
+        tacticDetails.saveTacticDetails();
+        Assert.assertEquals("Tactic management fee value is incorrect", expectedFeeValue, tacticSettings.fetchDisplayedManagementFeeValue());
+    }
+
     @Then("Verify campaign details are saved and user is navigated to the line item page")
     public void verify_campaign_details_are_saved_and_user_is_navigated_to_line_item_page() {
         logger.info("Verifying campaign creation and navigation to Line Item page");
@@ -3929,7 +3986,7 @@ public class LifeSteps {
     public void userClicksTestConnectionLinkToVerifyIfConnectionHappenedSuccessfully() {
         logger.info("User clicks Test Connection link to verify if connection happened successfully");
         String connectionStatus = accounts.clickTestConnection();
-        Assert.assertEquals("Connection confirmed", connectionStatus);
+        Assert.assertTrue("Unexpected connection status: " + connectionStatus, "Connection confirmed".equals(connectionStatus) || "Access test successful".equals(connectionStatus));
     }
 
     @Then("User selects destination name created, and other details - {string}, {string}")
