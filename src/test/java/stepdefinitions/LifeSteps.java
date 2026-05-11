@@ -121,7 +121,6 @@ public class LifeSteps {
                 password = ConfigReader.getInternalDemoPassword();
             }
         } else if (environment.equals("Pre-release")) {
-            logger.info("Configuring for Pre-release environment");
             url = ConfigReader.getProperty("preReleaseURL");
             if (user != null && user.toLowerCase().contains("external")) {
                 username = ConfigReader.getExternalPreReleaseUsername();
@@ -135,11 +134,11 @@ public class LifeSteps {
 
     @And("{string} application is logged in successfully with Account {string}")
     public void life_application_is_logged_in_as(String application, String account) {
-        logger.info("{} application is logged in successfully with Account {}", application, account);
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
+        logger.info("{} application is logged in successfully with Account {}", application, account);
         logger.info("Navigating to specific application module: {}", application);
         navigation.selectAndClickExternalUserApplicationType();
         switch (application) {
@@ -162,7 +161,7 @@ public class LifeSteps {
             logger.info("Selecting account: {}", account);
             navigation.selectAccount(account);
         } else {
-            logger.info("Default account for External user: {}", account);
+            logger.info("Selecting account for External user: {}", account);
             navigation.selectExternalUserAccount(account);
         }
     }

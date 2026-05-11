@@ -4,7 +4,7 @@ Feature: E2E workflow for creating a campaign with an external user and approvin
   3. Verification of the approved campaign by the external user
 
   @e2e
-  Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
+  Scenario Outline: Create a Campaign with a Line Item and a Tactic for an External user, then approve it as an Admin user
     Given This scenario will be executed in the "Demo" environment as a "External User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
