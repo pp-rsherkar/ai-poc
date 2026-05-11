@@ -77,7 +77,6 @@ public class Campaigns {
     private final Locator BUDGET_STATUS_EXTERNAL;
     private final Locator CAMPAIGN_APPROVAL_STATUS;
     private final Locator CAMPAIGN_STATUS_APPROVED_BUTTON;
-    private final Locator CREATE_NEW_CAMPAIGN_PAGE;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -148,7 +147,6 @@ public class Campaigns {
         this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
         this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
         this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
-        this.CREATE_NEW_CAMPAIGN_PAGE = page.locator("//div[contains(@class,'page-title') and text()='Create New Campaign']");
     }
 
     public void createCampaign() {
@@ -218,6 +216,7 @@ public class Campaigns {
     }
 
     public String verifyCampaignText() {
+        waitUtility.waitForLocatorVisible(VERIFY_CAMPAIGN_PAGE);
         return VERIFY_CAMPAIGN_PAGE.innerText();
     }
 
@@ -563,9 +562,5 @@ public class Campaigns {
         CAMPAIGN_STATUS_APPROVED_BUTTON.click();
         SAVE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
-    }
-
-    public boolean isCreateNewCampaignPageDisplayed() {
-        return CREATE_NEW_CAMPAIGN_PAGE.isVisible();
     }
 }
