@@ -225,7 +225,7 @@ public class Navigation {
     }
 
     public void selectExternalUserAccount(String account) {
-        if (!ACCOUNT_NAME.innerText().contains("automation@pulsepoint")) {
+        if (!ACCOUNT_NAME.innerText().contains(account)) {
             ACCOUNT_NAME.click();
             String accountXpath = String.format("//li[contains(@class, 'account-item')]//span[contains(@class, 'account-name') and normalize-space(text())='%s']", account);
             page.locator(accountXpath).click();
