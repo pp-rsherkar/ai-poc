@@ -212,7 +212,6 @@ public class Navigation {
     }
 
     public void selectAndClickExternalUserApplicationType() {
-        System.out.println("method selectAndClickExternalUserApplicationType");
         page.waitForURL(url -> url.contains("AdminDashBoard.aspx") || url.contains("LifePortalSelector.aspx") || url.contains("Buyer/#/campaign"));
         if (page.url().contains("LifePortalSelector.aspx")) {
             BUYING_PLATFORM.click();
@@ -227,12 +226,9 @@ public class Navigation {
 
     public void selectExternalUserAccount(String account) {
         if (!ACCOUNT_NAME.innerText().contains("automation@pulsepoint")) {
-            System.out.println("Method selectExternalUserAccount");
             ACCOUNT_NAME.click();
-            System.out.println("clicking account section");
             String accountXpath = String.format("//li[contains(@class, 'account-item')]//span[contains(@class, 'account-name') and normalize-space(text())='%s']", account);
             page.locator(accountXpath).click();
-            System.out.println("selected new account");
             page.waitForLoadState(LoadState.LOAD);
             waitUtility.waitUntilSpinnerHidden();
         }
