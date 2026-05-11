@@ -265,7 +265,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                | 5               | + 5 %                  | Email   | Tactic      | 1     |
 
   @regression
-  Scenario Outline: Verify forecast is refreshed after adding age gender and geo target rules in a new tactic
+  Scenario Outline: Verify forecast is refreshed after adding age in a new tactic
     And User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
