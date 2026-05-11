@@ -7,7 +7,7 @@ Feature: LIFE Regression - Create a Campaign
   5. Custom field addition, modification, and deletion on the Campaign creation page
   6. Create a campaign for an external user
 
-  @regression
+  @regression @ps
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
@@ -149,6 +149,7 @@ Feature: LIFE Regression - Create a Campaign
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
     Then Verify that the campaign budget status is "Pending Appr" and is greyed out

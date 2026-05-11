@@ -162,8 +162,8 @@ public class LifeSteps {
             logger.info("Selecting account: {}", account);
             navigation.selectAccount(account);
         } else {
-            navigation.selectExternalUserAccount(account);
             logger.info("Default account for External user: {}", account);
+            navigation.selectExternalUserAccount(account);
         }
     }
 
