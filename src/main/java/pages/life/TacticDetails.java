@@ -187,7 +187,6 @@ public class TacticDetails {
 
     public boolean isForecastDataAvailable() {
         CLICK_REFRESH_BUTTON.click();
-        //waitUtility.waitForElementHidden("//button[contains(@class,'loading')]");
         waitUtility.waitUntilSpinnerHidden();
         List<String> forecastData = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']").allInnerTexts();
         return forecastData.getLast().contains("$");
