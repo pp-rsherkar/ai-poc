@@ -192,7 +192,7 @@ public class TacticDetails {
         return forecastData.getLast().contains("$");
     }
 
-    public boolean isTargetingRuleAdded() {
+    public boolean isTargetingRuleMissing() {
         waitUtility.waitForLocatorVisible(targetingTemplate.ADD_TARGETING_RULE_BUTTON);
         return NO_TARGETING_RULES.isVisible();
     }

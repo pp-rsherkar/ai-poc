@@ -5574,15 +5574,14 @@ public class LifeSteps {
         tacticDetails.clickSettingsTab();
     }
 
-    @Then("User verify that the forecast data is not available when no targeting rules are added in the tactic")
-    public void user_verify_that_the_forecast_data_is_not_available_when_no_targeting_rules_are_added_in_the_tactic() {
-        logger.info("Verifying that forecast data is not available when no targeting rules are added in the tactic");
-        Assert.assertTrue("Targeting is added in the tactic", tacticDetails.isTargetingRuleAdded());
+    @Then("User verifies that forecast data is unavailable when no targeting rules are applied")
+    public void user_verifies_that_forecast_data_is_unavailable_when_no_targeting_rules_are_applied() {
+        Assert.assertTrue("Targeting is added in the tactic", tacticDetails.isTargetingRuleMissing());
         Assert.assertFalse("Forecast data is displayed even though no targeting rules are added", tacticDetails.isForecastDataAvailable());
     }
 
-    @Then("The forecast data should be refreshed and generate a forecast for the specified values")
-    public void the_forecast_data_should_be_refreshed_and_generate_a_forecast_for_the_specified_values() {
+    @Then("User verifies the forecast data refreshes and displays values after adding targeting rule")
+    public void user_verifies_the_forecast_data_refreshes_and_displays_values_after_adding_targeting_rule() {
         logger.info("Verifying that forecast data is refreshed and generated after targeting rules are added");
         Assert.assertTrue("Forecast data was not refreshed after adding targeting rules", tacticDetails.isForecastDataAvailable()
         );
