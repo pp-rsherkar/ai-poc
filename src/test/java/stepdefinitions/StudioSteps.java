@@ -270,6 +270,7 @@ public class StudioSteps {
         explorerWorkspace.clickEditWorkspace();
         explorerWorkspace.enterWorkspaceName(workspaceName);
         explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitUntilAlertDisappears();
         explorerWorkspace.waitForDashboardLoad();
     }
 
@@ -580,7 +581,7 @@ public class StudioSteps {
         logger.info("Verifying webhook failure error message");
         List<String> mediaTypeList = CommonUtils.parseCommaSeparatedString(errorData);
         String errorMessage = workspace.verifyErrorMsgWhenAPIFailed(mediaTypeList);
-        Assert.assertTrue("Error message is not displayed", errorMessage.contains("Error occurred while saving workspace or editing webhook"));
+        Assert.assertTrue("Error message is not displayed", errorMessage.contains("Webhook setup error. Try again."));
     }
 
     @Then("Check the webhook icon is highlighted in green color")

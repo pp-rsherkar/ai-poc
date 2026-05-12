@@ -168,6 +168,7 @@ public class Navigation {
     public void clickCampaigns() {
         CAMPAIGNS.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForElementVisible("//div[@class='page-title' and text()='Campaigns']");
     }
 
     public void clickCreativeLibrary() {
@@ -212,7 +213,7 @@ public class Navigation {
     }
 
     public void selectAndClickExternalUserApplicationType() {
-        page.waitForURL(url -> url.contains("AdminDashBoard.aspx") || url.contains("LifePortalSelector.aspx"));
+        page.waitForURL(url -> url.contains("AdminDashBoard.aspx") || url.contains("LifePortalSelector.aspx") || url.contains("Buyer/#/campaign"));
         if (page.url().contains("LifePortalSelector.aspx")) {
             BUYING_PLATFORM.click();
             waitUtility.waitUntilSpinnerHidden();
@@ -221,6 +222,16 @@ public class Navigation {
 
     public void navigateToCuratedMarket() {
         CURATED_MARKET.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void selectExternalUserAccount(String account) {
+        if (!ACCOUNT_NAME.innerText().contains(account)) {
+            ACCOUNT_NAME.click();
+            String accountXpath = String.format("//li[contains(@class, 'account-item')]//span[contains(@class, 'account-name') and normalize-space(text())='%s']", account);
+            page.locator(accountXpath).click();
+            page.waitForLoadState(LoadState.LOAD);
+        }
         waitUtility.waitUntilSpinnerHidden();
     }
 }
