@@ -148,7 +148,8 @@ Feature: LIFE Regression - Create a Campaign
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
-    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
     Then Verify that the campaign budget status is "Pending Appr" and is greyed out
