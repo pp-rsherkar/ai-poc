@@ -253,6 +253,7 @@ public class TacticDetails {
     public void saveTacticDetails() {
         waitUtility.waitForLocatorVisible(SAVE_TACTIC_DETAILS);
         SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String tacticDetailsSuccess() {
@@ -299,6 +300,25 @@ public class TacticDetails {
             templateNameList.add(saveTargetingTemplate(lineItemType.trim()));
         }
         return templateNameList;
+    }
+
+    public void selectManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount, String expectedFeeValue) {
+        String optionXPath = String.format("//div[contains(@class,'management-fee-contanier')]//div//button[normalize-space(text())='%s']", managementFeeOption);
+        page.locator(optionXPath).click();
+        switch (managementFeeOption) {
+            case "Percentage" -> tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+            case "CPM", "Fixed CPM" -> tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            case "% + CPM"    -> {
+                tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+                tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            }
+            default -> throw new IllegalArgumentException("Unexpected fee type: " + managementFeeOption);
+        }
+        saveTacticDetails();
+        waitUtility.waitForElementVisible("//span[contains(@class,'strike-text')]");
+        clickFirstTacticTab();
+        clickSettingsTab();
+        waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
     }
 
     private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {
