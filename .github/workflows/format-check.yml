@@ -42,6 +42,7 @@ jobs:
       - name: Create pull request if changes were made
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.QA_AUTOMATION }}
           commit-message: "chore: weekly auto-format"
           title: "chore: weekly auto-format"
           body: |
