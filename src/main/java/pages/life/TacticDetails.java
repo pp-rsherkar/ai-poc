@@ -68,6 +68,7 @@ public class TacticDetails {
     private final Locator CONTINUE_BUTTON;
     private final Locator CLICK_REFRESH_BUTTON;
     private final Locator NO_TARGETING_RULES;
+    private final Locator FORECAST_AVAILS_NUMBER;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -135,6 +136,7 @@ public class TacticDetails {
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
         this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
         this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
+        this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
     }
 
     public void clickNewTactic() {
@@ -188,7 +190,7 @@ public class TacticDetails {
     public boolean isForecastDataAvailable() {
         CLICK_REFRESH_BUTTON.click();
         waitUtility.waitUntilSpinnerHidden();
-        List<String> forecastData = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']").allInnerTexts();
+        List<String> forecastData = FORECAST_AVAILS_NUMBER.allInnerTexts();
         return forecastData.getLast().contains("$");
     }
 
