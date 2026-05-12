@@ -66,6 +66,9 @@ public class TacticDetails {
     private final Locator COMMENT_SUCCESS_ALERT;
     private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
     private final Locator CONTINUE_BUTTON;
+    private final Locator CLICK_REFRESH_BUTTON;
+    private final Locator NO_TARGETING_RULES;
+    private final Locator FORECAST_AVAILS_NUMBER;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -131,6 +134,9 @@ public class TacticDetails {
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
+        this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
+        this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
     }
 
     public void clickNewTactic() {
@@ -179,6 +185,18 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public boolean isForecastDataAvailable() {
+        CLICK_REFRESH_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        List<String> forecastData = FORECAST_AVAILS_NUMBER.allInnerTexts();
+        return forecastData.getLast().contains("$");
+    }
+
+    public boolean isTargetingRuleMissing() {
+        waitUtility.waitForLocatorVisible(targetingTemplate.ADD_TARGETING_RULE_BUTTON);
+        return NO_TARGETING_RULES.isVisible();
     }
 
     public void addComment(String entryPoint, String comment) {
