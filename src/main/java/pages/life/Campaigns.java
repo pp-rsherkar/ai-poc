@@ -216,6 +216,7 @@ public class Campaigns {
     }
 
     public String verifyCampaignText() {
+        waitUtility.waitForLocatorVisible(VERIFY_CAMPAIGN_PAGE);
         return VERIFY_CAMPAIGN_PAGE.innerText();
     }
 

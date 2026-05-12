@@ -95,7 +95,7 @@ public class TacticSettings {
     public TacticSettings(Page page) {
         this.page = page;
         this.VERIFY_TACTIC_SETTINGS_PAGE = page.locator("//div[text()='Bid Strategy']");
-        this.SELECT_CHANNEL = page.locator("(//div[@id='billingTypeDropdown'])[1]");
+        this.SELECT_CHANNEL = page.locator("//label[text()='Channel']/following-sibling::div//div[@id='billingTypeDropdown']");
         this.SEARCH_RULE_TYPE = page.locator("//input[@name='search']");
         this.SELECT_RULE_TYPE = page.locator("(//a[@classname='target-tooltip'])[1]");
         this.SELECT_OPTION = page.locator("(//div[contains(@class,'include-default')])[1]");
@@ -848,7 +848,6 @@ public List<String> fetchEnteredManagementFeeValues() {
     public String verifyTacticName() {
         return TACTIC_NAME.innerText();
     }
-
 
     public void clickNewTactic() {
         NEW_TACTIC.click();

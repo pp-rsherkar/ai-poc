@@ -168,6 +168,7 @@ public class Navigation {
     public void clickCampaigns() {
         CAMPAIGNS.click();
         waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForElementVisible("//div[@class='page-title' and text()='Campaigns']");
     }
 
     public void clickCreativeLibrary() {
