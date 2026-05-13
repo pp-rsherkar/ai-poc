@@ -233,7 +233,6 @@ public class LineItemDetails {
 
     public void enableManagementFeeOverride() {
        Locator checkboxInput = page.locator("//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]/preceding-sibling::input");
-
        if (!checkboxInput.isChecked()) {
             MANAGEMENT_FEE_OVERRIDE.click();
         }
@@ -344,7 +343,6 @@ public class LineItemDetails {
     public void clickDetailsTab() {
         TAB_NAMES.locator("text=Details").click();
         waitUtility.waitUntilPreLoaderHidden();
-        page.waitForTimeout(2000);
     }
 
     public void clickOverviewTab() {
@@ -364,7 +362,7 @@ public class LineItemDetails {
         GENERATE_FLIGHTS.click();
     }
 
-    public List<String> fetchSequentialFlightStartDates(){
+    public List<String> fetchSequentialFlightStartDates() {
         List<String> sequentialFlights = new ArrayList<>();
         int totalFlightCount = FLIGHT_CONTAINER.count();
         for (int i = 1; i <= totalFlightCount; i++) {
@@ -374,7 +372,7 @@ public class LineItemDetails {
         return sequentialFlights;
     }
 
-    public List<String> fetchSequentialFlightEndDates(){
+    public List<String> fetchSequentialFlightEndDates() {
         List<String> sequentialFlights = new ArrayList<>();
         int totalFlightCount = FLIGHT_CONTAINER.count();
         for (int i = 1; i <= totalFlightCount; i++) {
@@ -562,7 +560,7 @@ public class LineItemDetails {
         Locator impressionCapLocator = page.locator(String.format("//label[contains(text(),'%s')]/parent::sui-checkbox", impressionCap));
         for (int i = 0; i < impressionCapLocator.count(); i++) {
             if (impressionCapLocator.nth(i).isVisible()) {
-                 return impressionCapLocator.nth(i).getAttribute("class").contains("checked");
+                return impressionCapLocator.nth(i).getAttribute("class").contains("checked");
             }
         }
         return false;

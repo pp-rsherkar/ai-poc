@@ -4300,7 +4300,7 @@ public class LifeSteps {
     @Then("User should see error message {string} when tries to save line item page")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage(String errorMessage) {
         logger.info("User should see error message {} when tries to save line item page", errorMessage);
-        Assert.assertTrue("Error message is not displayed", lineItemDetails.fetchErrorAlert().contains("Invalid budget"));
+        Assert.assertTrue("Error message is not displayed", lineItemDetails.fetchErrorAlert().contains(errorMessage));
     }
 
     @And("Verify if user enters flight budget that exceeds Campaign budget")
@@ -6175,8 +6175,8 @@ public class LifeSteps {
     @And("Verify {string} and {string} checkboxes are available for each flight entry")
     public void verifyAndCheckboxesAreAvailableForEachFlightEntry(String flightImpressionCap, String dailyImpressionCap) {
         logger.info("Verify {} and {} checkboxes are available for each flight entry", flightImpressionCap, dailyImpressionCap);
-        Assert.assertTrue("{} checkbox is not available for the flight entry", lineItemDetails.isImpressionCapCheckboxAvailable(flightImpressionCap));
-        Assert.assertTrue("{} checkbox is not available for the flight entry", lineItemDetails.isImpressionCapCheckboxAvailable(dailyImpressionCap));
+        Assert.assertTrue(flightImpressionCap + " checkbox is not available for the flight entry", lineItemDetails.isImpressionCapCheckboxAvailable(flightImpressionCap));
+        Assert.assertTrue(dailyImpressionCap + " checkbox is not available for the flight entry", lineItemDetails.isImpressionCapCheckboxAvailable(dailyImpressionCap));
     }
 
     @And("User should be able to check the {string} and {string} checkboxes")
