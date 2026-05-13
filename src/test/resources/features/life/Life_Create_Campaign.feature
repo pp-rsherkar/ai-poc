@@ -178,5 +178,3 @@ Feature: LIFE Regression - Create a Campaign
 #      | apiName | param1 | param2 | statusCode | expected1 | expected2 |
 #      | GET     | 1      | 2      | 404        | 1         | 2         |
 #      | POST    | 1      | 2      | 404        | 1         | 2         |
-
-#test commit to trigger format check workflow
