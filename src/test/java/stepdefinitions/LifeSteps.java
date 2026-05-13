@@ -4375,9 +4375,8 @@ public class LifeSteps {
             String dateStr = capturedDetails.get(i);
             LocalDate actualStartDate = LocalDate.parse(dateStr, formatter);
             LocalDate expectedStartDate = startDate.plusMonths(i).withDayOfMonth(1);
-            if (actualStartDate.getDayOfMonth()== expectedStartDate.getDayOfMonth() || actualStartDate.getMonthValue() == expectedStartDate.getMonthValue() || actualStartDate.getYear() == expectedStartDate.getYear()) {
-                Assert.assertEquals("Flight start date mismatch ", expectedStartDate, actualStartDate);
-            }
+            Assert.assertEquals("Flight start date mismatch ", expectedStartDate, actualStartDate);
+
         }
     }
 
@@ -4390,9 +4389,7 @@ public class LifeSteps {
             String dateStr = itemList.get(i);
             LocalDate actualEndDate = LocalDate.parse(dateStr, formatter);
             LocalDate expectedEndDate = endDate.plusMonths(i).withDayOfMonth(endDate.plusMonths(i).lengthOfMonth());
-            if ( actualEndDate.withDayOfMonth(actualEndDate.lengthOfMonth()) == expectedEndDate.withDayOfMonth(expectedEndDate.lengthOfMonth()) || actualEndDate.getMonthValue() == expectedEndDate.getMonthValue() || actualEndDate.getYear() == expectedEndDate.getYear()) {
-                Assert.assertEquals("Flight end date mismatch ", actualEndDate, expectedEndDate);
-            }
+            Assert.assertEquals("Flight end date mismatch ", expectedEndDate, actualEndDate);
         }
     }
 
