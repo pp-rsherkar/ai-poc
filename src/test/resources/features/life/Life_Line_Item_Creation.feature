@@ -48,7 +48,7 @@ Feature: LIFE Regression - Line Item Management
       | LINE_ITEM  | BUDGET | NUMBER_OF_FLIGHTS |
       | Line_Item_ | 200    | 3                 |
 
-  @regression @e2e
+  @regression
   Scenario Outline: Add sequential flights to a line item and verify Flights tab after deleting some entries
     When User enters line item details "<LINE_ITEM>"
     And User generates sequential flights for the line item using "<BUDGET>" and "<NUMBER_OF_MONTHS>"
