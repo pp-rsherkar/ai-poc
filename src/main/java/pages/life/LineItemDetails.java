@@ -101,7 +101,8 @@ public class LineItemDetails {
         this.TACTIC_ITEM_DETAILS = page.locator("//div[contains(@class,'tactic item-details pointer')]");
         this.LINE_ITEM_STATUS = page.locator("//span[contains(@class,'status-label')]/span");
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
-        this.ERROR_ALERT = page.locator("//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.') or contains(@aria-label, 'Invalid budget')]");
+        this.ERROR_ALERT = page.locator(
+                "//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.') or contains(@aria-label, 'Invalid budget')]");
         this.UNACCOUNTED_BUDGET = page.locator("//span[contains(text(), 'Use Unaccounted Budget')]");
         this.FLIGHT_CONTAINER = page.locator("//div[contains(@class,'flight-container')]");
         this.FLIGHT_START_DATE = page.locator("//input[contains(@class,'gaFlightStartDate')]");
