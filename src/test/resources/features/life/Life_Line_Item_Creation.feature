@@ -22,31 +22,48 @@ Feature: LIFE Regression - Line Item Management
     When User fills in required details "<LINE_ITEM>" except for flight information and save
     Then User should see an error message to add flight details
     And User clicks Add Flight button
+    And User tries to save the line item without entering any flight details
+    Then User should see error message "Invalid budget" when tries to save line item page
     And Verify if user enters flight budget that exceeds Campaign budget
     Then User should see error message when tries to save line item page
     And User adds the flight details - Flight Start Date, Flight End Date, "<BUDGET>"
     And User adds new flight and enter overlapping flight details - Flight Start Date, Flight End Date, "<BUDGET>"
     And User should see error message when tries to save line item page and dates fields should get highlighted with inline error message
+    And Verify "Apply Impression Cap for This Flight" and "Apply Daily Impression Cap" checkboxes are available for each flight entry
+    And User should be able to check the "Apply Impression Cap for This Flight" and "Apply Daily Impression Cap" checkboxes
+    And Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page
     Examples:
       | LINE_ITEM  | BUDGET |
       | Line_Item_ | 200    |
 
   @regression
-  Scenario Outline: Add multiple and sequential flights to a line item and verify Flights tab after deleting some entries
+  Scenario Outline: Add multiple flights to a line item and verify Flights tab after deleting some entries
     When User enters line item details "<LINE_ITEM>"
     And User adds "<NUMBER_OF_FLIGHTS>" flights, fills in the details with "<BUDGET>" for each flight section, and saves the line item
-    And User generates sequential flights for the line item using "<BUDGET>" and "<NUMBER_OF_MONTHS>"
-    And Verify that Sequential flights should be added based on the start month
     And User fetches all the flight details added
     Then User navigates to the Flights tab and verifies the flight details
     When User deletes some flight entries
     Then User should see the remaining flights listed under the Flights section
     Examples:
-      | LINE_ITEM  | BUDGET | NUMBER_OF_FLIGHTS | NUMBER_OF_MONTHS |
-      | Line_Item_ | 200    | 3                 | 2                |
+      | LINE_ITEM  | BUDGET | NUMBER_OF_FLIGHTS |
+      | Line_Item_ | 200    | 3                 |
+
+  @regression @e2e
+  Scenario Outline: Add sequential flights to a line item and verify Flights tab after deleting some entries
+    When User enters line item details "<LINE_ITEM>"
+    And User generates sequential flights for the line item using "<BUDGET>" and "<NUMBER_OF_MONTHS>"
+    And Verify that Sequential flights should be added based on the start month and verify start date of the month for each flight entry
+    And Verify end date of the month for each flight entry
+    And User fetches all the flight details added
+    Then User navigates to the Flights tab and verifies the flight details
+    When User deletes some flight entries
+    Then User should see the remaining flights listed under the Flights section
+    Examples:
+      | LINE_ITEM  | BUDGET | NUMBER_OF_MONTHS |
+      | Line_Item_ | 200    | 4                |
 
   @regression
-  Scenario Outline: Create, modify, duplicate, delete, and toggle line items of different types using Bulk Edit Mode
+  Scenario Outline: Perform create, modify, duplicate, delete, and toggle operations on line items using Bulk Edit Mode and verify data integrity after duplication
     When User creates line items with below line types and other details, enables the line item and saves the changes
       | LINE_TYPE        | LINE_ITEM_DETAILS                                                                                                                          |
       | Display          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60    |
@@ -69,3 +86,15 @@ Feature: LIFE Regression - Line Item Management
     Examples:
       | LINE_ITEM_NOTE | TEMPLATE            |
       | Notes          | Template_Automation |
+
+  @regression
+  Scenario: Verify data integrity after creating line items with different line types and details
+    When User creates line items with below line types and other details and verifies the details after saving the line item
+      | LINE_TYPE        | LINE_ITEM_DETAILS                                                                                                                          |
+      | Display          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Ahead, PacingPercentage:60   |
+      | Audio            | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60     |
+      | Video            | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
+      | Native Display   | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60    |
+      | Native Video     | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Ahead, PacingPercentage:60   |
+      | DOOH             | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60     |
+      | Search Extension | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
