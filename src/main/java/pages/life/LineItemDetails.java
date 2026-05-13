@@ -149,7 +149,8 @@ public class LineItemDetails {
         this.PACING_MODE_INPUT = page.locator("//input[contains(@class,'pacing-mode-input')]");
         this.PLACEMENT_ID = page.locator("//label[contains(text(),'PlacementId')]/following-sibling::input");
         this.MANAGEMENT_FEE_LABEL_VALUE = page.locator("//span[contains(@class, 'fee-value')]");
-        this.MANAGEMENT_FEE_OVERRIDE = page.locator("//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]");
+        this.MANAGEMENT_FEE_OVERRIDE = page.locator(
+                "//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]");
         this.IMPRESSION_ERROR_MESSAGE = page.locator("//p[contains(text(),'Invalid Impression Cap')]");
     }
 
@@ -353,24 +354,6 @@ public class LineItemDetails {
     public void deleteFlightEntry() {
         DELETE_FLIGHT.first().click();
     }
-
-//    public List<String> generateSequentialFlights(String budget, String numberOfMonths) {
-//        List<String> sequentialFlights = new ArrayList<>();
-//        int initialFlightCount = FLIGHT_CONTAINER.count();
-//        GENERATE_SEQUENTIAL_FLIGHT.click();
-//        String startMonthValue = SEQUENTIAL_START_MONTH.evaluate("el => el.value").toString();
-//        sequentialFlights.add(startMonthValue);
-//        NUMBER_OF_MONTHS.click();
-//        page.locator(String.format("//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']", numberOfMonths)).click();
-//        enterLineItemBudget(budget);
-//        GENERATE_FLIGHTS.click();
-//        int totalFlightCount = FLIGHT_CONTAINER.count();
-//        for (int i = initialFlightCount + 1; i <= totalFlightCount; i++) {
-//            String flightStartDate = page.locator(String.format("//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightStartDate')]", i)).evaluate("el => el.value").toString();
-//            sequentialFlights.add(flightStartDate);
-//        }
-//        return sequentialFlights;
-//    }
 
     public void generateSequentialFlights(String budget, String numberOfMonths) {
         GENERATE_SEQUENTIAL_FLIGHT.click();
