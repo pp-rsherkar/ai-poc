@@ -4467,7 +4467,9 @@ public class LifeSteps {
             lineItemDetails.saveLineItem();
             Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
-            Assert.assertTrue("Line Item '" + lineItemNameRandom + "' is not available", lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
+            Assert.assertTrue(
+                    "Line Item '" + lineItemNameRandom + "' is not available",
+                    lineItemLabelList.stream().anyMatch(item -> item.equalsIgnoreCase(lineItemNameRandom)));
             lineItemDetails.cancelTactic();
             if (currentRowIndex < totalRows - 1) {
                 lineItemDetails.selectNewLineItem();
