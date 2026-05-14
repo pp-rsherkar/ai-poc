@@ -14,7 +14,6 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import utils.CommonUtils;
 import utils.ConfigReader;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,12 +31,12 @@ public class ApiSteps {
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode data;
 
-
     @Given("I call the Token API for user {string} and password {string} for authentication")
     public void iCallTheTokenAPIForUserAndPassword(String username, String password) {
         // Headers
+        String basicAuth = "Basic " + Base64.getEncoder().encodeToString((ConfigReader.getProperty("clientId") + ":" + ConfigReader.getProperty("clientSecret")).getBytes());
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("Authorization", ConfigReader.getProperty("basicAuth"));
+        headers.put("Authorization", basicAuth);
         // Form Data
         HashMap<String, String> formData = new HashMap<>();
         formData.put("username", username);
@@ -65,8 +64,8 @@ public class ApiSteps {
     public void theResponseShouldContainTheNPIBlockAndReturnASuccessfulStatusCode() throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(200, response.status());
-        Assert.assertTrue("NPI key missing in response", jsonNode.has("npis"));
-        Assert.assertFalse("'npis' is empty", jsonNode.get("npis").isEmpty());
+        Assert.assertTrue("NPI key missing in response", jsonNode.get("data").has("npis"));
+        Assert.assertFalse("'npis' is empty", jsonNode.get("data").get("npis").isEmpty());
     }
 
     @When("User uses the token to call the GET NPI List API with account ID {string}")
@@ -106,12 +105,12 @@ public class ApiSteps {
         if (response.status() != 200) {
             List<String> expectedErrorMessages = CommonUtils.parseCommaSeparatedString(errorMessage);
             List<String> actualErrorMessages = new ArrayList<>();
-            JsonNode validationErrors = jsonNode.get("validationErrors");
+            JsonNode validationErrors = jsonNode.get("error").get("details");
             if (validationErrors != null && validationErrors.isArray()) {
                 for (JsonNode error : validationErrors) {
-                    actualErrorMessages.add(error.get("errorDescription").asText());
+                    actualErrorMessages.add(error.get("message").asText());
                 }
-            } else if (jsonNode.has("errorMessage")) {
+            } else if (jsonNode.has("message")) {
                 actualErrorMessages.add(jsonNode.get("errorMessage").get("errorDescription").asText());
             }
             for (String expectedError : expectedErrorMessages) {
@@ -175,7 +174,7 @@ public class ApiSteps {
     @Then("Verify the NPI block contains the newly added NPIs")
     public void verifyTheNPIBlockContainsTheNewlyAddedNPIs() throws Exception {
         jsonNode = mapper.readTree(response.text());
-        JsonNode npisInResponse = jsonNode.path("npis");
+        JsonNode npisInResponse = jsonNode.path("data").path("npis");
         Set<String> responseNpisSet = new HashSet<>();
         for (JsonNode node : npisInResponse) {
             responseNpisSet.add(node.asText());
