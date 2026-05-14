@@ -357,7 +357,10 @@ public class LineItemDetails {
     public void generateSequentialFlights(String budget, String numberOfMonths) {
         GENERATE_SEQUENTIAL_FLIGHT.click();
         NUMBER_OF_MONTHS.click();
-        page.locator(String.format("//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']", numberOfMonths)).click();
+        page.locator(String.format(
+                        "//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']",
+                        numberOfMonths))
+                .click();
         enterLineItemBudget(budget);
         GENERATE_FLIGHTS.click();
     }
