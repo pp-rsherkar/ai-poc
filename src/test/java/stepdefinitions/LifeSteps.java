@@ -4393,7 +4393,8 @@ public class LifeSteps {
         for (int i = 0; i < itemList.size(); i++) {
             String dateStr = itemList.get(i);
             LocalDate actualEndDate = LocalDate.parse(dateStr, formatter);
-            LocalDate expectedEndDate = endDate.plusMonths(i).withDayOfMonth(endDate.plusMonths(i).lengthOfMonth());
+            LocalDate expectedEndDate =
+                    endDate.plusMonths(i).withDayOfMonth(endDate.plusMonths(i).lengthOfMonth());
             Assert.assertEquals("Flight end date mismatch ", expectedEndDate, actualEndDate);
         }
     }
