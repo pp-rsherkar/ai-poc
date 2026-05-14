@@ -6188,7 +6188,9 @@ public class LifeSteps {
     public void userShouldBeAbleToCheckTheAndCheckboxes(String flightImpressionCap, String dailyImpressionCap) {
         logger.info("User should be able to check the {} and {} checkboxes", flightImpressionCap, dailyImpressionCap);
         lineItemDetails.clickImpressionCapCheckbox(flightImpressionCap);
-        Assert.assertTrue(flightImpressionCap + " checkbox is not checked successfully for the flight entry", lineItemDetails.isImpressionCapCheckboxChecked(flightImpressionCap));
+        Assert.assertTrue(
+                flightImpressionCap + " checkbox is not checked successfully for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxChecked(flightImpressionCap));
         lineItemDetails.clickImpressionCapCheckbox(dailyImpressionCap);
         Assert.assertTrue(
                 dailyImpressionCap + " checkbox is not checked successfully for the flight entry",
