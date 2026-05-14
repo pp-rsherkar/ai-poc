@@ -6173,8 +6173,11 @@ public class LifeSteps {
 
     @Then("User searches and verifies the created targeting template is available on Targeting Templates page")
     public void userSearchesAndVerifiesTheCreatedTargetingTemplateIsAvailableOnTargetingTemplatesPage() {
-        logger.info("User searches and verifies the created targeting template is available on Targeting Templates page");
-        Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
+        logger.info(
+                "User searches and verifies the created targeting template is available on Targeting Templates page");
+        Assert.assertTrue(
+                "Targeting template is not found in the search results",
+                targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
     }
 
     @And("Verify {string} and {string} checkboxes are available for each flight entry")
