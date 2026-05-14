@@ -6190,7 +6190,9 @@ public class LifeSteps {
         lineItemDetails.clickImpressionCapCheckbox(flightImpressionCap);
         Assert.assertTrue(flightImpressionCap + " checkbox is not checked successfully for the flight entry", lineItemDetails.isImpressionCapCheckboxChecked(flightImpressionCap));
         lineItemDetails.clickImpressionCapCheckbox(dailyImpressionCap);
-        Assert.assertTrue(dailyImpressionCap + " checkbox is not checked successfully for the flight entry", lineItemDetails.isImpressionCapCheckboxChecked(dailyImpressionCap));
+        Assert.assertTrue(
+                dailyImpressionCap + " checkbox is not checked successfully for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxChecked(dailyImpressionCap));
     }
 
     @And(
