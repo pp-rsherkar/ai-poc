@@ -564,7 +564,8 @@ public class LineItemDetails {
     }
 
     public boolean isImpressionCapCheckboxChecked(String impressionCap) {
-        Locator impressionCapLocator = page.locator(String.format("//label[contains(text(),'%s')]/parent::sui-checkbox", impressionCap));
+        Locator impressionCapLocator =
+                page.locator(String.format("//label[contains(text(),'%s')]/parent::sui-checkbox", impressionCap));
         for (int i = 0; i < impressionCapLocator.count(); i++) {
             if (impressionCapLocator.nth(i).isVisible()) {
                 return impressionCapLocator.nth(i).getAttribute("class").contains("checked");
