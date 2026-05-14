@@ -582,5 +582,3 @@ public class LineItemDetails {
         return IMPRESSION_ERROR_MESSAGE.count() > 0;
     }
 }
-
-
