@@ -4484,7 +4484,10 @@ public class LifeSteps {
         for (Map<String, String> row : rows) {
             String type = row.get("LINE_TYPE").trim();
             String attributes = row.get("LINE_ITEM_DETAILS").trim();
-            Map<String, String> attributeMap = Arrays.stream(attributes.split(",")).map(String::trim).map(entry -> entry.split(":", 2)).collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
             lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
             logger.info("Creating Line Item: {} of type {}", lineItemNameRandom, type);
             lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
