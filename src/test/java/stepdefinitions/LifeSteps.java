@@ -4476,8 +4476,10 @@ public class LifeSteps {
         }
     }
 
-    @When("User creates line items with below line types and other details and verifies the details after saving the line item")
-    public void userCreatesLineItemsWithBelowLineTypesAndOtherDetailsAndVerifiesTheDetailsAfterSavingTheLineItem(DataTable dataTable) throws InterruptedException {
+    @When(
+            "User creates line items with below line types and other details and verifies the details after saving the line item")
+    public void userCreatesLineItemsWithBelowLineTypesAndOtherDetailsAndVerifiesTheDetailsAfterSavingTheLineItem(
+            DataTable dataTable) throws InterruptedException {
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         int currentRowIndex = 0;
         int totalRows = rows.size();
