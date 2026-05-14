@@ -376,7 +376,11 @@ public class LineItemDetails {
         List<String> sequentialFlights = new ArrayList<>();
         int totalFlightCount = FLIGHT_CONTAINER.count();
         for (int i = 1; i <= totalFlightCount; i++) {
-            String flightEndDate = page.locator(String.format("//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightEndDate')]", i)).evaluate("el => el.value").toString();
+            String flightEndDate = page.locator(String.format(
+                            "//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightEndDate')]",
+                            i))
+                    .evaluate("el => el.value")
+                    .toString();
             sequentialFlights.add(flightEndDate);
         }
         return sequentialFlights;
