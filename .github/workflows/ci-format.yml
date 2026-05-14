@@ -4,18 +4,28 @@ on:
   pull_request:
 
 permissions:
-  contents: read
-  # Required to allow reviewdog to post review comments on the PR
+  contents: write
   pull-requests: write
 
 jobs:
   spotless:
     name: Spotless check
     runs-on: ubuntu-latest
+    # PRs from forks cannot be pushed to from this workflow (and don't have
+    # access to repository secrets on `pull_request`), so we skip them here.
+    # Contributors from forks need to run `mvn spotless:apply` locally; their
+    # PRs will fail the equivalent check on the maintainer side.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - name: Checkout repository
+      - name: Checkout PR head branch
         uses: actions/checkout@v4
         with:
+          # Check out the PR's head branch (not the merge ref) so we can
+          # commit Spotless fixes back to it.
+          ref: ${{ github.head_ref }}
+          # Use a PAT so that the resulting push re-triggers PR checks
+          # (pushes made with the default GITHUB_TOKEN do not).
+          token: ${{ secrets.QA_AUTOMATION }}
           fetch-depth: 0
 
       - name: Set up JDK 21
@@ -29,15 +39,16 @@ jobs:
         # We run 'apply' instead of 'check' so that the files are actually fixed locally
         run: mvn -B -ntp spotless:apply
 
-      - name: Suggest formatting changes
-        # This action takes any changed files in the workspace and converts
-        # them into inline PR suggestions. It only posts on Pull Requests.
-        uses: reviewdog/action-suggester@v1
+      - name: Auto-commit formatting fixes
+        # If Spotless changed any files, commit and push them back to the PR
+        # branch so the author does not need to click "Commit suggestion" on
+        # every inline review comment.
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          tool_name: Spotless
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_message: "chore: apply Spotless auto-format"
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
 
-      - name: Fail build if formatting was incorrect
-        # We still want the check to fail if changes were needed,
-        # so the PR cannot be merged until the suggestions are applied.
+      - name: Fail build if formatting is still incorrect
+        # Sanity check: after auto-apply (and any push) the tree must be clean.
         run: mvn -B -ntp spotless:check
