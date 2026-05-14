@@ -4300,7 +4300,9 @@ public class LifeSteps {
     @Then("User should see error message {string} when tries to save line item page")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage(String errorMessage) {
         logger.info("User should see error message {} when tries to save line item page", errorMessage);
-        Assert.assertTrue("Error message is not displayed", lineItemDetails.fetchErrorAlert().contains(errorMessage));
+        Assert.assertTrue(
+                "Error message is not displayed",
+                lineItemDetails.fetchErrorAlert().contains(errorMessage));
     }
 
     @And("Verify if user enters flight budget that exceeds Campaign budget")
