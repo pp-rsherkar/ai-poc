@@ -4316,7 +4316,10 @@ public class LifeSteps {
     @Then("User should see error message when tries to save line item page")
     public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage() {
         logger.info("User should see error message when tries to save line item page");
-        Assert.assertTrue("The total flight budget is exceeded", lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed") || lineItemDetails.fetchErrorAlert().contains("Invalid budget"));
+        Assert.assertTrue(
+                "The total flight budget is exceeded",
+                lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed")
+                        || lineItemDetails.fetchErrorAlert().contains("Invalid budget"));
     }
 
     @And("User adds the flight details - Flight Start Date, Flight End Date, {string}")
