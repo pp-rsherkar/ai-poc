@@ -6178,10 +6178,18 @@ public class LifeSteps {
     }
 
     @And("Verify {string} and {string} checkboxes are available for each flight entry")
-    public void verifyAndCheckboxesAreAvailableForEachFlightEntry(String flightImpressionCap, String dailyImpressionCap) {
-        logger.info("Verify {} and {} checkboxes are available for each flight entry", flightImpressionCap, dailyImpressionCap);
-        Assert.assertTrue(flightImpressionCap + " checkbox is not available for the flight entry", lineItemDetails.isImpressionCapCheckboxAvailable(flightImpressionCap));
-        Assert.assertTrue(dailyImpressionCap + " checkbox is not available for the flight entry", lineItemDetails.isImpressionCapCheckboxAvailable(dailyImpressionCap));
+    public void verifyAndCheckboxesAreAvailableForEachFlightEntry(
+            String flightImpressionCap, String dailyImpressionCap) {
+        logger.info(
+                "Verify {} and {} checkboxes are available for each flight entry",
+                flightImpressionCap,
+                dailyImpressionCap);
+        Assert.assertTrue(
+                flightImpressionCap + " checkbox is not available for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxAvailable(flightImpressionCap));
+        Assert.assertTrue(
+                dailyImpressionCap + " checkbox is not available for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxAvailable(dailyImpressionCap));
     }
 
     @And("User should be able to check the {string} and {string} checkboxes")
