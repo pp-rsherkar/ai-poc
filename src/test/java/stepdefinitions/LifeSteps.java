@@ -6195,6 +6195,8 @@ public class LifeSteps {
     public void verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
         logger.info("Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
         lineItemDetails.saveLineItem();
-        Assert.assertTrue("Error message is not displayed when impression cap values are not added for the selected checkboxes", lineItemDetails.isImpressionCapErrorMessageVisible());
+        Assert.assertTrue(
+                "Error message is not displayed when impression cap values are not added for the selected checkboxes",
+                lineItemDetails.isImpressionCapErrorMessageVisible());
     }
 }
