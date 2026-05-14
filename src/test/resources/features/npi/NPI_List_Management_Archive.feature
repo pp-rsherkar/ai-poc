@@ -135,10 +135,10 @@ Feature: NPI List Management - Archive and Unarchive Lists capability
     Given Multiple archived NPI lists exist under "Archived" tab
     When User clicks "Archived" tab from the NPI Lists page
     Then Verify the following filters are available and working under "Archived" tab
-      | List Type  |
-      | Advertiser |
-      | Archived By|
-      | Date Range |
+      | List Type   |
+      | Advertiser  |
+      | Archived By |
+      | Date Range  |
     When User searches for an archived list by name "ARCHIVE_SEARCH"
     Then Verify only the lists matching the search term "ARCHIVE_SEARCH" are displayed under "Archived" tab
     When User sorts the archived lists by "Archived On" in descending order
