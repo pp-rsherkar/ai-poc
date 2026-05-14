@@ -6193,9 +6193,12 @@ public class LifeSteps {
         Assert.assertTrue(dailyImpressionCap + " checkbox is not checked successfully for the flight entry", lineItemDetails.isImpressionCapCheckboxChecked(dailyImpressionCap));
     }
 
-    @And("Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
-    public void verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
-        logger.info("Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
+    @And(
+            "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
+    public void
+            verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
+        logger.info(
+                "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
         lineItemDetails.saveLineItem();
         Assert.assertTrue(
                 "Error message is not displayed when impression cap values are not added for the selected checkboxes",
