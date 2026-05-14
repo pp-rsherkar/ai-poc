@@ -1,0 +1,36 @@
+name: Copilot Setup Steps
+
+# Pre-installs everything the Copilot coding agent needs inside its
+# sandbox so it can build, run, and verify Playwright/Cucumber tests
+# while iterating on a fix opened from an automated failure issue.
+#
+# Documented hook used by the Copilot coding agent:
+# https://docs.github.com/en/copilot/customizing-copilot/customizing-the-development-environment-for-copilot-coding-agent
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  copilot-setup-steps:
+    name: Prepare Copilot agent environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Warm Maven cache
+        run: mvn -B -ntp -DskipTests dependency:go-offline
+
+      - name: Install Playwright browsers (with OS deps)
+        run: mvn -B -ntp exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
