@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-
 public class ApiSteps {
 
     APIResponse response;
@@ -49,7 +48,10 @@ public class ApiSteps {
     public void theTokenAPIResponseShouldReturnASuccessfulStatusCodeAndContainAValidBearerToken() throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(200, response.status());
-        Assert.assertTrue("access_token is missing in response", jsonNode.has("access_token") || !jsonNode.get("access_token").isEmpty());
+        Assert.assertTrue(
+                "access_token is missing in response",
+                jsonNode.has("access_token") || !jsonNode.get("access_token").isEmpty()
+        );
         bearerToken = jsonNode.path("access_token").asText();
     }
 
@@ -118,7 +120,7 @@ public class ApiSteps {
             }
         }
         if (response.status() == 200) {
-            JsonNode returnedNpis = jsonNode.get("npis");
+            JsonNode returnedNpis = jsonNode.get("data").get("npis");
             Assert.assertTrue("Expected 'npis' array in response", returnedNpis != null && returnedNpis.isArray());
             Set<String> submittedNpisSet = new HashSet<>(CommonUtils.parseCommaSeparatedString(npis));
             Set<String> returnedNpisSet = new HashSet<>();
@@ -145,7 +147,7 @@ public class ApiSteps {
     public void verifyTheCreateNPIAPIWithAttributesAPIResponseContainsTheSameListNameAndASuccessfulStatusCode() throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(200, response.status());
-        Assert.assertEquals(modifiedName, jsonNode.get("name").asText());
+        Assert.assertEquals(modifiedName, jsonNode.get("data").get("name").asText());
     }
 
     @And("Add NPIs to the existing NPI list {string} using patch API")
@@ -158,7 +160,7 @@ public class ApiSteps {
         }
         data = mapper.createArrayNode();
         data.addAll(npiArray);
-        System.out.println(data);
+
         ((ObjectNode) templateNode).set("npis", npiArray);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + bearerToken);
