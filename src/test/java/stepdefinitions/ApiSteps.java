@@ -50,8 +50,7 @@ public class ApiSteps {
         Assert.assertEquals(200, response.status());
         Assert.assertTrue(
                 "access_token is missing in response",
-                jsonNode.has("access_token") || !jsonNode.get("access_token").isEmpty()
-        );
+                jsonNode.has("access_token") || !jsonNode.get("access_token").isEmpty());
         bearerToken = jsonNode.path("access_token").asText();
     }
 
