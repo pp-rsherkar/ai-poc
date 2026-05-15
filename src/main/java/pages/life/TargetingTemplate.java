@@ -24,8 +24,8 @@ public class TargetingTemplate {
     private final Locator TEMPLATE_NAME_ERROR;
     private final Locator TARGETING_RULES_ERROR;
     private final Locator TARGETING_RULES_DELETE_ICON;
-    private final Locator SHOW_EXPRESSION_ICON;
-    private final Locator TARGETING_CONTAINER;
+    public final Locator SHOW_EXPRESSION_ICON;
+    public final Locator TARGETING_CONTAINER;
     private final Locator SEARCH_FIRST_ITEM;
     private final Locator TARGET_TEMPLATE_DELETE_ICON;
     private final Locator DELETE_DIALOG;

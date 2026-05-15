@@ -185,6 +185,27 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public boolean verifyShowExpressionValues(String ruleType) {
+        waitUtility.waitUntilSpinnerHidden();
+        System.out.println("trying to click show expression icon");
+        page.locator("//span[contains(text(),'Show Expression')]").click();
+        waitUtility.waitForLocatorVisible(targetingTemplate.TARGETING_CONTAINER);
+        if (ruleType.equalsIgnoreCase("Behavioral segment")) {
+            ruleType = "Behavioral";
+        } else if (ruleType.equalsIgnoreCase("Health Populations")) {
+            ruleType = "CONDITION";
+        }
+        return page.locator(String.format("//span[text()='%s']", ruleType)).isVisible();
+    }
+
+    public void removeTargetingRule(String ruleType) {
+        waitUtility.waitUntilSpinnerHidden();
+        String ruleLocator = String.format("//span[text()='%s']/parent::label//following-sibling::div//div[contains(@title,'delete')]", ruleType);
+        page.locator(ruleLocator).click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean isForecastDataAvailable() {
@@ -326,7 +347,7 @@ public class TacticDetails {
         switch (managementFeeOption) {
             case "Percentage" -> tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
             case "CPM", "Fixed CPM" -> tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
-            case "% + CPM"    -> {
+            case "% + CPM" -> {
                 tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
                 tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
             }
