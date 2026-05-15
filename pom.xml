@@ -88,7 +88,71 @@
                     <target>21</target>
                 </configuration>
             </plugin>
-        </plugins>
-    </build>
+            <!--
+                Spotless enforces a consistent code style across the repo.
+                  - `mvn spotless:check`  fails the build on formatting violations (used by CI).
+                  - `mvn spotless:apply`  auto-formats sources locally before committing.
+                A weekly scheduled GitHub Actions workflow runs `spotless:apply` every Sunday
+                and opens an auto-fix PR if anything needs reformatting.
+            -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>2.43.0</version>
+        <configuration>
+          <ratchetFrom>origin/main</ratchetFrom>
+          <java>
+            <includes>
+              <include>src/main/java/**/*.java</include>
+              <include>src/test/java/**/*.java</include>
+            </includes>
+            <palantirJavaFormat>
+              <version>2.50.0</version>
+            </palantirJavaFormat>
+            <removeUnusedImports/>
+            <importOrder/>
+            <trimTrailingWhitespace/>
+            <endWithNewline/>
+          </java>
+          <pom>
+            <includes>
+              <include>pom.xml</include>
+            </includes>
+            <sortPom>
+              <expandEmptyElements>false</expandEmptyElements>
+            </sortPom>
+          </pom>
+          <markdown>
+            <includes>
+              <include>**/*.md</include>
+            </includes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+            </excludes>
+            <flexmark/>
+            <trimTrailingWhitespace/>
+            <endWithNewline/>
+          </markdown>
+          <formats>
+            <format>
+              <includes>
+                <include>**/*.yml</include>
+                <include>**/*.yaml</include>
+              </includes>
+              <excludes>
+                <exclude>**/target/**</exclude>
+              </excludes>
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
+              <indent>
+                <spaces>true</spaces>
+                <spacesPerTab>2</spacesPerTab>
+              </indent>
+            </format>
+          </formats>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
