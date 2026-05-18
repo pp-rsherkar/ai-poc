@@ -82,7 +82,7 @@ public class Campaigns {
     public Campaigns(Page page) {
         this.page = page;
         this.CREATE_CAMPAIGN = page.locator("//button[text()='Create a Campaign']");
-        this.VERIFY_CAMPAIGN_PAGE = page.locator("//div[text()='Create New Campaign']");
+        this.VERIFY_CAMPAIGN_PAGE =      page.locator("//div[text()='Create New Campaign']");
         this.SEARCH_ADVERTISER = page.locator("//label[text()='Advertiser']/following-sibling::div//input");
         this.SELECT_ADVERTISER = page.getByText("");
         this.CAMPAIGN_NAME = page.locator("//input[@placeholder='Campaign Name']");
@@ -556,7 +556,11 @@ public class Campaigns {
         return page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span").count();
     }
 
-    public void approveCampaign() {
+
+
+
+    public void approveCampaign()
+    {
         waitUtility.waitForLocatorVisible(CAMPAIGN_APPROVAL_STATUS);
         waitUtility.waitForLocatorVisible(CAMPAIGN_STATUS_APPROVED_BUTTON);
         CAMPAIGN_STATUS_APPROVED_BUTTON.click();
@@ -564,3 +568,4 @@ public class Campaigns {
         waitUtility.waitUntilSpinnerHidden();
     }
 }
+

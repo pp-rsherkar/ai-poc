@@ -12,7 +12,7 @@ Feature: LIFE Regression - Line Item Management
   @regression
   Scenario Outline: Validate that a line item cannot be saved without valid flight details and appropriate budget and date constraints
     And Verify Line Item page has below tabs
-      | Overview       |
+      | Overview                         |
       | Details        |
       | Flights        |
       | Conversion     |
@@ -27,9 +27,12 @@ Feature: LIFE Regression - Line Item Management
     And User adds the flight details - Flight Start Date, Flight End Date, "<BUDGET>"
     And User adds new flight and enter overlapping flight details - Flight Start Date, Flight End Date, "<BUDGET>"
     And User should see error message when tries to save line item page and dates fields should get highlighted with inline error message
+
+
+
     Examples:
       | LINE_ITEM  | BUDGET |
-      | Line_Item_ | 200    |
+      | Line_Item_                       | 200    |
 
   @regression
   Scenario Outline: Add multiple and sequential flights to a line item and verify Flights tab after deleting some entries
