@@ -32,10 +32,10 @@ jobs:
           cache: maven
 
       - name: Run Spotless apply
-        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=DISABLE
+        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=
 
       - name: Verify formatting is now clean
-        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=DISABLE
+        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=
 
       - name: Remove Spotless cache files from git index
         run: git rm -r --cached target/ 2>/dev/null || true
