@@ -295,7 +295,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then User navigates to tactic setting tab
     When User clicks on Add Targeting Rule
-    And User configures targeting rules as with options "<RULE_TYPE>" and "<RULE_VALUE>"
+    And User configures targeting rules with options "<RULE_TYPE>" and "<RULE_VALUE>"
     And User saves the settings
     And User navigates to tactic setting tab
     Then User clicks on Show Expression and verifies if the displayed expression "contains" "<RULE_TYPE>"
