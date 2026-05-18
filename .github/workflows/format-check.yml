@@ -32,10 +32,10 @@ jobs:
           cache: maven
 
       - name: Run Spotless apply
-        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=
+        run: mvn -B -ntp spotless:apply
 
       - name: Verify formatting is now clean
-        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=
+        run: mvn -B -ntp spotless:check
 
       - name: Create pull request if changes were made
         uses: peter-evans/create-pull-request@v7
