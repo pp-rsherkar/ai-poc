@@ -40,8 +40,8 @@ jobs:
         id: find_issue
         uses: atlassian/gajira-find-issue-key@v3
         with:
-          from: branch,commits,workflow_input
-          issue: ${{ github.event.inputs.issue_id }}
+          string: ${{ github.event.inputs.issue_id }}
+          from: workflow_input
 
       # Transitions the linked issue to "In Progress" on push, or "In Review" on a PR.
       - name: Transition issue — In Progress (push)
