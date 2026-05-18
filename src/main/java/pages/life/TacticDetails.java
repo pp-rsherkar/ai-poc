@@ -493,5 +493,55 @@ public class TacticDetails {
         String xpath = String.format("//div[text()='%s']/ancestor::div[contains(@class,'lineitem-list-wrapper')]//app-icon-lable-link[@class='tactic-new-button']//div", name);
         page.locator(xpath).click();
     }
+
+    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows) {
+        String currentLiName = null;
+
+        for (Map<String, String> row : rows) {
+            String liType    = row.get("LI_TYPE");
+            String liName    = row.get("LI_NAME");
+            String liBudget  = row.get("LI_BUDGET");
+            String tacticName = row.get("TACTIC_NAME");
+            String channel   = row.get("CHANNEL");
+
+            // Create a new line item only when LI_NAME changes
+            if (!liName.equals(currentLiName)) {
+                if (currentLiName != null) {
+                    lineItemDetails.selectNewLineItem();   // already has waitUtility inside
+                }
+                lineItemDetails.enterLineItemName(liName);
+                lineItemDetails.selectLineItemType(liType);
+                lineItemDetails.clickAddFlightButton();
+                lineItemDetails.enterLineItemBudget(liBudget);
+                lineItemDetails.enableLineItem();
+                lineItemDetails.saveLineItem();
+                waitUtility.waitUntilSpinnerHidden();
+                currentLiName = liName;
+            }
+
+            // Create tactic — createTactic() already has waitUtility inside
+            createTactic(tacticName);
+
+            // Select channel and open targeting panel
+            tacticSettings.selectChannel(channel);
+            clickTargetingRuleIcon();   // already has waitUtility inside
+
+            // Configure all 6 targeting rules
+            for (int i = 1; i <= 6; i++) {
+                String rule   = row.get("RULE_"   + i);
+                String values = row.get("VALUES_" + i);
+                if (rule != null && !rule.isEmpty()) {
+                    tacticSettings.selectMultipleRuleTypes(rule, CommonUtils.parseCommaSeparatedString(values));
+                }
+            }
+            tacticSettings.closeRuleTypePanel();
+
+            // Save — saveTacticDetails() already has waitUtility inside
+            saveTacticDetails();
+
+            // Open new tactic for the next row
+            clickNewTactic();
+        }
+    }
 }
 

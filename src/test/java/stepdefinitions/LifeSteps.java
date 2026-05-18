@@ -6121,4 +6121,10 @@ public class LifeSteps {
         logger.info("User searches and verifies the created targeting template is available on Targeting Templates page");
         Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
     }
+
+    @When("User creates line items with tactics and targeting rules as below")
+    public void userCreatesLineItemsWithTacticsAndTargetingRules(DataTable dataTable) {
+        logger.info("Creating line items with tactics and targeting rules");
+        tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class));
+    }
 }
