@@ -19,7 +19,7 @@ public class TargetingTemplate {
     private final Locator LINE_ITEM_TYPE_VALUE;
     private final Locator CHANNEL_DROPDOWN;
     private final Locator CHANNEL_VALUE;
-    private final Locator ADD_TARGETING_RULE_BUTTON;
+    public final Locator ADD_TARGETING_RULE_BUTTON;
     private final Locator SAVE_BUTTON;
     private final Locator TEMPLATE_NAME_ERROR;
     private final Locator TARGETING_RULES_ERROR;

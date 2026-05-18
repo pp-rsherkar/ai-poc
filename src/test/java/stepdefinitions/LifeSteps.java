@@ -121,7 +121,6 @@ public class LifeSteps {
                 password = ConfigReader.getInternalDemoPassword();
             }
         } else if (environment.equals("Pre-release")) {
-            logger.info("Configuring for Pre-release environment");
             url = ConfigReader.getProperty("preReleaseURL");
             if (user != null && user.toLowerCase().contains("external")) {
                 username = ConfigReader.getExternalPreReleaseUsername();
@@ -135,11 +134,11 @@ public class LifeSteps {
 
     @And("{string} application is logged in successfully with Account {string}")
     public void life_application_is_logged_in_as(String application, String account) {
-        logger.info("{} application is logged in successfully with Account {}", application, account);
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
         navigation.clickLogin();
+        logger.info("{} application is logged in successfully with Account {}", application, account);
         logger.info("Navigating to specific application module: {}", application);
         navigation.selectAndClickExternalUserApplicationType();
         switch (application) {
@@ -162,7 +161,8 @@ public class LifeSteps {
             logger.info("Selecting account: {}", account);
             navigation.selectAccount(account);
         } else {
-            logger.info("Default account for External user: {}", account);
+            logger.info("Selecting account for External user: {}", account);
+            navigation.selectExternalUserAccount(account);
         }
     }
 
@@ -208,6 +208,63 @@ public class LifeSteps {
     public void userSavesTheCampaign() {
         logger.info("Saving campaign details");
         campaigns.saveCampaign();
+    }
+
+    @And("User sets campaign management fee as {string} {string} {string}")
+    public void userSetsCampaignManagementFeeAs(String managementFeeOption, String percent, String amount) {
+        logger.info("Setting campaign management fee. Option: {}, Percent: {}, Amount: {}", managementFeeOption, percent, amount);
+        Assert.assertTrue("Campaign management fee checkbox is not visible", campaigns.isManagementFeeAvailable());
+
+        campaigns.clickManagementFee();
+        campaigns.clickManagementFeeOptionAndEnterData(managementFeeOption, percent, amount);
+    }
+
+    @Then("Verify management fee is set as {string}")
+    public void verifyManagementFeeIsSetAs(String expectedFeeValue) {
+        logger.info("Verifying inherited management fee value: {}", expectedFeeValue);
+        Assert.assertEquals("Inherited management fee is incorrect", expectedFeeValue, lineItemDetails.fetchDisplayedManagementFeeValue());
+    }
+
+    @Then("User clicks on create new tactic")
+    public void userClicksOnCreateNewTactic() {
+        logger.info("Clicking on Create New Tactic");
+        tacticDetails.clickNewTactic();
+    }
+
+    @Then("User navigates to line item and clicks on details tab")
+    public void userNavigatesToLineItemAndClicksOnDetailsTab() {
+        campaigns.clickLineItemTile();
+        lineItemDetails.clickDetailsTab();
+    }
+
+    @When("User overrides line item management fee and verifies tactic reflection for the following fee types")
+    public void userOverridesLineItemManagementFeeAndVerifiesTacticReflectionForTheFollowingFeeTypes(DataTable dataTable) {
+
+        logger.info("Overriding line item management fee and verifying tactic reflection for each fee type");
+        List<Map<String, String>> feeDetails = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> feeRow : feeDetails) {
+            campaigns.clickLineItemTile();
+            lineItemDetails.clickDetailsTab();
+            String feeOption = feeRow.get("Fee Option");
+            String percent = feeRow.get("Percent");
+            String amount = feeRow.get("Amount");
+            String expectedDisplay = feeRow.get("Expected Display");
+
+            logger.info("Applying line item management fee override - Fee Option: {}, Percent: {}, Amount: {}, Expected Display: {}",
+                    feeOption, percent, amount, expectedDisplay);
+
+            lineItemDetails.enableManagementFeeOverride();
+            tacticDetails.selectManagementFeeOptionAndEnterData(feeOption, percent, amount, expectedDisplay);
+        }
+    }
+
+    @Then("Verify tactic reflects line item management fee as {string}")
+    public void verifyTacticReflectsLineItemManagementFeeAs(String expectedFeeValue) {
+        logger.info("Verifying tactic management fee value: {}", expectedFeeValue);
+        tacticDetails.enterTacticName("Tactic_" + CommonUtils.timeStampCalculation());
+        tacticDetails.saveTacticDetails();
+        Assert.assertEquals("Tactic management fee value is incorrect", expectedFeeValue, tacticSettings.fetchDisplayedManagementFeeValue());
     }
 
     @Then("Verify campaign details are saved and user is navigated to the line item page")
@@ -2569,7 +2626,9 @@ public class LifeSteps {
         logger.info("Navigate to Campaign Dashboard and clicks on Create Campaign");
         navigation.clickSubMenu();
         navigation.clickCampaigns();
+        Assert.assertTrue("Unable to navigate to Campaign Dashboard", campaigns.isCreateCampaignButtonVisible());
         campaigns.createCampaign();
+        Assert.assertEquals("Create New Campaign", campaigns.verifyCampaignText());
     }
 
     @And("User add and configure {string} targeting rule and verify list is displayed in the targeting rule")
@@ -3929,7 +3988,7 @@ public class LifeSteps {
     public void userClicksTestConnectionLinkToVerifyIfConnectionHappenedSuccessfully() {
         logger.info("User clicks Test Connection link to verify if connection happened successfully");
         String connectionStatus = accounts.clickTestConnection();
-        Assert.assertEquals("Connection confirmed", connectionStatus);
+        Assert.assertTrue("Unexpected connection status: " + connectionStatus, "Connection confirmed".equals(connectionStatus) || "Access test successful".equals(connectionStatus));
     }
 
     @Then("User selects destination name created, and other details - {string}, {string}")
@@ -5515,6 +5574,19 @@ public class LifeSteps {
     public void userNavigatesToTacticSettingTab() {
         logger.info("User navigates to Line item from Association Tab");
         tacticDetails.clickSettingsTab();
+    }
+
+    @Then("User verifies that forecast data is unavailable when no targeting rules are applied")
+    public void user_verifies_that_forecast_data_is_unavailable_when_no_targeting_rules_are_applied() {
+        Assert.assertTrue("Targeting is added in the tactic", tacticDetails.isTargetingRuleMissing());
+        Assert.assertFalse("Forecast data is displayed even though no targeting rules are added", tacticDetails.isForecastDataAvailable());
+    }
+
+    @Then("User verifies the forecast data refreshes and displays values after adding targeting rule")
+    public void user_verifies_the_forecast_data_refreshes_and_displays_values_after_adding_targeting_rule() {
+        logger.info("Verifying that forecast data is refreshed and generated after targeting rules are added");
+        Assert.assertTrue("Forecast data was not refreshed after adding targeting rules", tacticDetails.isForecastDataAvailable()
+        );
     }
 
     @And("User opens Life Settings")

@@ -66,6 +66,9 @@ public class TacticDetails {
     private final Locator COMMENT_SUCCESS_ALERT;
     private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
     private final Locator CONTINUE_BUTTON;
+    private final Locator CLICK_REFRESH_BUTTON;
+    private final Locator NO_TARGETING_RULES;
+    private final Locator FORECAST_AVAILS_NUMBER;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -131,6 +134,9 @@ public class TacticDetails {
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
+        this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
+        this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
     }
 
     public void clickNewTactic() {
@@ -179,6 +185,18 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public boolean isForecastDataAvailable() {
+        CLICK_REFRESH_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        List<String> forecastData = FORECAST_AVAILS_NUMBER.allInnerTexts();
+        return forecastData.getLast().contains("$");
+    }
+
+    public boolean isTargetingRuleMissing() {
+        waitUtility.waitForLocatorVisible(targetingTemplate.ADD_TARGETING_RULE_BUTTON);
+        return NO_TARGETING_RULES.isVisible();
     }
 
     public void addComment(String entryPoint, String comment) {
@@ -253,6 +271,7 @@ public class TacticDetails {
     public void saveTacticDetails() {
         waitUtility.waitForLocatorVisible(SAVE_TACTIC_DETAILS);
         SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String tacticDetailsSuccess() {
@@ -299,6 +318,25 @@ public class TacticDetails {
             templateNameList.add(saveTargetingTemplate(lineItemType.trim()));
         }
         return templateNameList;
+    }
+
+    public void selectManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount, String expectedFeeValue) {
+        String optionXPath = String.format("//div[contains(@class,'management-fee-contanier')]//div//button[normalize-space(text())='%s']", managementFeeOption);
+        page.locator(optionXPath).click();
+        switch (managementFeeOption) {
+            case "Percentage" -> tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+            case "CPM", "Fixed CPM" -> tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            case "% + CPM"    -> {
+                tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+                tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            }
+            default -> throw new IllegalArgumentException("Unexpected fee type: " + managementFeeOption);
+        }
+        saveTacticDetails();
+        waitUtility.waitForElementVisible("//span[contains(@class,'strike-text')]");
+        clickFirstTacticTab();
+        clickSettingsTab();
+        waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
     }
 
     private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {

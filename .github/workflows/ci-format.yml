@@ -1,0 +1,43 @@
+name: Format check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  # Required to allow reviewdog to post review comments on the PR
+  pull-requests: write
+
+jobs:
+  spotless:
+    name: Spotless check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Run Spotless apply
+        # We run 'apply' instead of 'check' so that the files are actually fixed locally
+        run: mvn -B -ntp spotless:apply
+
+      - name: Suggest formatting changes
+        # This action takes any changed files in the workspace and converts
+        # them into inline PR suggestions. It only posts on Pull Requests.
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: Spotless
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail build if formatting was incorrect
+        # We still want the check to fail if changes were needed,
+        # so the PR cannot be merged until the suggestions are applied.
+        run: mvn -B -ntp spotless:check

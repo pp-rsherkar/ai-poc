@@ -1,4 +1,11 @@
 Feature: LIFE Regression - Create a Campaign
+  It ensures creation of a campaign with a line item and a tactic, including:
+  1. Create a campaign with a tactic and a line item
+  2. Create a campaign with multiple targeting rules added to a tactic
+  3. Create a campaign and verify all targetings under categories
+  4. Verify campaign creation, check field-level validation, and default values
+  5. Custom field addition, modification, and deletion on the Campaign creation page
+  6. Create a campaign for an external user
 
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
@@ -50,8 +57,8 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Examples:
-      | ADVERTISER             | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
-      | CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
 
   @regression
   Scenario Outline: Create a Campaign and add and verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings
@@ -122,7 +129,7 @@ Feature: LIFE Regression - Create a Campaign
       | Practice Staff           | SMART_Pixel_NPI_20250701_155147                                       |
       | Health Pages             | Animal Diseases                                                       |
       | Keywords                 | Custom_Keyword, TestingKeyword, Qwerty123                             |
-      | Endemics                 | Endemic + EHR                                                         |
+      | Endemics                 | Endemic                                                               |
       | Geo Targets              | New York, California                                                  |
       | Postal Codes             | 123456, 10001, 987654                                                 |
       | Weather Signals          | Below 15F degrees, Outdoor Activity                                   |
@@ -140,7 +147,7 @@ Feature: LIFE Regression - Create a Campaign
       | Retargeting Pixels       | Retargeting_20250814_011101                                           |
       | OTC Populations          | Dental/Oral Care                                                      |
       | IP                       | AutoIP101602041                                                       |
-      | Clickers                 | Auto_20260210_150825                                                  |
+      | Clickers                 | Auto_20260506_153916                                                  |
       | Email                    | AutoEmail120220716113986417                                           |
       | Sensitive Areas          | Anxiety Disorders                                                     |
       | IAB Categories           | Agriculture                                                           |
@@ -227,7 +234,8 @@ Feature: LIFE Regression - Create a Campaign
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
-    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
     Then Verify that the campaign budget status is "Pending Appr" and is greyed out
@@ -248,145 +256,6 @@ Feature: LIFE Regression - Create a Campaign
     Examples:
       | ADVERTISER       | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     | RULE_TYPE          | CREATIVE          |
       | 1Demo Advertiser | External_Auto | Regular | 10000     | External_Line | 500         | External_Tactic | Behavioral Segment | External_Creative |
-
-  @regression
-  Scenario Outline: Verify list of Targeting Rules available under Video Targeting Category and create a campaign by adding all of them
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And User clicks on Create Campaign
-    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
-    Then Verify campaign details are saved and user is navigated to the line item page
-    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
-    Then Verify line item details are saved and user is navigated to the tactic page
-    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
-    Then Verify tactic details are saved and user is navigated to the settings tab
-    When User selects the "<CHANNEL>" as channel
-    Then Verify targeting panel with all targeting under below categories
-      | AUDIENCE ATTRIBUTE |
-      | HEALTH JOURNEY     |
-      | DEMOGRAPHICS       |
-      | CONTEXTUAL         |
-      | GEOGRAPHY          |
-      | MEDIA SUPPLY       |
-      | Video              |
-      | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
-      | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience  |
-      | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                             |
-      | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
-      | CONTEXTUAL         | Health Pages,IAB Categories,IAB Categories New, Keywords,Language,Endemics                                                                                                                                                   |
-      | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
-      | Video              | Video Size,Video Placement,Video Skipping                                                                                                                                                                                    |
-      | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                |
-    And User configures targeting rules as below
-      | Video Size      | Small, Large                          |
-      | Video Placement | Interstitial, Accompanying Content    |
-      | Video Skipping  | Skippable and Non-Skippable Inventory |
-    Then Verify the configured targeting rules
-    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
-    When User saves the settings
-    Then Verify settings details are saved and user is navigated to the creatives tab
-    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    And User saves tactic details as a target template "<LINE_ITEMS>" and verifies the template is saved successfully
-    Then Verify the newly created campaign is in running state
-    When User navigates to Targeting template page by clicking the icon from Activation section
-    Then User searches and verifies the created targeting template is available on Targeting Templates page
-    Examples:
-      | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CHANNEL        | CREATIVE      |
-      | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Video      | Tactic      | Video Advanced | Auto_Creative |
-
-  @regression
-  Scenario Outline: Verify list of Targeting Rules available under Native Video Targeting Category and create a campaign by adding all of them
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And User clicks on Create Campaign
-    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
-    Then Verify campaign details are saved and user is navigated to the line item page
-    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
-    Then Verify line item details are saved and user is navigated to the tactic page
-    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
-    Then Verify tactic details are saved and user is navigated to the settings tab
-    And User clicks on Add Targeting Rule
-    Then Verify targeting panel with all targeting under below categories
-      | AUDIENCE ATTRIBUTE |
-      | HEALTH JOURNEY     |
-      | DEMOGRAPHICS       |
-      | CONTEXTUAL         |
-      | GEOGRAPHY          |
-      | MEDIA SUPPLY       |
-      | Video              |
-      | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
-      | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience  |
-      | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                             |
-      | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
-      | CONTEXTUAL         | Health Pages,IAB Categories,IAB Categories New, Keywords,Language,Endemics                                                                                                                                                   |
-      | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
-      | Video              | Video Size,Video Placement                                                                                                                                                                                                   |
-      | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                |
-    And User configures targeting rules as below
-      | Video Size      | Small, Large                               |
-      | Video Placement | NoContent/Standalone, Accompanying Content |
-    Then Verify the configured targeting rules
-    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
-    When User saves the settings
-    Then Verify settings details are saved and user is navigated to the creatives tab
-    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    And User saves tactic details as a target template "<LINE_ITEMS>" and verifies the template is saved successfully
-    Then Verify the newly created campaign is in running state
-    When User navigates to Targeting template page by clicking the icon from Activation section
-    Then User searches and verifies the created targeting template is available on Targeting Templates page
-    Examples:
-      | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS   | TACTIC_NAME | CREATIVE      |
-      | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Native Video | Tactic      | Auto_Creative |
-
-  @regression
-  Scenario Outline: Verify list of Targeting Rules available under Search Extension Targeting Category and create a campaign by adding all of them
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And User clicks on Create Campaign
-    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
-    Then Verify campaign details are saved and user is navigated to the line item page
-    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
-    Then Verify line item details are saved and user is navigated to the tactic page
-    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
-    Then Verify tactic details are saved and user is navigated to the settings tab
-    And User clicks on Add Targeting Rule
-    Then Verify targeting panel with all targeting under below categories
-      | SEARCH SPECIFIC    |
-      | AUDIENCE ATTRIBUTE |
-      | HEALTH JOURNEY     |
-      | DEMOGRAPHICS       |
-      | CONTEXTUAL         |
-      | GEOGRAPHY          |
-      | MEDIA SUPPLY       |
-      | Video              |
-      | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
-      | SEARCH SPECIFIC    | Search Keywords                                                                                                                                                                                                              |
-      | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience  |
-      | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                             |
-      | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
-      | CONTEXTUAL         | Health Pages,IAB Categories,IAB Categories New, Keywords,Language,Endemics                                                                                                                                                   |
-      | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
-      | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                |
-    And User configures targeting rules as below
-      | Search Keywords | Pandemic, Intestine |
-    Then Verify the configured targeting rules
-    When User saves the settings
-    Then Verify settings details are saved and user is navigated to the creatives tab
-    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    And User saves tactic details as a target template "<LINE_ITEMS>" and verifies the template is saved successfully
-    Then Verify the newly created campaign is in running state
-    When User navigates to Targeting template page by clicking the icon from Activation section
-    Then User searches and verifies the created targeting template is available on Targeting Templates page
-    Examples:
-      | ADVERTISER     | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS       | TACTIC_NAME | CREATIVE      |
-      | 01- Advertiser | External_Auto | Regular | 10000     | Line      | 500         | Search Extension | Tactic      | Auto_Creative |
-
 
 #  @regression
 #  Scenario Outline: API Sample Test
