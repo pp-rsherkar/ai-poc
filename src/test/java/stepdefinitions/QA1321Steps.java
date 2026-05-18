@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class QA1321Steps {
+    private static final String INTERNAL_USER_TYPE = "user";
 
     private final Navigation navigation = new Navigation(DriverFactory.getPage());
     private final Campaigns campaigns = new Campaigns(DriverFactory.getPage());
@@ -65,7 +66,7 @@ public class QA1321Steps {
         navigation.enterPassword(password);
         navigation.clickLogin();
         navigation.selectAndClickExternalUserApplicationType();
-        if ("User".equals(userType)) {
+        if (userType != null && INTERNAL_USER_TYPE.equalsIgnoreCase(userType)) {
             navigation.navigateToLife();
             navigation.selectAccount(account);
         } else {
