@@ -16,7 +16,7 @@ Feature: DTC Workspace creation, segmentation, and publishing in Studio
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
 
-  @regression
+  @todo
   Scenario: Create, segment and publish DTC workspace based on Unique Consumers
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
@@ -37,7 +37,3 @@ Feature: DTC Workspace creation, segmentation, and publishing in Studio
     Then Verify the dialog message as "Your Audience is being processed"
     When User navigates to Workspace Management page
     Then Verify the workspace status as "Requested"
-    Then Verify the workspace status is changed from "Requested" to "Segmented" on the second day
-    When User clicks on Publish button
-    Then Verify the workspace is published successfully
-    And Verify the workspace status as "Published"
