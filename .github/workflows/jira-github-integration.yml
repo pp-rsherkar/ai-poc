@@ -1,0 +1,91 @@
+name: Generate Feature from Jira and Run Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_id:
+        description: 'Jira Issue ID (e.g., QA-1321)'
+        required: true
+
+jobs:
+  generate-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Step 2: Install jq for JSON parsing
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # Step 3: Fetch Jira story and generate feature file
+      - name: Generate Feature File from Jira
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          ISSUE_ID: ${{ github.event.inputs.issue_id }}
+          FEATURES_DIR: src/test/resources/features
+          TEMPLATE_FILE: src/test/resources/features/template.feature
+        run: |
+          echo "Fetching Jira issue $ISSUE_ID..."
+          
+          RESPONSE=$(curl -s -u "$JIRA_EMAIL:$JIRA_TOKEN" \
+            -H "Accept: application/json" \
+            "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID")
+
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description // "No description"')
+
+          # Make summary slug for file name
+          SUMMARY_SLUG=$(echo "$SUMMARY" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:] \n' | tr ' ' '-')
+          FEATURE_FILE="$FEATURES_DIR/$ISSUE_ID-$SUMMARY_SLUG.feature"
+
+          mkdir -p $(dirname "$FEATURE_FILE")
+
+          echo "Generating feature file: $FEATURE_FILE"
+
+          # Use template if exists
+          if [ -f "$TEMPLATE_FILE" ]; then
+            awk -v summary="$SUMMARY" -v description="$DESCRIPTION" '
+            BEGIN { feature_done=0 }
+            /^Feature:/ && feature_done==0 { print "Feature: " summary; feature_done=1; next }
+            /^  # Description:/ { print "  # Description: " description; next }
+            { print }
+            ' "$TEMPLATE_FILE" > "$FEATURE_FILE"
+          else
+            # Fallback template
+            echo "Feature: $SUMMARY" > "$FEATURE_FILE"
+            echo "" >> "$FEATURE_FILE"
+            echo "  # Description: $DESCRIPTION" >> "$FEATURE_FILE"
+            echo "" >> "$FEATURE_FILE"
+            echo "  Scenario: Default scenario" >> "$FEATURE_FILE"
+            echo "    # Steps follow repo conventions" >> "$FEATURE_FILE"
+          fi
+
+          echo "Feature file created successfully."
+
+      # Step 4: Set up Java
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # Step 5: Install Maven dependencies
+      - name: Install Maven dependencies
+        run: mvn clean install -DskipTests
+
+      # Step 6: Install Node.js for Playwright
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Playwright browsers
+        run: npx playwright install
+
+      # Step 7: Run Playwright + Cucumber tests
+      - name: Run Playwright Cucumber Tests
+        run: mvn test
