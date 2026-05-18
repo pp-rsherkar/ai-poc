@@ -285,7 +285,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      |
 
-  @todo
+  @regression
   Scenario Outline: Verify show expression query is correct for the chosen targeting rules
     And User clicks on create new Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
