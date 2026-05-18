@@ -5610,15 +5610,13 @@ public class LifeSteps {
     @Then("User clicks on Show Expression and verifies if the displayed expression does not contain {string}")
     public void userClicksOnShowExpressionAndVerifiesIfTheDisplayedExpressionDoesNotContain(String ruleType) {
         logger.info("Clicking Show Expression and verifying expression does not contain: {}", ruleType);
-        String displayLabel = getDisplayLabel(ruleType);
         Assert.assertTrue("Expression doesn't contain " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
     }
 
     private String getDisplayLabel(String ruleType) {
         Map<String, String> labelMap = Map.of(
                 "behavioral segment", "Behavioral",
-                "health population", "Health"
-        );
+                "health population", "Health");
         return labelMap.getOrDefault(ruleType.toLowerCase(), ruleType);
     }
 
