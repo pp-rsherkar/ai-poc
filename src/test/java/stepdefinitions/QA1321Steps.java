@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class QA1321Steps {
-    private static final String INTERNAL_USER_TYPE = "user";
+    private static final String INTERNAL_USER_TYPE_VALUE = "User";
 
     private final Navigation navigation = new Navigation(DriverFactory.getPage());
     private final Campaigns campaigns = new Campaigns(DriverFactory.getPage());
@@ -41,7 +41,7 @@ public class QA1321Steps {
 
         if (environment.equals("Demo")) {
             url = ConfigReader.getProperty("demoURL");
-            if (user != null && user.toLowerCase().contains("external") && ConfigReader.getProperty("demoExternalUser") != null) {
+            if (user != null && user.toLowerCase().contains("external")) {
                 username = ConfigReader.getExternalDemoUsername();
                 password = ConfigReader.getExternalDemoPassword();
             } else {
@@ -66,7 +66,7 @@ public class QA1321Steps {
         navigation.enterPassword(password);
         navigation.clickLogin();
         navigation.selectAndClickExternalUserApplicationType();
-        if (userType != null && INTERNAL_USER_TYPE.equalsIgnoreCase(userType)) {
+        if (userType != null && INTERNAL_USER_TYPE_VALUE.equalsIgnoreCase(userType)) {
             navigation.navigateToLife();
             navigation.selectAccount(account);
         } else {

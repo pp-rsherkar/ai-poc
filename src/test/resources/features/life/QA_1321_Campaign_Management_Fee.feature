@@ -15,4 +15,4 @@ Feature: QA-1321 - Campaign management fee inheritance and override
 
     Examples:
       | ENVIRONMENT | USER_TYPE | ACCOUNT               | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | TACTIC_NAME |
-      | Demo        | User      | automation@pulsepoint | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                | 5               | + 5 %                  | Tactic      |
+      | Demo        | User      | automation@pulsepoint | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                |                 | + 5 %                  | Tactic      |
