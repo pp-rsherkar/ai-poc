@@ -54,8 +54,6 @@ jobs:
             automated
             formatting
           add-paths: |
-            src/**
+            src/
             pom.xml
-            **/*.md
-            **/*.yml
-            **/*.yaml
+            .github/
