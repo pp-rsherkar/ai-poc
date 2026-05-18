@@ -787,7 +787,7 @@ public class LifeSteps {
         tacticSettings.closeRuleTypePanel();
     }
 
-    @Given("User configures targeting rules as with options {string} and {string}")
+    @Given("User configures targeting rules with options {string} and {string}")
     public void UserConfiguresTargetingRulesWithOptions(String ruleType, String ruleValue) {
         logger.info("Configuring targeting rules from string variables - Rule Type: {}, Rule Value: {}", ruleType, ruleValue);
         Map<String, String> rawMap = new HashMap<>();
