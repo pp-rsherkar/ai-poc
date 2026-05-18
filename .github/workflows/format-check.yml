@@ -37,9 +37,6 @@ jobs:
       - name: Verify formatting is now clean
         run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=
 
-      - name: Remove Spotless cache files from git index
-        run: git rm -r --cached target/ 2>/dev/null || true
-
       - name: Create pull request if changes were made
         uses: peter-evans/create-pull-request@v7
         with:
@@ -56,3 +53,9 @@ jobs:
           labels: |
             automated
             formatting
+          add-paths: |
+            src/**
+            pom.xml
+            **/*.md
+            **/*.yml
+            **/*.yaml
