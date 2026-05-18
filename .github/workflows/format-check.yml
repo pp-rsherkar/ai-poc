@@ -1,12 +1,12 @@
 name: Weekly format check
 
-# Runs every Wednesday at 3:00 PM IST and verifies formatting across the repo using Spotless.
+# Runs every Sunday at 3:00 PM IST and verifies formatting across the repo using Spotless.
 # If anything is mis-formatted, it auto-applies the fixes and opens a pull
 # request so reviewers can approve the changes.
 on:
   schedule:
-    # 3:00 PM IST every Wednesday (IST is UTC+5:30, so Wednesday 09:30 UTC)
-    - cron: "30 9 * * 3"
+    # 3:00 PM IST every Sunday (IST is UTC+5:30, so Sunday 09:30 UTC)
+    - cron: "30 9 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -31,10 +31,11 @@ jobs:
           cache: maven
 
       - name: Run Spotless apply
-        run: mvn -B -ntp spotless:apply
+        # Override ratchetFrom so ALL files are checked, not just diffs vs main
+        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=
 
       - name: Verify formatting is now clean
-        run: mvn -B -ntp spotless:check
+        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=
 
       - name: Create pull request if changes were made
         uses: peter-evans/create-pull-request@v7
