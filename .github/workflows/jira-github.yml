@@ -1,71 +1,139 @@
-name: Generate Feature from Jira
+name: JIRA-GitHub Integration
 
+# Scoped to the test branch so the workflow can be validated before enabling on main.
+# Once verified, change the branch name below (or add 'main') to roll it out.
 on:
   workflow_dispatch:
     inputs:
       issue_id:
-        description: 'Jira Issue ID (e.g., QA-1321)'
+        description: "Jira issue ID (e.g., QA-1321)"
         required: true
+  push:
+    branches:
+      - copilot/create-jira-github-workflow
+  pull_request:
+    branches:
+      - copilot/create-jira-github-workflow
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  create-feature:
+  sync-jira:
+    name: Sync with JIRA
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # Step 2: Fetch Jira story using API
-      - name: Fetch Jira story
-        env:
-          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
-          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
-          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-          ISSUE_ID: ${{ github.event.inputs.issue_id }}
-        run: |
-          echo "Fetching Jira issue $ISSUE_ID..."
-          RESPONSE=$(curl -s -u "$JIRA_EMAIL:$JIRA_TOKEN" \
-            -H "Accept: application/json" \
-            "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID")
-          
-          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description // "No description"')
-
-          SUMMARY_SLUG=$(echo "$SUMMARY" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:] \n' | tr ' ' '-')
-          FEATURE_FILE="src/test/resources/features/$ISSUE_ID-$SUMMARY_SLUG.feature"
-          mkdir -p $(dirname "$FEATURE_FILE")
-          echo "Feature: $SUMMARY" > $FEATURE_FILE
-          echo "" >> $FEATURE_FILE
-          echo "  # Description: $DESCRIPTION" >> $FEATURE_FILE
-          echo "" >> $FEATURE_FILE
-          echo "  Scenario: Default scenario" >> $FEATURE_FILE
-          echo "    # Steps to be implemented" >> $FEATURE_FILE
-
-          echo "FEATURE_FILE=$FEATURE_FILE" >> $GITHUB_ENV
-
-      # Step 3: Commit the new feature file
-      - name: Commit feature file
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git checkout -b feature/${{ github.event.inputs.issue_id }}
-          git add $FEATURE_FILE
-          git commit -m "Add feature file for ${{ github.event.inputs.issue_id }}"
-          git push origin feature/${{ github.event.inputs.issue_id }}
-
-      # Step 4: Create a Pull Request
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Add feature file for ${{ github.event.inputs.issue_id }}"
-          branch: feature/${{ github.event.inputs.issue_id }}
-          title: "Feature: ${{ github.event.inputs.issue_id }}"
-          body: "Auto-generated feature file from Jira story ${{ github.event.inputs.issue_id }}"
+          fetch-depth: 20
+
+      - name: Resolve JIRA issue key
+        id: resolve_issue
+        env:
+          ISSUE_INPUT: ${{ github.event.inputs.issue_id }}
+          REF_NAME: ${{ github.ref_name }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          extract_issue() {
+            printf '%s\n' "$1" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true
+          }
+
+          BRANCH_NAME="${HEAD_REF:-$REF_NAME}"
+          ISSUE_KEY="$(extract_issue "$ISSUE_INPUT")"
+          SOURCE="workflow input"
+
+          if [ -z "$ISSUE_KEY" ]; then
+            ISSUE_KEY="$(extract_issue "$HEAD_REF")"
+            SOURCE="head branch"
+          fi
+
+          if [ -z "$ISSUE_KEY" ]; then
+            ISSUE_KEY="$(extract_issue "$REF_NAME")"
+            SOURCE="ref name"
+          fi
+
+          if [ -z "$ISSUE_KEY" ]; then
+            ISSUE_KEY="$(git log -20 --pretty=%B | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)"
+            SOURCE="recent commits"
+          fi
+
+          echo "branch=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$ISSUE_KEY" ]; then
+            echo "issue=$ISSUE_KEY" >> "$GITHUB_OUTPUT"
+            echo "source=$SOURCE" >> "$GITHUB_OUTPUT"
+            echo "Resolved JIRA issue $ISSUE_KEY from $SOURCE."
+          else
+            echo "issue=" >> "$GITHUB_OUTPUT"
+            echo "source=" >> "$GITHUB_OUTPUT"
+            echo "::warning::No JIRA issue key found in workflow input, branch name, or recent commits. Skipping JIRA sync."
+          fi
+
+      - name: Check JIRA configuration
+        id: jira_config
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          missing=()
+          [ -n "$JIRA_BASE_URL" ] || missing+=("JIRA_BASE_URL")
+          [ -n "$JIRA_USER_EMAIL" ] || missing+=("JIRA_USER_EMAIL")
+          [ -n "$JIRA_API_TOKEN" ] || missing+=("JIRA_API_TOKEN")
+
+          if [ "${#missing[@]}" -eq 0 ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Skipping JIRA sync because required secrets are missing: ${missing[*]}"
+          fi
+
+      - name: Login to JIRA
+        if: steps.resolve_issue.outputs.issue != '' && steps.jira_config.outputs.available == 'true'
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Transition issue — In Progress (manual)
+        if: github.event_name == 'workflow_dispatch' && steps.resolve_issue.outputs.issue != '' && steps.jira_config.outputs.available == 'true'
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.resolve_issue.outputs.issue }}
+          transition: "In Progress"
+
+      - name: Transition issue — In Progress (push)
+        if: github.event_name == 'push' && steps.resolve_issue.outputs.issue != '' && steps.jira_config.outputs.available == 'true'
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.resolve_issue.outputs.issue }}
+          transition: "In Progress"
+
+      - name: Transition issue — In Review (pull_request)
+        if: github.event_name == 'pull_request' && steps.resolve_issue.outputs.issue != '' && steps.jira_config.outputs.available == 'true'
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.resolve_issue.outputs.issue }}
+          transition: "In Review"
+
+      - name: Comment on JIRA issue
+        if: steps.resolve_issue.outputs.issue != '' && steps.jira_config.outputs.available == 'true'
+        uses: atlassian/gajira-comment@v3
+        with:
+          issue: ${{ steps.resolve_issue.outputs.issue }}
+          comment: |
+            *GitHub event:* ${{ github.event_name }}
+            *Repository:* [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }})
+            *Branch:* ${{ steps.resolve_issue.outputs.branch }}
+            *Actor:* ${{ github.actor }}
+            *Issue source:* ${{ steps.resolve_issue.outputs.source }}
+            *Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Report skipped sync
+        if: steps.resolve_issue.outputs.issue == '' || steps.jira_config.outputs.available != 'true'
+        run: echo "JIRA sync was skipped."
