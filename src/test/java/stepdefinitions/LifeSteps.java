@@ -5617,8 +5617,7 @@ public class LifeSteps {
     private String getDisplayLabel(String ruleType) {
         Map<String, String> labelMap = Map.of(
                 "behavioral segment", "Behavioral",
-                "health population", "Health"
-        );
+                "health population", "Health");
         return labelMap.getOrDefault(ruleType.toLowerCase(), ruleType);
     }
 
