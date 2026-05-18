@@ -17,6 +17,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  ISSUE_LOOKBACK_COMMITS: "20"
 
 permissions:
   contents: read
@@ -29,7 +30,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 20
+          fetch-depth: ${{ fromJSON(env.ISSUE_LOOKBACK_COMMITS) }}
 
       - name: Resolve JIRA issue key
         id: resolve_issue
@@ -57,7 +58,7 @@ jobs:
           fi
 
           if [ -z "$ISSUE_KEY" ]; then
-            ISSUE_KEY="$(git log -20 --pretty=%B | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)"
+            ISSUE_KEY="$(git log -"$ISSUE_LOOKBACK_COMMITS" --pretty=%B | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)"
             SOURCE="recent commits"
           fi
 
