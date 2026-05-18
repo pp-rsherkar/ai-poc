@@ -32,11 +32,10 @@ jobs:
           cache: maven
 
       - name: Run Spotless apply
-        # Override ratchetFrom so ALL files are checked, not just diffs vs main
-        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=
+        run: mvn -B -ntp spotless:apply
 
       - name: Verify formatting is now clean
-        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=
+        run: mvn -B -ntp spotless:check
 
       - name: Remove Spotless cache files from git index
         run: git rm -r --cached target/ 2>/dev/null || true
