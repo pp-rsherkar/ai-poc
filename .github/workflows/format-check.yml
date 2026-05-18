@@ -44,6 +44,8 @@ jobs:
           token: ${{ secrets.QA_AUTOMATION }}
           commit-message: "chore: weekly auto-format"
           title: "chore: weekly auto-format"
+          add-paths: |
+            src/**
           body: |
             Automated formatting fixes produced by the weekly `Weekly format check` workflow.
 
