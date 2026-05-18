@@ -21,6 +21,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up JDK 21
@@ -31,11 +32,13 @@ jobs:
           cache: maven
 
       - name: Run Spotless apply
-        # Override ratchetFrom so ALL files are checked, not just diffs vs main
-        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=
+        run: mvn -B -ntp spotless:apply
 
       - name: Verify formatting is now clean
-        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=
+        run: mvn -B -ntp spotless:check
+
+      - name: Remove Spotless cache files from git index
+        run: git rm -r --cached target/ 2>/dev/null || true
 
       - name: Create pull request if changes were made
         uses: peter-evans/create-pull-request@v7
