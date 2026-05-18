@@ -37,6 +37,7 @@ jobs:
         shell: bash
         env:
           ISSUE_INPUT: ${{ github.event.inputs.issue_id }}
+          ISSUE_LOOKBACK_COMMITS: ${{ env.ISSUE_LOOKBACK_COMMITS }}
           REF_NAME: ${{ github.ref_name }}
           HEAD_REF: ${{ github.head_ref }}
         run: |
