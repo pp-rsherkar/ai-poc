@@ -3,6 +3,11 @@ name: JIRA-GitHub Integration
 # Scoped to the test branch so the workflow can be validated before enabling on main.
 # Once verified, change the branch name below (or add 'main') to roll it out.
 on:
+  workflow_dispatch:
+    inputs:
+      issue_id:
+        description: 'Jira Issue ID (e.g., QA-1321)'
+        required: true
   push:
     branches:
       - copilot/create-jira-github-workflow
@@ -35,7 +40,8 @@ jobs:
         id: find_issue
         uses: atlassian/gajira-find-issue-key@v3
         with:
-          from: branch,commits
+          from: branch,commits,workflow_input
+          issue: ${{ github.event.inputs.issue_id }}
 
       # Transitions the linked issue to "In Progress" on push, or "In Review" on a PR.
       - name: Transition issue — In Progress (push)
