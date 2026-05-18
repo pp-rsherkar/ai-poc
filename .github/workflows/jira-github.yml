@@ -1,0 +1,64 @@
+name: JIRA-GitHub Integration
+
+# Scoped to the test branch so the workflow can be validated before enabling on main.
+# Once verified, change the branch name below (or add 'main') to roll it out.
+on:
+  push:
+    branches:
+      - copilot/create-jira-github-workflow
+  pull_request:
+    branches:
+      - copilot/create-jira-github-workflow
+
+permissions:
+  contents: read
+
+jobs:
+  sync-jira:
+    name: Sync with JIRA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to JIRA
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      # Parses a JIRA issue key (e.g. QA-123) from the branch name or commit message.
+      - name: Find JIRA issue key
+        id: find_issue
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          from: branch,commits
+
+      # Transitions the linked issue to "In Progress" on push, or "In Review" on a PR.
+      - name: Transition issue — In Progress (push)
+        if: github.event_name == 'push' && steps.find_issue.outputs.issue != ''
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.find_issue.outputs.issue }}
+          transition: "In Progress"
+
+      - name: Transition issue — In Review (pull_request)
+        if: github.event_name == 'pull_request' && steps.find_issue.outputs.issue != ''
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.find_issue.outputs.issue }}
+          transition: "In Review"
+
+      # Adds a comment on the JIRA issue with a link back to the GitHub event.
+      - name: Comment on JIRA issue
+        if: steps.find_issue.outputs.issue != ''
+        uses: atlassian/gajira-comment@v3
+        with:
+          issue: ${{ steps.find_issue.outputs.issue }}
+          comment: |
+            *GitHub event:* ${{ github.event_name }}
+            *Repository:* [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }})
+            *Branch:* ${{ github.ref_name }}
+            *Actor:* ${{ github.actor }}
+            *Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
