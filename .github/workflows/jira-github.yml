@@ -17,7 +17,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  ISSUE_LOOKBACK_COMMITS: "20"
+  ISSUE_LOOKBACK_COMMITS: 20
 
 permissions:
   contents: read
@@ -30,17 +30,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ fromJSON(env.ISSUE_LOOKBACK_COMMITS) }}
+          fetch-depth: ${{ env.ISSUE_LOOKBACK_COMMITS }}
 
       - name: Resolve JIRA issue key
         id: resolve_issue
+        shell: bash
         env:
           ISSUE_INPUT: ${{ github.event.inputs.issue_id }}
           REF_NAME: ${{ github.ref_name }}
           HEAD_REF: ${{ github.head_ref }}
         run: |
+          issue_pattern='[A-Z][A-Z0-9]+-[0-9]+'
+
           extract_issue() {
-            printf '%s\n' "$1" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true
+            printf '%s\n' "$1" | grep -Eo "$issue_pattern" | head -n 1 || true
           }
 
           BRANCH_NAME="${HEAD_REF:-$REF_NAME}"
@@ -58,7 +61,7 @@ jobs:
           fi
 
           if [ -z "$ISSUE_KEY" ]; then
-            ISSUE_KEY="$(git log -"$ISSUE_LOOKBACK_COMMITS" --pretty=%B | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)"
+            ISSUE_KEY="$(git log -"$ISSUE_LOOKBACK_COMMITS" --pretty=%B | grep -Eo "$issue_pattern" | head -n 1 || true)"
             SOURCE="recent commits"
           fi
 
@@ -76,6 +79,7 @@ jobs:
 
       - name: Check JIRA configuration
         id: jira_config
+        shell: bash
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
