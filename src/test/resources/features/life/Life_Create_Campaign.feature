@@ -1,9 +1,17 @@
 Feature: LIFE Regression - Create a Campaign
+  It ensures creation of a campaign with a line item and a tactic, including:
+  1. Create a campaign with a tactic and a line item
+  2. Create a campaign with multiple targeting rules added to a tactic
+  3. Create a campaign and verify all targetings under categories
+  4. Verify campaign creation, check field-level validation, and default values
+  5. Custom field addition, modification, and deletion on the Campaign creation page
+  6. Create a campaign for an external user
 
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -15,7 +23,7 @@ Feature: LIFE Regression - Create a Campaign
     And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     #Then Verify the newly created campaign in the database
     Examples:
@@ -46,11 +54,11 @@ Feature: LIFE Regression - Create a Campaign
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
+    Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Examples:
-      | ADVERTISER             | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
-      | CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
 
   @regression
   Scenario Outline: Create a Campaign and add and verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings
@@ -85,7 +93,7 @@ Feature: LIFE Regression - Create a Campaign
       | CacheTestAdvertise232n | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced |
 
   @regression
-  Scenario Outline: Verify all Targeting Rules under categories and Create a campaign by adding all Targeting Rules
+  Scenario Outline: Verify all Targeting Rules under categories and create a campaign by adding all Targeting Rules
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -113,34 +121,59 @@ Feature: LIFE Regression - Create a Campaign
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability      |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
-      | Behavioral Segment   | AutoSegment18577650                                     |
-      | NPI                  | AutoSmartList954103283                                  |
-      | HCP by Specialty     | Radiology, Aerospace Medicine                           |
-      | Health Populations   | Anesthesia and Analgesia                                |
-      | Keyword Populations  | CustomTextForKeywordPopulations, KeywordPopulationsTest |
-      | Practice Staff       | SMART_Pixel_NPI_20250701_155147                         |
-      | Health Pages         | Animal Diseases                                         |
-      | Keywords             | Custom_Keyword, TestingKeyword, Qwerty123               |
-      | Endemics             | Endemic + EHR                                           |
-      | Geo Targets          | New York, California                                    |
-      | Postal Codes         | 123456, 10001, 987654                                   |
-      | Weather Signals      | Below 15F degrees, Outdoor Activity                     |
-      | Brand Safety Profile | 51246802                                                |
-      | Brand Suitability    | Unknown Brand Safety, Highly Illicit Do Not Monetize    |
-      | Browser              | Chrome, EDGE, Opera, Safari                             |
-      | Device               | Mobile, Tablet, Connected Device                        |
-      | Domains/Apps         | APP Regular, updaedList106043912                        |
-      | Inventory Source     | New Report                                              |
-      | Operating System     | Windows, macOS, Blackberry                              |
-      | Viewability          | 50                                                      |
-      | Legal Pages          | Emancipation                                            |
-      | Legal Populations    | Adoption                                                |
+      | Behavioral Segment       | AutoSegment18577650                                                   |
+      | NPI                      | AutoSmartList954103283                                                |
+      | HCP by Specialty         | Radiology, Aerospace Medicine                                         |
+      | Health Populations       | Anesthesia and Analgesia                                              |
+      | Keyword Populations      | CustomTextForKeywordPopulations, KeywordPopulationsTest               |
+      | Practice Staff           | SMART_Pixel_NPI_20250701_155147                                       |
+      | Health Pages             | Animal Diseases                                                       |
+      | Keywords                 | Custom_Keyword, TestingKeyword, Qwerty123                             |
+      | Endemics                 | Endemic                                                               |
+      | Geo Targets              | New York, California                                                  |
+      | Postal Codes             | 123456, 10001, 987654                                                 |
+      | Weather Signals          | Below 15F degrees, Outdoor Activity                                   |
+      | Brand Safety Profile     | 51246802                                                              |
+      | Brand Suitability        | Unknown Brand Safety, Highly Illicit Do Not Monetize                  |
+      | Browser                  | Chrome, EDGE, Opera, Safari                                           |
+      | Device                   | Mobile, Tablet, Connected Device                                      |
+      | Domains/Apps             | APP Regular, updaedList106043912                                      |
+      | Inventory Source         | New Report                                                            |
+      | Operating System         | Windows, macOS, Blackberry                                            |
+      | Viewability              | 50                                                                    |
+      | Legal Pages              | Emancipation                                                          |
+      | Legal Populations        | Adoption                                                              |
+      | NPI Facility Affiliation | NEW AGE DERMATOLOGY CENTER PA (NC)                                    |
+      | Retargeting Pixels       | Retargeting_20250814_011101                                           |
+      | OTC Populations          | Dental/Oral Care                                                      |
+      | IP                       | AutoIP101602041                                                       |
+      | Clickers                 | Auto_20260506_153916                                                  |
+      | Email                    | AutoEmail120220716113986417                                           |
+      | Sensitive Areas          | Anxiety Disorders                                                     |
+      | IAB Categories           | Agriculture                                                           |
+      | IAB Categories New       | Communication                                                         |
+      | Language                 | English, Spanish                                                      |
+      | Custom Targeting Bundle  | 203397, 203396                                                        |
+#      | IAS Context Control      | Pollution                                                             |
+      | Invalid Traffic          | Sites/Apps with Insufficient Fraud & IVT Stats, Fraudulent Sites/Apps |
+      | Inventory Type           | App, Site                                                             |
+      | Health Populations+      | Dental Polishing, Dental Cavity Preparation                           |
+      | In Condition             | Liver Diseases                                                        |
+      | Bespoke                  | AutoSegment384105361                                                  |
+      | Ethnicity                | Asian, Arab                                                           |
+      | Gender                   | Male                                                                  |
+      | Age                      | 25-29, 35-39                                                          |
+      | Geo Radius               | 35.5::122.42::400::California                                         |
     Then Verify the configured targeting rules
+    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
-    Then Verify creative details are saved and the campaign is in running state
+    And User saves tactic details as a target template "Display" and verifies the template is saved successfully
+    Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    When User navigates to Targeting template page by clicking the icon from Activation section
+    Then User searches and verifies the created targeting template is available on Targeting Templates page
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE      |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Auto_Creative |
@@ -201,7 +234,8 @@ Feature: LIFE Regression - Create a Campaign
   @regression
   Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
-    And "Life" application is logged in successfully with Account "buyer2@ppcom"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
     Then Verify that the campaign budget status is "Pending Appr" and is greyed out

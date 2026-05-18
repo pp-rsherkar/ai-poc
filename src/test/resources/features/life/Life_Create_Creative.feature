@@ -50,9 +50,9 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario Outline: Verify filter's (Creative Status, Ad Sizes, Creative Type) list of value available under Active and Archived tabs
     When User clicks on "<ACTIVITY_TAB_NAME>" tab and verify following filters value
-      | Creative Status | PendingApproval, Approved, Denied                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+      | Creative Status | PendingApproval, Approved, Denied                                                                                                                                                                                                                                                                                                                                                                                                                                           |
       | Ad Sizes        | 1024x576, 1025x800, 1040x875, 1050x800, 1050x880, 1200x200, 1200x750, 120x20, 120x240, 120x600, 123x123, 125x125, 1280x720, 1500x900, 160x600, 168x28, 170x130, 180x150, 1920x1080, 200x200, 200x600, 216x36, 234x60, 250x250, 300x100, 300x250, 300x50, 300x600, 301x601, 320x100, 320x480, 320x50, 333x333, 336x280, 400x400, 468x60, 480x320, 640x100, 640x360, 640x480, 700x500, 728x200, 728x90, 768x576, 800x200, 800x250, 800x600, 854x480, 970x250, 970x30, 970x550 |
-      | Creative Type   | Image, Html, Video, Search Extension, Html5, Audio, Native Display, Native Video                                                                                                                                                                                                                                                                                                                                                                                   |
+      | Creative Type   | Image, Html, Video, Search Extension, Html5, Audio, Native Display, Native Video                                                                                                                                                                                                                                                                                                                                                                                            |
     Examples:
       | ACTIVITY_TAB_NAME |
       | Active            |
@@ -72,6 +72,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify deletion on creatives associated with a Campaign and on creatives that are not associated with any Campaign
     When User assigns a campaign to the creative using "Bulk Assign" option
+      | 01- Advertiser |
     Then Verify user is not able to delete a creative associated with a Campaign and appropriate error message is displayed
     And User deletes a creative not associated with any Campaign
     And Verify the creative is removed from the Creative Library page
@@ -280,12 +281,13 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DCM File     | Video_DCM.xls           |
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | DoubleVerify | Video_DoubleVerify.xls  |
       | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Flashtalking | Video_FlashTalking.xlsx |
-      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Innovid      | Video_INNOVID.xlsx       |
+      | 01- Advertiser | AutomationTest.com | www.google.com | Auto_DSA       | Auto_Financer | Approved | Video_Creative | Display_Image.jpg | 800x250 | 60       | Innovid      | Video_INNOVID.xlsx      |
 
 
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative
     When User assigns a campaign to the creative using "Bulk Assign" option
+      | 01- Advertiser |
     Then User navigates to creative details and clicks Association tab
     And Verify column selection icon is available and upon clicking it below columns should display
       | Line Item Name |
@@ -309,6 +311,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
   @regression
   Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
     When User assigns a campaign to the creative using "Bulk Assign" option
+      | 01- Advertiser |
     Then User navigates to creative details and clicks Association tab
     And Verify filter icon is available and upon clicking it "Add Filter", "Done" and "No Filters applied." text should display
     And User clicks "Add Filter", selects below filters and apply using "Done" button

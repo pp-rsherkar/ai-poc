@@ -60,6 +60,7 @@ public class ExplorerWorkspace {
     private final Locator ADVERTISER_BUTTON;
     private final Locator SPECIALITY_PANEL;
     private final Locator INCLUDE_EXCLUDE_CHECK;
+    private final Locator ALERT;
     WaitUtility waitUtility;
 
     public ExplorerWorkspace(Page page) {
@@ -111,6 +112,7 @@ public class ExplorerWorkspace {
         this.ADVERTISER_BUTTON = WORKSPACE_FRAME.locator("//button[contains(@data-tour-id,'workspace-advertiser')]");
         this.SPECIALITY_PANEL = WORKSPACE_FRAME.locator("//div[@id='panel-speciality_all']");
         this.INCLUDE_EXCLUDE_CHECK = WORKSPACE_FRAME.locator("//button[@data-testid='bi-include-exclude-check']");
+        this.ALERT = WORKSPACE_FRAME.locator("//div[contains(@class, 'Toastify')]//div[@role='alert']//p");
     }
 
     public void enterWorkspaceName(String workspaceName) {
@@ -138,6 +140,10 @@ public class ExplorerWorkspace {
 
     public void saveWorkspaceName() {
         SAVE_WORKSPACE_NAME.click();
+    }
+
+    public void waitUntilAlertDisappears(){
+        waitUtility.waitForLocatorHidden(ALERT);
     }
 
     public void waitForDashboardLoad() {

@@ -35,7 +35,7 @@ public class Workspace {
     private final Locator WEBHOOK_SUCCESS_ALERT;
     private final Locator WEBHOOK_SAVE_BUTTON;
     private final Locator INLINE_ERROR_MESSAGE;
-    private final Locator ERROR_ALERT;
+    private final Locator WEBHOOK_ERROR_ALERT;
     private final Locator CREATE_WORKSPACE;
     private final Locator BEFORE_YOU_LEAVE_DIALOG;
     private final Locator EXIT_BUTTON;
@@ -80,7 +80,7 @@ public class Workspace {
         this.WEBHOOK_SUCCESS_ALERT = WORKSPACE_FRAME.locator("//p[contains(text(),'Webhook setup successfully')]");
         this.WEBHOOK_SAVE_BUTTON = WORKSPACE_FRAME.locator("//button[@type='submit']");
         this.INLINE_ERROR_MESSAGE = WORKSPACE_FRAME.locator(" //label[contains(@class,'FieldLabel')]/following-sibling::div/div[contains(@class,'ValidationMessage')]");
-        this.ERROR_ALERT = WORKSPACE_FRAME.locator(" //p[contains(text(),'Error occurred while saving workspace or editing webhook')]");
+        this.WEBHOOK_ERROR_ALERT = WORKSPACE_FRAME.locator("//div[contains(@class, 'Toastify')]//p[contains(text(),'Webhook')]");
         this.CREATE_WORKSPACE = WORKSPACE_FRAME.locator("//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.BEFORE_YOU_LEAVE_DIALOG = WORKSPACE_FRAME.locator("//h3[contains(text(),'Before you leave')]");
         this.EXIT_BUTTON = WORKSPACE_FRAME.locator("//div[contains(text(),'Yes, Exit')]");
@@ -238,8 +238,8 @@ public class Workspace {
             BODY_TEXTAREA.fill(CommonUtils.readJsonTestDataFile(file));
         }
         WEBHOOK_SAVE_BUTTON.click();
-        alert = ERROR_ALERT.innerText();
-        ERROR_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        alert = WEBHOOK_ERROR_ALERT.innerText();
+        waitUtility.waitForLocatorHidden(WEBHOOK_ERROR_ALERT);
         return alert;
     }
 

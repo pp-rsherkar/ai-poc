@@ -37,7 +37,7 @@ public class LineItemFlights {
     public List<String> fetchFlightDates() {
         List<String> flightDates = new ArrayList<>();
         waitUtility.waitForLocatorVisible(FLIGHTS_DATES.first());
-        for(int i = 0; i < FLIGHTS_DATES.count(); i++) {
+        for (int i = 0; i < FLIGHTS_DATES.count(); i++) {
             flightDates.add(FLIGHTS_DATES.nth(i).textContent());
         }
         return flightDates;

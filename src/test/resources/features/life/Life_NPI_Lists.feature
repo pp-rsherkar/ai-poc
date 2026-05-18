@@ -12,7 +12,8 @@ Feature: LIFE regression - Create NPI List of following types:
 
   @regression
   Scenario Outline: Create Static NPI List by specifying NPI Numbers.
-    When User navigates to Administrative section and go to Accounts Tab
+    When User navigates to Administrative section
+    And User navigates to Accounts Tab
     And User searches the account "automation@pulsepoint" and selects the account
     And User opens Life Settings
     And User fetches PulsePoint Data Fees, NPI Targeting Gross CPM and calculates the data cost

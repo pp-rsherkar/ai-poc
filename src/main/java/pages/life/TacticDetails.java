@@ -64,6 +64,11 @@ public class TacticDetails {
     private final Locator NAVIGATION_COMMENT;
     private final Locator COMMENT_TEXT_BOX;
     private final Locator COMMENT_SUCCESS_ALERT;
+    private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
+    private final Locator CONTINUE_BUTTON;
+    private final Locator CLICK_REFRESH_BUTTON;
+    private final Locator NO_TARGETING_RULES;
+    private final Locator FORECAST_AVAILS_NUMBER;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -76,7 +81,7 @@ public class TacticDetails {
 
     public TacticDetails(Page page) {
         this.page = page;
-        this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
+        this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic' or text()='New Ad Group']");
         this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
         this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Tactic')]");
@@ -127,6 +132,11 @@ public class TacticDetails {
         this.NAVIGATION_COMMENT = page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
         this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
+        this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
+        this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
+        this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
+        this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
     }
 
     public void clickNewTactic() {
@@ -175,6 +185,18 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public boolean isForecastDataAvailable() {
+        CLICK_REFRESH_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        List<String> forecastData = FORECAST_AVAILS_NUMBER.allInnerTexts();
+        return forecastData.getLast().contains("$");
+    }
+
+    public boolean isTargetingRuleMissing() {
+        waitUtility.waitForLocatorVisible(targetingTemplate.ADD_TARGETING_RULE_BUTTON);
+        return NO_TARGETING_RULES.isVisible();
     }
 
     public void addComment(String entryPoint, String comment) {
@@ -249,6 +271,7 @@ public class TacticDetails {
     public void saveTacticDetails() {
         waitUtility.waitForLocatorVisible(SAVE_TACTIC_DETAILS);
         SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String tacticDetailsSuccess() {
@@ -297,6 +320,25 @@ public class TacticDetails {
         return templateNameList;
     }
 
+    public void selectManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount, String expectedFeeValue) {
+        String optionXPath = String.format("//div[contains(@class,'management-fee-contanier')]//div//button[normalize-space(text())='%s']", managementFeeOption);
+        page.locator(optionXPath).click();
+        switch (managementFeeOption) {
+            case "Percentage" -> tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+            case "CPM", "Fixed CPM" -> tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            case "% + CPM"    -> {
+                tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+                tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            }
+            default -> throw new IllegalArgumentException("Unexpected fee type: " + managementFeeOption);
+        }
+        saveTacticDetails();
+        waitUtility.waitForElementVisible("//span[contains(@class,'strike-text')]");
+        clickFirstTacticTab();
+        clickSettingsTab();
+        waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
+    }
+
     private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {
         campaigns.createCampaign();
         campaigns.verifyCampaignText();
@@ -320,7 +362,7 @@ public class TacticDetails {
         lineItemDetails.lineItemSuccess();
     }
 
-    private void createTactic(String tacticName) {
+    public void createTactic(String tacticName) {
         try {
             enterTacticName(tacticName);
             saveTacticDetails();
@@ -352,16 +394,18 @@ public class TacticDetails {
         return labelCountMap;
     }
 
-    private String saveTargetingTemplate(String lineItemType) {
+    public String saveTargetingTemplate(String lineItemType) {
         String templateName = lineItemType + "_Template_" + CommonUtils.timeStampCalculation();
         TACTIC_SETTINGS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
         tacticSettings.verifyTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
-        SAVE_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if (TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
+            CONTINUE_BUTTON.click();
+        waitUtility.waitForLocatorVisible(SAVE_TEMPLATE_DIALOG);
         TEMPLATE_NAME_TEXT.fill(templateName);
         SAVE_BUTTON.click();
-        TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(TEMPLATE_SAVED_SUCCESS_ALERT);
         return templateName;
     }
 
@@ -443,6 +487,11 @@ public class TacticDetails {
 
     public void closeGlobalSearch() {
         CLOSE_GLOBAL_SEARCH.click();
+    }
+
+    public void clickNewTacticForLineItem(String name) {
+        String xpath = String.format("//div[text()='%s']/ancestor::div[contains(@class,'lineitem-list-wrapper')]//app-icon-lable-link[@class='tactic-new-button']//div", name);
+        page.locator(xpath).click();
     }
 }
 

@@ -51,7 +51,7 @@ public class CommonUtils {
     }
 
     public static List<String> normalizeObjectList(List<Object> list) {
-        return list.stream().map(Object::toString).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
+        return list.stream().map(Object::toString).flatMap(s -> Arrays.stream(s.split("::"))).flatMap(s -> Arrays.stream(s.split(","))).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
     }
 
     public static List<String> parseCommaSeparatedString(String input) {
@@ -242,11 +242,11 @@ public class CommonUtils {
         int attempts = 0;
         int startDay;
         int endDay;
-         do {
-             if (today <= 1) {
-                 startDay = 1;
-                 endDay = Math.min(2, maxDay);
-             } else if (today >= maxDay - 1) {
+        do {
+            if (today <= 1) {
+                startDay = 1;
+                endDay = Math.min(2, maxDay);
+            } else if (today >= maxDay - 1) {
                 startDay = maxDay - 1;
                 endDay = maxDay;
             } else {
@@ -264,7 +264,7 @@ public class CommonUtils {
         return new String[]{startDate.format(formatter), endDate.format(formatter)};
     }
 
-    public static void selectCalendarData(Locator locator, String data){
+    public static void selectCalendarData(Locator locator, String data) {
         for (int i = 0; i < locator.count(); i++) {
             if (locator.nth(i).textContent().trim().equals(data)) {
                 locator.nth(i).last().click();

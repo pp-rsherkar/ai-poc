@@ -100,7 +100,7 @@ public class FileActions {
     }
 
     public static int fetchRowCountFromCSV(Path filePath) throws IOException {
-        return fetchRowCount(filePath, false);
+        return fetchRowCount(filePath, true);
     }
 
     public static int fetchRowCountExcludeHeaderFromCSVAndTxt(String fileName) throws IOException {

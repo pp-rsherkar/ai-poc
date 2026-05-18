@@ -122,7 +122,7 @@ public class Accounts {
         this.PASSWORD = page.locator("//input[@placeholder='Enter Password']");
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection' or text()='Test Access']");
-        this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div");
+        this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div | //span[contains(text(),'Access test successful')]");
         this.OK_BUTTON = page.locator("//button[contains(@class, 'okButton') or contains(text(),'Save')]");
         this.ACCOUNT_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.GLOBAL_SIGNALS_TAB = page.locator("//button[@class='signal']");
@@ -460,7 +460,7 @@ public class Accounts {
         return workspaceNameList;
     }
 
-    public void clickCancelButtonFromSettingsPanel(){
+    public void clickCancelButtonFromSettingsPanel() {
         STUDIO_SETTINGS_PANEL_CANCEL_BUTTON.click();
     }
 

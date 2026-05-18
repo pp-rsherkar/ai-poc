@@ -113,16 +113,23 @@ public class TacticCreatives {
     }
 
     public void selectAndAssignCreativeByStatus(String status) {
+        int maxAttempts = 3;
         waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
-        Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
-        while (!statusLocator.first().isVisible()) {
+        for (int i = 0; i < maxAttempts; i++) {
+            Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
+            if (statusLocator.first().isVisible()) {
+                int rowIndex = (int) statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
+                Locator selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
+                selectCreative.click();
+                ASSIGN_CREATIVE_OK_BUTTON.click();
+                return;
+            }
+            if (!SHOW_MORE_BUTTON.isVisible() || !SHOW_MORE_BUTTON.isEnabled()) {
+                break;
+            }
             SHOW_MORE_BUTTON.scrollIntoViewIfNeeded();
             SHOW_MORE_BUTTON.click();
             waitUtility.waitForLocatorVisible(SEARCH_CREATIVE);
         }
-        int rowIndex = (int) statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
-        Locator selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
-        selectCreative.click();
-        ASSIGN_CREATIVE_OK_BUTTON.click();
     }
 }
