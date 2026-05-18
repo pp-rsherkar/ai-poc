@@ -69,6 +69,7 @@ public class TacticDetails {
     private final Locator CLICK_REFRESH_BUTTON;
     private final Locator NO_TARGETING_RULES;
     private final Locator FORECAST_AVAILS_NUMBER;
+    private final Locator SHOW_EXPRESSION_BUTTON;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -137,6 +138,7 @@ public class TacticDetails {
         this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
         this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
         this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
+        this.SHOW_EXPRESSION_BUTTON = page.locator("//span[contains(text(),'Show Expression')]");
     }
 
     public void clickNewTactic() {
@@ -190,8 +192,7 @@ public class TacticDetails {
 
     public boolean verifyShowExpressionValues(String ruleType) {
         waitUtility.waitUntilSpinnerHidden();
-        System.out.println("trying to click show expression icon");
-        page.locator("//span[contains(text(),'Show Expression')]").click();
+        SHOW_EXPRESSION_BUTTON.click();
         waitUtility.waitForLocatorVisible(targetingTemplate.TARGETING_CONTAINER);
         if (ruleType.equalsIgnoreCase("Behavioral segment")) {
             ruleType = "Behavioral";

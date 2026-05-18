@@ -788,7 +788,7 @@ public class LifeSteps {
     }
 
     @Given("User configures targeting rules as with options {string} and {string}")
-    public void user_selects_the_channel_configures_targeting_rules(String ruleType, String ruleValue) {
+    public void UserConfiguresTargetingRulesWithOptions(String ruleType, String ruleValue) {
         logger.info("Configuring targeting rules from string variables - Rule Type: {}, Rule Value: {}", ruleType, ruleValue);
         Map<String, String> rawMap = new HashMap<>();
         rawMap.put(ruleType, ruleValue);
