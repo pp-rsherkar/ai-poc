@@ -39,14 +39,18 @@ public class NPIAttributesList {
         this.LIST_NAME = page.locator("//input[contains(@placeholder,'List Name')]");
         this.SEARCH_ADVERTISER = page.locator("//div[contains(text(),'Select Advertiser')]");
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
-        this.NPI_COLUMN_DROPDOWN = page.locator("//ng-select[contains(@class,'hcpDropdown') and contains(@placeholder,'NPI Column')]");
+        this.NPI_COLUMN_DROPDOWN =
+                page.locator("//ng-select[contains(@class,'hcpDropdown') and contains(@placeholder,'NPI Column')]");
         this.NEXT_BUTTON = page.locator("//button[contains(@class,'saveButton')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(@aria-label,'List Name is required')]");
         this.ADVERTISER_NAME_ERROR = page.locator("//div[contains(@aria-label,'Advertiser is required')]");
-        this.AVAILABLE_IN_LIFE = page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='Life'])[1]");
-        this.AVAILABLE_IN_HCP365 = page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='HCP365'])[1]");
+        this.AVAILABLE_IN_LIFE =
+                page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='Life'])[1]");
+        this.AVAILABLE_IN_HCP365 =
+                page.locator("(//span[@class='mat-checkbox-label' and normalize-space(text())='HCP365'])[1]");
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
-        this.BACK_TO_NPI_LISTS = page.locator("//img[@alt='BackButton_NPI_Lists' and contains(@src,'BackButton_NPI_Lists.svg')]");
+        this.BACK_TO_NPI_LISTS =
+                page.locator("//img[@alt='BackButton_NPI_Lists' and contains(@src,'BackButton_NPI_Lists.svg')]");
         this.SAVE_BUTTON = page.locator("//span[text()='Save']");
         this.LIST_UPDATE_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list updated')]");
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
@@ -80,7 +84,8 @@ public class NPIAttributesList {
     public void selectNPIColumn(String columnName) {
         waitUtility.waitForLocatorDetached(FILE_UPLOAD_SUCCESS);
         NPI_COLUMN_DROPDOWN.click();
-        Locator columnOption = page.locator("//div[contains(@class,'ng-option') and normalize-space()='" + columnName + "']");
+        Locator columnOption =
+                page.locator("//div[contains(@class,'ng-option') and normalize-space()='" + columnName + "']");
         waitUtility.waitForLocatorVisible(columnOption);
         columnOption.click();
     }
@@ -150,8 +155,11 @@ public class NPIAttributesList {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(TOTAL_NPI_LIST_COUNT);
         waitUtility.waitForLocatorVisible(MATCH_NPI_COUNT);
-        if (listName.contains(page.locator(String.format("//div[contains(@class,'header-name') and contains(@title,'%s')]", listName)).innerText()))
-            npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-" + MATCH_NPI_COUNT.innerText().trim();
+        if (listName.contains(
+                page.locator(String.format("//div[contains(@class,'header-name') and contains(@title,'%s')]", listName))
+                        .innerText()))
+            npiCount = "Total-" + TOTAL_NPI_LIST_COUNT.innerText().trim() + "&" + "Matched-"
+                    + MATCH_NPI_COUNT.innerText().trim();
         return npiCount;
     }
 

@@ -73,5 +73,3 @@ public class ConfigReader {
         return EncryptionDecryption.decrypt(getProperty("preReleaseExternalPassword"));
     }
 }
-
-

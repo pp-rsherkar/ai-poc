@@ -4,9 +4,8 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import utils.WaitUtility;
-
 import java.util.regex.Pattern;
+import utils.WaitUtility;
 
 public class ExpansionWorkspace {
     private final Page page;
@@ -33,24 +32,100 @@ public class ExpansionWorkspace {
     public ExpansionWorkspace(Page page) {
         this.page = page;
         this.waitUtility = new WaitUtility(page);
-        this.HCP_AUDIENCEEXP = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.IMG).nth(2);
-        this.ADVERTISER_DROPDOWN = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX);
-        this.SELECT_ADVERTISER = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Abbvie"));
-        this.SOURCE_AUDIENCE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Studio Workspace Extend"));
+        this.HCP_AUDIENCEEXP = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.IMG)
+                .nth(2);
+        this.ADVERTISER_DROPDOWN = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.TEXTBOX);
+        this.SELECT_ADVERTISER = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Abbvie"));
+        this.SOURCE_AUDIENCE = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Studio Workspace Extend"));
         this.NPILIST = page.locator("//div[@class='styles__StyledIcon-sc-d00f7j-2 QkzJU']");
-        this.SELECT_SOURCE_AUDIENCE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("My playground");
-        this.ENTER_MY_PLAYGROUND = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
-        this.EXPAND_CARE_TEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("Expand With Care Team");
-        this.EXPAND_AFF_GRAPH = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("Expand With Affiliation Graph");
-        this.ADD_FILTER = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Add Filters"));
-        this.NPI_AGE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^NPI Age$"))).nth(3);
-        this.BELOW_25 = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByLabel("Below");
-        this.OK_FILTER = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
-        this.SAVE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator(".styles__StyledResetUpdate-sc-njp72g-0 > button:nth-child(2)");
-        this.POPUP_CLOSE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().locator("div").filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$"))).getByRole(AriaRole.BUTTON);
-        this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.TEXTBOX).nth(3);
-        this.DROPDOWN_CARE_TEAM = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.COMPLEMENTARY).getByRole(AriaRole.COMBOBOX, new Locator.GetByRoleOptions().setName("undefined combobox")).getByRole(AriaRole.TEXTBOX);
-        this.DROPDOWN_CARETEAM_VALUE = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Basic"));
+        this.SELECT_SOURCE_AUDIENCE = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByText("My playground");
+        this.ENTER_MY_PLAYGROUND = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.TEXTBOX, new FrameLocator.GetByRoleOptions().setName("Search"));
+        this.EXPAND_CARE_TEAM = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByText("Expand With Care Team");
+        this.EXPAND_AFF_GRAPH = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByText("Expand With Affiliation Graph");
+        this.ADD_FILTER = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Add Filters"));
+        this.NPI_AGE = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .locator("div")
+                .filter(new Locator.FilterOptions().setHasText(Pattern.compile("^NPI Age$")))
+                .nth(3);
+        this.BELOW_25 = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByLabel("Below");
+        this.OK_FILTER = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Ok"));
+        this.SAVE = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .locator(".styles__StyledResetUpdate-sc-njp72g-0 > button:nth-child(2)");
+        this.POPUP_CLOSE = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .locator("div")
+                .filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Select Filter$")))
+                .getByRole(AriaRole.BUTTON);
+        this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.TEXTBOX)
+                .nth(3);
+        this.DROPDOWN_CARE_TEAM = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.COMPLEMENTARY)
+                .getByRole(AriaRole.COMBOBOX, new Locator.GetByRoleOptions().setName("undefined combobox"))
+                .getByRole(AriaRole.TEXTBOX);
+        this.DROPDOWN_CARETEAM_VALUE = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByRole(AriaRole.OPTION, new FrameLocator.GetByRoleOptions().setName("Basic"));
     }
 
     public void clickAdvertiserDropdown(String advertiser) {

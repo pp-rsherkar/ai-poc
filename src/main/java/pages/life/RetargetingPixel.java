@@ -22,7 +22,8 @@ public class RetargetingPixel {
     public RetargetingPixel(Page page) {
         this.page = page;
         this.PIXEL_NAME = page.locator("//input[@placeholder='Pixel Name']");
-        this.SEARCH_ADVERTISER = page.locator("//input[contains(@class,'dropdown-search') and @placeholder='Advertisers']");
+        this.SEARCH_ADVERTISER =
+                page.locator("//input[contains(@class,'dropdown-search') and @placeholder='Advertisers']");
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'item text-truncate')]");
         this.SAVE_BUTTON = page.locator("//button[text()='Save']");
         this.SAVE_SUCCESS = page.locator("//div[contains(@aria-label,'Success!')]");

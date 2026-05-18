@@ -5,14 +5,13 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.SelectOption;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.Constants;
-import utils.WaitUtility;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import utils.CommonUtils;
+import utils.Constants;
+import utils.WaitUtility;
 
 public class BulkCreativeUpload {
     private final Page page;
@@ -70,20 +69,26 @@ public class BulkCreativeUpload {
         this.page = page;
         this.BULK_UPLOAD_BUTTON = page.locator("//button[contains(text(),'Bulk Upload')]");
         this.BULK_UPLOAD_CREATIVE_HEADER = page.locator("//div[contains(text(),'Bulk Creative Upload')]");
-        this.CREATIVE_TYPE_BUTTON = page.locator("//label[contains(text(),'Creative Type')]/following-sibling::div//button");
+        this.CREATIVE_TYPE_BUTTON =
+                page.locator("//label[contains(text(),'Creative Type')]/following-sibling::div//button");
         this.ADVERTISER_DROPDOWN = page.locator("//sui-select[contains(@placeholder,'Select Advertiser')]");
-        this.ADVERTISER_DROPDOWN_VALUE = page.locator("//div[contains(@class,'menu transition visible')]/sui-select-option//span");
-        this.APPROVAL_STATUS_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
+        this.ADVERTISER_DROPDOWN_VALUE =
+                page.locator("//div[contains(@class,'menu transition visible')]/sui-select-option//span");
+        this.APPROVAL_STATUS_BUTTON =
+                page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
         this.PREVIEW_BUTTON = page.locator("//button[contains(text(),'Preview')]");
         this.OK_BUTTON = page.locator("//button[contains(text(),'Ok')]");
-        this.ERROR_ALERT = page.locator("//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or contains(@aria-label,'Select Advertiser') or contains(@aria-label,'Landing Page Domain is required') or contains(@aria-label, 'Landing Page Domain is not valid.') or contains(@aria-label,'1 error')]");
+        this.ERROR_ALERT = page.locator(
+                "//div[@role='alert' and contains(@aria-label,'Atleast one creative should be selected') or contains(@aria-label,'Select Advertiser') or contains(@aria-label,'Landing Page Domain is required') or contains(@aria-label, 'Landing Page Domain is not valid.') or contains(@aria-label,'1 error')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
-        this.BULK_UPLOAD_HEADER = page.locator("//div[contains(@class,'main-heading') and (contains(text(),'Bulk Upload'))]");
+        this.BULK_UPLOAD_HEADER =
+                page.locator("//div[contains(@class,'main-heading') and (contains(text(),'Bulk Upload'))]");
         this.CREATIVE_TEXT_DETAILS_FROM_TABLE = page.locator("//tbody//span/input");
         this.HEADER_MESSAGE = page.locator("//div[contains(@class,'appr-status-label')]/span");
         this.DROPDOWN_SEARCH = page.locator("//div[@id='campaignLookup' and contains(@class,'loading')]");
         this.DOWNLOAD_BLANK_TEMPLATE = page.locator("//span[contains(text(),'Blank Template')]");
-        this.IMAGE_FILE_BROWSE_BUTTON = page.locator("//span[contains(text(),'Upload Images to Get Template With URLs')]/ancestor::div//div[contains(@class,'drop-wrapper')]");
+        this.IMAGE_FILE_BROWSE_BUTTON = page.locator(
+                "//span[contains(text(),'Upload Images to Get Template With URLs')]/ancestor::div//div[contains(@class,'drop-wrapper')]");
         this.TEMPLATE_WITH_URL_LINK = page.locator("//span[contains(text(),'Template With URLs')]");
         this.CAMPAIGN_DROPDOWN = page.locator("//div[contains(@id,'campaignLookup')]/input[@placeholder='Search']");
         this.CAMPAIGN_DROPDOWN_VALUE = page.locator("//div[contains(@class,'menu transition visible')]/div");
@@ -93,24 +98,31 @@ public class BulkCreativeUpload {
         this.DOUBLE_VERIFY_TEXTAREA = page.locator("//textarea[contains(@class,'textarea')]");
         this.DELETE_ICON = page.locator("//div[contains(@class,'successTP')]/div[contains(@title,'delete')]");
         this.REMOVE_FILE_ICON = page.locator("//span[text()='Remove File']");
-        this.TEMPLATE_BROWSE_BUTTON = page.locator("//span[contains(text(),'Spreadsheet')]/ancestor::div//div[contains(@class,'drop-wrapper')]");
+        this.TEMPLATE_BROWSE_BUTTON = page.locator(
+                "//span[contains(text(),'Spreadsheet')]/ancestor::div//div[contains(@class,'drop-wrapper')]");
         this.LANDING_PAGE_DOMAIN = page.locator("//input[@formcontrolname='landingDomain']");
         this.FILE_DROPDOWN = page.locator("//label[text()='File']/parent::div//div[contains(@class,'text')]");
-        this.FILE_DROPDOWN_VALUE = page.locator("//label[text()='File']/following-sibling::div//div[contains(@class,'text')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
-        this.AD_CHOICES_DROPDOWN = page.locator("//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
-        this.NOTES_DROPDOWN = page.locator("//span[contains(text(),'Notes Column')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
+        this.FILE_DROPDOWN_VALUE = page.locator(
+                "//label[text()='File']/following-sibling::div//div[contains(@class,'text')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
+        this.AD_CHOICES_DROPDOWN = page.locator(
+                "//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
+        this.NOTES_DROPDOWN = page.locator(
+                "//span[contains(text(),'Notes Column')]/ancestor::app-info-label/following-sibling::div//div[@class='text']");
         this.RICH_MEDIA_CHECKBOX = page.locator("//sui-checkbox[@formcontrolname='expandable']");
         this.DIRECTION_DROPDOWN = page.locator("//div[contains(text(),'Direction')]");
-        this.DIRECTION_DROPDOWN_VALUE = page.locator("//div[contains(text(),'Direction')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
+        this.DIRECTION_DROPDOWN_VALUE = page.locator(
+                "//div[contains(text(),'Direction')]/following-sibling::div[contains(@class,'menu transition visible')]/div");
         this.HTML_CREATIVE_NAME = page.locator("//input[@placeholder='Creative Name']");
-        this.IAB_CATEGORY_DROPDOWN = page.locator("//sui-multi-select[contains(@placeholder,'Search Categories')]//input");
+        this.IAB_CATEGORY_DROPDOWN =
+                page.locator("//sui-multi-select[contains(@placeholder,'Search Categories')]//input");
         this.INLINE_VALIDATION_MESSAGE = page.locator("//p[contains(@class,'ng-star-inserted')]");
         this.WIDTH_BOX = page.locator("//input[contains(@placeholder,'width')]");
         this.HEIGHT_BOX = page.locator("//input[contains(@placeholder, 'height')]");
         this.UPLOAD_BUTTON = page.locator("//button[contains(@class,'okButton') and contains(text(),'Upload')]");
         this.VALIDATION_ERROR = page.locator("//div[contains(@class,'validation-erros')]");
         this.TOOL_TIP_TEXT = page.locator("//div[contains(@class,'tooltip-row')]");
-        this.WARNING_IMAGE_ICON = page.locator("//div[@class='preview-table-container']//img[contains(@src,'warning.svg')]");
+        this.WARNING_IMAGE_ICON =
+                page.locator("//div[@class='preview-table-container']//img[contains(@src,'warning.svg')]");
         this.CREATIVE_DROPDOWN_DETAILS_FROM_TABLE = page.locator("select.selectBox");
         this.DOWNLOAD_BULK_UPLOAD_TEMPLATE = page.locator("//div[contains(@onclick,'BulkUploadTemplate')]");
         this.DURATION = page.locator("//input[contains(@placeholder,'Duration')]");
@@ -200,7 +212,9 @@ public class BulkCreativeUpload {
         if (!(INLINE_VALIDATION_MESSAGE.count() > 0)) {
             return Collections.emptyList();
         }
-        return INLINE_VALIDATION_MESSAGE.allInnerTexts().stream().map(String::trim).collect(Collectors.toList());
+        return INLINE_VALIDATION_MESSAGE.allInnerTexts().stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 
     public String fetchSuccessAlert() {
@@ -257,7 +271,6 @@ public class BulkCreativeUpload {
         String locator = "//div[contains(@title,'%s')]";
         CommonUtils.uploadFile(page, 0, locator, fileName);
     }
-
 
     public Path clickTemplateWithURLsLink() throws IOException {
         Download download = page.waitForDownload(TEMPLATE_WITH_URL_LINK::click);
@@ -376,7 +389,8 @@ public class BulkCreativeUpload {
         waitUtility.waitUntilSpinnerHidden();
         List<String> nameList = new ArrayList<>();
         for (int i = 0; i < HTML_CREATIVE_NAME.count(); i++) {
-            String newName = name + "_" + CommonUtils.timeStampCalculation() + "_" + CommonUtils.randomFourDigitNumber();
+            String newName =
+                    name + "_" + CommonUtils.timeStampCalculation() + "_" + CommonUtils.randomFourDigitNumber();
             HTML_CREATIVE_NAME.nth(i).fill(newName);
             nameList.add(newName);
         }
@@ -401,7 +415,10 @@ public class BulkCreativeUpload {
 
     public boolean isWidthHeightVisibleAndBlank() {
         for (int i = 0; i < WIDTH_BOX.count(); i++) {
-            if (!WIDTH_BOX.nth(i).isVisible() || !HEIGHT_BOX.nth(i).isVisible() || !WIDTH_BOX.nth(i).inputValue().trim().isEmpty() || !HEIGHT_BOX.nth(i).inputValue().trim().isEmpty()) {
+            if (!WIDTH_BOX.nth(i).isVisible()
+                    || !HEIGHT_BOX.nth(i).isVisible()
+                    || !WIDTH_BOX.nth(i).inputValue().trim().isEmpty()
+                    || !HEIGHT_BOX.nth(i).inputValue().trim().isEmpty()) {
                 return false;
             }
         }
@@ -410,7 +427,8 @@ public class BulkCreativeUpload {
 
     public boolean isDurationVisibleAndBlank() {
         for (int i = 0; i < DURATION.count(); i++) {
-            if (!DURATION.nth(i).isVisible() || !DURATION.nth(i).inputValue().trim().isEmpty()) {
+            if (!DURATION.nth(i).isVisible()
+                    || !DURATION.nth(i).inputValue().trim().isEmpty()) {
                 return false;
             }
         }
@@ -443,7 +461,8 @@ public class BulkCreativeUpload {
         enterFinancer(financer);
     }
 
-    public void fillAttributes(String type, Map<String, String> attributeMap, String updatedCreativeName) throws IOException {
+    public void fillAttributes(String type, Map<String, String> attributeMap, String updatedCreativeName)
+            throws IOException {
         switch (type) {
             case "Display", "Native":
                 uploadSecondaryCreativeTemplate(attributeMap.get("FileName"));
@@ -457,8 +476,8 @@ public class BulkCreativeUpload {
                 clickUploadButton();
                 break;
             case "HTML", "Video":
-//                if (type.contains("Video"))
-//                    uploadPrimaryCreativeTemplate(attributeMap.get("ImageFile"));
+                //                if (type.contains("Video"))
+                //                    uploadPrimaryCreativeTemplate(attributeMap.get("ImageFile"));
                 selectFileTypeAndUploadFile(attributeMap.get("FileType"), attributeMap.get("FileName"));
                 if (createCreatives.CLICK_THROUGH_URL.isVisible())
                     enterClickthroughURL(attributeMap.get("ClickThroughURL"));
@@ -483,18 +502,30 @@ public class BulkCreativeUpload {
             switch (errorField) {
                 case "AD SIZE is not supported":
                     for (int i = 0; i < CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.count(); i++) {
-                        String fieldPlaceholder = CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).getAttribute("class");
+                        String fieldPlaceholder =
+                                CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).getAttribute("class");
                         if (fieldPlaceholder.contains("red-border")) {
-                            List<String> texts = CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).locator("option").allInnerTexts().stream().map(String::trim).filter(text -> !text.isEmpty()).toList();
+                            List<String> texts =
+                                    CREATIVE_DROPDOWN_DETAILS_FROM_TABLE
+                                            .nth(i)
+                                            .locator("option")
+                                            .allInnerTexts()
+                                            .stream()
+                                            .map(String::trim)
+                                            .filter(text -> !text.isEmpty())
+                                            .toList();
                             String randomText = texts.get(new Random().nextInt(texts.size()));
-                            CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.first().selectOption(new SelectOption().setLabel(randomText));
+                            CREATIVE_DROPDOWN_DETAILS_FROM_TABLE
+                                    .first()
+                                    .selectOption(new SelectOption().setLabel(randomText));
                             break;
                         }
                     }
                     break;
                 case "Display URL is required":
                     for (int i = 0; i < CREATIVE_TEXT_DETAILS_FROM_TABLE.count(); i++) {
-                        String fieldPlaceholder = CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).getAttribute("class");
+                        String fieldPlaceholder =
+                                CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).getAttribute("class");
                         if (fieldPlaceholder.contains("red-border")) {
                             CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).fill(constants.DISPLAY_URL);
                             break;
@@ -507,7 +538,8 @@ public class BulkCreativeUpload {
 
     public List<String> fetchBulkUploadCreativeDetails() {
         List<String> creativeDetails = new ArrayList<>();
-        creativeDetails.add(ADVERTISER_DROPDOWN.locator("xpath=./div/span[2]").textContent().trim());
+        creativeDetails.add(
+                ADVERTISER_DROPDOWN.locator("xpath=./div/span[2]").textContent().trim());
         creativeDetails.add(createCreatives.ADVERTISER_DSA.inputValue().trim());
         creativeDetails.add(createCreatives.FINANCER.inputValue().trim());
         for (int i = 0; i < APPROVAL_STATUS_BUTTON.count(); i++) {
@@ -518,19 +550,26 @@ public class BulkCreativeUpload {
         }
         if (CREATIVE_TEXT_DETAILS_FROM_TABLE.first().isVisible()) {
             for (int i = 0; i < CREATIVE_TEXT_DETAILS_FROM_TABLE.count(); i++) {
-                String bulkUploadFields = CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).inputValue().trim();
+                String bulkUploadFields =
+                        CREATIVE_TEXT_DETAILS_FROM_TABLE.nth(i).inputValue().trim();
                 if (!bulkUploadFields.isEmpty()) creativeDetails.add(bulkUploadFields);
             }
         }
         if (CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.first().isVisible()) {
             for (int i = 0; i < CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.count(); i++) {
-                String bulkUploadFields = CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).inputValue().trim();
+                String bulkUploadFields =
+                        CREATIVE_DROPDOWN_DETAILS_FROM_TABLE.nth(i).inputValue().trim();
                 if (!bulkUploadFields.isEmpty()) creativeDetails.add(bulkUploadFields);
             }
         }
-        if (LANDING_PAGE_DOMAIN.isVisible()) creativeDetails.add(LANDING_PAGE_DOMAIN.inputValue().trim());
+        if (LANDING_PAGE_DOMAIN.isVisible())
+            creativeDetails.add(LANDING_PAGE_DOMAIN.inputValue().trim());
         if (createCreatives.SELECTED_AD_CHOICES_ICON.first().isVisible())
-            creativeDetails.add(createCreatives.SELECTED_AD_CHOICES_ICON.first().textContent().trim());
+            creativeDetails.add(createCreatives
+                    .SELECTED_AD_CHOICES_ICON
+                    .first()
+                    .textContent()
+                    .trim());
         if (HTML_CREATIVE_NAME.first().isVisible()) {
             for (int i = 0; i < HTML_CREATIVE_NAME.count(); i++) {
                 creativeDetails.add(HTML_CREATIVE_NAME.nth(i).inputValue().trim());

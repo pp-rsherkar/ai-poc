@@ -3,9 +3,8 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
-import utils.WaitUtility;
-
 import java.util.List;
+import utils.WaitUtility;
 
 public class Pixels {
     private final Page page;
@@ -34,7 +33,8 @@ public class Pixels {
 
     public Pixels(Page page) {
         this.page = page;
-        this.PIXELS_MENU_ITEM = page.locator("//div[text()='Pixels' and (contains(@class,'pull-left menuLabel') or contains(@class,'pull-left menuText'))]");
+        this.PIXELS_MENU_ITEM = page.locator(
+                "//div[text()='Pixels' and (contains(@class,'pull-left menuLabel') or contains(@class,'pull-left menuText'))]");
         this.ADD_PIXEL_BUTTON = page.locator("//span[normalize-space(text())='Add Pixel']");
         this.CREATE_NEW_PIXEL_LABEL = page.locator("//div[@class='createNewPixel']/div[@class='heading-wrapper']");
         this.RETARGETING_PIXEL = page.locator("//span[text()='Retargeting Pixel']");
@@ -47,13 +47,17 @@ public class Pixels {
         this.SMART_TAB = page.locator("//button[text()='Smart']");
         this.CONVERSION_TAB = page.locator("//button[text()='Conversion']");
         this.ADVERTISER_DROPDOWN = page.locator("//app-multi-select[@placeholder='Any Advertiser']");
-        this.UPDATE_SUCCESS = page.locator("//div[@role='alert' and (text()='Pixel updated successfully' or text()='Saved successfully')]");
+        this.UPDATE_SUCCESS = page.locator(
+                "//div[@role='alert' and (text()='Pixel updated successfully' or text()='Saved successfully')]");
         this.REMOVE_PIXEL_ICON = page.locator("//app-icon-lable-link[@icon='20-delete.svg']");
         this.REMOVE_PIXEL_BUTTON = page.locator("//span[text()='Remove']");
         this.REMOVE_SUCCESS = page.locator("//div[@role='alert' and text()='Pixel deleted successfully']");
-        this.CANCEL_BUTTON = page.locator("//button[contains(@class,'cancel secondary button') and normalize-space(text())='Cancel']");
-        this.NO_RESULTS_FOUND = page.locator("//div[contains(text(),'Nothing found') or contains(text(),'Nothing Found')]");
-        this.PIXEL_LIST = page.locator("//div[contains(@class,'pixel-list-wrapper')]//div[contains(@class,'main-details')]");
+        this.CANCEL_BUTTON = page.locator(
+                "//button[contains(@class,'cancel secondary button') and normalize-space(text())='Cancel']");
+        this.NO_RESULTS_FOUND =
+                page.locator("//div[contains(text(),'Nothing found') or contains(text(),'Nothing Found')]");
+        this.PIXEL_LIST =
+                page.locator("//div[contains(@class,'pixel-list-wrapper')]//div[contains(@class,'main-details')]");
         this.EDIT_ICON = page.locator("//img[@alt='edit' and contains(@class,'header-edit-icon')]");
     }
 
@@ -180,7 +184,9 @@ public class Pixels {
 
     public void selectAdvertiser(String advertiser) {
         ADVERTISER_DROPDOWN.click();
-        ADVERTISER_DROPDOWN.locator("xpath=//span[contains(text(),'" + advertiser + "')]").click();
+        ADVERTISER_DROPDOWN
+                .locator("xpath=//span[contains(text(),'" + advertiser + "')]")
+                .click();
         page.keyboard().press("Escape");
         waitUtility.waitForLocatorVisible(PIXEL_LIST.last());
     }

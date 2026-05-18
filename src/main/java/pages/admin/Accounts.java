@@ -1,14 +1,13 @@
 package pages.admin;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import utils.WaitUtility;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import utils.WaitUtility;
 
 public class Accounts {
     private final Page page;
@@ -95,8 +94,10 @@ public class Accounts {
         this.STUDIO_USER_TAB = page.locator("//button[.//span[text()='Studio']]");
         this.STUDIO_TOGGLE_EXTERNAL_USER_ENABLED = page.locator("//span[contains(@class,'icons-24-checkmark-green')]");
         this.STUDIO_TOGGLE_EXTERNAL_USER_DISABLED = page.locator("//span[contains(@class,'icons-24-checkmark-white')]");
-        this.STUDIO_TOGGLE_BUTTON = page.locator("//span[@class='btn-label' and text()='Studio']/following-sibling::span//span");
-        this.EXPANSION_TOGGLE = page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
+        this.STUDIO_TOGGLE_BUTTON =
+                page.locator("//span[@class='btn-label' and text()='Studio']/following-sibling::span//span");
+        this.EXPANSION_TOGGLE =
+                page.locator("tr:nth-child(3) > td:nth-child(2) > .toggle-wrapper-withLabel > .toggle > label");
         this.STUDIO_SETTINGS_SAVE = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.STUDIO_MENU = page.getByText("Studio").nth(4);
         this.DISABLE_STUDIO_OK_BUTTON = page.locator("//div[contains(@class,'approveButtonText')]");
@@ -104,7 +105,11 @@ public class Accounts {
         this.SWITCH_ACCOUNT = page.locator(".left > div:nth-child(2)").first();
         this.SWITCH_SEARCH_ACCOUNT = page.getByPlaceholder("Search");
         this.SWITCH_CLICK_ACCOUNT = page.locator("#accountSwitcher").getByText("100Plus");
-        this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]").contentFrame().locator("iframe").contentFrame().getByText("HCP Audience Expansion");
+        this.WORKSPACE_NAME = page.locator("iframe[title=\"overview\"]")
+                .contentFrame()
+                .locator("iframe")
+                .contentFrame()
+                .getByText("HCP Audience Expansion");
         this.ACCOUNTS_TAB_TEXT = page.locator("//span[text()='Account Management']");
         this.ADVERTISER_TAB = page.locator("//a[@routerlink='/advertisers/list']");
         this.ACCOUNT_DROPDOWN = page.locator("//app-single-select-dropdown[@placeholder='Any Account']");
@@ -122,7 +127,8 @@ public class Accounts {
         this.PASSWORD = page.locator("//input[@placeholder='Enter Password']");
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection' or text()='Test Access']");
-        this.CONNECTION_CONFIRMATION_TEXT = page.locator("//app-icon-lable-link[@text='Connection confirmed']/div | //span[contains(text(),'Access test successful')]");
+        this.CONNECTION_CONFIRMATION_TEXT = page.locator(
+                "//app-icon-lable-link[@text='Connection confirmed']/div | //span[contains(text(),'Access test successful')]");
         this.OK_BUTTON = page.locator("//button[contains(@class, 'okButton') or contains(text(),'Save')]");
         this.ACCOUNT_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
         this.GLOBAL_SIGNALS_TAB = page.locator("//button[@class='signal']");
@@ -130,19 +136,26 @@ public class Accounts {
         this.ACCOUNT_USER_TAB = page.locator("//a[@routerlink='users']");
         this.USER_SIGNAL_TAB = page.locator("//button[normalize-space(.)='Signal']");
         this.USER_PERMISSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
-        this.USER_PROFILE_ICON = page.locator("//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
+        this.USER_PROFILE_ICON = page.locator(
+                "//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
         this.LOGOUT_BUTTON = page.locator("//div[@class='hovitems item last link']");
         this.MOMENTS_CHECKBOX = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
         this.IBHEALTH_CHECKBOX = page.locator("//*[@id='45_0' and not(contains(@class, 'checked'))]");
         this.CLAIMSDATA_CHECKBOX = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
         this.ACCOUNTS_ADVERTISER_TAB = page.locator("//a[@routerlink='advertisers']");
-        this.SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
+        this.SUCCESS_ALERT =
+                page.locator("//div[@role='alert' and contains(text(),'Advertisers updated successfully')]");
         this.CLIENT_VALUE = page.locator("//app-single-select-dropdown[@placeholder='Client']//span");
-        this.STUDIO_SETTINGS_ICON = page.locator("//span[@class='header-name' and text()='Studio']/following-sibling::span");
-        this.STUDIO_SETTINGS_PANEL = page.locator("//div[@class='bsHeaderContainer']//div[contains(text(),'Studio Settings')]");
-        this.WORKSPACE_PERMISSION_TOGGLE_BUTTON = page.locator("//div[@class='secondtablewrapper']//div[contains(@class,'toggle-wrapper-withLabel')]//sui-checkbox");
-        this.STUDIO_SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
-        this.LIFE_SETTINGS_PANEL_CANCEL_BUTTON = page.locator("//app-account-fee//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
+        this.STUDIO_SETTINGS_ICON =
+                page.locator("//span[@class='header-name' and text()='Studio']/following-sibling::span");
+        this.STUDIO_SETTINGS_PANEL =
+                page.locator("//div[@class='bsHeaderContainer']//div[contains(text(),'Studio Settings')]");
+        this.WORKSPACE_PERMISSION_TOGGLE_BUTTON = page.locator(
+                "//div[@class='secondtablewrapper']//div[contains(@class,'toggle-wrapper-withLabel')]//sui-checkbox");
+        this.STUDIO_SETTINGS_PANEL_CANCEL_BUTTON = page.locator(
+                "//app-genomestudio-workspace//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
+        this.LIFE_SETTINGS_PANEL_CANCEL_BUTTON =
+                page.locator("//app-account-fee//button[contains(@class,'cancelbtn') and contains(text(),'Cancel')]");
         this.ERROR_ALERT = page.locator("//div[@aria-label='Error while saving.']");
         this.ALERT = page.locator("//div[@role='alert']");
         this.EXPORT_OPTIONS_DIALOG = page.locator("//div[text()='Choose file size to test access']");
@@ -283,7 +296,8 @@ public class Accounts {
     public String clickTestConnection() {
         TEST_CONNECTION_LINK.last().click();
         if (EXPORT_OPTIONS_DIALOG.isVisible()) RUN_BUTTON.click();
-        if (TEST_ACCESS_FAILED_TEXT.isVisible()) return TEST_ACCESS_FAILED_TEXT.textContent().trim();
+        if (TEST_ACCESS_FAILED_TEXT.isVisible())
+            return TEST_ACCESS_FAILED_TEXT.textContent().trim();
         else {
             waitUtility.waitForLocatorVisible(CONNECTION_CONFIRMATION_TEXT);
             return CONNECTION_CONFIRMATION_TEXT.textContent().trim();
@@ -300,7 +314,8 @@ public class Accounts {
         while (!PULSEPOINT_ICON.isVisible() && !PULSEPOINT_ICON.isEnabled()) {
             page.waitForTimeout(5000);
         }
-        page.waitForTimeout(10000); //needed this hard wait as page remains un-interactive even after element is visible
+        page.waitForTimeout(
+                10000); // needed this hard wait as page remains un-interactive even after element is visible
     }
 
     public void selectUserTab() {
@@ -342,7 +357,9 @@ public class Accounts {
     }
 
     public void enableAdvertiserPermission(String advertiserName, String advertiserPermission) {
-        Locator permissionCheckbox = page.locator(String.format("//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]", advertiserName, advertiserPermission));
+        Locator permissionCheckbox = page.locator(String.format(
+                "//tr[td[normalize-space(.)='%s']]/td[position() = count(ancestor::table//th[normalize-space(.)='%s']/preceding-sibling::th) + 1]//sui-checkbox[not(contains(@class, 'checked'))]",
+                advertiserName, advertiserPermission));
         switch (advertiserPermission) {
             case "MOMENTS", "IB HEALTH", "CLAIMS DATA":
                 if (!permissionCheckbox.isHidden()) {
@@ -399,14 +416,19 @@ public class Accounts {
     }
 
     public void clickAdvertisersSubTab(String tabName) {
-        Locator tabXpath = page.locator(String.format("//div[@class='advertiser-tabs']//button[contains(normalize-space(text()),'%s')]", tabName));
+        Locator tabXpath = page.locator(String.format(
+                "//div[@class='advertiser-tabs']//button[contains(normalize-space(text()),'%s')]", tabName));
         tabXpath.click();
     }
 
     public boolean checkHCPPermissionForAdvertiser(String checkboxStatus, String advertiser) {
         boolean flag;
-        Locator permissionXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox", advertiser));
-        Locator disabledTextXpath = page.locator(String.format("//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]", advertiser));
+        Locator permissionXpath = page.locator(String.format(
+                "//td[contains(normalize-space(text()),'%s')]/following-sibling::td[contains(@class,'hcp365Col')]//sui-checkbox",
+                advertiser));
+        Locator disabledTextXpath = page.locator(String.format(
+                "//td[contains(normalize-space(text()),'%s')]/following-sibling::td//span[contains(@class,'disabled-text' )and contains(text(),'HCP365 is disabled for this Advertiser')]",
+                advertiser));
         waitUtility.waitForLocatorVisible(permissionXpath);
         flag = switch (checkboxStatus) {
             case "Disabled" -> {
@@ -452,8 +474,11 @@ public class Accounts {
         List<String> workspaceNameList = new ArrayList<>();
         for (int i = 0; i < WORKSPACE_PERMISSION_TOGGLE_BUTTON.count(); i++) {
             if (WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).getAttribute("class").contains("checked")) {
-                int rowIndex = (int) WORKSPACE_PERMISSION_TOGGLE_BUTTON.nth(i).evaluate("(el) => Array.from(el.closest('tbody').children).indexOf(el.closest('tr')) + 1");
-                Locator workspaceNameLocator = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//div", rowIndex));
+                int rowIndex = (int) WORKSPACE_PERMISSION_TOGGLE_BUTTON
+                        .nth(i)
+                        .evaluate("(el) => Array.from(el.closest('tbody').children).indexOf(el.closest('tr')) + 1");
+                Locator workspaceNameLocator = page.locator(
+                        String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//div", rowIndex));
                 workspaceNameList.add(workspaceNameLocator.textContent().trim());
             }
         }
