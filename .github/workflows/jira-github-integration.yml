@@ -1,91 +1,165 @@
-name: Generate Feature from Jira and Run Tests
+name: Jira Feature PR Automation
 
 on:
   workflow_dispatch:
     inputs:
       issue_id:
-        description: 'Jira Issue ID (e.g., QA-1321)'
+        description: Jira Issue ID (for example QA-1321)
         required: true
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  generate-and-test:
+  generate-feature-and-pr:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Step 2: Install jq for JSON parsing
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      # Step 3: Fetch Jira story and generate feature file
-      - name: Generate Feature File from Jira
+      - name: Generate feature file from Jira and create PR
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           ISSUE_ID: ${{ github.event.inputs.issue_id }}
-          FEATURES_DIR: src/test/resources/features
-          TEMPLATE_FILE: src/test/resources/features/template.feature
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
         run: |
-          echo "Fetching Jira issue $ISSUE_ID..."
-          
-          RESPONSE=$(curl -s -u "$JIRA_EMAIL:$JIRA_TOKEN" \
-            -H "Accept: application/json" \
-            "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID")
+          set -euo pipefail
 
-          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description // "No description"')
-
-          # Make summary slug for file name
-          SUMMARY_SLUG=$(echo "$SUMMARY" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:] \n' | tr ' ' '-')
-          FEATURE_FILE="$FEATURES_DIR/$ISSUE_ID-$SUMMARY_SLUG.feature"
-
-          mkdir -p $(dirname "$FEATURE_FILE")
-
-          echo "Generating feature file: $FEATURE_FILE"
-
-          # Use template if exists
-          if [ -f "$TEMPLATE_FILE" ]; then
-            awk -v summary="$SUMMARY" -v description="$DESCRIPTION" '
-            BEGIN { feature_done=0 }
-            /^Feature:/ && feature_done==0 { print "Feature: " summary; feature_done=1; next }
-            /^  # Description:/ { print "  # Description: " description; next }
-            { print }
-            ' "$TEMPLATE_FILE" > "$FEATURE_FILE"
-          else
-            # Fallback template
-            echo "Feature: $SUMMARY" > "$FEATURE_FILE"
-            echo "" >> "$FEATURE_FILE"
-            echo "  # Description: $DESCRIPTION" >> "$FEATURE_FILE"
-            echo "" >> "$FEATURE_FILE"
-            echo "  Scenario: Default scenario" >> "$FEATURE_FILE"
-            echo "    # Steps follow repo conventions" >> "$FEATURE_FILE"
+          if [[ ! "$ISSUE_ID" =~ ^[A-Z][A-Z0-9]+-[0-9]+$ ]]; then
+            echo "Invalid Jira issue id: $ISSUE_ID"
+            exit 1
           fi
 
-          echo "Feature file created successfully."
+          ISSUE_API="$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID"
+          ISSUE_RESPONSE=$(curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" -H "Accept: application/json" "$ISSUE_API")
+          SUMMARY=$(echo "$ISSUE_RESPONSE" | jq -r '.fields.summary // empty')
 
-      # Step 4: Set up Java
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: '21'
+          if [ -z "$SUMMARY" ]; then
+            echo "Unable to read Jira issue summary for $ISSUE_ID"
+            echo "$ISSUE_RESPONSE" | jq '.'
+            exit 1
+          fi
 
-      # Step 5: Install Maven dependencies
-      - name: Install Maven dependencies
-        run: mvn clean install -DskipTests
+          FEATURE_DIR="src/test/resources/features/generated"
+          FEATURE_FILE="$FEATURE_DIR/${ISSUE_ID}.feature"
+          mkdir -p "$FEATURE_DIR"
 
-      # Step 6: Install Node.js for Playwright
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+          cat > "$FEATURE_FILE" <<EOF
+          @e2e
+          Feature: $ISSUE_ID - $SUMMARY
 
-      - name: Install Playwright browsers
-        run: npx playwright install
+            Scenario: Validate $ISSUE_ID
+              Given test preconditions are prepared for "$ISSUE_ID"
+              When business steps are implemented for "$ISSUE_ID"
+              Then expected behavior is verified for "$ISSUE_ID"
+          EOF
 
-      # Step 7: Run Playwright + Cucumber tests
-      - name: Run Playwright Cucumber Tests
-        run: mvn test
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          BRANCH_NAME="$ISSUE_ID"
+          git checkout -B "$BRANCH_NAME"
+          git add "$FEATURE_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit for $ISSUE_ID"
+          else
+            git commit -m "$ISSUE_ID: add generated cucumber feature file"
+            git push --force-with-lease origin "$BRANCH_NAME"
+          fi
+
+          EXISTING_PR=$(curl -sS \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$OWNER/$REPO/pulls?head=$OWNER:$BRANCH_NAME&state=open" \
+            | jq -r '.[0].html_url // empty')
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR already exists: $EXISTING_PR"
+            exit 0
+          fi
+
+          PR_BODY=$(cat <<EOF
+          Auto-generated feature file for Jira issue $ISSUE_ID.
+          This PR was created by workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          EOF
+          )
+
+          CREATE_PR_RESPONSE=$(curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$OWNER/$REPO/pulls" \
+            -d "$(jq -nc \
+              --arg title "$ISSUE_ID: add generated cucumber feature file" \
+              --arg head "$BRANCH_NAME" \
+              --arg base "main" \
+              --arg body "$PR_BODY" \
+              '{title: $title, head: $head, base: $base, body: $body}')")
+
+          PR_URL=$(echo "$CREATE_PR_RESPONSE" | jq -r '.html_url // empty')
+          if [ -z "$PR_URL" ]; then
+            echo "Failed to create PR."
+            echo "$CREATE_PR_RESPONSE" | jq '.'
+            exit 1
+          fi
+
+          echo "Created PR: $PR_URL"
+
+  transition-jira-on-merge:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Transition Jira issue to Done
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+
+          ISSUE_ID=$(printf '%s\n%s\n%s\n' "$PR_BRANCH" "$PR_TITLE" "$PR_BODY" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)
+
+          if [ -z "$ISSUE_ID" ]; then
+            echo "No Jira issue id found in PR branch/title/body; skipping transition."
+            exit 0
+          fi
+
+          TRANSITIONS=$(curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" \
+            -H "Accept: application/json" \
+            "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID/transitions")
+
+          DONE_ID=$(echo "$TRANSITIONS" | jq -r '.transitions[] | select(.name=="Done") | .id' | head -n 1)
+          if [ -z "$DONE_ID" ]; then
+            echo "Done transition not available for $ISSUE_ID"
+            echo "$TRANSITIONS" | jq '.'
+            exit 1
+          fi
+
+          curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" \
+            -X POST \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID/transitions" \
+            -d "$(jq -nc --arg id "$DONE_ID" '{transition: {id: $id}}')"
+
+          echo "Transitioned $ISSUE_ID to Done."
