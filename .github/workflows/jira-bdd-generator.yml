@@ -10,10 +10,10 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - main
+      - QA-1321
 
 jobs:
-  # JOB 1: Triggers manually to read JIRA, generate the file, and open a PR
+  # JOB 1: Triggers manually to read JIRA, generate the file, and open a PR against QA-1321
   generate-feature-file:
     if: github.event_name == 'workflow_dispatch' && github.ref_name == 'QA-1321'
     runs-on: ubuntu-latest
@@ -79,11 +79,11 @@ jobs:
             
             **Summary:** ${{ env.SUMMARY }}
             **Description Context:** ${{ env.DESCRIPTION }}
-          base: main
+          base: QA-1321
 
-  # JOB 2: Triggers automatically when a PR is merged into main to close the JIRA ticket
+  # JOB 2: Triggers automatically when a PR is merged into QA-1321 to close the JIRA ticket
   close-jira-ticket:
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'QA-1321'
     runs-on: ubuntu-latest
     steps:
       - name: Extract JIRA ID from Branch Name
