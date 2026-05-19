@@ -1,0 +1,127 @@
+name: JIRA BDD Feature Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: 'Enter the JIRA Ticket ID (e.g., PROJ-123)'
+        required: true
+        type: string
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  # JOB 1: Triggers manually to read JIRA, generate the file, and open a PR
+  generate-feature-file:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'QA-1321'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout QA-1321 Branch
+        uses: actions/checkout@v4
+        with:
+          ref: QA-1321
+
+      - name: Fetch Summary and Description from JIRA
+        id: jira_data
+        run: |
+          # Encode authentication credentials
+          AUTH=$(echo -n "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" | base64)
+          
+          # Fetch issue details via JIRA REST API
+          RESPONSE=$(curl -s --request GET \
+            --url "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}" \
+            --header "Authorization: Basic $AUTH" \
+            --header "Accept: application/json")
+          
+          # Extract Summary using jq
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
+          
+          # Extract and flatten Description text from Atlassian Document Format (ADF)
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '"')
+          
+          # Clean text variables to ensure safe multi-line output for GitHub environment variables
+          echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
+          echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+
+      - name: Generate Cucumber Feature File
+        run: |
+          # Format file name using JIRA ID and summary (lowercase, spaces replaced with underscores)
+          CLEAN_SUMMARY=$(echo "${{ env.SUMMARY }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g')
+          FILE_NAME="${{ inputs.jira_id }}_${CLEAN_SUMMARY}.feature"
+          
+          # Target directory matching Playwright + Cucumber + Java standard structures
+          TARGET_DIR="src/test/resources/features"
+          mkdir -p $TARGET_DIR
+          
+          # Build Gherkin content purely using Bash echo
+          echo "@${{ inputs.jira_id }}" > "$TARGET_DIR/$FILE_NAME"
+          echo "Feature: ${{ env.SUMMARY }}" >> "$TARGET_DIR/$FILE_NAME"
+          echo "" >> "$TARGET_DIR/$FILE_NAME"
+          echo "  Background:" >> "$TARGET_DIR/$FILE_NAME"
+          echo "    # JIRA Description Context: ${{ env.DESCRIPTION }}" >> "$TARGET_DIR/$FILE_NAME"
+          echo "" >> "$TARGET_DIR/$FILE_NAME"
+          echo "  Scenario: Verify requirements for ${{ inputs.jira_id }}" >> "$TARGET_DIR/$FILE_NAME"
+          echo "    Given The user is logged into the application" >> "$TARGET_DIR/$FILE_NAME"
+          echo "    When The user processes requirements specified in ${{ inputs.jira_id }}" >> "$TARGET_DIR/$FILE_NAME"
+          echo "    Then The application matches the expected behavior" >> "$TARGET_DIR/$FILE_NAME"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: "feat: automated feature file for ${{ inputs.jira_id }}"
+          branch: "auto-feature/${{ inputs.jira_id }}"
+          title: "feat: Test cases for ${{ inputs.jira_id }}"
+          body: |
+            Automated Cucumber BDD feature file generated from JIRA ticket ${{ inputs.jira_id }}.
+            
+            **Summary:** ${{ env.SUMMARY }}
+            **Description Context:** ${{ env.DESCRIPTION }}
+          base: main
+
+  # JOB 2: Triggers automatically when a PR is merged into main to close the JIRA ticket
+  close-jira-ticket:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract JIRA ID from Branch Name
+        id: extract_id
+        run: |
+          # Extracts the JIRA ID from the automated branch name (e.g., auto-feature/QA-123 -> QA-123)
+          JIRA_ID=$(echo "${{ github.event.pull_request.head.ref }}" | grep -oE '[A-Z]+-[0-9]+' | head -n 1)
+          echo "jira_id=$JIRA_ID" >> $GITHUB_OUTPUT
+
+      - name: Transition JIRA Issue to Done
+        if: steps.extract_id.outputs.jira_id != ''
+        run: |
+          AUTH=$(echo -n "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" | base64)
+          
+          # 1. Fetch available transitions to find the ID corresponding to "Done"
+          TRANSITIONS_URL="${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ steps.extract_id.outputs.jira_id }}/transitions"
+          
+          AVAILABLE_TRANSITIONS=$(curl -s --request GET \
+            --url "$TRANSITIONS_URL" \
+            --header "Authorization: Basic $AUTH" \
+            --header "Accept: application/json")
+          
+          # Target the transition ID where the name is "Done" or "Closed"
+          TRANSITION_ID=$(echo "$AVAILABLE_TRANSITIONS" | jq -r '.transitions[] | select(.name == "Done") | .id')
+          
+          # Fallback if your workflow uses "Closed" instead of "Done"
+          if [ -z "$TRANSITION_ID" ] || [ "$TRANSITION_ID" = "null" ]; then
+            TRANSITION_ID=$(echo "$AVAILABLE_TRANSITIONS" | jq -r '.transitions[] | select(.name == "Closed") | .id')
+          fi
+          
+          # 2. Execute the transition update if found
+          if [ ! -z "$TRANSITION_ID" ] && [ "$TRANSITION_ID" != "null" ]; then
+            curl -s --request POST \
+              --url "$TRANSITIONS_URL" \
+              --header "Authorization: Basic $AUTH" \
+              --header "Content-Type: application/json" \
+              --data "{\"transition\": {\"id\": \"$TRANSITION_ID\"}}"
+            echo "Successfully moved JIRA ticket ${{ steps.extract_id.outputs.jira_id }} to Done."
+          else
+            echo "Could not find a matching transition state named 'Done' or 'Closed' for this ticket."
+          fi
