@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       issue_id:
-        description: Jira Issue ID (for example QA-1321)
+        description: Jira Issue ID (e.g., QA-1321)
         required: true
   pull_request:
     types: [closed]
@@ -63,6 +63,7 @@ jobs:
           Feature: $ISSUE_ID - $SUMMARY
 
             Scenario: Validate $ISSUE_ID
+              # Replace template steps with Jira acceptance criteria before merge.
               Given test preconditions are prepared for "$ISSUE_ID"
               When business steps are implemented for "$ISSUE_ID"
               Then expected behavior is verified for "$ISSUE_ID"
@@ -140,23 +141,44 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          JIRA_DONE_TRANSITION_NAME: ${{ secrets.JIRA_DONE_TRANSITION_NAME }}
         run: |
           set -euo pipefail
 
-          ISSUE_ID=$(printf '%s\n%s\n%s\n' "$PR_BRANCH" "$PR_TITLE" "$PR_BODY" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)
+          ISSUE_ID=""
+          ISSUE_SOURCE=""
+          for SOURCE in BRANCH TITLE BODY; do
+            VALUE=""
+            if [ "$SOURCE" = "BRANCH" ]; then
+              VALUE="$PR_BRANCH"
+            elif [ "$SOURCE" = "TITLE" ]; then
+              VALUE="$PR_TITLE"
+            else
+              VALUE="$PR_BODY"
+            fi
+            CANDIDATE=$(printf '%s' "$VALUE" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)
+            if [ -n "$CANDIDATE" ]; then
+              ISSUE_ID="$CANDIDATE"
+              ISSUE_SOURCE="$SOURCE"
+              break
+            fi
+          done
 
           if [ -z "$ISSUE_ID" ]; then
             echo "No Jira issue ID found in PR branch/title/body; skipping transition."
             exit 0
           fi
 
+          echo "Resolved Jira issue ID $ISSUE_ID from PR $ISSUE_SOURCE."
+          TARGET_TRANSITION_NAME="${JIRA_DONE_TRANSITION_NAME:-Done}"
+
           TRANSITIONS=$(curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" \
             -H "Accept: application/json" \
             "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID/transitions")
 
-          DONE_ID=$(echo "$TRANSITIONS" | jq -r '.transitions[] | select(.name=="Done") | .id' | head -n 1)
+          DONE_ID=$(echo "$TRANSITIONS" | jq -r --arg name "$TARGET_TRANSITION_NAME" '.transitions[] | select(.name==$name) | .id' | head -n 1)
           if [ -z "$DONE_ID" ]; then
-            echo "Done transition not available for $ISSUE_ID"
+            echo "Transition '$TARGET_TRANSITION_NAME' is not available for $ISSUE_ID"
             echo "$TRANSITIONS" | jq '.'
             exit 1
           fi
@@ -168,4 +190,4 @@ jobs:
             "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_ID/transitions" \
             -d "$(jq -nc --arg id "$DONE_ID" '{transition: {id: $id}}')"
 
-          echo "Transitioned $ISSUE_ID to Done."
+          echo "Transitioned $ISSUE_ID to '$TARGET_TRANSITION_NAME'."
