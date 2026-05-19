@@ -40,7 +40,7 @@ jobs:
           set -euo pipefail
 
           if [[ ! "$ISSUE_ID" =~ ^[A-Z][A-Z0-9]+-[0-9]+$ ]]; then
-            echo "Invalid Jira issue id: $ISSUE_ID"
+            echo "Invalid Jira issue ID: $ISSUE_ID"
             exit 1
           fi
 
@@ -72,16 +72,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           BRANCH_NAME="$ISSUE_ID"
-          git checkout -B "$BRANCH_NAME"
-          git add "$FEATURE_FILE"
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit for $ISSUE_ID"
-          else
-            git commit -m "$ISSUE_ID: add generated cucumber feature file"
-            git push --force-with-lease origin "$BRANCH_NAME"
-          fi
-
           EXISTING_PR=$(curl -sS \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
@@ -91,6 +81,22 @@ jobs:
           if [ -n "$EXISTING_PR" ]; then
             echo "PR already exists: $EXISTING_PR"
             exit 0
+          fi
+
+          if git ls-remote --exit-code --heads origin "$BRANCH_NAME" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH_NAME"
+            git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME"
+          else
+            git checkout -b "$BRANCH_NAME"
+          fi
+
+          git add "$FEATURE_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit for $ISSUE_ID"
+          else
+            git commit -m "$ISSUE_ID: add generated cucumber feature file"
+            git push origin "$BRANCH_NAME"
           fi
 
           PR_BODY=$(cat <<EOF
@@ -140,7 +146,7 @@ jobs:
           ISSUE_ID=$(printf '%s\n%s\n%s\n' "$PR_BRANCH" "$PR_TITLE" "$PR_BODY" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)
 
           if [ -z "$ISSUE_ID" ]; then
-            echo "No Jira issue id found in PR branch/title/body; skipping transition."
+            echo "No Jira issue ID found in PR branch/title/body; skipping transition."
             exit 0
           fi
 
