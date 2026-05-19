@@ -59,16 +59,16 @@ jobs:
           FEATURE_FILE="$FEATURE_DIR/${ISSUE_ID}.feature"
           mkdir -p "$FEATURE_DIR"
 
-          cat > "$FEATURE_FILE" <<EOF
-          @e2e
-          Feature: $ISSUE_ID - $SUMMARY
-
-            Scenario: Validate $ISSUE_ID
-              # Replace template steps with Jira acceptance criteria before merge.
-              Given test preconditions are prepared for "$ISSUE_ID"
-              When business steps are implemented for "$ISSUE_ID"
-              Then expected behavior is verified for "$ISSUE_ID"
-          EOF
+          {
+            printf '%s\n' '@e2e'
+            printf '%s\n' "Feature: $ISSUE_ID - $SUMMARY"
+            printf '\n'
+            printf '%s\n' "  Scenario: Validate $ISSUE_ID"
+            printf '%s\n' '    # Replace template steps with Jira acceptance criteria before merge.'
+            printf '%s\n' "    Given test preconditions are prepared for \"$ISSUE_ID\""
+            printf '%s\n' "    When business steps are implemented for \"$ISSUE_ID\""
+            printf '%s\n' "    Then expected behavior is verified for \"$ISSUE_ID\""
+          } > "$FEATURE_FILE"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -96,6 +96,8 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No changes to commit for $ISSUE_ID"
+            echo "No new PR will be created because there are no file changes."
+            exit 0
           else
             git commit -m "$ISSUE_ID: add generated cucumber feature file"
             git push origin "$BRANCH_NAME"
@@ -172,7 +174,7 @@ jobs:
           fi
 
           echo "Resolved Jira issue ID $ISSUE_ID from PR $ISSUE_SOURCE."
-          # Set JIRA_DONE_TRANSITION_NAME secret if your Jira completion transition is not named "Done".
+          # Configure the JIRA_DONE_TRANSITION_NAME repository secret if completion transition is not "Done".
           TARGET_TRANSITION_NAME="${JIRA_DONE_TRANSITION_NAME:-Done}"
 
           TRANSITIONS=$(curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" \
