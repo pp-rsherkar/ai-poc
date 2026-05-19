@@ -87,9 +87,18 @@ jobs:
 
           if git ls-remote --exit-code --heads origin "$BRANCH_NAME" >/dev/null 2>&1; then
             git fetch origin "$BRANCH_NAME"
-            git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME"
+            if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+              git checkout "$BRANCH_NAME"
+              git reset --hard "origin/$BRANCH_NAME"
+            else
+              git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME"
+            fi
           else
-            git checkout -b "$BRANCH_NAME"
+            if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+              git checkout "$BRANCH_NAME"
+            else
+              git checkout -b "$BRANCH_NAME"
+            fi
           fi
 
           git add "$FEATURE_FILE"
@@ -174,7 +183,6 @@ jobs:
           fi
 
           echo "Resolved Jira issue ID $ISSUE_ID from PR $ISSUE_SOURCE."
-          # Configure the JIRA_DONE_TRANSITION_NAME repository secret if completion transition is not "Done".
           TARGET_TRANSITION_NAME="${JIRA_DONE_TRANSITION_NAME:-Done}"
 
           TRANSITIONS=$(curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" \
