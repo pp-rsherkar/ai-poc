@@ -38,8 +38,9 @@ jobs:
           REPO: ${{ github.event.repository.name }}
         run: |
           set -euo pipefail
+          ISSUE_KEY_PATTERN='[A-Z][A-Z0-9]+-[0-9]+'
 
-          if [[ ! "$ISSUE_ID" =~ ^[A-Z][A-Z0-9]+-[0-9]+$ ]]; then
+          if [[ ! "$ISSUE_ID" =~ ^$ISSUE_KEY_PATTERN$ ]]; then
             echo "Invalid Jira issue ID: $ISSUE_ID"
             exit 1
           fi
@@ -144,6 +145,7 @@ jobs:
           JIRA_DONE_TRANSITION_NAME: ${{ secrets.JIRA_DONE_TRANSITION_NAME }}
         run: |
           set -euo pipefail
+          ISSUE_KEY_PATTERN='[A-Z][A-Z0-9]+-[0-9]+'
 
           ISSUE_ID=""
           ISSUE_SOURCE=""
@@ -156,7 +158,7 @@ jobs:
             else
               VALUE="$PR_BODY"
             fi
-            CANDIDATE=$(printf '%s' "$VALUE" | grep -Eo '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1 || true)
+            CANDIDATE=$(printf '%s' "$VALUE" | grep -Eo "$ISSUE_KEY_PATTERN" | head -n 1 || true)
             if [ -n "$CANDIDATE" ]; then
               ISSUE_ID="$CANDIDATE"
               ISSUE_SOURCE="$SOURCE"
@@ -170,6 +172,7 @@ jobs:
           fi
 
           echo "Resolved Jira issue ID $ISSUE_ID from PR $ISSUE_SOURCE."
+          # Set JIRA_DONE_TRANSITION_NAME secret if your Jira completion transition is not named "Done".
           TARGET_TRANSITION_NAME="${JIRA_DONE_TRANSITION_NAME:-Done}"
 
           TRANSITIONS=$(curl -sS -u "$JIRA_EMAIL:$JIRA_TOKEN" \
