@@ -147,7 +147,8 @@ public class Campaigns {
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
         this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
         this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
-        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
+        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator(
+                "//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
     }
 
