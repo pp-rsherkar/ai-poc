@@ -3,6 +3,7 @@ package factory;
 import com.microsoft.playwright.*;
 import utils.ConfigReader;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 public class DriverFactory {
@@ -53,7 +54,7 @@ public class DriverFactory {
         }
         if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);
         threadLocalBrowser.set(browser);
-        BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
+        BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null).setRecordVideoDir(Paths.get("target/videos")).setRecordVideoSize(1280, 720));
         //Below line is used to start the trace file
         context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
         Page page = context.newPage();

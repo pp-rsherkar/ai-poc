@@ -14,11 +14,12 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 public class Hooks {
-
+    private static final long MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
     private static final Logger logger = LoggerFactory.getLogger(Hooks.class);
     public DriverFactory driverFactory;
     public Page page;
@@ -40,7 +41,37 @@ public class Hooks {
         }
     }
 
-    //After runs in reverse order so order=1 will run first
+    //After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST.
+    @After(value = "@e2e or @regression", order = -1)
+    public void renameAndAttachVideo(Scenario scenario) {
+        if (page.video() == null) {
+            return;
+        }
+        try {
+            Path videoPath = page.video().path();
+            if (!Files.exists(videoPath)) {
+                return;
+            }
+            String scenarioName = "Video - " + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_");
+            if (scenario.isFailed()) {
+                Path renamed = videoPath.getParent().resolve(scenarioName + ".webm");
+                Files.move(videoPath, renamed, StandardCopyOption.REPLACE_EXISTING);
+                long videoSize = Files.size(renamed);
+                if (videoSize > MAX_VIDEO_SIZE) {
+                    scenario.attach(("Video file too large (" + videoSize + " bytes). See: " + renamed.toAbsolutePath()).getBytes(), "text/plain", scenarioName);
+                } else {
+                    scenario.attach(Files.readAllBytes(renamed), "video/webm", scenarioName);
+                }
+                Files.deleteIfExists(renamed);
+            } else {
+                Files.deleteIfExists(videoPath);
+            }
+        } catch (Exception e) {
+            logger.warn("Video handling failed: {}", String.valueOf(e));
+        }
+    }
+
+
     @After(value = "@e2e or @regression", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
@@ -59,9 +90,10 @@ public class Hooks {
         if (scenario.isFailed()) {
             try {
                 logger.info("Taking screenshot for failed scenario: {}", scenario.getName());
-                String screenshotName = scenario.getName().replaceAll("\\s+", "_");
+                String screenshotName = "Screenshot - " + scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
+                DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
                 Path tracePath = Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip");
                 // Delete existing file (ensures overwrite)
                 Files.deleteIfExists(tracePath);
