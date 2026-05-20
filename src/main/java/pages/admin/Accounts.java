@@ -130,8 +130,8 @@ public class Accounts {
         this.ACCOUNT_USER_TAB = page.locator("//a[@routerlink='users']");
         this.USER_SIGNAL_TAB = page.locator("//button[normalize-space(.)='Signal']");
         this.USER_PERMISSIONS_SAVE_BUTTON = page.locator("//button[@class='ui primary button okButton']");
-        this.USER_PROFILE_ICON = page.locator("//div[@class='ui header-options pointer simple dropdown avatar-dropdown profile-section']");
-        this.LOGOUT_BUTTON = page.locator("//div[@class='hovitems item last link']");
+        this.USER_PROFILE_ICON = page.locator("//div[@class='accountname']");
+        this.LOGOUT_BUTTON = page.locator("//button[text()='Sign Out']");
         this.MOMENTS_CHECKBOX = page.locator("//*[@id='44_0' and not(contains(@class, 'checked'))]");
         this.IBHEALTH_CHECKBOX = page.locator("//*[@id='45_0' and not(contains(@class, 'checked'))]");
         this.CLAIMSDATA_CHECKBOX = page.locator("//*[@id='43_0' and not(contains(@class, 'checked'))]");
@@ -480,5 +480,11 @@ public class Accounts {
 
     public void clickLifeCancelButtonFromSettingsPanel() {
         LIFE_SETTINGS_PANEL_CANCEL_BUTTON.click();
+    }
+    public void externalUserSwitchAccount(String accountName)
+    {
+        USER_PROFILE_ICON.click();
+        Locator SelectAccount=page.locator(String.format("//span[@class='account-name' and normalize-space()='%s]",accountName));
+        SelectAccount.click();
     }
 }

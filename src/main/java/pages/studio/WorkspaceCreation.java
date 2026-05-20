@@ -55,6 +55,7 @@ public class WorkspaceCreation {
     private final Locator BACK_ARROW;
     private final Locator AI_PANEL;
     private final Locator AI_PANEL_CLOSE_BUTTON;
+    private final Locator ABSENT_WORKSPACE;
     WaitUtility waitUtility;
     int counter = 0;
 
@@ -100,6 +101,7 @@ public class WorkspaceCreation {
         this.BACK_ARROW = WORKSPACE_FRAME.locator("//button[@color='textPrimary']");
         this.AI_PANEL = page.locator("//div[@class='ai-assistant-panel open']");
         this.AI_PANEL_CLOSE_BUTTON = page.locator("//button[@aria-label='Close AI Assistant' and @class='ai-icon-btn']");
+        this.ABSENT_WORKSPACE=WORKSPACE_FRAME.locator(("//p[text()='Nothing Found...']"));WORKSPACE_FRAME.locator(("//p[text()='Nothing Found...']"));
     }
 
     public String studioDashboard() {
@@ -315,10 +317,18 @@ public class WorkspaceCreation {
     public void searchByWorkspaceName(String workspaceName) {
         SEARCH_WORKSPACE.fill(workspaceName);
         page.keyboard().press("Enter");
+
+    }
+    public void isWorkspacePresent(String workspaceName)
+    {
         waitUtility.waitForLocatorVisible(PAGINATION.first());
         waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
     }
 
+    public void isWorkspaceAbsent()
+    {
+        waitUtility.waitForLocatorVisible(ABSENT_WORKSPACE);
+    }
     public void clickBackArrowFromCreateNewWorkspace() {
         BACK_ARROW.click();
         CREATE_WORKSPACE.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -358,6 +368,14 @@ public class WorkspaceCreation {
         if (AI_PANEL.isVisible() && AI_PANEL_CLOSE_BUTTON.isVisible()) {
             AI_PANEL_CLOSE_BUTTON.click();
             waitUtility.waitForLocatorDetached(AI_PANEL);
+        }
+    }
+
+    public boolean isWorkspaceVisible(String workspaceName, String draftOption) {
+        if (draftOption.equalsIgnoreCase("Public")) {
+            return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
+        } else {
+            return ABSENT_WORKSPACE.isVisible();
         }
     }
 }

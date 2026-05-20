@@ -2,6 +2,7 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -31,6 +32,7 @@ public class StudioSteps {
     private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
     static String workspaceName;
     static String newWorkspaceName;
+    static String draftOption;
     Boolean flag = true;
     Boolean isOverwritten = false;
     List<String[]> fileContent;
@@ -1034,6 +1036,7 @@ public class StudioSteps {
         workspaceName = workspaceCreation.fetchWorkspaceNameFromDashboard();
         logger.info("Searching workspace by name: {}", workspaceName);
         workspaceCreation.searchByWorkspaceName(workspaceName);
+        workspaceCreation.isWorkspacePresent(workspaceName);
     }
 
     @And("User navigates to another page within Studio and then returns to the workspace list page")
@@ -1069,5 +1072,43 @@ public class StudioSteps {
         Assert.assertTrue("Workspace advertiser dropdown is not reset", workspaceCreation.getSelectedWorkspaceAdvertiser().isEmpty());
         Assert.assertTrue("Workspace created by dropdown is not reset", workspaceCreation.getSelectedWorkspaceCreatedBy().isEmpty());
         Assert.assertTrue("Search box is not cleared", workspaceCreation.getSearchedWorkspaceName().isEmpty());
+    }
+
+    @And("User selects the Draft option as {string}")
+    public void userSelectsTheDraftOptionAs(String draftOption) {
+        explorerWorkspace.selectDraftOption(draftOption);
+    }
+
+    @And("{string} logs out from the {string} application")
+    public void logsOutFromTheApplication(String arg0, String arg1) {
+        accounts.internalUserLogout();
+    }
+
+    @And("{string} switch the {string} account in Studio application")
+    public void switchTheAccountInStudioApplication(String arg0, String accountName) {
+        if (!accountName.contains("PP Engineering team")) {
+            accounts.externalUserSwitchAccount(accountName);
+            logger.info("Switching account in Studio application to: {}", accountName);
+        }
+    }
+
+    @When("External user Searches the workspace name in studio application with {string} draft option")
+    public void externalUserSearchesTheWorkspaceNameInStudioApplicationWithDraftOption(String draftOption) {
+        logger.info("External user searching and selecting the workspace: {}", workspaceName);
+        workspaceCreation.searchByWorkspaceName(workspaceName);
+        if (draftOption.equals("Public")) {
+            workspaceCreation.isWorkspacePresent(workspaceName);
+        } else {
+            workspaceCreation.isWorkspaceAbsent();
+        }
+    }
+
+    @Then("External user Verifies whether the workspace with {string} is visible in workspace management page")
+    public void externalUserVerifiesWhetherTheWorkspaceWithIsVisibleInWorkspaceManagementPage(String draftOption) {
+        logger.info("External user verifying workspace visibility with draft option: {}", draftOption);
+        boolean isWorkspaceVisible = workspaceCreation.isWorkspaceVisible(workspaceName, draftOption);
+        logger.info("Is workspace visible for external user: {}", isWorkspaceVisible);
+        Assert.assertTrue("Workspace is not visible for external user with draft option: " + draftOption, isWorkspaceVisible);
+
     }
 }
