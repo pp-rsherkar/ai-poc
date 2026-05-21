@@ -40,45 +40,28 @@ pipeline {
             }
         }
 
-        stage('Generate Config') {
-            steps {
-                script {
-                    // Prepare data for config.json
-                    def config = [
-                        'environment': params.ENVIRONMENT,
-                        'browser': params.BROWSER,
-                        'automation': 'mvn',
-                        'tests_directory': 'src/test/resources/features',
-                        'categories': params.INCLUDE_CATEGORIES ? params.INCLUDE_CATEGORIES.split(',') : [],
-                        'notCategories': params.EXCLUDE_CATEGORIES ? params.EXCLUDE_CATEGORIES.split(',') : [],
-                        'grid': params.GRID,
-                        'additionalArgs': params.ADDITIONAL_ARGS,
-                        'developer_mode': params.developer_mode,
-                        'test_status_filter': params.STATUS_FILTER ? params.STATUS_FILTER.split(',') : [],
-                        'automation_only_mode': params.automation_only_mode,
-                        'use_skipped_execution_status': params.useSkippedFiltered,
-                        'pool_size': params.pool,
-                        'squash_server': params.Squash_Server ? params.Squash_Server : 'stg',    // 'stg' or 'prod',
-                        'rerun_failed_tests': params.rerun_failed_tests,
-                        'rerun_statuses': params.RERUN_STATUSES ? params.RERUN_STATUSES.split(',') : [],
-                        'build_url': env.BUILD_URL + 'execution/node/3/ws/'
-                    ]
-                    if (params.test_id_type == 'test-suite') {
-                        config['test_suites'] = params.IDS.split(',')
-                    } else if (params.test_id_type == 'iteration') {
-                        config['iterations'] = params.IDS.split(',')
-                    }
+stage('Generate Config') {
+    steps {
+        script {
 
-                    // Write config to JSON file
-                    writeJSON file: 'config.json', json: config
+            def config = [
+                automation      : 'mvn',
+                squash_server   : params.Squash_Server ?: 'stg',
+                build_url       : env.BUILD_URL
+            ]
 
-                    // Print config.json
-                    def cleanConfig = readJSON file: 'config.json'
-                    def formattedConfig = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(cleanConfig))
-                    echo formattedConfig
-                }
+            if (params.test_id_type == 'test-suite') {
+                config['test_suites'] = params.IDS.split(',')
+            } else {
+                config['iterations'] = params.IDS.split(',')
             }
+
+            writeJSON file: 'config.json', json: config
+
+            bat 'type config.json'
         }
+    }
+}
 
         stage('Run Tests') {
             steps {
