@@ -23,7 +23,7 @@ pipeline {
                     }
                 }
                 
-                checkout scmGit(branches: [[name: params.BRANCH]], extensions: [], userRemoteConfigs: [[credentialsId: '23c71168-01de-4537-ae73-62fb01c818ad', url: 'git@github.com:pulsepointinc/qa-automation.git']])
+                checkout scmGit(branches: [[name: params.BRANCH]], extensions: [], userRemoteConfigs: [[credentialsId: '23c71168-01de-4537-ae73-62fb01c818ad', url: 'https://github.com/pulsepointinc/qa-automation.git']])
                 
                 // Create and activate virtual environment
                 sh '''
