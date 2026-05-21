@@ -1,0 +1,2 @@
+--extra-index-url http://stg-qa-selenium1.internetbrands.com:8080/ --trusted-host stg-qa-selenium1.internetbrands.com
+ib-squashglados==1.2.0rc3
