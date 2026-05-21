@@ -67,26 +67,23 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    bat '''
-                    source ./.venv/bin/activate
-                    # Create an exec-capable temp directory inside the workspace for Playwright/Java
-                    TMP_DIR="$PWD/tmp/playwright-$(date +%s%N)"
-                    mkdir -p "$TMP_DIR"
-                    chmod 0777 "$TMP_DIR"
-                    export TMPDIR="$TMP_DIR"
-                    # Ensure Java uses the same temp directory (preserve existing options)
-                    export JAVA_TOOL_OPTIONS="-Djava.io.tmpdir=$TMP_DIR ${JAVA_TOOL_OPTIONS:-}"
-                    # Run the test runner
-                    python3 -m SquashGlados config.json
-                    # Cleanup the temporary directory when finished
-                    rm -rf "$TMP_DIR"
-                    '''
-                }
-            }
-        }
+stage('Run Tests') {
+    steps {
+        bat '''
+        call .venv\\Scripts\\activate.bat
+
+        mkdir tmp
+
+        set TMPDIR=%CD%\\tmp
+        set TEMP=%CD%\\tmp
+        set TMP=%CD%\\tmp
+
+        set JAVA_TOOL_OPTIONS=-Djava.io.tmpdir=%CD%\\tmp
+
+        python -m SquashGlados config.json
+        '''
+    }
+}
 
     }
 
