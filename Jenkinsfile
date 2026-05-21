@@ -4,6 +4,9 @@ pipeline {
         PROD_SQUASH_SECRET_API_TOKEN = credentials('prod_squash_secret_api_token')
         STG_SQUASH_SECRET_API_TOKEN = credentials('stg_squash_secret_api_token')
     }
+        tools {
+        maven 'Maven_3.9'
+    }
 
     parameters {
         choice(name: 'test_id_type', choices: ['iteration', 'test-suite'], description: 'Select which type of Squash IDs you are providing')
