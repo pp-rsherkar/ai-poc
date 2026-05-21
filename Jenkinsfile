@@ -45,8 +45,6 @@ pipeline {
                 script {
                     // Prepare data for config.json
                     def config = [
-                        'environment': params.ENVIRONMENT,
-                        'browser': params.BROWSER,
                         'automation': 'mvn',
                         'tests_directory': 'src/test/resources/features',
                         'squash_server': params.Squash_Server ? params.Squash_Server : 'stg',    // 'stg' or 'prod',
