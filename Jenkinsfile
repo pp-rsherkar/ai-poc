@@ -40,28 +40,34 @@ pipeline {
             }
         }
 
-stage('Generate Config') {
-    steps {
-        script {
+        stage('Generate Config') {
+            steps {
+                script {
+                    // Prepare data for config.json
+                    def config = [
+                        'environment': params.ENVIRONMENT,
+                        'browser': params.BROWSER,
+                        'automation': 'mvn',
+                        'tests_directory': 'src/test/resources/features',
+                        'squash_server': params.Squash_Server ? params.Squash_Server : 'stg',    // 'stg' or 'prod',
+                        'build_url': env.BUILD_URL + 'execution/node/3/ws/'
+                    ]
+                    if (params.test_id_type == 'test-suite') {
+                        config['test_suites'] = params.IDS.split(',')
+                    } else if (params.test_id_type == 'iteration') {
+                        config['iterations'] = params.IDS.split(',')
+                    }
 
-            def config = [
-                automation      : 'mvn',
-                squash_server   : params.Squash_Server ?: 'stg',
-                build_url       : env.BUILD_URL
-            ]
+                    // Write config to JSON file
+                    writeJSON file: 'config.json', json: config
 
-            if (params.test_id_type == 'test-suite') {
-                config['test_suites'] = params.IDS.split(',')
-            } else {
-                config['iterations'] = params.IDS.split(',')
+                    // Print config.json
+                    def cleanConfig = readJSON file: 'config.json'
+                    def formattedConfig = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(cleanConfig))
+                    echo formattedConfig
+                }
             }
-
-            writeJSON file: 'config.json', json: config
-
-            bat 'type config.json'
         }
-    }
-}
 
         stage('Run Tests') {
             steps {
