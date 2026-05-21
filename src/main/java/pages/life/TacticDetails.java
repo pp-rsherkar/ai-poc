@@ -194,10 +194,15 @@ public class TacticDetails {
         waitUtility.waitUntilSpinnerHidden();
         SHOW_EXPRESSION_BUTTON.click();
         waitUtility.waitForLocatorVisible(targetingTemplate.TARGETING_CONTAINER);
-        if (ruleType.equalsIgnoreCase("Behavioral segment")) {
-            ruleType = "Behavioral";
-        } else if (ruleType.equalsIgnoreCase("Health Populations")) {
-            ruleType = "CONDITION";
+        switch (ruleType) {
+            case "Behavioral Segment":
+                ruleType = "Behavioral";
+                break;
+            case "Health Populations":
+                ruleType = "CONDITION";
+                break;
+            default:
+                break;
         }
         return page.locator(String.format("//span[text()='%s']", ruleType)).isVisible();
     }

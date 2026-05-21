@@ -302,7 +302,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User removes the targeting "<RULE_TYPE>" and saves the settings
     Then User clicks on Show Expression and verifies if the displayed expression "doesn't contain" "<RULE_TYPE>"
 
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | RULE_TYPE          | RULE_VALUE               |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Behavioral Segment | AutoSegment18577650      |
