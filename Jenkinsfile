@@ -70,7 +70,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh '''
+                    bat '''
                     source ./.venv/bin/activate
                     # Create an exec-capable temp directory inside the workspace for Playwright/Java
                     TMP_DIR="$PWD/tmp/playwright-$(date +%s%N)"
