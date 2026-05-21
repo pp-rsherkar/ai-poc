@@ -69,6 +69,7 @@ public class TacticDetails {
     private final Locator CLICK_REFRESH_BUTTON;
     private final Locator NO_TARGETING_RULES;
     private final Locator FORECAST_AVAILS_NUMBER;
+    private final Locator SHOW_EXPRESSION_BUTTON;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -137,6 +138,7 @@ public class TacticDetails {
         this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
         this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
         this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
+        this.SHOW_EXPRESSION_BUTTON = page.locator("//span[contains(text(),'Show Expression')]");
     }
 
     public void clickNewTactic() {
@@ -185,6 +187,31 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public boolean verifyShowExpressionValues(String ruleType) {
+        waitUtility.waitUntilSpinnerHidden();
+        SHOW_EXPRESSION_BUTTON.click();
+        waitUtility.waitForLocatorVisible(targetingTemplate.TARGETING_CONTAINER);
+        switch (ruleType) {
+            case "Behavioral Segment":
+                ruleType = "Behavioral";
+                break;
+            case "Health Populations":
+                ruleType = "CONDITION";
+                break;
+            default:
+                break;
+        }
+        return page.locator(String.format("//span[text()='%s']", ruleType)).isVisible();
+    }
+
+    public void removeTargetingRule(String ruleType) {
+        waitUtility.waitUntilSpinnerHidden();
+        String ruleLocator = String.format("//span[text()='%s']/parent::label//following-sibling::div//div[contains(@title,'delete')]", ruleType);
+        page.locator(ruleLocator).click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean isForecastDataAvailable() {
@@ -326,7 +353,7 @@ public class TacticDetails {
         switch (managementFeeOption) {
             case "Percentage" -> tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
             case "CPM", "Fixed CPM" -> tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
-            case "% + CPM"    -> {
+            case "% + CPM" -> {
                 tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
                 tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
             }

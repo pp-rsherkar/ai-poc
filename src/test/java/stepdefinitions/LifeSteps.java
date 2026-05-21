@@ -787,6 +787,20 @@ public class LifeSteps {
         tacticSettings.closeRuleTypePanel();
     }
 
+    @Given("User configures targeting rules with options {string} and {string}")
+    public void UserConfiguresTargetingRulesWithOptions(String ruleType, String ruleValue) {
+        logger.info("Configuring targeting rules from string variables - Rule Type: {}, Rule Value: {}", ruleType, ruleValue);
+        Map<String, String> rawMap = new HashMap<>();
+        rawMap.put(ruleType, ruleValue);
+        rulesMap = CommonUtils.processDataTable(rawMap);
+        for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
+            keyType.add(entry.getKey());
+            keyValues.addAll(entry.getValue());
+            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
+        }
+        tacticSettings.closeRuleTypePanel();
+    }
+
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         logger.info("Starting verification of configured targeting rules");
@@ -5574,6 +5588,36 @@ public class LifeSteps {
     public void userNavigatesToTacticSettingTab() {
         logger.info("User navigates to Line item from Association Tab");
         tacticDetails.clickSettingsTab();
+    }
+
+    @Then("User clicks on Show Expression and verifies if the displayed expression {string} {string}")
+    public void userClicksOnShowExpressionAndVerifiesIfTheDisplayedExpressionContains(String validation, String ruleType) {
+        logger.info("User clicks on Show Expression and verifies if the displayed expression contains {}", ruleType);
+        if (validation.contains("contains")) {
+            Assert.assertTrue("Expression doesn't contain " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
+        } else if (validation.contains("doesn't contain")) {
+            Assert.assertFalse("Expression contains " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
+        }
+    }
+
+    @Then("User removes the targeting {string} and saves the settings")
+    public void userRemovesTheTargetingAndSavesTheSettings(String ruleType) {
+        logger.info("Removing targeting rule type: {}", ruleType);
+        tacticDetails.removeTargetingRule(ruleType);
+        tacticSettings.saveTacticSettings();
+    }
+
+    @Then("User clicks on Show Expression and verifies if the displayed expression does not contain {string}")
+    public void userClicksOnShowExpressionAndVerifiesIfTheDisplayedExpressionDoesNotContain(String ruleType) {
+        logger.info("Clicking Show Expression and verifying expression does not contain: {}", ruleType);
+        Assert.assertTrue("Expression doesn't contain " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
+    }
+
+    private String getDisplayLabel(String ruleType) {
+        Map<String, String> labelMap = Map.of(
+                "behavioral segment", "Behavioral",
+                "health population", "Health");
+        return labelMap.getOrDefault(ruleType.toLowerCase(), ruleType);
     }
 
     @Then("User verifies that forecast data is unavailable when no targeting rules are applied")
