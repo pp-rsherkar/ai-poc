@@ -7,17 +7,8 @@ pipeline {
 
     parameters {
         choice(name: 'test_id_type', choices: ['iteration', 'test-suite'], description: 'Select which type of Squash IDs you are providing')
-        string(name: 'IDS', description: 'Enter iteration/test-suite IDs separated by commas', defaultValue: '') 
-        string(name: 'BRANCH', description: 'Enter Git branch to run tests from', defaultValue: 'main')
-        choice(name: 'ENVIRONMENT', choices: ['ike', 'stg1', 'stg2', 'stg3', 'prod'], description: 'Select the target environment')
-        choice(name: 'BROWSER', choices: ['chrome', 'firefox', 'safari'], description: 'Select the browser')
-        choice(name: 'GRID', choices: ['ws://stg-qa-selenium1.internetbrands.com:8090'], description: 'Select the Grid where the browser runs')
-        string(name: 'ADDITIONAL_ARGS', description: 'Enter any additional arguments', defaultValue: '')
-        booleanParam(name: 'developer_mode', description: 'developer mode allows you to run tests with Automation Test Name and Automation Suite Name (even if the Automation Type has not been updated yet)', defaultValue: false)
-        booleanParam(name: 'automation_only_mode', description: 'automation_only_mode will only run tests if the most recent execution was run by the apiuser', defaultValue: false)
-        booleanParam(name: 'useSkippedFiltered', description: 'check this if you want an execution to have skipped status for the filtered cases', defaultValue: false)
-        string(name: 'pool', description: 'how many tests do you want to run at the same time?', defaultValue: '4')
-        string(name: 'rerun_failed_tests', description: 'If you want to rerun failed tests, how many times do you want to rerun failures?', defaultValue: '0')
+        string(name: 'IDS', description: 'Enter iteration/test-suite IDs separated by commas', defaultValue: '19425') 
+        string(name: 'BRANCH', description: 'Enter Git branch to run tests from', defaultValue: 'QA-1192')
         choice(name: 'Squash_Server', choices: ['prod', 'stg'], description: 'Select the Squash environment')
 
     }
