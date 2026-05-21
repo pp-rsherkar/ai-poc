@@ -27,12 +27,16 @@ pipeline {
                 
                 // Create and activate virtual environment
                 bat '''
-                python3 -m venv ./.venv
-                source ./.venv/bin/activate
-                python3 -m pip install --upgrade pip 
-                python3 -m pip install -r requirements.txt
-                python3 -m pip list
-                '''
+        "C:\\Users\\rsherkar\\AppData\\Local\\Programs\\Python\\Python314\\python.exe" -m venv .venv
+
+        call .venv\\Scripts\\activate.bat
+
+        python -m pip install --upgrade pip
+
+        pip install -r requirements.txt
+
+        pip list
+        '''
             }
         }
 
