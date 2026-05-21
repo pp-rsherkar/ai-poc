@@ -2,7 +2,6 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import utils.CommonUtils;
@@ -314,7 +313,7 @@ public class NPISmartList {
 
     public void enterSearchKeywords(List<String> keywordList) {
         for (String keyword : keywordList) {
-            SEARCH_KEYWORDS_TEXTAREA.type(keyword);
+            SEARCH_KEYWORDS_TEXTAREA.fill(keyword);
             page.keyboard().press("Enter");
         }
     }
@@ -676,7 +675,7 @@ public class NPISmartList {
     }
 
     public void selectDecile(String sliderValue, String listOption) {
-        switch (listOption){
+        switch (listOption) {
             case "Prescribed Drug":
                 PRESCRIBED_DRUG_DECILE.first().click();
                 break;

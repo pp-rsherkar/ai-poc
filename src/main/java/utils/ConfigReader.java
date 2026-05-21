@@ -18,6 +18,12 @@ public class ConfigReader {
     }
 
     public static String getProperty(String key) {
+        // Check system properties first (from Maven -D arguments)
+        String systemValue = System.getProperty(key);
+        if (systemValue != null && !systemValue.isEmpty()) {
+            return systemValue;
+        }
+        // Fall back to config file properties
         return properties.getProperty(key);
     }
 

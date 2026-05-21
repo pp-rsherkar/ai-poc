@@ -12,6 +12,8 @@ import java.util.*;
 
 public class TacticSettings {
 
+    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
+    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
     private final Locator SELECT_CHANNEL;
@@ -81,9 +83,12 @@ public class TacticSettings {
     private final Locator APP_TREE_VIEW_NODE;
     private final Locator TARGETING_SEGMENT;
     private final Locator TARGETING_PANEL_TEXTAREA;
+    private final Locator MANAGEMENT_FEE_LABEL_VALUE;
+    private final Locator MANAGEMENT_FEE_OVERRIDE;
+    private final Locator MANAGEMENT_FEE_OPTIONS;
+    final Locator PERCENT_TYPE_FEE_INPUT;
+    final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
-    public final Set<String> ACTUAL_TARGET_RULE = new HashSet<>();
-    public final Set<String> EXPECTED_TARGET_RULE = new HashSet<>();
     List<Object> ruleTypes;
     List<Object> ruleOptions;
 
@@ -157,6 +162,11 @@ public class TacticSettings {
         this.APP_TREE_VIEW_NODE = page.locator("//app-treeview//div[contains(@class,'treeviewNode')]");
         this.TARGETING_SEGMENT = page.locator("//div[contains(text(),'Targeting Segments')]");
         this.TARGETING_PANEL_TEXTAREA = page.locator("//div[contains(@class,'editableTextarea')]");
+        this.MANAGEMENT_FEE_LABEL_VALUE = page.locator("//span[contains(@class,'fee-value')]");
+        this.MANAGEMENT_FEE_OVERRIDE = page.locator("//label[contains(text(),'Override')]");
+        this.MANAGEMENT_FEE_OPTIONS = page.locator("//div[contains(@class,'management-fee-contanier')]//div//button");
+        this.PERCENT_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
+        this.DOLLAR_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
     }
 
     public String verifyTacticSettingsText() {
@@ -215,6 +225,35 @@ public class TacticSettings {
         SELECT_RULE_TYPE.click();
     }
 
+public boolean isManagementFeeSectionVisible() {
+    return MANAGEMENT_FEE_LABEL_VALUE.isVisible();
+}
+
+public String fetchDisplayedManagementFeeValue() {
+    return MANAGEMENT_FEE_LABEL_VALUE.innerText().trim();
+}
+
+public boolean isManagementFeeOverrideVisible() {
+    return MANAGEMENT_FEE_OVERRIDE.isVisible();
+}
+
+public String fetchSelectedManagementFeeOption() {
+    for (int i = 0; i < MANAGEMENT_FEE_OPTIONS.count(); i++) {
+        String classAttr = MANAGEMENT_FEE_OPTIONS.nth(i).getAttribute("class");
+        if (classAttr != null && classAttr.contains("active")) {
+            return MANAGEMENT_FEE_OPTIONS.nth(i).innerText().trim();
+        }
+    }
+    return "";
+}
+
+public List<String> fetchEnteredManagementFeeValues() {
+    List<String> values = new ArrayList<>();
+    if (PERCENT_TYPE_FEE_INPUT.isVisible()) values.add(PERCENT_TYPE_FEE_INPUT.inputValue().trim());
+    if (DOLLAR_TYPE_FEE_INPUT.isVisible()) values.add(DOLLAR_TYPE_FEE_INPUT.inputValue().trim());
+    return values;
+}
+
     public void addTargetingRules(String ruleType) {
         searchAndSelectRuleType(ruleType);
         switch (ruleType) {
@@ -266,7 +305,7 @@ public class TacticSettings {
 
     public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues) {
         SEARCH_RULE_TYPE.clear();
-        SEARCH_RULE_TYPE.type(ruleType);
+        SEARCH_RULE_TYPE.fill(ruleType);
         if (SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitUntilSpinnerHidden();
@@ -286,7 +325,7 @@ public class TacticSettings {
                         isElementVisible(xpath);
                     }
                     break;
-                case "HCP by Specialty":
+                case "HCP by Specialty", "Venue Type":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format("(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target'])[1]", val);
@@ -307,7 +346,7 @@ public class TacticSettings {
                     PERSON_TAB.click();
                     RULE_INDIVIDUAL_KEYWORDS_OPTION.click();
                     for (String val : ruleValues) {
-                        KEYWORD_POPULATIONS_TEXTBOX.type(val.trim());
+                        KEYWORD_POPULATIONS_TEXTBOX.fill(val.trim());
                         KEYWORD_POPULATIONS_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -351,7 +390,7 @@ public class TacticSettings {
                 case "Keywords":
                     RULE_INDIVIDUAL_KEYWORDS_OPTION.click();
                     for (String val : ruleValues) {
-                        KEYWORDS_TEXTBOX.type(val.trim());
+                        KEYWORDS_TEXTBOX.fill(val.trim());
                         KEYWORDS_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -362,7 +401,7 @@ public class TacticSettings {
                     GEO_TARGETS_BULK_UPLOAD.click();
                     GEO_TARGETS_TEXTBOX.click();
                     for (String val : ruleValues) {
-                        GEO_TARGETS_TEXTBOX.type(val.trim());
+                        GEO_TARGETS_TEXTBOX.fill(val.trim());
                         GEO_TARGETS_TEXTBOX.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -386,7 +425,7 @@ public class TacticSettings {
                 case "Postal Codes":
                     TARGETING_PANEL_TEXTAREA.click();
                     for (String val : ruleValues) {
-                        TARGETING_PANEL_TEXTAREA.type(val.trim());
+                        TARGETING_PANEL_TEXTAREA.fill(val.trim());
                         TARGETING_PANEL_TEXTAREA.press("Enter");
                         page.waitForLoadState(LoadState.LOAD);
                     }
@@ -538,15 +577,43 @@ public class TacticSettings {
                     break;
                 case "Search Keywords", "Area Codes", "Custom Targeting Bundle":
                     for (String val : ruleValues) {
-                        TARGETING_PANEL_TEXTAREA.type(val.trim());
+                        TARGETING_PANEL_TEXTAREA.fill(val.trim());
                         TARGETING_PANEL_TEXTAREA.press("Enter");
                     }
                     break;
                 case "Bespoke":
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
-                        String xpath= String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
+                        String xpath = String.format("(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
                         isElementVisible(xpath);
+                    }
+                    break;
+                case "Audience Multiplier":
+                    if (ruleValues.size() == 1) {
+                        String rangeValue = ruleValues.get(0).trim();
+                        String[] minMax = rangeValue.split("-");
+
+                        if (minMax.length != 2) {
+                            throw new IllegalArgumentException("Audience Multiplier requires a range format like 'Min-Max'. Found: " + rangeValue);
+                        }
+
+                        String minValue = minMax[0].trim();
+                        String maxValue = minMax[1].trim();
+
+                        Locator minHandle = page.locator("span.ngx-slider-pointer-min");
+                        Locator maxHandle = page.locator("span.ngx-slider-pointer-max");
+                        Locator minTarget = page.locator(String.format("//span[contains(@class, 'ngx-slider-tick-legend') and normalize-space()='%s']", minValue));
+                        Locator maxTarget = page.locator(String.format("//span[contains(@class, 'ngx-slider-tick-legend') and normalize-space()='%s']", maxValue));
+
+                        minHandle.dragTo(minTarget);
+                        Locator minSelected = page.locator(String.format("//span[contains(@class, 'ngx-slider-selected') and normalize-space()='%s']", minValue));
+                        waitUtility.waitForLocatorVisible(minSelected);
+
+                        maxHandle.dragTo(maxTarget);
+                        Locator maxSelected = page.locator(String.format("//span[contains(@class, 'ngx-slider-selected') and normalize-space()='%s']", maxValue));
+                        waitUtility.waitForLocatorVisible(maxSelected);
+                    } else {
+                        throw new IllegalArgumentException("Audience Multiplier rule requires exactly 2 values (minimum and maximum). Found: " + ruleValues.size() + " values.");
                     }
                     break;
             }
@@ -608,7 +675,7 @@ public class TacticSettings {
 
     public void selectTargetingRule(String ruleType, String listName) {
         SEARCH_RULE_TYPE.clear();
-        SEARCH_RULE_TYPE.type(ruleType);
+        SEARCH_RULE_TYPE.fill(ruleType);
         if (SELECT_RULE_TYPE.isVisible()) {
             SELECT_RULE_TYPE.click();
             waitUtility.waitForLocatorVisible(TARGETING_RULES_PANEL_TITLE);

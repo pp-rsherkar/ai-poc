@@ -242,7 +242,7 @@ public class ScheduleReport {
 
     public void enterExternalEmails(List<String> emailList) {
         for (String email : emailList) {
-            DELIVER_TO_EXTERNAL_EMAILS.type(email);
+            DELIVER_TO_EXTERNAL_EMAILS.fill(email);
             page.keyboard().press("Shift+Enter");
         }
     }

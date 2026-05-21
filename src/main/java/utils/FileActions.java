@@ -14,9 +14,8 @@ public class FileActions {
 
     public static List<String[]> readAllDataAtOnce(String file) {
         List<String[]> allData = null;
-        try {
-            FileReader filereader = new FileReader(file);
-            CSVReader csvReader = new CSVReader(filereader);
+        try (FileReader filereader = new FileReader(file);
+             CSVReader csvReader = new CSVReader(filereader)) {
             allData = csvReader.readAll();
             /*for (String[] row : allData) {
                 System.out.println(String.join(", ", row));

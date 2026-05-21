@@ -106,6 +106,7 @@ public class SharedList {
     public boolean verifyListIsAvailable(String tabName) {
         int failed = 0;
         Locator locator = page.locator(String.format("//span/img[contains(translate(@src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '%s')]", tabName.toLowerCase(Locale.ROOT)));
+        @SuppressWarnings("unchecked")
         List<String> srcList = (List<String>) locator.evaluateAll("elements => elements.map(el => el.getAttribute('src'))");
         for (String src : srcList) {
             if (src == null || !src.toLowerCase(Locale.ROOT).contains(tabName.toLowerCase(Locale.ROOT))) {
@@ -135,7 +136,7 @@ public class SharedList {
     public String checkErrorOnSingleLineMultipleDomainsInput(List<String> domainNameList) {
         String text = "";
         for (String domainName : domainNameList) {
-            LIST_TEXTAREA.type(domainName);
+            LIST_TEXTAREA.fill(domainName);
             page.keyboard().press("Space");
         }
         SAVE_BUTTON.click();
@@ -151,7 +152,7 @@ public class SharedList {
     public void enterDomainNames(List<Object> domainNameList) {
         for (Object domainName : domainNameList) {
             if (domainName instanceof String) {
-                LIST_TEXTAREA.type((String) domainName);
+                LIST_TEXTAREA.fill((String) domainName);
                 page.keyboard().press("Shift+Enter");
             }
         }

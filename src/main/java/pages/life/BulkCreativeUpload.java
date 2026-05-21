@@ -285,7 +285,7 @@ public class BulkCreativeUpload {
 
     public void clickCampaignName(String name) {
         CAMPAIGN_DROPDOWN.click();
-        CAMPAIGN_DROPDOWN.type(name);
+        CAMPAIGN_DROPDOWN.fill(name);
         try {
             waitUtility.waitForLocatorVisible(DROPDOWN_SEARCH, 1000);
         } catch (Exception ignored) {

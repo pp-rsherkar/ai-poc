@@ -168,7 +168,7 @@ public class PMP {
 
     public void searchTargetingRuleAndSelect(String ruleType) {
         SEARCH_RULE_TYPE.clear();
-        SEARCH_RULE_TYPE.type(ruleType);
+        SEARCH_RULE_TYPE.fill(ruleType);
         SELECT_RULE_TYPE.click();
         page.waitForLoadState(LoadState.LOAD);
     }

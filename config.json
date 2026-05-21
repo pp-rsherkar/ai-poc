@@ -1,0 +1,10 @@
+{
+"iterations": ["19425"],
+"automation": "mvn",
+"tests_directory": "src/test/resources/features",
+"environment": "prod",
+"browser": "",
+"additionalArgs": "",
+"pool_size": "4",
+"squash_server": "prod"
+}

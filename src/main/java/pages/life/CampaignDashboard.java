@@ -380,7 +380,7 @@ public class CampaignDashboard {
     public void enterCustomDateRange(String startDate, String endDate) {
         CUSTOM_DATE_TEXTBOX.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         CUSTOM_DATE_TEXTBOX.clear();
-        CUSTOM_DATE_TEXTBOX.type(startDate + " - " + endDate);
+        CUSTOM_DATE_TEXTBOX.fill(startDate + " - " + endDate);
         CALENDER_APPLY_BUTTON.click();
         waitUtility.waitUntilPreLoaderHidden();
     }
