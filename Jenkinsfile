@@ -26,7 +26,7 @@ pipeline {
                 checkout scmGit(branches: [[name: params.BRANCH]], extensions: [], userRemoteConfigs: [[credentialsId: '23c71168-01de-4537-ae73-62fb01c818ad', url: 'https://github.com/pulsepointinc/qa-automation.git']])
                 
                 // Create and activate virtual environment
-                sh '''
+                bat '''
                 python3 -m venv ./.venv
                 source ./.venv/bin/activate
                 python3 -m pip install --upgrade pip 
