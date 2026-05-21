@@ -122,7 +122,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     When User clicks Campaign "<Campaign ID>", Line Item and Tactic and verify navigation to respective pages
     Examples:
       | Campaign ID          |
-      | Auto_20260218_024705 |
+      | Auto_20260519_183446 |
 
   @regression
   Scenario Outline: Verify navigation to Tactic, assign Creatives of "<STATUS>" and check the creative assignment on Campaign Dashboard

@@ -77,6 +77,7 @@ public class Campaigns {
     private final Locator BUDGET_STATUS_EXTERNAL;
     private final Locator CAMPAIGN_APPROVAL_STATUS;
     private final Locator CAMPAIGN_STATUS_APPROVED_BUTTON;
+    private final Locator FAVORITE_ONLY_CHECKBOX;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public Campaigns(Page page) {
@@ -146,7 +147,9 @@ public class Campaigns {
         this.EXPORT_CAMPAIGN_SETTINGS_SUCCESS_ALERT = page.locator("//div[@role='alert' and contains(text(),'The exported file will be sent')]");
         this.BUDGET_STATUS_EXTERNAL = page.locator("//label[contains(text(),'Budget Status')]/following-sibling::div//span");
         this.CAMPAIGN_APPROVAL_STATUS = page.locator("//label[contains(text(),'Approval Status')]");
-        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
+        this.CAMPAIGN_STATUS_APPROVED_BUTTON = page.locator(
+                "//label[contains(text(),'Approval Status')]/following-sibling::div[contains(@class,'display-inlineBlock')]//button[text()='Approved']");
+        this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
     }
 
     public void createCampaign() {
@@ -252,6 +255,9 @@ public class Campaigns {
     public void navigateToCampaignDashboard() {
         CAMPAIGN_DASHBOARD.click();
         waitUtility.waitForLocatorVisible(CAMPAIGN_DASHBOARD);
+        if (FAVORITE_ONLY_CHECKBOX.getAttribute("class").contains("checked")) {
+            FAVORITE_ONLY_CHECKBOX.click();
+        }
         if (LIFE_TIME_FILTER.getAttribute("class").contains("inactive")) {
             LIFE_TIME_FILTER.click();
             waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
