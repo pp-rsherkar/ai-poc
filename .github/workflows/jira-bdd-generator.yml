@@ -141,6 +141,7 @@ jobs:
             echo "Feature: ${{ env.SUMMARY }}"
             echo "  $FEATURE_DESC"
             echo ""
+            echo "  @todo"
             echo "  Scenario: Validate ${{ inputs.jira_id }}"
             echo "    Given $STEP1"
             echo "    When $STEP2"
