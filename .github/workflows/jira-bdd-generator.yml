@@ -201,23 +201,38 @@ jobs:
           fi
 
       # =====================================================
-      # STEP 6: CREATE PR
+      # STEP 6: CREATE PR (SAFE VERSION)
       # =====================================================
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
+          echo "Checking existing PR..."
+
+          EXISTING_PR=$(gh pr list \
+            --head "${{ env.BRANCH }}" \
+            --base main \
+            --state open \
+            --json number \
+            --jq '.[0].number')
 
           if [ -n "$EXISTING_PR" ]; then
             echo "PR already exists"
             exit 0
           fi
 
-          gh pr create \
-            --base main \
-            --head "${{ env.BRANCH }}" \
-            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
-            --body "Auto-generated BDD feature file from Jira ticket.
-            
-Jira: ${{ inputs.jira_id }}"
+          PR_BODY=$(cat <<EOF
+          Auto-generated BDD feature file from Jira ticket.
+          
+          Jira ID: ${{ inputs.jira_id }}
+          Summary: ${{ env.SUMMARY }}
+          
+          This PR was created automatically by the JIRA BDD Feature Generator workflow.
+          EOF
+          )
+          
+                    gh pr create \
+                      --base main \
+                      --head "${{ env.BRANCH }}" \
+                      --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
+                      --body "$PR_BODY"
