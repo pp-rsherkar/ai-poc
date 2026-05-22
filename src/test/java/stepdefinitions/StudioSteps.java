@@ -257,9 +257,10 @@ public class StudioSteps {
     public void userSelectsTheAdvertiser(String advertiser) {
         logger.info("Selecting advertiser: {}", advertiser);
         explorerWorkspace.selectAdvertiser(advertiser);
-        String alertText = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Alert: {}", alertText);
-        Assert.assertEquals("Workspace created successfully", alertText);
+        //As confirmed by Nikhil ,Studio workspace creation alert is removed, so commenting the below code and assertion for now.
+//        String alertText = workspaceCreation.isWorkspaceCreationAlertDisplayed();
+//        logger.info("Alert: {}", alertText);
+//        Assert.assertEquals("Workspace created successfully", alertText);
     }
 
     @And("User updates the workspace name as {string}")
