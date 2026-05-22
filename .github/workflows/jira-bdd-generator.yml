@@ -37,7 +37,7 @@ jobs:
 
       - name: Create or reuse Jira branch
         run: |
-          BRANCH="feature/${{ inputs.jira_id }}"
+          BRANCH="${{ inputs.jira_id }}"
       
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
