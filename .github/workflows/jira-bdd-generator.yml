@@ -11,7 +11,7 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - QA-1321
+      - main
 
 
 jobs:
@@ -20,13 +20,27 @@ jobs:
   # JOB 1: Generate Feature File from Jira
   # ======================================
   generate-feature-file:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
-      - name: Checkout QA-1321 Branch
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
-          ref: QA-1321
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create feature branch
+        run: |
+          BRANCH="feature/${{ inputs.jira_id }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       - name: Fetch Jira Issue
         id: fetch_jira
@@ -58,7 +72,7 @@ jobs:
 
           # Use GitHub Actions Multiline String Syntax to prevent Exit 43 / Syntax crashes
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
-          
+
           echo "DESCRIPTION<<EOF" >> $GITHUB_ENV
           echo "$DESCRIPTION" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -69,44 +83,107 @@ jobs:
 
           CLEAN_SUMMARY=$(echo "${{ env.SUMMARY }}" \
             | tr '[:upper:]' '[:lower:]' \
-            | sed 's/[^a-z0-9]/_/g')
+            | sed 's/[^a-z0-9]/_/g' \
+            | sed 's/__*/_/g' \
+            | sed 's/^_//;s/_$//')
 
           FILE_NAME="${{ inputs.jira_id }}_${CLEAN_SUMMARY}.feature"
 
           TARGET_DIR="src/test/resources/features"
           mkdir -p "$TARGET_DIR"
 
+          # Build scenario steps by splitting description sentences into Given/When/Then
+          DESCRIPTION="${{ env.DESCRIPTION }}"
+
+          # Extract up to 3 meaningful sentences from the description in one pass
+          SENTENCES=$(echo "$DESCRIPTION" | grep -oP '[A-Z][^.!?]{10,}[.!?]' | sed 's/[.!?]$//')
+          STEP1=$(echo "$SENTENCES" | sed -n '1p')
+          STEP2=$(echo "$SENTENCES" | sed -n '2p')
+          STEP3=$(echo "$SENTENCES" | sed -n '3p')
+
+          # Warn and fall back to generic steps when description doesn't yield extractable sentences
+          if [ -z "$STEP1" ]; then
+            echo "⚠️ Could not extract scenario steps from Jira description — using generic fallbacks"
+            STEP1="the user is logged into the application"
+            STEP2="the user performs the action described in ${{ inputs.jira_id }}"
+            STEP3="the system behaves as described in the acceptance criteria"
+          else
+            [ -z "$STEP2" ] && STEP2="the user performs the action described in ${{ inputs.jira_id }}"
+            [ -z "$STEP3" ] && STEP3="the system behaves as described in the acceptance criteria"
+          fi
+
           {
             echo "@${{ inputs.jira_id }}"
             echo "Feature: ${{ env.SUMMARY }}"
+            echo "  # Jira Ticket : ${{ inputs.jira_id }}"
+            echo "  # Description : ${{ env.DESCRIPTION }}"
             echo ""
-            echo "  Background:"
-            echo "    # Jira Description:"
-            echo "    ${{ env.DESCRIPTION }}"
-            echo ""
-            echo "  Scenario: Verify requirements for ${{ inputs.jira_id }}"
-            echo "    Given the user is logged into the application"
-            echo "    When the user processes requirements from Jira"
-            echo "    Then the system behaves as expected"
+            echo "  @${{ inputs.jira_id }}"
+            echo "  Scenario: Verify ${{ env.SUMMARY }}"
+            echo "    Given $STEP1"
+            echo "    When $STEP2"
+            echo "    Then $STEP3"
           } > "$TARGET_DIR/$FILE_NAME"
 
-      - name: Commit Changes
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+          echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
+
+          echo "✅ Feature file created: $TARGET_DIR/$FILE_NAME"
+          cat "$TARGET_DIR/$FILE_NAME"
+
+      - name: Commit and push feature branch
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
           git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit (feature file may already exist)"
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
+          else
+            git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature file from Jira ticket"
+            git push origin "${{ env.BRANCH }}"
+            echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          fi
 
-          git commit -m "feat: generated feature file for ${{ inputs.jira_id }}" || echo "No changes"
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if a PR already exists for this branch; create one only when it doesn't
+          EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING_PR" ]; then
+            echo "ℹ️  PR #$EXISTING_PR already exists for ${{ env.BRANCH }} — skipping creation"
+            exit 0
+          fi
 
-          git push origin QA-1321
+          if [ "${{ env.HAS_CHANGES }}" = "false" ]; then
+            echo "⚠️  No new commits and no existing PR — the feature file was already committed previously"
+            echo "    Push new changes to '${{ env.BRANCH }}' or delete the branch and re-run the workflow."
+            exit 1
+          fi
+
+          gh pr create \
+            --base main \
+            --head "${{ env.BRANCH }}" \
+            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
+            --body "## JIRA Ticket
+          **[${{ inputs.jira_id }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ inputs.jira_id }})**
+
+          ## Description
+          ${{ env.DESCRIPTION }}
+
+          ## Changes
+          - Auto-generated BDD feature file: \`${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}\`
+
+          > This PR was automatically created by the JIRA BDD Feature Generator workflow."
 
 
   # ======================================
   # JOB 2: Close Jira After PR Merge
   # ======================================
   close-jira-ticket:
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'QA-1321'
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'feature/')
     runs-on: ubuntu-latest
 
     steps:
@@ -117,9 +194,15 @@ jobs:
             | grep -oE '[A-Z]+-[0-9]+' \
             | head -n 1)
 
+          if [ -z "$JIRA_ID" ]; then
+            echo "⚠️ No Jira ticket ID found in branch name, skipping"
+            exit 0
+          fi
+
           echo "jira_id=$JIRA_ID" >> $GITHUB_OUTPUT
 
       - name: Transition Jira to Done
+        if: steps.extract_id.outputs.jira_id != ''
         run: |
           AUTH="${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}"
 
@@ -142,7 +225,7 @@ jobs:
               --data "{\"transition\":{\"id\":\"$TRANSITION_ID\"}}" \
               "$TRANSITIONS_URL"
 
-            echo "✅ Jira ticket moved to Done"
+            echo "✅ Jira ticket ${{ steps.extract_id.outputs.jira_id }} moved to Done"
           else
-            echo "⚠️ No valid transition found"
+            echo "⚠️ No valid transition found for ${{ steps.extract_id.outputs.jira_id }}"
           fi
