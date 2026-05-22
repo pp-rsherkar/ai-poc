@@ -37,17 +37,28 @@ jobs:
 
       - name: Create or reuse Jira branch
         run: |
-          BRANCH="${{ inputs.jira_id }}"
+          BRANCH="feature/${{ inputs.jira_id }}"
+      
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
+      
+          # Fetch all remote branches
+          git fetch origin
+      
+          # Check if branch exists remotely
           if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
-            git fetch origin "$BRANCH":"refs/remotes/origin/$BRANCH"
-            echo "Reusing existing branch $BRANCH"
-            git checkout -B "$BRANCH" "refs/remotes/origin/$BRANCH"
+            echo "Reusing existing branch: $BRANCH"
+      
+            # Checkout tracking branch
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+      
+            # Pull latest changes
+            git pull --rebase origin "$BRANCH"
           else
-            echo "Creating new branch $BRANCH from origin/main"
-            git checkout -B "$BRANCH" "origin/main"
+            echo "Creating new branch: $BRANCH"
+      
+            # Create new branch from main
+            git checkout -b "$BRANCH" origin/main
           fi
 
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
@@ -146,25 +157,14 @@ jobs:
           git add .
       
           if git diff --cached --quiet; then
-            echo "No changes to commit (feature file may already exist)"
+            echo "No changes to commit"
             echo "HAS_CHANGES=false" >> $GITHUB_ENV
           else
             git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature file from Jira ticket"
       
-            # Sync with remote branch if it exists
-            git fetch origin "${{ env.BRANCH }}" || true
-            git pull --rebase origin "${{ env.BRANCH }}" || true
-      
-            # Push safely
             git push --force-with-lease origin "${{ env.BRANCH }}"
       
             echo "HAS_CHANGES=true" >> $GITHUB_ENV
-          fi
-      
-          if git log --oneline "origin/main..${{ env.BRANCH }}" | grep -q .; then
-            echo "BRANCH_HAS_DIFF=true" >> $GITHUB_ENV
-          else
-            echo "BRANCH_HAS_DIFF=false" >> $GITHUB_ENV
           fi
 
       - name: Create Pull Request
