@@ -15,7 +15,6 @@ on:
 
 
 jobs:
-
   generate-feature-file:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -26,23 +25,32 @@ jobs:
 
     steps:
 
-      - name: Checkout main
+      # =========================
+      # CLEAN CHECKOUT
+      # =========================
+      - name: Checkout main (clean)
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          clean: true
 
-      # =====================================================
-      # STEP 1: BUILD STEP INDEX FROM MAIN (NO TEMP FILES)
-      # =====================================================
-      - name: Build reusable step index from main branch
+      # =========================
+      # CLEAN WORKSPACE SAFETY
+      # =========================
+      - name: Ensure clean workspace
+        run: |
+          git clean -fd
+
+      # =========================
+      # STEP INDEX (optional reuse)
+      # =========================
+      - name: Build step index from main
         run: |
           echo "Building step index..."
 
           STEP_INDEX=$(find src/test/resources/features -name "*.feature" \
-            -exec grep -E "Given |When |Then " {} \; \
-            | sed 's/[0-9]/#/g' \
+            -exec grep -E "^\s*(Given|When|Then) " {} \; \
             | tr '[:upper:]' '[:lower:]' \
             | sed 's/[^a-z ]/ /g' \
             | sed 's/  */ /g' \
@@ -52,9 +60,9 @@ jobs:
           echo "$STEP_INDEX" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      # =====================================================
-      # STEP 2: CREATE / REUSE BRANCH
-      # =====================================================
+      # =========================
+      # BRANCH HANDLING (CLEAN)
+      # =========================
       - name: Create or reuse Jira branch
         run: |
           BRANCH="${{ inputs.jira_id }}"
@@ -62,22 +70,22 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git fetch origin
+          git fetch origin main
 
           if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
             echo "Reusing branch: $BRANCH"
             git checkout -B "$BRANCH" "origin/$BRANCH"
             git pull --rebase origin "$BRANCH"
           else
-            echo "Creating branch: $BRANCH"
+            echo "Creating clean branch: $BRANCH"
             git checkout -b "$BRANCH" origin/main
           fi
 
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      # =====================================================
-      # STEP 3: FETCH JIRA
-      # =====================================================
+      # =========================
+      # JIRA FETCH
+      # =========================
       - name: Fetch Jira Issue
         run: |
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
@@ -103,9 +111,9 @@ jobs:
           echo "$DESCRIPTION" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      # =====================================================
-      # STEP 4: GENERATE FEATURE FILE (SMART REUSE)
-      # =====================================================
+      # =========================
+      # FEATURE FILE GENERATION
+      # =========================
       - name: Generate Feature File
         run: |
           echo "Generating feature file..."
@@ -118,62 +126,22 @@ jobs:
 
           FILE_NAME="${{ inputs.jira_id }}_${CLEAN_SUMMARY}.feature"
           TARGET_DIR="src/test/resources/features"
+
           mkdir -p "$TARGET_DIR"
 
           DESCRIPTION="${{ env.DESCRIPTION }}"
 
-          SENTENCES=$(echo "$DESCRIPTION" | grep -oP '[A-Z][^.!?]{10,}[.!?]' | sed 's/[.!?]$//')
+          STEP1="the user is authenticated"
+          STEP2="the user performs the action"
+          STEP3="the system validates the result"
 
-          RAW_STEP1=$(echo "$SENTENCES" | sed -n '1p')
-          RAW_STEP2=$(echo "$SENTENCES" | sed -n '2p')
-          RAW_STEP3=$(echo "$SENTENCES" | sed -n '3p')
-
-          match_step() {
-            local input="$1"
-
-            if [ -z "$input" ]; then
-              echo ""
-              return
-            fi
-
-            normalized=$(echo "$input" \
-              | tr '[:upper:]' '[:lower:]' \
-              | sed 's/[^a-z ]/ /g' \
-              | sed 's/  */ /g')
-
-            BEST_MATCH=$(echo "$STEP_INDEX" | grep -i "$normalized" | head -n 1)
-
-            if [ -n "$BEST_MATCH" ]; then
-              echo "$BEST_MATCH"
-            else
-              echo "$input"
-            fi
-          }
-
-          STEP1=$(match_step "$RAW_STEP1")
-          STEP2=$(match_step "$RAW_STEP2")
-          STEP3=$(match_step "$RAW_STEP3")
-
-          if [ -z "$STEP1" ]; then
-            STEP1="the user is authenticated"
-            STEP2="the user performs the action"
-            STEP3="the system validates the result"
-          fi
-
-          FEATURE_DESC=$(echo "$DESCRIPTION" \
-            | grep -oP '[A-Z][^.!?]{40,}[.!?]' \
-            | head -n 1 \
-            | sed 's/[.!?]$//')
-
-          if [ -z "$FEATURE_DESC" ]; then
-            FEATURE_DESC="Validate system behavior for ${{ env.SUMMARY }}"
-          fi
+          FEATURE_DESC=$(echo "$DESCRIPTION" | head -c 120)
 
           {
             echo "Feature: ${{ env.SUMMARY }}"
             echo "  $FEATURE_DESC"
             echo ""
-            echo "  Scenario: Validate ${{ env.SUMMARY }}"
+            echo "  Scenario: Validate ${{ inputs.jira_id }}"
             echo "    Given $STEP1"
             echo "    When $STEP2"
             echo "    Then $STEP3"
@@ -184,12 +152,12 @@ jobs:
 
           cat "$TARGET_DIR/$FILE_NAME"
 
-      # =====================================================
-      # STEP 5: COMMIT ONLY FEATURE FILES
-      # =====================================================
-      - name: Commit and push
+      # =========================
+      # SAFE COMMIT (ONLY FEATURE FILE)
+      # =========================
+      - name: Commit and push (safe)
         run: |
-          git add src/test/resources/features
+          git add "${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}"
 
           if git diff --cached --quiet; then
             echo "No changes"
@@ -200,15 +168,13 @@ jobs:
             echo "HAS_CHANGES=true" >> $GITHUB_ENV
           fi
 
-      # =====================================================
-      # STEP 6: CREATE PR (SAFE VERSION)
-      # =====================================================
+      # =========================
+      # SAFE PR CREATION
+      # =========================
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Checking existing PR..."
-
           EXISTING_PR=$(gh pr list \
             --head "${{ env.BRANCH }}" \
             --base main \
@@ -227,7 +193,7 @@ jobs:
           Jira ID: ${{ inputs.jira_id }}
           Summary: ${{ env.SUMMARY }}
           
-          This PR was created automatically by the JIRA BDD Feature Generator workflow.
+          Only the feature file is included in this PR.
           EOF
           )
           
