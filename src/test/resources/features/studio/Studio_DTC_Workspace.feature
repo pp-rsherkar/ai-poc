@@ -1,11 +1,8 @@
-Feature: DTC Workspace creation, segmentation, and publishing in Studio
+Feature: DTC Workspace creation in Studio
   1. Creation of DTC Workspace in Studio
   2. Applying advertiser and filters to the workspace
   3. Verify the workspace is saved successfully
   4. Verify the submission based on Unique Consumers count
-  5. Verify the status transition from Requested to Segmented
-  6. Verify publishing of workspace after segmentation
-  7. Verify the workspace status as Published in Workspace Management page
 
   Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
@@ -17,7 +14,7 @@ Feature: DTC Workspace creation, segmentation, and publishing in Studio
     And User navigates to Studio application
 
   @todo
-  Scenario: Create, segment and publish DTC workspace based on Unique Consumers
+  Scenario: Create DTC workspace based on Unique Consumers
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User selects the Workspace Type as "DTC Workspace"
