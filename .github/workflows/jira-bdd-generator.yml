@@ -28,18 +28,39 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout main
+      - name: Checkout base branch
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create feature branch
+      - name: Create or reuse Jira branch
         run: |
           BRANCH="feature/${{ inputs.jira_id }}"
+      
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git checkout -b "$BRANCH"
+      
+          # Fetch all remote branches
+          git fetch origin
+      
+          # Check if branch exists remotely
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+            echo "Reusing existing branch: $BRANCH"
+      
+            # Checkout tracking branch
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+      
+            # Pull latest changes
+            git pull --rebase origin "$BRANCH"
+          else
+            echo "Creating new branch: $BRANCH"
+      
+            # Create new branch from main
+            git checkout -b "$BRANCH" origin/main
+          fi
+
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       - name: Fetch Jira Issue
@@ -134,12 +155,15 @@ jobs:
       - name: Commit and push feature branch
         run: |
           git add .
+      
           if git diff --cached --quiet; then
-            echo "No changes to commit (feature file may already exist)"
+            echo "No changes to commit"
             echo "HAS_CHANGES=false" >> $GITHUB_ENV
           else
             git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature file from Jira ticket"
-            git push origin "${{ env.BRANCH }}"
+      
+            git push --force-with-lease origin "${{ env.BRANCH }}"
+      
             echo "HAS_CHANGES=true" >> $GITHUB_ENV
           fi
 
@@ -154,10 +178,9 @@ jobs:
             exit 0
           fi
 
-          if [ "${{ env.HAS_CHANGES }}" = "false" ]; then
-            echo "⚠️  No new commits and no existing PR — the feature file was already committed previously"
-            echo "    Push new changes to '${{ env.BRANCH }}' or delete the branch and re-run the workflow."
-            exit 1
+          if [ "${{ env.HAS_CHANGES }}" = "false" ] && [ "${{ env.BRANCH_HAS_DIFF }}" = "false" ]; then
+            echo "ℹ️  No new commit generated and branch matches main — skipping PR creation"
+            exit 0
           fi
 
           gh pr create \
@@ -182,8 +205,7 @@ jobs:
   close-jira-ticket:
     if: >
       github.event_name == 'pull_request' &&
-      github.event.pull_request.merged == true &&
-      startsWith(github.event.pull_request.head.ref, 'feature/')
+      github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
