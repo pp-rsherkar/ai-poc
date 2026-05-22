@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       jira_id:
-        description: 'Enter the JIRA Ticket ID (e.g., PROJ-123)'
+        description: 'Enter the JIRA Ticket ID (e.g., QA-1321)'
         required: true
         type: string
 
@@ -16,9 +16,9 @@ on:
 
 jobs:
 
-  # ================================
-  # JOB 1: Generate Feature File
-  # ================================
+  # ======================================
+  # JOB 1: Generate Feature File from Jira
+  # ======================================
   generate-feature-file:
     runs-on: ubuntu-latest
 
@@ -28,10 +28,9 @@ jobs:
         with:
           ref: QA-1321
 
-      - name: Fetch Jira Data
-        id: jira_data
+      - name: Fetch Jira Issue
         run: |
-          echo "Fetching Jira ticket..."
+          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
 
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
@@ -42,8 +41,10 @@ jobs:
 
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
 
+          echo "HTTP STATUS: $HTTP_STATUS"
+
           if [ "$HTTP_STATUS" != "200" ]; then
-            echo "❌ Jira API failed with status: $HTTP_STATUS"
+            echo "❌ Jira API failed or invalid ticket"
             exit 1
           fi
 
@@ -69,19 +70,6 @@ jobs:
           FILE_NAME="${{ inputs.jira_id }}_${CLEAN_SUMMARY}.feature"
 
           TARGET_DIR="src/test/resources/features"
-          mkdir -p $TARGET_DIR
-
-               - name: Generate Feature File
-        run: |
-          echo "Generating feature file..."
-
-          CLEAN_SUMMARY=$(echo "${{ env.SUMMARY }}" \
-            | tr '[:upper:]' '[:lower:]' \
-            | sed 's/[^a-z0-9]/_/g')
-
-          FILE_NAME="${{ inputs.jira_id }}_${CLEAN_SUMMARY}.feature"
-
-          TARGET_DIR="src/test/resources/features"
           mkdir -p "$TARGET_DIR"
 
           {
@@ -97,19 +85,22 @@ jobs:
             echo "    When the user processes requirements from Jira"
             echo "    Then the system behaves as expected"
           } > "$TARGET_DIR/$FILE_NAME"
-          
+
+      - name: Commit Changes
+        run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
           git add .
-          git commit -m "feat: generated feature file for ${{ inputs.jira_id }}" || echo "No changes to commit"
+
+          git commit -m "feat: generated feature file for ${{ inputs.jira_id }}" || echo "No changes"
 
           git push origin QA-1321
 
 
-  # ================================
-  # JOB 2: Close Jira Ticket
-  # ================================
+  # ======================================
+  # JOB 2: Close Jira After PR Merge
+  # ======================================
   close-jira-ticket:
     if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'QA-1321'
     runs-on: ubuntu-latest
@@ -125,7 +116,6 @@ jobs:
           echo "jira_id=$JIRA_ID" >> $GITHUB_OUTPUT
 
       - name: Transition Jira to Done
-        if: steps.extract_id.outputs.jira_id != ''
         run: |
           AUTH="${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}"
 
@@ -148,7 +138,7 @@ jobs:
               --data "{\"transition\":{\"id\":\"$TRANSITION_ID\"}}" \
               "$TRANSITIONS_URL"
 
-            echo "Jira ticket closed successfully"
+            echo "✅ Jira ticket moved to Done"
           else
-            echo "No valid transition found"
+            echo "⚠️ No valid transition found"
           fi
