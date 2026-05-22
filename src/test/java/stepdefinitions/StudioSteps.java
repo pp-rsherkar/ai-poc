@@ -240,6 +240,7 @@ public class StudioSteps {
     }
 */
 
+
     @And("User clicks on HCP Explorer workspace")
     public void user_clicks_on_hcp_explorer_workspace() {
         logger.info("Selecting HCP Explorer workspace");
