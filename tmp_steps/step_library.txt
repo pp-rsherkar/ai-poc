@@ -1,0 +1,1259 @@
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User makes list available in "LIFE" and saves the list
+ Then Verify list gets saved successfully
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User tries to save the list without entering any details, an error message should be displayed
+ When User makes list available in "LIFE" and saves the list
+ Then Verify list gets saved successfully
+ When User edits the created list
+ Then Verify list gets updated successfully
+ When User deletes the created list
+ Then Verify list gets deleted successfully
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ Then Verify file "<FILE_NAME>" is uploaded successfully
+ When User tries to save the Attribute list without entering any details, an error message should be displayed
+ When User makes list available in LIFE and HCP### and clicks on next
+ Then Verify the Attributes list is saved successfully
+ When User edits the saved list
+ Then Verify the updates are applied successfully
+ When User deletes the Attribute list
+ Then Verify the list is deleted successfully
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ Then User tries to save the Auto-Imported list without entering any details, an error message should be displayed
+ When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
+ Then User clicks Check File button to verify the file details are correct
+ Then User saves the import settings and verifies the data is imported successfully
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ Then User tries to save the Auto-Imported list without entering any details, an error message should be displayed
+ When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
+ Then User clicks Check File button to verify the file details are correct
+ Then User saves the import settings and verifies the data is imported successfully
+ When User clicks on Reload Now button
+ Then Verify the file is reloaded successfully
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ Then Verify Smart List Creation Panel should display the following List Population Options
+ Then Verify the tabs displayed on the Pixels page
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ #Then Verify the newly created campaign in the database
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify targeting panel with all targeting under below categories
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify targeting panel with all targeting under below categories
+ Then Verify the configured targeting rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then User searches and verifies the created targeting template is available on Targeting Templates page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify Advertiser dropdown should show values which are mapped to the account
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User adds a custom field with "<FIELD_NAME>" on the campaign creation page successfully
+ Then Verify that the custom field is added on the campaign creation page
+ When User modifies the custom field label to new label "<NEW_FIELD_NAME>"
+ Then Verify that the custom field is updated with new label
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ Then Verify that the custom field value "<CUSTOM_FIELD_VALUE>" is saved and displayed in the campaign details page
+ When User deletes the custom field for which campaign is created and verifies if it is deleted
+ Given This scenario will be executed in the "Demo" environment as a "External User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+ Then Verify that the campaign budget status is "Pending Appr" and is greyed out
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User clicks on Add Targeting Rule
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify creative details are saved
+ Then Verify that the campaign is in "Pending Appr" state
+ Then Verify that the approval status of the campaign is "Pending Appr"
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+# Given I call "<apiName>" with parameters "<param#>" & "<param#>"
+# Then Verify response have "<statusCode>" & "<expected#>" & "<expected#>"
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "##- Advertiser" "Auto" "Regular" "#####" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User fills in required details "<LINE_ITEM>" except for flight information and save
+ Then User should see an error message to add flight details
+ Then User should see error message when tries to save line item page
+ When User enters line item details "<LINE_ITEM>"
+ Then User navigates to the Flights tab and verifies the flight details
+ When User deletes some flight entries
+ Then User should see the remaining flights listed under the Flights section
+ When User creates line items with below line types and other details, enables the line item and saves the changes
+ Then User adds Comments or Notes "<LINE_ITEM_NOTE>" to each line item
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters "<Campaign ID>" and click Search button
+ Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+ When User add and save comments to Campaign, Line Items and Tactics
+ Then Verify comments, icon should display in bluish-green color "<COLOUR>" and comments should available on individual panel
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters "<Campaign ID>" and click Search button
+ Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+ When User toggles the Enabled button for Line Items and Tactics
+ Then Verify that Line Items and Tactics reflect the correct enabled or disabled state
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks Menu option and selects column names
+ Then Verify dashboard is customized and only selected columns are displayed
+ When Navigate to any Dashboard column, select the filter and apply
+ Then Verify the filter list displays only the selected filter values
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify only Current Month's Flights should render on the Dashboard
+ Then Verify only Current Month's Flights should render on the Dashboard
+ Then Verify only Current Month's Flights should render on the Dashboard
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks Favorite Only checkbox
+ Then Verify the dashboard results should show only campaigns which are marked as favorite
+ When User clicks Hide Finished checkbox
+ Then Verify the dashboard data should not reflect campaigns with Finished status
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters "<Campaign ID>" and click Search button
+ Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+ When User clicks Campaign "<Campaign ID>", Line Item and Tactic and verify navigation to respective pages
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ Then User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
+ When User navigates to Tactic and assigns creative of status "<STATUS>" to the Tactic
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify the tabs displayed on the Report Templates page
+ When User clicks on New Template
+ Then Verify the tabs displayed on the Create New Template panel
+ When User enters the template details as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
+ Then Verify the selected dimensions and metrics under the Template Structure section
+ When User saves the new template
+ Then Verify new template is saved and displayed in the template list
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Given User navigates to the "Keyword Lists" page
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Create Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates below tactics under same line item and verifies it
+ Then Verify that below tabs gets enabled only after saving tactics
+ When User clicks on Create Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates below tactics under same line item and verifies it
+ Then User clicks on first tactic and goes to details tab
+ Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
+ Then User clears the custom field text
+ Then User deletes the custom field and verify its removed from new tactic
+ When User clicks on Campaign Settings
+ Then Verify user is on default bid settings page
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User clicks on Campaign Settings
+ Then Verify user is on default bid settings page
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify user is able to update and save the "base" bid price
+ Then Verify user is able to update and save the "max" bid price
+ Then Verify user is not able to update "base" bid price more than allowed limit
+ Then Verify user is not able to update "max" bid price more than allowed limit
+ When User clicks on create new Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+ Then User deletes the tactic and verifies it
+ When User clicks on create new Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+ When User clicks on Create Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates below tactics under same line item and verifies it
+ Then User navigates to campaign
+ Then User clicks on details tab
+ Then User verifies if Frequency Cap is in disabled state by default
+ Then User adds frequency cap with details "<ON_CAMPAIGN_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+ Then User navigates to LineItem
+ Then User clicks on details tab
+ Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
+ Then User verifies if Frequency Cap is in disabled state by default
+ Then User adds frequency cap with details "<ON_LI_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+ Then User navigates to Tactic and clicks on settings tab
+ Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
+ Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_LI_LEVEL>"
+ Then User verifies if Frequency Cap is in disabled state by default
+ Then User adds frequency cap with details "<ON_TACTIC_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+ Then User navigates to LineItem
+ Then User navigates to Tactic and clicks on settings tab
+ Then Verify that frequency cap is saved in tactic
+ When User clicks on Create Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User creates below tactics under same line item and verifies it
+ When User navigates to Tactic and clicks on settings tab
+ Then User validates the comment added in "header" is "<HEADER_COMMENT>" then clear it
+ Then User validates the comment added in "navigation" is "<NAV_COMMENT>" then clear it
+ When User clicks on create new Campaign
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+ Then User navigates to tactic setting tab
+ Then User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules
+ Then Verify Bid multiplier panel with all options under below categories
+ Then Verify the configured Bid multiplier rules
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ When User clicks on Create Campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then User navigates to line item and clicks on details tab
+ Then User clicks on create new tactic
+ Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+ Then User navigates to tactic setting tab
+ When User overrides line item management fee and verifies tactic reflection for the following fee types
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then User navigates to tactic setting tab
+ Then User verifies that forecast data is unavailable when no targeting rules are applied
+ When User clicks on Add Targeting Rule
+ Then User verifies the forecast data refreshes and displays values after adding targeting rule
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User navigates to Schedule report from mega menu of the life application
+ Then Verify Schedule Report panel should be opened
+ When User clicks on "Email" tab as Delivery Method
+ Then Verify Deliver to Users field is available
+ When User clicks Add Emails link, Deliver to External Emails field should display
+ When User clicks on "Custom Destination" tab as Delivery Method
+ Then Verify Destination dropdown field is available
+ When User clicks "Add Destination" button
+ Then Verify Destination Name, Destination Type fields are displayed
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When User clicks on "Custom Destination" tab as Delivery Method
+ Then Verify Destination dropdown field is available
+ When User clicks "Add Destination" button
+ Then User runs the connection test and creates the destination
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then Verify New Template button is present above the Search option
+ When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
+ Then User searches and verifies the already created targeting template using the search option
+ Then Verify the template created can be imported in the Tactic
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then Verify New Template button is present above the Search option
+ When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
+ Then User searches and verifies the already created targeting template using the search option
+ Then Verify the template created can be imported in the Tactic
+ Then Verify the template created are saved
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then Verify New Template button is present above the Search option
+ Then User searches and verifies the already created targeting template using the search option
+ When User navigates to Targeting template page by clicking the icon from Activation section
+ Then Verify New Template button is present above the Search option
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify the tabs displayed on the Pixels page
+ Then Verify the Advertiser dropdown and search box are displayed on the Pixels page
+ When User clicks on Add Pixel button
+ Then Verify the Create New Pixel panel and types of Pixel
+ When User tries to save the Retargeting pixel without entering any details, an error message should be displayed
+ Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User edits the name of the created "<PIXEL_TYPE>"
+ Then Verify the "<PIXEL_TYPE>" gets updated successfully
+ When User removes the created pixel
+ Then Verify the pixel gets removed successfully
+ Then Verify the removed pixel should not be displayed in the pixel list
+ When User tries to save the Retargeting pixel without entering any details, an error message should be displayed
+ Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User edits the name of the created "<PIXEL_TYPE>"
+ Then Verify the "<PIXEL_TYPE>" gets updated successfully
+ When User removes the created pixel
+ Then Verify the pixel gets removed successfully
+ Then Verify the removed pixel should not be displayed in the pixel list
+ When User selects "<ADVERTISER>" as advertiser
+ Then Verify the Smart Pixel name is auto populated with "<ADVERTISER>" and Smart Pixel text
+ Then Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ Then Verify the selected "<ADVERTISER>" and Smart Pixel
+ Then Save and Verify the list gets saved successfully
+ Then Verify the selected Smart List should be reflected in the Associated Smartlists tab
+ When User edits the name of the created "<PIXEL_TYPE>"
+ Then Verify the "<PIXEL_TYPE>" gets updated successfully
+ Then Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it
+ When User selects "<ADVERTISER>" as advertiser
+ Then Verify the Smart Pixel name is auto populated with "<ADVERTISER>" and Smart Pixel text
+ Then Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User edits the name of the created "<PIXEL_TYPE>"
+ Then Verify the "<PIXEL_TYPE>" gets updated successfully
+ When User deactivates the created pixel
+ Then Verify the pixel gets deactivated successfully
+ Then Verify the deactivated pixel should not be displayed in the pixel list
+ When User tries to save the Conversion pixel without entering any details, an error message should be displayed
+ Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User edits the name of the created "<PIXEL_TYPE>"
+ Then Verify the "<PIXEL_TYPE>" gets updated successfully
+ When User removes the created pixel
+ Then Verify the pixel gets removed successfully
+ Then Verify the removed pixel should not be displayed in the pixel list
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify Creative Library page is displayed
+ When User clicks on "<ACTIVITY_TAB_NAME>" tab and verify following filters value
+ When User selects pagination values "<PAGINATION_VALUE>" from the dropdown
+ When User assigns a campaign to the creative using "Bulk Assign" option
+ Then Verify user is not able to delete a creative associated with a Campaign and appropriate error message is displayed
+ When User performs "Bulk Archive" action using "Archive Creatives" option on multiple creatives - "#" and verifies the selected creatives are moved to "Archived" tab
+ When User clicks on Preview icon for a creative from Creative Library page
+ Then Verify Creative Preview tab is displayed with correct creative name
+ When Verify data persistence when user creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+ Then Verify the newly created creative is displayed in the Creative Library page
+ Given User clicks Bulk Upload button on Creative Library page
+ Then Verify Bulk Upload panel is displayed with following options - Creative Type and Advertiser Dropdown
+ Given User clicks Bulk Upload button on Creative Library page
+ When User selects the "<CREATIVE_TYPE>" creative type
+ When The advertiser "<ADVERTISER>" is selected for "Display" creative the following sections are visible
+ Then Verify the header message for "<STATUS>" status
+ Given User clicks Bulk Upload button on Creative Library page
+ When User selects the "Display" creative type
+ Given User clicks Bulk Upload button on Creative Library page
+ When User selects the "HTML" creative type
+ Given User clicks Bulk Upload button on Creative Library page
+ When User selects the "HTML" creative type
+ Given User clicks Bulk Upload button on Creative Library page
+ When User selects the "Native" creative type
+ Given User clicks Bulk Upload button on Creative Library page
+ When User selects the "Video" creative type
+ When User assigns a campaign to the creative using "Bulk Assign" option
+ Then User navigates to creative details and clicks Association tab
+ When User assigns a campaign to the creative using "Bulk Assign" option
+ Then User navigates to creative details and clicks Association tab
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Given User navigates to the "Domain & App Lists" page
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "##- Advertiser" "Auto" "Regular" "#####" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "Line" "###", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "Tactic" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ When User clicks Tactic Setting tab
+ Then User should navigate to respective Tactic Setting tab
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User clicks "Private" Deals Tab
+ Then User should see Add New Deal button, filters such as Exchange, Search
+ When User enters below details in respective search field, verify that the deal list appears based on the selected filters
+ When User clicks Tactic Setting tab
+ Then User should navigate to respective Tactic Setting tab
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User clicks "Life Marketplace Deals" Deals Tab
+ When User enters below details in respective search field, verify that the deal list appears based on the selected filters
+ When User clicks Tactic Setting tab
+ Then User should navigate to respective Tactic Setting tab
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User clicks "Private" Deals Tab
+ Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+ When User searches the deal and assign it from the deal list
+ Then Verify Edit icon availability for the deals listed under "Private" Deals tab
+ Then Selected Deals should appear in Applied Deals panel
+ When User clicks on OK button
+ Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+ When User clicks Save button from Tactic Setting tab
+ Then Deals should get assigned to the Tactic
+ When User clicks Tactic Setting tab
+ Then User should navigate to respective Tactic Setting tab
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User clicks "Private" Deals Tab
+ Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+ When User searches the deal and assign it from the deal list
+ Then Verify that the deal is moved to archived deal section
+ When User clicks Tactic Setting tab
+ Then User should navigate to respective Tactic Setting tab
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User clicks "Private" Deals Tab
+ Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+ When User searches the deal and assign it from the deal list
+ When User clicks on OK button
+ Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User searches the deal and assign it from the deal list
+ When User clicks Tactic Setting tab
+ Then User should navigate to respective Tactic Setting tab
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User clicks "Private" Deals Tab
+ Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+ When User searches the deal and assign it from the deal list
+ When User clicks on OK button
+ Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User searches the deal and assign it from the deal list
+ When User searches the deal and assign it from the deal list
+ When User clicks on OK button
+ When User add new targeting rule for Rule Type "Deals"
+ Then user should navigate to PMP Deals Panel
+ When User searches the deal and assign it from the deal list
+ Then Verify that the deal is moved to archived deal section
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks Create Curated Market link
+ When User clicks Create Curated Market link
+ Then Verify Import Deal panel is opened
+ Then Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template
+ Then Verify the market id, media type, and floor price displayed in Curated Markets section matches the media type in Admin Setup for the same market
+ When User clicks Create Curated Market link
+ Then Verify Import Deal panel is opened
+ Then Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template
+ Then Verify the market id, media type, and floor price displayed in Curated Markets section matches the media type in Admin Setup for the same market
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User navigates to run report from mega menu of the life application
+ When User clicks on "Pick Dimensions/Metrics" link
+ Then Dimensions and Metrics fields should be displayed
+ Then Template drop-down should be visible
+ Then Data Granularity should have default value "Daily"
+ Then Advertiser drop-down should list advertisers mapped to "automation@pulsepoint"
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select multiple values from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select multiple values from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select multiple values from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select multiple values from dropdown
+ When User clicks on Advanced Settings
+ Then "Filter Report" section should be visible with label "Only Report on Impressions with Identifiable NPIs" checkbox
+ Then "Run Now" and "Schedule" tabs should be present in the Run Report pop-up
+ When On Run Now tab, Report Period field should have options below
+ When User navigates to run report from mega menu of the life application
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When On Run Now tab, Report Period field should have options below
+ When User navigates to run report from mega menu of the life application
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When User navigates to run report from mega menu of the life application
+ When User clicks on "Pick Dimensions/Metrics" link
+ Then Dimensions and Metrics fields should be displayed
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ Then User searches the Campaign "<CAMPAIGN_NAME>", navigates to LineItem and fetches the flight details
+ When User navigates to run report from mega menu of the life application
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ Then Verify the tabs displayed on the Report Templates page
+ When User clicks on New Template
+ Then Verify the tabs displayed on the Create New Template panel
+ When User navigates to run report from mega menu of the life application
+ When User clicks on "Pick Dimensions/Metrics" link
+ Then Dimensions and Metrics fields should be displayed
+ When User navigates to run report from mega menu of the life application
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When User clicks on Advanced Settings
+ Then "Filter Report" section should be visible with label "Only Report on Impressions with Identifiable NPIs", "Only Report on Running Advertisers", "Only Report on Running Campaigns" checkbox
+ When User navigates to run report from mega menu of the life application
+ When User clicks on "Custom Destination" tab as Delivery Method
+ Then Verify Destination dropdown field is available
+ When User clicks "Add Destination" button
+ Then Verify Destination Name, Destination Type fields are displayed
+ When User navigates to run report from mega menu of the life application
+ When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+ Then User should be able to select value from dropdown
+ When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+ Then User should be able to select value from dropdown
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+ Then User should be able to select value from dropdown
+ When User clicks on "Custom Destination" tab as Delivery Method
+ Then Verify Destination dropdown field is available
+ When User clicks "Add Destination" button
+ Then User runs the connection test and creates the destination
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Given User navigates to the "Keyword Lists" page
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ Given User navigates to the "Domain & App Lists" page
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ Given User navigates to the "Domain & App Lists" page
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User makes list available in "LIFE" and saves the list
+ Then Verify list gets saved successfully
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify that user is able to export the audit log for "campaign"
+ When User navigates to "line item" page
+ Then Verify that user is able to export the audit log for "line item"
+ When User navigates to "tactic" page
+ Then Verify that user is able to export the audit log for "tactic"
+ When User enters the campaign details as "##- Advertiser" "<CAMPAIGN_NAME>" "Regular" "#####" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User creates line items with below line types and other details, enables the line item and saves the changes
+ Then Verify that user is able to export the campaign settings
+ When User enters the campaign details as "##- Advertiser" "<CAMPAIGN_NAME>" "Regular" "#####" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User creates line items with below line types and other details, enables the line item and saves the changes
+ Then Verify that user is able to export the campaign settings
+ When User enters the campaign details as "##- Advertiser" "<CAMPAIGN_NAME>" "Regular" "#####" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User creates line items with below line types and other details, enables the line item and saves the changes
+ Then Verify that user is able to export the campaign settings
+ Given Life application is logged in as "<USER>"
+ When User land on Overview tab on HCP Dashboard
+ Then Verify Tabs and Subtabs of Overview tab on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User clicks on Site tab on HCP Dashboard
+ Then Verify Tabs and Subtabs of Site tab on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User clicks on Search tab on HCP Dashboard
+ Then Verify Tabs and Subtabs of Search tab on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User clicks on Media tab on HCP Dashboard
+ Then Verify Tabs and Subtabs of Media tab on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User clicks on Email tab on HCP Dashboard
+ Then Verify Tabs and Subtabs of Email tab on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User clicks on Social tab on HCP Dashboard
+ Then Verify Tabs and Subtabs of Social tab on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User change settings of HCP Dashboard Display modules
+ Then Verify Tabs and Subtabs of shall change on HCP Dashboard
+ Given Life application is logged in as "<USER>"
+ When User change filters of HCP Dashboard Overview tabs
+ Then Verify data after change in filter of HCP Dashboard
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify Creative Library page is displayed
+ Then Verify the newly created creative is displayed in the Creative Library page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Then Verify Creative Library page is displayed
+ Then Verify the newly created creative is displayed in the Creative Library page
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ Then Verify file "<FILE_NAME>" is uploaded successfully
+ When User makes list available in LIFE and HCP### and clicks on next
+ Then Verify the Attributes list is saved successfully
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify that the "NPI" rule is added to the tactic and retrieve the count of selected lists
+ When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
+ Then User clicks Check File button to verify the file details are correct
+ Then User saves the import settings and verifies the data is imported successfully
+ When User clicks on Reload Now button
+ Then Verify the file is reloaded successfully
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify that the "NPI" rule is added to the tactic and retrieve the count of selected lists
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ When User applies the filter and selects option
+ Then Verify Webhook panel is enabled after applying engagement filters
+ When User clicks "GET" request method
+ Then Verify inline error message for the invalid webhook entries "<INVALID_WEBHOOK_DATA>"
+ When User adds valid URL and append Macros with "<PARAM>" to the "URL" as follow
+ Then Verify if Macros Appended to the URL
+ When User saves the webhook setup
+ Then Check that the success message appears once the webhook is successfully created
+ Then Verify the HCP Explorer Workspace is saved
+ Then Check the webhook icon is highlighted in green color
+ When User tries to delete the workspace associated with active webhook from the workspace list
+ Then Verify user receives a warning when attempting to delete a workspace with an active webhook
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ When User applies the filter and selects option
+ Then Verify Webhook panel is enabled after applying engagement filters
+ When User clicks "POST" request method
+ Then Verify inline error message for the invalid webhook entries "<INVALID_WEBHOOK_DATA>"
+ When User adds valid URL and append Macros with "<PARAM>" to the "URL" as follow
+ Then Verify if Macros Appended to the URL
+ When User adds valid body "<BODY>" and append Macros with "<PARAM>" to the "Body" as follow
+ Then Verify if Macros Appended to the Body "<BODY>"
+ When User saves the webhook setup
+ Then Check that the success message appears once the webhook is successfully created
+ Then Verify the HCP Explorer Workspace is saved
+ Then Check the webhook icon is highlighted in green color
+ When User tries to delete the workspace associated with active webhook from the workspace list
+ Then Verify user receives a warning when attempting to delete a workspace with an active webhook
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ Then Verify list is published
+ Then User Verify the list is displayed in the Life
+ Then Verify campaign details are saved and user is navigated to the line item page
+ Then Verify line item details are saved and user is navigated to the tactic page
+ Then Verify the selected targeting rule "<RULE_TYPE>" and rule option
+ Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
+ When User selects the "Delete" option by clicking More Actions menu
+ Then Verify that the workspace cannot be deleted and appropriate message is displayed to the user
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ Given User navigates to the "Domain & App Lists" page
+ When User clicks on Create New List
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify that the "<RULE_TYPE>" rule is added to the tactic and retrieve the count of selected lists
+ Given User navigates to the "Domain & App Lists" page
+ When User clicks on Create New List
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify that the "<RULE_TYPE>" rule is added to the tactic and retrieve the count of selected lists
+ Given User navigates to the "Keyword Lists" page
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify that the "<RULE_TYPE>" rule is added to the tactic and retrieve the count of selected lists
+ When User clicks on Create New List
+ Then Verify that the Create New List screen is displayed
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify that the "IP" rule is added to the tactic and retrieve the count of selected lists
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify the newly created campaign is in running state
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ Then Verify the tabs displayed on the Report Templates page
+ When User clicks on New Template
+ Then Verify the tabs displayed on the Create New Template panel
+ When User enters the template details for end to end as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
+ When User saves the new template
+ Then Verify new template is saved and displayed in the template list
+ Then User selects the report template created tactic and other fields for running the report
+ Then User verifies the selected campaign,line item, tactic and runs report by clicking on Run button
+ Then User navigates to generate report field and verifies the report name by campaign name
+ Then User downloads the report and verify the data in downloaded report
+ Given This scenario will be executed in the "Demo" environment as a "External User"
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+ Then Verify that the campaign budget status is "Pending Appr" and is greyed out
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User clicks on Add Targeting Rule
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Then Verify creative details are saved
+ Then Verify that the campaign is in "Pending Appr" state
+ Then Verify that the approval status of the campaign is "Pending Appr"
+ Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+ Then Verify that the campaign is in "Running" state
+ Given This scenario will be executed in the "Demo" environment as a "External User"
+ Then Verify that the campaign is in "Running" state
+ Then Verify that the approval status of the campaign is "Approved"
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ Then Verify list is published
+ Then User Verify the list is displayed in the Life
+ When User selects the "Delete" option by clicking More Actions menu
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ When User applies the filter and selects option
+ Then Download button is enabled to the user
+ Then Verify list is published
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the filter is applied correctly "<PRIMARY_FILTERS>"
+ Then Delete the filter
+ Then Verify the HCP Explorer Workspace is saved
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User navigates to Administrative section
+ Then User clicks Add Destination button
+ Then Verify the tabs displayed on the Report Templates page
+ When User clicks on New Template
+ Then Verify the tabs displayed on the Create New Template panel
+ When User enters the template details for end to end as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
+ When User saves the new template
+ When User navigates to run report from mega menu of the life application
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When User clicks on "Custom Destination" tab as Delivery Method
+ Then User selects destination name created, and other details - "<FILE_PATH>", "<FILE_NAME>"
+ #Then User downloads the report and verify the data in downloaded report
+ Then Verify the tabs displayed on the Report Templates page
+ When User clicks on New Template
+ Then Verify the tabs displayed on the Create New Template panel
+ When User enters the template details for end to end as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
+ When User saves the new template
+ When User navigates to Schedule report from mega menu of the life application
+ Then Verify Schedule Report panel should be opened
+ When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+ Then User should be able to select value from dropdown
+ When User clicks on "Custom Destination" tab as Delivery Method
+ Then User selects destination name created, and other details - "<FILE_PATH>", "<FILE_NAME>"
+ #Then User downloads the report and verify the data in downloaded report
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User clicks on "Prescribed Drug" and enters the drug details "<DRUG_NAME>"
+ Then Verify drug details are added
+ When User makes list available in LIFE, HCP### and saves the list
+ Then Verify list gets saved successfully
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" channel, configure "NPI" targeting rule
+ Then Verify list is targeted in the tactic successfully
+ When User clicks on Add Smart Action
+ Then Verify smart action creation page is displayed
+ When User saves the smart action
+ Then Verify smart action is saved successfully and navigates to Audience tab
+ When User clicks on NPI Lists
+ Then Verify NPI list created is present
+ When User clicks on Ok and Save
+ Then Verify data is saved successfully
+ When User clicks on Action and enters the details and saves
+ Then Verify data is saved successfully
+ When User clicks on Response and enter the details and creates smart list "<SMART_LIST_NAME>" "<DAYS>" and saves
+ Then Verify data is saved successfully
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Create New List
+ Then Verify creation of NPI List screen is displayed
+ When User makes list available in LIFE, HCP### and saves the list
+ Then Verify list gets saved successfully
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" channel, configure "NPI" targeting rule
+ Then Verify list is targeted in the tactic successfully
+ When User clicks on Add Smart Action
+ Then Verify smart action creation page is displayed
+ When User saves the smart action
+ Then Verify smart action is saved successfully and navigates to Audience tab
+ When User clicks on NPI Lists
+ Then Verify NPI list created is present
+ When User clicks on Ok and Save
+ Then Verify data is saved successfully
+ When User clicks on Action and enters the details and saves
+ Then Verify data is saved successfully
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Add Pixel button
+ Then Verify the Create New Pixel panel and types of Pixel
+ Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify the selected targeting rule "<RULE_TYPE>"
+ Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Add Pixel button
+ Then Verify the Create New Pixel panel and types of Pixel
+ Then Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User clicks on Create New List
+ Then Verify the selected Smart Pixel
+ Then Save and Verify the list gets saved successfully
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify the selected targeting rule "<RULE_TYPE>" for Smart list
+ Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Given This scenario will be executed in the "Demo" environment as a "User"
+ When User clicks on Add Pixel button
+ Then Verify the Create New Pixel panel and types of Pixel
+ Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+ When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+ Then Verify campaign details are saved and user is navigated to the line item page
+ When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+ Then Verify line item details are saved and user is navigated to the tactic page
+ When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+ Then Verify tactic details are saved and user is navigated to the settings tab
+ When User selects the "<CHANNEL>" as channel
+ Then Verify the selected targeting rule "<RULE_TYPE>"
+ Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
+ When User saves the settings
+ Then Verify settings details are saved and user is navigated to the creatives tab
+ Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
+ Then Verify the Token API response status and presence of a valid bearer token
+ When User uses the token to call the GET NPI List API with list ID "<LIST_ID>"
+ Then Verify the GET NPI List API response contains the expected NPI block and a successful status code
+ Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
+ Then Verify the Token API response status and presence of a valid bearer token
+ When User uses the token to call the GET NPI List API with account ID "<ACCOUNT_ID>"
+ Then Verify the GET NPI List API response contains the NPI details and a successful status code
+ Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
+ Then Verify the Token API response status and presence of a valid bearer token
+ When User calls the Create NPI API with account ID "<ACCOUNT_ID>", list name "<LIST_NAME>" and NPIs "<NPIs>"
+ Then The API response should have status "<STATUS_CODE>", errors "<EXPECTED_ERRORS>", and contain the submitted NPI list "<NPIs>" if applicable
+ Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
+ Then Verify the Token API response status and presence of a valid bearer token
+ When User calls the Create NPI API with account ID "<ACCOUNT_ID>", list name "<LIST_NAME>"
+ Then Verify the Create NPI API with Attributes API response contains the same list name and a successful status code
+ Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
+ Then Verify the Token API response status and presence of a valid bearer token
+ When User uses the token to call the GET NPI List API with list ID "<LIST_ID>"
+ Then Verify the NPI block contains the newly added NPIs
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ Then Download button is enabled to the user
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When "Life" application is logged in successfully with Account "automation@pulsepoint"
+ Then User turns on studio toggle for external users and verifies that it is enabled
+ Given This scenario will be executed in the "Pre-release" environment as a "External User"
+ Then User should be able to see Studio for that account
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the filter is applied correctly "<PRIMARY_FILTERS>"
+# Then Verify the HCP Explorer Workspace is saved
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ Then Verify the Workspace is updated with edited name
+ Then Verify the HCP Explorer Workspace is saved
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the HCP Explorer Workspace is saved
+ When User selects the workspace type "<WORKSPACE_TYPE>"
+ Then User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - "<WORKSPACE_TYPE>", "<ADVERTISER>", "<CREATED_BY>"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then User applies the filter and selects option
+ Then Verify that the applied filters are displayed correctly
+ Given This scenario will be executed in the "Pre-release" environment as a "External User"
+ When External user Searches the "<WORKSPACE_NAME>" in studio application
+ Then External user Verifies whether the "<WORKSPACE_NAME>" is visible in workspace management page
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the HCP Explorer Workspace is saved
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section and go to Accounts Tab
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+ Then User verifies the expanded audience count
+ Then Verify the workspace is visible in workspace management page
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the Workspace is saved
+ Then Verify list is published
+ Then User Verify the list is displayed in the LIFE
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+ Then User selects Draft option as "<DRAFT>"
+ Then Verify the Workspace is saved
+ Given This scenario will be executed in the "Pre-release" environment as a "External User"
+ When External user Searches the workspace name in studio application with "<DRAFT_OPTION>" draft option
+ Then External user Verifies whether the workspace with "<DRAFT_OPTION>" is visible in workspace management page
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+ Then User verifies the expanded audience count
+ Then Verify the Workspace is saved
+ Then Verify the workspace is visible in workspace management page
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the Workspace is saved
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the Workspace is saved
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the Workspace is saved
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify the Workspace is saved
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User selects the workspace types and saves the settings
+ Then Studio should be enabled for that account
+ Then User verifies if Studio appears in submenu for "<ACCOUNT_NAME>" account
+ When User disables the studio permission for "<ACCOUNT_NAME>" account
+ Then User should not be able to see the studio permission for that account
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ Given This scenario will be executed in the "Pre-release" environment as a "External User"
+ Then External user should be able to see the "<STUDIO_PERMISSIONS>" permission in the workspace
+ Given This scenario will be executed in the "Pre-release" environment as a "User"
+ When User navigates to Administrative section
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ Then Download button is enabled to the user
+ Then Verify list is published
+ When User clicks on Create New Workspace
+ Then User sees the types of workspaces they have permissions for
+ Then Verify that the applied filters are displayed correctly
+ Then Verify the HCP Explorer Workspace is saved
+ Then Download button is enabled to the user
+ Then Verify list is published
