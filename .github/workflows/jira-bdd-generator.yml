@@ -16,9 +16,6 @@ on:
 
 jobs:
 
-  # ======================================
-  # JOB 1: Generate Feature File from Jira
-  # ======================================
   generate-feature-file:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -28,76 +25,92 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout base branch
+      - name: Checkout base branch (main)
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # ======================================
+      # STEP 1: BUILD STEP LIBRARY FROM MAIN
+      # ======================================
+      - name: Build reusable step library from main branch
+        run: |
+          echo "Building reusable step library..."
+
+          mkdir -p tmp_steps
+          STEP_DB="tmp_steps/step_library.txt"
+          rm -f "$STEP_DB"
+          touch "$STEP_DB"
+
+          find src/test/resources/features -name "*.feature" | while read file; do
+            grep -E "Given |When |Then " "$file" >> "$STEP_DB" || true
+          done
+
+          # normalize
+          sed -i 's/[0-9]/#/g' "$STEP_DB"
+          sed -i 's/  */ /g' "$STEP_DB"
+
+          sort "$STEP_DB" | uniq > tmp_steps/step_library_clean.txt
+
+          echo "STEP_LIBRARY=tmp_steps/step_library_clean.txt" >> $GITHUB_ENV
+
+      # ======================================
+      # STEP 2: CREATE / REUSE BRANCH
+      # ======================================
       - name: Create or reuse Jira branch
         run: |
           BRANCH="${{ inputs.jira_id }}"
-      
+
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-      
-          # Fetch all remote branches
+
           git fetch origin
-      
-          # Check if branch exists remotely
+
           if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
             echo "Reusing existing branch: $BRANCH"
-      
-            # Checkout tracking branch
             git checkout -B "$BRANCH" "origin/$BRANCH"
-      
-            # Pull latest changes
             git pull --rebase origin "$BRANCH"
           else
             echo "Creating new branch: $BRANCH"
-      
-            # Create new branch from main
             git checkout -b "$BRANCH" origin/main
           fi
 
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
+      # ======================================
+      # STEP 3: FETCH JIRA
+      # ======================================
       - name: Fetch Jira Issue
         id: fetch_jira
         run: |
-          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
-
-          # Fetch response and track HTTP status safely
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
-          echo "HTTP STATUS: $HTTP_STATUS"
 
           if [ "$HTTP_STATUS" != "200" ]; then
-            echo "❌ Jira API failed or invalid ticket"
+            echo "❌ Jira API failed"
             exit 1
           fi
 
-          # Strip out the HTTP_STATUS suffix line to leave clean JSON
           JSON=$(echo "$RESPONSE" | sed '$d')
 
-          # Extract summary and handle fallback safely
           SUMMARY=$(echo "$JSON" | jq -r '.fields.summary // "NO_SUMMARY"')
+          DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")')
 
-          # Robust extraction of text from Jira's ADF structure
-          DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '"')
-
-          # Use GitHub Actions Multiline String Syntax to prevent Exit 43 / Syntax crashes
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
 
           echo "DESCRIPTION<<EOF" >> $GITHUB_ENV
           echo "$DESCRIPTION" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      # ======================================
+      # STEP 4: GENERATE FEATURE FILE
+      # ======================================
       - name: Generate Feature File
         run: |
           echo "Generating feature file..."
@@ -109,38 +122,64 @@ jobs:
             | sed 's/^_//;s/_$//')
 
           FILE_NAME="${{ inputs.jira_id }}_${CLEAN_SUMMARY}.feature"
-
           TARGET_DIR="src/test/resources/features"
           mkdir -p "$TARGET_DIR"
 
-          # Build scenario steps by splitting description sentences into Given/When/Then
           DESCRIPTION="${{ env.DESCRIPTION }}"
 
-          # Extract up to 3 meaningful sentences from the description in one pass
           SENTENCES=$(echo "$DESCRIPTION" | grep -oP '[A-Z][^.!?]{10,}[.!?]' | sed 's/[.!?]$//')
-          STEP1=$(echo "$SENTENCES" | sed -n '1p')
-          STEP2=$(echo "$SENTENCES" | sed -n '2p')
-          STEP3=$(echo "$SENTENCES" | sed -n '3p')
 
-          # Warn and fall back to generic steps when description doesn't yield extractable sentences
+          RAW_STEP1=$(echo "$SENTENCES" | sed -n '1p')
+          RAW_STEP2=$(echo "$SENTENCES" | sed -n '2p')
+          RAW_STEP3=$(echo "$SENTENCES" | sed -n '3p')
+
+          STEP_LIBRARY="${STEP_LIBRARY:-tmp_steps/step_library_clean.txt}"
+
+          match_step() {
+            local input="$1"
+            local file="$STEP_LIBRARY"
+
+            MATCH=$(grep -i "$input" "$file" | head -n 1)
+
+            if [ -n "$MATCH" ]; then
+              echo "$MATCH"
+            else
+              echo "$input"
+            fi
+          }
+
+          STEP1=$(match_step "$RAW_STEP1")
+          STEP2=$(match_step "$RAW_STEP2")
+          STEP3=$(match_step "$RAW_STEP3")
+
           if [ -z "$STEP1" ]; then
-            echo "⚠️ Could not extract scenario steps from Jira description — using generic fallbacks"
-            STEP1="the user is logged into the application"
-            STEP2="the user performs the action described in ${{ inputs.jira_id }}"
-            STEP3="the system behaves as described in the acceptance criteria"
-          else
-            [ -z "$STEP2" ] && STEP2="the user performs the action described in ${{ inputs.jira_id }}"
-            [ -z "$STEP3" ] && STEP3="the system behaves as described in the acceptance criteria"
+            STEP1=$(match_step "user is authenticated")
+            STEP2=$(match_step "user performs action")
+            STEP3=$(match_step "system validates behavior")
+          fi
+
+          FEATURE_NAME=$(echo "${{ env.SUMMARY }}" \
+            | sed 's/\[Automation\]//g' \
+            | xargs)
+
+          FEATURE_DESC=$(echo "$DESCRIPTION" \
+            | grep -oP '[A-Z][^.!?]{40,}[.!?]' \
+            | head -n 1 \
+            | sed 's/[.!?]$//')
+
+          if [ -z "$FEATURE_DESC" ]; then
+            FEATURE_DESC="Validate system behavior for $FEATURE_NAME"
           fi
 
           {
-            echo "@${{ inputs.jira_id }}"
-            echo "Feature: ${{ env.SUMMARY }}"
-            echo "  # Jira Ticket : ${{ inputs.jira_id }}"
-            echo "  # Description : ${{ env.DESCRIPTION }}"
+            echo "Feature: $FEATURE_NAME"
+            echo "  $FEATURE_DESC"
             echo ""
-            echo "  @${{ inputs.jira_id }}"
-            echo "  Scenario: Verify ${{ env.SUMMARY }}"
+            echo "  Background:"
+            echo "    Given the user is managing tactic creatives"
+            echo ""
+            echo "  @todo"
+            echo "  Scenario: Validate $FEATURE_NAME behavior"
             echo "    Given $STEP1"
             echo "    When $STEP2"
             echo "    Then $STEP3"
@@ -149,37 +188,37 @@ jobs:
           echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
           echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
 
-          echo "✅ Feature file created: $TARGET_DIR/$FILE_NAME"
           cat "$TARGET_DIR/$FILE_NAME"
 
+      # ======================================
+      # STEP 5: COMMIT + PUSH
+      # ======================================
       - name: Commit and push feature branch
         run: |
           git add .
-      
+
           if git diff --cached --quiet; then
-            echo "No changes to commit"
+            echo "No changes"
             echo "HAS_CHANGES=false" >> $GITHUB_ENV
           else
-            git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature file from Jira ticket"
-      
+            git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature file"
+
             git push --force-with-lease origin "${{ env.BRANCH }}"
-      
+
             echo "HAS_CHANGES=true" >> $GITHUB_ENV
           fi
 
+      # ======================================
+      # STEP 6: CREATE PR
+      # ======================================
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check if a PR already exists for this branch; create one only when it doesn't
           EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
-          if [ -n "$EXISTING_PR" ]; then
-            echo "ℹ️  PR #$EXISTING_PR already exists for ${{ env.BRANCH }} — skipping creation"
-            exit 0
-          fi
 
-          if [ "${{ env.HAS_CHANGES }}" = "false" ] && [ "${{ env.BRANCH_HAS_DIFF }}" = "false" ]; then
-            echo "ℹ️  No new commit generated and branch matches main — skipping PR creation"
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR already exists"
             exit 0
           fi
 
@@ -187,67 +226,4 @@ jobs:
             --base main \
             --head "${{ env.BRANCH }}" \
             --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
-            --body "## JIRA Ticket
-          **[${{ inputs.jira_id }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ inputs.jira_id }})**
-
-          ## Description
-          ${{ env.DESCRIPTION }}
-
-          ## Changes
-          - Auto-generated BDD feature file: \`${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}\`
-
-          > This PR was automatically created by the JIRA BDD Feature Generator workflow."
-
-
-  # ======================================
-  # JOB 2: Close Jira After PR Merge
-  # ======================================
-  close-jira-ticket:
-    if: >
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Extract Jira ID
-        id: extract_id
-        run: |
-          JIRA_ID=$(echo "${{ github.event.pull_request.head.ref }}" \
-            | grep -oE '[A-Z]+-[0-9]+' \
-            | head -n 1)
-
-          if [ -z "$JIRA_ID" ]; then
-            echo "⚠️ No Jira ticket ID found in branch name, skipping"
-            exit 0
-          fi
-
-          echo "jira_id=$JIRA_ID" >> $GITHUB_OUTPUT
-
-      - name: Transition Jira to Done
-        if: steps.extract_id.outputs.jira_id != ''
-        run: |
-          AUTH="${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}"
-
-          TRANSITIONS_URL="${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ steps.extract_id.outputs.jira_id }}/transitions"
-
-          RESPONSE=$(curl -s -u "$AUTH" \
-            -H "Accept: application/json" \
-            "$TRANSITIONS_URL")
-
-          TRANSITION_ID=$(echo "$RESPONSE" | jq -r '.transitions[] | select(.name=="Done") | .id')
-
-          if [ -z "$TRANSITION_ID" ] || [ "$TRANSITION_ID" = "null" ]; then
-            TRANSITION_ID=$(echo "$RESPONSE" | jq -r '.transitions[] | select(.name=="Closed") | .id')
-          fi
-
-          if [ ! -z "$TRANSITION_ID" ] && [ "$TRANSITION_ID" != "null" ]; then
-            curl -s -X POST \
-              -u "$AUTH" \
-              -H "Content-Type: application/json" \
-              --data "{\"transition\":{\"id\":\"$TRANSITION_ID\"}}" \
-              "$TRANSITIONS_URL"
-
-            echo "✅ Jira ticket ${{ steps.extract_id.outputs.jira_id }} moved to Done"
-          else
-            echo "⚠️ No valid transition found for ${{ steps.extract_id.outputs.jira_id }}"
-          fi
+            --body "Auto-generated BDD feature file from Jira."
