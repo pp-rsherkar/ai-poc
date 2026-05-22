@@ -29,18 +29,17 @@ jobs:
           ref: QA-1321
 
       - name: Fetch Jira Issue
+        id: fetch_jira
         run: |
           echo "Fetching Jira issue: ${{ inputs.jira_id }}"
 
+          # Fetch response and track HTTP status safely
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
-          echo "$RESPONSE"
-
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
-
           echo "HTTP STATUS: $HTTP_STATUS"
 
           if [ "$HTTP_STATUS" != "200" ]; then
@@ -48,16 +47,21 @@ jobs:
             exit 1
           fi
 
+          # Strip out the HTTP_STATUS suffix line to leave clean JSON
           JSON=$(echo "$RESPONSE" | sed '$d')
 
+          # Extract summary and handle fallback safely
           SUMMARY=$(echo "$JSON" | jq -r '.fields.summary // "NO_SUMMARY"')
 
-          DESCRIPTION=$(echo "$JSON" | jq -r '
-            .fields.description.content[]?.content[]?.text // empty
-          ' | tr '\n' ' ')
+          # Robust extraction of text from Jira's ADF structure
+          DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '"')
 
+          # Use GitHub Actions Multiline String Syntax to prevent Exit 43 / Syntax crashes
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
-          echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+          
+          echo "DESCRIPTION<<EOF" >> $GITHUB_ENV
+          echo "$DESCRIPTION" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Generate Feature File
         run: |
