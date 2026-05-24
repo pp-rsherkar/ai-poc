@@ -4,9 +4,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
-import pages.Navigation;
-
 import java.math.BigDecimal;
+import pages.Navigation;
 
 public class CampaignSettings {
     private final Page page;
@@ -22,7 +21,8 @@ public class CampaignSettings {
         this.page = page;
         this.CAMPAIGN_SETTINGS = page.getByText("Campaign Settings");
         this.BID_SETTINGS = page.getByText("Bid Settings", new Page.GetByTextOptions().setExact(true));
-        this.DEFAULT_BID_SETTINGS = page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Default Bid Settings"));
+        this.DEFAULT_BID_SETTINGS =
+                page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Default Bid Settings"));
         this.BASE_BID_PRICE = page.locator("//input[@formcontrolname='defBaseBidPrice']");
         this.MAX_BID_PRICE = page.locator("//input[@formcontrolname='defMaxBidPrice']");
         this.HIGHEST_BID_PRICE = page.locator("//input[@formcontrolname='highestMaxBidPrice']");

@@ -4,13 +4,12 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class NPISmartList {
     private final Page page;
@@ -102,56 +101,76 @@ public class NPISmartList {
 
     public NPISmartList(Page page) {
         this.page = page;
-        this.CLICK_LIFE_CHECKBOX = page.locator("//span[contains(@class,'mat-checkbox-label') and contains(text(),'Life')]");
+        this.CLICK_LIFE_CHECKBOX =
+                page.locator("//span[contains(@class,'mat-checkbox-label') and contains(text(),'Life')]");
         this.LIST_NAME = page.locator("//input[contains(@placeholder,'List Name')]");
         this.SEARCH_ADVERTISER = page.locator("app-npilists-manager").getByRole(AriaRole.COMBOBOX);
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
         this.SEARCH_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown')]//input");
-        this.SELECT_DROPDOWN_VALUES = page.locator("//div[contains(@class,'dropdown-items') or contains(@class,'ng-option')]");
-        this.SELECTED_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown ')]//span[contains(@class,'ng-value-label')]");
+        this.SELECT_DROPDOWN_VALUES =
+                page.locator("//div[contains(@class,'dropdown-items') or contains(@class,'ng-option')]");
+        this.SELECTED_DRUG =
+                page.locator("//ng-select[contains(@class, 'drugDropdown ')]//span[contains(@class,'ng-value-label')]");
         this.LIFE_AVAILABLE_IN = page.locator("//span[contains(text(),'Life')]");
         this.HCP365_AVAILABLE_IN = page.locator("//span[contains(text(),'HCP365')]");
         this.PULSEPOINT_ICON = page.locator("//div[@class='logo-lists']/img[@alt='logo']");
         this.ADD_DRUG_BUTTON = page.locator("//span[contains(text(), 'Add Drug')]");
-        this.SMART_PIXEL = page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
+        this.SMART_PIXEL =
+                page.locator("//ng-select[@placeholder='Select Smart Pixel']//div[contains(@class,'ng-value')]//span");
         this.ADVERTISER_NAME = page.locator("//div[@class='chips']//span[contains(@class,'ng-value-label')]");
         this.SMART_LIST_CONTAINER = page.locator("//div[@id='smartlistDetailsContainer']");
-        this.SMART_LIST_POPULATION_OPTIONS = page.locator("//mat-checkbox[contains(@class,'populationCheckbox')]//span[@class='mat-checkbox-label']");
+        this.SMART_LIST_POPULATION_OPTIONS = page.locator(
+                "//mat-checkbox[contains(@class,'populationCheckbox')]//span[@class='mat-checkbox-label']");
         this.SMART_PIXEL_DROPDOWN = page.locator("//ng-select[contains(@placeholder,'Select Smart Pixel')]");
         this.SMART_PIXEL_DROPDOWN_VALUE = page.locator("//span[contains(@class,'pixel-template-options')]");
         this.ENGAGEMENT_TYPE = page.locator("//div[contains(@class,'engagementSwitch')]//div[@class='selection']");
-        this.ADD_VISITED_URL = page.locator("//div[contains(text(),'Visited URLs')]/following-sibling::div[@class='add-icon']");
+        this.ADD_VISITED_URL =
+                page.locator("//div[contains(text(),'Visited URLs')]/following-sibling::div[@class='add-icon']");
         this.INSERT_VISITED_URL = page.locator("//input[contains(@class,'visitedUrlInput')]");
         this.INSERT_IGNORED_URL = page.locator("//input[contains(@class,'ignoredUrlInput')]");
-        this.ADD_IGNORED_URL = page.locator("//div[contains(text(),'Ignored URLs')]/following-sibling::div[@class='add-icon']");
+        this.ADD_IGNORED_URL =
+                page.locator("//div[contains(text(),'Ignored URLs')]/following-sibling::div[@class='add-icon']");
         this.SAVE_BUTTON = page.locator("//span[contains(text(),'Save')]");
         this.SUCCESS_ALERT = page.locator("//div[contains(text(), 'NPI list created successfully')]");
         this.SEARCH_KEYWORDS_CHECKBOX = page.locator("//span[contains(text(),'Search Keywords')]");
         this.SEARCH_KEYWORDS_TEXTAREA = page.locator("//textarea[contains(@class,'textarea-smartlist-padding')]");
         this.HCP_SWITCH = page.locator("//div[contains(@class,'targetHCPSwitch')]//div");
         this.NPI_GROUP_DROPDOWN = page.locator("//ng-select[@placeholder='Select NPI Groups']//input");
-        this.NPI_LIST_DROPDOWN_VALUE = page.locator("//div[contains(@class,'npilistFilter')]//div[contains(@class,'dropdown-items')]");
+        this.NPI_LIST_DROPDOWN_VALUE =
+                page.locator("//div[contains(@class,'npilistFilter')]//div[contains(@class,'dropdown-items')]");
         this.SPECIALITY_DROPDOWN = page.locator("//ng-select[@placeholder='Select Specialities']//input");
         this.PROFESSION_DROPDOWN = page.locator("//ng-select[@placeholder='Select Professions']//input");
-        this.PRESCRIBED_DRUG_RECENCY = page.locator("//app-clinical-population[@headername='Prescribed Drug']//input[contains(@class,'recencyInp')]");
-        this.PRESCRIBED_DRUG_DECILE = page.locator("//app-clinical-population[@headername='Prescribed Drug']//div[contains(@class, 'text ng-star-inserted')]");
-        this.SEARCH_DIAGNOSIS = page.locator("//div[contains(text(), 'Select Diagnosis')]/following-sibling::div//input");
+        this.PRESCRIBED_DRUG_RECENCY = page.locator(
+                "//app-clinical-population[@headername='Prescribed Drug']//input[contains(@class,'recencyInp')]");
+        this.PRESCRIBED_DRUG_DECILE = page.locator(
+                "//app-clinical-population[@headername='Prescribed Drug']//div[contains(@class, 'text ng-star-inserted')]");
+        this.SEARCH_DIAGNOSIS =
+                page.locator("//div[contains(text(), 'Select Diagnosis')]/following-sibling::div//input");
         this.ADD_DIAGNOSIS_BUTTON = page.locator("//span[contains(text(), 'Add Diagnoses')]");
-        this.DIAGNOSIS_RECENCY = page.locator("//app-clinical-population[@headername='Diagnosis']//input[contains(@class,'recencyInp')]");
-        this.DIAGNOSIS_DECILE = page.locator("//app-clinical-population[@headername='Diagnosis']//div[contains(@class, 'text ng-star-inserted')]");
-        this.BROWSE_DIAGNOSIS_FILE = page.locator("//app-clinical-population[@headername='Diagnosis']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
-        this.MEDICAL_PROCEDURE_RECENCY = page.locator("//app-clinical-population[@headername='Medical Procedure']//input[contains(@class,'recencyInp')]");
-        this.MEDICAL_PROCEDURE_DECILE = page.locator("//app-clinical-population[@headername='Medical Procedure']//div[contains(@class, 'text ng-star-inserted')]");
-        this.BROWSE_MEDICAL_PROCEDURE_FILE = page.locator("//app-clinical-population[@headername='Medical Procedure']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
-        this.SEARCH_MEDICAL_PROCEDURE = page.locator("//div[contains(text(), 'Select Medical Procedure')]/ancestor::div[@class='ng-select-container']");
-        this.MEDICAL_PROCEDURE_INPUT = page.locator("//div[contains(text(), 'Select Medical Procedure')]/ancestor::div[@class='ng-select-container']//input");
+        this.DIAGNOSIS_RECENCY = page.locator(
+                "//app-clinical-population[@headername='Diagnosis']//input[contains(@class,'recencyInp')]");
+        this.DIAGNOSIS_DECILE = page.locator(
+                "//app-clinical-population[@headername='Diagnosis']//div[contains(@class, 'text ng-star-inserted')]");
+        this.BROWSE_DIAGNOSIS_FILE = page.locator(
+                "//app-clinical-population[@headername='Diagnosis']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
+        this.MEDICAL_PROCEDURE_RECENCY = page.locator(
+                "//app-clinical-population[@headername='Medical Procedure']//input[contains(@class,'recencyInp')]");
+        this.MEDICAL_PROCEDURE_DECILE = page.locator(
+                "//app-clinical-population[@headername='Medical Procedure']//div[contains(@class, 'text ng-star-inserted')]");
+        this.BROWSE_MEDICAL_PROCEDURE_FILE = page.locator(
+                "//app-clinical-population[@headername='Medical Procedure']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
+        this.SEARCH_MEDICAL_PROCEDURE = page.locator(
+                "//div[contains(text(), 'Select Medical Procedure')]/ancestor::div[@class='ng-select-container']");
+        this.MEDICAL_PROCEDURE_INPUT = page.locator(
+                "//div[contains(text(), 'Select Medical Procedure')]/ancestor::div[@class='ng-select-container']//input");
         this.ADD_MEDICAL_PROCEDURE_BUTTON = page.locator("//span[contains(text(), 'Add Procedures')]");
         this.PRESCRIPTION_BEHAVIOUR_BUTTON = page.locator("//div[contains(@class, 'prescriptionBehaviorSwitch')]//div");
         this.PRESCRIPTION_DRUG = page.locator("//div[contains(text(), 'Select Drugs')]/following-sibling::div/input");
         this.TOP_DROPPERS_PERCENTAGE = page.locator("//div[contains(@class, 'topDroppers-percent')]");
         this.TOP_DROPPER_SLIDER = page.locator("//div[contains(@class, 'topDroppersWrapper')]//span[@role='slider']");
         this.TIME_FRAME_SELECTOR = page.locator("//div[contains(@class, 'timeFrame-months')]");
-        this.TIME_FRAME_SELECTOR_SLIDER = page.locator("//div[contains(@class, 'timeframeWrapper')]//span[@role='slider']");
+        this.TIME_FRAME_SELECTOR_SLIDER =
+                page.locator("//div[contains(@class, 'timeframeWrapper')]//span[@role='slider']");
         this.MESH_DROPDOWN = page.locator("//div[contains(@class, 'mesh-placeholder')]");
         this.MESH_CONDITION = page.locator("//input[contains(@placeholder,'Select MESH Conditions')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'okButton')]");
@@ -159,33 +178,52 @@ public class NPISmartList {
         this.RECENCY_DAYS = page.locator("//div[contains(@class,'recency-days')]");
         this.PRIME_LIST_CHECKBOX = page.locator("//mat-checkbox[contains(@class, 'checkboxSectionHeading')]");
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
-        this.MEDSCAPE_PRIMARY_CONCEPT = page.locator("//div[contains(text(),'Select Medscape Primary Concept')]/following-sibling::div/input");
-        this.WEBMD_PRIMARY_TOPIC = page.locator("//div[contains(text(),'Select WebMD Primary Topic')]/following-sibling::div/input");
+        this.MEDSCAPE_PRIMARY_CONCEPT =
+                page.locator("//div[contains(text(),'Select Medscape Primary Concept')]/following-sibling::div/input");
+        this.WEBMD_PRIMARY_TOPIC =
+                page.locator("//div[contains(text(),'Select WebMD Primary Topic')]/following-sibling::div/input");
         this.ERROR_ALERT = page.locator("//div[@role='alertdialog']");
         this.FETCH_SELECTED_ADVERTISER = page.locator("//span[@class='ng-value-label']");
         this.FETCH_SELECTED_SMART_PIXEL = page.locator("//span[contains(@class,'pixel-template-options')]");
-        this.FETCH_SELECTED_ENGAGEMENT_SWITCH = page.locator("//div[contains(text(),'Engagement')]//following-sibling::div//button");
-        this.FETCH_SELECTED_RECENCY = page.locator("//div[contains(text(),'Recency')]//following-sibling::div//mat-radio-button");
-        this.FETCH_SELECTED_KEYWORD_FLAG = page.locator("//div[contains(@class,'searchKeywordsSection')]//following-sibling::div//mat-radio-button");
-        this.FETCH_SELECTED_AVAILABLE_IN = page.locator("//div[contains(text(),'Available In ')]//following-sibling::div//mat-checkbox");
+        this.FETCH_SELECTED_ENGAGEMENT_SWITCH =
+                page.locator("//div[contains(text(),'Engagement')]//following-sibling::div//button");
+        this.FETCH_SELECTED_RECENCY =
+                page.locator("//div[contains(text(),'Recency')]//following-sibling::div//mat-radio-button");
+        this.FETCH_SELECTED_KEYWORD_FLAG = page.locator(
+                "//div[contains(@class,'searchKeywordsSection')]//following-sibling::div//mat-radio-button");
+        this.FETCH_SELECTED_AVAILABLE_IN =
+                page.locator("//div[contains(text(),'Available In ')]//following-sibling::div//mat-checkbox");
         this.FETCH_SELECTED_NPI_LIST = page.locator("//div[@class='npilistFilter']//span[@class='ng-value-label']");
-        this.FETCH_SELECTED_SPECIALTY = page.locator("//div[@class='hcpSpecialtyFilter']//div[@class='ng-value-label']");
-        this.FETCH_SELECTED_DIAGNOSIS_CODE = page.locator("//div[contains(text(),'Select Diagnosis Code')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
-        this.DIAGNOSIS_CODE_FILE_DETAILS = page.locator("//div[contains(@class,'fileDetails')]//span[contains(normalize-space(.), 'names /') and contains(normalize-space(.), 'codes')]");
-        this.FETCH_SELECTED_MEDICAL_PROCEDURE_CODE = page.locator("//div[contains(text(),'Select Medical Procedure Code')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
-        this.MEDICAL_PROCEDURE_CODE_FILE_DETAILS = page.locator("//div[contains(@class,'fileDetails')]//a[contains(normalize-space(.), 'lines are ignored')]");
-        this.FETCH_SELECTED_PRESCRIPTION_DRUG = page.locator("//div[contains(text(), 'Select Drugs')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
-        this.FETCH_SELECTED_TOP_DROPPER_PERCENT = page.locator("//div[contains(@class,'topDroppersWrapper')]//div[contains(@class,'topDroppers-percent')]");
-        this.FETCH_SELECTED_TIME_FRAME_MONTHS = page.locator("//div[contains(@class,'timeframeWrapper')]//div[contains(@class,'timeFrame-months')]");
+        this.FETCH_SELECTED_SPECIALTY =
+                page.locator("//div[@class='hcpSpecialtyFilter']//div[@class='ng-value-label']");
+        this.FETCH_SELECTED_DIAGNOSIS_CODE = page.locator(
+                "//div[contains(text(),'Select Diagnosis Code')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
+        this.DIAGNOSIS_CODE_FILE_DETAILS = page.locator(
+                "//div[contains(@class,'fileDetails')]//span[contains(normalize-space(.), 'names /') and contains(normalize-space(.), 'codes')]");
+        this.FETCH_SELECTED_MEDICAL_PROCEDURE_CODE = page.locator(
+                "//div[contains(text(),'Select Medical Procedure Code')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
+        this.MEDICAL_PROCEDURE_CODE_FILE_DETAILS = page.locator(
+                "//div[contains(@class,'fileDetails')]//a[contains(normalize-space(.), 'lines are ignored')]");
+        this.FETCH_SELECTED_PRESCRIPTION_DRUG = page.locator(
+                "//div[contains(text(), 'Select Drugs')]/following-sibling::div//span[contains(@class,'ng-value-label')]");
+        this.FETCH_SELECTED_TOP_DROPPER_PERCENT = page.locator(
+                "//div[contains(@class,'topDroppersWrapper')]//div[contains(@class,'topDroppers-percent')]");
+        this.FETCH_SELECTED_TIME_FRAME_MONTHS =
+                page.locator("//div[contains(@class,'timeframeWrapper')]//div[contains(@class,'timeFrame-months')]");
         this.ENDEMIC_RESEARCH_SECTION = page.locator("//div[contains(@class,'endamicResearchContainer')]");
-        this.FETCH_SELECTED_RECENCY_DAYS = page.locator("//div[contains(@class,'recencyframeWrapper')]//div[contains(@class,'recency-days')]");
-        this.FETCH_SELECTED_DRUG = page.locator("//ng-select[contains(@class, 'drugDropdown')]//span[contains(@class,'ng-value-label')]");
-        this.FETCH_SELECTED_PROFESSION = page.locator("//div[contains(text(),'Select Professions')]/following-sibling::div//span[@class='ng-value-label']");
+        this.FETCH_SELECTED_RECENCY_DAYS =
+                page.locator("//div[contains(@class,'recencyframeWrapper')]//div[contains(@class,'recency-days')]");
+        this.FETCH_SELECTED_DRUG =
+                page.locator("//ng-select[contains(@class, 'drugDropdown')]//span[contains(@class,'ng-value-label')]");
+        this.FETCH_SELECTED_PROFESSION = page.locator(
+                "//div[contains(text(),'Select Professions')]/following-sibling::div//span[@class='ng-value-label']");
         this.LIST_NAME_FROM_HEADER = page.locator("//div[contains(@class,'header-name')]");
         this.ADVERTISER_NAME_FROM_HEADER = page.locator("//span[@class='header-adv']");
         this.EDIT_ICON = page.locator("//img[contains(@class,'header-edit-icon')]");
-        this.DECILE_SLIDER = page.locator("//div[contains(@class, 'decileSelectorContainer')]//span[@role='slider' and @aria-label='ngx-slider-max']");
-        this.BROWSE_PRESCRIBED_DRUG_FILE = page.locator("//app-clinical-population[@headername='Prescribed Drug']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
+        this.DECILE_SLIDER = page.locator(
+                "//div[contains(@class, 'decileSelectorContainer')]//span[@role='slider' and @aria-label='ngx-slider-max']");
+        this.BROWSE_PRESCRIBED_DRUG_FILE = page.locator(
+                "//app-clinical-population[@headername='Prescribed Drug']//div[contains(@class, 'editOrFileSwitch')]//i[@class='icon-20-csv']");
     }
 
     public void clickSmartPixelDropDownValue(String smartPixelDropdownValue) {
@@ -319,7 +357,8 @@ public class NPISmartList {
     }
 
     public boolean verifyNPIListDisabled(String smartListType) {
-        Locator xpath = page.locator(String.format("//span[contains(text(),'%s')]/ancestor::mat-checkbox", smartListType));
+        Locator xpath =
+                page.locator(String.format("//span[contains(text(),'%s')]/ancestor::mat-checkbox", smartListType));
         return xpath.getAttribute("class").contains("mat-checkbox-disabled");
     }
 
@@ -340,7 +379,8 @@ public class NPISmartList {
 
     public void selectSpeciality(String speciality) {
         SPECIALITY_DROPDOWN.click();
-        Locator xpath = page.locator(String.format("//div[@title='%s']//preceding-sibling::div[contains(@class,'targetIcons')]/div", speciality));
+        Locator xpath = page.locator(String.format(
+                "//div[@title='%s']//preceding-sibling::div[contains(@class,'targetIcons')]/div", speciality));
         xpath.click();
         page.keyboard().press("Escape");
     }
@@ -452,7 +492,9 @@ public class NPISmartList {
     }
 
     public boolean fetchDefaultPrescriptionBehaviourTab(String defaultTabName) {
-        Locator tabXpath = page.locator(String.format("//div[contains(@class, 'prescriptionBehaviorSwitch')]//div[contains(text(),'%s')]/parent::button", defaultTabName));
+        Locator tabXpath = page.locator(String.format(
+                "//div[contains(@class, 'prescriptionBehaviorSwitch')]//div[contains(text(),'%s')]/parent::button",
+                defaultTabName));
         return tabXpath.getAttribute("class").contains("active");
     }
 
@@ -498,7 +540,10 @@ public class NPISmartList {
     public void selectMESHCondition(String meshCondition) {
         MESH_DROPDOWN.click();
         MESH_CONDITION.fill(meshCondition);
-        page.locator(String.format("//div[contains(@title,'%s')]/preceding-sibling::div[contains(@class,'targetIcons')]/div", meshCondition)).click();
+        page.locator(String.format(
+                        "//div[contains(@title,'%s')]/preceding-sibling::div[contains(@class,'targetIcons')]/div",
+                        meshCondition))
+                .click();
         OK_BUTTON.click();
     }
 
@@ -515,7 +560,8 @@ public class NPISmartList {
     }
 
     public String hoverAndFetchTooltip(String contextualCategory) {
-        page.locator(String.format("//div[contains(text(),'%s')]//span[@class='question-icon']", contextualCategory)).hover();
+        page.locator(String.format("//div[contains(text(),'%s')]//span[@class='question-icon']", contextualCategory))
+                .hover();
         waitUtility.waitForLocatorVisible(TOOL_TIP);
         return TOOL_TIP.innerText().trim();
     }
@@ -533,7 +579,8 @@ public class NPISmartList {
     }
 
     public boolean verifyMedscapeAndWebMDAreDisabled(String contextualCategory) {
-        Locator xpath = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::button", contextualCategory));
+        Locator xpath =
+                page.locator(String.format("//div[contains(text(),'%s')]/ancestor::button", contextualCategory));
         return xpath.getAttribute("class").contains("disabled");
     }
 
@@ -582,53 +629,81 @@ public class NPISmartList {
     public List<String> retrieveEnteredData(String listType) {
         List<String> enteredData = new ArrayList<>();
         if (LIST_NAME.isVisible()) enteredData.add(LIST_NAME.inputValue());
-        else if (LIST_NAME_FROM_HEADER.isVisible()) enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
+        else if (LIST_NAME_FROM_HEADER.isVisible())
+            enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
         if (!EDIT_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible())
             enteredData.add(FETCH_SELECTED_ADVERTISER.first().textContent().trim());
         else if (ADVERTISER_NAME_FROM_HEADER.isVisible())
-            enteredData.add(ADVERTISER_NAME_FROM_HEADER.textContent().replace("Advertiser: ", "").trim());
-        getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
+            enteredData.add(ADVERTISER_NAME_FROM_HEADER
+                    .textContent()
+                    .replace("Advertiser: ", "")
+                    .trim());
+        getValuesByClassAttribute(
+                FETCH_SELECTED_AVAILABLE_IN,
+                "mat-checkbox-checked",
+                "xpath=//span[@class='mat-checkbox-label']",
+                enteredData);
         switch (listType) {
             case "Smart Pixel" -> {
                 enteredData.add(FETCH_SELECTED_SMART_PIXEL.textContent().trim());
                 getValuesByClassAttribute(FETCH_SELECTED_ENGAGEMENT_SWITCH, "active", "xpath=//div", enteredData);
-                getValuesByClassAttribute(FETCH_SELECTED_RECENCY, "mat-radio-checked", "xpath=//div[@class='mat-radio-label-content']", enteredData);
+                getValuesByClassAttribute(
+                        FETCH_SELECTED_RECENCY,
+                        "mat-radio-checked",
+                        "xpath=//div[@class='mat-radio-label-content']",
+                        enteredData);
                 if (FETCH_SELECTED_KEYWORD_FLAG.first().isVisible()) {
-                    getValuesByClassAttribute(FETCH_SELECTED_KEYWORD_FLAG, "mat-radio-checked", "xpath=//div[@class='mat-radio-label-content']", enteredData);
+                    getValuesByClassAttribute(
+                            FETCH_SELECTED_KEYWORD_FLAG,
+                            "mat-radio-checked",
+                            "xpath=//div[@class='mat-radio-label-content']",
+                            enteredData);
                 }
                 addLocatorData(INSERT_VISITED_URL, enteredData, true);
                 addLocatorData(INSERT_IGNORED_URL, enteredData, true);
-                if (SEARCH_KEYWORDS_TEXTAREA.isVisible()) enteredData.add(SEARCH_KEYWORDS_TEXTAREA.inputValue().trim());
+                if (SEARCH_KEYWORDS_TEXTAREA.isVisible())
+                    enteredData.add(SEARCH_KEYWORDS_TEXTAREA.inputValue().trim());
             }
             case "NPI List" -> {
-                Locator npiListLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button", listType));
+                Locator npiListLocator = page.locator(String.format(
+                        "//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button",
+                        listType));
                 getValuesByClassAttribute(npiListLocator, "active", "xpath=//div", enteredData);
                 enteredData.add(FETCH_SELECTED_NPI_LIST.textContent().trim());
             }
             case "Specialty" -> {
-                Locator specialtyLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button", listType));
+                Locator specialtyLocator = page.locator(String.format(
+                        "//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//button",
+                        listType));
                 getValuesByClassAttribute(specialtyLocator, "active", "xpath=//div", enteredData);
                 addLocatorData(FETCH_SELECTED_SPECIALTY, enteredData, false);
             }
             case "Profession" -> addLocatorData(FETCH_SELECTED_PROFESSION, enteredData, false);
             case "Prescribed Drug", "Diagnosis Code", "Medical Procedure Code" -> {
-                Locator prescribedDrugLocator = page.locator(String.format("//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//div[contains(@class,'clinicalPopulationSwitch')]//button", listType));
+                Locator prescribedDrugLocator = page.locator(String.format(
+                        "//span[@class='mat-checkbox-label'  and contains(text(),'%s')]/ancestor::div[contains(@class,'section-name')]/following-sibling::div//div[contains(@class,'clinicalPopulationSwitch')]//button",
+                        listType));
                 getValuesByClassAttribute(prescribedDrugLocator, "active", "xpath=//div", enteredData);
                 enteredData.add(fetchRecency(listType));
                 if (listType.contains("Prescribed Drug")) addLocatorData(FETCH_SELECTED_DRUG, enteredData, false);
-                if (listType.contains("Diagnosis Code") && FETCH_SELECTED_DIAGNOSIS_CODE.first().isVisible())
+                if (listType.contains("Diagnosis Code")
+                        && FETCH_SELECTED_DIAGNOSIS_CODE.first().isVisible())
                     addLocatorData(FETCH_SELECTED_DIAGNOSIS_CODE, enteredData, false);
-                if (listType.contains("Medical Procedure Code") && FETCH_SELECTED_MEDICAL_PROCEDURE_CODE.first().isVisible())
+                if (listType.contains("Medical Procedure Code")
+                        && FETCH_SELECTED_MEDICAL_PROCEDURE_CODE.first().isVisible())
                     addLocatorData(FETCH_SELECTED_MEDICAL_PROCEDURE_CODE, enteredData, false);
                 enteredData.addAll(fetchDecile(listType));
             }
             case "Prescription Behavior Change" -> {
-                getValuesByClassAttribute(PRESCRIPTION_BEHAVIOUR_BUTTON, "active", "xpath=//parent::button", enteredData);
+                getValuesByClassAttribute(
+                        PRESCRIPTION_BEHAVIOUR_BUTTON, "active", "xpath=//parent::button", enteredData);
                 addLocatorData(FETCH_SELECTED_PRESCRIPTION_DRUG, enteredData, false);
                 if (FETCH_SELECTED_TOP_DROPPER_PERCENT.isVisible())
-                    enteredData.add(FETCH_SELECTED_TOP_DROPPER_PERCENT.textContent().trim());
+                    enteredData.add(
+                            FETCH_SELECTED_TOP_DROPPER_PERCENT.textContent().trim());
                 if (FETCH_SELECTED_TIME_FRAME_MONTHS.isVisible())
-                    enteredData.add(FETCH_SELECTED_TIME_FRAME_MONTHS.textContent().trim());
+                    enteredData.add(
+                            FETCH_SELECTED_TIME_FRAME_MONTHS.textContent().trim());
             }
             case "Endemic Research" -> {
                 Locator buttonXpath = ENDEMIC_RESEARCH_SECTION.locator("xpath=//button");
@@ -641,8 +716,8 @@ public class NPISmartList {
         return enteredData;
     }
 
-
-    public void getValuesByClassAttribute(Locator locator, String classValue, String extendedLocator, List<String> dataList) {
+    public void getValuesByClassAttribute(
+            Locator locator, String classValue, String extendedLocator, List<String> dataList) {
         for (int i = 0; i < locator.count(); i++) {
             String classAttribute = locator.nth(i).getAttribute("class");
             if (classAttribute != null && classAttribute.contains(classValue)) {
@@ -660,7 +735,9 @@ public class NPISmartList {
     private void addLocatorData(Locator locator, List<String> dataList, boolean useInputValue) {
         if (locator.first().isVisible()) {
             for (int i = 0; i < locator.count(); i++) {
-                String value = useInputValue ? locator.nth(i).inputValue() : locator.nth(i).textContent();
+                String value = useInputValue
+                        ? locator.nth(i).inputValue()
+                        : locator.nth(i).textContent();
                 dataList.add(value.trim());
             }
         }
