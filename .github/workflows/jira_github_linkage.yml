@@ -1,4 +1,4 @@
-name: JIRA BDD Feature Generator
+name: JIRA GITHUB Linkage Feature Generator
 
 on:
   workflow_dispatch:
