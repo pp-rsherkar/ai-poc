@@ -32,8 +32,10 @@ public class TacticCreatives {
         this.VERIFY_TACTIC_CREATIVES_PAGE = page.locator("//div[text()='Creative(s)']");
         this.SEARCH_CREATIVE = page.locator("//input[contains(@class, 'gaTableSearch')]");
         this.CLICK_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
-        this.ASSIGN_CREATIVE_OK_BUTTON = page.locator("//button[@class='ui primary button okButton' and normalize-space(text())='Ok']");
-        this.ENABLE_CREATIVE = page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
+        this.ASSIGN_CREATIVE_OK_BUTTON =
+                page.locator("//button[@class='ui primary button okButton' and normalize-space(text())='Ok']");
+        this.ENABLE_CREATIVE =
+                page.locator("//sui-checkbox[@class='toggle ui checkbox ng-untouched ng-pristine ng-valid']");
         this.SAVE_TACTIC_CREATIVES = page.locator("//span[text()='Save']");
         this.TACTIC_CREATIVE_SUCCESS = page.locator("//div[@aria-label='Success!']");
         this.NAVIGATE_TO_CAMPAIGN_DASHBOARD = page.locator("//div[contains(@class,'campaign-tile')]");
@@ -53,7 +55,8 @@ public class TacticCreatives {
     }
 
     public void assignCreatives(String creative) {
-        Locator selectCreative = page.locator(String.format("//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td/sui-checkbox", creative));
+        Locator selectCreative = page.locator(String.format(
+                "//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td/sui-checkbox", creative));
         ASSIGN_CREATIVE_TITLE.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         SEARCH_CREATIVE.fill(creative);
         CLICK_SEARCH.click();
@@ -63,13 +66,15 @@ public class TacticCreatives {
             waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
             for (int i = 0; i < CREATIVE_STATUS.count(); i++) {
                 if (CREATIVE_STATUS.nth(i).innerText().equalsIgnoreCase("Approved")) {
-                    selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", i + 1));
+                    selectCreative = page.locator(String.format(
+                            "//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", i + 1));
                     break;
                 }
             }
         }
         selectCreative.first().scrollIntoViewIfNeeded();
-        if (!selectCreative.first().getAttribute("class").contains("checked")) selectCreative.first().click();
+        if (!selectCreative.first().getAttribute("class").contains("checked"))
+            selectCreative.first().click();
         ASSIGN_CREATIVE_OK_BUTTON.click();
     }
 
@@ -116,10 +121,13 @@ public class TacticCreatives {
         int maxAttempts = 3;
         waitUtility.waitForLocatorVisible(CREATIVES_TABLE);
         for (int i = 0; i < maxAttempts; i++) {
-            Locator statusLocator = page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
+            Locator statusLocator =
+                    page.locator(String.format("//div[@class='secondtablewrapper']//tr[td//div[@title='%s']]", status));
             if (statusLocator.first().isVisible()) {
-                int rowIndex = (int) statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
-                Locator selectCreative = page.locator(String.format("//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
+                int rowIndex = (int)
+                        statusLocator.first().evaluate("(el) => Array.from(el.parentElement.children).indexOf(el) + 1");
+                Locator selectCreative = page.locator(String.format(
+                        "//div[contains(@class,'firsttablewrapper')]//tbody//tr[%d]//sui-checkbox", rowIndex));
                 selectCreative.click();
                 ASSIGN_CREATIVE_OK_BUTTON.click();
                 return;
