@@ -53,7 +53,15 @@ jobs:
           # step dictionary (small + relevant only)
           find src/test/resources/features -name "*.feature" \
             -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
-            | sort -u | head -n 200 > step_dictionary.txt
+            > raw_steps.txt || true
+          
+          if [ -s raw_steps.txt ]; then
+            LC_ALL=C sort -u raw_steps.txt > sorted_steps.txt
+          else
+            echo "" > sorted_steps.txt
+          fi
+          
+          head -n 200 sorted_steps.txt > step_dictionary.txt
 
       # =========================
       # CREATE BRANCH (FIXED)
