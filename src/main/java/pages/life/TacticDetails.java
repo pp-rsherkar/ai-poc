@@ -538,6 +538,7 @@ public class TacticDetails {
             tacticCreatives.assignCreatives(creative);
             tacticCreatives.enableCreative();
             tacticCreatives.saveTacticCreatives();
+            waitUtility.waitUntilSpinnerHidden();
 
             if (i + 1 < rows.size()) {
                 String nextLiName = rows.get(i + 1).get("LI_NAME");
