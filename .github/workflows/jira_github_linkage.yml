@@ -119,6 +119,8 @@ jobs:
           - Do NOT repeat scenario headers
           - Do NOT add placeholders like $SUMMARY
           - Output clean Gherkin only
+          - DO NOT use variables like $SUMMARY or $DESCRIPTION in output.
+          - Always convert into natural language feature names.
           
           ==================================================
           JIRA
