@@ -36,8 +36,10 @@ jobs:
       - name: Build step index from main
         run: |
           echo "Building step index..."
-          # Extracts clean, unique step phrases from existing feature files
+          # Ensures directory exists before running search to avoid find warnings
           mkdir -p src/test/resources/features
+          
+          # Extracts clean, unique step phrases from existing feature files
           find src/test/resources/features -name "*.feature" -exec grep -E "^\s*(Given|When|Then|And|But) " {} \; \
             | sed -e 's/^[ \t]*//' \
             | sort | uniq > step_dictionary.txt
@@ -91,48 +93,27 @@ jobs:
         run: |
           echo "Requesting feature file layout from GitHub Copilot..."
           
-          # Escape input fragments safely into JSON strings using jq
-          DICT=$(cat step_dictionary.txt | jq -aR .)
-          JIRA_DESC=$(cat jira_description.txt | jq -aR .)
-          JIRA_SUMM=$(echo "${{ env.SUMMARY }}" | jq -aR .)
-
-          PROMPT="You are a professional QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
+          # 1. Format the multi-line Prompt text file clearly
+          cat << 'EOF' > structural_prompt.txt
+          You are a professional QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
           
-          Jira Summary: $JIRA_SUMM
-          Jira Description: $JIRA_DESC
+          Jira Summary:
+          ${{ env.SUMMARY }}
+          
+          Jira Description:
+          EOF
+          
+          # Append the raw text files directly into our core prompt file
+          cat jira_description.txt >> structural_prompt.txt
+          
+          cat << 'EOF' >> structural_prompt.txt
           
           CRITICAL INSTRUCTIONS:
           1. Review the repository step dictionary provided below.
           2. Do NOT copy raw text blocks or full paragraphs directly from the Jira description into the Given/When/Then steps.
           3. Synthesize the description details into short, logical user interactions (e.g., Given the user navigates to workspace, When the user schedules a creative, Then a validation error warning should display).
           4. Match your step phrasing style directly to how steps are constructed in the step dictionary below. Use the exact text patterns from the dictionary where contextually logical.
-          5. Return ONLY the raw Gherkin syntax content. Do not output markdown fences, no triple backticks (\`\`\`), no introductory chat prose. Start your response directly with line 'Feature:'
-
-          Repository Steps Dictionary:
-          $DICT"
-
-          # Query GitHub's native Copilot API proxy
-          RESPONSE_DATA=$(curl -s -X POST "https://api.githubcopilot.com/chat/completions" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"model\": \"gpt-4o\",
-              \"messages\": [
-                {\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rxs .)}
-              ],
-              \"temperature\": 0.1
-            }")
-
-          # Parse the result and strip any lingering markdown code block formatting artifacts
-          echo "$RESPONSE_DATA" | jq -r '.choices[0].message.content // empty' > temp_generated.feature
-
-          if [ ! -s temp_generated.feature ] || [ "$(cat temp_generated.feature)" = "null" ]; then
-            echo "❌ Failed to generate content from Copilot API. Response log:"
-            echo "$RESPONSE_DATA"
-            exit 1
-          fi
-
-          cat temp_generated.feature | sed '/^```/d' > generated.feature
+          5. Return ONLY the raw Gherkin syntax content. Do not output markdown fences, no triple backticks (
 
       # =========================
       # FILE NAMING & PLACEMENT
