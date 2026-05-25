@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       jira_id:
-        description: "Enter Jira Ticket ID (e.g., QA-1321)"
+        description: "Enter JIRA Ticket ID (e.g., QA-1321)"
         required: true
         type: string
 
@@ -14,29 +14,51 @@ permissions:
   models: read
 
 jobs:
-  generate-feature:
+  generate-feature-file:
     runs-on: ubuntu-latest
 
     steps:
 
       # =========================
-      # Checkout
+      # CHECKOUT
       # =========================
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # =========================
-      # Install dependencies
+      # CLEAN WORKSPACE
       # =========================
-      - name: Install jq
+      - name: Prepare workspace
+        run: |
+          set -euo pipefail
+          git clean -fd
+
+      # =========================
+      # JQ INSTALL
+      # =========================
+      - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y jq
 
       # =========================
-      # Create branch (CRITICAL FIX)
+      # BUILD CONTEXT (LIGHTWEIGHT)
       # =========================
-      - name: Create Jira branch
+      - name: Build AI context
+        run: |
+          set -euo pipefail
+
+          mkdir -p src/test/resources/features
+
+          # step dictionary (small + relevant only)
+          find src/test/resources/features -name "*.feature" \
+            -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
+            | sort -u | head -n 200 > step_dictionary.txt
+
+      # =========================
+      # CREATE BRANCH (FIXED)
+      # =========================
+      - name: Create branch
         run: |
           set -euo pipefail
 
@@ -45,101 +67,87 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git fetch origin main
+          git fetch origin
 
-          git checkout -b "$BRANCH" origin/main || git checkout "$BRANCH"
+          git checkout -B "$BRANCH"
 
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       # =========================
-      # Fetch Jira safely (FIXED JSON parsing)
+      # FETCH JIRA
       # =========================
-      - name: Fetch Jira Issue
-        env:
-          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
-          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
-          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+      - name: Fetch Jira
         run: |
           set -euo pipefail
 
           RESPONSE=$(curl -s \
-            -u "$JIRA_EMAIL:$JIRA_TOKEN" \
-            -H "Accept: application/json" \
-            "$JIRA_BASE_URL/rest/api/3/issue/${{ inputs.jira_id }}")
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
-          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "NO_SUMMARY"')
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
 
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '
-            .. | objects | .text? // empty
-          ' | tr '\n' ' ' | head -c 1200)
+          DESCRIPTION=$(echo "$RESPONSE" \
+            | jq -r '[.. | .text? // empty] | join(" ")' \
+            | head -c 1200)
 
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
           echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
 
       # =========================
-      # Build prompt (SAFE + SMALL)
+      # GENERATE FEATURE (SAFE PROMPT)
       # =========================
-      - name: Build AI prompt
-        run: |
-          set -euo pipefail
-
-          cat <<EOF > prompt.txt
-          You are a senior QA automation engineer.
-          
-          Generate a production-ready BDD Gherkin feature file.
-          
-          RULES:
-          - Use existing repo style
-          - Reuse steps when possible
-          - Do not copy Jira text directly
-          - Output ONLY raw Gherkin
-          
-          JIRA ID: ${{ inputs.jira_id }}
-          SUMMARY: $SUMMARY
-          
-          DESCRIPTION:
-          $(echo "$DESCRIPTION" | head -c 1200)
-          
-          EOF
-
-      # =========================
-      # Call GitHub Models (FIXED AUTH)
-      # =========================
-      - name: Generate Feature
+      - name: Generate feature via GitHub Models
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          jq -n \
-            --rawfile prompt prompt.txt \
-            '{
-              model: "gpt-4.1",
-              temperature: 0.2,
-              messages: [
-                { role: "system", content: "You generate enterprise BDD feature files." },
-                { role: "user", content: $prompt }
-              ]
-            }' > request.json
-
-          RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            --data @request.json)
-
-          echo "$RESPONSE"
-
-          FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
-
-          if [ -z "$FEATURE" ] || [ "$FEATURE" = "null" ]; then
-            echo "Model failed"
-            exit 1
-          fi
-
-          echo "$FEATURE" > generated.feature
+          cat <<EOF > prompt.txt
+          You are a QA automation engineer.
+          
+          Generate a BDD Gherkin feature file.
+          
+          RULES:
+          - No markdown
+          - No \`\`\` fences
+          - Use existing repo step style
+          - Do not copy Jira text directly
+          
+          JIRA:
+          ID: ${{ inputs.jira_id }}
+          SUMMARY: $SUMMARY
+          DESCRIPTION: $DESCRIPTION
+          
+          EXISTING STEPS:
+          EOF
+          
+                    head -n 200 step_dictionary.txt >> prompt.txt
+          
+                    jq -n \
+                      --rawfile prompt prompt.txt \
+                      '{
+                        model: "gpt-4.1-mini",
+                        temperature: 0.2,
+                        messages: [
+                          { role: "system", content: "Return ONLY raw Gherkin." },
+                          { role: "user", content: $prompt }
+                        ]
+                      }' > request.json
+          
+                    RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
+                      -H "Content-Type: application/json" \
+                      -H "Authorization: Bearer $GITHUB_TOKEN" \
+                      --data @request.json)
+          
+                    FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+          
+                    # IMPORTANT: remove markdown fences if model adds them
+                    FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
+          
+                    echo "$FEATURE" > generated.feature
 
       # =========================
-      # Save file (SAFE naming from summary)
+      # SAVE FILE
       # =========================
       - name: Save feature file
         run: |
@@ -148,59 +156,50 @@ jobs:
           DIR="src/test/resources/features"
           mkdir -p "$DIR"
 
-          CLEAN_NAME=$(echo "$SUMMARY" \
-            | tr '[:upper:]' '[:lower:]' \
-            | sed 's/[^a-z0-9]/_/g' \
-            | sed 's/_\+/_/g' \
-            | cut -c1-60)
+          FILE="${{ inputs.jira_id }}.feature"
 
-          [ -z "$CLEAN_NAME" ] && CLEAN_NAME="feature"
-
-          FILE="$DIR/${{ inputs.jira_id }}_${CLEAN_NAME}.feature"
-
-          mv generated.feature "$FILE"
+          mv generated.feature "$DIR/$FILE"
 
           echo "FILE=$FILE" >> $GITHUB_ENV
+          echo "DIR=$DIR" >> $GITHUB_ENV
 
       # =========================
-      # Commit
+      # COMMIT + FORCE PUSH (FIXED)
       # =========================
-      - name: Commit and push (overwrite branch)
+      - name: Commit & push (overwrite branch)
         run: |
           set -euo pipefail
-      
-          git add "$FILE"
-      
-          git commit -m "feat(QA-1321): generate BDD feature" || echo "No changes to commit"
-      
-          # overwrite remote branch safely
-          git push --force-with-lease origin "$BRANCH"
+
+          git add "$DIR/$FILE"
+
+          git commit -m "feat(${{ inputs.jira_id }}): generate feature file" || true
+
+          # FORCE OVERWRITE (your requirement)
+          git push origin "${{ env.BRANCH }}" --force
 
       # =========================
-      # Create PR (FIXED MAIN → BRANCH ONLY)
+      # PR (FIXED - NEVER main→main)
       # =========================
-      - name: Create Pull Request
+      - name: Create PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          BRANCH="${{ inputs.jira_id }}"
-
-          EXISTING_PR=$(gh pr list \
-            --head "$BRANCH" \
+          PR=$(gh pr list \
+            --head "${{ env.BRANCH }}" \
             --base main \
             --state open \
             --json number \
             --jq '.[0].number')
 
-          if [ -n "$EXISTING_PR" ]; then
+          if [ -n "$PR" ]; then
             echo "PR already exists"
             exit 0
           fi
 
           gh pr create \
             --base main \
-            --head "$BRANCH" \
-            --title "feat($BRANCH): $SUMMARY" \
-            --body "Auto-generated BDD feature file from Jira"
+            --head "${{ env.BRANCH }}" \
+            --title "feat(${{ inputs.jira_id }}): $SUMMARY" \
+            --body "Auto-generated BDD feature file"
