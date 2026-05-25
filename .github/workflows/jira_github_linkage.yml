@@ -1,4 +1,4 @@
-name: JIRA GITHUB Linkage Feature Generator
+name: JIRA GHERKIN Generator (Production Ready)
 
 on:
   workflow_dispatch:
@@ -14,13 +14,13 @@ permissions:
   models: read
 
 jobs:
-  generate-feature-file:
+  generate-feature:
     runs-on: ubuntu-latest
 
     steps:
 
       # =========================
-      # CHECKOUT
+      # Checkout
       # =========================
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,21 +28,13 @@ jobs:
           fetch-depth: 0
 
       # =========================
-      # CLEAN WORKSPACE
+      # Install dependencies
       # =========================
-      - name: Prepare workspace
-        run: |
-          set -euo pipefail
-          git clean -fd
-
-      # =========================
-      # JQ INSTALL
-      # =========================
-      - name: Install dependencies
+      - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
       # =========================
-      # BUILD CONTEXT (LIGHTWEIGHT)
+      # Build step dictionary (SAFE)
       # =========================
       - name: Build AI context
         run: |
@@ -50,21 +42,19 @@ jobs:
 
           mkdir -p src/test/resources/features
 
-          # step dictionary (small + relevant only)
-          find src/test/resources/features -name "*.feature" \
-            -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
-            > raw_steps.txt || true
-          
-          if [ -s raw_steps.txt ]; then
-            LC_ALL=C sort -u raw_steps.txt > sorted_steps.txt
+          # SAFE extraction (no pipe failures)
+          if find src/test/resources/features -name "*.feature" | read; then
+            find src/test/resources/features -name "*.feature" \
+              -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
+              2>/dev/null \
+              | sort -u \
+              | head -n 200 > step_dictionary.txt || true
           else
-            echo "" > sorted_steps.txt
+            echo "" > step_dictionary.txt
           fi
-          
-          head -n 200 sorted_steps.txt > step_dictionary.txt
 
       # =========================
-      # CREATE BRANCH (FIXED)
+      # Create branch
       # =========================
       - name: Create branch
         run: |
@@ -75,14 +65,13 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git fetch origin
-
+          git fetch origin || true
           git checkout -B "$BRANCH"
 
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       # =========================
-      # FETCH JIRA
+      # Fetch Jira (FIXED JSON handling)
       # =========================
       - name: Fetch Jira
         run: |
@@ -92,17 +81,19 @@ jobs:
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
-          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
 
+          # flatten Atlassian JSON properly
           DESCRIPTION=$(echo "$RESPONSE" \
-            | jq -r '[.. | .text? // empty] | join(" ")' \
+            | jq -r '.. | .text? // empty' \
+            | tr '\n' ' ' \
             | head -c 1200)
 
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
           echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
 
       # =========================
-      # GENERATE FEATURE (SAFE PROMPT)
+      # Generate Feature (FINAL PROMPT)
       # =========================
       - name: Generate feature via GitHub Models
         env:
@@ -110,151 +101,120 @@ jobs:
         run: |
           set -euo pipefail
 
-          cat <<'EOF' > prompt.txt
-          You are a Senior QA Automation Engineer working on a mature BDD (Cucumber/Gherkin) automation framework.
-          
-          Your task is to generate a production-quality, automation-ready Gherkin feature file based on Jira requirements and existing repository patterns.
-          
-          ==================================================
-          JIRA CONTEXT
-          ==================================================
-          
-          ID:
-          QA-1321
-          
-          SUMMARY:
-          '"$SUMMARY"'
-          
-          DESCRIPTION:
-          '"$DESCRIPTION"'
-          
-          ==================================================
-          REPOSITORY CONTEXT (MOST IMPORTANT)
-          ==================================================
-          
-          You MUST strictly follow existing repository feature file patterns.
-          
-          Use:
-          - step_dictionary.txt for step reuse
-          - existing scenario structures
-          - existing tagging style
-          - existing background patterns
-          - existing test data patterns
-          
-          Do NOT introduce new patterns unless absolutely necessary.
+          STEP_CONTEXT=$(head -n 150 step_dictionary.txt)
+
+          cat <<EOF > prompt.txt
+          You are a Senior QA Automation Engineer working in a mature Cucumber BDD framework.
           
           ==================================================
           CRITICAL OUTPUT RULES
           ==================================================
-          
           - Output ONLY raw Gherkin
-          - NO markdown
-          - NO ``` fences
-          - NO explanations
-          - NO commentary
-          - NO extra text outside feature file
+          - No markdown
+          - No code fences
+          - No explanations
+          - Every Scenario must start with @todo exactly once
+          - No duplicate @todo tags
+          - Use existing steps whenever possible
           
           ==================================================
-          SCENARIO RULE (MANDATORY)
+          JIRA
+          ==================================================
+          ID: ${{ inputs.jira_id }}
+          SUMMARY: $SUMMARY
+          DESCRIPTION: $DESCRIPTION
+          
+          ==================================================
+          REPOSITORY STEPS
+          ==================================================
+          $STEP_CONTEXT
+          
+          ==================================================
+          TEST DATA RULES (STRICT PRODUCTION RULES)
           ==================================================
           
-          Every Scenario MUST start with:
-          @todo
+          1. INLINE DATA (DEFAULT)
+          Use natural language values in steps.
           
           Example:
+          Given a tactic with 3 creatives
+          
+          2. TABLES (ONLY IF EXISTS IN REPO)
+          Do NOT introduce new table patterns.
+          
+          3. SCENARIO OUTLINE (ONLY IF EXISTS)
+          Only use if already present in repo.
+          
+          4. NO STRUCTURED DATA BY DEFAULT
+          Prefer readable steps over data structures.
+          
+          ==================================================
+          LOGIN RULES
+          ==================================================
+          - Reuse login steps if present in repo
+          - Otherwise assume user is already authenticated
+          - Do NOT invent authentication flows
+          
+          ==================================================
+          OUTPUT FORMAT
+          ==================================================
+          Feature: <name>
+          
           @todo
-          Scenario: Validate user behavior
-          
-          ==================================================
-          LOGIN / NAVIGATION RULES
-          ==================================================
-          
-          If repository contains login/navigation steps:
-          - Reuse them exactly from step_dictionary.txt
-          
-          If NOT present:
-          - Assume user is already authenticated
-          - DO NOT invent login flows
-          
-          ==================================================
-          TEST DATA RULES
-          ==================================================
-          
-          Use step-level data, tables, or scenario outlines ONLY if repository already uses them.
-          
-          ==================================================
-          STEP REUSE RULE (STRICT)
-          ==================================================
-          
-          - Check step_dictionary.txt first
-          - Prefer reuse
-          - Only create new steps if necessary
-          
-          ==================================================
-          FINAL OUTPUT RULE
-          ==================================================
-          
-          Return ONLY valid Gherkin.
-          
-          Feature: ...
+          Scenario: <name>
+            Given ...
+            When ...
+            Then ...
           EOF
-          
-                    head -n 200 step_dictionary.txt >> prompt.txt
-          
-                    jq -n \
-                      --rawfile prompt prompt.txt \
-                      '{
-                        model: "gpt-4.1-mini",
-                        temperature: 0.2,
-                        messages: [
-                          { role: "system", content: "Return ONLY raw Gherkin." },
-                          { role: "user", content: $prompt }
-                        ]
-                      }' > request.json
-          
-                    RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
-                      -H "Content-Type: application/json" \
-                      -H "Authorization: Bearer $GITHUB_TOKEN" \
-                      --data @request.json)
-          
-                    FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
-          
-                    # IMPORTANT: remove markdown fences if model adds them
-                    FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
-          
-                    echo "$FEATURE" > generated.feature
+
+          jq -n \
+            --rawfile prompt prompt.txt \
+            '{
+              model: "gpt-4.1-mini",
+              temperature: 0.2,
+              messages: [
+                { role: "system", content: "Return ONLY valid Gherkin." },
+                { role: "user", content: $prompt }
+              ]
+            }' > request.json
+
+          RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            --data @request.json)
+
+          FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+
+          # cleanup fences if model misbehaves
+          FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
+
+          echo "$FEATURE" > generated.feature
 
       # =========================
-      # SAVE FILE
+      # Save + enforce @todo fix
       # =========================
       - name: Save feature file
         run: |
           set -euo pipefail
-          
+
           DIR="src/test/resources/features"
           mkdir -p "$DIR"
-          
+
           FILE="${{ inputs.jira_id }}.feature"
-          
-          mv generated.feature "$DIR/$FILE"
-          
-          echo "FILE=$FILE" >> $GITHUB_ENV
-          echo "DIR=$DIR" >> $GITHUB_ENV
-          
-          echo "Adding @todo tags to scenarios..."
-          
+
+          # ensure single @todo per scenario
           awk '
-          /^  Scenario:/ {print "  @todo"}
+          /^Scenario:/ {print "@todo"}
           {print}
-          ' "$DIR/$FILE" > "$DIR/tmp.feature" && mv "$DIR/tmp.feature" "$DIR/$FILE"
-          
-          echo "--- FINAL FEATURE FILE ---"
-          cat "$DIR/$FILE"
+          ' generated.feature > "$DIR/$FILE"
+
+          echo "DIR=$DIR" >> $GITHUB_ENV
+          echo "FILE=$FILE" >> $GITHUB_ENV
 
       # =========================
-      # COMMIT + FORCE PUSH (FIXED)
+      # Commit + FORCE PUSH (overwrite branch)
       # =========================
-      - name: Commit & push (overwrite branch)
+      - name: Commit & push
         run: |
           set -euo pipefail
 
@@ -262,11 +222,10 @@ jobs:
 
           git commit -m "feat(${{ inputs.jira_id }}): generate feature file" || true
 
-          # FORCE OVERWRITE (your requirement)
           git push origin "${{ env.BRANCH }}" --force
 
       # =========================
-      # PR (FIXED - NEVER main→main)
+      # Create PR safely
       # =========================
       - name: Create PR
         env:
@@ -277,7 +236,6 @@ jobs:
           PR=$(gh pr list \
             --head "${{ env.BRANCH }}" \
             --base main \
-            --state open \
             --json number \
             --jq '.[0].number')
 
@@ -290,4 +248,4 @@ jobs:
             --base main \
             --head "${{ env.BRANCH }}" \
             --title "feat(${{ inputs.jira_id }}): $SUMMARY" \
-            --body "Auto-generated BDD feature file"
+            --body "Auto-generated BDD feature file from Jira"
