@@ -6127,4 +6127,12 @@ public class LifeSteps {
         logger.info("Creating line items with tactics and targeting rules");
         tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative);
     }
+
+    @Then("Verify the newly created campaign details in the campaign list")
+    public void verifyTheNewlyCreatedCampaignDetailsInTheCampaignList() {
+        campaigns.navigateToCampaignDashboard();
+        logger.info("Searching for Campaign: {}", campaignNameRandom);
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+    }
 }
