@@ -79,8 +79,10 @@ jobs:
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
-          if [ "$|HTTP_STATUS" != "200" ]; then
-            echo "❌ Jira API failed"
+          
+          # FIXED: Removed the stray '|' character below
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "❌ Jira API failed (HTTP Status: $HTTP_STATUS)"
             exit 1
           fi
 
