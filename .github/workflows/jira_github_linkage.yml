@@ -171,8 +171,10 @@ jobs:
           Jira Summary:
           ${{ env.SUMMARY }}
 
+          DESCRIPTION_TRIMMED=$(echo "${{ env.DESCRIPTION }}" | head -c 1500)
+
           Jira Description:
-          ${{ env.DESCRIPTION }}
+          $DESCRIPTION_TRIMMED
 
           ==================================================
           FEATURE STYLE REFERENCES
@@ -191,7 +193,7 @@ jobs:
 
           EOF
 
-          cat feature_examples.txt >> prompt.txt
+          tail -n 200 feature_examples.txt >> prompt.txt
 
           cat <<EOF >> prompt.txt
 
@@ -205,7 +207,7 @@ jobs:
 
           EOF
 
-          cat step_dictionary.txt >> prompt.txt
+          head -n 150 step_dictionary.txt >> prompt.txt
 
           cat <<EOF >> prompt.txt
 
