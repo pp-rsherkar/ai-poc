@@ -22,11 +22,14 @@ public class ConversionPixel {
     public ConversionPixel(Page page) {
         this.page = page;
         this.PIXEL_NAME = page.locator("//input[@placeholder='Pixel Name']");
-        this.SEARCH_ADVERTISER = page.locator("//input[contains(@class,'dropdown-search') and @placeholder='Advertisers']");
+        this.SEARCH_ADVERTISER =
+                page.locator("//input[contains(@class,'dropdown-search') and @placeholder='Advertisers']");
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'item text-truncate')]");
-        this.PIXEL_SCOPE_DROPDOWN = page.locator("//sui-select[@placeholder='Scope' and contains(@class,'filter-dropdown conversion-pixel')]");
+        this.PIXEL_SCOPE_DROPDOWN = page.locator(
+                "//sui-select[@placeholder='Scope' and contains(@class,'filter-dropdown conversion-pixel')]");
         this.PIXEL_SCOPE_OPTION = page.locator("//sui-select-option[contains(@class,'item')]/span");
-        this.PIXEL_TYPE_DROPDOWN = page.locator("//sui-select[@placeholder='Select Conversion Type' and contains(@class,'filter-dropdown conversion-pixel')]");
+        this.PIXEL_TYPE_DROPDOWN = page.locator(
+                "//sui-select[@placeholder='Select Conversion Type' and contains(@class,'filter-dropdown conversion-pixel')]");
         this.PIXEL_TYPE_OPTION = page.locator("//sui-select-option[contains(@class,'item')]/span");
         this.PIXEL_NAME_ERROR = page.locator("//div[contains(text(),'Pixel Name is required')]");
         this.ADVERTISER_NAME_ERROR = page.locator("//div[contains(text(),'Advertiser is required')]");
