@@ -2,6 +2,7 @@ package pages.life;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import pages.Navigation;
@@ -74,6 +75,11 @@ public class TacticDetails {
     private final Locator HUMAN_COST_CPM;
     private final Locator COPY_SUCCESS_ALERT;
 
+    private final Locator TARGETING_RULE_CONFIRMATION_DIALOG;
+    private final Locator CONTINUE_BUTTON;
+    private final Locator CLICK_REFRESH_BUTTON;
+    private final Locator NO_TARGETING_RULES;
+    private final Locator FORECAST_AVAILS_NUMBER;
 
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -86,7 +92,7 @@ public class TacticDetails {
 
     public TacticDetails(Page page) {
         this.page = page;
-        this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic']");
+        this.VERIFY_TACTIC_DETAILS_PAGE = page.locator("//div[text()='New Tactic' or text()='New Ad Group']");
         this.TACTIC_NAME = page.locator("//input[@placeholder='Tactic Name' or @placeholder='Ad Group Name']");
         this.SAVE_TACTIC_DETAILS = page.locator("//span[text()='Save']");
         this.TACTIC_DETAILS_SUCCESS = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert' and contains(text(),'Tactic')]");
@@ -146,6 +152,11 @@ public class TacticDetails {
         this.DATA_COST_CPM = page.locator("(//span[contains(@class, 'cost-override')])[1]");
         this.HUMAN_COST_CPM = page.locator("(//span[contains(@class, 'cost-override')])[2]");
         this.COPY_SUCCESS_ALERT = page.locator("//div[@id='toast-container' and contains(., 'Tactic(s)') and contains(., 'copied successfully')]");
+        this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
+        this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
+        this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
+        this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
+        this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
     }
 
     public void clickNewTactic() {
@@ -194,6 +205,18 @@ public class TacticDetails {
 
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+    }
+
+    public boolean isForecastDataAvailable() {
+        CLICK_REFRESH_BUTTON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        List<String> forecastData = FORECAST_AVAILS_NUMBER.allInnerTexts();
+        return forecastData.getLast().contains("$");
+    }
+
+    public boolean isTargetingRuleMissing() {
+        waitUtility.waitForLocatorVisible(targetingTemplate.ADD_TARGETING_RULE_BUTTON);
+        return NO_TARGETING_RULES.isVisible();
     }
 
     public void addComment(String entryPoint, String comment) {
@@ -252,6 +275,7 @@ public class TacticDetails {
     }
 
     public void clickTargetingRuleIcon() {
+        waitUtility.waitForLocatorVisible(TARGETING_RULES_ICON);
         TARGETING_RULES_ICON.click();
     }
 
@@ -265,7 +289,9 @@ public class TacticDetails {
     }
 
     public void saveTacticDetails() {
+        waitUtility.waitForLocatorVisible(SAVE_TACTIC_DETAILS);
         SAVE_TACTIC_DETAILS.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String tacticDetailsSuccess() {
@@ -288,6 +314,7 @@ public class TacticDetails {
             Map<String, String> labelCountMap = importTargetingTemplate(lineItemType.trim(), templateNameList);
             labelCountMapList.add(labelCountMap);
             saveTacticDetails();
+            tacticDetailsSuccess();
         }
         ruleCountAndValueList.sort(Comparator.comparing(Object::toString));
         labelCountMapList.sort(Comparator.comparing(Object::toString));
@@ -313,6 +340,25 @@ public class TacticDetails {
         return templateNameList;
     }
 
+    public void selectManagementFeeOptionAndEnterData(String managementFeeOption, String percent, String amount, String expectedFeeValue) {
+        String optionXPath = String.format("//div[contains(@class,'management-fee-contanier')]//div//button[normalize-space(text())='%s']", managementFeeOption);
+        page.locator(optionXPath).click();
+        switch (managementFeeOption) {
+            case "Percentage" -> tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+            case "CPM", "Fixed CPM" -> tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            case "% + CPM"    -> {
+                tacticSettings.PERCENT_TYPE_FEE_INPUT.fill(percent);
+                tacticSettings.DOLLAR_TYPE_FEE_INPUT.fill(amount);
+            }
+            default -> throw new IllegalArgumentException("Unexpected fee type: " + managementFeeOption);
+        }
+        saveTacticDetails();
+        waitUtility.waitForElementVisible("//span[contains(@class,'strike-text')]");
+        clickFirstTacticTab();
+        clickSettingsTab();
+        waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
+    }
+
     private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {
         campaigns.createCampaign();
         campaigns.verifyCampaignText();
@@ -322,6 +368,7 @@ public class TacticDetails {
         campaigns.enterBudget(budget);
         campaigns.saveCampaign();
         waitUtility.waitUntilSpinnerHidden();
+        campaigns.campaignSuccess();
     }
 
     private void createLineItem(String lineItemName, String lineItemType, String lineBudget) {
@@ -332,12 +379,19 @@ public class TacticDetails {
         lineItemDetails.enableLineItem();
         lineItemDetails.saveLineItem();
         waitUtility.waitUntilSpinnerHidden();
+        lineItemDetails.lineItemSuccess();
     }
 
-    private void createTactic(String tacticName) {
-        enterTacticName(tacticName);
-        saveTacticDetails();
-        waitUtility.waitUntilSpinnerHidden();
+    public void createTactic(String tacticName) {
+        try {
+            enterTacticName(tacticName);
+            saveTacticDetails();
+            waitUtility.waitUntilSpinnerHidden();
+            tacticDetailsSuccess();
+        } catch (PlaywrightException e) {
+            saveTacticDetails();
+            tacticDetailsSuccess();
+        }
     }
 
     private Map<String, String> importTargetingTemplate(String lineItemType, List<String> templateNameList) {
@@ -360,16 +414,18 @@ public class TacticDetails {
         return labelCountMap;
     }
 
-    private String saveTargetingTemplate(String lineItemType) {
+    public String saveTargetingTemplate(String lineItemType) {
         String templateName = lineItemType + "_Template_" + CommonUtils.timeStampCalculation();
         TACTIC_SETTINGS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
         tacticSettings.verifyTacticSettingsText();
         SAVE_TEMPLATE_BUTTON.click();
-        SAVE_TEMPLATE_DIALOG.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        if (TARGETING_RULE_CONFIRMATION_DIALOG.isVisible())
+            CONTINUE_BUTTON.click();
+        waitUtility.waitForLocatorVisible(SAVE_TEMPLATE_DIALOG);
         TEMPLATE_NAME_TEXT.fill(templateName);
         SAVE_BUTTON.click();
-        TEMPLATE_SAVED_SUCCESS_ALERT.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+        waitUtility.waitForLocatorHidden(TEMPLATE_SAVED_SUCCESS_ALERT);
         return templateName;
     }
 
@@ -496,6 +552,11 @@ public class TacticDetails {
     public List<String> fetchTacticCreative() {
         CREATIVE_NAME.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return CREATIVE_NAME.allInnerTexts();
+    }
+
+    public void clickNewTacticForLineItem(String name) {
+        String xpath = String.format("//div[text()='%s']/ancestor::div[contains(@class,'lineitem-list-wrapper')]//app-icon-lable-link[@class='tactic-new-button']//div", name);
+        page.locator(xpath).click();
     }
 }
 

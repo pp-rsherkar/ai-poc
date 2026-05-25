@@ -4,6 +4,7 @@ Feature: LIFE Regression - Line Item Management
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page

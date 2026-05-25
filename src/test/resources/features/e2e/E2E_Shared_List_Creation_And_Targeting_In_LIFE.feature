@@ -7,6 +7,7 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     #1
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @e2e
   Scenario Outline: Create Domain List by manually entering domain names and target in 'Domains/Apps' targeting at Tactic level

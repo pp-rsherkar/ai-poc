@@ -8,6 +8,7 @@ import factory.DriverFactory;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,6 +65,19 @@ public class PMP {
     private final Locator GA_SURVEY_CLOSE_BUTTON;
     private final Locator CURATED_MARKETS_AND_DEALS_TITLE;
     private final Locator ALERT;
+    private final Locator DEAL_TYPE;
+    private final Locator PRICING_TYPE;
+    private final Locator EDIT_PMP_DEAL_PANEL;
+    private final Locator EDIT_PMP_DEAL_PANEL_CLOSE_BUTTON;
+    private final Locator CLEARING_PRICE;
+    private final Locator ACTIVE_ARCHIVED_BUTTON;
+    private final Locator THREE_DOT_ICON;
+    private final Locator DEALS_INFO;
+    private final Locator ARCHIVE_CONFIRMATION_DIALOG;
+    private final Locator ARCHIVE_BUTTON_FROM_CONFIRMATION_DIALOG;
+    private final Locator REMOVE_ASSOCIATION_TEXT;
+    private final Locator TACTIC_LINK;
+    private final Locator TACTIC_HEADER;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     boolean flag1, flag2 = false;
 
@@ -120,6 +134,19 @@ public class PMP {
         this.GA_SURVEY_CLOSE_BUTTON = page.locator("//div[contains(@class,'btn-close .gaSurveyClose')]");
         this.CURATED_MARKETS_AND_DEALS_TITLE = page.locator("//span[text()='Curated Markets and Deals']");
         this.ALERT = page.locator("//div[@role='alert']");
+        this.DEAL_TYPE = page.locator("//label[contains(text(),'Deal Type')]/following-sibling::div[contains(@class,'deal-type-button-group')]");
+        this.PRICING_TYPE = page.locator("//label[contains(text(),'Pricing Type')]/following-sibling::div[contains(@class,'deal-type-button-group')]");
+        this.EDIT_PMP_DEAL_PANEL = page.locator("//div[contains(text(),'Edit PMP Deal')]");
+        this.EDIT_PMP_DEAL_PANEL_CLOSE_BUTTON = page.locator("//app-rightside[contains(@class,'editPMPSideBarinsideTargetingPanel')]//button[contains(@class,'cancelbtn')]");
+        this.CLEARING_PRICE = page.locator("//div[contains(text(),'Clearing Price')]//span[contains(@class,'question-icon')]");
+        this.ACTIVE_ARCHIVED_BUTTON = page.locator("//div[contains(@class,'activeArchiveBtns')]//button");
+        this.THREE_DOT_ICON = page.locator("//span[contains(@class,'dealName')]/following-sibling::div//span[contains(@class,'vertical-align-middle')]");
+        this.DEALS_INFO = page.locator("//div[contains(@class,'dealDetails')]//div[@popuptrigger='manual']");
+        this.ARCHIVE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'setup-confrimmodal') and (contains(text(),'Archive Deal?') or contains(text(),\"This Deal Can't Be Archived\"))]");
+        this.ARCHIVE_BUTTON_FROM_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'approveButtonText')]//span[contains(text(),'Archive')]");
+        this.REMOVE_ASSOCIATION_TEXT = page.locator("//ul[contains(@class,'ulMargin')]/preceding-sibling::div");
+        this.TACTIC_LINK = page.locator("//div[contains(@class,'list-header')]/following-sibling::li//a");
+        this.TACTIC_HEADER = page.locator("//div[@id='tacticName']//span");
     }
 
     public void navigateToTacticSettingTab() {
@@ -196,14 +223,17 @@ public class PMP {
     }
 
     public String verifyTacticIsSaved() {
-        return SUCCESS_ALERT.innerText();
+        return ALERT.innerText();
     }
 
-    public void selectDealFromListAndAssign(String dealName) {
+    public void searchDealFromList(String dealName) {
         DEAL_SEARCH_FILTER.fill(dealName);
         waitUtility.waitForElementVisible(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName));
         String xpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/parent::div/preceding-sibling::span", dealName);
         page.locator(xpath).click();
+    }
+
+    public void assignDealFromList(String dealName) {
         String assignDealXpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/ancestor::div[@class='left dealDetails']/following-sibling::div/span[contains(@class,'addDeal')]", dealName);
         String assignedDealXpath = String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/ancestor::div[@class='left dealDetails']/following-sibling::div/span[contains(@class,'addedDeal')]", dealName);
         if (!page.locator(assignedDealXpath).isVisible()) page.locator(assignDealXpath).click();
@@ -230,7 +260,6 @@ public class PMP {
                 }
                 break;
         }
-
         waitUtility.waitForLocatorVisible(DEALS_LIST.last());
         return DEALS_LIST.first().isVisible();
     }
@@ -294,7 +323,8 @@ public class PMP {
         clickDealsTab(dealType);
         clickAddNewDeals();
         addAndSaveNewDeals(exchangeType, dealID, dealName, mediaType, advertiser, dealPriceType, price, curator);
-        selectDealFromListAndAssign(dealName);
+        searchDealFromList(dealName);
+        assignDealFromList(dealName);
         saveDealsAssigned();
         return verifyAssignedDealsOnTactic(dealName);
     }
@@ -341,5 +371,178 @@ public class PMP {
             }
         }
         return true;
+    }
+
+    public boolean isDealTypeFieldAvailable() {
+        waitUtility.waitForLocatorVisible(ADD_NEW_DEAL_LABEL);
+        return DEAL_TYPE.isVisible();
+    }
+
+    public String fetchDefaultDealTypeValue() {
+        Locator buttonXpath = DEAL_TYPE.locator("xpath=//button");
+        for (int i = 0; i < buttonXpath.count(); i++) {
+            if (buttonXpath.nth(i).getAttribute("class").contains("active")) {
+                return buttonXpath.nth(i).textContent().trim();
+            }
+        }
+        return null;
+    }
+
+    public boolean isCuratorFieldAvailable() {
+        return CURATOR_DROPDOWN.isVisible();
+    }
+
+    public String fetchDefaultCuratorValue() {
+        Locator curatorValueXpath = CURATOR_DROPDOWN.locator("xpath=//span");
+        return curatorValueXpath.textContent().trim();
+    }
+
+    public boolean isPricingTypeFieldAvailable() {
+        return PRICING_TYPE.isVisible();
+    }
+
+    public String fetchDefaultPricingTypeValue() {
+        Locator buttonXpath = PRICING_TYPE.locator("xpath=//button");
+        for (int i = 0; i < buttonXpath.count(); i++) {
+            if (buttonXpath.nth(i).getAttribute("class").contains("active")) {
+                return buttonXpath.nth(i).textContent().trim();
+            }
+        }
+        return null;
+    }
+
+    public boolean isEditIconAvailableForDeals() {
+        for (int i = 0; i < THREE_DOT_ICON.count(); i++) {
+            if (THREE_DOT_ICON.nth(i).isVisible()) {
+                return THREE_DOT_ICON.nth(i).isVisible() && THREE_DOT_ICON.nth(i).isEnabled();
+            }
+        }
+        return false;
+    }
+
+    public boolean clickEditButtonForCreatedPrivateDeal(String dealName) {
+        Locator threeDotIcon = page.locator(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/following-sibling::div//span[contains(@class,'vertical-align-middle')]", dealName));
+        threeDotIcon.click();
+        Locator editOption = threeDotIcon.locator("xpath=//following-sibling::div//span[@title='Edit']");
+        if (editOption.isVisible() && editOption.isEnabled()) {
+            editOption.click();
+            waitUtility.waitForLocatorVisible(EDIT_PMP_DEAL_PANEL);
+            return true;
+        }
+        return false;
+    }
+
+    public void closePMPDealEditPanel() {
+        EDIT_PMP_DEAL_PANEL_CLOSE_BUTTON.click();
+    }
+
+    public boolean isClearingPriceFieldAvailable() {
+        return CLEARING_PRICE.first().isVisible();
+    }
+
+    public String fetchClearingPriceFieldToolTip() {
+        CLEARING_PRICE.click();
+        return TOOLTIP_TEXT.textContent().trim();
+    }
+
+    public boolean isActiveArchivedButtonAvailable(String activeText) {
+        return ACTIVE_ARCHIVED_BUTTON.locator("text=" + activeText).isVisible();
+    }
+
+    public void clickActiveArchivedButtonAvailable(String activeText) {
+        ACTIVE_ARCHIVED_BUTTON.locator("text=" + activeText).click();
+        waitUtility.waitForLocatorVisible(DEALS_INFO.last());
+    }
+
+    public String isDefaultStatusButtonSelected() {
+        for (int i = 0; i < ACTIVE_ARCHIVED_BUTTON.count(); i++) {
+            if (ACTIVE_ARCHIVED_BUTTON.nth(i).getAttribute("class").contains("active")) {
+                return ACTIVE_ARCHIVED_BUTTON.nth(i).textContent().trim();
+            }
+        }
+        return null;
+    }
+
+    public List<String> fetchDealExchangeTypesFromDealsListing() {
+        waitUtility.waitForLocatorVisible(DEALS_INFO.last());
+        List<String> dealExchangeTypesList = new ArrayList<>();
+        for (int i = 0; i < DEALS_INFO.count(); i++) {
+            String[] text = DEALS_INFO.nth(i).textContent().trim().split("\\|");
+            dealExchangeTypesList.add(text[0].trim());
+        }
+        return dealExchangeTypesList;
+    }
+
+    public void clickArchiveButtonForCreatedPrivateDeal(String dealName) {
+        Locator threeDotIcon = page.locator(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]/following-sibling::div//span[contains(@class,'vertical-align-middle')]", dealName));
+        threeDotIcon.click();
+        Locator archiveOption = threeDotIcon.locator("xpath=//following-sibling::div//span[@title='Archive']");
+        archiveOption.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public boolean isArchiveConfirmationDialogDisplayed() {
+        return ARCHIVE_CONFIRMATION_DIALOG.isVisible();
+    }
+
+    public boolean isArchiveButtonAvailableOnConfirmationDialog() {
+        return ARCHIVE_BUTTON_FROM_CONFIRMATION_DIALOG.isVisible() && ARCHIVE_BUTTON_FROM_CONFIRMATION_DIALOG.isEnabled();
+    }
+
+    public void clickArchiveButtonFromConfirmationDialog() {
+        ARCHIVE_BUTTON_FROM_CONFIRMATION_DIALOG.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public String fetchDealArchiveSuccessAlert() {
+        String text = ALERT.textContent().trim();
+        waitUtility.waitForLocatorHidden(SUCCESS_ALERT);
+        return text;
+    }
+
+    public boolean isDealAvailable(String dealName) {
+        Locator dealLocator = page.locator(String.format("//span[contains(@class,'dealName') and contains(text(),'%s')]", dealName));
+        return dealLocator.isVisible();
+    }
+
+    public boolean isRemoveAssociationTextDisplayed() {
+        return REMOVE_ASSOCIATION_TEXT.isVisible();
+    }
+
+    public String fetchRemoveAssociationText() {
+        return REMOVE_ASSOCIATION_TEXT.textContent().trim();
+    }
+
+    public boolean isTacticLinkAvailable() {
+        return TACTIC_LINK.isVisible();
+    }
+
+    public String fetchTacticLinkText() {
+        return TACTIC_LINK.textContent().trim();
+    }
+
+    public String clickTacticLink() {
+        Page newTab = page.waitForPopup(TACTIC_LINK::click);
+        newTab.bringToFront();
+        DriverFactory.threadLocalDriver.set(newTab);
+        newTab.waitForLoadState();
+        newTab.waitForTimeout(2000);
+        String text = TACTIC_HEADER.first().textContent().trim();
+        newTab.close();
+        return text;
+    }
+
+    public boolean unassignDealFromAppliedDealsSection(String dealNameRandom) {
+        Locator xpath = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div//button[@class='closeButton']", dealNameRandom));
+        for (int i = 0; i < xpath.count(); i++) {
+            if (xpath.nth(i).isVisible()) {
+                xpath.nth(i).click();
+            }
+        }
+        return !xpath.isVisible();
+    }
+
+    public boolean isLifeMarketplaceDealsTabVisible() {
+        return PREMIUM_DEALS_TAB.isVisible();
     }
 }

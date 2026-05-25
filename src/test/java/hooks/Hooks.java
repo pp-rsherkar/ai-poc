@@ -10,7 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ConfigReader;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class Hooks {
 
@@ -21,6 +26,8 @@ public class Hooks {
     @Before(value = "@e2e or @regression")
     public void launchBrowser(Scenario scenario) {
         try {
+            // Clean old traces before starting new scenario
+            cleanOldTracesKeepTodayAndYesterday();
             double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
             String browserName = ConfigReader.getProperty("browser"); //Fetching browser value from config file
             logger.info("Launching browser: {} with timeout: {}", browserName, timeout);
@@ -55,7 +62,10 @@ public class Hooks {
                 String screenshotName = scenario.getName().replaceAll("\\s+", "_");
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
-                DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
+                Path tracePath = Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip");
+                // Delete existing file (ensures overwrite)
+                Files.deleteIfExists(tracePath);
+                DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(tracePath));
             } catch (Exception e) {
                 handleError("Error capturing screenshot or trace", e, scenario);
                 throw new RuntimeException(e);
@@ -76,6 +86,29 @@ public class Hooks {
         logger.error(message, e);
         if (scenario != null) {
             scenario.log(message + ": " + e.getMessage());
+        }
+    }
+
+    // Clean up old trace files before starting new tests
+    private void cleanOldTracesKeepTodayAndYesterday() {
+        try {
+            File targetDir = new File("target");
+            if (targetDir.exists() && targetDir.isDirectory()) {
+                File[] files = targetDir.listFiles((dir, name) -> name.startsWith("trace_") && name.endsWith(".zip"));
+                if (files != null) {
+                    LocalDate today = LocalDate.now();
+                    LocalDate yesterday = today.minusDays(1);
+                    for (File file : files) {
+                        LocalDate fileDate = Files.getLastModifiedTime(file.toPath()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        if (!(fileDate.equals(today) || fileDate.equals(yesterday))) {
+                            Files.deleteIfExists(file.toPath());
+                            logger.info("Deleted old trace: {}", file.getName());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to clean old traces", e);
         }
     }
 }

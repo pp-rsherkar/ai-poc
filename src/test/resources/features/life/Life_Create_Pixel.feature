@@ -8,6 +8,7 @@ Feature: LIFE Regression - Create Pixel of following types:
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to Pixels page
     Then Verify the tabs displayed on the Pixels page
     Then Verify the Advertiser dropdown and search box are displayed on the Pixels page

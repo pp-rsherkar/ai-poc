@@ -1,15 +1,10 @@
 package utils;
 
 import com.opencsv.CSVReader;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -83,15 +78,41 @@ public class FileActions {
         }
     }
 
+    private static Path resolvePath(String fileName) throws IOException {
+        Path[] paths = {
+                Paths.get("src/main/resources", fileName),
+                Paths.get("src/main/resources/uploadfiles", fileName),
+                Paths.get(System.getProperty("user.home"), "Downloads", fileName)
+        };
+
+        for (Path path : paths) {
+            if (Files.exists(path)) {
+                return path;
+            }
+        }
+        throw new FileNotFoundException("File not found: " + fileName);
+    }
+
     public static int countRecordsFromTextFile(String fileName) throws IOException {
-        Path basePath = Paths.get("src/main/resources/uploadfiles", fileName);
+        Path basePath = resolvePath(fileName);
         List<String> lines = Files.readAllLines(basePath);
         return Math.toIntExact(lines.stream().filter(line -> !line.trim().isEmpty()).count());
     }
 
     public static int fetchRowCountFromCSV(Path filePath) throws IOException {
+        return fetchRowCount(filePath, true);
+    }
+
+    public static int fetchRowCountExcludeHeaderFromCSVAndTxt(String fileName) throws IOException {
+        return fetchRowCount(resolvePath(fileName), true);
+    }
+
+    private static int fetchRowCount(Path filePath, boolean excludeHeader) throws IOException {
         int rowCount = 0;
         try (BufferedReader br = Files.newBufferedReader(filePath)) {
+            if (excludeHeader) {
+                br.readLine();
+            }
             String line;
             while ((line = br.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
@@ -100,5 +121,14 @@ public class FileActions {
             }
         }
         return rowCount;
+    }
+
+    public static int fetchRowCountFromExcel(String fileName) throws IOException {
+        Path basePath = resolvePath(fileName);
+        try (InputStream is = Files.newInputStream(basePath);
+             Workbook workbook = WorkbookFactory.create(is)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            return sheet.getLastRowNum();
+        }
     }
 }

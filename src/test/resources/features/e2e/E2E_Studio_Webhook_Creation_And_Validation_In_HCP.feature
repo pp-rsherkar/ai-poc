@@ -12,11 +12,11 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
   Background:
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
-    When User navigates to Administrative section and go to Accounts Tab
+    When User navigates to Administrative section
+    And User navigates to Accounts Tab
     And User searches the account "PP engineering test" and checks Studio permissions
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
-
 
   @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the GET request URL and body
@@ -58,7 +58,6 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     Examples:
       | ADVERTISER | WORKSPACE_NAME | PARAM   | INVALID_WEBHOOK_DATA | ERROR_DATA                             |
       | Abbvie     | Explorer       | Param 4 | Test                 | https:www.google.com, WebhookData.json |
-
 
   @e2e
   Scenario Outline: Create a webhook and verify macros are appended to the POST request URL and body

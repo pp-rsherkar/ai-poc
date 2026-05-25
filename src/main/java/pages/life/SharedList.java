@@ -66,6 +66,7 @@ public class SharedList {
 
     public void clickDomainListFromMenu(String pageName) {
         Locator locator = page.locator(String.format("//div[contains(@class,'menuLabel') and contains(text(),'%s')]", pageName));
+        waitUtility.waitForLocatorVisible(locator);
         locator.click();
         waitUtility.waitUntilSpinnerHidden();
     }

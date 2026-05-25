@@ -15,6 +15,7 @@ public class CampaignSettings {
     private final Locator DEFAULT_BID_SETTINGS;
     private final Locator BASE_BID_PRICE;
     private final Locator MAX_BID_PRICE;
+    private final Locator HIGHEST_BID_PRICE;
     Navigation navigation = new Navigation(DriverFactory.getPage());
 
     public CampaignSettings(Page page) {
@@ -24,6 +25,7 @@ public class CampaignSettings {
         this.DEFAULT_BID_SETTINGS = page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Default Bid Settings"));
         this.BASE_BID_PRICE = page.locator("//input[@formcontrolname='defBaseBidPrice']");
         this.MAX_BID_PRICE = page.locator("//input[@formcontrolname='defMaxBidPrice']");
+        this.HIGHEST_BID_PRICE = page.locator("//input[@formcontrolname='highestMaxBidPrice']");
     }
 
     public void campaignSettingsLink() {
@@ -45,5 +47,9 @@ public class CampaignSettings {
 
     public BigDecimal getMaxBidPrice() {
         return new BigDecimal(MAX_BID_PRICE.inputValue());
+    }
+
+    public BigDecimal getHighestPossibleMaxBidPrice() {
+        return new BigDecimal(HIGHEST_BID_PRICE.inputValue());
     }
 }

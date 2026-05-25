@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CommonUtils {
-    public static int startDay = 0;
-    public static int endDay = 0;
 
     public static String timeStampCalculation() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -53,7 +51,7 @@ public class CommonUtils {
     }
 
     public static List<String> normalizeObjectList(List<Object> list) {
-        return list.stream().map(Object::toString).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
+        return list.stream().map(Object::toString).flatMap(s -> Arrays.stream(s.split("::"))).flatMap(s -> Arrays.stream(s.split(","))).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
     }
 
     public static List<String> parseCommaSeparatedString(String input) {
@@ -237,25 +235,42 @@ public class CommonUtils {
         return targetFile;
     }
 
-    public static void generateScheduleDaysIfNeeded() {
+    public static String[] generateStartAndEndDates() {
         YearMonth currentMonth = YearMonth.now();
         int maxDay = currentMonth.lengthOfMonth();
         int today = LocalDate.now().getDayOfMonth();
         int attempts = 0;
-        if (startDay != 0 && endDay != 0) {
-            return;
-        }
+        int startDay;
+        int endDay;
         do {
-            if (today >= maxDay - 1) {
+            if (today <= 1) {
+                startDay = 1;
+                endDay = Math.min(2, maxDay);
+            } else if (today >= maxDay - 1) {
                 startDay = maxDay - 1;
                 endDay = maxDay;
             } else {
-                startDay = ThreadLocalRandom.current().nextInt(today, maxDay);
+                startDay = ThreadLocalRandom.current().nextInt(1, today);
                 endDay = ThreadLocalRandom.current().nextInt(startDay + 1, maxDay + 1);
             }
+
             attempts++;
             if (attempts > 10) break;
+
         } while (endDay <= startDay);
+        LocalDate startDate = currentMonth.atDay(startDay);
+        LocalDate endDate = currentMonth.atDay(endDay);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMM-yyyy");
+        return new String[]{startDate.format(formatter), endDate.format(formatter)};
+    }
+
+    public static void selectCalendarData(Locator locator, String data) {
+        for (int i = 0; i < locator.count(); i++) {
+            if (locator.nth(i).textContent().trim().equals(data)) {
+                locator.nth(i).last().click();
+                break;
+            }
+        }
     }
 
     public static void moveSliderToValue(Locator sliderHandle, int targetValue, Page page) {
