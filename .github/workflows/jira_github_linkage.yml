@@ -92,28 +92,29 @@ jobs:
       - name: Generate Feature File via GitHub Copilot API
         run: |
           echo "Requesting feature file layout from GitHub Copilot..."
-          
-          # 1. Format the multi-line Prompt text file clearly
+
           cat << 'EOF' > structural_prompt.txt
           You are a professional QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
-          
+
           Jira Summary:
           ${{ env.SUMMARY }}
-          
+
           Jira Description:
           EOF
-          
-          # Append the raw text files directly into our core prompt file
+
           cat jira_description.txt >> structural_prompt.txt
-          
+
           cat << 'EOF' >> structural_prompt.txt
-          
+
           CRITICAL INSTRUCTIONS:
           1. Review the repository step dictionary provided below.
           2. Do NOT copy raw text blocks or full paragraphs directly from the Jira description into the Given/When/Then steps.
-          3. Synthesize the description details into short, logical user interactions (e.g., Given the user navigates to workspace, When the user schedules a creative, Then a validation error warning should display).
-          4. Match your step phrasing style directly to how steps are constructed in the step dictionary below. Use the exact text patterns from the dictionary where contextually logical.
-          5. Return ONLY the raw Gherkin syntax content. Do not output markdown fences, no triple backticks (
+          3. Synthesize the description details into short, logical user interactions.
+          4. Match your step phrasing style directly to how steps are constructed in the step dictionary below.
+          5. Return ONLY raw Gherkin syntax content. Do not output markdown fences or triple backticks.
+          EOF
+
+          cat step_dictionary.txt >> structural_prompt.txt
 
       # =========================
       # FILE NAMING & PLACEMENT
