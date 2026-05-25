@@ -1,0 +1,172 @@
+name: JIRA BDD Feature Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: 'Enter the JIRA Ticket ID (e.g., QA-1321)'
+        required: true
+        type: string
+
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  generate-feature-file:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      # Required for accessing GitHub's native LLM capabilities natively
+      id-token: write 
+
+    steps:
+      # =========================
+      # CLEAN CHECKOUT
+      # =========================
+      - name: Checkout main (clean)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          clean: true
+
+      - name: Ensure clean workspace
+        run: |
+          git clean -fd
+
+      # =========================
+      # STEP INDEX (Your Dictionary)
+      # =========================
+      - name: Build step index from main
+        run: |
+          echo "Building step index..."
+          STEP_INDEX=$(find src/test/resources/features -name "*.feature" \
+            -exec grep -E "^\s*(Given|When|Then|And|But) " {} \; \
+            | sed -e 's/^[ \t]*//' \
+            | sort | uniq)
+          
+          echo "$STEP_INDEX" > step_dictionary.txt
+
+      # =========================
+      # BRANCH HANDLING
+      # =========================
+      - name: Create or reuse Jira branch
+        run: |
+          BRANCH="${{ inputs.jira_id }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git fetch origin main
+
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+            git pull --rebase origin "$BRANCH"
+          else
+            git checkout -b "$BRANCH" origin/main
+          fi
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      # =========================
+      # JIRA FETCH
+      # =========================
+      - name: Fetch Jira Issue
+        run: |
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+
+          HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "❌ Jira API failed"
+            exit 1
+          fi
+
+          JSON=$(echo "$RESPONSE" | sed '$d')
+          SUMMARY=$(echo "$JSON" | jq -r '.fields.summary // "NO_SUMMARY"')
+          DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '\n\r')
+
+          echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
+          echo "$DESCRIPTION" > jira_description.txt
+
+      # =========================
+      # NATIVE GITHUB LLM GENERATION
+      # =========================
+      - name: Generate Feature File via GitHub Copilot
+        id: copilot-llm
+        uses: github/copilot-action@v1
+        with:
+          # Uses your enterprise/org Copilot subscription seats
+          copilot-token: ${{ secrets.COPILOT_TOKEN }} 
+          output-format: text
+          model: gpt-4o # Or any available model in your Copilot allowance (e.g. claude-3.5-sonnet)
+          prompt: |
+            You are a QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
+            Jira Summary: ${{ env.SUMMARY }}
+            Jira Description: $(cat jira_description.txt)
+            
+            Here is a dictionary of existing steps in our repository. You MUST try to reuse these exact step phrasings or formats where contextually appropriate so we do not duplicate step definitions:
+            $(cat step_dictionary.txt)
+            
+            Provide your response back in raw Gherkin format. Do not wrap it in markdown code blocks. Start directly with 'Feature:'
+
+      # =========================
+      # FEATURE FILE NAMING & PLACEMENT
+      # =========================
+      - name: Save and Name Feature File
+        run: |
+          RAW_DESC_SNIPPET=$(cat jira_description.txt | head -c 40)
+          CLEAN_DESC=$(echo "$RAW_DESC_SNIPPET" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9]/_/g' \
+            | sed 's/__*/_/g' \
+            | sed 's/^_//;s/_$//')
+
+          if [ -z "$CLEAN_DESC" ]; then CLEAN_DESC="feature"; fi
+
+          FILE_NAME="${{ inputs.jira_id }}_${CLEAN_DESC}.feature"
+          TARGET_DIR="src/test/resources/features"
+          mkdir -p "$TARGET_DIR"
+
+          # Use the output variable generated from the GitHub Copilot action step
+          echo "${{ steps.copilot-llm.outputs.result }}" > "$TARGET_DIR/$FILE_NAME"
+
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+          echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
+          
+          echo "--- Generated Feature Preview ---"
+          cat "$TARGET_DIR/$FILE_NAME"
+
+      # =========================
+      # SAFE COMMIT & PR
+      # =========================
+      - name: Commit and push (safe)
+        run: |
+          git add "${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}"
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "feat(${{ inputs.jira_id }}): generate contextual BDD feature file"
+            git push --force-with-lease origin "${{ env.BRANCH }}"
+          fi
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR already exists"
+            exit 0
+          fi
+
+          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub Copilot.\n\nJira ID: ${{ inputs.jira_id }}"
+          gh pr create \
+            --base main \
+            --head "${{ env.BRANCH }}" \
+            --title "feat(${{ inputs.jira_id }}): BDD Feature Implementation" \
+            --body "$PR_BODY"
