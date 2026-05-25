@@ -267,16 +267,6 @@ jobs:
           {print}
           ' generated.feature > "$DIR/$FILE"
 
-          # REMOVE DUPLICATE @todo SAFELY
-          awk '
-          BEGIN {prev=""}
-          {
-            if ($0=="@todo" && prev=="@todo") next
-            print
-            prev=$0
-          }
-          ' "$DIR/$FILE" > "$DIR/tmp" && mv "$DIR/tmp" "$DIR/$FILE"
-
           echo "DIR=$DIR" >> $GITHUB_ENV
           echo "FILE=$FILE" >> $GITHUB_ENV
 
