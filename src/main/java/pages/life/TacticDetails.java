@@ -516,6 +516,7 @@ public class TacticDetails {
                 lineItemDetails.enableLineItem();
                 lineItemDetails.saveLineItem();
                 waitUtility.waitUntilSpinnerHidden();
+                lineItemDetails.lineItemSuccess();
                 currentLiName = liName;
             }
 
