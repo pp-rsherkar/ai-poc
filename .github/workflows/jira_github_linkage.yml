@@ -113,8 +113,6 @@ jobs:
           - No markdown
           - No code fences
           - No explanations
-          - Every Scenario must start with @todo exactly once
-          - No duplicate @todo tags
           - Use existing steps whenever possible
           - Do NOT repeat scenario headers
           - Do NOT add placeholders like $SUMMARY
