@@ -10,170 +10,345 @@ on:
 
 jobs:
   generate-feature-file:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
       pull-requests: write
+      models: read
 
     steps:
-      # =========================
-      # CLEAN CHECKOUT
-      # =========================
-      - name: Checkout main (clean)
+
+      # =========================================================
+      # CHECKOUT
+      # =========================================================
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           clean: true
 
+      # =========================================================
+      # CLEAN WORKSPACE
+      # =========================================================
       - name: Ensure clean workspace
-        run: git clean -fd
-
-      # =========================
-      # STEP INDEX (Your Dictionary)
-      # =========================
-      - name: Build step index from main
         run: |
-          echo "Building step index..."
-          # Ensures directory exists before running search to avoid find warnings
-          mkdir -p src/test/resources/features
-          
-          # Extracts clean, unique step phrases from existing feature files
-          find src/test/resources/features -name "*.feature" -exec grep -E "^\s*(Given|When|Then|And|But) " {} \; \
-            | sed -e 's/^[ \t]*//' \
-            | sort | uniq > step_dictionary.txt
-          echo "Dictionary built with $(wc -l < step_dictionary.txt) steps."
+          set -euo pipefail
+          git clean -fd
 
-      # =========================
-      # BRANCH HANDLING
-      # =========================
+      # =========================================================
+      # INSTALL DEPENDENCIES
+      # =========================================================
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      # =========================================================
+      # BUILD AI CONTEXT FROM EXISTING FEATURE FILES
+      # =========================================================
+      - name: Build repository AI context
+        run: |
+          set -euo pipefail
+
+          mkdir -p src/test/resources/features
+
+          echo "Building reusable step dictionary..."
+
+          find src/test/resources/features -name "*.feature" \
+            -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
+            | sed 's/^[ \t]*//' \
+            | sort -u > step_dictionary.txt
+
+          echo "Step dictionary size:"
+          wc -l step_dictionary.txt
+
+          echo "Building feature style examples..."
+
+          rm -f feature_examples.txt
+
+          find src/test/resources/features -name "*.feature" | head -10 | while read file; do
+            echo "" >> feature_examples.txt
+            echo "================ FEATURE EXAMPLE ================" >> feature_examples.txt
+            cat "$file" >> feature_examples.txt
+            echo "" >> feature_examples.txt
+          done
+
+          echo "Repository AI context prepared."
+
+      # =========================================================
+      # CREATE OR REUSE BRANCH
+      # =========================================================
       - name: Create or reuse Jira branch
         run: |
+          set -euo pipefail
+
           BRANCH="${{ inputs.jira_id }}"
+
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+
           git fetch origin main
 
           if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+            echo "Reusing branch: $BRANCH"
             git checkout -B "$BRANCH" "origin/$BRANCH"
             git pull --rebase origin "$BRANCH"
           else
+            echo "Creating branch: $BRANCH"
             git checkout -b "$BRANCH" origin/main
           fi
+
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      # =========================
-      # JIRA FETCH
-      # =========================
+      # =========================================================
+      # FETCH JIRA ISSUE
+      # =========================================================
       - name: Fetch Jira Issue
         run: |
+          set -euo pipefail
+
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2 | tr -d '[:space:]')
+
           if [ "$HTTP_STATUS" != "200" ]; then
             echo "❌ Jira API failed with status $HTTP_STATUS"
             exit 1
           fi
 
           JSON=$(echo "$RESPONSE" | sed '$d')
+
           SUMMARY=$(echo "$JSON" | jq -r '.fields.summary // "NO_SUMMARY"')
-          DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '\n\r')
 
-          echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
-          echo "$DESCRIPTION" > jira_description.txt
+          DESCRIPTION=$(echo "$JSON" \
+            | jq -r '[.. | .text? // empty] | join(" ")' \
+            | tr -d '\n\r')
 
-      # =========================
-      # NATIVE GITHUB COPILOT CHAT API
-      # =========================
-      - name: Generate Feature File via GitHub Copilot API
+          {
+            echo "SUMMARY<<EOF"
+            echo "$SUMMARY"
+            echo "EOF"
+          } >> $GITHUB_ENV
+
+          {
+            echo "DESCRIPTION<<EOF"
+            echo "$DESCRIPTION"
+            echo "EOF"
+          } >> $GITHUB_ENV
+
+          echo "Fetched Jira summary:"
+          echo "$SUMMARY"
+
+      # =========================================================
+      # GENERATE FEATURE FILE USING GITHUB MODELS
+      # =========================================================
+      - name: Generate Feature File using GitHub Models
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Requesting feature file layout from GitHub Copilot..."
+          set -euo pipefail
 
-          cat << 'EOF' > structural_prompt.txt
-          You are a professional QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
+          echo "Building AI prompt..."
+
+          cat <<EOF > prompt.txt
+          You are a senior QA automation engineer.
+
+          Your task is to generate a production-quality BDD Gherkin feature file.
+
+          ==================================================
+          JIRA INFORMATION
+          ==================================================
+
+          Jira ID:
+          ${{ inputs.jira_id }}
 
           Jira Summary:
           ${{ env.SUMMARY }}
 
           Jira Description:
+          ${{ env.DESCRIPTION }}
+
+          ==================================================
+          FEATURE STYLE REFERENCES
+          ==================================================
+
+          These are REAL feature files from the repository.
+
+          Follow:
+          - formatting
+          - indentation
+          - scenario structure
+          - naming style
+          - tagging style
+          - wording patterns
+          - repository conventions
+
           EOF
 
-          cat jira_description.txt >> structural_prompt.txt
+          cat feature_examples.txt >> prompt.txt
 
-          cat << 'EOF' >> structural_prompt.txt
+          cat <<EOF >> prompt.txt
 
-          CRITICAL INSTRUCTIONS:
-          1. Review the repository step dictionary provided below.
-          2. Do NOT copy raw text blocks or full paragraphs directly from the Jira description into the Given/When/Then steps.
-          3. Synthesize the description details into short, logical user interactions.
-          4. Match your step phrasing style directly to how steps are constructed in the step dictionary below.
-          5. Return ONLY raw Gherkin syntax content. Do not output markdown fences or triple backticks.
+          ==================================================
+          REUSABLE STEP DICTIONARY
+          ==================================================
+
+          Reuse these exact steps whenever possible.
+
+          Prefer existing repository steps over inventing new ones.
+
           EOF
 
-          cat step_dictionary.txt >> structural_prompt.txt
+          cat step_dictionary.txt >> prompt.txt
 
-      # =========================
-      # FILE NAMING & PLACEMENT
-      # =========================
-      - name: Save and Name Feature File
+          cat <<EOF >> prompt.txt
+
+          ==================================================
+          IMPORTANT RULES
+          ==================================================
+
+          1. Generate meaningful automation-ready scenarios.
+          2. Reuse repository step wording whenever possible.
+          3. Only create new steps if absolutely necessary.
+          4. Do NOT copy Jira text directly into steps.
+          5. Convert Jira requirements into realistic user workflows.
+          6. Follow repository formatting exactly.
+          7. Return ONLY raw Gherkin syntax.
+          8. No markdown.
+          9. No explanations.
+
+          EOF
+
+          echo "Generating feature file from GitHub Models..."
+
+          RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -d "$(jq -n \
+              --rawfile prompt prompt.txt \
+              '{
+                model: "gpt-4.1",
+                temperature: 0.2,
+                messages: [
+                  {
+                    role: "system",
+                    content: "You generate enterprise-quality BDD feature files."
+                  },
+                  {
+                    role: "user",
+                    content: $prompt
+                  }
+                ]
+              }')")
+
+          echo "$RESPONSE" | jq -r '.choices[0].message.content' > generated.feature
+
+          if [ ! -s generated.feature ]; then
+            echo "❌ generated.feature is empty"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          echo "Generated feature file successfully."
+
+      # =========================================================
+      # SAVE GENERATED FEATURE FILE
+      # =========================================================
+      - name: Save generated feature file
         run: |
-          RAW_DESC_SNIPPET=$(cat jira_description.txt | head -c 40)
-          CLEAN_DESC=$(echo "$RAW_DESC_SNIPPET" \
+          set -euo pipefail
+
+          TARGET_DIR="src/test/resources/features"
+
+          mkdir -p "$TARGET_DIR"
+
+          CLEAN_NAME=$(echo "${{ env.DESCRIPTION }}" \
+            | head -c 80 \
             | tr '[:upper:]' '[:lower:]' \
             | sed 's/[^a-z0-9]/_/g' \
             | sed 's/__*/_/g' \
-            | sed 's/^_//;s/_$//')
+            | sed 's/^_//;s/_$//' \
+            | cut -c1-60)
 
-          if [ -z "$CLEAN_DESC" ]; then CLEAN_DESC="feature"; fi
-
-          FILE_NAME="${{ inputs.jira_id }}_${CLEAN_DESC}.feature"
-          TARGET_DIR="src/test/resources/features"
-          
-          # Clean up previous feature iterations for this ticket to keep the branch clean
-          rm -f "$TARGET_DIR/${{ inputs.jira_id }}_"*.feature
-          mkdir -p "$TARGET_DIR"
-
-          mv generated.feature "$TARGET_DIR/$FILE_NAME"
-          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
-          echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
-          
-          echo "--- Generated Feature File Preview ---"
-          cat "$TARGET_DIR/$FILE_NAME"
-
-      # =========================
-      # SAFE COMMIT & PR PUSH
-      # =========================
-      - name: Commit and push changes
-        run: |
-          # Stage both the file addition and any automatic dynamic deletion of the old style names
-          git add src/test/resources/features/
-          
-          if git diff --cached --quiet; then
-            echo "No structural variations detected."
-          else
-            git commit -m "feat(${{ inputs.jira_id }}): generate tailored BDD feature file"
-            git push --force-with-lease origin "${{ env.BRANCH }}"
+          if [ -z "$CLEAN_NAME" ]; then
+            CLEAN_NAME="feature"
           fi
 
-      # =========================
-      # SMART PR UPDATE OR CREATE
-      # =========================
-      - name: Create or Update Pull Request
+          FILE_NAME="${{ inputs.jira_id }}_${CLEAN_NAME}.feature"
+
+          rm -f "$TARGET_DIR/${{ inputs.jira_id }}_"*.feature
+
+          mv generated.feature "$TARGET_DIR/$FILE_NAME"
+
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+          echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
+
+          echo "--- GENERATED FEATURE FILE ---"
+          cat "$TARGET_DIR/$FILE_NAME"
+
+      # =========================================================
+      # COMMIT AND PUSH
+      # =========================================================
+      - name: Commit and push changes
+        run: |
+          set -euo pipefail
+
+          git add "${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}"
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
+          else
+            git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature file"
+            git push --force-with-lease origin "${{ env.BRANCH }}"
+            echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          fi
+
+      # =========================================================
+      # CREATE PULL REQUEST
+      # =========================================================
+      - name: Create Pull Request
+        if: env.HAS_CHANGES == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
-          PR_TITLE="feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}"
-          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub Copilot.\n\n**Jira ID:** ${{ inputs.jira_id }}"
+          set -euo pipefail
+
+          EXISTING_PR=$(gh pr list \
+            --head "${{ env.BRANCH }}" \
+            --base main \
+            --state open \
+            --json number \
+            --jq '.[0].number')
 
           if [ -n "$EXISTING_PR" ]; then
-            echo "Updating existing PR #$EXISTING_PR"
-            gh pr edit "$EXISTING_PR" --title "$PR_TITLE" --body "$PR_BODY"
-          else
-            echo "Creating a new PR"
-            gh pr create --base main --head "${{ env.BRANCH }}" --title "$PR_TITLE" --body "$PR_BODY"
+            echo "PR already exists"
+            exit 0
           fi
+
+          PR_BODY=$(cat <<EOF
+          Auto-generated BDD feature file from Jira ticket.
+
+          Jira ID: ${{ inputs.jira_id }}
+          Summary: ${{ env.SUMMARY }}
+
+          Generated using:
+          - Existing repository feature file patterns
+          - Existing repository step dictionary
+          - Jira description semantic analysis
+
+          Only the generated feature file is included in this PR.
+          EOF
+          )
+
+          gh pr create \
+            --base main \
+            --head "${{ env.BRANCH }}" \
+            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
+            --body "$PR_BODY"
