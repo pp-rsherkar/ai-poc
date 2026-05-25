@@ -110,7 +110,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          cat <<EOF > prompt.txt
+          cat <<'EOF' > prompt.txt
           You are a Senior QA Automation Engineer working on a mature BDD (Cucumber/Gherkin) automation framework.
           
           Your task is to generate a production-quality, automation-ready Gherkin feature file based on Jira requirements and existing repository patterns.
@@ -120,13 +120,13 @@ jobs:
           ==================================================
           
           ID:
-          ${{ inputs.jira_id }}
+          QA-1321
           
           SUMMARY:
-          $SUMMARY
+          '"$SUMMARY"'
           
           DESCRIPTION:
-          $DESCRIPTION
+          '"$DESCRIPTION"'
           
           ==================================================
           REPOSITORY CONTEXT (MOST IMPORTANT)
@@ -171,120 +171,32 @@ jobs:
           
           If repository contains login/navigation steps:
           - Reuse them exactly from step_dictionary.txt
-          Example:
-            Given user is logged in as "<role>"
-            And user navigates to "<page>"
           
-          If NOT present in repository:
+          If NOT present:
           - Assume user is already authenticated
           - DO NOT invent login flows
           
           ==================================================
-          TEST DATA USAGE RULES (3 LEVEL MODEL)
+          TEST DATA RULES
           ==================================================
           
-          You MUST decide test-data format based on repository patterns:
-          
-          --------------------------------------------------
-          1. STEP-LEVEL TEST DATA (PREFERRED IF AVAILABLE)
-          --------------------------------------------------
-          Use inline values inside steps when repo uses it.
-          
-          Example:
-          Given a tactic with 3 creatives
-          And schedule is active for all creatives
-          
-          --------------------------------------------------
-          2. CUCUMBER DATA TABLES (ONLY IF REPO USES THEM)
-          --------------------------------------------------
-          Use ONLY if similar structure exists in repository.
-          
-          Example:
-          Given a tactic exists with:
-            | creatives | 3 |
-            | schedule  | active |
-          
-          Rules:
-          - Do NOT introduce tables if repo does not already use them
-          - Keep tables minimal and readable
-          
-          --------------------------------------------------
-          3. SCENARIO OUTLINE / EXAMPLES (ONLY IF PATTERN EXISTS)
-          --------------------------------------------------
-          Use Scenario Outline ONLY if repository already uses it.
-          
-          Example:
-          Scenario Outline: Validate scheduling for different creatives
-            Given a tactic with "<creative_count>" creatives
-            When scheduling is applied
-            Then system validates "<expected_result>"
-          
-            Examples:
-              | creative_count | expected_result |
-              | 1              | success         |
-              | 5              | warning         |
+          Use step-level data, tables, or scenario outlines ONLY if repository already uses them.
           
           ==================================================
           STEP REUSE RULE (STRICT)
           ==================================================
           
-          Before writing any step:
           - Check step_dictionary.txt first
-          - Prefer exact match reuse
-          - Only create new steps if no match exists
+          - Prefer reuse
+          - Only create new steps if necessary
           
           ==================================================
-          SCENARIO DESIGN PRINCIPLES
+          FINAL OUTPUT RULE
           ==================================================
           
-          Each scenario must:
-          - Represent ONE business behavior
-          - Be independent and executable
-          - Include meaningful validation
-          - Avoid duplication
-          - Include positive + negative coverage where relevant
+          Return ONLY valid Gherkin.
           
-          ==================================================
-          TAGGING RULES
-          ==================================================
-          
-          - Every Scenario MUST start with @todo
-          - Reuse existing tags from repository if present
-          - Do NOT invent new tag taxonomy
-          
-          ==================================================
-          BACKGROUND RULES
-          ==================================================
-          
-          Include Background ONLY if repository shows consistent usage.
-          Otherwise omit it.
-          
-          ==================================================
-          FEATURE QUALITY RULES
-          ==================================================
-          
-          Ensure:
-          - Automation-ready structure
-          - Clean Gherkin formatting
-          - No redundant scenarios
-          - Business logic accuracy
-          - Proper reuse of repository patterns
-          
-          ==================================================
-          FINAL OUTPUT FORMAT (STRICT)
-          ==================================================
-          
-          Feature: <Feature Name>
-          
-          Background:
-            ...
-          
-          @todo
-          Scenario: <Scenario Name>
-            Given ...
-            When ...
-            Then ...
-          
+          Feature: ...
           EOF
           
                     head -n 200 step_dictionary.txt >> prompt.txt
