@@ -130,23 +130,82 @@ jobs:
           $STEP_CONTEXT
           
           ==================================================
-          TEST DATA RULES (STRICT PRODUCTION RULES)
+          TEST DATA RULES (ENHANCED - PRODUCTION SAFE)
           ==================================================
           
-          1. INLINE DATA (DEFAULT)
+          You MUST choose ONE of the following based on Jira + repo patterns.
+          
+          --------------------------------------------------
+          1. INLINE DATA (DEFAULT - PREFERRED)
+          --------------------------------------------------
           Use natural language values in steps.
           
           Example:
           Given a tactic with 3 creatives
+          And all creatives have active schedules
           
-          2. TABLES (ONLY IF EXISTS IN REPO)
-          Do NOT introduce new table patterns.
+          Use this unless there is a strong need for structured data.
           
-          3. SCENARIO OUTLINE (ONLY IF EXISTS)
-          Only use if already present in repo.
+          --------------------------------------------------
+          2. DATA TABLES (ONLY IF LOGIC IS STRUCTURED OR REPO USES IT)
+          --------------------------------------------------
+          Use Data Tables ONLY when:
           
-          4. NO STRUCTURED DATA BY DEFAULT
-          Prefer readable steps over data structures.
+          - The scenario has multiple attributes for same entity
+          - OR repository already uses tables
+          - OR Jira explicitly describes structured fields
+          
+          Example:
+          Given a tactic exists with:
+            | creatives | 3 |
+            | schedule  | active |
+            | flights   | 2 |
+          
+          RULES:
+          - Max 5 rows
+          - No nested tables
+          - No tables unless necessary for clarity
+          - NEVER introduce tables just for formatting
+          
+          --------------------------------------------------
+          3. SCENARIO OUTLINE + EXAMPLES (ONLY FOR DATA VARIANTS)
+          --------------------------------------------------
+          Use Scenario Outline ONLY when:
+          
+          - Same scenario repeats with different inputs
+          - OR Jira describes multiple test permutations
+          - OR repository already contains Scenario Outline
+          
+          Example:
+          Scenario Outline: Validate scheduling behavior for creatives
+          
+            Given a tactic with "<creative_count>" creatives
+            And schedule state is "<schedule_state>"
+          
+            When user views scheduling dashboard
+            Then system shows "<expected_result>"
+          
+          Examples:
+            | creative_count | schedule_state | expected_result |
+            | 1              | partial        | no warning      |
+            | 3              | full           | warning shown   |
+            | 5              | none           | full warning    |
+          
+          RULES:
+          - Must map 1:1 with Jira variations
+          - Do NOT create examples unless multiple cases exist
+          
+          --------------------------------------------------
+          4. DECISION RULE (VERY IMPORTANT)
+          --------------------------------------------------
+          You must decide in this order:
+          
+          1st priority → INLINE DATA
+          2nd priority → DATA TABLES (if structure needed)
+          3rd priority → SCENARIO OUTLINE (if multiple permutations exist)
+          
+          Never skip directly to tables or outlines.
+          Never mix all 3 in one scenario unless repo already does.
           
           ==================================================
           LOGIN RULES
