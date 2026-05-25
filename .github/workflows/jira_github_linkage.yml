@@ -165,14 +165,16 @@ jobs:
       # =========================
       # Commit
       # =========================
-      - name: Commit changes
+      - name: Commit and push (overwrite branch)
         run: |
           set -euo pipefail
-
+      
           git add "$FILE"
-
-          git commit -m "feat(${{ inputs.jira_id }}): generate BDD feature" || exit 0
-          git push origin "$BRANCH"
+      
+          git commit -m "feat(QA-1321): generate BDD feature" || echo "No changes to commit"
+      
+          # overwrite remote branch safely
+          git push --force-with-lease origin "$BRANCH"
 
       # =========================
       # Create PR (FIXED MAIN → BRANCH ONLY)
