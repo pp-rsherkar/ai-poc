@@ -6009,7 +6009,6 @@ public class LifeSteps {
             logger.info("Successfully verified copy for tactic: {}", name);
         }
     }
-}
 
     @And("User clicks Import Deals button")
     public void userClicksImportDealsButton() {
