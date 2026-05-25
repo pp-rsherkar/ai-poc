@@ -176,19 +176,40 @@ jobs:
             git push --force-with-lease origin "${{ env.BRANCH }}"
           fi
 
-      - name: Create Pull Request
+# =========================
+      # SMART PR CREATION OR UPDATE
+      # =========================
+      - name: Create or Update Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
-          if [ -n "$EXISTING_PR" ]; then
-            echo "PR already exists"
-            exit 0
-          fi
-
-          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub LLM.\n\nJira ID: ${{ inputs.jira_id }}"
-          gh pr create \
-            --base main \
+          # Check for an existing open PR for this branch
+          EXISTING_PR=$(gh pr list \
             --head "${{ env.BRANCH }}" \
-            --title "feat(${{ inputs.jira_id }}): BDD Feature Implementation" \
-            --body "$PR_BODY"
+            --base main \
+            --state open \
+            --json number \
+            --jq '.[0].number')
+
+          PR_TITLE="feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}"
+          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub LLM.\n\n**Jira ID:** ${{ inputs.jira_id }}\n**File Generated:** \`${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}\`"
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "🔄 Existing PR found (#$EXISTING_PR). Updating Title and Description..."
+            
+            gh pr edit "$EXISTING_PR" \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
+              
+            echo "✅ Pull Request #$EXISTING_PR updated successfully."
+          else
+            echo "🚀 No existing PR found. Creating a new one..."
+            
+            gh pr create \
+              --base main \
+              --head "${{ env.BRANCH }}" \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
+              
+            echo "✅ Pull Request created successfully."
+          fi
