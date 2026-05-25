@@ -69,29 +69,40 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       # =========================
-      # JIRA FETCH
+      # JIRA FETCH (With Enhanced Debugging)
       # =========================
       - name: Fetch Jira Issue
         run: |
+          echo "Connecting to Jira API..."
+          
+          # Execute the curl request and save raw output to a file to prevent token exposure in logs
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
-          HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
-          
-          # FIXED: Removed the stray '|' character below
+          # Extract HTTP Status safely
+          HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2 | tr -d '[:space:]')
+
+          echo "Status Received: $HTTP_STATUS"
+
           if [ "$HTTP_STATUS" != "200" ]; then
-            echo "❌ Jira API failed (HTTP Status: $HTTP_STATUS)"
+            echo "❌ Jira API failed with HTTP Status: $HTTP_STATUS"
+            echo "--- Raw Response Payload (First 500 characters) ---"
+            echo "$RESPONSE" | sed '$d' | head -c 500
             exit 1
           fi
 
+          # If successful, extract data
           JSON=$(echo "$RESPONSE" | sed '$d')
           SUMMARY=$(echo "$JSON" | jq -r '.fields.summary // "NO_SUMMARY"')
           DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '\n\r')
 
+          # Save values cleanly
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
           echo "$DESCRIPTION" > jira_description.txt
+          
+          echo "✅ Successfully fetched Jira ticket: $SUMMARY"
 
       # =========================
       # NATIVE GITHUB LLM INFERENCE via CURL
