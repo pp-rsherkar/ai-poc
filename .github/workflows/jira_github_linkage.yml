@@ -8,14 +8,8 @@ on:
         required: true
         type: string
 
-  pull_request:
-    types: [closed]
-    branches:
-      - main
-
 jobs:
   generate-feature-file:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     permissions:
@@ -34,8 +28,7 @@ jobs:
           clean: true
 
       - name: Ensure clean workspace
-        run: |
-          git clean -fd
+        run: git clean -fd
 
       # =========================
       # STEP INDEX (Your Dictionary)
@@ -43,12 +36,11 @@ jobs:
       - name: Build step index from main
         run: |
           echo "Building step index..."
-          STEP_INDEX=$(find src/test/resources/features -name "*.feature" \
-            -exec grep -E "^\s*(Given|When|Then|And|But) " {} \; \
+          # Extracts clean, unique step phrases from existing feature files
+          find src/test/resources/features -name "*.feature" -exec grep -E "^\s*(Given|When|Then|And|But) " {} \; \
             | sed -e 's/^[ \t]*//' \
-            | sort | uniq)
-          
-          echo "$STEP_INDEX" > step_dictionary.txt
+            | sort | uniq > step_dictionary.txt
+          echo "Dictionary built with $(wc -l < step_dictionary.txt) steps."
 
       # =========================
       # BRANCH HANDLING
@@ -69,76 +61,67 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       # =========================
-      # JIRA FETCH (With Enhanced Debugging)
+      # JIRA FETCH
       # =========================
       - name: Fetch Jira Issue
         run: |
-          echo "Connecting to Jira API..."
-          
-          # Execute the curl request and save raw output to a file to prevent token exposure in logs
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
-          # Extract HTTP Status safely
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2 | tr -d '[:space:]')
-
-          echo "Status Received: $HTTP_STATUS"
-
           if [ "$HTTP_STATUS" != "200" ]; then
-            echo "❌ Jira API failed with HTTP Status: $HTTP_STATUS"
-            echo "--- Raw Response Payload (First 500 characters) ---"
-            echo "$RESPONSE" | sed '$d' | head -c 500
+            echo "❌ Jira API failed with status $HTTP_STATUS"
             exit 1
           fi
 
-          # If successful, extract data
           JSON=$(echo "$RESPONSE" | sed '$d')
           SUMMARY=$(echo "$JSON" | jq -r '.fields.summary // "NO_SUMMARY"')
           DESCRIPTION=$(echo "$JSON" | jq -r '[.. | .text? // empty] | join(" ")' | tr -d '\n\r')
 
-          # Save values cleanly
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
           echo "$DESCRIPTION" > jira_description.txt
-          
-          echo "✅ Successfully fetched Jira ticket: $SUMMARY"
 
       # =========================
-      # NATIVE GITHUB LLM INFERENCE via CURL
+      # ROBUST COPILOT LLM GENERATION
       # =========================
-      - name: Generate Feature File via GitHub Models API
+      - name: Generate Feature File via GitHub Copilot CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Prompting GitHub's LLM engine..."
+          echo "Initializing Copilot integration..."
+          gh extension install github/gh-copilot || true
           
-          # Escaping variables safely for the JSON payload
-          DICT=$(cat step_dictionary.txt | jq -aR .)
-          JIRA_DESC=$(cat jira_description.txt | jq -aR .)
-          JIRA_SUMM=$(echo "${{ env.SUMMARY }}" | jq -aR .)
-
-          PROMPT="You are a QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
-          Jira Summary: $JIRA_SUMM
+          # Prepare text blocks safely
+          DICT=$(cat step_dictionary.txt)
+          JIRA_DESC=$(cat jira_description.txt)
+          
+          # Create a structural system prompt instructing Copilot on how to write code
+          cat << EOF > prompt.txt
+          You are a strict QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
+          
+          Jira Summary: ${{ env.SUMMARY }}
           Jira Description: $JIRA_DESC
           
-          Here is a dictionary of existing steps in our repository. You MUST reuse these exact step phrasings or formats where contextually appropriate so we don't duplicate code:
-          $DICT
-          
-          Provide your response back in raw Gherkin format. Do not wrap it in markdown code blocks. Start directly with 'Feature:'"
+          CRITICAL INSTRUCTIONS:
+          1. Review the existing repository steps dictionary below. 
+          2. Do NOT copy the Jira description sentence directly into the Given/When/Then lines. 
+          3. Convert the description into logical user actions (e.g., Given the user navigates to workspace, When the user schedules a creative without a line item flight, Then an error message should display). Match your phrase structure to the existing dictionary style where possible.
+          4. Output ONLY the raw Gherkin text. No markdown code blocks, no backticks, no talkback prose. Start directly with "Feature:".
 
-          # Querying GitHub's OpenAI/Copilot Proxy endpoint natively using standard token privileges
-          curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -d "{
-              \"model\": \"gpt-4o\",
-              \"messages\": [
-                {\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rxs .)}
-              ],
-              \"temperature\": 0.2
-            }" | jq -r '.choices[0].message.content' > generated.feature
+          Repository Steps Dictionary:
+          $DICT
+          EOF
+
+          # Call the copilot CLI to compute the result safely
+          gh copilot explain "Generate Gherkin feature file based on prompt.txt instructions" --prompt "$(cat prompt.txt)" > generated_raw.txt
+          
+          # Clean any stray markdown artifacts if returned
+          cat generated_raw.txt | sed '/^```/d' > generated.feature
 
       # =========================
-      # FEATURE FILE NAMING & PLACEMENT
+      # SINGLE FILE NAMING & PLACEMENT
       # =========================
       - name: Save and Name Feature File
         run: |
@@ -153,63 +136,45 @@ jobs:
 
           FILE_NAME="${{ inputs.jira_id }}_${CLEAN_DESC}.feature"
           TARGET_DIR="src/test/resources/features"
+          
+          # Clean up any residual old feature files on this branch to keep the PR pristine
+          rm -rf $TARGET_DIR/${{ inputs.jira_id }}_*.feature
           mkdir -p "$TARGET_DIR"
 
           mv generated.feature "$TARGET_DIR/$FILE_NAME"
-
           echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
           echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
-          
-          echo "--- Generated Feature Preview ---"
-          cat "$TARGET_DIR/$FILE_NAME"
 
       # =========================
-      # SAFE COMMIT & PR
+      # SAFE COMMIT & PR PUSH
       # =========================
-      - name: Commit and push (safe)
+      - name: Commit and push changes
         run: |
           git add "${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}"
+          
+          # Check if there are real changes to commit
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No variations detected."
           else
-            git commit -m "feat(${{ inputs.jira_id }}): generate contextual BDD feature file"
+            git commit -m "feat(${{ inputs.jira_id }}): generate tailored BDD feature file"
             git push --force-with-lease origin "${{ env.BRANCH }}"
           fi
 
-# =========================
-      # SMART PR CREATION OR UPDATE
+      # =========================
+      # SMART PR UPDATE OR CREATE
       # =========================
       - name: Create or Update Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check for an existing open PR for this branch
-          EXISTING_PR=$(gh pr list \
-            --head "${{ env.BRANCH }}" \
-            --base main \
-            --state open \
-            --json number \
-            --jq '.[0].number')
-
+          EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
           PR_TITLE="feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}"
-          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub LLM.\n\n**Jira ID:** ${{ inputs.jira_id }}\n**File Generated:** \`${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}\`"
+          PR_BODY="Auto-generated smart BDD feature file matched against existing repository patterns.\n\n**Jira ID:** ${{ inputs.jira_id }}"
 
           if [ -n "$EXISTING_PR" ]; then
-            echo "🔄 Existing PR found (#$EXISTING_PR). Updating Title and Description..."
-            
-            gh pr edit "$EXISTING_PR" \
-              --title "$PR_TITLE" \
-              --body "$PR_BODY"
-              
-            echo "✅ Pull Request #$EXISTING_PR updated successfully."
+            echo "Updating existing PR #$EXISTING_PR"
+            gh pr edit "$EXISTING_PR" --title "$PR_TITLE" --body "$PR_BODY"
           else
-            echo "🚀 No existing PR found. Creating a new one..."
-            
-            gh pr create \
-              --base main \
-              --head "${{ env.BRANCH }}" \
-              --title "$PR_TITLE" \
-              --body "$PR_BODY"
-              
-            echo "✅ Pull Request created successfully."
+            echo "Creating a new PR"
+            gh pr create --base main --head "${{ env.BRANCH }}" --title "$PR_TITLE" --body "$PR_BODY"
           fi
