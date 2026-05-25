@@ -227,25 +227,27 @@ jobs:
 
           echo "Generating feature file from GitHub Models..."
 
+          jq -n \
+            --rawfile prompt prompt.txt \
+            '{
+              model: "gpt-4.1",
+              temperature: 0.2,
+              messages: [
+                {
+                  role: "system",
+                  content: "You generate enterprise-quality BDD feature files."
+                },
+                {
+                  role: "user",
+                  content: $prompt
+                }
+              ]
+            }' > request.json
+          
           RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -d "$(jq -n \
-              --rawfile prompt prompt.txt \
-              '{
-                model: "gpt-4.1",
-                temperature: 0.2,
-                messages: [
-                  {
-                    role: "system",
-                    content: "You generate enterprise-quality BDD feature files."
-                  },
-                  {
-                    role: "user",
-                    content: $prompt
-                  }
-                ]
-              }')")
+            -H "Authorization: Bearer '"$GITHUB_TOKEN"'" \
+            --data @request.json)
 
           echo "$RESPONSE" | jq -r '.choices[0].message.content' > generated.feature
 
