@@ -396,6 +396,10 @@ public List<String> fetchEnteredManagementFeeValues() {
                     }
                     break;
                 case "Endemics":
+                    for (String val : ruleValues) {
+                        String xpath = String.format("//sui-radio-button//label[normalize-space(text())='%s']", val);
+                        isElementVisible(xpath);
+                    }
                     break;
                 case "Geo Targets":
                     GEO_TARGETS_BULK_UPLOAD.click();

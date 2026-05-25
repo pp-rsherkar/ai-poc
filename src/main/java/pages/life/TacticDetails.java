@@ -494,20 +494,20 @@ public class TacticDetails {
         page.locator(xpath).click();
     }
 
-    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows) {
+    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative) {
         String currentLiName = null;
 
-        for (Map<String, String> row : rows) {
+        for (int i = 0; i < rows.size(); i++) {
+            Map<String, String> row = rows.get(i);
             String liType    = row.get("LI_TYPE");
             String liName    = row.get("LI_NAME");
             String liBudget  = row.get("LI_BUDGET");
             String tacticName = row.get("TACTIC_NAME");
             String channel   = row.get("CHANNEL");
 
-            // Create a new line item only when LI_NAME changes
             if (!liName.equals(currentLiName)) {
                 if (currentLiName != null) {
-                    lineItemDetails.selectNewLineItem();   // already has waitUtility inside
+                    lineItemDetails.selectNewLineItem();
                 }
                 lineItemDetails.enterLineItemName(liName);
                 lineItemDetails.selectLineItemType(liType);
@@ -519,29 +519,37 @@ public class TacticDetails {
                 currentLiName = liName;
             }
 
-            // Create tactic — createTactic() already has waitUtility inside
             createTactic(tacticName);
-
-            // Select channel and open targeting panel
             tacticSettings.selectChannel(channel);
-            clickTargetingRuleIcon();   // already has waitUtility inside
+            clickTargetingRuleIcon();
 
-            // Configure all 6 targeting rules
-            for (int i = 1; i <= 6; i++) {
-                String rule   = row.get("RULE_"   + i);
-                String values = row.get("VALUES_" + i);
+            for (int j = 1; j <= 6; j++) {
+                String rule   = row.get("RULE_"   + j);
+                String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
                     tacticSettings.selectMultipleRuleTypes(rule, CommonUtils.parseCommaSeparatedString(values));
                 }
             }
+
             tacticSettings.closeRuleTypePanel();
-
-            // Save — saveTacticDetails() already has waitUtility inside
             saveTacticDetails();
+            navigation.clickOnIcon("Assign Existing Creatives");
+            tacticCreatives.assignCreatives(creative);
+            tacticCreatives.enableCreative();
+            tacticCreatives.saveTacticCreatives();
 
-            // Open new tactic for the next row
-            clickNewTactic();
+            if (i + 1 < rows.size()) {
+                String nextLiName = rows.get(i + 1).get("LI_NAME");
+                if (nextLiName.equals(liName)) {
+                    addNewTactic();
+                }
+            }
         }
+    }
+
+    public void addNewTactic() {
+        NEW_TACTIC_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
     }
 }
 
