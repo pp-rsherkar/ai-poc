@@ -249,8 +249,19 @@ jobs:
             -H "Authorization: Bearer '"$GITHUB_TOKEN"'" \
             --data @request.json)
 
-          echo "$RESPONSE" | jq -r '.choices[0].message.content' > generated.feature
-
+          echo "===== RAW RESPONSE ====="
+          echo "$RESPONSE"
+          
+          CONTENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+          
+          if [ -z "$CONTENT" ] || [ "$CONTENT" = "null" ]; then
+            echo "❌ Model did not return valid content"
+            echo "$RESPONSE"
+            exit 1
+          fi
+          
+          echo "$CONTENT" > generated.feature
+          
           if [ ! -s generated.feature ]; then
             echo "❌ generated.feature is empty"
             echo "$RESPONSE"
