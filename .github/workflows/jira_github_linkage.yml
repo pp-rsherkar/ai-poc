@@ -160,16 +160,26 @@ jobs:
       - name: Save feature file
         run: |
           set -euo pipefail
-
+          
           DIR="src/test/resources/features"
           mkdir -p "$DIR"
-
+          
           FILE="${{ inputs.jira_id }}.feature"
-
+          
           mv generated.feature "$DIR/$FILE"
-
+          
           echo "FILE=$FILE" >> $GITHUB_ENV
           echo "DIR=$DIR" >> $GITHUB_ENV
+          
+          echo "Adding @todo tags to scenarios..."
+          
+          awk '
+          /^  Scenario:/ {print "  @todo"}
+          {print}
+          ' "$DIR/$FILE" > "$DIR/tmp.feature" && mv "$DIR/tmp.feature" "$DIR/$FILE"
+          
+          echo "--- FINAL FEATURE FILE ---"
+          cat "$DIR/$FILE"
 
       # =========================
       # COMMIT + FORCE PUSH (FIXED)
