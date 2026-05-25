@@ -21,8 +21,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      # Required for accessing GitHub's native LLM capabilities natively
-      id-token: write 
 
     steps:
       # =========================
@@ -81,7 +79,7 @@ jobs:
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
           HTTP_STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
-          if [ "$HTTP_STATUS" != "200" ]; then
+          if [ "$|HTTP_STATUS" != "200" ]; then
             echo "❌ Jira API failed"
             exit 1
           fi
@@ -94,25 +92,37 @@ jobs:
           echo "$DESCRIPTION" > jira_description.txt
 
       # =========================
-      # NATIVE GITHUB LLM GENERATION
+      # NATIVE GITHUB LLM INFERENCE via CURL
       # =========================
-      - name: Generate Feature File via GitHub Copilot
-        id: copilot-llm
-        uses: github/copilot-action@v1
-        with:
-          # Uses your enterprise/org Copilot subscription seats
-          copilot-token: ${{ secrets.COPILOT_TOKEN }} 
-          output-format: text
-          model: gpt-4o # Or any available model in your Copilot allowance (e.g. claude-3.5-sonnet)
-          prompt: |
-            You are a QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
-            Jira Summary: ${{ env.SUMMARY }}
-            Jira Description: $(cat jira_description.txt)
-            
-            Here is a dictionary of existing steps in our repository. You MUST try to reuse these exact step phrasings or formats where contextually appropriate so we do not duplicate step definitions:
-            $(cat step_dictionary.txt)
-            
-            Provide your response back in raw Gherkin format. Do not wrap it in markdown code blocks. Start directly with 'Feature:'
+      - name: Generate Feature File via GitHub Models API
+        run: |
+          echo "Prompting GitHub's LLM engine..."
+          
+          # Escaping variables safely for the JSON payload
+          DICT=$(cat step_dictionary.txt | jq -aR .)
+          JIRA_DESC=$(cat jira_description.txt | jq -aR .)
+          JIRA_SUMM=$(echo "${{ env.SUMMARY }}" | jq -aR .)
+
+          PROMPT="You are a QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
+          Jira Summary: $JIRA_SUMM
+          Jira Description: $JIRA_DESC
+          
+          Here is a dictionary of existing steps in our repository. You MUST reuse these exact step phrasings or formats where contextually appropriate so we don't duplicate code:
+          $DICT
+          
+          Provide your response back in raw Gherkin format. Do not wrap it in markdown code blocks. Start directly with 'Feature:'"
+
+          # Querying GitHub's OpenAI/Copilot Proxy endpoint natively using standard token privileges
+          curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{
+              \"model\": \"gpt-4o\",
+              \"messages\": [
+                {\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rxs .)}
+              ],
+              \"temperature\": 0.2
+            }" | jq -r '.choices[0].message.content' > generated.feature
 
       # =========================
       # FEATURE FILE NAMING & PLACEMENT
@@ -132,8 +142,7 @@ jobs:
           TARGET_DIR="src/test/resources/features"
           mkdir -p "$TARGET_DIR"
 
-          # Use the output variable generated from the GitHub Copilot action step
-          echo "${{ steps.copilot-llm.outputs.result }}" > "$TARGET_DIR/$FILE_NAME"
+          mv generated.feature "$TARGET_DIR/$FILE_NAME"
 
           echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
           echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
@@ -164,7 +173,7 @@ jobs:
             exit 0
           fi
 
-          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub Copilot.\n\nJira ID: ${{ inputs.jira_id }}"
+          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub LLM.\n\nJira ID: ${{ inputs.jira_id }}"
           gh pr create \
             --base main \
             --head "${{ env.BRANCH }}" \
