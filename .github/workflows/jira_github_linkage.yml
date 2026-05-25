@@ -61,7 +61,14 @@ jobs:
             "$JIRA_BASE_URL/rest/api/3/issue/${{ inputs.jira_id }}")
 
           SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary')
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description // ""' | tr -d '\n')
+          DESCRIPTION=$(echo "$JSON" | jq -r '
+            def extract_text:
+              .. | objects | .text? // empty;
+          
+            [extract_text] | join(" ")
+          ' | tr -d '\n\r')
+          
+          DESCRIPTION=$(echo "$DESCRIPTION" | head -c 1200)
 
           echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
           echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
@@ -111,18 +118,21 @@ jobs:
                           { role: "user", content: $prompt }
                         ]
                       }' > request.json
-          
+
+                    set -e
                     RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
                       -H "Content-Type: application/json" \
                       -H "Authorization: Bearer $GITHUB_TOKEN" \
                       --data @request.json)
+                    set -e  
           
                     echo "$RESPONSE"
-          
+
                     FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
-          
-                    if [ -z "$FEATURE" ]; then
-                      echo "Model failed"
+
+                    if [ -z "$FEATURE" ] || [ "$FEATURE" = "null" ]; then
+                      echo "RAW RESPONSE:"
+                      echo "$RESPONSE"
                       exit 1
                     fi
           
