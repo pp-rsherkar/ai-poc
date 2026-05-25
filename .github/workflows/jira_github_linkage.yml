@@ -37,6 +37,7 @@ jobs:
         run: |
           echo "Building step index..."
           # Extracts clean, unique step phrases from existing feature files
+          mkdir -p src/test/resources/features
           find src/test/resources/features -name "*.feature" -exec grep -E "^\s*(Given|When|Then|And|But) " {} \; \
             | sed -e 's/^[ \t]*//' \
             | sort | uniq > step_dictionary.txt
@@ -84,44 +85,57 @@ jobs:
           echo "$DESCRIPTION" > jira_description.txt
 
       # =========================
-      # ROBUST COPILOT LLM GENERATION
+      # NATIVE GITHUB COPILOT CHAT API
       # =========================
-      - name: Generate Feature File via GitHub Copilot CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate Feature File via GitHub Copilot API
         run: |
-          echo "Initializing Copilot integration..."
-          gh extension install github/gh-copilot || true
+          echo "Requesting feature file layout from GitHub Copilot..."
           
-          # Prepare text blocks safely
-          DICT=$(cat step_dictionary.txt)
-          JIRA_DESC=$(cat jira_description.txt)
+          # Escape input fragments safely into JSON strings using jq
+          DICT=$(cat step_dictionary.txt | jq -aR .)
+          JIRA_DESC=$(cat jira_description.txt | jq -aR .)
+          JIRA_SUMM=$(echo "${{ env.SUMMARY }}" | jq -aR .)
+
+          PROMPT="You are a professional QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
           
-          # Create a structural system prompt instructing Copilot on how to write code
-          cat << EOF > prompt.txt
-          You are a strict QA automation engineer. Generate a BDD Gherkin .feature file for Jira Ticket ${{ inputs.jira_id }}.
-          
-          Jira Summary: ${{ env.SUMMARY }}
+          Jira Summary: $JIRA_SUMM
           Jira Description: $JIRA_DESC
           
           CRITICAL INSTRUCTIONS:
-          1. Review the existing repository steps dictionary below. 
-          2. Do NOT copy the Jira description sentence directly into the Given/When/Then lines. 
-          3. Convert the description into logical user actions (e.g., Given the user navigates to workspace, When the user schedules a creative without a line item flight, Then an error message should display). Match your phrase structure to the existing dictionary style where possible.
-          4. Output ONLY the raw Gherkin text. No markdown code blocks, no backticks, no talkback prose. Start directly with "Feature:".
+          1. Review the repository step dictionary provided below.
+          2. Do NOT copy raw text blocks or full paragraphs directly from the Jira description into the Given/When/Then steps.
+          3. Synthesize the description details into short, logical user interactions (e.g., Given the user navigates to workspace, When the user schedules a creative, Then a validation error warning should display).
+          4. Match your step phrasing style directly to how steps are constructed in the step dictionary below. Use the exact text patterns from the dictionary where contextually logical.
+          5. Return ONLY the raw Gherkin syntax content. Do not output markdown fences, no triple backticks (\`\`\`), no introductory chat prose. Start your response directly with line 'Feature:'
 
           Repository Steps Dictionary:
-          $DICT
-          EOF
+          $DICT"
 
-          # Call the copilot CLI to compute the result safely
-          gh copilot explain "Generate Gherkin feature file based on prompt.txt instructions" --prompt "$(cat prompt.txt)" > generated_raw.txt
-          
-          # Clean any stray markdown artifacts if returned
-          cat generated_raw.txt | sed '/^```/d' > generated.feature
+          # Query GitHub's native Copilot API proxy
+          RESPONSE_DATA=$(curl -s -X POST "https://api.githubcopilot.com/chat/completions" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"model\": \"gpt-4o\",
+              \"messages\": [
+                {\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rxs .)}
+              ],
+              \"temperature\": 0.1
+            }")
+
+          # Parse the result and strip any lingering markdown code block formatting artifacts
+          echo "$RESPONSE_DATA" | jq -r '.choices[0].message.content // empty' > temp_generated.feature
+
+          if [ ! -s temp_generated.feature ] || [ "$(cat temp_generated.feature)" = "null" ]; then
+            echo "❌ Failed to generate content from Copilot API. Response log:"
+            echo "$RESPONSE_DATA"
+            exit 1
+          fi
+
+          cat temp_generated.feature | sed '/^```/d' > generated.feature
 
       # =========================
-      # SINGLE FILE NAMING & PLACEMENT
+      # FILE NAMING & PLACEMENT
       # =========================
       - name: Save and Name Feature File
         run: |
@@ -137,24 +151,27 @@ jobs:
           FILE_NAME="${{ inputs.jira_id }}_${CLEAN_DESC}.feature"
           TARGET_DIR="src/test/resources/features"
           
-          # Clean up any residual old feature files on this branch to keep the PR pristine
-          rm -rf $TARGET_DIR/${{ inputs.jira_id }}_*.feature
+          # Clean up previous feature iterations for this ticket to keep the branch clean
+          rm -f "$TARGET_DIR/${{ inputs.jira_id }}_"*.feature
           mkdir -p "$TARGET_DIR"
 
           mv generated.feature "$TARGET_DIR/$FILE_NAME"
           echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
           echo "TARGET_DIR=$TARGET_DIR" >> $GITHUB_ENV
+          
+          echo "--- Generated Feature File Preview ---"
+          cat "$TARGET_DIR/$FILE_NAME"
 
       # =========================
       # SAFE COMMIT & PR PUSH
       # =========================
       - name: Commit and push changes
         run: |
-          git add "${{ env.TARGET_DIR }}/${{ env.FILE_NAME }}"
+          # Stage both the file addition and any automatic dynamic deletion of the old style names
+          git add src/test/resources/features/
           
-          # Check if there are real changes to commit
           if git diff --cached --quiet; then
-            echo "No variations detected."
+            echo "No structural variations detected."
           else
             git commit -m "feat(${{ inputs.jira_id }}): generate tailored BDD feature file"
             git push --force-with-lease origin "${{ env.BRANCH }}"
@@ -169,7 +186,7 @@ jobs:
         run: |
           EXISTING_PR=$(gh pr list --head "${{ env.BRANCH }}" --base main --state open --json number --jq '.[0].number')
           PR_TITLE="feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}"
-          PR_BODY="Auto-generated smart BDD feature file matched against existing repository patterns.\n\n**Jira ID:** ${{ inputs.jira_id }}"
+          PR_BODY="Auto-generated smart BDD feature file tailored to matching step definitions using GitHub Copilot.\n\n**Jira ID:** ${{ inputs.jira_id }}"
 
           if [ -n "$EXISTING_PR" ]; then
             echo "Updating existing PR #$EXISTING_PR"
