@@ -46,20 +46,32 @@ jobs:
       - name: Build AI repository context
         run: |
           set -euo pipefail
-
+      
           mkdir -p "$FEATURE_DIR"
-
-          if find "$FEATURE_DIR" -name "*.feature" | read; then
+      
+          FEATURE_COUNT=$(find "$FEATURE_DIR" -name "*.feature" | wc -l)
+      
+          if [ "$FEATURE_COUNT" -gt 0 ]; then
+      
+            TEMP_FILE=$(mktemp)
+      
             find "$FEATURE_DIR" -name "*.feature" \
               -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
               2>/dev/null \
               | sed 's/^[[:space:]]*//g' \
               | sort -u \
-              | head -n 300 \
-              > step_dictionary.txt
+              > "$TEMP_FILE"
+      
+            head -n 300 "$TEMP_FILE" > step_dictionary.txt
+      
+            rm -f "$TEMP_FILE"
+      
           else
             touch step_dictionary.txt
           fi
+      
+          echo "Reusable step count:"
+          wc -l step_dictionary.txt
 
       # =========================
       # Create working branch
