@@ -291,13 +291,21 @@ jobs:
           mkdir -p "$FEATURE_DIR"
 
           awk '
-          /^Scenario:|^Scenario Outline:/ {
+          /^(Scenario:|Scenario Outline:)/ {
             print "@todo"
           }
           {
             print
           }
-          ' generated.feature > "$FEATURE_DIR/$FILE"
+          ' generated.feature \
+          | awk '
+          !(prev == "@todo" && $0 == "@todo") {
+            print
+          }
+          {
+            prev = $0
+          }
+          ' > "$FEATURE_DIR/$FILE"
 
           if [ ! -s "$FEATURE_DIR/$FILE" ]; then
             echo "Generated feature file is empty"
