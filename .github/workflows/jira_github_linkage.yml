@@ -292,20 +292,18 @@ jobs:
 
           awk '
           /^(Scenario:|Scenario Outline:)/ {
-            print "@todo"
+            if (prev != "@todo") {
+              print "@todo"
+            }
+            print $0
+            prev="@todo"
+            next
           }
           {
+            prev=""
             print
           }
-          ' generated.feature \
-          | awk '
-          !(prev == "@todo" && $0 == "@todo") {
-            print
-          }
-          {
-            prev = $0
-          }
-          ' > "$FEATURE_DIR/$FILE"
+          ' generated.feature > "$FEATURE_DIR/$FILE"
 
           if [ ! -s "$FEATURE_DIR/$FILE" ]; then
             echo "Generated feature file is empty"
