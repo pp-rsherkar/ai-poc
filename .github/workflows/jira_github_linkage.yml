@@ -119,6 +119,7 @@ jobs:
           - Output clean Gherkin only
           - DO NOT use variables like $SUMMARY or $DESCRIPTION in output.
           - Always convert into natural language feature names.
+          - Always prefix every scenario definition with the @todo annotation tag
           
           ==================================================
           JIRA
