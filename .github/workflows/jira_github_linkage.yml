@@ -17,6 +17,9 @@ jobs:
   generate-feature:
     runs-on: ubuntu-latest
 
+    env:
+      FEATURE_DIR: src/test/resources/features
+
     steps:
 
       # =========================
@@ -30,32 +33,34 @@ jobs:
       # =========================
       # Install dependencies
       # =========================
-      - name: Install jq
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
 
       # =========================
-      # Build repository AI context
+      # Build reusable step dictionary
       # =========================
-      - name: Build AI context
+      - name: Build AI repository context
         run: |
           set -euo pipefail
 
-          mkdir -p src/test/resources/features
+          mkdir -p "$FEATURE_DIR"
 
-          if find src/test/resources/features -name "*.feature" | read; then
-            find src/test/resources/features -name "*.feature" \
+          if find "$FEATURE_DIR" -name "*.feature" | read; then
+            find "$FEATURE_DIR" -name "*.feature" \
               -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
               2>/dev/null \
+              | sed 's/^[[:space:]]*//g' \
               | sort -u \
-              | head -n 200 > step_dictionary.txt || true
+              | head -n 300 \
+              > step_dictionary.txt || true
           else
             touch step_dictionary.txt
           fi
 
       # =========================
-      # Create branch
+      # Create working branch
       # =========================
       - name: Create branch
         run: |
@@ -74,36 +79,45 @@ jobs:
       # =========================
       # Fetch Jira
       # =========================
-      - name: Fetch Jira
+      - name: Fetch Jira details
         run: |
           set -euo pipefail
+
+          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
 
           RESPONSE=$(curl -s \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
 
+          # Validate Jira response
           if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
-            echo "Failed to fetch Jira issue"
+            echo "Jira API returned an error:"
             echo "$RESPONSE"
             exit 1
           fi
 
+          # =========================
+          # Summary
+          # =========================
           SUMMARY=$(echo "$RESPONSE" | jq -r '
             .fields.summary // "No Summary"
           ')
 
+          # =========================
+          # Full Description (ADF safe)
+          # =========================
           DESCRIPTION=$(echo "$RESPONSE" | jq -r '
             .fields.description
             | .. | .text? // empty
-          ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 3000)
+          ' | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g')
 
+          # =========================
+          # Full Comments (ADF safe)
+          # =========================
           COMMENTS=$(echo "$RESPONSE" | jq -r '
             .fields.comment.comments
             | sort_by(.created)
-            | reverse
-            | .[:5]
-            | reverse
             | .[]
             | (
                 .author.displayName // "Unknown"
@@ -111,8 +125,9 @@ jobs:
                 .body
                 | .. | .text? // empty
               )
-          ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 4000)
+          ' | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g')
 
+          # Fallbacks
           [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
           [ -z "$COMMENTS" ] && COMMENTS="No Comments"
 
@@ -131,7 +146,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       # =========================
-      # Generate feature
+      # Generate Feature File
       # =========================
       - name: Generate feature via GitHub Models
         env:
@@ -139,7 +154,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          STEP_CONTEXT=$(head -n 150 step_dictionary.txt)
+          STEP_CONTEXT=$(head -n 200 step_dictionary.txt)
 
           cat <<EOF > prompt.txt
           You are a Senior QA Automation Engineer working in a mature Cucumber BDD framework.
@@ -161,20 +176,25 @@ jobs:
           ==================================================
           CRITICAL OUTPUT RULES
           ==================================================
+          
           - Output ONLY raw Gherkin
           - No markdown
           - No code fences
           - No explanations
-          - Use existing steps whenever possible
+          - No notes
+          - Use existing repository steps whenever possible
           - Do NOT repeat scenario headers
           - Do NOT add placeholders
-          - Output clean Gherkin only
-          - Always convert into natural language feature names
-          - Always prefix every scenario definition with the @todo annotation tag
+          - Do NOT invent unnecessary steps
+          - Always convert Jira language into natural feature names
+          - Always prefix every Scenario or Scenario Outline with @todo
+          - Keep scenarios concise and production realistic
+          - Follow existing repository conventions strictly
           
           ==================================================
-          JIRA
+          JIRA DETAILS
           ==================================================
+          
           ID:
           ${{ inputs.jira_id }}
           
@@ -188,8 +208,9 @@ jobs:
           $COMMENTS
           
           ==================================================
-          REPOSITORY STEPS
+          REPOSITORY STEP LIBRARY
           ==================================================
+          
           $STEP_CONTEXT
           
           ==================================================
@@ -201,15 +222,18 @@ jobs:
           2. Data tables
           3. Scenario Outline
           
-          Use Scenario Outline ONLY if Jira explicitly contains permutations.
+          Use Scenario Outline ONLY when Jira explicitly contains permutations or repeated validation combinations.
           
-          Reuse existing repository steps whenever possible.
+          Use Data Tables ONLY when structured entity attributes are required.
           
-          Do not invent authentication flows.
+          Prefer reusable repository wording over generating new steps.
+          
+          Do not invent authentication or setup flows unless repository patterns clearly require them.
           
           ==================================================
           OUTPUT FORMAT
           ==================================================
+          
           Feature: <name>
           
           EOF
@@ -222,7 +246,7 @@ jobs:
               messages: [
                 {
                   role: "system",
-                  content: "Return ONLY valid Gherkin."
+                  content: "Return ONLY valid raw Gherkin."
                 },
                 {
                   role: "user",
@@ -231,19 +255,24 @@ jobs:
               ]
             }' > request.json
 
-          RESPONSE=$(curl -s https://models.inference.ai.azure.com/chat/completions \
+          RESPONSE=$(curl -s \
+            https://models.inference.ai.azure.com/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             --data @request.json)
 
-          FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+          FEATURE=$(echo "$RESPONSE" | jq -r '
+            .choices[0].message.content // empty
+          ')
 
+          # Cleanup accidental markdown
           FEATURE=$(echo "$FEATURE" \
             | sed 's/```gherkin//g' \
             | sed 's/```//g')
 
+          # Validate output
           if [ -z "$FEATURE" ]; then
-            echo "Model returned empty feature file"
+            echo "Model returned empty output"
             echo "$RESPONSE"
             exit 1
           fi
@@ -257,28 +286,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          DIR="src/test/resources/features"
           FILE="${{ inputs.jira_id }}.feature"
 
-          mkdir -p "$DIR"
+          mkdir -p "$FEATURE_DIR"
 
           awk '
-          /^Scenario:/ {
+          /^Scenario:|^Scenario Outline:/ {
             print "@todo"
           }
           {
             print
           }
-          ' generated.feature \
-          | awk '!seen[$0]++ || $0 != "@todo"' \
-          > "$DIR/$FILE"
+          ' generated.feature > "$FEATURE_DIR/$FILE"
 
-          if [ ! -s "$DIR/$FILE" ]; then
+          if [ ! -s "$FEATURE_DIR/$FILE" ]; then
             echo "Generated feature file is empty"
             exit 1
           fi
 
-          echo "DIR=$DIR" >> "$GITHUB_ENV"
           echo "FILE=$FILE" >> "$GITHUB_ENV"
 
       # =========================
@@ -288,7 +313,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          git add "$DIR/$FILE"
+          git add "$FEATURE_DIR/${{ env.FILE }}"
 
           git commit -m "feat(${{ inputs.jira_id }}): generate feature file" || true
 
@@ -297,20 +322,20 @@ jobs:
       # =========================
       # Create PR
       # =========================
-      - name: Create PR
+      - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          PR=$(gh pr list \
+          PR_NUMBER=$(gh pr list \
             --head "${{ env.BRANCH }}" \
             --base main \
             --json number \
             --jq '.[0].number')
 
-          if [ -n "$PR" ]; then
-            echo "PR already exists"
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Pull Request already exists"
             exit 0
           fi
 
