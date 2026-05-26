@@ -145,139 +145,138 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_ENV"
 
-      # =========================
-      # Generate Feature File
-      # =========================
-      - name: Generate feature via GitHub Models
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          STEP_CONTEXT=$(head -n 200 step_dictionary.txt)
-
-          cat <<EOF > prompt.txt
-          You are a Senior QA Automation Engineer working in a mature Cucumber BDD framework.
+          # =========================
+          # Generate Feature File
+          # =========================
+          - name: Generate feature via GitHub Models
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+              set -euo pipefail
           
-          Please understand and learn the way all feature files are created in our project.
+              echo "Preparing repository context..."
           
-          Carefully analyze:
-          - Existing feature structure
-          - Step wording
-          - Naming conventions
-          - Scenario patterns
-          - Tagging strategy
-          - Data handling style
-          - Reusable steps
-          - Formatting consistency
+              # Relevant reusable steps
+              STEP_CONTEXT=$(head -n 120 step_dictionary.txt)
           
-          Then go through the Jira requirement below and generate production-quality Gherkin feature files and scenarios that match the repository standards exactly.
+              # Real feature examples from repository
+              FEATURE_EXAMPLES=$(find . -name "*.feature" \
+                | head -3 \
+                | xargs cat \
+                | head -n 350)
           
-          ==================================================
-          CRITICAL OUTPUT RULES
-          ==================================================
+              cat <<EOF > prompt.txt
+              Generate a production-quality Cucumber Gherkin feature file that matches existing repository conventions.
           
-          - Output ONLY raw Gherkin
-          - No markdown
-          - No code fences
-          - No explanations
-          - No notes
-          - Use existing repository steps whenever possible
-          - Do NOT repeat scenario headers
-          - Do NOT add placeholders
-          - Do NOT invent unnecessary steps
-          - Always convert Jira language into natural feature names
-          - Always prefix every Scenario or Scenario Outline with @todo
-          - Keep scenarios concise and production realistic
-          - Follow existing repository conventions strictly
+              ==================================================
+              RULES
+              ==================================================
           
-          ==================================================
-          JIRA DETAILS
-          ==================================================
+              - Return ONLY raw valid Gherkin
+              - No markdown
+              - No code fences
+              - No explanations
+              - Reuse existing repository steps whenever possible
+              - Prefix every Scenario or Scenario Outline with @todo
+              - Keep scenarios concise and automation-friendly
+              - Use business-readable language
+              - Avoid duplicate or redundant scenarios
+              - Use Scenario Outline ONLY when permutations are required
+              - Prefer repository wording over generating new steps
           
-          ID:
-          ${{ inputs.jira_id }}
+              Generate:
+              - Happy path scenarios
+              - Validation scenarios
+              - Negative scenarios
+              - Permission/security scenarios if implied by requirements
           
-          SUMMARY:
-          $SUMMARY
+              ==================================================
+              JIRA DETAILS
+              ==================================================
           
-          DESCRIPTION:
-          $DESCRIPTION
+              ID:
+              ${{ inputs.jira_id }}
           
-          COMMENTS:
-          $COMMENTS
+              SUMMARY:
+              $SUMMARY
           
-          ==================================================
-          REPOSITORY STEP LIBRARY
-          ==================================================
+              DESCRIPTION:
+              $DESCRIPTION
           
-          $STEP_CONTEXT
+              COMMENTS:
+              $COMMENTS
           
-          ==================================================
-          TEST DATA RULES
-          ==================================================
+              ==================================================
+              REPOSITORY FEATURE EXAMPLES
+              ==================================================
           
-          Priority order:
-          1. Inline data
-          2. Data tables
-          3. Scenario Outline
+              $FEATURE_EXAMPLES
           
-          Use Scenario Outline ONLY when Jira explicitly contains permutations or repeated validation combinations.
+              ==================================================
+              RELEVANT STEP DEFINITIONS
+              ==================================================
           
-          Use Data Tables ONLY when structured entity attributes are required.
+              $STEP_CONTEXT
           
-          Prefer reusable repository wording over generating new steps.
+              ==================================================
+              OUTPUT FORMAT
+              ==================================================
           
-          Do not invent authentication or setup flows unless repository patterns clearly require them.
+              Feature: <name>
           
-          ==================================================
-          OUTPUT FORMAT
-          ==================================================
+              EOF
           
-          Feature: <name>
+              jq -n \
+                --rawfile prompt prompt.txt \
+                '{
+                  model: "gpt-4.1",
+                  temperature: 0,
+                  messages: [
+                    {
+                      role: "system",
+                      content: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary"
+                    },
+                    {
+                      role: "user",
+                      content: $prompt
+                    }
+                  ]
+                }' > request.json
           
-          EOF
-
-          jq -n \
-            --rawfile prompt prompt.txt \
-            '{
-              model: "gpt-4.1",
-              temperature: 0,
-              messages: [
-                {
-                  "role": "system",
-                  "content": "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer existing reusable steps\n- Use concise business-readable language\n- Generate automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary\n- Keep scenarios deterministic and production realistic"
-                },
-                {
-                  role: "user",
-                  content: $prompt
-                }
-              ]
-            }' > request.json
-
-          RESPONSE=$(curl -s \
-            https://models.inference.ai.azure.com/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            --data @request.json)
-
-          FEATURE=$(echo "$RESPONSE" | jq -r '
-            .choices[0].message.content // empty
-          ')
-
-          # Cleanup accidental markdown
-          FEATURE=$(echo "$FEATURE" \
-            | sed 's/```gherkin//g' \
-            | sed 's/```//g')
-
-          # Validate output
-          if [ -z "$FEATURE" ]; then
-            echo "Model returned empty output"
-            echo "$RESPONSE"
-            exit 1
-          fi
-
-          echo "$FEATURE" > generated.feature
+              echo "Generating feature file..."
+          
+              RESPONSE=$(curl -s \
+                https://models.inference.ai.azure.com/chat/completions \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer $GITHUB_TOKEN" \
+                --data @request.json)
+          
+              FEATURE=$(echo "$RESPONSE" | jq -r '
+                .choices[0].message.content // empty
+              ')
+          
+              # Cleanup accidental markdown
+              FEATURE=$(echo "$FEATURE" \
+                | sed 's/```gherkin//g' \
+                | sed 's/```//g')
+          
+              # Validate output
+              if [ -z "$FEATURE" ]; then
+                echo "Model returned empty output"
+                echo "$RESPONSE"
+                exit 1
+              fi
+          
+              # Basic validation
+              if ! echo "$FEATURE" | grep -q "^Feature:"; then
+                echo "Invalid Gherkin generated"
+                echo "$FEATURE"
+                exit 1
+              fi
+          
+              echo "$FEATURE" > generated.feature
+          
+              echo "Feature file generated successfully"
 
       # =========================
       # Save feature file
