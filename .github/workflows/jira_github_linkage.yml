@@ -241,12 +241,12 @@ jobs:
           jq -n \
             --rawfile prompt prompt.txt \
             '{
-              model: "gpt-4.1-mini",
+              model: "gpt-4.1",
               temperature: 0.2,
               messages: [
                 {
-                  role: "system",
-                  content: "Return ONLY valid raw Gherkin."
+                  "role": "system",
+                  "content": "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer existing reusable steps\n- Use concise business-readable language\n- Generate automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary\n- Keep scenarios deterministic and production realistic"
                 },
                 {
                   role: "user",
