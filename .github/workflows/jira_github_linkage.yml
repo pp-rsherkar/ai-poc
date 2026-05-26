@@ -31,10 +31,12 @@ jobs:
       # Install dependencies
       # =========================
       - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
 
       # =========================
-      # Build step dictionary (SAFE)
+      # Build repository AI context
       # =========================
       - name: Build AI context
         run: |
@@ -42,7 +44,6 @@ jobs:
 
           mkdir -p src/test/resources/features
 
-          # SAFE extraction (no pipe failures)
           if find src/test/resources/features -name "*.feature" | read; then
             find src/test/resources/features -name "*.feature" \
               -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
@@ -50,7 +51,7 @@ jobs:
               | sort -u \
               | head -n 200 > step_dictionary.txt || true
           else
-            echo "" > step_dictionary.txt
+            touch step_dictionary.txt
           fi
 
       # =========================
@@ -68,73 +69,69 @@ jobs:
           git fetch origin || true
           git checkout -B "$BRANCH"
 
-          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-
-          # =========================
-          # Fetch Jira (SUMMARY + DESCRIPTION + COMMENTS)
-          # =========================
-          - name: Fetch Jira
-            run: |
-              set -euo pipefail
-          
-              RESPONSE=$(curl -s \
-                -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
-                -H "Accept: application/json" \
-                "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
-          
-              # =========================
-              # Summary
-              # =========================
-              SUMMARY=$(echo "$RESPONSE" | jq -r '
-                .fields.summary // "No Summary"
-              ')
-          
-              # =========================
-              # Description (ADF-safe)
-              # =========================
-              DESCRIPTION=$(echo "$RESPONSE" | jq -r '
-                .fields.description
-                | .. | .text? // empty
-              ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 3000)
-          
-              # =========================
-              # Comments (latest 5)
-              # =========================
-              COMMENTS=$(echo "$RESPONSE" | jq -r '
-                .fields.comment.comments
-                | sort_by(.created)
-                | reverse
-                | .[:5]
-                | reverse
-                | .[]
-                | (
-                    .author.displayName // "Unknown"
-                  ) + ": " + (
-                    .body
-                    | .. | .text? // empty
-                  )
-              ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 4000)
-          
-              # fallback safety
-              [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
-              [ -z "$COMMENTS" ] && COMMENTS="No Comments"
-          
-              {
-                echo "SUMMARY<<EOF"
-                echo "$SUMMARY"
-                echo "EOF"
-          
-                echo "DESCRIPTION<<EOF"
-                echo "$DESCRIPTION"
-                echo "EOF"
-          
-                echo "COMMENTS<<EOF"
-                echo "$COMMENTS"
-                echo "EOF"
-              } >> $GITHUB_ENV
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # =========================
-      # Generate Feature (FINAL PROMPT)
+      # Fetch Jira
+      # =========================
+      - name: Fetch Jira
+        run: |
+          set -euo pipefail
+
+          RESPONSE=$(curl -s \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+
+          if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
+            echo "Failed to fetch Jira issue"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          SUMMARY=$(echo "$RESPONSE" | jq -r '
+            .fields.summary // "No Summary"
+          ')
+
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '
+            .fields.description
+            | .. | .text? // empty
+          ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 3000)
+
+          COMMENTS=$(echo "$RESPONSE" | jq -r '
+            .fields.comment.comments
+            | sort_by(.created)
+            | reverse
+            | .[:5]
+            | reverse
+            | .[]
+            | (
+                .author.displayName // "Unknown"
+              ) + ": " + (
+                .body
+                | .. | .text? // empty
+              )
+          ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 4000)
+
+          [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
+          [ -z "$COMMENTS" ] && COMMENTS="No Comments"
+
+          {
+            echo "SUMMARY<<EOF"
+            echo "$SUMMARY"
+            echo "EOF"
+
+            echo "DESCRIPTION<<EOF"
+            echo "$DESCRIPTION"
+            echo "EOF"
+
+            echo "COMMENTS<<EOF"
+            echo "$COMMENTS"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      # =========================
+      # Generate feature
       # =========================
       - name: Generate feature via GitHub Models
         env:
@@ -146,9 +143,9 @@ jobs:
 
           cat <<EOF > prompt.txt
           You are a Senior QA Automation Engineer working in a mature Cucumber BDD framework.
-
+          
           Please understand and learn the way all feature files are created in our project.
-
+          
           Carefully analyze:
           - Existing feature structure
           - Step wording
@@ -160,7 +157,7 @@ jobs:
           - Formatting consistency
           
           Then go through the Jira requirement below and generate production-quality Gherkin feature files and scenarios that match the repository standards exactly.
-                    
+          
           ==================================================
           CRITICAL OUTPUT RULES
           ==================================================
@@ -170,16 +167,17 @@ jobs:
           - No explanations
           - Use existing steps whenever possible
           - Do NOT repeat scenario headers
-          - Do NOT add placeholders like $SUMMARY
+          - Do NOT add placeholders
           - Output clean Gherkin only
-          - DO NOT use variables like $SUMMARY or $DESCRIPTION in output.
-          - Always convert into natural language feature names.
+          - Always convert into natural language feature names
           - Always prefix every scenario definition with the @todo annotation tag
           
           ==================================================
           JIRA
           ==================================================
-          ID: ${{ inputs.jira_id }}
+          ID:
+          ${{ inputs.jira_id }}
+          
           SUMMARY:
           $SUMMARY
           
@@ -195,89 +193,19 @@ jobs:
           $STEP_CONTEXT
           
           ==================================================
-          TEST DATA RULES (ENHANCED - PRODUCTION SAFE)
+          TEST DATA RULES
           ==================================================
           
-          You MUST choose ONE of the following based on Jira + repo patterns.
+          Priority order:
+          1. Inline data
+          2. Data tables
+          3. Scenario Outline
           
-          --------------------------------------------------
-          1. INLINE DATA (DEFAULT - PREFERRED)
-          --------------------------------------------------
-          Use natural language values in steps.
+          Use Scenario Outline ONLY if Jira explicitly contains permutations.
           
-          Example:
-          Given a tactic with 3 creatives
-          And all creatives have active schedules
+          Reuse existing repository steps whenever possible.
           
-          Use this unless there is a strong need for structured data.
-          
-          --------------------------------------------------
-          2. DATA TABLES (ONLY IF LOGIC IS STRUCTURED OR REPO USES IT)
-          --------------------------------------------------
-          Use Data Tables ONLY when:
-          
-          - The scenario has multiple attributes for same entity
-          - OR repository already uses tables
-          - OR Jira explicitly describes structured fields
-          
-          Example:
-          Given a tactic exists with:
-            | creatives | 3 |
-            | schedule  | active |
-            | flights   | 2 |
-          
-          RULES:
-          - Max 5 rows
-          - No nested tables
-          - No tables unless necessary for clarity
-          - NEVER introduce tables just for formatting
-          
-          --------------------------------------------------
-          3. SCENARIO OUTLINE + EXAMPLES (ONLY FOR DATA VARIANTS)
-          --------------------------------------------------
-          Use Scenario Outline ONLY when:
-          
-          - Same scenario repeats with different inputs
-          - OR Jira describes multiple test permutations
-          - OR repository already contains Scenario Outline
-          
-          Example:
-          Scenario Outline: Validate scheduling behavior for creatives
-          
-            Given a tactic with "<creative_count>" creatives
-            And schedule state is "<schedule_state>"
-          
-            When user views scheduling dashboard
-            Then system shows "<expected_result>"
-          
-          Examples:
-            | creative_count | schedule_state | expected_result |
-            | 1              | partial        | no warning      |
-            | 3              | full           | warning shown   |
-            | 5              | none           | full warning    |
-          
-          RULES:
-          - Must map 1:1 with Jira variations
-          - Do NOT create examples unless multiple cases exist
-          
-          --------------------------------------------------
-          4. DECISION RULE (VERY IMPORTANT)
-          --------------------------------------------------
-          You must decide in this order:
-          
-          1st priority → INLINE DATA
-          2nd priority → DATA TABLES (if structure needed)
-          3rd priority → SCENARIO OUTLINE (if multiple permutations exist)
-          
-          Never skip directly to tables or outlines.
-          Never mix all 3 in one scenario unless repo already does.
-          
-          ==================================================
-          LOGIN RULES
-          ==================================================
-          - Reuse login steps if present in repo
-          - Otherwise assume user is already authenticated
-          - Do NOT invent authentication flows
+          Do not invent authentication flows.
           
           ==================================================
           OUTPUT FORMAT
@@ -292,8 +220,14 @@ jobs:
               model: "gpt-4.1-mini",
               temperature: 0.2,
               messages: [
-                { role: "system", content: "Return ONLY valid Gherkin." },
-                { role: "user", content: $prompt }
+                {
+                  role: "system",
+                  content: "Return ONLY valid Gherkin."
+                },
+                {
+                  role: "user",
+                  content: $prompt
+                }
               ]
             }' > request.json
 
@@ -304,34 +238,51 @@ jobs:
 
           FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
 
-          # cleanup fences if model misbehaves
-          FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
+          FEATURE=$(echo "$FEATURE" \
+            | sed 's/```gherkin//g' \
+            | sed 's/```//g')
+
+          if [ -z "$FEATURE" ]; then
+            echo "Model returned empty feature file"
+            echo "$RESPONSE"
+            exit 1
+          fi
 
           echo "$FEATURE" > generated.feature
 
       # =========================
-      # Save + enforce @todo fix
+      # Save feature file
       # =========================
       - name: Save feature file
         run: |
           set -euo pipefail
 
           DIR="src/test/resources/features"
-          mkdir -p "$DIR"
-
           FILE="${{ inputs.jira_id }}.feature"
 
-          # ensure single @todo per scenario
-          awk '
-          /^Scenario:/ {print "@todo"}
-          {print}
-          ' generated.feature > "$DIR/$FILE"
+          mkdir -p "$DIR"
 
-          echo "DIR=$DIR" >> $GITHUB_ENV
-          echo "FILE=$FILE" >> $GITHUB_ENV
+          awk '
+          /^Scenario:/ {
+            print "@todo"
+          }
+          {
+            print
+          }
+          ' generated.feature \
+          | awk '!seen[$0]++ || $0 != "@todo"' \
+          > "$DIR/$FILE"
+
+          if [ ! -s "$DIR/$FILE" ]; then
+            echo "Generated feature file is empty"
+            exit 1
+          fi
+
+          echo "DIR=$DIR" >> "$GITHUB_ENV"
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
 
       # =========================
-      # Commit + FORCE PUSH (overwrite branch)
+      # Commit and push
       # =========================
       - name: Commit & push
         run: |
@@ -344,7 +295,7 @@ jobs:
           git push origin "${{ env.BRANCH }}" --force
 
       # =========================
-      # Create PR safely
+      # Create PR
       # =========================
       - name: Create PR
         env:
