@@ -70,27 +70,68 @@ jobs:
 
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      # =========================
-      # Fetch Jira (FIXED JSON handling)
-      # =========================
-      - name: Fetch Jira
-        run: |
-          set -euo pipefail
-
-          RESPONSE=$(curl -s \
-            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
-            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
-
-          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
-
-          # flatten Atlassian JSON properly
-          DESCRIPTION=$(echo "$RESPONSE" \
-            | jq -r '.. | .text? // empty' \
-            | tr '\n' ' ' \
-            | head -c 1200)
-
-          echo "SUMMARY=$SUMMARY" >> $GITHUB_ENV
-          echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+          # =========================
+          # Fetch Jira (SUMMARY + DESCRIPTION + COMMENTS)
+          # =========================
+          - name: Fetch Jira
+            run: |
+              set -euo pipefail
+          
+              RESPONSE=$(curl -s \
+                -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+                -H "Accept: application/json" \
+                "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+          
+              # =========================
+              # Summary
+              # =========================
+              SUMMARY=$(echo "$RESPONSE" | jq -r '
+                .fields.summary // "No Summary"
+              ')
+          
+              # =========================
+              # Description (ADF-safe)
+              # =========================
+              DESCRIPTION=$(echo "$RESPONSE" | jq -r '
+                .fields.description
+                | .. | .text? // empty
+              ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 3000)
+          
+              # =========================
+              # Comments (latest 5)
+              # =========================
+              COMMENTS=$(echo "$RESPONSE" | jq -r '
+                .fields.comment.comments
+                | sort_by(.created)
+                | reverse
+                | .[:5]
+                | reverse
+                | .[]
+                | (
+                    .author.displayName // "Unknown"
+                  ) + ": " + (
+                    .body
+                    | .. | .text? // empty
+                  )
+              ' | tr '\n' ' ' | sed 's/  */ /g' | head -c 4000)
+          
+              # fallback safety
+              [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
+              [ -z "$COMMENTS" ] && COMMENTS="No Comments"
+          
+              {
+                echo "SUMMARY<<EOF"
+                echo "$SUMMARY"
+                echo "EOF"
+          
+                echo "DESCRIPTION<<EOF"
+                echo "$DESCRIPTION"
+                echo "EOF"
+          
+                echo "COMMENTS<<EOF"
+                echo "$COMMENTS"
+                echo "EOF"
+              } >> $GITHUB_ENV
 
       # =========================
       # Generate Feature (FINAL PROMPT)
@@ -105,7 +146,21 @@ jobs:
 
           cat <<EOF > prompt.txt
           You are a Senior QA Automation Engineer working in a mature Cucumber BDD framework.
+
+          Please understand and learn the way all feature files are created in our project.
+
+          Carefully analyze:
+          - Existing feature structure
+          - Step wording
+          - Naming conventions
+          - Scenario patterns
+          - Tagging strategy
+          - Data handling style
+          - Reusable steps
+          - Formatting consistency
           
+          Then go through the Jira requirement below and generate production-quality Gherkin feature files and scenarios that match the repository standards exactly.
+                    
           ==================================================
           CRITICAL OUTPUT RULES
           ==================================================
@@ -125,8 +180,14 @@ jobs:
           JIRA
           ==================================================
           ID: ${{ inputs.jira_id }}
-          SUMMARY: $SUMMARY
-          DESCRIPTION: $DESCRIPTION
+          SUMMARY:
+          $SUMMARY
+          
+          DESCRIPTION:
+          $DESCRIPTION
+          
+          COMMENTS:
+          $COMMENTS
           
           ==================================================
           REPOSITORY STEPS
