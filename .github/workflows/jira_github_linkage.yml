@@ -169,9 +169,9 @@ jobs:
         run: |
           curl -s \
             https://api.github.com/models \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Authorization: ******" \
             -H "Accept: application/vnd.github+json" \
-            | jq -r '.data[].id''
+            | jq -r '.data[].id'
       
       # =========================
       # Generate Feature File
