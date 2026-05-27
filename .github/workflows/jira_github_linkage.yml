@@ -170,7 +170,7 @@ jobs:
           set -euo pipefail
       
           RESPONSE=$(curl -sS \
-            https://api.github.com/models \
+            https://models.github.ai/catalog/models \
             -H "Authorization: ******" \
             -H "Accept: application/vnd.github+json")
       
