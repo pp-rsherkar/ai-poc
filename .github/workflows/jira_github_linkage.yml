@@ -264,11 +264,26 @@ jobs:
 
           echo "Generating feature file..."
 
-          RESPONSE=$(curl -s --fail \
+          HTTP_RESPONSE=$(mktemp)
+
+          HTTP_CODE=$(curl -s \
+            -o "$HTTP_RESPONSE" \
+            -w "%{http_code}" \
             https://models.inference.ai.azure.com/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             --data @request.json)
+          
+          echo "HTTP Status: $HTTP_CODE"
+          
+          cat "$HTTP_RESPONSE"
+          
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Model API request failed"
+            exit 1
+          fi
+          
+          RESPONSE=$(cat "$HTTP_RESPONSE")
 
           echo "$RESPONSE" > model_response.json
 
