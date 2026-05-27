@@ -284,7 +284,7 @@ jobs:
           https://models.github.ai/inference/chat/completions \
           -H "Accept: application/vnd.github+json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: ******" \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           --data @request.json)
           
