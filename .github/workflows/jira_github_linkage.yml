@@ -248,7 +248,7 @@ jobs:
           jq -n \
             --rawfile prompt prompt.txt \
             '{
-              model: "gpt-4.1",
+              model: "claude-opus-4.7",
               temperature: 0,
               messages: [
                 {
