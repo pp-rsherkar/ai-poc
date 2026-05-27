@@ -261,7 +261,7 @@ jobs:
           jq -n \
             --rawfile prompt prompt.txt \
             '{
-              model: "claude-opus-4-7",
+              model: "anthropic/claude-opus-4.7",
               temperature: 0,
               messages: [
                 {
@@ -282,7 +282,7 @@ jobs:
           HTTP_CODE=$(curl -s \
             -o "$HTTP_RESPONSE" \
             -w "%{http_code}" \
-            https://models.inference.ai.azure.com/chat/completions \
+            https://models.github.ai/inference/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             --data @request.json)
