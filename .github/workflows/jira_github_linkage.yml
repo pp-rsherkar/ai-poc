@@ -248,7 +248,7 @@ jobs:
           jq -n \
             --rawfile prompt prompt.txt \
             '{
-              model: "anthropic/claude-opus-4.7",
+              model: "claude-opus-4-7",
               temperature: 0,
               messages: [
                 {
