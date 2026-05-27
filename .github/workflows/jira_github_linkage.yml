@@ -161,6 +161,19 @@ jobs:
           } >> "$GITHUB_ENV"
 
       # =========================
+      # Debug available models
+      # =========================
+      - name: List available models
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -s \
+            https://models.inference.ai.azure.com/models \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            | jq -r '.data[].id'
+
+
+      # =========================
       # Generate Feature File
       # =========================
       - name: Generate feature via GitHub Models
