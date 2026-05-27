@@ -163,6 +163,18 @@ jobs:
       # =========================
       # Generate Feature File
       # =========================
+      - name: List available models
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -s \
+            https://models.github.ai/inference/models \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            | jq -r '.[].id'
+      
+      # =========================
+      # Generate Feature File
+      # =========================
       - name: Generate feature via GitHub Models
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
