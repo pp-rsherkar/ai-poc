@@ -272,7 +272,7 @@ jobs:
           jq -n \
             --rawfile prompt prompt.txt \
             '{
-              model: "claude-sonnet-4-20250514",
+              model: "openai/gpt-4.1",
               temperature: 0,
               messages: [
                 {
