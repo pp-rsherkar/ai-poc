@@ -168,7 +168,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -s \
-            https://models.inference.ai.azure.com/models \
+            https://models.github.ai/inference/models \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             | jq -r '.data[].id'
 
