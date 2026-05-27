@@ -161,17 +161,28 @@ jobs:
           } >> "$GITHUB_ENV"
 
       # =========================
-      # Generate Feature File
+      # List Available Models
       # =========================
       - name: List available models
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -s \
+          set -euo pipefail
+      
+          RESPONSE=$(curl -sS \
             https://api.github.com/models \
             -H "Authorization: ******" \
-            -H "Accept: application/vnd.github+json" \
-            | jq -r '.data[].id'
+            -H "Accept: application/vnd.github+json")
+      
+          echo "$RESPONSE" | jq .
+      
+          # Handles both possible shapes: {data:[...]} or [...]
+          echo "$RESPONSE" | jq -r '
+            if type=="object" and (.data|type=="array") then .data[].id
+            elif type=="array" then .[].id
+            else empty
+            end
+          '
       
       # =========================
       # Generate Feature File
