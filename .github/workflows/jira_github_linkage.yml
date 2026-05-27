@@ -168,7 +168,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -s \
-            https://models.inference.ai.azure.com/models \
+            https://models.github.ai/inference/chat/completions \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             | jq -r '.[].id'
       
@@ -279,12 +279,14 @@ jobs:
           HTTP_RESPONSE=$(mktemp)
 
           HTTP_CODE=$(curl -s \
-            -o "$HTTP_RESPONSE" \
-            -w "%{http_code}" \
-            https://models.github.ai/inference/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            --data @request.json)
+          -o "$HTTP_RESPONSE" \
+          -w "%{http_code}" \
+          https://models.github.ai/inference/chat/completions \
+          -H "Accept: application/vnd.github+json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: ******" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          --data @request.json)
           
           echo "HTTP Status: $HTTP_CODE"
           
