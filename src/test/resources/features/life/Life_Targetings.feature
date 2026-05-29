@@ -31,7 +31,7 @@ Feature: LIFE Regression - Targetings
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
       | CONTEXTUAL         | Health Pages,IAB Categories,Keywords,Language,Endemics                                                                                                                                                                            |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                    |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability      |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability      |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
     And User configures targeting rules as below
       | Behavioral Segment       | AutoSegment18577650                                                   |
@@ -51,7 +51,7 @@ Feature: LIFE Regression - Targetings
       | Browser                  | Chrome, EDGE, Opera, Safari                                           |
       | Device                   | Mobile, Tablet, Connected Device                                      |
       | Domains/Apps             | APP Regular, updaedList106043912                                      |
-      | Inventory Source         | New Report                                                            |
+      | Inventory Source         | Reporttest                                                          |
       | Operating System         | Windows, macOS, Blackberry                                            |
       | Viewability              | 50                                                                    |
       | Legal Pages              | Emancipation                                                          |
@@ -118,7 +118,7 @@ Feature: LIFE Regression - Targetings
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
       | CONTEXTUAL         | Health Pages,IAB Categories,IAB Categories New, Keywords,Language,Endemics                                                                                                                                                   |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
       | Video              | Video Size,Video Placement,Video Skipping                                                                                                                                                                                    |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                |
     And User configures targeting rules as below
@@ -165,7 +165,7 @@ Feature: LIFE Regression - Targetings
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
       | CONTEXTUAL         | Health Pages,IAB Categories,IAB Categories New, Keywords,Language,Endemics                                                                                                                                                   |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
       | Video              | Video Size,Video Placement                                                                                                                                                                                                   |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                |
     And User configures targeting rules as below
@@ -213,7 +213,7 @@ Feature: LIFE Regression - Targetings
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                         |
       | CONTEXTUAL         | Health Pages,IAB Categories,IAB Categories New, Keywords,Language,Endemics                                                                                                                                                   |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                               |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                |
     And User configures targeting rules as below
       | Search Keywords | Pandemic, Intestine |
@@ -248,7 +248,7 @@ Feature: LIFE Regression - Targetings
     And Verify target type with respect to category
       | AUDIENCE ATTRIBUTE | IP Address                                                                                           |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Venue Type,Weather Signals                            |
-      | MEDIA SUPPLY       | Audience Multiplier,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Inventory Source,Deals |
+      | MEDIA SUPPLY       | Audience Multiplier,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Inventory Source,Deals |
     And User configures targeting rules as below
       | Venue Type              | Transit, Retail, Office Buildings |
       | Custom Targeting Bundle | 203397, 203396                    |
@@ -290,10 +290,10 @@ Feature: LIFE Regression - Targetings
       | HEALTH JOURNEY     | Health Populations+,Bespoke,In Condition                                                                                                                                                                                    |
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                        |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                              |
-      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Group,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals            |
+      | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals            |
       | LEGAL TARGETINGS   | Legal Populations                                                                                                                                                                                                           |
     And User configures targeting rules as below
-      | Clickers | Auto_20260210_164534, TargetingTemplate_20260405_002455 |
+      | Clickers | DomainList_Campaign_20260503_001635, TargetingTemplate_20260503_003625 |
       | Age      | 18-24, 50-54, 60-64                                     |
     Then Verify the configured targeting rules
     And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
