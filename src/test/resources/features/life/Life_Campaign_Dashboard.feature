@@ -21,7 +21,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User verifies the comments in the campaign, line item, and tactic dashboard's comment boxes
     Examples:
       | Campaign ID          | COLOUR                     |
-      | Auto_20260218_024705 | 24-note-table-provided.svg |
+      | Auto_20260528_000342 | 24-note-table-provided.svg |
 
   @regression
   Scenario Outline: Verify toggle functionality for Line Item and Tactic on Campaign Dashboard and validate it on Line Item and Tactic pages
