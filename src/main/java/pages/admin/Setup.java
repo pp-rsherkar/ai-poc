@@ -4,14 +4,6 @@ import com.microsoft.playwright.Download;
 import com.microsoft.playwright.FileChooser;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class Setup {
     private final Page page;
@@ -65,14 +64,16 @@ public class Setup {
         this.CREATE_CURATED_MARKET_BUTTON = page.locator("//span[text()='Create Curated Market']");
         this.MARKET_NAME = page.locator("//input[@placeholder='Name']");
         this.SELECT_ACCOUNT_DROPDOWN = page.locator("//app-multi-select[@placeholder='Select Accounts']");
-        this.ACCOUNT_DROPDOWN_OPTIONS = page.locator("//app-multi-select[@placeholder='Select Accounts']//div[@class='item']//span");
+        this.ACCOUNT_DROPDOWN_OPTIONS =
+                page.locator("//app-multi-select[@placeholder='Select Accounts']//div[@class='item']//span");
         this.DESCRIPTION = page.locator("//textarea[@formcontrolname='description']");
         this.MARKET_KPI_AND_BENCHMARK = page.locator("//input[@formcontrolname='kpiAndBenchmark']");
         this.SAVE_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.ALERT = page.locator("//div[@role='alert']");
         this.IMPORT_DEALS_BUTTON = page.locator("//span[contains(text(),'Import Deals')]");
         this.MARKET_ID = page.locator("//span[contains(text(),'Market Name')]//following-sibling::span");
-        this.IMPORT_DEALS_PANEL = page.locator("//div[contains(@class,'rightPanelHeader2') and contains(text(),'Import Deals')]");
+        this.IMPORT_DEALS_PANEL =
+                page.locator("//div[contains(@class,'rightPanelHeader2') and contains(text(),'Import Deals')]");
         this.DOWNLOAD_TEMPLATE_LINK = page.locator("//span[contains(text(),'Curated Market Template')]");
         this.BROWSE_LINK = page.locator("//a[@id='upload_link']");
         this.UPLOADED_TEXT = page.locator("//span[@class='uploaded-result-text']");
@@ -84,13 +85,19 @@ public class Setup {
         this.UPLOAD_BUTTON = page.locator("//button[contains(text(),'Upload')]");
         this.DEAL_NAME_FROM_DEALS_TAB = page.locator("//input[@placeholder='Deal Name']");
         this.DEAL_ID_FROM_DEALS_TAB = page.locator("//div[contains(@class,'id-col')]/span[@class='deal-name-text']");
-        this.EXCHANGE_FROM_DEALS_TAB = page.locator("//div[contains(@class,'exchange-col')]/span[@class='deal-name-text']");
+        this.EXCHANGE_FROM_DEALS_TAB =
+                page.locator("//div[contains(@class,'exchange-col')]/span[@class='deal-name-text']");
         this.DEAL_PRICE_FROM_DEALS_TAB = page.locator("//input[@placeholder='Price']");
-        this.PRICING_TYPE_FROM_DEALS_TAB = page.locator("//div[contains(@class,'pricing-type')]//app-native-dropdown[@labelfield='name']//select");
-        this.MEDIA_TYPE_FROM_DEALS_TAB = page.locator("//div[contains(@class,'mediatype')]//div[contains(@class,'transition')]//span");
-        this.CURATOR_FROM_DEALS_TAB = page.locator("//div[contains(@class,'curator')]//app-native-dropdown[@labelfield='name']//select");
-        this.MPC_DEAL_TYPE_FROM_DEALS_TAB = page.locator("//div[contains(@class,'mpc-deal-type')]//app-native-dropdown[@labelfield='name']//select");
-        this.FLOOR_PRICE_FROM_DEALS_TAB = page.locator("//div[contains(@class,'pricing-type')]/following-sibling::div[1]//span[@class='deal-name-text']"); //since we do not have unique identifier for floor price column hence passed the index as 1 to fetch the floor price value from deals tab in curated market details page
+        this.PRICING_TYPE_FROM_DEALS_TAB =
+                page.locator("//div[contains(@class,'pricing-type')]//app-native-dropdown[@labelfield='name']//select");
+        this.MEDIA_TYPE_FROM_DEALS_TAB =
+                page.locator("//div[contains(@class,'mediatype')]//div[contains(@class,'transition')]//span");
+        this.CURATOR_FROM_DEALS_TAB =
+                page.locator("//div[contains(@class,'curator')]//app-native-dropdown[@labelfield='name']//select");
+        this.MPC_DEAL_TYPE_FROM_DEALS_TAB = page.locator(
+                "//div[contains(@class,'mpc-deal-type')]//app-native-dropdown[@labelfield='name']//select");
+        this.FLOOR_PRICE_FROM_DEALS_TAB = page.locator(
+                "//div[contains(@class,'pricing-type')]/following-sibling::div[1]//span[@class='deal-name-text']"); // since we do not have unique identifier for floor price column hence passed the index as 1 to fetch the floor price value from deals tab in curated market details page
         this.TOGGLE_BUTTON = page.locator("//div[contains(@class,'toggle-check')]//sui-checkbox");
     }
 
@@ -112,7 +119,8 @@ public class Setup {
         waitUtility.waitForLocatorVisible(MARKET_NAME);
     }
 
-    public void enterCuratedMarketDetails(String marketNameUnique, String accountName, String description, String marginKPIAndBenchmark) {
+    public void enterCuratedMarketDetails(
+            String marketNameUnique, String accountName, String description, String marginKPIAndBenchmark) {
         MARKET_NAME.fill(marketNameUnique);
         SELECT_ACCOUNT_DROPDOWN.click();
         waitUtility.waitForLocatorVisible(ACCOUNT_DROPDOWN_OPTIONS.last());
@@ -162,7 +170,17 @@ public class Setup {
         return CommonUtils.downloadFileAndMoveToSystemFolder(download);
     }
 
-    public void fillCuratedMarketTemplate(Path filePath, String marketID, String dealNameUnique, String exchange, String mediaType, String curator, String dealPrice, String pricingType, String mpcDealType) throws IOException {
+    public void fillCuratedMarketTemplate(
+            Path filePath,
+            String marketID,
+            String dealNameUnique,
+            String exchange,
+            String mediaType,
+            String curator,
+            String dealPrice,
+            String pricingType,
+            String mpcDealType)
+            throws IOException {
         Map<String, Object> data = new HashMap<>();
         data.put("Market ID", Integer.parseInt(marketID));
         data.put("Deal ID", dealNameUnique);
@@ -175,7 +193,7 @@ public class Setup {
         data.put("MPC Deal Type", mpcDealType);
 
         try (FileInputStream fis = new FileInputStream(filePath.toFile());
-             Workbook workbook = new XSSFWorkbook(fis)) {
+                Workbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             Row headerRow = sheet.getRow(0);

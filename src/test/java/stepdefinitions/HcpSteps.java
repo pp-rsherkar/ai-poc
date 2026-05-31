@@ -107,9 +107,13 @@ public class HcpSteps {
     }
 
     @When("User clicks on Response and enter the details and creates smart list {string} {string} and saves")
-    public void user_clicks_on_response_and_enter_the_details_and_creates_smart_list_and_saves(String smartListName, String days) {
+    public void user_clicks_on_response_and_enter_the_details_and_creates_smart_list_and_saves(
+            String smartListName, String days) {
         smartListName = smartListName + '_' + timestamp;
-        logger.info("Entering details in Response tab, creating smart list: {} for {} days, and saving", smartListName, days);
+        logger.info(
+                "Entering details in Response tab, creating smart list: {} for {} days, and saving",
+                smartListName,
+                days);
         smartActions.responseTabDataEntryAndSave(smartListName, days);
     }
 
