@@ -129,6 +129,7 @@ jobs:
       # =========================
       - name: List available models
         env:
+          # Bound directly to your custom repository secret
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           set -euo pipefail
@@ -143,8 +144,8 @@ jobs:
       # =========================
       - name: Generate feature via GitHub Models
         env:
+          # Bound directly to your custom repository secret
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          # Explicitly import the variables from GITHUB_ENV step context into current shell runtime environment parameters
           SUMMARY: ${{ env.SUMMARY }}
           DESCRIPTION: ${{ env.DESCRIPTION }}
           COMMENTS: ${{ env.COMMENTS }}
@@ -218,7 +219,8 @@ jobs:
               messages: [
                 {
                   role: "system",
-                  content: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary"                },
+                  content: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary"
+                },
                 {
                   role: "user",
                   content: $prompt
@@ -254,26 +256,22 @@ jobs:
             .choices[0].message.content // empty
           ')
 
-          # Cleanup accidental markdown
           FEATURE=$(echo "$FEATURE" \
             | sed 's/```gherkin//g' \
             | sed 's/```//g')
 
-          # Validate output
           if [ -z "$FEATURE" ]; then
             echo "Model returned empty output"
             cat model_response.json
             exit 1
           fi
 
-          # Validate Feature
           if ! echo "$FEATURE" | grep -q "^Feature:"; then
             echo "Invalid Gherkin generated"
             echo "$FEATURE"
             exit 1
           fi
 
-          # Validate Scenario
           if ! echo "$FEATURE" | grep -Eq "Scenario:|Scenario Outline:"; then
             echo "No scenarios generated"
             echo "$FEATURE"
@@ -322,6 +320,7 @@ jobs:
       # =========================
       - name: Create Pull Request
         env:
+          # Using your custom repository secret for the GitHub CLI client mapping layer
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           set -euo pipefail
