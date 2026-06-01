@@ -54,11 +54,11 @@ jobs:
           MATCH_COUNT=$(echo "$MATCHES" | grep -v '^$' | wc -l || echo 0)
 
           if [ "$MATCH_COUNT" -eq 0 ]; then
-            echo "❌ Error: Feature file '$FILENAME' could not be found anywhere inside $FEATURE_ROOT_DIR!"
+            echo "Feature file '$FILENAME' could not be found anywhere inside $FEATURE_ROOT_DIR!"
             echo "Checked domains: life, e2e, studio, api, hcp."
             exit 1
           elif [ "$MATCH_COUNT" -gt 1 ]; then
-            echo "❌ Error: Multiple files named '$FILENAME' were found in different domains!"
+            echo "Multiple files named '$FILENAME' were found in different domains!"
             echo "Matches found:"
             echo "$MATCHES"
             echo "Please ensure filenames are unique across folders to avoid ambiguous assignments."
@@ -66,7 +66,7 @@ jobs:
           fi
 
           FILE_PATH=$(echo "$MATCHES" | xargs)
-          echo "🎯 File successfully located at: $FILE_PATH"
+          echo "File successfully located at: $FILE_PATH"
           echo "TARGET_FILE_PATH=$FILE_PATH" >> "$GITHUB_ENV"
 
       # =========================
@@ -89,10 +89,10 @@ jobs:
             "$JIRA_BASE_URL/rest/api/3/issue/${{ inputs.jira_id }}/attachments")
 
           if [ "$UPLOAD_STATUS" -ne 200 ]; then
-            echo "❌ Failed to upload attachment to Jira ID: ${{ inputs.jira_id }} (HTTP Status: $UPLOAD_STATUS)"
+            echo "Failed to upload attachment to Jira ID: ${{ inputs.jira_id }} (HTTP Status: $UPLOAD_STATUS)"
             exit 1
           fi
-          echo "✅ Attachment uploaded successfully."
+          echo "Attachment uploaded successfully."
 
       # =========================
       # Add Traceability Comment
@@ -105,7 +105,7 @@ jobs:
         run: |
           set -euo pipefail
           
-          COMMENT_TEXT="📁 Manual Traceability Association: Automated test cases from feature file [${{ inputs.feature_file_name }}] have been linked to this ticket for execution references. Triggered by GitHub User: @${{ github.actor }}"
+          COMMENT_TEXT="Automated test cases from feature file [${{ inputs.feature_file_name }}] have been linked to this ticket for execution references."
           
           PAYLOAD=$(jq -n --arg text "$COMMENT_TEXT" '{
             body: {
@@ -133,7 +133,7 @@ jobs:
             "$JIRA_BASE_URL/rest/api/3/issue/${{ inputs.jira_id }}/comment")
 
           if [ "$COMMENT_STATUS" -ne 201 ]; then
-            echo "⚠️ File attached, but confirmation comment failed to post (HTTP Status: $COMMENT_STATUS)"
+            echo "File attached, but confirmation comment failed to post (HTTP Status: $COMMENT_STATUS)"
           else
-            echo "✅ Traceability reference comment posted successfully."
+            echo "Traceability reference comment posted successfully."
           fi
