@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       feature_file_name:
-        description: "Enter the exact feature file name (e.g., login_validation.feature)"
+        description: "Enter the feature filename (e.g., login_validation.feature)"
         required: true
         type: string
 
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      FEATURE_DIR: src/test/resources/features
+      FEATURE_ROOT_DIR: src/test/resources/features
 
     steps:
       # =========================
@@ -39,19 +39,33 @@ jobs:
           sudo apt-get install -y jq
 
       # =========================
-      # Locate & Validate Input Feature File
+      # Locate & Validate Input Feature File (Recursive)
       # =========================
       - name: Locate Feature File
         run: |
           set -euo pipefail
-          FILE_PATH="$FEATURE_DIR/${{ inputs.feature_file_name }}"
           
-          if [ ! -f "$FILE_PATH" ]; then
-            echo "❌ Error: Feature file '$FILE_PATH' could not be found in the repository!"
-            echo "Please check the spelling or ensure the file exists in your specified path."
+          FILENAME="${{ inputs.feature_file_name }}"
+          echo "Searching for '$FILENAME' inside subdirectories of $FEATURE_ROOT_DIR..."
+
+          # Recursively find the file across all nested structures
+          # e.g., features/life, features/e2e, features/studio, etc.
+          MATCHES=$(find "$FEATURE_ROOT_DIR" -type f -name "$FILENAME")
+          MATCH_COUNT=$(echo "$MATCHES" | grep -v '^$' | wc -l || echo 0)
+
+          if [ "$MATCH_COUNT" -eq 0 ]; then
+            echo "❌ Error: Feature file '$FILENAME' could not be found anywhere inside $FEATURE_ROOT_DIR!"
+            echo "Checked domains: life, e2e, studio, api, hcp."
+            exit 1
+          elif [ "$MATCH_COUNT" -gt 1 ]; then
+            echo "❌ Error: Multiple files named '$FILENAME' were found in different domains!"
+            echo "Matches found:"
+            echo "$MATCHES"
+            echo "Please ensure filenames are unique across folders to avoid ambiguous assignments."
             exit 1
           fi
-          
+
+          FILE_PATH=$(echo "$MATCHES" | xargs)
           echo "🎯 File successfully located at: $FILE_PATH"
           echo "TARGET_FILE_PATH=$FILE_PATH" >> "$GITHUB_ENV"
 
