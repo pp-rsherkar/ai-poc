@@ -313,30 +313,59 @@ jobs:
       - name: Update Jira ticket (Attach + Comment)
         run: |
           set -euo pipefail
+      
           FILE_PATH="$FEATURE_DIR/${{ inputs.jira_id }}.feature"
-          
+      
           if [ ! -f "$FILE_PATH" ]; then
             echo "ERROR: Feature file not found: $FILE_PATH"
             exit 1
           fi
-          
+      
+          echo "Uploading attachment to Jira..."
+      
           ATTACH_RESPONSE=$(curl --silent --show-error --fail \
-            -w "\nHTTP_STATUS:%{http_code}" \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "X-Atlassian-Token: no-check" \
             -H "Accept: application/json" \
             -F "file=@${FILE_PATH}" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/attachments")
-            
-          HTTP_STATUS=$(echo "$ATTACH_RESPONSE" | tail -n1 | cut -d: -f2)
-          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
-            echo "ERROR: Jira attachment upload failed"
-            exit 1
-          fi
+      
+          echo "Attachment response:"
+          echo "$ATTACH_RESPONSE"
+      
+          # Extract filename safely
+          ATTACH_FILE=$(echo "$ATTACH_RESPONSE" | jq -r '.[0].filename // "feature-file.feature"')
+      
+          echo "Uploaded file: $ATTACH_FILE"
+      
+          # Build Jira comment
+          COMMENT_TEXT="BDD feature file has been generated and attached to this ticket.
           
-          COMMENT_TEXT="BDD feature file has been generated and attached to this ticket."
-          COMMENT_JSON=$(jq -n --arg text "$COMMENT_TEXT" '{body: {type: "doc", version: 1, content: [{type: "paragraph", content: [{type: "text", text: $text}]}]}}')
+          Attachment Name: $ATTACH_FILE
           
+          You can find it in the 'Attachments' section of this issue."
+          
+              COMMENT_JSON=$(jq -n --arg text "$COMMENT_TEXT" '
+              {
+                body: {
+                  type: "doc",
+                  version: 1,
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: $text
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }')
+          
+              echo "Adding Jira comment..."
+      
           curl --silent --show-error --fail \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
@@ -344,6 +373,8 @@ jobs:
             -X POST \
             --data "$COMMENT_JSON" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/comment"
+      
+          echo "Jira updated successfully"
 
       # =========================
       # Commit and push
