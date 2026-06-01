@@ -1,0 +1,133 @@
+name: Search Squash Test Case
+
+on:
+workflow_dispatch:
+inputs:
+search_value:
+description: "Enter Test Case ID or Keyword"
+required: true
+type: string
+
+jobs:
+search:
+runs-on: ubuntu-latest
+
+```
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Setup Java 17
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '17'
+
+  - name: Search Test Case in Squash
+    env:
+      SQUASH_URL: http://stg-qa-selenium1.internetbrands.com:9001/squashmcp
+      SQUASH_TOKEN: ${{ secrets.SQUASH_TOKEN }}
+      SEARCH_VALUE: ${{ github.event.inputs.search_value }}
+    run: |
+      cat <<'EOF' > SquashMcpClient.java
+      import java.net.URI;
+      import java.net.http.HttpClient;
+      import java.net.http.HttpRequest;
+      import java.net.http.HttpResponse;
+
+      public class SquashMcpClient {
+
+          public static void main(String[] args) throws Exception {
+
+              String url = System.getenv("SQUASH_URL");
+              String token = System.getenv("SQUASH_TOKEN");
+              String searchValue = System.getenv("SEARCH_VALUE");
+
+              boolean isNumeric = searchValue.matches("\\d+");
+
+              String payload;
+
+              if (isNumeric) {
+                  payload = """
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {
+                      "name": "search-for-test-case",
+                      "arguments": {
+                        "case_id": %s,
+                        "folder_id": 0,
+                        "project_id": 0,
+                        "semantic_query": "",
+                        "name_keyword_filter": "",
+                        "creator": "",
+                        "status_list": "",
+                        "weight_list": "",
+                        "nature_list": "",
+                        "type_list": "",
+                        "test_category_list": "",
+                        "exclude_test_category_list": "",
+                        "automated": "any",
+                        "page": 1
+                      }
+                    }
+                  }
+                  """.formatted(searchValue);
+              } else {
+                  payload = """
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {
+                      "name": "search-for-test-case",
+                      "arguments": {
+                        "case_id": 0,
+                        "folder_id": 0,
+                        "project_id": 0,
+                        "semantic_query": "%s",
+                        "name_keyword_filter": "",
+                        "creator": "",
+                        "status_list": "",
+                        "weight_list": "",
+                        "nature_list": "",
+                        "type_list": "",
+                        "test_category_list": "",
+                        "exclude_test_category_list": "",
+                        "automated": "any",
+                        "page": 1
+                      }
+                    }
+                  }
+                  """.formatted(searchValue);
+              }
+
+              HttpClient client = HttpClient.newHttpClient();
+
+              HttpRequest request = HttpRequest.newBuilder()
+                      .uri(URI.create(url))
+                      .header("Authorization", "Bearer " + token)
+                      .header("Content-Type", "application/json")
+                      .POST(HttpRequest.BodyPublishers.ofString(payload))
+                      .build();
+
+              HttpResponse<String> response =
+                      client.send(request, HttpResponse.BodyHandlers.ofString());
+
+              System.out.println("=================================================");
+              System.out.println("Search Value: " + searchValue);
+              System.out.println("HTTP Status : " + response.statusCode());
+              System.out.println("=================================================");
+              System.out.println(response.body());
+
+              if (response.statusCode() != 200) {
+                  throw new RuntimeException(
+                          "Search failed. HTTP Status: " + response.statusCode());
+              }
+          }
+      }
+      EOF
+
+      java SquashMcpClient.java
+```
