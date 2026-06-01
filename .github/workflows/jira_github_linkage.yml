@@ -378,6 +378,69 @@ jobs:
           echo "FILE=$FILE" >> "$GITHUB_ENV"
 
       # =========================
+      # Attach feature file and comment on Jira
+      # =========================
+      - name: Update Jira ticket
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+    
+          FILE_PATH="$FEATURE_DIR/${{ env.FILE }}"
+    
+          echo "Uploading feature file to Jira..."
+    
+          ATTACH_RESPONSE=$(curl --silent --show-error --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "X-Atlassian-Token: no-check" \
+            -F "file=@${FILE_PATH}" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/attachments")
+    
+          echo "Attachment uploaded successfully"
+    
+          PR_URL=$(gh pr view "${{ env.BRANCH }}" --json url --jq '.url' 2>/dev/null || echo "")
+    
+          COMMENT_TEXT="BDD feature file generated automatically and attached to this ticket."
+    
+          if [ -n "$PR_URL" ]; then
+            COMMENT_TEXT="$COMMENT_TEXT
+    
+          Pull Request:
+          $PR_URL"
+          fi
+    
+          COMMENT_JSON=$(jq -n --arg text "$COMMENT_TEXT" '
+          {
+            body: {
+              type: "doc",
+              version: 1,
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: $text
+                    }
+                  ]
+                }
+              ]
+            }
+          }')
+    
+          echo "Adding Jira comment..."
+    
+          curl --silent --show-error --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            --data "$COMMENT_JSON" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/comment"
+    
+          echo "Jira updated successfully"
+
+      # =========================
       # Commit and push
       # =========================
       - name: Commit & push
