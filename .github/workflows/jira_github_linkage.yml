@@ -169,9 +169,10 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Authenticate with the GITHUB_TOKEN environment variable instead of asterisks
           RESPONSE=$(curl -sS \
             https://models.github.ai/catalog/models \
-            -H "Authorization: ******" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json")
 
           echo "$RESPONSE" | jq .
