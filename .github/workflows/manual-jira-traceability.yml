@@ -1,0 +1,125 @@
+name: Manual JIRA Test-Case Association
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: "Enter JIRA Ticket ID (e.g., QA-1321)"
+        required: true
+        type: string
+      feature_file_name:
+        description: "Enter the exact feature file name (e.g., login_validation.feature)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  link-test-cases:
+    runs-on: ubuntu-latest
+
+    env:
+      FEATURE_DIR: src/test/resources/features
+
+    steps:
+      # =========================
+      # Checkout
+      # =========================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # =========================
+      # Install dependencies
+      # =========================
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      # =========================
+      # Locate & Validate Input Feature File
+      # =========================
+      - name: Locate Feature File
+        run: |
+          set -euo pipefail
+          FILE_PATH="$FEATURE_DIR/${{ inputs.feature_file_name }}"
+          
+          if [ ! -f "$FILE_PATH" ]; then
+            echo "❌ Error: Feature file '$FILE_PATH' could not be found in the repository!"
+            echo "Please check the spelling or ensure the file exists in your specified path."
+            exit 1
+          fi
+          
+          echo "🎯 File successfully located at: $FILE_PATH"
+          echo "TARGET_FILE_PATH=$FILE_PATH" >> "$GITHUB_ENV"
+
+      # =========================
+      # Upload Feature to Jira as Test Case Reference
+      # =========================
+      - name: Upload feature file to Jira
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        run: |
+          set -euo pipefail
+          echo "Uploading $TARGET_FILE_PATH to Jira issue: ${{ inputs.jira_id }}"
+          
+          UPLOAD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -u "$JIRA_EMAIL:$JIRA_TOKEN" \
+            -X POST \
+            -H "X-Atlassian-Token: no-check" \
+            -F "file=@$TARGET_FILE_PATH" \
+            "$JIRA_BASE_URL/rest/api/3/issue/${{ inputs.jira_id }}/attachments")
+
+          if [ "$UPLOAD_STATUS" -ne 200 ]; then
+            echo "❌ Failed to upload attachment to Jira ID: ${{ inputs.jira_id }} (HTTP Status: $UPLOAD_STATUS)"
+            exit 1
+          fi
+          echo "✅ Attachment uploaded successfully."
+
+      # =========================
+      # Add Traceability Comment
+      # =========================
+      - name: Post reference comment to Jira
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        run: |
+          set -euo pipefail
+          
+          COMMENT_TEXT="📁 Manual Traceability Association: Automated test cases from feature file [${{ inputs.feature_file_name }}] have been linked to this ticket for execution references. Triggered by GitHub User: @${{ github.actor }}"
+          
+          PAYLOAD=$(jq -n --arg text "$COMMENT_TEXT" '{
+            body: {
+              type: "doc",
+              version: 1,
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: $text
+                    }
+                  ]
+                }
+              ]
+            }
+          }')
+
+          COMMENT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -u "$JIRA_EMAIL:$JIRA_TOKEN" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$JIRA_BASE_URL/rest/api/3/issue/${{ inputs.jira_id }}/comment")
+
+          if [ "$COMMENT_STATUS" -ne 201 ]; then
+            echo "⚠️ File attached, but confirmation comment failed to post (HTTP Status: $COMMENT_STATUS)"
+          else
+            echo "✅ Traceability reference comment posted successfully."
+          fi
