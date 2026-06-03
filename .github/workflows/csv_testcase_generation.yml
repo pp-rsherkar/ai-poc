@@ -1,0 +1,190 @@
+name: JIRA Testcase CSV Generator (Direct Attach)
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: "Enter JIRA Ticket ID (e.g., QA-1321)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  models: read
+
+jobs:
+  generate-and-attach:
+    runs-on: ubuntu-latest
+
+    steps:
+      # =========================
+      # Checkout
+      # =========================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # =========================
+      # Install dependencies
+      # =========================
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      # =========================
+      # Fetch Jira Details
+      # =========================
+      - name: Fetch Jira details
+        run: |
+          set -euo pipefail
+          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
+          
+          RESPONSE=$(curl -s --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+            
+          echo "$RESPONSE" > jira_response.json
+          
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+          COMMENTS=$(echo "$RESPONSE" | jq -r '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+          
+          [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
+          [ -z "$COMMENTS" ] && COMMENTS="No Comments"
+          
+          DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
+          COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
+          
+          {
+            echo "SUMMARY<<EOF"
+            echo "$SUMMARY"
+            echo "EOF"
+            echo "DESCRIPTION<<EOF"
+            echo "$DESCRIPTION"
+            echo "EOF"
+            echo "COMMENTS<<EOF"
+            echo "$COMMENTS"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      # =========================
+      # Generate Testcases via LLM (JSON Format)
+      # =========================
+      - name: Generate structured test cases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          SUMMARY: ${{ env.SUMMARY }}
+          DESCRIPTION: ${{ env.DESCRIPTION }}
+          COMMENTS: ${{ env.COMMENTS }}
+        run: |
+          set -euo pipefail
+          
+          cat <<EOF > prompt.txt
+          Analyze the following Jira ticket details and generate an exhaustive suite of test cases (Happy paths, Edge cases, validations, and Negative scenarios).
+          
+          You must output a single, raw, valid JSON object containing an array called "test_cases".
+          No markdown wrappers, no backticks, no trailing explanation code blocks.
+          
+          Each object in the array must match this scheme precisely:
+          {
+            "id": "TC-01",
+            "title": "Descriptive short title",
+            "type": "Functional/Validation/Negative/Edge-Case",
+            "preconditions": "Setup prerequisites required",
+            "steps": "1. Step one\n2. Step two",
+            "expected_result": "Explicit expected outcome"
+          }
+
+          JIRA DETAILS:
+          ID: ${{ inputs.jira_id }}
+          SUMMARY: $SUMMARY
+          DESCRIPTION: $DESCRIPTION
+          COMMENTS: $COMMENTS
+          EOF
+
+          jq -n \
+            --rawfile prompt prompt.txt \
+            '{
+              model: "openai/gpt-4.1",
+              temperature: 0,
+              response_format: { type: "json_object" },
+              messages: [
+                {
+                  role: "system",
+                  content: "You are an expert QA Automator. Your objective is to read Jira parameters and output raw JSON maps matching the requested test_cases matrix schema exactly."
+                },
+                {
+                  role: "user",
+                  content: $prompt
+                }
+              ]
+            }' > request.json
+
+          HTTP_RESPONSE=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+            https://models.github.ai/inference/chat/completions \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            --data @request.json)
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Model API call dropped with code $HTTP_CODE"
+            cat "$HTTP_RESPONSE"
+            exit 1
+          fi
+
+          cat "$HTTP_RESPONSE" | jq -r '.choices[0].message.content' > raw_output.json
+
+      # =========================
+      # Build CSV & Markdown Artifacts
+      # =========================
+      - name: Process JSON into CSV
+        shell: python
+        run: |
+          import json
+          import csv
+
+          with open('raw_output.json', 'r', encoding='utf-8') as f:
+              data = json.load(f)
+
+          test_cases = data.get('test_cases', [])
+          
+          # Write CSV file locally in the runner root workspace
+          csv_file_path = "${{ inputs.jira_id }}.csv"
+          headers = ["Test Case ID", "Title", "Type", "Preconditions", "Steps", "Expected Result"]
+          
+          with open(csv_file_path, 'w', newline='', encoding='utf-8') as cf:
+              writer = csv.writer(cf)
+              writer.writerow(headers)
+              for tc in test_cases:
+                  writer.writerow([
+                      tc.get('id', ''),
+                      tc.get('title', ''),
+                      tc.get('type', ''),
+                      tc.get('preconditions', ''),
+                      tc.get('steps', ''),
+                      tc.get('expected_result', '')
+                  ])
+
+      # =========================
+      # Attach CSV File directly back to JIRA
+      # =========================
+      - name: Attach CSV to Jira Ticket
+        run: |
+          set -euo pipefail
+          CSV_PATH="${{ inputs.jira_id }}.csv"
+          
+          echo "Uploading file $CSV_PATH to Jira Ticket: ${{ inputs.jira_id }}"
+          
+          curl -s --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -X POST \
+            -H "X-Atlassian-Token: no-check" \
+            --form "file=@$CSV_PATH" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/attachments"
+          
+          echo "Successfully attached $CSV_PATH to ${{ inputs.jira_id }}"
