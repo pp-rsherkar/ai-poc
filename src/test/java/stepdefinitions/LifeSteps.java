@@ -6126,6 +6126,17 @@ public class LifeSteps {
     public void userCreatesLineItemsWithTacticsAndTargetingRules(String creative, DataTable dataTable) {
         logger.info("Creating line items with tactics and targeting rules");
         tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative);
+        tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative, perTacticRules -> {
+            logger.info("Running per-tactic targeting rule verifications for: {}", perTacticRules.keySet());
+            rulesMap = new LinkedHashMap<>(perTacticRules);
+            keyType = new ArrayList<>(perTacticRules.keySet());
+            keyValues = new ArrayList<>();
+            for (List<String> v : perTacticRules.values()) {
+                keyValues.addAll(v);
+            }
+            verify_the_configured_targeting_rules();
+            verifyTheCountOfRulesAddedForTheSelectedTargetingRuleTypeOnTheTacticSettingsPage();
+        });
     }
 
     @Then("Verify the newly created campaign details in the campaign list")

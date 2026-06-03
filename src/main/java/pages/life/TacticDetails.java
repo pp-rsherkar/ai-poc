@@ -10,6 +10,7 @@ import utils.CommonUtils;
 import utils.WaitUtility;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class TacticDetails {
     public final Locator TARGETING_RULES_ICON;
@@ -495,6 +496,10 @@ public class TacticDetails {
     }
 
     public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative) {
+        createLineItemsWithTacticsAndTargetingRules(rows, creative, null);
+    }
+
+    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative, Consumer<Map<String, List<String>>> perTacticVerification) {
         String currentLiName = null;
 
         for (int i = 0; i < rows.size(); i++) {
@@ -524,15 +529,24 @@ public class TacticDetails {
             tacticSettings.selectChannel(channel);
             clickTargetingRuleIcon();
 
+            Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
             for (int j = 1; j <= 6; j++) {
                 String rule   = row.get("RULE_"   + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
-                    tacticSettings.selectMultipleRuleTypes(rule, CommonUtils.parseCommaSeparatedString(values));
+                    //tacticSettings.selectMultipleRuleTypes(rule, CommonUtils.parseCommaSeparatedString(values));
+                    List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
+                    tacticSettings.selectMultipleRuleTypes(rule, parsedValues);
+                    perTacticRules.put(rule, parsedValues);
                 }
             }
 
             tacticSettings.closeRuleTypePanel();
+
+            if (perTacticVerification != null) {
+                perTacticVerification.accept(perTacticRules);
+            }
+
             saveTacticDetails();
             navigation.clickOnIcon("Assign Existing Creatives");
             tacticCreatives.assignCreatives(creative);
