@@ -144,9 +144,9 @@ jobs:
           cat "$HTTP_RESPONSE" | jq -r '.choices[0].message.content' > raw_output.json
 
       # =========================
-      # Build CSV to Match Excel Columns
+      # Build CSV & Jira Comment Payload
       # =========================
-      - name: Process JSON into Excel Matching CSV
+      - name: Process JSON into Excel CSV and Jira Comment
         shell: python
         run: |
           import json
@@ -158,7 +158,7 @@ jobs:
           test_cases = data.get('test_cases', [])
           jira_id = "${{ inputs.jira_id }}"
           
-          # Match your exact Excel structural template header layout
+          # 1. Generate the standard CSV matrix matching your Excel template
           csv_file_path = f"Test_Cases_{jira_id}.csv"
           headers = ["Test ID", "Requirement ID", "Test Description", "Test Data", "Expected Result", "Actual Result", "Test Status", "Owner"]
           
@@ -167,20 +167,88 @@ jobs:
               writer.writerow(headers)
               
               for tc in test_cases:
-                  # Generates format matching your file: TC_QA-633_01, TC_QA-633_02 etc.
                   idx = str(tc.get('index', '1')).zfill(2)
                   test_id = f"TC_{jira_id}_{idx}"
                   
                   writer.writerow([
-                      test_id,                  # Test ID
-                      jira_id,                  # Requirement ID
-                      tc.get('description', ''), # Test Description
-                      tc.get('test_data', ''),   # Test Data
-                      tc.get('expected_result', ''), # Expected Result
-                      "",                       # Actual Result (Left blank for manual run)
-                      "",                       # Test Status (Left blank)
-                      ""                        # Owner (Left blank)
+                      test_id,
+                      jira_id,
+                      tc.get('description', ''),
+                      tc.get('test_data', ''),
+                      tc.get('expected_result', ''),
+                      "", "", "" 
                   ])
+
+          # 2. Construct Jira v3 Atlassian Document Format (ADF) for a rich UI Table Comment
+          # Initialize ADF table structure header rows
+          table_rows = [
+              {
+                  "type": "tableRow",
+                  "content": [
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test ID", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test Description", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Expected Result", "marks": [{"type": "strong"}]}]}]}
+                  ]
+              }
+          ]
+
+          # Populate data rows dynamically into the ADF body maps
+          for tc in test_cases:
+              idx = str(tc.get('index', '1')).zfill(2)
+              test_id = f"TC_{jira_id}_{idx}"
+              
+              table_rows.append({
+                  "type": "tableRow",
+                  "content": [
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": test_id}]}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": tc.get('description', 'N/A')}]}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": tc.get('expected_result', 'N/A')}]}]}
+                  ]
+              })
+
+          # Combine into the finalized corporate ADF JSON schema
+          comment_payload = {
+              "body": {
+                  "type": "doc",
+                  "version": 1,
+                  "content": [
+                      {
+                          "type": "heading",
+                          "attrs": {"level": 3},
+                          "content": [{"type": "text", "text": "🤖 AI-Generated Test Matrix Summary"}]
+                      },
+                      {
+                          "type": "paragraph",
+                          "content": [
+                              {"type": "text", "text": "The full detailed test matrix spreadsheet has been compiled and attached natively below. Here is the high-level preview:"}
+                          ]
+                      },
+                      {
+                          "type": "table",
+                          "content": table_rows
+                      }
+                  ]
+              }
+          }
+
+          with open('jira_comment_payload.json', 'w', encoding='utf-8') as jf:
+              json.dump(comment_payload, jf, ensure_ascii=False, indent=2)
+
+      # =========================
+      # Post Test Case Comment to JIRA
+      # =========================
+      - name: Post Table Comment to Jira Ticket
+        run: |
+          set -euo pipefail
+          echo "Posting test case review table to Jira Ticket Comment section..."
+          
+          curl -s --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data @jira_comment_payload.json \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/comment"
 
       # =========================
       # Attach CSV File directly back to JIRA
