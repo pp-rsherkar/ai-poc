@@ -24,7 +24,7 @@ jobs:
 
       - name: Search Test Case in Squash
         env:
-          SQUASH_URL: http://stg-qa-selenium1.internetbrands.com:9001/squashmcp
+          SQUASH_URL: https://sq-mcp.internetbrands.com/squashmcp
           SQUASH_TOKEN: ${{ secrets.SQUASH_TOKEN }}
           SEARCH_VALUE: ${{ github.event.inputs.search_value }}
         run: |
