@@ -158,7 +158,7 @@ jobs:
           test_cases = data.get('test_cases', [])
           jira_id = "${{ inputs.jira_id }}"
           
-          # 1. Generate the standard CSV matrix matching your Excel template
+          # 1. Generate the standard CSV matrix matching your Excel template layout exactly
           csv_file_path = f"Test_Cases_{jira_id}.csv"
           headers = ["Test ID", "Requirement ID", "Test Description", "Test Data", "Expected Result", "Actual Result", "Test Status", "Owner"]
           
@@ -171,12 +171,12 @@ jobs:
                   test_id = f"TC_{jira_id}_{idx}"
                   
                   writer.writerow([
-                      test_id,
-                      jira_id,
-                      tc.get('description', ''),
-                      tc.get('test_data', ''),
-                      tc.get('expected_result', ''),
-                      "", "", "" 
+                      test_id,                   # Test ID
+                      jira_id,                   # Requirement ID
+                      tc.get('description', ''), # Test Description
+                      tc.get('test_data', ''),   # Test Data
+                      tc.get('expected_result', ''), # Expected Result
+                      "", "", "", ""             # Actual Result, Test Status, Owner (Left blank)
                   ])
 
           # 2. Construct Jira v3 Atlassian Document Format (ADF) for a rich UI Table Comment
@@ -186,6 +186,7 @@ jobs:
                   "type": "tableRow",
                   "content": [
                       {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test ID", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Requirement ID", "marks": [{"type": "strong"}]}]}]},
                       {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test Description", "marks": [{"type": "strong"}]}]}]},
                       {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Expected Result", "marks": [{"type": "strong"}]}]}]}
                   ]
@@ -201,12 +202,15 @@ jobs:
                   "type": "tableRow",
                   "content": [
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": test_id}]}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": jira_id}]}]},
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": tc.get('description', 'N/A')}]}]},
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": tc.get('expected_result', 'N/A')}]}]}
                   ]
               })
 
-          # Combine into the finalized corporate ADF JSON schema
+          # Combine into the finalized corporate ADF JSON schema along with your custom linking strings
+          tracking_message = f"[Test_Cases_{jira_id}.csv] have been linked to this ticket for execution references."
+          
           comment_payload = {
               "body": {
                   "type": "doc",
@@ -220,12 +224,18 @@ jobs:
                       {
                           "type": "paragraph",
                           "content": [
-                              {"type": "text", "text": "The full detailed test matrix spreadsheet has been compiled and attached natively below. Here is the high-level preview:"}
+                              {"type": "text", "text": "The comprehensive manual test cases have been extracted from the requirements criteria and compiled below. The full tracking file has also been uploaded natively to the attachments deck."}
                           ]
                       },
                       {
                           "type": "table",
                           "content": table_rows
+                      },
+                      {
+                          "type": "paragraph",
+                          "content": [
+                              {"type": "text", "text": tracking_message, "marks": [{"type": "em"}]}
+                          ]
                       }
                   ]
               }
