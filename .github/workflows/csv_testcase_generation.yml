@@ -1,10 +1,10 @@
-name: JIRA Testcase CSV Generator (Direct Attach)
+name: JIRA Testcase CSV Generator
 
 on:
   workflow_dispatch:
     inputs:
       jira_id:
-        description: "Enter JIRA Ticket ID (e.g., QA-1321)"
+        description: "Enter JIRA Ticket ID (e.g., PROD-14604)"
         required: true
         type: string
 
@@ -82,19 +82,23 @@ jobs:
           set -euo pipefail
           
           cat <<EOF > prompt.txt
-          Analyze the following Jira ticket details and generate an exhaustive suite of test cases (Happy paths, Edge cases, validations, and Negative scenarios).
+          Analyze the following Jira ticket details and generate a thorough, professional suite of test cases. 
+          You must generate:
+          - Positive test scenarios (Happy Path workflow)
+          - Negative test scenarios (Validation errors, edge conditions, bad inputs)
+          - UI/Layout/Toggle states if mentioned in requirements
           
           You must output a single, raw, valid JSON object containing an array called "test_cases".
-          No markdown wrappers, no backticks, no trailing explanation code blocks.
+          No markdown backticks, no wrapping text blocks.
           
-          Each object in the array must match this scheme precisely:
+          Generate sequential numbers for the 'index' property starting at 1 (e.g., 1, 2, 3...).
+          
+          Each object in the array must match this schema precisely:
           {
-            "id": "TC-01",
-            "title": "Descriptive short title",
-            "type": "Functional/Validation/Negative/Edge-Case",
-            "preconditions": "Setup prerequisites required",
-            "steps": "1. Step one\n2. Step two",
-            "expected_result": "Explicit expected outcome"
+            "index": 1,
+            "description": "Verify user can toggle between Tactic and Line Item views",
+            "test_data": "Optional specific data parameters needed to execute, leave blank if none",
+            "expected_result": "Explicit step outcomes or data update confirmations. If multiple items are listed, use plain string newlines (\n) to separate them."
           }
 
           JIRA DETAILS:
@@ -113,7 +117,7 @@ jobs:
               messages: [
                 {
                   role: "system",
-                  content: "You are an expert QA Automator. Your objective is to read Jira parameters and output raw JSON maps matching the requested test_cases matrix schema exactly."
+                  content: "You are an expert QA Engineer. Your goal is to dissect requirement descriptions and generate clean, descriptive test validations formatted exactly to the requested structural JSON parameters."
                 },
                 {
                   role: "user",
@@ -140,9 +144,9 @@ jobs:
           cat "$HTTP_RESPONSE" | jq -r '.choices[0].message.content' > raw_output.json
 
       # =========================
-      # Build CSV & Markdown Artifacts
+      # Build CSV to Match Excel Columns
       # =========================
-      - name: Process JSON into CSV
+      - name: Process JSON into Excel Matching CSV
         shell: python
         run: |
           import json
@@ -152,22 +156,30 @@ jobs:
               data = json.load(f)
 
           test_cases = data.get('test_cases', [])
+          jira_id = "${{ inputs.jira_id }}"
           
-          # Write CSV file locally in the runner root workspace
-          csv_file_path = "${{ inputs.jira_id }}.csv"
-          headers = ["Test Case ID", "Title", "Type", "Preconditions", "Steps", "Expected Result"]
+          # Match your exact Excel structural template header layout
+          csv_file_path = f"Test_Cases_{jira_id}.csv"
+          headers = ["Test ID", "Requirement ID", "Test Description", "Test Data", "Expected Result", "Actual Result", "Test Status", "Owner"]
           
           with open(csv_file_path, 'w', newline='', encoding='utf-8') as cf:
               writer = csv.writer(cf)
               writer.writerow(headers)
+              
               for tc in test_cases:
+                  # Generates format matching your file: TC_QA-633_01, TC_QA-633_02 etc.
+                  idx = str(tc.get('index', '1')).zfill(2)
+                  test_id = f"TC_{jira_id}_{idx}"
+                  
                   writer.writerow([
-                      tc.get('id', ''),
-                      tc.get('title', ''),
-                      tc.get('type', ''),
-                      tc.get('preconditions', ''),
-                      tc.get('steps', ''),
-                      tc.get('expected_result', '')
+                      test_id,                  # Test ID
+                      jira_id,                  # Requirement ID
+                      tc.get('description', ''), # Test Description
+                      tc.get('test_data', ''),   # Test Data
+                      tc.get('expected_result', ''), # Expected Result
+                      "",                       # Actual Result (Left blank for manual run)
+                      "",                       # Test Status (Left blank)
+                      ""                        # Owner (Left blank)
                   ])
 
       # =========================
@@ -176,9 +188,9 @@ jobs:
       - name: Attach CSV to Jira Ticket
         run: |
           set -euo pipefail
-          CSV_PATH="${{ inputs.jira_id }}.csv"
+          CSV_PATH="Test_Cases_${{ inputs.jira_id }}.csv"
           
-          echo "Uploading file $CSV_PATH to Jira Ticket: ${{ inputs.jira_id }}"
+          echo "Uploading spreadsheet artifact $CSV_PATH directly to Jira Issue..."
           
           curl -s --fail \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
@@ -187,4 +199,4 @@ jobs:
             --form "file=@$CSV_PATH" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/attachments"
           
-          echo "Successfully attached $CSV_PATH to ${{ inputs.jira_id }}"
+          echo "Process complete! File has been bound seamlessly."
