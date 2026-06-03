@@ -790,6 +790,7 @@ public class LifeSteps {
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         logger.info("Starting verification of configured targeting rules");
+        tacticSettings.expandAllTargetingRules();
         List<String> expectedNormalizedRuleTypes = normalizeObjectList(keyType);
         int expectedCount = expectedNormalizedRuleTypes.size();
         logger.info("Fetching actual rule types (Expected Count: {})", expectedCount);
@@ -6125,7 +6126,7 @@ public class LifeSteps {
     @When("User creates line items with tactics and targeting rules as below and assigns existing creative named {string}")
     public void userCreatesLineItemsWithTacticsAndTargetingRules(String creative, DataTable dataTable) {
         logger.info("Creating line items with tactics and targeting rules");
-        tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative);
+        //tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative);
         tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative, perTacticRules -> {
             logger.info("Running per-tactic targeting rule verifications for: {}", perTacticRules.keySet());
             rulesMap = new LinkedHashMap<>(perTacticRules);

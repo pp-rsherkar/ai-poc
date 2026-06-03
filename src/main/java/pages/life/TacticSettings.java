@@ -32,6 +32,7 @@ public class TacticSettings {
     private final Locator VERIFY_NPI;
     private final Locator FETCH_TARGET_RULE_TYPES;
     private final Locator FETCH_TARGET_RULE_OPTIONS;
+    private final Locator EXPAND_TARGETING_ICONS;
     private final Locator TARGET_CATEGORY_NAME;
     private final Locator PERSON_TAB;
     private final Locator HOUSEHOLD_TAB;
@@ -110,6 +111,7 @@ public class TacticSettings {
         this.VERIFY_NPI = page.locator("//label[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
+        this.EXPAND_TARGETING_ICONS = page.locator("//i[@class='dropdown icon gaExpandTargeting']");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
@@ -855,5 +857,16 @@ public List<String> fetchEnteredManagementFeeValues() {
 
     public void clickNewTactic() {
         NEW_TACTIC.click();
+    }
+
+    public void expandAllTargetingRules() {
+        int count = EXPAND_TARGETING_ICONS.count();
+        for (int i = 0; i < count; i++) {
+            Locator icon = EXPAND_TARGETING_ICONS.nth(i);
+            if (icon.isVisible()) {
+                icon.scrollIntoViewIfNeeded();
+                icon.click();
+            }
+        }
     }
 }
