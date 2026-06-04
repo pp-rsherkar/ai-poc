@@ -665,6 +665,7 @@ public List<String> fetchEnteredManagementFeeValues() {
     }
 
     public void fetchRulesTypesCount(int expectedCount) {
+        waitUtility.waitUntilSpinnerHidden();
         FETCH_TARGET_RULE_TYPES.nth(expectedCount - 1).waitFor();
     }
 
