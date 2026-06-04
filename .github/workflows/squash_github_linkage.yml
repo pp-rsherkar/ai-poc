@@ -21,9 +21,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install MCP Dependencies
-        run: npm install tslib isomorphic-ws eventsource
-
       - name: Search Test Case via MCP
         env:
           SQUASH_URL: "https://sq-mcp.internetbrands.com/squashmcp"
@@ -31,22 +28,18 @@ jobs:
           SEARCH_VALUE: ${{ github.event.inputs.search_value }}
         run: |
           cat << 'EOF' > squash_mcp_client.js
-          const EventSource = require('eventsource');
-
           const url = process.env.SQUASH_URL;
           const token = process.env.SQUASH_TOKEN;
           const searchValue = process.env.SEARCH_VALUE;
 
           const isNumeric = /^\d+$/.test(searchValue);
           
-          // Construct arguments based on input type matching your working Postman payload schema
-          const args = isNumeric 
-            ? { case_id: parseInt(searchValue, 10), folder_id: 0, project_id: 0, semantic_query: "" }
-            : { case_id: 0, folder_id: 0, project_id: 0, semantic_query: searchValue };
-
-          // Fallbacks for filters matching your original Java template
+          // Mimicking the exact argument structure from your working Postman setup
           const structuralArgs = {
-            ...args,
+            case_id: isNumeric ? parseInt(searchValue, 10) : 0,
+            folder_id: 0,
+            project_id: 0,
+            semantic_query: isNumeric ? "" : searchValue,
             name_keyword_filter: "",
             creator: "",
             status_list: "",
@@ -69,20 +62,8 @@ jobs:
             }
           };
 
-          console.log(`Connecting to Squash MCP via SSE: ${url}`);
-          
-          // MCP over HTTP establishes an SSE stream connection for transport
-          const es = new EventSource(url, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-
-          es.onopen = async () => {
-            console.log("Connected securely to Squash MCP stream.");
-            
-            // Postman manages the handshake background; here we transmit the tool execution payload
+          async function run() {
+            console.log(`Sending HTTP POST to Squash MCP Gateway: ${url}`);
             try {
               const response = await fetch(url, {
                 method: 'POST',
@@ -93,33 +74,28 @@ jobs:
                 body: JSON.stringify(payload)
               });
 
-              console.log(`HTTP Post Status: ${response.status}`);
-              const data = await response.json();
-              console.log("================ MCP RESPONSE ================");
-              console.log(JSON.stringify(data, null, 2));
-              console.log("==============================================");
+              console.log(`HTTP Status: ${response.status} ${response.statusText}`);
               
-              es.close();
-              process.exit(0);
+              const text = await response.text();
+              console.log("================ MCP RESPONSE ================");
+              try {
+                // Formatting JSON response cleanly if valid
+                console.log(JSON.stringify(JSON.parse(text), null, 2));
+              } catch {
+                console.log(text);
+              }
+              console.log("==============================================");
+
+              if (!response.ok) {
+                process.exit(1);
+              }
             } catch (error) {
-              console.error("Execution payload transmission failed:", error);
-              es.close();
+              console.error("Network or execution payload error:", error);
               process.exit(1);
             }
-          };
+          }
 
-          es.onerror = (err) => {
-            console.error("MCP Stream Transport Error:", err);
-            es.close();
-            process.exit(1);
-          };
-
-          // Timeout fallback safety mechanism for the runner
-          setTimeout(() => {
-            console.error("Workflow Timeout: MCP server failed to respond within 15 seconds.");
-            es.close();
-            process.exit(1);
-          }, 15000);
+          run();
           EOF
 
           node squash_mcp_client.js
