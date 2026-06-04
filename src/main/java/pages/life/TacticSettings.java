@@ -113,7 +113,7 @@ public class TacticSettings {
         this.VERIFY_NPI = page.locator("//label[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
-        this.EXPAND_TARGETING_ICONS = page.locator("//i[@class='dropdown icon gaExpandTargeting']");
+        this.EXPAND_TARGETING_ICONS = page.locator("//i[contains(@class,'gaExpandTargeting')]");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
