@@ -1,4 +1,4 @@
-name: JIRA Testcase CSV Generator
+name: JIRA - Testcase (CSV) Generator
 
 on:
   workflow_dispatch:
