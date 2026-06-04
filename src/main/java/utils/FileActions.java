@@ -1,14 +1,13 @@
 package utils;
 
 import com.opencsv.CSVReader;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class FileActions {
 
@@ -80,9 +79,9 @@ public class FileActions {
 
     private static Path resolvePath(String fileName) throws IOException {
         Path[] paths = {
-                Paths.get("src/main/resources", fileName),
-                Paths.get("src/main/resources/uploadfiles", fileName),
-                Paths.get(System.getProperty("user.home"), "Downloads", fileName)
+            Paths.get("src/main/resources", fileName),
+            Paths.get("src/main/resources/uploadfiles", fileName),
+            Paths.get(System.getProperty("user.home"), "Downloads", fileName)
         };
 
         for (Path path : paths) {
@@ -96,7 +95,8 @@ public class FileActions {
     public static int countRecordsFromTextFile(String fileName) throws IOException {
         Path basePath = resolvePath(fileName);
         List<String> lines = Files.readAllLines(basePath);
-        return Math.toIntExact(lines.stream().filter(line -> !line.trim().isEmpty()).count());
+        return Math.toIntExact(
+                lines.stream().filter(line -> !line.trim().isEmpty()).count());
     }
 
     public static int fetchRowCountFromCSV(Path filePath) throws IOException {
@@ -126,7 +126,7 @@ public class FileActions {
     public static int fetchRowCountFromExcel(String fileName) throws IOException {
         Path basePath = resolvePath(fileName);
         try (InputStream is = Files.newInputStream(basePath);
-             Workbook workbook = WorkbookFactory.create(is)) {
+                Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
             return sheet.getLastRowNum();
         }

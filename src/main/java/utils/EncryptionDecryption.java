@@ -1,9 +1,9 @@
 package utils;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 public class EncryptionDecryption {
     private static final String ALGORITHM = "AES";

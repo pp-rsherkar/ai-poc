@@ -3,9 +3,6 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -13,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class CreateCreatives {
     public final Locator CLICK_THROUGH_URL;
@@ -132,112 +131,156 @@ public class CreateCreatives {
         this.page = page;
         this.CREATIVE_PAGE_TITLE = page.locator("//div[contains(text(),'Creatives')]");
         this.UNARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//img[@title='unarchive']");
-        this.ENABLED_ARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//img[contains(@title,'archive')]");
-        this.DISABLED_ARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//span[@class='d-block']");
+        this.ENABLED_ARCHIVED_BUTTON =
+                page.locator("//div[contains(@class,'content-section')]//img[contains(@title,'archive')]");
+        this.DISABLED_ARCHIVED_BUTTON =
+                page.locator("//div[contains(@class,'content-section')]//span[@class='d-block']");
         this.ARCHIVED_BUTTON = page.locator("//div[contains(@class,'content-section')]//img[@title]");
-        this.SELECT_ADVERTISER = page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
+        this.SELECT_ADVERTISER =
+                page.locator("//app-multi-select[contains(@placeholder,'Select Advertisers')]/div/span/input");
         this.DROPDOWN_VALUES = page.locator("//div[@class='menu transition visible']//div[@class='item']/span");
         this.CLEAR_ALL_BUTTON = page.locator("//div[contains(text(),'Clear All')]");
-        this.SELECT_CAMPAIGN = page.locator("//app-multi-select[contains(@placeholder,'Select Campaigns')]/div/span/input");
-        this.SELECT_AD_SIZE = page.locator("//app-multi-select[contains(@placeholder,'Select Ad Sizes')]/div/span/input");
-        this.SELECT_CREATIVE_TYPE = page.locator("//app-multi-select[contains(@placeholder,'Select Type')]/div/span/input");
-        this.CREATIVE_STATUS = page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
+        this.SELECT_CAMPAIGN =
+                page.locator("//app-multi-select[contains(@placeholder,'Select Campaigns')]/div/span/input");
+        this.SELECT_AD_SIZE =
+                page.locator("//app-multi-select[contains(@placeholder,'Select Ad Sizes')]/div/span/input");
+        this.SELECT_CREATIVE_TYPE =
+                page.locator("//app-multi-select[contains(@placeholder,'Select Type')]/div/span/input");
+        this.CREATIVE_STATUS =
+                page.locator("//app-multi-select[contains(@placeholder,'Select Status')]/div/span/input");
         this.CREATED_BY = page.locator("//app-multi-select[contains(@placeholder,'Select Created By')]/div/span/input");
         this.SORT_DROPDOWN = page.locator("//div[contains(@class, 'sort-option-dropdown')]");
         this.SEARCH_BOX = page.locator("//div[contains(@class,'search-field')]/input[@placeholder='Search']");
-        this.CANCEL_BUTTON = page.locator("//div[contains(@class,'newCreativeFooter')]//button[normalize-space(text())='Cancel']");
+        this.CANCEL_BUTTON =
+                page.locator("//div[contains(@class,'newCreativeFooter')]//button[normalize-space(text())='Cancel']");
         this.CREATIVE_HEADER = page.locator("//div[contains(@class,'rightPanelHeader1')]");
         this.OK_BUTTON = page.locator("//button[contains(@class,'okButton')]");
         this.SUCCESS_ALERT = page.locator("//div[@aria-label='Success!']/following-sibling::div[@role='alert']");
         this.NEW_CREATIVE_BUTTON = page.locator("//button[contains(text(),'New Creative')]");
-        this.ADVERTISER_DROPDOWN = page.locator("//app-single-select-dropdown[contains(@placeholder,'Select Advertiser')]/div/div/input");
-        this.ADVERTISER_DROPDOWN_VALUES = page.locator("//app-single-select-dropdown[contains(@placeholder,'Select Advertiser')]//input/following-sibling::div/div");
+        this.ADVERTISER_DROPDOWN =
+                page.locator("//app-single-select-dropdown[contains(@placeholder,'Select Advertiser')]/div/div/input");
+        this.ADVERTISER_DROPDOWN_VALUES = page.locator(
+                "//app-single-select-dropdown[contains(@placeholder,'Select Advertiser')]//input/following-sibling::div/div");
         this.CREATIVE_NAME = page.locator("//input[contains(@formcontrolname,'creativeName')]");
         this.ADVERTISER_DSA = page.locator("//input[contains(@placeholder,'Advertiser per DSA')]");
         this.FINANCER = page.locator("//input[contains(@placeholder,'Financer')]");
         this.CREATIVE_TYPE = page.locator("//app-creativetype/div//following-sibling::div");
         this.CREATIVE_HTML_CODE = page.locator("//textarea[contains(@formcontrolname,'htmlCode')]");
         this.MACROS_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'multi_click_macros_check ')]");
-        this.CREATIVE_AD_SIZE = page.locator("//app-single-select-dropdown//input[contains(@placeholder,'Select Ad Size')]");
-        this.CREATIVE_AD_SIZE_VALUE = page.locator("//input[contains(@placeholder,'Select Ad Size')]/following-sibling::div/div");
+        this.CREATIVE_AD_SIZE =
+                page.locator("//app-single-select-dropdown//input[contains(@placeholder,'Select Ad Size')]");
+        this.CREATIVE_AD_SIZE_VALUE =
+                page.locator("//input[contains(@placeholder,'Select Ad Size')]/following-sibling::div/div");
         this.DOMAIN_LANDING = page.locator("//input[contains(@formcontrolname,'landingDomain')]");
-        this.DURATION = page.locator("//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");
+        this.DURATION = page.locator(
+                "//input[contains(@formcontrolname,'audioDuration') or contains(@formcontrolname,'duration')]");
         this.URL = page.locator("//input[contains(@placeholder,'url')]");
-        this.VAST_XML_TEXTAREA = page.locator("//textarea[contains(@formcontrolname,'vastDoc') or contains(@formcontrolname,'vastAudioDoc')]");
+        this.VAST_XML_TEXTAREA = page.locator(
+                "//textarea[contains(@formcontrolname,'vastDoc') or contains(@formcontrolname,'vastAudioDoc')]");
         this.IAB_CATEGORY = page.locator("//div[contains(@id,'iabcreativeLookup')]/div/input");
         this.IAB_CATEGORY_VALUE = page.locator("//div[contains(@id,'iabcreativeLookup')]/div/div/div");
         this.WIDTH = page.locator("//input[contains(@formcontrolname,'width')]");
         this.HEIGHT = page.locator("//input[contains(@formcontrolname,'height')]");
-        this.HEADLINE = page.locator("//input[contains(@formcontrolname,'headline') or contains(@formcontrolname,'tittle')]");
+        this.HEADLINE =
+                page.locator("//input[contains(@formcontrolname,'headline') or contains(@formcontrolname,'tittle')]");
         this.DESCRIPTION = page.locator("//input[contains(@formcontrolname,'description')]");
-        this.DISPLAY_URL = page.locator("//input[contains(@formcontrolname,'srchDisplayUrl') or contains(@formcontrolname,'displayUrl')]");
+        this.DISPLAY_URL = page.locator(
+                "//input[contains(@formcontrolname,'srchDisplayUrl') or contains(@formcontrolname,'displayUrl')]");
         this.SPONSORED_BY = page.locator("//input[contains(@formcontrolname,'sponsoredText')]");
         this.PRODUCT_DESCRIPTION = page.locator("//textarea[contains(@formcontrolname,'productDescription')]");
         this.SELECTED_IAB_CATEGORY = page.locator("//div[@id='iabcreativeLookup']//span");
         this.CLICK_THROUGH_URL = page.locator("//input[contains(@formcontrolname,'clickThruUrl')]");
-        this.PAGINATION_NEXT_BUTTON = page.locator("//button[contains(@class,'button basic')]//i[contains(@class,'angle right icon')]");
-        this.PAGINATION_PREVIOUS_BUTTON = page.locator("//button[contains(@class,'button basic')]//i[contains(@class,'angle left icon')]");
-        this.ITEMS_PER_PAGE_DROPDOWN = page.locator("//td[contains(@class,'sui-select-single-dropdown')]//div[@class='text']");
+        this.PAGINATION_NEXT_BUTTON =
+                page.locator("//button[contains(@class,'button basic')]//i[contains(@class,'angle right icon')]");
+        this.PAGINATION_PREVIOUS_BUTTON =
+                page.locator("//button[contains(@class,'button basic')]//i[contains(@class,'angle left icon')]");
+        this.ITEMS_PER_PAGE_DROPDOWN =
+                page.locator("//td[contains(@class,'sui-select-single-dropdown')]//div[@class='text']");
         this.ITEMS_PER_PAGE = page.locator("//div[contains(@class,'content-section')]");
-        this.SORT_BY_NAME_ASC = page.locator("//span[contains(text(),'Name')]/following-sibling::i[contains(@class,'up')]");
-        this.SORT_BY_NAME_DESC = page.locator("//span[contains(text(),'Name')]/following-sibling::i[contains(@class,'down')]");
+        this.SORT_BY_NAME_ASC =
+                page.locator("//span[contains(text(),'Name')]/following-sibling::i[contains(@class,'up')]");
+        this.SORT_BY_NAME_DESC =
+                page.locator("//span[contains(text(),'Name')]/following-sibling::i[contains(@class,'down')]");
         this.SORT_BY_ID_ASC = page.locator("//span[contains(text(),'ID')]/following-sibling::i[contains(@class,'up')]");
-        this.SORT_BY_ID_DESC = page.locator("//span[contains(text(),'ID')]/following-sibling::i[contains(@class,'down')]");
-        this.SORT_BY_LAST_UPDATED_ASC = page.locator("//span[contains(text(),'Last Updated')]/following-sibling::i[contains(@class,'up')]");
-        this.SORT_BY_LAST_UPDATED_DESC = page.locator("//span[contains(text(),'Last Updated')]/following-sibling::i[contains(@class,'down')]");
+        this.SORT_BY_ID_DESC =
+                page.locator("//span[contains(text(),'ID')]/following-sibling::i[contains(@class,'down')]");
+        this.SORT_BY_LAST_UPDATED_ASC =
+                page.locator("//span[contains(text(),'Last Updated')]/following-sibling::i[contains(@class,'up')]");
+        this.SORT_BY_LAST_UPDATED_DESC =
+                page.locator("//span[contains(text(),'Last Updated')]/following-sibling::i[contains(@class,'down')]");
         this.CREATIVE_NAME_LIST = page.locator("//div[contains(@class,'name-section-truncate')]");
         this.CREATIVE_ID_LIST = page.locator("//div[contains(@class,'id-section')]");
-        this.CREATIVE_LAST_UPDATED_LIST = page.locator("//span[contains(text(),'Last updated:')]//following-sibling::span");
+        this.CREATIVE_LAST_UPDATED_LIST =
+                page.locator("//span[contains(text(),'Last updated:')]//following-sibling::span");
         this.CREATIVE_SOURCE_LIST = page.locator("//span[contains(text(),'Source:')]//following-sibling::span");
         this.CREATIVE_AD_SIZE_LIST = page.locator("//span[contains(text(),'AdSize:')]//following-sibling::span");
-        this.APPROVAL_STATUS_BUTTON = page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
+        this.APPROVAL_STATUS_BUTTON =
+                page.locator("//label[contains(text(),'Approval Status')]/following-sibling::div//button");
         this.CREATIVE_FREQUENCY_OPTIONS = page.locator("//button[@name='frequencyOptionType']");
         this.SELECTED_AD_SIZE = page.locator("//div[contains(@class,'ad-size-group')]//input/following-sibling::span");
         this.DELETE_ICON = page.locator("//app-icon-lable-link[@text='Delete']//div");
         this.BULK_ACTIONS_BUTTON = page.locator("//div[contains(@id,'CreativeBulkActions')]");
-        this.BULK_ASSIGN_CREATIVE_HEADER = page.locator("//div[contains(@class,'rightPanelHeader2') and contains(text(),'Bulk Assign Creatives')]");
+        this.BULK_ASSIGN_CREATIVE_HEADER = page.locator(
+                "//div[contains(@class,'rightPanelHeader2') and contains(text(),'Bulk Assign Creatives')]");
         this.BULK_ASSIGN_CHECKBOX = page.locator("//div[contains(@class,'shtCategoryContainer')]//sui-checkbox");
         this.FETCH_TOOLTIP_TEXT_FOR_ASSIGNED_CAMPAIGNS = page.locator("//div[contains(@class,'ng-tooltip-show')]");
         this.REMOVAL_CONFIRMATION_POP_UP = page.locator("//div[contains(text(),'Removal Confirmation')]");
-        this.REMOVAL_CONFIRMATION_TEXT = page.locator("//div[contains(text(),'Removal Confirmation')]/following-sibling::div[contains(@class,'text-middle')]");
-        this.REMOVE_BUTTON = page.locator("//div[contains(text(),'Removal Confirmation')]/following-sibling::div[contains(@class,'popup-actions-footer')]//span[contains(text(),'Remove')]");
-        this.NO_CREATIVE_FOUND_MESSAGE = page.locator("//img[contains(@alt,'No Creatives Found')]/following-sibling::div");
-        this.CREATIVE_STATUS_LABEL = page.locator("//div[contains(@class,'content-section')]//div[contains(@class,'status-label')]");
-        this.APPROVE_ALL_BUTTON = page.locator("//div[contains(@class,'bulkapprove')]//button[contains(text(),'Approve All')]");
-        this.APPROVED_BUTTON = page.locator("//div[contains(@class,'basic group')]//button[contains(text(),'Approved')]");
-        this.CREATIVE_TYPE_ICON = page.locator("//div[contains(@class,'image pointer') or contains(@class,'video pointer') or contains(@class,'generichtml pointer') or contains(@class,'search pointer') or contains(@class,'audio pointer') or contains(@class,'native pointer') or contains(@class,'nativevideo') or contains(@class,'expandablerichmedia pointer')]");
+        this.REMOVAL_CONFIRMATION_TEXT = page.locator(
+                "//div[contains(text(),'Removal Confirmation')]/following-sibling::div[contains(@class,'text-middle')]");
+        this.REMOVE_BUTTON = page.locator(
+                "//div[contains(text(),'Removal Confirmation')]/following-sibling::div[contains(@class,'popup-actions-footer')]//span[contains(text(),'Remove')]");
+        this.NO_CREATIVE_FOUND_MESSAGE =
+                page.locator("//img[contains(@alt,'No Creatives Found')]/following-sibling::div");
+        this.CREATIVE_STATUS_LABEL =
+                page.locator("//div[contains(@class,'content-section')]//div[contains(@class,'status-label')]");
+        this.APPROVE_ALL_BUTTON =
+                page.locator("//div[contains(@class,'bulkapprove')]//button[contains(text(),'Approve All')]");
+        this.APPROVED_BUTTON =
+                page.locator("//div[contains(@class,'basic group')]//button[contains(text(),'Approved')]");
+        this.CREATIVE_TYPE_ICON = page.locator(
+                "//div[contains(@class,'image pointer') or contains(@class,'video pointer') or contains(@class,'generichtml pointer') or contains(@class,'search pointer') or contains(@class,'audio pointer') or contains(@class,'native pointer') or contains(@class,'nativevideo') or contains(@class,'expandablerichmedia pointer')]");
         this.PREVIEW_LINK = page.locator("//app-icon-lable-link[contains(@text,'Open a creative preview')]");
         this.UPLOADING_PROGRESS_BAR = page.locator("//sui-progress[contains(@class,'uploadProgressbar')]");
         this.UPLOAD_DELETE_ICON = page.locator("//img[contains(@alt,'delete')]");
-        this.SELECTED_AD_CHOICES_ICON = page.locator("//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following::div//div[@class='text']");
+        this.SELECTED_AD_CHOICES_ICON = page.locator(
+                "//span[contains(text(),'AdChoices Icon')]/ancestor::app-info-label/following::div//div[@class='text']");
         this.CREATIVE_WIDTH_TYPE = page.locator("//button[contains(@name,'VideoTechType')]");
-        this.DOMAIN_LANDING_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Domain Landing:')]/following-sibling::span");
+        this.DOMAIN_LANDING_FROM_CREATIVE_TILE =
+                page.locator("//span[contains(text(),'Domain Landing:')]/following-sibling::span");
         this.ADSIZE_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'AdSize:')]/following-sibling::span");
         this.CREATIVE_STATUS_FROM_CREATIVE_TILE = page.locator("//div[contains(@class,'status-label')]//span");
-        this.CREATED_BY_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Created by :')]/following-sibling::span");
+        this.CREATED_BY_FROM_CREATIVE_TILE =
+                page.locator("//span[contains(text(),'Created by :')]/following-sibling::span");
         this.SOURCE_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Source:')]/following-sibling::span");
-        this.LAST_UPDATED_FROM_CREATIVE_TILE = page.locator("//span[contains(text(),'Last updated:')]/following-sibling::span");
+        this.LAST_UPDATED_FROM_CREATIVE_TILE =
+                page.locator("//span[contains(text(),'Last updated:')]/following-sibling::span");
         this.ASSOCIATIONS_TAB = page.locator("//div[@class='creativeContainer']//a[contains(text(),'Associations')]");
         this.COLUMN_SELECTION_ICON = page.locator("//span[@class='icon-bars']");
-        this.COLUMN_NAME_FROM_SELECTION_ICON = page.locator("//span[@class='icon-bars']/following-sibling::div//div[contains(@class,'item')]");
+        this.COLUMN_NAME_FROM_SELECTION_ICON =
+                page.locator("//span[@class='icon-bars']/following-sibling::div//div[contains(@class,'item')]");
         this.ASSOCIATIONS_TAB_COLUMN_NAME = page.locator("//div[@class='filter-container']");
-        this.MENU_BUTTONS_FROM_ASSOCIATION_ICON = page.locator("//div[@class='menuButtons']/button[contains(@class,'button small')]");
+        this.MENU_BUTTONS_FROM_ASSOCIATION_ICON =
+                page.locator("//div[@class='menuButtons']/button[contains(@class,'button small')]");
         this.FILTER_ICON = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link");
-        this.NO_FILTER_TEXT = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//p");
-        this.FILTER_BUTTONS = page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//button");
+        this.NO_FILTER_TEXT =
+                page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//p");
+        this.FILTER_BUTTONS =
+                page.locator("//span[text()='Filter']/ancestor::app-icon-lable-link/following-sibling::div//button");
         this.SELECTED_FILTER_NAME = page.locator("//table[contains(@class,'filterTable')]//div[@class='text']");
         this.FILTER_VALUE = page.locator("//input[@value='Enter Value']");
         this.FILTER_START_DATE = page.locator("//td[not(@hidden)]//input[contains(@placeholder,'Start Date')]");
         this.FILTER_END_DATE = page.locator("//td[not(@hidden)]//input[contains(@placeholder,'End Date')]");
         this.ASSOCIATIONS_TAB_LINE_ITEM_NAME = page.locator("//td[contains(@class,'gaTableRow creativeNames')]");
-        this.ASSOCIATIONS_TAB_CAMPAIGN_NAME = page.locator("//td[contains(@class,'multiline-wrapper')]//div[contains(@class,'ellipsediv')]");
+        this.ASSOCIATIONS_TAB_CAMPAIGN_NAME =
+                page.locator("//td[contains(@class,'multiline-wrapper')]//div[contains(@class,'ellipsediv')]");
         this.FILTERED_RECORD_COUNT = page.locator("//td[contains(@class,'total-record-counts')]");
         this.CALENDAR_TITLE = page.locator("//sui-calendar-view-title//span[@class='title link']");
         this.CALENDAR_MONTH = page.locator("//sui-calendar-month-view//tbody//td");
         this.CALENDAR_DATE = page.locator("//sui-calendar-date-view//tbody//td");
         this.LINE_ITEM_PAGE_TITLE = page.locator("//div[contains(@class,'lineitem-name')]");
         this.NO_CAMPAIGN_FOUND_MESSAGE = page.locator("//div[@class='creative_message']//div[@class='no_campaings']");
-        this.BULK_PANEL_CANCEL_BUTTON = page.locator("//div[@class='targetingFooterActions']//button[contains(text(),'Cancel')]");
+        this.BULK_PANEL_CANCEL_BUTTON =
+                page.locator("//div[@class='targetingFooterActions']//button[contains(text(),'Cancel')]");
     }
 
     public String verifyCreativeLibraryPageTitle() {
@@ -263,7 +306,8 @@ public class CreateCreatives {
 
     public boolean isArchiveUnarchiveButtonsPresent(String buttonType) {
         boolean flag = false;
-        if (buttonType.contains("Active") && ENABLED_ARCHIVED_BUTTON.first().isVisible() || DISABLED_ARCHIVED_BUTTON.first().isVisible()) {
+        if (buttonType.contains("Active") && ENABLED_ARCHIVED_BUTTON.first().isVisible()
+                || DISABLED_ARCHIVED_BUTTON.first().isVisible()) {
             waitUtility.waitUntilPreLoaderHidden();
             flag = true;
         } else if (buttonType.contains("Archived") && UNARCHIVED_BUTTON.first().isVisible()) {
@@ -278,7 +322,9 @@ public class CreateCreatives {
         if (CREATIVE_NAME_LIST.first().isVisible()) {
             text = CREATIVE_NAME_LIST.first().textContent().trim();
         }
-        Locator archiveXpath = page.locator(String.format("//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='archive']", text));
+        Locator archiveXpath = page.locator(String.format(
+                "//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='archive']",
+                text));
         archiveXpath.click();
         waitUtility.waitUntilPreLoaderHidden();
         return text;
@@ -289,7 +335,9 @@ public class CreateCreatives {
         if (CREATIVE_NAME_LIST.first().isVisible()) {
             text = CREATIVE_NAME_LIST.first().textContent().trim();
         }
-        Locator archiveXpath = page.locator(String.format("//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='unarchive']", text));
+        Locator archiveXpath = page.locator(String.format(
+                "//div[contains(@class,'name-section-truncate') and @title='%s']/parent::div/following-sibling::div//img[@title='unarchive']",
+                text));
         archiveXpath.click();
         waitUtility.waitUntilPreLoaderHidden();
         return text;
@@ -302,7 +350,8 @@ public class CreateCreatives {
             case "Advertiser":
                 selectDropdownAndFill(SELECT_ADVERTISER, values);
                 for (String value : values) {
-                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    keyLocator = page.locator(String.format(
+                            "//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
                     flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
@@ -310,7 +359,8 @@ public class CreateCreatives {
             case "Associated Campaigns":
                 selectDropdownAndFill(SELECT_CAMPAIGN, values);
                 for (String value : values) {
-                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    keyLocator = page.locator(String.format(
+                            "//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
                     flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
@@ -318,7 +368,8 @@ public class CreateCreatives {
             case "Creative Status":
                 selectDropdownAndFill(CREATIVE_STATUS, values);
                 for (String value : values) {
-                    keyLocator = page.locator(String.format("//div[contains(@class,'status-label')]//span[contains(text(),'%s')]", value));
+                    keyLocator = page.locator(String.format(
+                            "//div[contains(@class,'status-label')]//span[contains(text(),'%s')]", value));
                     flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
@@ -326,7 +377,8 @@ public class CreateCreatives {
             case "Ad Sizes":
                 selectDropdownAndFill(SELECT_AD_SIZE, values);
                 for (String value : values) {
-                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    keyLocator = page.locator(String.format(
+                            "//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
                     flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
@@ -339,7 +391,8 @@ public class CreateCreatives {
             case "CreatedBy":
                 selectDropdownAndFill(CREATED_BY, values);
                 for (String value : values) {
-                    keyLocator = page.locator(String.format("//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
+                    keyLocator = page.locator(String.format(
+                            "//span[@class='label']/following-sibling::span[contains(text(),'%s')]", value));
                     flag = isContentCountMatching(keyLocator);
                 }
                 clickClearAllButton();
@@ -388,16 +441,18 @@ public class CreateCreatives {
     }
 
     public boolean isColumnOrderCorrect(Locator creativeListType, String columnType, boolean ascending) {
-        List<String> values = creativeListType.allTextContents().stream().map(text -> {
-            text = text.trim();
-            if (columnType.equals("Name") && text.contains("|")) {
-                String[] parts = text.split("\\|");
-                if (parts.length > 5) {
-                    return parts[5].trim();
-                }
-            }
-            return text;
-        }).toList();
+        List<String> values = creativeListType.allTextContents().stream()
+                .map(text -> {
+                    text = text.trim();
+                    if (columnType.equals("Name") && text.contains("|")) {
+                        String[] parts = text.split("\\|");
+                        if (parts.length > 5) {
+                            return parts[5].trim();
+                        }
+                    }
+                    return text;
+                })
+                .toList();
 
         for (int i = 0; i < values.size() - 1; i++) {
             boolean valid = false;
@@ -412,10 +467,21 @@ public class CreateCreatives {
                     valid = ascending ? currentId <= nextId : currentId >= nextId;
                     break;
                 case "Last Updated":
-                    DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("M/d/yyyy h:mm").optionalStart().appendLiteral(' ').optionalEnd().appendPattern("a").toFormatter();
-                    LocalDateTime currentDateTime = LocalDateTime.parse(values.get(i).toUpperCase(), formatter);
-                    LocalDateTime nextDateTime = LocalDateTime.parse(values.get(i + 1).toUpperCase(), formatter);
-                    valid = ascending ? !currentDateTime.isAfter(nextDateTime) : !currentDateTime.isBefore(nextDateTime);
+                    DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                            .parseCaseInsensitive()
+                            .appendPattern("M/d/yyyy h:mm")
+                            .optionalStart()
+                            .appendLiteral(' ')
+                            .optionalEnd()
+                            .appendPattern("a")
+                            .toFormatter();
+                    LocalDateTime currentDateTime =
+                            LocalDateTime.parse(values.get(i).toUpperCase(), formatter);
+                    LocalDateTime nextDateTime =
+                            LocalDateTime.parse(values.get(i + 1).toUpperCase(), formatter);
+                    valid = ascending
+                            ? !currentDateTime.isAfter(nextDateTime)
+                            : !currentDateTime.isBefore(nextDateTime);
                     break;
             }
             if (!valid) return false;
@@ -426,7 +492,9 @@ public class CreateCreatives {
     public boolean checkSearchedValue(String searchValue) {
         Locator[] locators = {CREATIVE_NAME_LIST, CREATIVE_ID_LIST, CREATIVE_AD_SIZE_LIST, CREATIVE_SOURCE_LIST};
         for (Locator locator : locators) {
-            if (locator.filter(new Locator.FilterOptions().setHasText(searchValue)).count() > 0) {
+            if (locator.filter(new Locator.FilterOptions().setHasText(searchValue))
+                            .count()
+                    > 0) {
                 return true;
             }
         }
@@ -448,7 +516,8 @@ public class CreateCreatives {
     }
 
     public void clickCopyCreative(String creativeName) {
-        Locator copyLocator = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div//span[@title='copy']", creativeName));
+        Locator copyLocator = page.locator(String.format(
+                "//div[@title='%s']/parent::div/following-sibling::div//span[@title='copy']", creativeName));
         copyLocator.first().click();
         page.waitForTimeout(2000);
         waitUtility.waitUntilSpinnerHidden();
@@ -511,7 +580,8 @@ public class CreateCreatives {
                     MACROS_CHECKBOX.click();
                 }
                 CREATIVE_AD_SIZE.click();
-                CommonUtils.selectAndClickElement(CREATIVE_AD_SIZE_VALUE, Collections.singletonList(attributeMap.get("Size")));
+                CommonUtils.selectAndClickElement(
+                        CREATIVE_AD_SIZE_VALUE, Collections.singletonList(attributeMap.get("Size")));
                 if (CLICK_THROUGH_URL.isEditable()) {
                     CLICK_THROUGH_URL.fill(attributeMap.get("ClickThroughURL"));
                 }
@@ -532,9 +602,13 @@ public class CreateCreatives {
                 } else if (type.contains("Audio URL") || type.contains("Video URL")) URL.fill(attributeMap.get("URL"));
                 else if (type.contains("VAST URL")) URL.fill(attributeMap.get("VASTURL"));
                 else VAST_XML_TEXTAREA.fill(attributeMap.get("VASTXML"));
-                if (type.contains("Audio URL") || type.contains("Video URL") || type.contains("VAST URL") || type.contains("VAST XML")) {
+                if (type.contains("Audio URL")
+                        || type.contains("Video URL")
+                        || type.contains("VAST URL")
+                        || type.contains("VAST XML")) {
                     if (CREATIVE_WIDTH_TYPE.first().isVisible()) {
-                        CommonUtils.selectAndClickElement(CREATIVE_TYPE_ICON, Collections.singletonList(attributeMap.get("Type")));
+                        CommonUtils.selectAndClickElement(
+                                CREATIVE_TYPE_ICON, Collections.singletonList(attributeMap.get("Type")));
                     }
                     DURATION.fill(attributeMap.get("Durations"));
                     if (WIDTH.isVisible() && HEIGHT.isVisible()) {
@@ -554,7 +628,8 @@ public class CreateCreatives {
 
             case "Search":
                 CREATIVE_AD_SIZE.click();
-                CommonUtils.selectAndClickElement(CREATIVE_AD_SIZE_VALUE, Collections.singletonList(attributeMap.get("Size")));
+                CommonUtils.selectAndClickElement(
+                        CREATIVE_AD_SIZE_VALUE, Collections.singletonList(attributeMap.get("Size")));
                 HEADLINE.fill(attributeMap.get("Headline"));
                 DESCRIPTION.fill(attributeMap.get("Description"));
                 DISPLAY_URL.fill(attributeMap.get("DisplayURL"));
@@ -584,7 +659,9 @@ public class CreateCreatives {
     }
 
     public String fetchCreativeName(String message) {
-        return message.replaceAll("\\b(Creative|created)\\b\\p{Punct}?", "").trim().replaceAll(" +", " ");
+        return message.replaceAll("\\b(Creative|created)\\b\\p{Punct}?", "")
+                .trim()
+                .replaceAll(" +", " ");
     }
 
     public boolean verifyCreativesInLibrary(String name) {
@@ -594,7 +671,9 @@ public class CreateCreatives {
     }
 
     public String fetchRecordsNumberAfterSearch() {
-        return page.locator("//div[contains(@class,'total-record')]").textContent().trim();
+        return page.locator("//div[contains(@class,'total-record')]")
+                .textContent()
+                .trim();
     }
 
     public boolean showsActiveCreativesWhenActiveClicked() {
@@ -610,7 +689,10 @@ public class CreateCreatives {
         if (locator.count() != expectedCount) {
             return false;
         }
-        if (expectedCount >= Integer.parseInt(ITEMS_PER_PAGE_DROPDOWN.textContent().trim()) && PAGINATION_NEXT_BUTTON.isVisible()) {
+        if (expectedCount
+                        >= Integer.parseInt(
+                                ITEMS_PER_PAGE_DROPDOWN.textContent().trim())
+                && PAGINATION_NEXT_BUTTON.isVisible()) {
             navigateToNextCreativePage();
             expectedCount = ITEMS_PER_PAGE.count();
             return locator.count() == expectedCount;
@@ -620,14 +702,18 @@ public class CreateCreatives {
 
     public void selectPaginationItemsPerPage(String itemsCount) {
         ITEMS_PER_PAGE_DROPDOWN.click();
-        Locator itemsLocator = ITEMS_PER_PAGE_DROPDOWN.locator(String.format("xpath=following-sibling::div//div[normalize-space(text())='%s']", itemsCount));
+        Locator itemsLocator = ITEMS_PER_PAGE_DROPDOWN.locator(
+                String.format("xpath=following-sibling::div//div[normalize-space(text())='%s']", itemsCount));
         itemsLocator.click();
         waitUtility.waitUntilPreLoaderHidden();
         waitUtility.waitForLocatorVisible(CREATIVE_NAME_LIST.last());
     }
 
     public void navigateToNextCreativePage() {
-        if (PAGINATION_NEXT_BUTTON.locator("xpath=./parent::button").getAttribute("class").contains("disabledButton")) {
+        if (PAGINATION_NEXT_BUTTON
+                .locator("xpath=./parent::button")
+                .getAttribute("class")
+                .contains("disabledButton")) {
             return;
         }
         PAGINATION_NEXT_BUTTON.click();
@@ -649,8 +735,12 @@ public class CreateCreatives {
 
     public List<String> fetchCreativeDetails() {
         List<String> creativeDetails = new ArrayList<>();
-        creativeDetails.add(ADVERTISER_DROPDOWN.locator("xpath = ./following-sibling::span").textContent().trim());
-        if (CREATIVE_NAME.isVisible()) creativeDetails.add(CREATIVE_NAME.inputValue().trim());
+        creativeDetails.add(ADVERTISER_DROPDOWN
+                .locator("xpath = ./following-sibling::span")
+                .textContent()
+                .trim());
+        if (CREATIVE_NAME.isVisible())
+            creativeDetails.add(CREATIVE_NAME.inputValue().trim());
         for (int i = 0; i < APPROVAL_STATUS_BUTTON.count(); i++) {
             if (APPROVAL_STATUS_BUTTON.nth(i).getAttribute("class").contains("active")) {
                 creativeDetails.add(APPROVAL_STATUS_BUTTON.nth(i).textContent().trim());
@@ -660,21 +750,28 @@ public class CreateCreatives {
         creativeDetails.add(ADVERTISER_DSA.inputValue().trim());
         creativeDetails.add(FINANCER.inputValue().trim());
         for (int i = 0; i < CREATIVE_TYPE.count(); i++) {
-            if (CREATIVE_TYPE.locator("xpath = ./parent::div").nth(i).getAttribute("class").contains("active")) {
+            if (CREATIVE_TYPE
+                    .locator("xpath = ./parent::div")
+                    .nth(i)
+                    .getAttribute("class")
+                    .contains("active")) {
                 creativeDetails.add(CREATIVE_TYPE.nth(i).textContent().trim());
                 break;
             }
         }
         for (int i = 0; i < CREATIVE_FREQUENCY_OPTIONS.count(); i++) {
             if (CREATIVE_FREQUENCY_OPTIONS.nth(i).getAttribute("class").contains("active")) {
-                creativeDetails.add(CREATIVE_FREQUENCY_OPTIONS.nth(i).textContent().trim());
+                creativeDetails.add(
+                        CREATIVE_FREQUENCY_OPTIONS.nth(i).textContent().trim());
                 break;
             }
         }
-        if (SELECTED_AD_SIZE.isVisible()) creativeDetails.add(SELECTED_AD_SIZE.textContent().trim());
+        if (SELECTED_AD_SIZE.isVisible())
+            creativeDetails.add(SELECTED_AD_SIZE.textContent().trim());
         if (CLICK_THROUGH_URL.isVisible() && CLICK_THROUGH_URL.isEnabled())
             creativeDetails.add(CLICK_THROUGH_URL.inputValue().trim());
-        if (DOMAIN_LANDING.isVisible()) creativeDetails.add(DOMAIN_LANDING.inputValue().trim());
+        if (DOMAIN_LANDING.isVisible())
+            creativeDetails.add(DOMAIN_LANDING.inputValue().trim());
         if (DURATION.isVisible()) {
             String duration = DURATION.inputValue();
             creativeDetails.add((duration == null || duration.trim().isEmpty()) ? "0" : duration.trim());
@@ -686,11 +783,16 @@ public class CreateCreatives {
             creativeDetails.add(WIDTH.inputValue().trim());
         }
         if (HEADLINE.isVisible()) creativeDetails.add(HEADLINE.inputValue().trim());
-        if (SPONSORED_BY.isVisible()) creativeDetails.add(SPONSORED_BY.inputValue().trim());
-        if (DESCRIPTION.isVisible()) creativeDetails.add(DESCRIPTION.inputValue().trim());
-        if (PRODUCT_DESCRIPTION.isVisible()) creativeDetails.add(PRODUCT_DESCRIPTION.inputValue().trim());
-        if (SELECTED_AD_CHOICES_ICON.isVisible()) creativeDetails.add(SELECTED_AD_CHOICES_ICON.textContent().trim());
-        if (DISPLAY_URL.isVisible()) creativeDetails.add(DISPLAY_URL.inputValue().trim());
+        if (SPONSORED_BY.isVisible())
+            creativeDetails.add(SPONSORED_BY.inputValue().trim());
+        if (DESCRIPTION.isVisible())
+            creativeDetails.add(DESCRIPTION.inputValue().trim());
+        if (PRODUCT_DESCRIPTION.isVisible())
+            creativeDetails.add(PRODUCT_DESCRIPTION.inputValue().trim());
+        if (SELECTED_AD_CHOICES_ICON.isVisible())
+            creativeDetails.add(SELECTED_AD_CHOICES_ICON.textContent().trim());
+        if (DISPLAY_URL.isVisible())
+            creativeDetails.add(DISPLAY_URL.inputValue().trim());
         return creativeDetails;
     }
 
@@ -703,19 +805,25 @@ public class CreateCreatives {
         return switch (key) {
             case "Creative Status" -> {
                 CREATIVE_STATUS.click();
-                List<String> values = DROPDOWN_VALUES.allTextContents().stream().map(String::trim).toList();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
+                        .map(String::trim)
+                        .toList();
                 page.keyboard().press("Escape");
                 yield values;
             }
             case "Ad Sizes" -> {
                 SELECT_AD_SIZE.click();
-                List<String> values = DROPDOWN_VALUES.allTextContents().stream().map(String::trim).toList();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
+                        .map(String::trim)
+                        .toList();
                 page.keyboard().press("Escape");
                 yield values;
             }
             case "Creative Type" -> {
                 SELECT_CREATIVE_TYPE.click();
-                List<String> values = DROPDOWN_VALUES.allTextContents().stream().map(String::trim).toList();
+                List<String> values = DROPDOWN_VALUES.allTextContents().stream()
+                        .map(String::trim)
+                        .toList();
                 page.keyboard().press("Escape");
                 yield values;
             }
@@ -737,7 +845,11 @@ public class CreateCreatives {
         for (int i = 0; i < CREATIVE_TYPE_ICON.count(); i++) {
             if (CREATIVE_TYPE_ICON.nth(i).isVisible()) {
                 final int index = i;
-                text = CREATIVE_TYPE_ICON.nth(i).locator("xpath=.//following-sibling::div//div[contains(@class,'name-section-truncate')]").textContent().trim();
+                text = CREATIVE_TYPE_ICON
+                        .nth(i)
+                        .locator("xpath=.//following-sibling::div//div[contains(@class,'name-section-truncate')]")
+                        .textContent()
+                        .trim();
                 newTab = DriverFactory.getContext().waitForPage(() -> {
                     CREATIVE_TYPE_ICON.nth(index).click();
                 });
@@ -770,13 +882,19 @@ public class CreateCreatives {
         checkIfCreativeIsPresent(locator);
         for (int i = 0; i < locator.count(); i++) {
             if (locator.nth(i).isVisible()) {
-                Locator checkBoxLocator = locator.nth(i).locator("xpath=.//ancestor::div[contains(@class,'content-section')]/preceding-sibling::div//sui-checkbox");
+                Locator checkBoxLocator = locator.nth(i)
+                        .locator(
+                                "xpath=.//ancestor::div[contains(@class,'content-section')]/preceding-sibling::div//sui-checkbox");
                 String checkboxClass = checkBoxLocator.getAttribute("class");
                 if (checkboxClass != null && checkboxClass.contains("checked")) {
                     continue;
                 }
                 checkBoxLocator.click();
-                return checkBoxLocator.locator("xpath=parent::div/following-sibling::div//div[contains(@class,'name-section-truncate')]").textContent().trim();
+                return checkBoxLocator
+                        .locator(
+                                "xpath=parent::div/following-sibling::div//div[contains(@class,'name-section-truncate')]")
+                        .textContent()
+                        .trim();
             }
         }
         return "";
@@ -788,8 +906,13 @@ public class CreateCreatives {
 
     public void selectBulkActionsOption(String bulkAssign) {
         if (bulkAssign.contains("Bulk Assign") || bulkAssign.contains("Bulk Edit"))
-            BULK_ACTIONS_BUTTON.locator("xpath=//div//a//div[normalize-space(.)='" + bulkAssign + "']").click();
-        else BULK_ACTIONS_BUTTON.locator("xpath=//div//a[normalize-space(.)='" + bulkAssign + "']").click();
+            BULK_ACTIONS_BUTTON
+                    .locator("xpath=//div//a//div[normalize-space(.)='" + bulkAssign + "']")
+                    .click();
+        else
+            BULK_ACTIONS_BUTTON
+                    .locator("xpath=//div//a[normalize-space(.)='" + bulkAssign + "']")
+                    .click();
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(BULK_ASSIGN_CREATIVE_HEADER);
     }
@@ -868,7 +991,9 @@ public class CreateCreatives {
     }
 
     public String fetchCreativeNameFromPreviewTab() {
-        return newTab.locator("xpath=//span[text()='Creative Name:']/parent::div").textContent().trim();
+        return newTab.locator("xpath=//span[text()='Creative Name:']/parent::div")
+                .textContent()
+                .trim();
     }
 
     public void closeCreativePreviewTab() {
@@ -930,7 +1055,8 @@ public class CreateCreatives {
         for (int i = 0; i < ASSOCIATIONS_TAB_COLUMN_NAME.count(); i++) {
             Locator columnHeader = ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).locator("xpath=./parent::th");
             if (columnHeader.getAttribute("hidden") == null)
-                columnNames.add(ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).textContent().trim());
+                columnNames.add(
+                        ASSOCIATIONS_TAB_COLUMN_NAME.nth(i).textContent().trim());
         }
         return columnNames;
     }
@@ -989,15 +1115,24 @@ public class CreateCreatives {
         FILTER_START_DATE.click();
         CALENDAR_TITLE.click();
         CALENDAR_MONTH.getByText("Jan").click();
-        CALENDAR_DATE.getByText("1", new Locator.GetByTextOptions().setExact(true)).first().click();
+        CALENDAR_DATE
+                .getByText("1", new Locator.GetByTextOptions().setExact(true))
+                .first()
+                .click();
 
         FILTER_END_DATE.click();
         CALENDAR_TITLE.scrollIntoViewIfNeeded();
         CALENDAR_TITLE.click();
         CALENDAR_MONTH.getByText("Dec").scrollIntoViewIfNeeded();
         CALENDAR_MONTH.getByText("Dec").click();
-        CALENDAR_DATE.getByText("31", new Locator.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
-        CALENDAR_DATE.getByText("31", new Locator.GetByTextOptions().setExact(true)).first().click();
+        CALENDAR_DATE
+                .getByText("31", new Locator.GetByTextOptions().setExact(true))
+                .first()
+                .scrollIntoViewIfNeeded();
+        CALENDAR_DATE
+                .getByText("31", new Locator.GetByTextOptions().setExact(true))
+                .first()
+                .click();
     }
 
     public String fetchFilteredRecordsCount() {
@@ -1006,7 +1141,8 @@ public class CreateCreatives {
     }
 
     public String clickLineItemName(String lineItemName) {
-        page.locator(String.format("//div[contains(@title,'%s')]", lineItemName)).click();
+        page.locator(String.format("//div[contains(@title,'%s')]", lineItemName))
+                .click();
         waitUtility.waitForLocatorVisible(LINE_ITEM_PAGE_TITLE);
         return LINE_ITEM_PAGE_TITLE.textContent().trim();
     }
