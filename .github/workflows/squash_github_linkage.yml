@@ -32,6 +32,7 @@ jobs:
           SQUASH_URL: "https://sq-mcp.internetbrands.com/squashmcp"
           SQUASH_TOKEN: ${{ secrets.SQUASH_TOKEN }}
           SEARCH_VALUE: ${{ github.event.inputs.search_value }}
+        shell: cmd   
         run: |
           cat << 'EOF' > squash_mcp_client.js
           const url = process.env.SQUASH_URL;
