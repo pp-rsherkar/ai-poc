@@ -16,116 +16,110 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          distribution: temurin
-          java-version: '17'
+          node-version: '20'
 
-      - name: Search Test Case in Squash
+      - name: Install MCP Dependencies
+        run: npm install tslib isomorphic-ws eventsource
+
+      - name: Search Test Case via MCP
         env:
-          SQUASH_URL: https://sq-mcp.internetbrands.com/squashmcp
+          SQUASH_URL: "https://sq-mcp.internetbrands.com/squashmcp"
           SQUASH_TOKEN: ${{ secrets.SQUASH_TOKEN }}
           SEARCH_VALUE: ${{ github.event.inputs.search_value }}
         run: |
-          cat <<'EOF' > SquashMcpClient.java
-          import java.net.URI;
-          import java.net.http.HttpClient;
-          import java.net.http.HttpRequest;
-          import java.net.http.HttpResponse;
+          cat << 'EOF' > squash_mcp_client.js
+          const EventSource = require('eventsource');
 
-          public class SquashMcpClient {
+          const url = process.env.SQUASH_URL;
+          const token = process.env.SQUASH_TOKEN;
+          const searchValue = process.env.SEARCH_VALUE;
 
-              public static void main(String[] args) throws Exception {
+          const isNumeric = /^\d+$/.test(searchValue);
+          
+          // Construct arguments based on input type matching your working Postman payload schema
+          const args = isNumeric 
+            ? { case_id: parseInt(searchValue, 10), folder_id: 0, project_id: 0, semantic_query: "" }
+            : { case_id: 0, folder_id: 0, project_id: 0, semantic_query: searchValue };
 
-                  String url = System.getenv("SQUASH_URL");
-                  String token = System.getenv("SQUASH_TOKEN");
-                  String searchValue = System.getenv("SEARCH_VALUE");
+          // Fallbacks for filters matching your original Java template
+          const structuralArgs = {
+            ...args,
+            name_keyword_filter: "",
+            creator: "",
+            status_list: "",
+            weight_list: "",
+            nature_list: "",
+            type_list: "",
+            test_category_list: "",
+            exclude_test_category_list: "",
+            automated: "any",
+            page: 1
+          };
 
-                  boolean isNumeric = searchValue.matches("\\d+");
+          const payload = {
+            jsonrpc: "2.0",
+            id: 1,
+            method: "tools/call",
+            params: {
+              name: "search-for-test-case",
+              arguments: structuralArgs
+            }
+          };
 
-                  String payload;
+          console.log(`Connecting to Squash MCP via SSE: ${url}`);
+          
+          // MCP over HTTP establishes an SSE stream connection for transport
+          const es = new EventSource(url, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
 
-                  if (isNumeric) {
-                      payload = """
-                      {
-                        "jsonrpc": "2.0",
-                        "id": 1,
-                        "method": "tools/call",
-                        "params": {
-                          "name": "search-for-test-case",
-                          "arguments": {
-                            "case_id": %s,
-                            "folder_id": 0,
-                            "project_id": 0,
-                            "semantic_query": "",
-                            "name_keyword_filter": "",
-                            "creator": "",
-                            "status_list": "",
-                            "weight_list": "",
-                            "nature_list": "",
-                            "type_list": "",
-                            "test_category_list": "",
-                            "exclude_test_category_list": "",
-                            "automated": "any",
-                            "page": 1
-                          }
-                        }
-                      }
-                      """.formatted(searchValue);
-                  } else {
-                      payload = """
-                      {
-                        "jsonrpc": "2.0",
-                        "id": 1,
-                        "method": "tools/call",
-                        "params": {
-                          "name": "search-for-test-case",
-                          "arguments": {
-                            "case_id": 0,
-                            "folder_id": 0,
-                            "project_id": 0,
-                            "semantic_query": "%s",
-                            "name_keyword_filter": "",
-                            "creator": "",
-                            "status_list": "",
-                            "weight_list": "",
-                            "nature_list": "",
-                            "type_list": "",
-                            "test_category_list": "",
-                            "exclude_test_category_list": "",
-                            "automated": "any",
-                            "page": 1
-                          }
-                        }
-                      }
-                      """.formatted(searchValue);
-                  }
+          es.onopen = async () => {
+            console.log("Connected securely to Squash MCP stream.");
+            
+            // Postman manages the handshake background; here we transmit the tool execution payload
+            try {
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+              });
 
-                  HttpClient client = HttpClient.newHttpClient();
+              console.log(`HTTP Post Status: ${response.status}`);
+              const data = await response.json();
+              console.log("================ MCP RESPONSE ================");
+              console.log(JSON.stringify(data, null, 2));
+              console.log("==============================================");
+              
+              es.close();
+              process.exit(0);
+            } catch (error) {
+              console.error("Execution payload transmission failed:", error);
+              es.close();
+              process.exit(1);
+            }
+          };
 
-                  HttpRequest request = HttpRequest.newBuilder()
-                          .uri(URI.create(url))
-                          .header("Authorization", "Bearer " + token)
-                          .header("Content-Type", "application/json")
-                          .POST(HttpRequest.BodyPublishers.ofString(payload))
-                          .build();
+          es.onerror = (err) => {
+            console.error("MCP Stream Transport Error:", err);
+            es.close();
+            process.exit(1);
+          };
 
-                  HttpResponse<String> response =
-                          client.send(request, HttpResponse.BodyHandlers.ofString());
-
-                  System.out.println("=================================================");
-                  System.out.println("Search Value: " + searchValue);
-                  System.out.println("HTTP Status : " + response.statusCode());
-                  System.out.println("=================================================");
-                  System.out.println(response.body());
-
-                  if (response.statusCode() != 200) {
-                      throw new RuntimeException(
-                              "Search failed. HTTP Status: " + response.statusCode());
-                  }
-              }
-          }
+          // Timeout fallback safety mechanism for the runner
+          setTimeout(() => {
+            console.error("Workflow Timeout: MCP server failed to respond within 15 seconds.");
+            es.close();
+            process.exit(1);
+          }, 15000);
           EOF
 
-          java SquashMcpClient.java
+          node squash_mcp_client.js
