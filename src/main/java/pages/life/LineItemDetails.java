@@ -501,9 +501,10 @@ public class LineItemDetails {
 
     public List<String> fetchLineItemDetails() {
         List<String> originalLineItemDetails = new ArrayList<>();
-        originalLineItemDetails.add(COST_MODEL.locator("xpath=./descendant::div[contains(@class, 'text')]").textContent());
-        if (FLAT_CPM.isVisible())
-            originalLineItemDetails.add(FLAT_CPM.inputValue());
+        originalLineItemDetails.add(COST_MODEL
+                .locator("xpath=./descendant::div[contains(@class, 'text')]")
+                .textContent());
+        if (FLAT_CPM.isVisible()) originalLineItemDetails.add(FLAT_CPM.inputValue());
         Locator budgetXpath = BUDGET_DISTRIBUTION.locator("xpath=//button");
         for (int i = 0; i < budgetXpath.count(); i++) {
             if (budgetXpath.nth(i).getAttribute("class").contains("active")) {
