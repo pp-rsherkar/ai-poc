@@ -420,11 +420,13 @@ public List<String> fetchEnteredManagementFeeValues() {
                         String latitude = parts[0].trim();
                         String longitude = parts[1].trim();
                         String distance = parts[2].trim();
-                        String pointName = parts[3].trim();
+                        String pointName = parts.length > 3 ? parts[3].trim() : "";
                         GEO_RADIUS_LAT.fill(latitude);
                         GEO_RADIUS_LONG.fill(longitude);
                         GEO_RADIUS_DISTANCE.fill(distance);
-                        GEO_RADIUS_POINT_NAME.fill(pointName);
+                        if (!pointName.isEmpty()) {
+                            GEO_RADIUS_POINT_NAME.fill(pointName);
+                        }
                         GEO_RADIUS_SAVE.click();
                     }
                     break;
@@ -860,7 +862,7 @@ public List<String> fetchEnteredManagementFeeValues() {
         NEW_TACTIC.click();
     }
 
-    public void expandAllTargetingRules() {
+    public void expandAllTargetingRules123() {
 //        int count = EXPAND_TARGETING_ICONS.count();
 //        for (int i = 0; i < count; i++) {
 //            Locator icon = EXPAND_TARGETING_ICONS.nth(i);
@@ -891,6 +893,94 @@ public List<String> fetchEnteredManagementFeeValues() {
             } catch (Exception e) {
                 break;
             }
+        }
+    }
+
+    public void expandAllTargetingRules321() {
+        waitUtility.waitUntilSpinnerHidden();
+        if (EXPAND_TARGETING_ICONS.count() == 0) {
+            try {
+                EXPAND_TARGETING_ICONS.first().waitFor(
+                        new Locator.WaitForOptions().setTimeout(5000));
+            } catch (Exception e) {
+                return;
+            }
+        }
+        int safetyCounter = 100;
+        while (safetyCounter-- > 0) {
+            int count = EXPAND_TARGETING_ICONS.count();
+            if (count == 0) {
+                try {
+                    page.waitForFunction(
+                            "() => document.querySelectorAll(\"i.dropdown.icon.gaExpandTargeting\").length > 0",
+                            null,
+                            new Page.WaitForFunctionOptions().setTimeout(1500));
+                } catch (Exception e) {
+                    return;
+                }
+                continue;
+            }
+            Locator icon = EXPAND_TARGETING_ICONS.first();
+            try {
+                icon.scrollIntoViewIfNeeded();
+                icon.click();
+                icon.waitFor(new Locator.WaitForOptions()
+                        .setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
+                        .setTimeout(3000));
+            } catch (Exception e) {
+                if (EXPAND_TARGETING_ICONS.count() == count) {
+                    return;
+                }
+            }
+        }
+    }
+
+    public void expandAllTargetingRules() {
+        waitUtility.waitUntilSpinnerHidden();
+        
+        // Loop until all expand icons are clicked
+        int maxAttempts = 6;
+        int attempts = 0;
+        
+        while (attempts < maxAttempts) {
+            int currentCount = EXPAND_TARGETING_ICONS.count();
+            
+            // If no icons left, we're done
+            if (currentCount == 0) {
+                break;
+            }
+            
+            // Always click the first visible icon to avoid index issues
+            Locator firstIcon = EXPAND_TARGETING_ICONS.first();
+            
+            try {
+                // Scroll into view and click
+                firstIcon.scrollIntoViewIfNeeded();
+                firstIcon.click();
+                
+                // Wait for the icon to detach from DOM after click
+                try {
+                    firstIcon.waitFor(new Locator.WaitForOptions()
+                            .setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
+                            .setTimeout(2000));
+                } catch (Exception e) {
+                    // Icon might still be there but with different appearance
+                    // Wait for count to decrease instead of hard wait
+                    page.waitForFunction(
+                            "prev => document.querySelectorAll(\"i.dropdown.icon.gaExpandTargeting\").length < prev",
+                            currentCount,
+                            new Page.WaitForFunctionOptions().setTimeout(1000));
+                }
+                
+            } catch (Exception e) {
+                // If click fails, try to verify if count decreased before moving to next attempt
+                int newCount = EXPAND_TARGETING_ICONS.count();
+                if (newCount == currentCount) {
+                    // Count didn't decrease, move to next attempt
+                }
+            }
+            
+            attempts++;
         }
     }
 }
