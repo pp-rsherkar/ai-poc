@@ -144,11 +144,7 @@ public class ReportTemplates {
     }
 
     public List<String> verifySelectedDimensions() {
-        List<String> dimensions = new ArrayList<>();
-        for (int i = 0; i < VERIFY_DIMENSION.count(); i++) {
-            dimensions.add(VERIFY_DIMENSION.nth(i).textContent());
-        }
-        return dimensions;
+        return VERIFY_DIMENSION.allInnerTexts().stream().map(String::trim).toList();
     }
 
     public List<String> verifySelectedMetrics() {
