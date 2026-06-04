@@ -515,11 +515,12 @@ public class LineItemDetails {
         }
         originalLineItemDetails.add(FLIGHT_START_DATE.inputValue());
         originalLineItemDetails.add(FLIGHT_END_DATE.inputValue());
-        if (LINE_ITEM_BUDGET.isVisible())
-            originalLineItemDetails.add(LINE_ITEM_BUDGET.inputValue());
-        originalLineItemDetails.add(PACING_MODE.locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]").textContent().trim());
-        if (PACING_MODE_INPUT.isVisible())
-            originalLineItemDetails.add(PACING_MODE_INPUT.inputValue());
+        if (LINE_ITEM_BUDGET.isVisible()) originalLineItemDetails.add(LINE_ITEM_BUDGET.inputValue());
+        originalLineItemDetails.add(PACING_MODE
+                .locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]")
+                .textContent()
+                .trim());
+        if (PACING_MODE_INPUT.isVisible()) originalLineItemDetails.add(PACING_MODE_INPUT.inputValue());
         return originalLineItemDetails;
     }
 
