@@ -1,4 +1,4 @@
-name: Search Squash Test Case (Cloud via FortiClient)
+name: Search Squash Test Case
 
 on:
   workflow_dispatch:
@@ -10,77 +10,17 @@ on:
 
 jobs:
   search:
-    runs-on: ubuntu-latest
+    # Tells GitHub to send this job down to your authenticated local laptop
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # =========================================================
-      # STEP 1: CONSTRUCT AND OPERATE THE SSL-VPN TUNNEL
-      # =========================================================
-      - name: Connect to FortiClient VPN
-        env:
-          VPN_HOST: ${{ secrets.VPN_GATEWAY }}
-          VPN_PORT: ${{ secrets.VPN_PORT }}
-          VPN_USER: ${{ secrets.VPN_USERNAME }}
-          VPN_PASS: ${{ secrets.VPN_PASSWORD }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openfortivpn
-          
-          # Writing config file dynamically without the invalid trusted-cert key
-          cat <<EOF > vpn.conf
-          host = $VPN_HOST
-          port = $VPN_PORT
-          username = $VPN_USER
-          password = $VPN_PASS
-          set-dns = 1
-          pppd-use-peerdns = 1
-          EOF
-          
-          echo "Starting OpenFortiVPN tunnel..."
-          # Pass the cert exception directly via CLI flag where it is supported natively
-          sudo openfortivpn -c vpn.conf --trusted-cert allow-all &
-          
-          echo "Waiting for ppp0 network interface to establish..."
-          CONNECTED=false
-          
-          # Poll the system for up to 30 seconds to guarantee the tunnel handshakes successfully
-          for i in {1..30}; do
-            if ip addr show dev ppp0 &> /dev/null; then
-              echo "SUCCESS: FortiClient SSL-VPN Tunnel (ppp0) established successfully!"
-              CONNECTED=true
-              break
-            fi
-            echo "Tunnel handshake negotiating... (Attempt $i/30)"
-            sleep 1
-          done
-
-          if [ "$CONNECTED" = false ]; then
-            echo "ERROR: FortiClient failed to establish a tunnel within 30 seconds."
-            echo "=== Diagnostic Logs ==="
-            sudo tail -n 20 /var/log/syslog || true
-            exit 1
-          fi
-          
-          # Allow the DNS route assignment to settle down completely
-          sleep 5
-          
-          echo "Verifying Internal DNS Resolution for Squash Gateway..."
-          nslookup sq-mcp.internetbrands.com
-
-      # =========================================================
-      # STEP 2: RUN THE SQUASH SEARCH IN THE ACTIVE TUNNEL
-      # =========================================================
       - name: Search Test Case via MCP
         env:
           SQUASH_URL: "https://sq-mcp.internetbrands.com/squashmcp"
           SQUASH_TOKEN: ${{ secrets.SQUASH_TOKEN }}
           SEARCH_VALUE: ${{ github.event.inputs.search_value }}
+        shell: cmd
         run: node squash_mcp_client.js
