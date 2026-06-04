@@ -1,4 +1,4 @@
-name: Manual JIRA Test-Case Association
+name: JIRA - Testcase & Comment Upload
 
 on:
   workflow_dispatch:
