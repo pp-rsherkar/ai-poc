@@ -152,11 +152,7 @@ public class ReportTemplates {
     }
 
     public List<String> verifySelectedMetrics() {
-        List<String> metrics = new ArrayList<>();
-        for (int i = 0; i < VERIFY_METRIC.count(); i++) {
-            metrics.add(VERIFY_METRIC.nth(i).textContent());
-        }
-        return metrics;
+        return VERIFY_METRIC.allInnerTexts().stream().map(String::trim).toList();
     }
 
     public void saveReportTemplate() {
