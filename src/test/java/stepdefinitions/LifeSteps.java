@@ -4921,7 +4921,6 @@ public class LifeSteps {
             LocalDate actualStartDate = LocalDate.parse(dateStr, formatter);
             LocalDate expectedStartDate = startDate.plusMonths(i).withDayOfMonth(1);
             Assert.assertEquals("Flight start date mismatch ", expectedStartDate, actualStartDate);
-
         }
     }
 
