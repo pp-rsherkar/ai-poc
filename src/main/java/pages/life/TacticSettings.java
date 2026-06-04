@@ -861,12 +861,35 @@ public List<String> fetchEnteredManagementFeeValues() {
     }
 
     public void expandAllTargetingRules() {
-        int count = EXPAND_TARGETING_ICONS.count();
-        for (int i = 0; i < count; i++) {
-            Locator icon = EXPAND_TARGETING_ICONS.nth(i);
-            if (icon.isVisible()) {
-                icon.scrollIntoViewIfNeeded();
-                icon.click();
+//        int count = EXPAND_TARGETING_ICONS.count();
+//        for (int i = 0; i < count; i++) {
+//            Locator icon = EXPAND_TARGETING_ICONS.nth(i);
+//            if (icon.isVisible()) {
+//                icon.scrollIntoViewIfNeeded();
+//                icon.click();
+//            }
+//        }
+
+        waitUtility.waitUntilSpinnerHidden();
+        if (EXPAND_TARGETING_ICONS.count() == 0) {
+            try {
+                EXPAND_TARGETING_ICONS.first().waitFor();
+            } catch (Exception e) {
+                return;
+            }
+        }
+        int safetyCounter = 50;
+        while (EXPAND_TARGETING_ICONS.count() > 0 && safetyCounter-- > 0) {
+            int before = EXPAND_TARGETING_ICONS.count();
+            Locator icon = EXPAND_TARGETING_ICONS.first();
+            icon.scrollIntoViewIfNeeded();
+            icon.click();
+            try {
+                page.waitForFunction(
+                        "prev => document.querySelectorAll(\"i.dropdown.icon.gaExpandTargeting\").length < prev",
+                        before);
+            } catch (Exception e) {
+                break;
             }
         }
     }
