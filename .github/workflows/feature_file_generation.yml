@@ -1,4 +1,4 @@
-name: JIRA GHERKIN Generator
+name: JIRA - Feature File (GHERKIN) Generator
 
 on:
   workflow_dispatch:
