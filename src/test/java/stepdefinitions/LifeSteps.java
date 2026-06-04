@@ -785,7 +785,9 @@ public class LifeSteps {
         nameList.clear();
         nameList.addAll(Arrays.stream(dimensions.split("\\s*,\\s*")).filter(s -> !s.isBlank()).toList());
         itemList.clear();
-        itemList.addAll(Arrays.stream(metrics.split("\\s*,\\s*")).filter(s -> !s.isBlank()).toList());
+        itemList.addAll(Arrays.stream(metrics.split("\\s*,\\s*"))
+                .filter(s -> !s.isBlank())
+                .toList());
         templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         logger.info(
                 "Entering template details. Name: {}, Dimension: {}, Metric: {}",
