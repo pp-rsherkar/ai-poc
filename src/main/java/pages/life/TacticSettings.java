@@ -30,6 +30,7 @@ public class TacticSettings {
     private final Locator VERIFY_NPI;
     private final Locator FETCH_TARGET_RULE_TYPES;
     private final Locator FETCH_TARGET_RULE_OPTIONS;
+    private final Locator EXPAND_TARGETING_ICONS;
     private final Locator TARGET_CATEGORY_NAME;
     private final Locator PERSON_TAB;
     private final Locator HOUSEHOLD_TAB;
@@ -112,6 +113,7 @@ public class TacticSettings {
         this.VERIFY_NPI = page.locator("//label[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
+        this.EXPAND_TARGETING_ICONS = page.locator("//i[@class='dropdown icon gaExpandTargeting']");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
@@ -763,6 +765,7 @@ public class TacticSettings {
     }
 
     public void fetchRulesTypesCount(int expectedCount) {
+        waitUtility.waitUntilSpinnerHidden();
         FETCH_TARGET_RULE_TYPES.nth(expectedCount - 1).waitFor();
     }
 
@@ -971,5 +974,46 @@ public class TacticSettings {
 
     public void clickNewTactic() {
         NEW_TACTIC.click();
+    }
+
+    public void expandAllTargetingRules() {
+        waitUtility.waitUntilSpinnerHidden();
+
+        int maxAttempts = 6;
+        int attempts = 0;
+
+        while (attempts < maxAttempts) {
+            int currentCount = EXPAND_TARGETING_ICONS.count();
+
+            if (currentCount == 0) {
+                break;
+            }
+
+            Locator firstIcon = EXPAND_TARGETING_ICONS.first();
+
+            try {
+                firstIcon.scrollIntoViewIfNeeded();
+                firstIcon.click();
+
+                try {
+                    firstIcon.waitFor(new Locator.WaitForOptions()
+                            .setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
+                            .setTimeout(2000));
+                } catch (Exception e) {
+                    page.waitForFunction(
+                            "prev => document.querySelectorAll(\"i.dropdown.icon.gaExpandTargeting\").length < prev",
+                            currentCount,
+                            new Page.WaitForFunctionOptions().setTimeout(1000));
+                }
+
+            } catch (Exception e) {
+                int newCount = EXPAND_TARGETING_ICONS.count();
+                if (newCount == currentCount) {
+                    // Count didn't decrease, move to next attempt
+                }
+            }
+
+            attempts++;
+        }
     }
 }

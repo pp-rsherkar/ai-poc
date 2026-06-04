@@ -171,6 +171,45 @@ Feature: LIFE Regression - Create a Campaign
       | ADVERTISER       | CP_NAME       | CP_TYPE | CP_BUDGET | LINE_NAME     | LINE_BUDGET | TACTIC_NAME     | RULE_TYPE          | CREATIVE          |
       | 1Demo Advertiser | External_Auto | Regular | 10000     | External_Line | 500         | External_Tactic | Behavioral Segment | External_Creative |
 
+  @regression @ps
+  Scenario Outline: Create a Campaign and verify Targeting Rules are preserved when navigating between Settings and Creatives tabs
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User configures targeting rules as below
+      | Keywords          | Custom_Keyword, TestingKeyword, Qwerty123, MedKeyword1, MedKeyword2, HealthKeyword1, PharmaKeyword1                                                                                                    |
+      | Geo Targets       | New York, California, Texas, Florida, Illinois, Ohio, Georgia                                                                                                                                          |
+      | Age               | 18-24, 25-29, 30-34, 35-39, 40-44, 50-54, 60-64                                                                                                                                                        |
+      | Device            | Mobile, Tablet, Connected Device, Desktop, OOH Device                                                                                                                                                  |
+      | IP                | AutoIP148406156, AutoIP193700567199550498, TestIP, NPIAuto777559789, IPAddress_FileUpload_20260109_155851, IP_Address_20250911_024138                                                                  |
+      | Legal Populations | Adoption, Emancipation, Divorce, Separation, Child Custody, Child Support, Considering Divorce                                                                                                         |
+      | Gender            | Male, Female                                                                                                                                                                                           |
+      | Operating System  | Windows, macOS, Linux, Blackberry, iOS, Android, Mobile                                                                                                                                                |
+      | Clickers          | AutoImportedNPI_Campaign_20260502_235258, CreativeCampaign_20260508_151430, TargetingTemplate_20260506_194240, Auto_20260506_192726, Test_20260525_175528, Campaign_20260524_220810                    |
+      | Brand Suitability | Unknown Brand Safety, Highly Illicit Do Not Monetize                                                                                                                                                   |
+      | Ethnicity         | African American, American Indian                                                                                                                                                                      |
+      | NPI               | AutoSmartList954103283, ATTRIBUTE_20260430_235013, STATIC_NPI_20260430_133910, Auto_Imported_20260426_235032, NPI_LIST_20260514_123551, PRESCRIBED_DRUG_NPI_20250831_132854, SMART_NPI_20251224_190216 |
+    Then Verify the configured targeting rules
+    When User saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    When User navigates back to settings tab from creatives tab
+    Then Verify the configured targeting rules
+    When User navigates back to creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    Then Verify the newly created campaign is in running state
+    Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+    Examples:
+      | ADVERTISER     | CP_NAME    | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | CREATIVE           |
+      | 01- Advertiser | Persisted  | Regular | 10000     | Line      | 120         | Tactic      | Display Advanced | Please_Dont_Delete |
+
 #  @regression
 #  Scenario Outline: API Sample Test
 #    Given I call "<apiName>" with parameters "<param1>" & "<param2>"
