@@ -48,7 +48,7 @@ jobs:
           EOF
           
           echo "Starting OpenFortiVPN background tunnel..."
-          sudo openfortivpn -c vpn.conf --daemon
+          sudo openfortivpn -c vpn.conf &
           
           # Give the tunnel handshake 15 seconds to fully complete and pass traffic
           sleep 15
