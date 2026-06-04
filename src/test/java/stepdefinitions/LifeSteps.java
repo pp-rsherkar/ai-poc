@@ -4911,7 +4911,8 @@ public class LifeSteps {
         itemList = lineItemDetails.fetchSequentialFlightEndDates();
     }
 
-    @And("Verify that Sequential flights should be added based on the start month and verify start date of the month for each flight entry")
+    @And(
+            "Verify that Sequential flights should be added based on the start month and verify start date of the month for each flight entry")
     public void verifyThatSequentialFlightsShouldBeAddedBasedOnTheStartMonth() {
         logger.info("Verify start date of the month for each flight entry");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
