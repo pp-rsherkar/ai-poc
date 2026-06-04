@@ -864,7 +864,9 @@ public class LifeSteps {
 
     @And("Verify the delete button is enabled on the Edit Template panel")
     public void verifyTheDeleteButtonIsEnabledOnTheEditTemplatePanel() {
-        Assert.assertTrue("Delete Icon is not enabled on Edit Template panel", reportTemplates.isDeleteIconEnabledOnEditTemplatePanel());
+        Assert.assertTrue(
+                "Delete Icon is not enabled on Edit Template panel",
+                reportTemplates.isDeleteIconEnabledOnEditTemplatePanel());
     }
 
     @Given("User configures targeting rules as below")
