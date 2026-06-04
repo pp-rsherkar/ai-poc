@@ -859,7 +859,9 @@ public class LifeSteps {
 
     @And("Verify the delete button is disabled on the Create New Template panel")
     public void verifyTheDeleteButtonIsDisabledOnTheCreateNewTemplatePanel() {
-        Assert.assertTrue("Delete Icon is not disabled on Create New Template panel", reportTemplates.isDeleteIconDisabledOnCreateNewTemplatePanel());
+        Assert.assertTrue(
+                "Delete Icon is not disabled on Create New Template panel",
+                reportTemplates.isDeleteIconDisabledOnCreateNewTemplatePanel());
     }
 
     @And("Verify the delete button is enabled on the Edit Template panel")
