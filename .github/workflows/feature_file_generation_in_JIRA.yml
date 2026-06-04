@@ -1,4 +1,4 @@
-name: JIRA GHERKIN Generator (Production Ready)
+name: JIRA GHERKIN Generator
 
 on:
   workflow_dispatch:
