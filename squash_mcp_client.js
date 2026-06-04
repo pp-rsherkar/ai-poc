@@ -43,7 +43,8 @@ async function run() {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/event-stream'
       },
       body: JSON.stringify(payload)
     });
