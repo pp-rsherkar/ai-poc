@@ -495,10 +495,6 @@ public class TacticDetails {
         page.locator(xpath).click();
     }
 
-    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative) {
-        createLineItemsWithTacticsAndTargetingRules(rows, creative, null);
-    }
-
     public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative, Consumer<Map<String, List<String>>> perTacticVerification) {
         String currentLiName = null;
 
@@ -534,7 +530,6 @@ public class TacticDetails {
                 String rule   = row.get("RULE_"   + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
-                    //tacticSettings.selectMultipleRuleTypes(rule, CommonUtils.parseCommaSeparatedString(values));
                     List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
                     tacticSettings.selectMultipleRuleTypes(rule, parsedValues);
                     perTacticRules.put(rule, parsedValues);
