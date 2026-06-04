@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -21,6 +21,49 @@ jobs:
         with:
           node-version: '20'
 
+      # =========================================================
+      # STEP 1: INSTALL AND CONFIGURE OPENVPN
+      # =========================================================
+      - name: Install OpenVPN
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openvpn openvpn-systemd-resolved
+
+      - name: Connect to Corporate VPN
+        env:
+          VPN_CONFIG: ${{ secrets.VPN_CONFIGURATION }}
+        run: |
+          # Write the corporate VPN configuration profile to a local file
+          echo "$VPN_CONFIG" > client.ovpn
+          
+          # Start OpenVPN in the background (--daemon)
+          # We include systemd-resolved options to ensure corporate DNS routes correctly
+          sudo openvpn --config client.ovpn --daemon vpn_tunnel
+          
+          # Wait up to 15 seconds for the virtual tunnel interface (tun0) to initialize and fetch an IP
+          echo "Waiting for VPN connection to stabilize..."
+          for i in {1..15}; do
+            if ip addr show dev tun0 &> /dev/null; then
+               echo "VPN Tunnel (tun0) established successfully!"
+               break
+            fi
+            sleep 1
+          done
+
+      # =========================================================
+      # STEP 2: NETWORK DIAGNOSTIC PRE-CHECK
+      # =========================================================
+      - name: Verify Corporate Network Routing
+        run: |
+          echo "Testing Internal DNS Resolution for Squash Gateway..."
+          nslookup sq-mcp.internetbrands.com || echo "DNS lookup failed, attempting fallback..."
+          
+          echo "Testing direct network ping to the host..."
+          ping -c 3 sq-mcp.internetbrands.com || echo "Ping failed (ICMP might be blocked, continuing workflow)..."
+
+      # =========================================================
+      # STEP 3: EXECUTE SQUASH MCP SEARCH VIA NODE.JS
+      # =========================================================
       - name: Search Test Case via MCP
         env:
           SQUASH_URL: "https://sq-mcp.internetbrands.com/squashmcp"
@@ -34,7 +77,6 @@ jobs:
 
           const isNumeric = /^\d+$/.test(searchValue);
           
-          // Mimicking the exact argument structure from your working Postman setup
           const structuralArgs = {
             case_id: isNumeric ? parseInt(searchValue, 10) : 0,
             folder_id: 0,
@@ -79,7 +121,6 @@ jobs:
               const text = await response.text();
               console.log("================ MCP RESPONSE ================");
               try {
-                // Formatting JSON response cleanly if valid
                 console.log(JSON.stringify(JSON.parse(text), null, 2));
               } catch {
                 console.log(text);
