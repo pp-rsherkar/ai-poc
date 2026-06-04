@@ -10,7 +10,6 @@ on:
 
 jobs:
   search:
-    # Runs entirely in GitHub's cloud, your laptop can be completely off!
     runs-on: ubuntu-latest
 
     steps:
@@ -35,8 +34,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openfortivpn
           
-          # Writing config file dynamically
-          # trusted-cert is added to pass your company's SSL gateway verification smoothly
+          # Writing config file dynamically without the invalid trusted-cert key
           cat <<EOF > vpn.conf
           host = $VPN_HOST
           port = $VPN_PORT
@@ -44,17 +42,38 @@ jobs:
           password = $VPN_PASS
           set-dns = 1
           pppd-use-peerdns = 1
-          trusted-cert = allow-all
           EOF
           
-          echo "Starting OpenFortiVPN background tunnel..."
-          sudo openfortivpn -c vpn.conf &
+          echo "Starting OpenFortiVPN tunnel..."
+          # Pass the cert exception directly via CLI flag where it is supported natively
+          sudo openfortivpn -c vpn.conf --trusted-cert allow-all &
           
-          # Give the tunnel handshake 15 seconds to fully complete and pass traffic
-          sleep 15
+          echo "Waiting for ppp0 network interface to establish..."
+          CONNECTED=false
           
-          echo "Verifying network interface routing status:"
-          ifconfig | grep -A 6 ppp || echo "Tunnel initialization ongoing..."
+          # Poll the system for up to 30 seconds to guarantee the tunnel handshakes successfully
+          for i in {1..30}; do
+            if ip addr show dev ppp0 &> /dev/null; then
+              echo "SUCCESS: FortiClient SSL-VPN Tunnel (ppp0) established successfully!"
+              CONNECTED=true
+              break
+            fi
+            echo "Tunnel handshake negotiating... (Attempt $i/30)"
+            sleep 1
+          done
+
+          if [ "$CONNECTED" = false ]; then
+            echo "ERROR: FortiClient failed to establish a tunnel within 30 seconds."
+            echo "=== Diagnostic Logs ==="
+            sudo tail -n 20 /var/log/syslog || true
+            exit 1
+          fi
+          
+          # Allow the DNS route assignment to settle down completely
+          sleep 5
+          
+          echo "Verifying Internal DNS Resolution for Squash Gateway..."
+          nslookup sq-mcp.internetbrands.com
 
       # =========================================================
       # STEP 2: RUN THE SQUASH SEARCH IN THE ACTIVE TUNNEL
