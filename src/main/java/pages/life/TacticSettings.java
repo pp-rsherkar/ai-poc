@@ -979,7 +979,7 @@ public class TacticSettings {
     public void expandAllTargetingRules() {
         waitUtility.waitUntilSpinnerHidden();
 
-        int maxAttempts = 6;
+        int maxAttempts = Math.max(6, EXPAND_TARGETING_ICONS.count() + 2);
         int attempts = 0;
 
         while (attempts < maxAttempts) {
