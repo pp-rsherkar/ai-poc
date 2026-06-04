@@ -783,7 +783,9 @@ public class LifeSteps {
     @When("User enters the template details as {string} {string} {string}")
     public void user_enters_the_template_details_as(String templateName, String dimensions, String metrics) {
         nameList.clear();
-        nameList.addAll(Arrays.stream(dimensions.split("\\s*,\\s*")).filter(s -> !s.isBlank()).toList());
+        nameList.addAll(Arrays.stream(dimensions.split("\\s*,\\s*"))
+                .filter(s -> !s.isBlank())
+                .toList());
         itemList.clear();
         itemList.addAll(Arrays.stream(metrics.split("\\s*,\\s*"))
                 .filter(s -> !s.isBlank())
