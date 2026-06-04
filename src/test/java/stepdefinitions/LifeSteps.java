@@ -782,8 +782,10 @@ public class LifeSteps {
 
     @When("User enters the template details as {string} {string} {string}")
     public void user_enters_the_template_details_as(String templateName, String dimensions, String metrics) {
-        nameList = List.of(dimensions.split("\\s*,\\s*"));
-        itemList = List.of(metrics.split("\\s*,\\s*"));
+        nameList.clear();
+        nameList.addAll(Arrays.stream(dimensions.split("\\s*,\\s*")).filter(s -> !s.isBlank()).toList());
+        itemList.clear();
+        itemList.addAll(Arrays.stream(metrics.split("\\s*,\\s*")).filter(s -> !s.isBlank()).toList());
         templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         logger.info(
                 "Entering template details. Name: {}, Dimension: {}, Metric: {}",
