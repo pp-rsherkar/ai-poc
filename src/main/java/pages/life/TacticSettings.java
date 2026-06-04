@@ -995,16 +995,10 @@ public class TacticSettings {
                 firstIcon.scrollIntoViewIfNeeded();
                 firstIcon.click();
 
-                try {
-                    firstIcon.waitFor(new Locator.WaitForOptions()
-                            .setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
-                            .setTimeout(2000));
-                } catch (Exception e) {
-                    page.waitForFunction(
-                            "prev => document.querySelectorAll(\"i.dropdown.icon.gaExpandTargeting\").length < prev",
-                            currentCount,
-                            new Page.WaitForFunctionOptions().setTimeout(1000));
-                }
+                page.waitForFunction(
+                        "prev => document.querySelectorAll('i.gaExpandTargeting').length < prev",
+                        currentCount,
+                        new Page.WaitForFunctionOptions().setTimeout(2000));
 
             } catch (Exception e) {
                 int newCount = EXPAND_TARGETING_ICONS.count();
