@@ -10,97 +10,24 @@ on:
 
 jobs:
   search:
-    # This targets the active runner currently listening on your machine
     runs-on: self-hosted
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # If Node.js is already installed on your local computer, you can remove this step.
-      # However, keeping it guarantees the correct version is ready to run.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       # =========================================================
-      # SQUASH MCP SEARCH VIA LOCAL COOPPERATING NETWORK
+      # SQUASH MCP SEARCH VIA LOCAL COOPERATING NETWORK
       # =========================================================
       - name: Search Test Case via MCP
         env:
           SQUASH_URL: "https://sq-mcp.internetbrands.com/squashmcp"
           SQUASH_TOKEN: ${{ secrets.SQUASH_TOKEN }}
           SEARCH_VALUE: ${{ github.event.inputs.search_value }}
-        shell: cmd   
-        run: |
-          cat << 'EOF' > squash_mcp_client.js
-          const url = process.env.SQUASH_URL;
-          const token = process.env.SQUASH_TOKEN;
-          const searchValue = process.env.SEARCH_VALUE;
-
-          const isNumeric = /^\d+$/.test(searchValue);
-          
-          const structuralArgs = {
-            case_id: isNumeric ? parseInt(searchValue, 10) : 0,
-            folder_id: 0,
-            project_id: 0,
-            semantic_query: isNumeric ? "" : searchValue,
-            name_keyword_filter: "",
-            creator: "",
-            status_list: "",
-            weight_list: "",
-            nature_list: "",
-            type_list: "",
-            test_category_list: "",
-            exclude_test_category_list: "",
-            automated: "any",
-            page: 1
-          };
-
-          const payload = {
-            jsonrpc: "2.0",
-            id: 1,
-            method: "tools/call",
-            params: {
-              name: "search-for-test-case",
-              arguments: structuralArgs
-            }
-          };
-
-          async function run() {
-            console.log(`Sending HTTP POST to Squash MCP Gateway via Local Network: ${url}`);
-            try {
-              const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-              });
-
-              console.log(`HTTP Status: ${response.status} ${response.statusText}`);
-              
-              const text = await response.text();
-              console.log("================ MCP RESPONSE ================");
-              try {
-                console.log(JSON.stringify(JSON.parse(text), null, 2));
-              } catch {
-                console.log(text);
-              }
-              console.log("==============================================");
-
-              if (!response.ok) {
-                process.exit(1);
-              }
-            } catch (error) {
-              console.error("Network or execution payload error:", error);
-              process.exit(1);
-            }
-          }
-
-          run();
-          EOF
-
-          node squash_mcp_client.js
+        shell: cmd
+        run: node squash_mcp_client.js
