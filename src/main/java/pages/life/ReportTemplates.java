@@ -9,6 +9,7 @@ import factory.DriverFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +51,8 @@ public class ReportTemplates {
     private final Locator TREE_COLLAPSED_ICON;
     private final Locator DIMENSION_AND_METRICS_LABELS;
     private final Locator CANCEL_BUTTON;
+    private final Locator EDIT_TEMPLATE;
+    private final Locator DELETE_ICON;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public ReportTemplates(Page page) {
@@ -69,8 +72,8 @@ public class ReportTemplates {
         this.SELECT_DIMENSION = page.locator("//label[text()='Advertiser Name']");
         this.SEARCH_METRIC = page.locator("//input[contains(@class,'search group_list') and @placeholder='Search']");
         this.SELECT_METRIC = page.locator("//label[text()='Impressions']");
-        this.VERIFY_DIMENSION = page.locator("//sortable-item[contains(@class,'diemension')]");
-        this.VERIFY_METRIC = page.locator("//sortable-item[contains(@class,'metric')]");
+        this.VERIFY_DIMENSION = page.locator("//sortable-item[contains(@class,'diemension')]//label");
+        this.VERIFY_METRIC = page.locator("//sortable-item[contains(@class,'metric')]//label");
         this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Save']");
         this.TEMPLATE_SUCCESS =
                 page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
@@ -94,6 +97,8 @@ public class ReportTemplates {
         this.DIMENSION_AND_METRICS_LABELS =
                 page.locator("//div[contains(@class,'checkbox-group-item')]//sui-checkbox//label");
         this.CANCEL_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Cancel')]");
+        this.EDIT_TEMPLATE = page.locator("//div[text()='Edit Template']");
+        this.DELETE_ICON = page.locator("//span[text()='Delete']/parent::div");
     }
 
     public void clickReportTemplatesLink() {
@@ -132,30 +137,26 @@ public class ReportTemplates {
         TEMPLATE_NAME.fill(templateName);
     }
 
-    public void selectDimension(String dimension) {
-        SEARCH_DIMENSION.fill(dimension);
-        SELECT_DIMENSION.click();
+    public void selectDimensionAndMetric(String category) {
+        SEARCH_DIMENSION.fill(category);
+        page.locator(String.format("//label[text()='%s']", category)).click();
         SEARCH_DIMENSION.clear();
     }
 
-    public void selectDimensione2e(String dimension) {
-        SEARCH_DIMENSION.fill(dimension);
-        page.locator(String.format("//label[text()='%s']", dimension)).click();
-        SEARCH_DIMENSION.clear();
+    public List<String> verifySelectedDimensions() {
+        List<String> dimensions = new ArrayList<>();
+        for (int i = 0; i < VERIFY_DIMENSION.count(); i++) {
+            dimensions.add(VERIFY_DIMENSION.nth(i).textContent());
+        }
+        return dimensions;
     }
 
-    public void selectMetric(String metric) {
-        SEARCH_METRIC.fill(metric);
-        SELECT_METRIC.click();
-        SEARCH_METRIC.clear();
-    }
-
-    public String verifySelectedDimensions() {
-        return VERIFY_DIMENSION.innerText();
-    }
-
-    public String verifySelectedMetrics() {
-        return VERIFY_METRIC.innerText();
+    public List<String> verifySelectedMetrics() {
+        List<String> metrics = new ArrayList<>();
+        for (int i = 0; i < VERIFY_METRIC.count(); i++) {
+            metrics.add(VERIFY_METRIC.nth(i).textContent());
+        }
+        return metrics;
     }
 
     public void saveReportTemplate() {
@@ -275,5 +276,19 @@ public class ReportTemplates {
         Locator xpath =
                 page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]", reportName));
         return xpath.isVisible();
+    }
+
+    public void clickTemplate(String templateName) {
+        Locator templateLocator = page.locator(String.format("//div[@title='%s']", templateName));
+        templateLocator.click();
+        waitUtility.waitForLocatorVisible(EDIT_TEMPLATE);
+    }
+
+    public boolean isDeleteIconDisabledOnCreateNewTemplatePanel() {
+        return DELETE_ICON.getAttribute("class").contains("disabled");
+    }
+
+    public boolean isDeleteIconEnabledOnEditTemplatePanel() {
+        return !DELETE_ICON.getAttribute("class").contains("disabled");
     }
 }

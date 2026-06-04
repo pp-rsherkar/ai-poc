@@ -781,19 +781,27 @@ public class LifeSteps {
     }
 
     @When("User enters the template details as {string} {string} {string}")
-    public void user_enters_the_template_details_as(String templateName, String dimension, String metric) {
-        dimensionName = dimension;
-        metricName = metric;
+    public void user_enters_the_template_details_as(String templateName, String dimensions, String metrics) {
+        nameList = List.of(dimensions.split("\\s*,\\s*"));
+        itemList = List.of(metrics.split("\\s*,\\s*"));
         templateNameRandom = templateName + '_' + CommonUtils.timeStampCalculation();
         logger.info(
                 "Entering template details. Name: {}, Dimension: {}, Metric: {}",
                 templateNameRandom,
-                dimension,
-                metric);
+                nameList,
+                itemList);
         reportTemplates.enterTemplateName(templateNameRandom);
-        reportTemplates.selectDimension(dimension);
+        for (String dimension : nameList) {
+            if (!dimension.isEmpty()) {
+                reportTemplates.selectDimensionAndMetric(dimension);
+            }
+        }
         reportTemplates.clickMetricsTab();
-        reportTemplates.selectMetric(metric);
+        for (String metric : itemList) {
+            if (!metric.isEmpty()) {
+                reportTemplates.selectDimensionAndMetric(metric);
+            }
+        }
     }
 
     @When("User enters the template details for end to end as {string} {string} {string}")
@@ -806,7 +814,7 @@ public class LifeSteps {
 
         for (String dimensionValue : dimensionList) {
             dimensionValue = dimensionValue.trim();
-            reportTemplates.selectDimensione2e(dimensionValue);
+            reportTemplates.selectDimensionAndMetric(dimensionValue);
         }
 
         reportTemplates.clickMetricsTab();
@@ -814,15 +822,15 @@ public class LifeSteps {
 
         for (String metricValue : metricsList) {
             metricValue = metricValue.trim();
-            reportTemplates.selectDimensione2e(metricValue);
+            reportTemplates.selectDimensionAndMetric(metricValue);
         }
     }
 
     @Then("Verify the selected dimensions and metrics under the Template Structure section")
     public void verify_the_selected_dimensions_and_metrics_under_the_template_structure_section() {
         logger.info("Verifying selected dimensions and metrics in Template Structure");
-        Assert.assertEquals(dimensionName, reportTemplates.verifySelectedDimensions());
-        Assert.assertEquals(metricName, reportTemplates.verifySelectedMetrics());
+        Assert.assertEquals(nameList, reportTemplates.verifySelectedDimensions());
+        Assert.assertEquals(itemList, reportTemplates.verifySelectedMetrics());
     }
 
     @When("User saves the new template")
@@ -839,6 +847,24 @@ public class LifeSteps {
         reportTemplates.searchCreatedReportTemplate(templateNameRandom);
         Assert.assertEquals(templateNameRandom, reportTemplates.verifyCreatedReportTemplate(templateNameRandom));
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
+    }
+
+    @And("Verify the details of the created template")
+    public void verifyTheDetailsOfTheCreatedTemplate() {
+        logger.info("Verifying details of the created template: {}", templateNameRandom);
+        reportTemplates.clickTemplate(templateNameRandom);
+        Assert.assertEquals(nameList, reportTemplates.verifySelectedDimensions());
+        Assert.assertEquals(itemList, reportTemplates.verifySelectedMetrics());
+    }
+
+    @And("Verify the delete button is disabled on the Create New Template panel")
+    public void verifyTheDeleteButtonIsDisabledOnTheCreateNewTemplatePanel() {
+        Assert.assertTrue("Delete Icon is not disabled on Create New Template panel", reportTemplates.isDeleteIconDisabledOnCreateNewTemplatePanel());
+    }
+
+    @And("Verify the delete button is enabled on the Edit Template panel")
+    public void verifyTheDeleteButtonIsEnabledOnTheEditTemplatePanel() {
+        Assert.assertTrue("Delete Icon is not enabled on Edit Template panel", reportTemplates.isDeleteIconEnabledOnEditTemplatePanel());
     }
 
     @Given("User configures targeting rules as below")
