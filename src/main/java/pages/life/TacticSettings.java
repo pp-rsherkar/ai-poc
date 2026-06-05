@@ -1,5 +1,6 @@
 package pages.life;
 
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
@@ -113,7 +114,7 @@ public class TacticSettings {
         this.VERIFY_NPI = page.locator("//label[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
-        this.EXPAND_TARGETING_ICONS = page.locator("//i[contains(@class,'gaExpandTargeting')]");
+        this.EXPAND_TARGETING_ICONS = page.locator("//i[@class='dropdown icon gaExpandTargeting']");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
@@ -976,7 +977,7 @@ public class TacticSettings {
         NEW_TACTIC.click();
     }
 
-    public void expandAllTargetingRules() {
+    public void expandAllTargetingRules321() {
         waitUtility.waitUntilSpinnerHidden();
 
         int maxAttempts = Math.max(6, EXPAND_TARGETING_ICONS.count() + 2);
@@ -1008,6 +1009,19 @@ public class TacticSettings {
             }
 
             attempts++;
+        }
+    }
+
+    public void expandAllTargetingRules() {
+        waitUtility.waitUntilSpinnerHidden();
+        List<ElementHandle> icons = EXPAND_TARGETING_ICONS.elementHandles();
+        for (ElementHandle icon : icons) {
+            try {
+                icon.scrollIntoViewIfNeeded();
+                icon.click();
+            } catch (Exception e) {
+                // Continue with the next icon if this one fails to click
+            }
         }
     }
 }
