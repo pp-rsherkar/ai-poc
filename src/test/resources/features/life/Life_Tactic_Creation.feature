@@ -200,6 +200,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
+
   @todo
   Scenario Outline: Verify all Bid Multipliers Rules under categories and Create a tactic by adding all Bid multipliers Rules
     And User clicks on create new Campaign
@@ -311,17 +312,20 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    When User enters the tactic details as "Dynamic_Tac" and saves the tactic
     Then User navigates to tactic setting tab
+    Then User verifies that forecast data is unavailable when no targeting rules are applied
     When User clicks on Add Targeting Rule
-    And User configures targeting rules with options "<RULE_TYPE>" and "<RULE_VALUE>"
+    And User configures targeting rules as below
+      | Behavioral Segment | AutoSegment18577650, 10136 Testing |
+      | Health Populations | Anesthesia and Analgesia           |
+      | Age                | 25-29, 35-39                       |
     And User saves the settings
     And User navigates to tactic setting tab
-    Then User clicks on Show Expression and verifies if the displayed expression "contains" "<RULE_TYPE>"
-    Then User removes the targeting "<RULE_TYPE>" and saves the settings
-    Then User clicks on Show Expression and verifies if the displayed expression "doesn't contain" "<RULE_TYPE>"
+    Then The user clicks on show expression tab and fetch the values displayed
+    Then Verify that all the rule types added in targeting rules are displayed in show expression with correct values
+    And Verify show expression connector AND OR logic is correct
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | RULE_TYPE          | RULE_VALUE               |
-      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Behavioral Segment | AutoSegment18577650      |
-      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Health Populations | Anesthesia and Analgesia |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         |

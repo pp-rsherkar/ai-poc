@@ -80,7 +80,10 @@ public class TacticDetails {
     private final Locator NO_TARGETING_RULES;
     private final Locator FORECAST_AVAILS_NUMBER;
     private final Locator SHOW_EXPRESSION_BUTTON;
-
+    private final Locator CONNECTION_LOCATOR;
+    private final Locator VALUE_LOCATOR;
+    public List<String> SHOW_EXPRESSION_RAW_VALUES;
+    List<String> SHOW_EXPRESSIOIN_VALUES;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -162,6 +165,8 @@ public class TacticDetails {
         this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
         this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
         this.SHOW_EXPRESSION_BUTTON = page.locator("//span[contains(text(),'Show Expression')]");
+        this.VALUE_LOCATOR = page.locator("//span[@class='targetGreen keyword text-target']");
+        this.CONNECTION_LOCATOR = page.locator("//span[@class='inlineDiv connector']");
     }
 
     public void clickNewTactic() {
@@ -213,6 +218,68 @@ public class TacticDetails {
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickShowExpressionButton() {
+        SHOW_EXPRESSION_BUTTON.click();
+        waitUtility.waitUntilPreLoaderHidden();
+    }
+
+    public void fetchShowExpressionValues() {
+        waitUtility.waitForLocatorVisible(VALUE_LOCATOR.first());
+        int valueCount = VALUE_LOCATOR.count();
+        List<String> values = new ArrayList<>(valueCount);
+        for (int i = 0; i < valueCount; i++) {
+            Locator connector = CONNECTION_LOCATOR.nth(i);
+            Locator value = VALUE_LOCATOR.nth(i);
+            values.add(connector.innerText());
+            values.add(value.innerText());
+        }
+        SHOW_EXPRESSION_RAW_VALUES = new ArrayList<>(values); // preserve raw for connector assertion
+        // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
+        SHOW_EXPRESSIOIN_VALUES = values.stream()
+                .filter(v -> !v.isBlank() && !v.equals("AND") && !v.equals("OR"))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public boolean assertShowExpressionConnectorLogic(List<String> rawValues) {
+        // Keywords are at odd indices (1, 3, 5, ...), connectors at even indices (2, 4, 6, ...)
+        boolean allValid = true;
+        for (int i = 1; i + 2 < rawValues.size(); i += 2) {
+            String leftKeyword = rawValues.get(i);
+            String connector = rawValues.get(i + 1);
+            String rightKeyword = rawValues.get(i + 2);
+            String expectedConnector = leftKeyword.equals(rightKeyword) ? "OR" : "AND";
+            if (!connector.equals(expectedConnector)) {
+                allValid = false;
+                break;
+            }
+        }
+        return allValid;
+    }
+
+    public boolean ruleMappingWithShowExpressionValues(Map<String, List<String>> ruleMap) {
+        List<String> ruleTypes = new ArrayList<>(ruleMap.keySet());
+        List<String> ruleTypeExpressions = new ArrayList<>(ruleTypes.size());
+        ruleTypeExpressions.add("COUNTRY");
+        for (String ruleType : ruleTypes) {
+            switch (ruleType) {
+                case "Behavioral Segment":
+                    ruleTypeExpressions.add("Behavioral");
+                    break;
+                case "Health Populations":
+                    ruleTypeExpressions.add("CONDITION");
+                    break;
+                case "Age":
+                    ruleTypeExpressions.add("AGE");
+                    break;
+                default:
+                    ruleTypeExpressions.add(ruleType);
+                    break;
+            }
+        }
+        return SHOW_EXPRESSIOIN_VALUES.equals(ruleTypeExpressions);
     }
 
     public boolean verifyShowExpressionValues(String ruleType) {

@@ -12,6 +12,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,6 +25,7 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1097,8 +1099,8 @@ public class LifeSteps {
     @Then(
             "Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void
-            verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(
-                    String colour) {
+    verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(
+            String colour) {
         logger.info("Verifying comment icon color: {} and comment text", colour);
         List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
         Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
@@ -1151,8 +1153,8 @@ public class LifeSteps {
     @And(
             "User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using {string} and verifies the same status in the respective Line Item and Tactic pages")
     public void
-            userFetchesTheLineItemsAndTacticsEnabledDisabledStatusFromCampaignDashboardAndVerifiesTheSameStatusInTheRespectiveLineItemAndTacticPages(
-                    String campaignID) {
+    userFetchesTheLineItemsAndTacticsEnabledDisabledStatusFromCampaignDashboardAndVerifiesTheSameStatusInTheRespectiveLineItemAndTacticPages(
+            String campaignID) {
         List<String> expectedStatus = campaignDashboard.fetchLineAndTacticToggleStatus();
         List<String> actualStatus = new ArrayList<>();
         logger.info("Navigating to pages to verify status. Campaign ID: {}", campaignID);
@@ -1262,8 +1264,8 @@ public class LifeSteps {
     @And(
             "Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
     public void
-            filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(
-                    String iconColor) {
+    filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(
+            String iconColor) {
         logger.info("Verifying filter icon color: {}", iconColor);
         String filterIconColor = campaignDashboard.verifyFilterIcon();
         Assert.assertEquals(iconColor, filterIconColor);
@@ -2284,8 +2286,8 @@ public class LifeSteps {
     @And(
             "User performs Bulk approve action using {string} option on multiple creatives - {string} with status other than Approved and verifies the selected creatives are marked as {string}")
     public void
-            userPerformsBulkApproveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreRemovedFromTheCreativeLibraryPage(
-                    String bulkActionOption, String noOfCreatives, String statusLabel, DataTable dataTable) {
+    userPerformsBulkApproveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreRemovedFromTheCreativeLibraryPage(
+            String bulkActionOption, String noOfCreatives, String statusLabel, DataTable dataTable) {
         logger.info(
                 "Performing bulk approval ({}) on {} creatives to set status: {}",
                 bulkActionOption,
@@ -2849,8 +2851,8 @@ public class LifeSteps {
     @And(
             "Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file {string} is uploaded")
     public void
-            verifyUploadedFilesSectionDisplaysEntriesIncludedInTheFileTimestampDownloadAndDeleteIconsOnceTheFileIsUploaded(
-                    String fileName) throws CsvValidationException, IOException {
+    verifyUploadedFilesSectionDisplaysEntriesIncludedInTheFileTimestampDownloadAndDeleteIconsOnceTheFileIsUploaded(
+            String fileName) throws CsvValidationException, IOException {
         logger.info(
                 "Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file {} is uploaded",
                 fileName);
@@ -3241,7 +3243,8 @@ public class LifeSteps {
     }
 
     @And("Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account")
-    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {}
+    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {
+    }
 
     @When("User selects the {string} creative type")
     public void userSelectsTheCreativeType(String creativeType) {
@@ -3341,7 +3344,7 @@ public class LifeSteps {
     @And(
             "Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation")
     public void
-            verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPageAndContainsAllTheDetailsEnteredDuringCreation() {
+    verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPageAndContainsAllTheDetailsEnteredDuringCreation() {
         logger.info("User saves the creative");
 
         for (String name : nameList) {
@@ -3606,7 +3609,7 @@ public class LifeSteps {
     @And(
             "Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void
-            verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
+    verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
         logger.info("Verifying mandatory validation for Clickthrough URL and Landing Domain");
         bulkCreativeUpload.clickPreviewButton();
         bulkCreativeUpload.clickOKButton();
@@ -4277,7 +4280,7 @@ public class LifeSteps {
     @And(
             "User verifies the custom destination fields - Destination Name, Destination Type, Host, Username, Password, Port textfields, Test Access, Create and Cancel buttons")
     public void
-            userVerifiesTheCustomDestinationFieldsDestinationNameDestinationTypeHostUsernamePasswordPortTextfieldsTestAccessCreateAndCancelButtons() {
+    userVerifiesTheCustomDestinationFieldsDestinationNameDestinationTypeHostUsernamePasswordPortTextfieldsTestAccessCreateAndCancelButtons() {
         logger.info("User clicks Edit button from Destination dropdown field");
         Assert.assertTrue("Destination Name field is not available", runReportPanel.isDestinationNameAvailable());
         Assert.assertTrue("Destination Type field is not available", runReportPanel.isDestinationTypeAvailable());
@@ -5751,8 +5754,8 @@ public class LifeSteps {
     @And(
             "Verify that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {string}")
     public void
-            verifyThatIfTheAccountHasAClientValueSetTheClientFieldIsDisabledAndAutoPopulatedOtherwiseItRemainsEnabledForUserSelection(
-                    String clientName) {
+    verifyThatIfTheAccountHasAClientValueSetTheClientFieldIsDisabledAndAutoPopulatedOtherwiseItRemainsEnabledForUserSelection(
+            String clientName) {
         boolean isEnabled = metricName.equalsIgnoreCase("None");
         String actualState = campaigns.verifyClientFieldEnabledOrDisabledBasedOnAccount(clientName);
         if (isEnabled) {
@@ -6137,8 +6140,8 @@ public class LifeSteps {
 
     @And("Verify column selection icon is available and upon clicking it below columns should display")
     public void
-            verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(
-                    DataTable dataTable) {
+    verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(
+            DataTable dataTable) {
         List<String> expectedColumnNames = dataTable.asList(String.class);
         logger.info("Verifying column selection icon and expected available columns: {}", expectedColumnNames);
         createCreatives.clickColumnSelectionIcon();
@@ -6260,6 +6263,27 @@ public class LifeSteps {
         } else if (validation.contains("doesn't contain")) {
             Assert.assertFalse("Expression contains " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
         }
+    }
+
+    @Then("The user clicks on show expression tab and fetch the values displayed")
+    public void The_user_clicks_on_show_expression_tab_and_fetch_the_values_displayed() {
+        tacticDetails.clickShowExpressionButton();
+        tacticDetails.fetchShowExpressionValues();
+
+    }
+
+    @Then("Verify that all the rule types added in targeting rules are displayed in show expression with correct values")
+    public void verify_all_rule_types_added_in_targeting_rules_are_displayed_in_show_expression_with_correct_values() {
+        boolean result = tacticDetails.ruleMappingWithShowExpressionValues(rulesMap);
+        Assert.assertTrue("Targeting rules added is not matching with the once in show expression", result);
+
+    }
+
+    @Then("Verify show expression connector AND OR logic is correct")
+    public void verifyShowExpressionConnectorLogicIsCorrect() {
+        tacticDetails.fetchShowExpressionValues();
+        Assert.assertTrue("Show expression connector logic is incorrect. Raw values: " + tacticDetails.SHOW_EXPRESSION_RAW_VALUES, tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.SHOW_EXPRESSION_RAW_VALUES)
+        );
     }
 
     @Then("User removes the targeting {string} and saves the settings")
@@ -6885,7 +6909,7 @@ public class LifeSteps {
     @Then(
             "Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template")
     public void
-            verifyTheImportedDealIsDisplayedInTheDealsTabOnAdminSCuratedMarketPageWithDetailsMatchingTheUploadedTemplate() {
+    verifyTheImportedDealIsDisplayedInTheDealsTabOnAdminSCuratedMarketPageWithDetailsMatchingTheUploadedTemplate() {
         logger.info(
                 "Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template");
         Assert.assertTrue(
