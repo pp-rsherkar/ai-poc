@@ -3,12 +3,11 @@ package pages.life;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class TargetingTemplate {
     private final Page page;
@@ -41,12 +40,16 @@ public class TargetingTemplate {
     public TargetingTemplate(Page page) {
         this.page = page;
         this.NEW_TEMPLATE_BUTTON = page.locator("//span[contains(text(),'New Template')]");
-        this.SEARCH_BOX = page.locator("//input[contains(@placeholder,'Search') and contains(@class,'search icon-pading')]");
+        this.SEARCH_BOX =
+                page.locator("//input[contains(@placeholder,'Search') and contains(@class,'search icon-pading')]");
         this.TEMPLATE_NAME_TEXT = page.locator("//input[contains(@placeholder,'Template Name')]");
-        this.LINE_ITEM_TYPE_DROPDOWN = page.locator("//div[@class='section-name' and contains(text(),'Line Item Type')]/following-sibling::div//div[contains(@id,'lineItemTypeDropdown')]");
-        this.LINE_ITEM_TYPE_VALUE = page.locator("//div[contains(@id,'lineItemTypeDropdown')]//../div[@class='inventory-key']");
+        this.LINE_ITEM_TYPE_DROPDOWN = page.locator(
+                "//div[@class='section-name' and contains(text(),'Line Item Type')]/following-sibling::div//div[contains(@id,'lineItemTypeDropdown')]");
+        this.LINE_ITEM_TYPE_VALUE =
+                page.locator("//div[contains(@id,'lineItemTypeDropdown')]//../div[@class='inventory-key']");
         this.CHANNEL_DROPDOWN = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div");
-        this.CHANNEL_VALUE = page.locator("//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
+        this.CHANNEL_VALUE = page.locator(
+                "//div[contains(@class,'display-flex')]/following-sibling::div//../div[@class='inventory-key']");
         this.ADD_TARGETING_RULE_BUTTON = page.locator("//span[contains(text(),'Add Targeting Rule')]");
         this.SAVE_BUTTON = page.locator("//button[contains(text(),'Save')]");
         this.TEMPLATE_NAME_ERROR = page.locator("//div[contains(text(),'Template Name is required')]");
@@ -71,10 +74,16 @@ public class TargetingTemplate {
 
     public boolean clickAndVerifyTargetingTemplate() {
         NEW_TEMPLATE_BUTTON.click();
-        return TEMPLATE_NAME_TEXT.isVisible() && LINE_ITEM_TYPE_DROPDOWN.isVisible() && ADD_TARGETING_RULE_BUTTON.isVisible();
+        return TEMPLATE_NAME_TEXT.isVisible()
+                && LINE_ITEM_TYPE_DROPDOWN.isVisible()
+                && ADD_TARGETING_RULE_BUTTON.isVisible();
     }
 
-    public Map<String, Map<String, String>> createAndSaveTargetingTemplate(String templateName, List<String> lineItemsList, List<String> channelList, Map<String, List<String>> rulesMap) {
+    public Map<String, Map<String, String>> createAndSaveTargetingTemplate(
+            String templateName,
+            List<String> lineItemsList,
+            List<String> channelList,
+            Map<String, List<String>> rulesMap) {
         Map<String, Map<String, String>> lineItemsToRuleCounts = new HashMap<>();
 
         for (String s : lineItemsList) {
@@ -84,7 +93,8 @@ public class TargetingTemplate {
                 String lineItemText = LINE_ITEM_TYPE_VALUE.nth(i).innerText();
                 if (lineItemText.equalsIgnoreCase(s.trim())) {
                     LINE_ITEM_TYPE_VALUE.nth(i).click();
-                    String templateNameWithTimestamp = lineItemText + "_" + templateName + "_" + CommonUtils.timeStampCalculation();
+                    String templateNameWithTimestamp =
+                            lineItemText + "_" + templateName + "_" + CommonUtils.timeStampCalculation();
                     TEMPLATE_NAME_TEXT.fill(templateNameWithTimestamp);
                     selectChannel(channelList);
                     addTargetingRules(rulesMap);
@@ -128,7 +138,9 @@ public class TargetingTemplate {
         Map<String, String> labelCountMap = new HashMap<>();
         int count = TARGET_ITEM_LABEL.count();
         for (int i = 0; i < count; i++) {
-            labelCountMap.put(TARGET_ITEM_LABEL.nth(i).innerText().trim(), TARGET_ITEM_VALUE.nth(i).innerText().trim());
+            labelCountMap.put(
+                    TARGET_ITEM_LABEL.nth(i).innerText().trim(),
+                    TARGET_ITEM_VALUE.nth(i).innerText().trim());
         }
         return labelCountMap;
     }

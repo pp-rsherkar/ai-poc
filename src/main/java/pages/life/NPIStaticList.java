@@ -5,9 +5,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
-import utils.CommonUtils;
-import utils.WaitUtility;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import utils.CommonUtils;
+import utils.WaitUtility;
 
 public class NPIStaticList {
     private final Page page;
@@ -48,13 +47,15 @@ public class NPIStaticList {
         this.LIST_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("List Name"));
         this.SEARCH_ADVERTISER = page.locator("//ng-select[@placeholder='Select Advertiser']//input");
         this.SELECT_ADVERTISER = page.locator("//div[contains(@class,'dropdown-items ng-star-inserted')]");
-        this.NPI_NUMBER = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
+        this.NPI_NUMBER =
+                page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NPI Numbers (one number per"));
         this.AVAILABLE_IN = page.locator("//div[contains(@class,'npiGroupAvailableSettingContainer')]//span");
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.LIST_SUCCESS = page.locator("//div[contains(@aria-label,'NPI list created')]");
         this.LIST_NAME_ERROR = page.locator("//div[contains(text(),'List Name is required')]");
         this.ADVERTISER_NAME_ERROR = page.locator("//div[contains(text(),'Advertiser is required')]");
-        this.BACK_TO_NPI_LISTS = page.locator("//img[@alt='BackButton_NPI_Lists'  and contains(@src,'BackButton_NPI_Lists.svg')]");
+        this.BACK_TO_NPI_LISTS =
+                page.locator("//img[@alt='BackButton_NPI_Lists'  and contains(@src,'BackButton_NPI_Lists.svg')]");
         this.DELETE_LIST_ICON = page.locator("//app-icon-lable-link[@icon='icons_20-delete.svg']");
         this.DELETE_LIST_BUTTON = page.locator("//span[text()='Delete']");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Deleted Successfully')]");
@@ -64,7 +65,8 @@ public class NPIStaticList {
         this.LIST_NAME_FROM_HEADER = page.locator("//div[contains(@class,'header-name')]");
         this.ADVERTISER_NAME_FROM_HEADER = page.locator("//span[@class='header-adv']/span");
         this.FETCH_SELECTED_ADVERTISER = page.locator("//span[@class='ng-value-label']");
-        this.FETCH_SELECTED_AVAILABLE_IN = page.locator("//div[contains(text(),'Available In ')]//following-sibling::div//mat-checkbox");
+        this.FETCH_SELECTED_AVAILABLE_IN =
+                page.locator("//div[contains(text(),'Available In ')]//following-sibling::div//mat-checkbox");
         this.TOTAL_NPI = page.locator("//span[contains(text(),'Total NPI')]/preceding-sibling::span");
         this.FETCH_DATA_COST = page.locator("//div[contains(@class,'data-cost')]");
     }
@@ -145,8 +147,7 @@ public class NPIStaticList {
 
     public List<String> retrieveEnteredData() {
         List<String> enteredData = new ArrayList<>();
-        if (LIST_NAME.isVisible())
-            enteredData.add(LIST_NAME.inputValue());
+        if (LIST_NAME.isVisible()) enteredData.add(LIST_NAME.inputValue());
         else if (LIST_NAME_FROM_HEADER.isVisible())
             enteredData.add(LIST_NAME_FROM_HEADER.textContent().trim());
         if (!EDIT_NPI_LIST_ICON.isVisible() && FETCH_SELECTED_ADVERTISER.first().isVisible()) {
@@ -154,7 +155,11 @@ public class NPIStaticList {
                 enteredData.add(FETCH_SELECTED_ADVERTISER.nth(i).textContent());
             }
         } else if (ADVERTISER_NAME_FROM_HEADER.first().isVisible()) {
-            String text = ADVERTISER_NAME_FROM_HEADER.first().textContent().replace("Advertiser: ", "").trim();
+            String text = ADVERTISER_NAME_FROM_HEADER
+                    .first()
+                    .textContent()
+                    .replace("Advertiser: ", "")
+                    .trim();
             if (text.contains(",")) {
                 String[] parts = text.split(",");
                 for (String part : parts) {
@@ -164,9 +169,12 @@ public class NPIStaticList {
                 enteredData.add(text);
             }
         }
-        if (NPI_NUMBER.isVisible())
-            enteredData.add(NPI_NUMBER.inputValue().trim());
-        npiSmartList.getValuesByClassAttribute(FETCH_SELECTED_AVAILABLE_IN, "mat-checkbox-checked", "xpath=//span[@class='mat-checkbox-label']", enteredData);
+        if (NPI_NUMBER.isVisible()) enteredData.add(NPI_NUMBER.inputValue().trim());
+        npiSmartList.getValuesByClassAttribute(
+                FETCH_SELECTED_AVAILABLE_IN,
+                "mat-checkbox-checked",
+                "xpath=//span[@class='mat-checkbox-label']",
+                enteredData);
         return enteredData;
     }
 
@@ -175,7 +183,9 @@ public class NPIStaticList {
     }
 
     public int getNPICountFromListItems(String listName) {
-        Locator npiCount = page.locator(String.format("//div[@title='%s']/parent::div/following-sibling::div[contains(@class,'list-item-counter')]", listName));
+        Locator npiCount = page.locator(String.format(
+                "//div[@title='%s']/parent::div/following-sibling::div[contains(@class,'list-item-counter')]",
+                listName));
         return Integer.parseInt(npiCount.textContent().trim());
     }
 
