@@ -5,6 +5,10 @@ on:
   # be delayed under load). Good enough for the 10m/5m testing windows.
   # Lets you trigger a run by hand from the Actions tab.
   workflow_dispatch:
+  
+  pull_request:
+    branches:
+      - main
 
 # Allow the default GITHUB_TOKEN to comment on PRs.
 permissions:
