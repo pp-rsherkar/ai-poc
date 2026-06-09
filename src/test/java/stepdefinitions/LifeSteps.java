@@ -767,6 +767,14 @@ public class LifeSteps {
         Assert.assertEquals("SCHEDULING", reportTemplates.verifySchedulingTab().toUpperCase());
     }
 
+    @And("Verify Template tab is selected by default on the Report Templates page")
+    public void verifyTabIsSelectedByDefaultOnTheReportTemplatesPage() {
+        logger.info("Verifying Template tab is selected by default");
+        Assert.assertTrue(
+                "Template tab is not selected by default",
+                reportTemplates.isTabSelectedByDefault());
+    }
+
     @When("User clicks on New Template")
     public void user_clicks_on_new_template() {
         logger.info("Clicking on New Template");
@@ -778,6 +786,14 @@ public class LifeSteps {
         logger.info("Verifying tabs on Create New Template panel");
         Assert.assertEquals("DIMENSIONS", reportTemplates.verifyDimensionsTab().toUpperCase());
         Assert.assertEquals("METRICS", reportTemplates.verifyMetricsTab().toUpperCase());
+    }
+
+    @And("Verify if {string} is selected by default as Template type on the Create New Template panel")
+    public void verifyIfIsSelectedByDefaultAsTemplateTypeOnTheCreateNewTemplatePanel(String defaultTemplateType) {
+        logger.info("Verifying default template type: {}", defaultTemplateType);
+        Assert.assertTrue(
+                defaultTemplateType + " is not selected by default as Template type",
+                reportTemplates.isDefaultTemplateTypeSelected(defaultTemplateType));
     }
 
     @When("User enters the template details as {string} {string} {string}")
@@ -855,6 +871,14 @@ public class LifeSteps {
         Assert.assertEquals(1, reportTemplates.searchResultRowCount());
     }
 
+    @And("Verify availability of {string}, {string} and {string} actions for the created template")
+    public void verifyAvailabilityOfAndActionsForTheCreatedTemplate(String runReportIcon, String copyIcon, String deleteIcon) {
+        logger.info("Verifying availability of action icons for template: {}", templateNameRandom);
+        Assert.assertTrue("Run report Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, runReportIcon));
+        Assert.assertTrue("Copy Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, copyIcon));
+        Assert.assertTrue("Delete Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, deleteIcon));
+    }
+
     @And("Verify the details of the created template")
     public void verifyTheDetailsOfTheCreatedTemplate() {
         logger.info("Verifying details of the created template: {}", templateNameRandom);
@@ -865,6 +889,7 @@ public class LifeSteps {
 
     @And("Verify the delete button is disabled on the Create New Template panel")
     public void verifyTheDeleteButtonIsDisabledOnTheCreateNewTemplatePanel() {
+        logger.info("Verifying delete button is disabled on Create New Template panel");
         Assert.assertTrue(
                 "Delete Icon is not disabled on Create New Template panel",
                 reportTemplates.isDeleteIconDisabledOnCreateNewTemplatePanel());
@@ -872,9 +897,43 @@ public class LifeSteps {
 
     @And("Verify the delete button is enabled on the Edit Template panel")
     public void verifyTheDeleteButtonIsEnabledOnTheEditTemplatePanel() {
+        logger.info("Verifying delete button is enabled on Edit Template panel");
         Assert.assertTrue(
                 "Delete Icon is not enabled on Edit Template panel",
                 reportTemplates.isDeleteIconEnabledOnEditTemplatePanel());
+    }
+
+    @And("User deletes the created template")
+    public void userDeletesTheCreatedTemplate() {
+        logger.info("Deleting the created template: {}", templateNameRandom);
+        reportTemplates.clickDeleteIconFromTemplatePanel();
+    }
+
+    @And("Verify error message when no dimensions and metrics are selected and user tries to save the template {string}")
+    public void verifyErrorMessageWhenNoDimensionsAndMetricsAreSelectedAndUserTriesToSaveTheTemplate(String templateName) {
+        logger.info("Verifying error message when no dimensions and metrics are selected for template: {}", templateName);
+        reportTemplates.enterTemplateName(templateName);
+        reportTemplates.saveReportTemplate();
+        Assert.assertEquals("Please select at least 1 dimension and 1 metric", reportTemplates.fetchAlertMessage());
+    }
+
+    @And("User deletes the existing template from the template list")
+    public void userDeletesTheExistingTemplateFromTheTemplateList() {
+        logger.info("Deleting the existing template from the template list");
+        reportTemplates.clickDeleteIconFromTemplateList();
+    }
+
+    @Then("Verify the template is deleted and not displayed in the template list")
+    public void verifyTheTemplateIsDeletedAndNotDisplayedInTheTemplateList() {
+        Assert.assertTrue("Delete Report Template Confirmation pop-up is not displayed", reportTemplates.isDeleteReportTemplateConfirmationPopupDisplayed());
+        reportTemplates.clickDeleteButtonFromConfirmationPopup();
+        String actualMessage = reportTemplates.fetchAlertMessage();
+        Assert.assertTrue(
+                actualMessage.contains("Deleted the template.") ||
+                        actualMessage.contains("Can not delete template: This template is being used by grouped templates"));
+        logger.info("Verifying template {} is deleted and not displayed in list", templateNameRandom);
+        reportTemplates.searchCreatedReportTemplate(templateNameRandom);
+        Assert.assertEquals(0, reportTemplates.searchResultRowCount());
     }
 
     @Given("User configures targeting rules as below")

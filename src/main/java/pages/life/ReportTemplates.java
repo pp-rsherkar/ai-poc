@@ -18,9 +18,9 @@ import utils.WaitUtility;
 public class ReportTemplates {
     private final Page page;
     private final Locator REPORT_TEMPLATE_LINK;
-    private final Locator VERIFY_TEMPLATES_TAB;
-    private final Locator VERIFY_GENERATED_REPORTS_TAB;
-    private final Locator VERIFY_SCHEDULING_TAB;
+    private final Locator TEMPLATES_TAB;
+    private final Locator GENERATED_REPORTS_TAB;
+    private final Locator SCHEDULING_TAB;
     private final Locator NEW_TEMPLATE;
     private final Locator REPORT_DIMENSIONS;
     private final Locator REPORT_METRICS;
@@ -52,16 +52,20 @@ public class ReportTemplates {
     private final Locator CANCEL_BUTTON;
     private final Locator EDIT_TEMPLATE;
     private final Locator DELETE_ICON;
+    private final Locator ALERT_MESSAGE;
+    private final Locator FETCH_TEMPLATE_NAME_FROM_CONFIRMATION_POPUP;
+    private final Locator DELETE_BUTTON_FROM_CONFIRMATION_POPUP;
+    private final Locator DELETE_ICON_FROM_TEMPLATE_LIST;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public ReportTemplates(Page page) {
         this.page = page;
         this.REPORT_TEMPLATE_LINK = page.locator("//div[normalize-space(text())='Report Templates']");
-        this.VERIFY_TEMPLATES_TAB = page.locator(
+        this.TEMPLATES_TAB = page.locator(
                 "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'templates')]");
-        this.VERIFY_GENERATED_REPORTS_TAB = page.locator(
+        this.GENERATED_REPORTS_TAB = page.locator(
                 "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'generated reports')]");
-        this.VERIFY_SCHEDULING_TAB = page.locator(
+        this.SCHEDULING_TAB = page.locator(
                 "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'scheduling')]");
         this.NEW_TEMPLATE = page.locator("//button[normalize-space(text())='New Template']");
         this.REPORT_DIMENSIONS = page.locator("//div[normalize-space(text())='Dimensions']");
@@ -98,6 +102,10 @@ public class ReportTemplates {
         this.CANCEL_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Cancel')]");
         this.EDIT_TEMPLATE = page.locator("//div[text()='Edit Template']");
         this.DELETE_ICON = page.locator("//span[text()='Delete']/parent::div");
+        this.ALERT_MESSAGE = page.locator("//div[@role='alert']");
+        this.FETCH_TEMPLATE_NAME_FROM_CONFIRMATION_POPUP = page.locator("//div[contains(text(),'Delete Report Template')]/following-sibling::div//div[contains(@style,'word-break:')]");
+        this.DELETE_BUTTON_FROM_CONFIRMATION_POPUP = page.locator("//div[contains(text(),'Delete Report Template')]/following-sibling::div//span[contains(text(),'Delete')]");
+        this.DELETE_ICON_FROM_TEMPLATE_LIST = page.locator("//span[@title='Delete']");
     }
 
     public void clickReportTemplatesLink() {
@@ -105,15 +113,15 @@ public class ReportTemplates {
     }
 
     public String verifyTemplatesTab() {
-        return VERIFY_TEMPLATES_TAB.innerText();
+        return TEMPLATES_TAB.innerText();
     }
 
     public String verifyGeneratedReportsTab() {
-        return VERIFY_GENERATED_REPORTS_TAB.innerText();
+        return GENERATED_REPORTS_TAB.innerText();
     }
 
     public String verifySchedulingTab() {
-        return VERIFY_SCHEDULING_TAB.innerText();
+        return SCHEDULING_TAB.innerText();
     }
 
     public void createNewTemplate() {
@@ -281,5 +289,47 @@ public class ReportTemplates {
 
     public boolean isDeleteIconEnabledOnEditTemplatePanel() {
         return !DELETE_ICON.getAttribute("class").contains("disabled");
+    }
+
+    public boolean isTabSelectedByDefault() {
+        return TEMPLATES_TAB.getAttribute("class").contains("active");
+    }
+
+    public String fetchAlertMessage() {
+        return ALERT_MESSAGE.textContent().trim();
+    }
+
+    public boolean checkActionIconsForTemplate(String templateName, String actionIcon) {
+        Locator actionIconLocator = page.locator(String.format("//div[contains(normalize-space(.),'%s')]/parent::span/following-sibling::span//span[@title='%s']", templateName, actionIcon));
+        return actionIconLocator.first().isVisible();
+    }
+
+    public void clickDeleteIconFromTemplatePanel() {
+        DELETE_ICON.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(DELETE_ICON_FROM_TEMPLATE_LIST);
+    }
+
+    public String getTemplateNameFromConfirmationPopup() {
+        String text = FETCH_TEMPLATE_NAME_FROM_CONFIRMATION_POPUP.innerText();
+        return text.substring(text.indexOf('"') + 1, text.lastIndexOf('"'));
+    }
+
+    public boolean isDeleteReportTemplateConfirmationPopupDisplayed() {
+        return FETCH_TEMPLATE_NAME_FROM_CONFIRMATION_POPUP.isVisible();
+    }
+
+    public void clickDeleteButtonFromConfirmationPopup() {
+        DELETE_BUTTON_FROM_CONFIRMATION_POPUP.click();
+    }
+
+    public void clickDeleteIconFromTemplateList() {
+        DELETE_ICON_FROM_TEMPLATE_LIST.click();
+        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(DELETE_BUTTON_FROM_CONFIRMATION_POPUP);
+    }
+
+    public boolean isDefaultTemplateTypeSelected(String defaultTemplateType) {
+        return page.locator(String.format("//label[text()='%s']/parent::sui-radio-button", defaultTemplateType)).getAttribute("class").contains("checked");
     }
 }
