@@ -52,7 +52,8 @@ public class Hooks {
             if (!Files.exists(videoPath)) {
                 return;
             }
-            String scenarioName = "Video - " + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_");
+            String scenarioName =
+                    "Video - " + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_");
             if (scenario.isFailed()) {
                 Path renamed = videoPath.getParent().resolve(scenarioName + ".webm");
                 Files.move(videoPath, renamed, StandardCopyOption.REPLACE_EXISTING);
