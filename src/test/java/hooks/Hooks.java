@@ -44,7 +44,8 @@ public class Hooks {
     //After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST.
     @After(value = "@e2e or @regression", order = -1)
     public void renameAndAttachVideo(Scenario scenario) {
-        if (page.video() == null) {
+        boolean videoEnabled = Boolean.parseBoolean(ConfigReader.getProperty("recordVideo"));
+        if (!videoEnabled || page == null || page.video() == null) {
             return;
         }
         try {
@@ -93,7 +94,6 @@ public class Hooks {
                 String screenshotName = "Screenshot - " + scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
-                DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip")));
                 Path tracePath = Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip");
                 // Delete existing file (ensures overwrite)
                 Files.deleteIfExists(tracePath);
