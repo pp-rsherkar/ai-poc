@@ -1,0 +1,47 @@
+name: Auto Assign Reviewers
+
+on:
+  pull_request_target:
+    types: [opened, ready_for_review, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  add-reviewers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add default reviewers
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const defaultReviewers = [
+              'pp-sdeodhar',
+              'pp-rsherkar',
+              'pp-psevak',
+              'pp-pmitra',
+            ];
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No pull_request payload found; skipping.');
+              return;
+            }
+            const author = (pr.user && pr.user.login) || '';
+            const reviewers = defaultReviewers.filter(
+              (login) => login.toLowerCase() !== author.toLowerCase()
+            );
+            if (reviewers.length === 0) {
+              core.info('No reviewers to add after excluding the PR author.');
+              return;
+            }
+            try {
+              await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                reviewers,
+              });
+              core.info(`Requested reviewers: ${reviewers.join(', ')}`);
+            } catch (error) {
+              core.warning(`Failed to request reviewers: ${error.message}`);
+            }
