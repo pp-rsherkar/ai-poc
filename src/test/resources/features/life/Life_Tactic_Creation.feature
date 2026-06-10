@@ -181,6 +181,25 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CHANNEL | TACTIC_NAME | COUNT |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Email   | Tactic      | 3     |
 
+
+  @regression
+  Scenario Outline: Verify user is able to create duplicate of a Tactic
+    When User clicks on Create Campaign
+    And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "<CHANNEL>" as channel
+    And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+    Then Verify settings details are saved and user is navigated to the creatives tab
+    And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+    When User duplicates tactic, verify data on the duplicated tactic using "Duplicate" option
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
   @todo
   Scenario Outline: Verify all Bid Multipliers Rules under categories and Create a tactic by adding all Bid multipliers Rules
     And User clicks on create new Campaign
@@ -238,3 +257,49 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |
+
+  @regression
+  Scenario Outline: Verify campaign management fee is reflected in line item and line item override is reflected in tactic
+    When User clicks on Create Campaign
+    And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+    And User sets campaign management fee as "<CAMPAIGN_FEE_OPTION>" "<CAMPAIGN_PERCENT>" "<CAMPAIGN_AMOUNT>"
+    And User saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    Then User navigates to line item and clicks on details tab
+    And Verify management fee is set as "<CAMPAIGN_DISPLAY_VALUE>"
+    Then User clicks on create new tactic
+    Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+    Then User navigates to tactic setting tab
+    And Verify management fee is set as "<CAMPAIGN_DISPLAY_VALUE>"
+    When User overrides line item management fee and verifies tactic reflection for the following fee types
+      | Fee Option | Percent | Amount | Expected Display |
+      | Percentage | 7.15    |        | + 7.15 %         |
+      | CPM        |         | 10.50  | + $10.5          |
+      | % + CPM    | 7       | 10     | + 7 % + $10      |
+      | Fixed CPM  |         | 11.1   | $11.1            |
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | CAMPAIGN_FEE_OPTION | CAMPAIGN_PERCENT | CAMPAIGN_AMOUNT | CAMPAIGN_DISPLAY_VALUE | CHANNEL | TACTIC_NAME | COUNT |
+      | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Percentage          | 5                | 5               | + 5 %                  | Email   | Tactic      | 1     |
+
+  @regression
+  Scenario Outline: Verify forecast refreshes after adding Age targeting to a new tactic
+    And User clicks on create new Campaign
+    When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+    Then User navigates to tactic setting tab
+    Then User verifies that forecast data is unavailable when no targeting rules are applied
+    When User clicks on Add Targeting Rule
+    And User configures targeting rules as below
+      | Age | 35-39, 55-59 |
+    And User saves the settings
+    And User navigates to tactic setting tab
+    Then User verifies the forecast data refreshes and displays values after adding targeting rule
+
+    Examples:
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      |

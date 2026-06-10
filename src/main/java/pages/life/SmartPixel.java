@@ -26,7 +26,8 @@ public class SmartPixel {
         this.page = page;
         this.SELECT_ADVERTISER = page.locator("//div[@class='advertiser']/div[contains(@class,'left')]");
         this.INACTIVE_CAMPAIGNS_BUTTON = page.locator("//button[contains(text(),'Show Inactive Campaigns')]");
-        this.ASSOCIATED_CAMPAIGN = page.locator("//sui-checkbox[contains(@class,'checkbox')]/label/span[contains(@class,'camp-name')]");
+        this.ASSOCIATED_CAMPAIGN =
+                page.locator("//sui-checkbox[contains(@class,'checkbox')]/label/span[contains(@class,'camp-name')]");
         this.PIXEL_NAME = page.locator("//input[@placeholder='Pixel Name']");
         this.ADD_SMARTLIST_BUTTON = page.locator("//app-icon-lable-link[@icon='20-add.svg' and @text='Add Smartlist']");
         this.ASSOCIATED_SMARTLISTS_TAB = page.locator("//span[contains(text(),'ASSOCIATED SMARTLISTS')]");

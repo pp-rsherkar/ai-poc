@@ -1,13 +1,12 @@
 package factory;
 
 import com.microsoft.playwright.*;
-import utils.ConfigReader;
-
 import java.nio.file.Paths;
 import java.util.List;
+import utils.ConfigReader;
 
 public class DriverFactory {
-    public static ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>(); //For Parallel execution
+    public static ThreadLocal<Page> threadLocalDriver = new ThreadLocal<>(); // For Parallel execution
     public static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
     public static ThreadLocal<Browser> threadLocalBrowser = new ThreadLocal<>();
     private static Playwright playwright;
@@ -31,7 +30,7 @@ public class DriverFactory {
         return threadLocalBrowser.get();
     }
 
-    //Launches Browser as set by user in config file
+    // Launches Browser as set by user in config file
     public Page initDriver(String browserName) {
         BrowserType browserType = null;
         boolean headless = Boolean.parseBoolean(ConfigReader.getProperty("headless"));
@@ -41,15 +40,21 @@ public class DriverFactory {
         switch (browserName) {
             case "firefox":
                 browserType = playwright.firefox();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
+                browser = browserType.launch(
+                        new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
                 break;
             case "chrome":
                 browserType = playwright.chromium();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chromium").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
+                browser = browserType.launch(new BrowserType.LaunchOptions()
+                        .setChannel("chromium")
+                        .setHeadless(headless)
+                        .setArgs(List.of("--start-maximized"))
+                        .setSlowMo(delay));
                 break;
             case "webkit":
                 browserType = playwright.webkit();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
+                browser = browserType.launch(
+                        new BrowserType.LaunchOptions().setHeadless(headless).setSlowMo(delay));
                 break;
         }
         if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);

@@ -6,10 +6,6 @@ import factory.DriverFactory;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import utils.ConfigReader;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +13,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utils.ConfigReader;
 
 public class Hooks {
     private static final long MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
@@ -30,7 +29,7 @@ public class Hooks {
             // Clean old traces before starting new scenario
             cleanOldTracesKeepTodayAndYesterday();
             double timeout = Double.parseDouble(ConfigReader.getProperty("timeout"));
-            String browserName = ConfigReader.getProperty("browser"); //Fetching browser value from config file
+            String browserName = ConfigReader.getProperty("browser"); // Fetching browser value from config file
             logger.info("Launching browser: {} with timeout: {}", browserName, timeout);
             driverFactory = new DriverFactory();
             page = driverFactory.initDriver(browserName); // Passing browser name to launch the browser
@@ -41,7 +40,7 @@ public class Hooks {
         }
     }
 
-    //After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST.
+    // After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST.
     @After(value = "@e2e or @regression", order = -1)
     public void renameAndAttachVideo(Scenario scenario) {
         boolean videoEnabled = Boolean.parseBoolean(ConfigReader.getProperty("recordVideo"));
@@ -72,7 +71,6 @@ public class Hooks {
         }
     }
 
-
     @After(value = "@e2e or @regression", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
@@ -93,8 +91,10 @@ public class Hooks {
                 logger.info("Taking screenshot for failed scenario: {}", scenario.getName());
                 String screenshotName = "Screenshot - " + scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
-                scenario.attach(sourcePath, "image/png", screenshotName);  //Attach screenshot to report if scenario fails
-                Path tracePath = Paths.get("target/trace_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip");
+                scenario.attach(
+                        sourcePath, "image/png", screenshotName); // Attach screenshot to report if scenario fails
+                Path tracePath = Paths.get("target/trace_"
+                        + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_") + ".zip");
                 // Delete existing file (ensures overwrite)
                 Files.deleteIfExists(tracePath);
                 DriverFactory.getContext().tracing().stop(new Tracing.StopOptions().setPath(tracePath));
@@ -131,7 +131,10 @@ public class Hooks {
                     LocalDate today = LocalDate.now();
                     LocalDate yesterday = today.minusDays(1);
                     for (File file : files) {
-                        LocalDate fileDate = Files.getLastModifiedTime(file.toPath()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        LocalDate fileDate = Files.getLastModifiedTime(file.toPath())
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate();
                         if (!(fileDate.equals(today) || fileDate.equals(yesterday))) {
                             Files.deleteIfExists(file.toPath());
                             logger.info("Deleted old trace: {}", file.getName());
