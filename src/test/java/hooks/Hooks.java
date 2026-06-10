@@ -54,9 +54,7 @@ public class Hooks {
                 return;
             }
             String scenarioName =
-                    "Video_" + scenario.getName()
-                            .replaceAll("\\s+", "_")
-                            .replaceAll("[^a-zA-Z0-9._-]", "_");
+                    "Video_" + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_");
             Path targetPath = videoPath;
             if (scenario.isFailed()) {
                 Path renamed = videoPath.getParent().resolve(scenarioName + ".webm");
