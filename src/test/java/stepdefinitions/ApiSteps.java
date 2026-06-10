@@ -29,6 +29,15 @@ public class ApiSteps {
     ApiActions apiActions = new ApiActions();
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode data;
+    static String p2McpAgentApiKey;
+
+    static {
+        try {
+            p2McpAgentApiKey = ConfigReader.getP2McpAgentApiKey();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Given("I call the Token API for user {string} and password {string} for authentication")
     public void iCallTheTokenAPIForUserAndPassword(String username, String password) {
@@ -207,5 +216,50 @@ public class ApiSteps {
             String npiValue = addedNpi.asText();
             Assert.assertTrue("Expected NPI not found in response: " + npiValue, responseNpisSet.contains(npiValue));
         }
+    }
+
+    @Given("I call the Token API using the API key for authentication with configuration:")
+    public void iCallTheTokenAPIUsingTheAPIKeyForAuthentication(Map<String, String> config) {
+        // Headers
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", config.get("Content-Type"));
+        headers.put("x-api-key", p2McpAgentApiKey);
+        // Form Data
+        HashMap<String, String> formData = new HashMap<>();
+        formData.put("grant_type", config.get("grant_type"));
+        formData.put("client_id", config.get("client_id"));
+        formData.put("client_secret", p2McpAgentApiKey);
+        formData.put("audience", config.get("audience"));
+        response = apiActions.postFormURLEncodedRequest(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_OAUTH_TOKEN, headers, formData);
+    }
+
+    @Then("Verify the Token API response status and presence of a valid access token")
+    public void verifyTokenAPIResponseStatusAndPresenceOfValidAccessToken() throws Exception {
+        jsonNode = mapper.readTree(response.text());
+        Assert.assertEquals(200, response.status());
+        String accessToken = jsonNode.get("access_token").asText();
+        Assert.assertTrue(
+                "access_token is missing in response",
+                jsonNode.has("access_token") || !jsonNode.get("access_token").isEmpty());
+        bearerToken = jsonNode.path("access_token").asText();
+    }
+
+    @When("User initializes the MCP server using the access token with headers:")
+    public void userInitializesMCPServerWithAccessToken(Map<String, String> headersConfig) throws Exception {
+        JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
+        JsonNode templateNode = fullPayload.path("mcpInitialize");
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", headersConfig.get("Content-Type"));
+        headers.put("Accept", headersConfig.get("Accept"));
+        headers.put("Authorization", "Bearer " + bearerToken);
+        String requestBody = templateNode.toString();
+        response = apiActions.postRequestWithBody(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+    }
+
+    @Then("Verify the MCP server initialization response is successful")
+    public void verifyTheMCPServerInitializationResponseIsSuccessful() throws Exception {
+        // Implementation pending
     }
 }
