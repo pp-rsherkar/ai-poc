@@ -60,9 +60,11 @@ public class DriverFactory {
         if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);
         threadLocalBrowser.set(browser);
         boolean videoEnabled = Boolean.parseBoolean(ConfigReader.getProperty("recordVideo"));
+        int width = Integer.parseInt(ConfigReader.getProperty("videoWidth"));
+        int height = Integer.parseInt(ConfigReader.getProperty("videoHeight"));
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions().setViewportSize(null);
         if (videoEnabled) {
-            contextOptions.setRecordVideoDir(Paths.get("target/videos")).setRecordVideoSize(1280, 720);
+            contextOptions.setRecordVideoDir(Paths.get("target/videos")).setRecordVideoSize(width, height);
         }
         BrowserContext context = browser.newContext(contextOptions);
         // Below line is used to start the trace file

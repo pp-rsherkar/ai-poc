@@ -7,6 +7,7 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,30 +50,37 @@ public class Hooks {
         }
         try {
             Path videoPath = page.video().path();
-            if (!Files.exists(videoPath)) {
+            if (videoPath == null || !Files.exists(videoPath)) {
                 return;
             }
             String scenarioName =
-                    "Video - " + scenario.getName().replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "_");
+                    "Video_" + scenario.getName()
+                            .replaceAll("\\s+", "_")
+                            .replaceAll("[^a-zA-Z0-9._-]", "_");
+            Path targetPath = videoPath;
             if (scenario.isFailed()) {
                 Path renamed = videoPath.getParent().resolve(scenarioName + ".webm");
                 Files.move(videoPath, renamed, StandardCopyOption.REPLACE_EXISTING);
-                long videoSize = Files.size(renamed);
-                if (videoSize > MAX_VIDEO_SIZE) {
-                    scenario.attach(
-                            ("Video file too large (" + videoSize + " bytes). See: " + renamed.toAbsolutePath())
-                                    .getBytes(),
-                            "text/plain",
-                            scenarioName);
-                } else {
-                    scenario.attach(Files.readAllBytes(renamed), "video/webm", scenarioName);
-                }
-                Files.deleteIfExists(renamed);
-            } else {
-                Files.deleteIfExists(videoPath);
+                targetPath = renamed;
             }
+            long videoSize = Files.size(targetPath);
+            if (videoSize > MAX_VIDEO_SIZE) {
+                scenario.attach(
+                        ("Video too large (" + videoSize + " bytes). Path: " + targetPath.toAbsolutePath())
+                                .getBytes(),
+                        "text/plain",
+                        scenarioName
+                );
+            } else {
+                byte[] videoBytes;
+                try (InputStream is = Files.newInputStream(targetPath)) {
+                    videoBytes = is.readAllBytes();
+                }
+                scenario.attach(videoBytes, "video/webm", scenarioName);
+            }
+            Files.deleteIfExists(targetPath);
         } catch (Exception e) {
-            logger.warn("Video handling failed: {}", String.valueOf(e));
+            logger.warn("Video handling failed", e);
         }
     }
 
