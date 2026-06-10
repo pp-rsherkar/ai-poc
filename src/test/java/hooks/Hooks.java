@@ -66,8 +66,7 @@ public class Hooks {
                 scenario.attach(
                         ("Video too large (" + videoSize + " bytes). Path: " + targetPath.toAbsolutePath()).getBytes(),
                         "text/plain",
-                        scenarioName
-                );
+                        scenarioName);
             } else {
                 byte[] videoBytes;
                 try (InputStream is = Files.newInputStream(targetPath)) {
