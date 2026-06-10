@@ -65,8 +65,12 @@ public class DriverFactory {
             contextOptions.setRecordVideoDir(Paths.get("target/videos")).setRecordVideoSize(1280, 720);
         }
         BrowserContext context = browser.newContext(contextOptions);
-        //Below line is used to start the trace file
-        context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(false));
+        // Below line is used to start the trace file
+        context.tracing()
+                .start(new Tracing.StartOptions()
+                        .setScreenshots(true)
+                        .setSnapshots(true)
+                        .setSources(false));
         Page page = context.newPage();
         threadLocalDriver.set(page);
         threadLocalContext.set(context);
