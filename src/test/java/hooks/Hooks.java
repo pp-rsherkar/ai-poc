@@ -59,7 +59,11 @@ public class Hooks {
                 Files.move(videoPath, renamed, StandardCopyOption.REPLACE_EXISTING);
                 long videoSize = Files.size(renamed);
                 if (videoSize > MAX_VIDEO_SIZE) {
-                    scenario.attach(("Video file too large (" + videoSize + " bytes). See: " + renamed.toAbsolutePath()).getBytes(), "text/plain", scenarioName);
+                    scenario.attach(
+                            ("Video file too large (" + videoSize + " bytes). See: " + renamed.toAbsolutePath())
+                                    .getBytes(),
+                            "text/plain",
+                            scenarioName);
                 } else {
                     scenario.attach(Files.readAllBytes(renamed), "video/webm", scenarioName);
                 }
