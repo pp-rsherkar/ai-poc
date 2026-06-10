@@ -89,7 +89,9 @@ public class Hooks {
         if (scenario.isFailed()) {
             try {
                 logger.info("Taking screenshot for failed scenario: {}", scenario.getName());
-                String screenshotName = "Screenshot - " + scenario.getName().replaceAll("\\s+", "_"); //Replace all space in scenario name with underscore
+                String screenshotName = "Screenshot - "
+                        + scenario.getName()
+                                .replaceAll("\\s+", "_"); // Replace all space in scenario name with underscore
                 byte[] sourcePath = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
                 scenario.attach(
                         sourcePath, "image/png", screenshotName); // Attach screenshot to report if scenario fails
