@@ -7153,7 +7153,7 @@ public class LifeSteps {
     public void verifyTheCustomFieldCreatedInLineItemDetailsPageIsAvailableForAllLineItemsUnderTheCampaign() {
         logger.info("Verify the custom field created in line item details page is available for all line items under the campaign");
         List<String> lineItemNames = lineItemDetails.fetchLineItemName();
-        for(String name : lineItemNames) {
+        for (String name : lineItemNames) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickDetailsTab();
             Assert.assertTrue(
