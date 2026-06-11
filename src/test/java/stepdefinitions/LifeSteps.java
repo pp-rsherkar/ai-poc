@@ -493,7 +493,9 @@ public class LifeSteps {
     @Then("User deletes the custom field and verify its removed from new tactic")
     public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         logger.info("Deleting custom field: {}", customFieldName);
-        Assert.assertTrue("Unable to delete Custom field", tacticDetails.deleteCustomField(customFieldName).contains("Successfully deleted the Field"));
+        Assert.assertTrue(
+                "Unable to delete Custom field",
+                tacticDetails.deleteCustomField(customFieldName).contains("Successfully deleted the Field"));
         Assert.assertFalse("Custom Field is available", tacticDetails.isCustomFieldAvailable(customFieldName));
     }
 
@@ -7153,7 +7155,8 @@ public class LifeSteps {
         for(String name : lineItemNames) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickDetailsTab();
-            Assert.assertTrue("Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
+            Assert.assertTrue(
+                    "Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
         }
     }
 }
