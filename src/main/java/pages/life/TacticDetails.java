@@ -270,13 +270,15 @@ public class TacticDetails {
         TACTIC_TAB.last().click();
     }
 
-    public void deleteCustomField(String customFieldName) {
+    public String deleteCustomField(String customFieldName) {
+        waitUtility.waitForLocatorVisible(page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]").last());
         Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
+        String text = DELETE_SUCCESS.innerText();
         waitUtility.waitForLocatorVisible(DELETE_SUCCESS);
-        waitUtility.waitForElementHidden(String.format("//label[contains(text(),'%s')]", customFieldName));
+        return text;
     }
 
     public void clickTargetingRuleIcon() {
@@ -607,5 +609,9 @@ public class TacticDetails {
                 "//div[text()='%s']/ancestor::div[contains(@class,'lineitem-list-wrapper')]//app-icon-lable-link[@class='tactic-new-button']//div",
                 name);
         page.locator(xpath).click();
+    }
+
+    public boolean isCustomFieldAvailable(String customFieldName) {
+        return page.locator(String.format("//label[contains(text(),'%s')]", customFieldName)).isVisible();
     }
 }

@@ -493,8 +493,8 @@ public class LifeSteps {
     @Then("User deletes the custom field and verify its removed from new tactic")
     public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         logger.info("Deleting custom field: {}", customFieldName);
-        tacticDetails.deleteCustomField(customFieldName);
-        logger.info("Custom field deletion action completed");
+        Assert.assertTrue("Unable to delete Custom field", tacticDetails.deleteCustomField(customFieldName).contains("Successfully deleted the Field"));
+        Assert.assertFalse("Custom Field is available", tacticDetails.isCustomFieldAvailable(customFieldName));
     }
 
     @When("User enters the tactic details as {string} and saves the tactic")
@@ -4888,7 +4888,7 @@ public class LifeSteps {
         Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
     }
 
-    @When("User enters line item details {string}")
+    @When("User enters line item name {string} on details page")
     public void userEntersLineItemDetails(String lineItemName) {
         lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
         logger.info("Entering Line Item name: {}", lineItemNameRandom);
@@ -7084,5 +7084,76 @@ public class LifeSteps {
         Assert.assertTrue(
                 "Error message is not displayed when impression cap values are not added for the selected checkboxes",
                 lineItemDetails.isImpressionCapErrorMessageVisible());
+    }
+
+    @When("User clicks on the existing campaign to open the campaign details page")
+    public void userClicksOnTheExistingCampaignToOpenTheCampaignDetailsPage() {
+        logger.info("Clicking on the existing campaign to open the campaign details page");
+        campaignDashboard.clickCampaignFromDashboard();
+        Assert.assertTrue(
+                "Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
+    }
+
+    @And("User clicks on Add Line Item button")
+    public void userClicksOnAddLineItemButton() {
+        logger.info("Clicking on Add Line Item button to add a new line item to the existing campaign");
+        lineItemDetails.selectNewLineItem();
+        String lineItemText = lineItemDetails.verifyLineItemText();
+        Assert.assertEquals("New Line Item", lineItemText);
+    }
+
+    @Then("Verify that the new line item is added to the existing campaign and displayed in the left menu under the campaign")
+    public void verifyThatTheNewLineItemIsAddedToTheExistingCampaignAndDisplayedInTheLeftMenuUnderTheCampaign() {
+        lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
+        Assert.assertTrue("Failed to create new Line Item", lineItemDetails.fetchLineItemName().contains(lineItemNameRandom));
+        lineItemDetails.clickDetailsTab();
+    }
+
+    @And("User updates line item details such as {string} and flight dates and saves the line item")
+    public void userUpdatesLineItemDetailsSuchAsAndFlightDatesAndSavesTheLineItem(String lineBudget) {
+        logger.info("Updating line item details - Budget, Flight Dates");
+        lineItemDetails.enterLineItemBudget(lineBudget);
+        nameList = lineItemDetails.fetchLineItemDetails();
+        lineItemDetails.saveLineItem();
+        Assert.assertEquals("Lineitem " + lineItemNameRandom + " updated.", lineItemDetails.lineItemSuccess());
+    }
+
+    @Then("Verify that the line item details are updated successfully and reflected on the Line Item page")
+    public void verifyThatTheLineItemDetailsAreUpdatedSuccessfullyAndReflectedOnTheLineItemPage() {
+        List<String> updatedDetails = lineItemDetails.fetchLineItemDetails();
+        Assert.assertEquals("Line item details are not updated successfully", nameList, updatedDetails);
+    }
+
+    @And("User enters details in {string} enables the line item and saves the changes")
+    public void userEntersDetailsInNewCustomFieldAndEnablesTheLineItemAndSavesTheChanges(String lineBudget) {
+        logger.info("Entering details in new custom field, line budget and saving the line item");
+        navigation.clickOnIcon("Add Flight");
+        lineItemDetails.enterLineItemBudget(lineBudget);
+        lineItemDetails.isPlacementIdAvailable(lineItemNameRandom);
+        lineItemDetails.enableLineItem();
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User creates new custom field {string} and verifies the same in the line item details page")
+    public void userCreatesNewCustomFieldAndVerifiesTheSameInTheLineItemDetailsPage(String customField) {
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
+        logger.info("Creating new custom field with name in Line Item: {}", customFieldName);
+        this.customFieldName = customFieldName;
+        lineItemDetails.addCustomField(customFieldName);
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0]; // To remove unwanted space and text
+        Assert.assertEquals(customFieldName, actualName);
+        this.uiCustomFieldName = actualName;
+    }
+
+    @Then("Verify the custom field created in line item details page is available for all line items under the campaign")
+    public void verifyTheCustomFieldCreatedInLineItemDetailsPageIsAvailableForAllLineItemsUnderTheCampaign() {
+        logger.info("Verify the custom field created in line item details page is available for all line items under the campaign");
+        List<String> lineItemNames = lineItemDetails.fetchLineItemName();
+        for(String name : lineItemNames) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickDetailsTab();
+            Assert.assertTrue("Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
+        }
     }
 }

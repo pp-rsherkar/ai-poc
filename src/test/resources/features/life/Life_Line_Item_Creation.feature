@@ -5,12 +5,12 @@ Feature: LIFE Regression - Line Item Management
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
-    And User clicks on Create Campaign
-    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
-    Then Verify campaign details are saved and user is navigated to the line item page
 
   @regression
   Scenario Outline: Validate that a line item cannot be saved without valid flight details and appropriate budget and date constraints
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
     And Verify Line Item page has below tabs
       | Overview       |
       | Details        |
@@ -38,7 +38,10 @@ Feature: LIFE Regression - Line Item Management
 
   @regression
   Scenario Outline: Add multiple flights to a line item and verify Flights tab after deleting some entries
-    When User enters line item details "<LINE_ITEM>"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters line item name "<LINE_ITEM>" on details page
     And User adds "<NUMBER_OF_FLIGHTS>" flights, fills in the details with "<BUDGET>" for each flight section, and saves the line item
     And User fetches all the flight details added
     Then User navigates to the Flights tab and verifies the flight details
@@ -50,7 +53,10 @@ Feature: LIFE Regression - Line Item Management
 
   @regression
   Scenario Outline: Add sequential flights to a line item and verify Flights tab after deleting some entries
-    When User enters line item details "<LINE_ITEM>"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters line item name "<LINE_ITEM>" on details page
     And User generates sequential flights for the line item using "<BUDGET>" and "<NUMBER_OF_MONTHS>"
     And Verify that Sequential flights should be added based on the start month and verify start date of the month for each flight entry
     And Verify end date of the month for each flight entry
@@ -64,6 +70,9 @@ Feature: LIFE Regression - Line Item Management
 
   @regression
   Scenario Outline: Perform create, modify, duplicate, delete, and toggle operations on line items using Bulk Edit Mode and verify data integrity after duplication
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
     When User creates line items with below line types and other details, enables the line item and saves the changes
       | LINE_TYPE        | LINE_ITEM_DETAILS                                                                                                                          |
       | Display          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Even, PacingPercentage:60    |
@@ -89,6 +98,9 @@ Feature: LIFE Regression - Line Item Management
 
   @regression
   Scenario: Verify data integrity after creating line items with different line types and details
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
     When User creates line items with below line types and other details and verifies the details after saving the line item
       | LINE_TYPE        | LINE_ITEM_DETAILS                                                                                                                          |
       | Display          | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Ahead, PacingPercentage:60   |
@@ -98,3 +110,32 @@ Feature: LIFE Regression - Line Item Management
       | Native Video     | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Priority, PacingMode:Ahead, PacingPercentage:60   |
       | DOOH             | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Dollars, PacingMode:ASAP, PacingPercentage:60     |
       | Search Extension | LineName:LineItem, LineBudget:500, CostModel:Fixed CPM, CPMAmount:50, BudgetDistribution:Percentage, PacingMode:Ahead, PacingPercentage:60 |
+
+  @regression
+  Scenario Outline: Verify addition of Line items to the existing campaign and validate the data persistence after updating the line item details
+    When User clicks on the existing campaign to open the campaign details page
+    And User clicks on Add Line Item button
+    And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+    Then Verify that the new line item is added to the existing campaign and displayed in the left menu under the campaign
+    And User updates line item details such as "<UPDATED_LINE_BUDGET>" and flight dates and saves the line item
+    Then Verify that the line item details are updated successfully and reflected on the Line Item page
+    Examples:
+      | LINE_NAME | LINE_BUDGET | UPDATED_LINE_BUDGET |
+      | Line      | 500         | 505.00              |
+
+  @regression
+  Scenario Outline: Create new custom field in Line Item details page and verify its availability in all the new and existing line items under all Campaigns of the selected account
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters line item name "<LINE_ITEM>" on details page
+    Then User creates new custom field "<CUSTOM_NAME>" and verifies the same in the line item details page
+    And User enters details in "<LINE_BUDGET>" enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    And User navigates to Campaign Dashboard
+    And User clicks on the existing campaign to open the campaign details page
+    Then Verify the custom field created in line item details page is available for all line items under the campaign
+    Then User deletes the custom field and verify its removed from new tactic
+    Examples:
+      | LINE_ITEM  | CUSTOM_NAME     | LINE_BUDGET |
+      | Line_Item_ | Custom_Field_ID | 50          |

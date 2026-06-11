@@ -72,6 +72,11 @@ public class LineItemDetails {
     private final Locator MANAGEMENT_FEE_LABEL_VALUE;
     private final Locator MANAGEMENT_FEE_OVERRIDE;
     private final Locator IMPRESSION_ERROR_MESSAGE;
+    private final Locator ADD_CUSTOM_FIELD;
+    private final Locator ADD_CUSTOM_FIELD_INPUT;
+    private final Locator SAVE_CUSTOM_FIELD_BUTTON;
+    private final Locator FIELD_CREATE_SUCCESS;
+    private final Locator FETCH_LINE_ITEM_NAME;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -104,7 +109,7 @@ public class LineItemDetails {
         this.LINE_ITEM_STATUS = page.locator("//span[contains(@class,'status-label')]/span");
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
         this.ERROR_ALERT = page.locator(
-                "//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.')]");
+                "//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.') or contains(@aria-label, 'Invalid budget')]");
         this.UNACCOUNTED_BUDGET = page.locator("//span[contains(text(), 'Use Unaccounted Budget')]");
         this.FLIGHT_CONTAINER = page.locator("//div[contains(@class,'flight-container')]");
         this.FLIGHT_START_DATE = page.locator("//input[contains(@class,'gaFlightStartDate')]");
@@ -159,6 +164,12 @@ public class LineItemDetails {
         this.MANAGEMENT_FEE_OVERRIDE = page.locator(
                 "//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]");
         this.IMPRESSION_ERROR_MESSAGE = page.locator("//p[contains(text(),'Invalid Impression Cap')]");
+        this.ADD_CUSTOM_FIELD = page.locator("//span[contains(text(),'Add Custom Field')]");
+        this.ADD_CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
+        this.SAVE_CUSTOM_FIELD_BUTTON = page.locator("//button[normalize-space()='Save']");
+        this.FIELD_CREATE_SUCCESS =
+                page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
+        this.FETCH_LINE_ITEM_NAME = page.locator("//div[contains(@class,'item-detials')]/div[@class='main-details']");
     }
 
     public String verifyLineItemText() {
@@ -348,7 +359,8 @@ public class LineItemDetails {
     public void navigateToLineItemDetails(String lineItemName) {
         page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName))
                 .click();
-        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+        //waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+        page.locator("//div[contains(@class, 'data-rangeSlider-container')]").or(ADD_FLIGHT_BUTTON).first().waitFor();
     }
 
     public void clickDetailsTab() {
@@ -481,7 +493,8 @@ public class LineItemDetails {
     }
 
     public List<String> fetchLineItemName() {
-        return MAIN_DETAILS_LABEL.allInnerTexts();
+        waitUtility.waitForLocatorVisible(FETCH_LINE_ITEM_NAME.last());
+        return FETCH_LINE_ITEM_NAME.allTextContents();
     }
 
     public void exitBulkEditMode() {
@@ -600,5 +613,18 @@ public class LineItemDetails {
 
     public boolean isImpressionCapErrorMessageVisible() {
         return IMPRESSION_ERROR_MESSAGE.count() > 0;
+    }
+
+    public void addCustomField(String customFieldName) {
+        ADD_CUSTOM_FIELD.click();
+        ADD_CUSTOM_FIELD_INPUT.fill(customFieldName);
+        SAVE_CUSTOM_FIELD_BUTTON.click();
+        waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+    }
+
+    public boolean isCustomFieldAvailable(String fieldName) {
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]").last());
+        return page.locator(String.format("//label[contains(@class,'form-label') and contains(text(),'%s')]", fieldName)).isVisible();
     }
 }
