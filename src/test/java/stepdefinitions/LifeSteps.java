@@ -7104,7 +7104,8 @@ public class LifeSteps {
         Assert.assertEquals("New Line Item", lineItemText);
     }
 
-    @Then("Verify that the new line item is added to the existing campaign and displayed in the left menu under the campaign")
+    @Then(
+            "Verify that the new line item is added to the existing campaign and displayed in the left menu under the campaign")
     public void verifyThatTheNewLineItemIsAddedToTheExistingCampaignAndDisplayedInTheLeftMenuUnderTheCampaign() {
         lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
         Assert.assertTrue("Failed to create new Line Item", lineItemDetails.fetchLineItemName().contains(lineItemNameRandom));
