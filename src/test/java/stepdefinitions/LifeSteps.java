@@ -7108,7 +7108,9 @@ public class LifeSteps {
             "Verify that the new line item is added to the existing campaign and displayed in the left menu under the campaign")
     public void verifyThatTheNewLineItemIsAddedToTheExistingCampaignAndDisplayedInTheLeftMenuUnderTheCampaign() {
         lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
-        Assert.assertTrue("Failed to create new Line Item", lineItemDetails.fetchLineItemName().contains(lineItemNameRandom));
+        Assert.assertTrue(
+                "Failed to create new Line Item",
+                lineItemDetails.fetchLineItemName().contains(lineItemNameRandom));
         lineItemDetails.clickDetailsTab();
     }
 
