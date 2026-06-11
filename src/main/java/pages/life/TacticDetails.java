@@ -271,7 +271,9 @@ public class TacticDetails {
     }
 
     public String deleteCustomField(String customFieldName) {
-        waitUtility.waitForLocatorVisible(page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]").last());
+        waitUtility.waitForLocatorVisible(
+                page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
+                        .last());
         Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
