@@ -359,7 +359,6 @@ public class LineItemDetails {
     public void navigateToLineItemDetails(String lineItemName) {
         page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName))
                 .click();
-        //waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
         page.locator("//div[contains(@class, 'data-rangeSlider-container')]").or(ADD_FLIGHT_BUTTON).first().waitFor();
     }
 
