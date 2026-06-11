@@ -7155,7 +7155,8 @@ public class LifeSteps {
         for(String name : lineItemNames) {
             lineItemDetails.navigateToLineItemDetails(name);
             lineItemDetails.clickDetailsTab();
-            Assert.assertTrue("Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
+            Assert.assertTrue(
+                    "Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
         }
     }
 }
