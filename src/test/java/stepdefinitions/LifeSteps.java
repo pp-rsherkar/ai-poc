@@ -7149,7 +7149,8 @@ public class LifeSteps {
         this.uiCustomFieldName = actualName;
     }
 
-    @Then("Verify the custom field created in line item details page is available for all line items under the campaign")
+    @Then(
+            "Verify the custom field created in line item details page is available for all line items under the campaign")
     public void verifyTheCustomFieldCreatedInLineItemDetailsPageIsAvailableForAllLineItemsUnderTheCampaign() {
         logger.info(
                 "Verify the custom field created in line item details page is available for all line items under the campaign");
