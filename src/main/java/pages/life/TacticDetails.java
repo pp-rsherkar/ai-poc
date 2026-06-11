@@ -612,6 +612,7 @@ public class TacticDetails {
     }
 
     public boolean isCustomFieldAvailable(String customFieldName) {
-        return page.locator(String.format("//label[contains(text(),'%s')]", customFieldName)).isVisible();
+        return page.locator(String.format("//label[contains(text(),'%s')]", customFieldName))
+                .isVisible();
     }
 }
