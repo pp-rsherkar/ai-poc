@@ -626,7 +626,11 @@ public class LineItemDetails {
 
     public boolean isCustomFieldAvailable(String fieldName) {
         waitUtility.waitUntilPreLoaderHidden();
-        waitUtility.waitForLocatorVisible(page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]").last());
-        return page.locator(String.format("//label[contains(@class,'form-label') and contains(text(),'%s')]", fieldName)).isVisible();
+        waitUtility.waitForLocatorVisible(
+                page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
+                        .last());
+        return page.locator(
+                        String.format("//label[contains(@class,'form-label') and contains(text(),'%s')]", fieldName))
+                .isVisible();
     }
 }
