@@ -11,6 +11,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -264,5 +265,28 @@ public class ApiSteps {
         Assert.assertEquals(200, response.status());
         String instructions = jsonNode.path("result").path("instructions").asText();
         Assert.assertFalse("Instruction is empty", instructions.isEmpty());
+    }
+
+    @And("User requests the list of available MCP prompts with headers:")
+    public void userRequestsTheListOfAvailableMCPPromptsWithHeaders(Map<String, String> headersConfig) throws IOException {
+        JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
+        JsonNode templateNode = fullPayload.path("mcpInitialize");
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", headersConfig.get("Content-Type"));
+        headers.put("Accept", headersConfig.get("Accept"));
+        headers.put("Authorization", "Bearer " + bearerToken);
+        String requestBody = templateNode.toString();
+        response = apiActions.postRequestWithBody(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+    }
+
+    @Then("Verify the MCP prompts list is fetched successfully")
+    public void verifyTheMCPPromptsListIsFetchedSuccessfully() throws Exception {
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        Assert.assertEquals(200, response.status());
+        JsonNode prompts = jsonNode.path("result").path("prompts");
+        for (JsonNode prompt : prompts) {
+            System.out.println(prompt.path("name").asText());
+        }
     }
 }
