@@ -265,4 +265,54 @@ public class ApiSteps {
         String instructions = jsonNode.path("result").path("instructions").asText();
         Assert.assertFalse("Instruction is empty", instructions.isEmpty());
     }
+
+    @And("User requests the list of available MCP prompts with headers:")
+    public void userRequestsTheListOfAvailableMcpPromptsWithHeaders(Map<String, String> headers) {
+        // TODO: Make API call using headers Map
+    }
+
+    @Then("Verify the MCP prompts list is fetched successfully")
+    public void verifyTheMcpPromptsListIsFetchedSuccessfully() {
+        // TODO: Add assertions
+    }
+
+    @And("User retrieves specific MCP prompt details with headers:")
+    public void userRetrievesSpecificMcpPromptDetailsWithHeaders(Map<String, String> headers) {
+        // TODO: Make API call using headers Map
+    }
+
+    @Then("Verify the MCP prompt details are retrieved successfully")
+    public void verifyTheMcpPromptDetailsAreRetrievedSuccessfully() {
+        // TODO: Add assertions
+    }
+
+    @And("User calls the MCP tool to get Looker explore metadata with headers:")
+    public void userCallsTheMcpToolToGetLookerExploreMetadataWithHeaders(Map<String, String> headers) {
+        // TODO: Make API call using headers Map
+    }
+
+    @Then("Verify the Looker explore metadata response is successful")
+    public void verifyTheLookerExploreMetadataResponseIsSuccessful() {
+        // TODO: Add assertions
+    }
+
+    @And("User calls the MCP tool to create a query using dimensions and metrics with headers:")
+    public void userCallsTheMcpToolToCreateAQueryUsingDimensionsAndMetricsWithHeaders(Map<String, String> headers) {
+        // TODO: Make API call, extract and save query ID to a class variable
+    }
+
+    @Then("Verify the query is created successfully and returns a query ID")
+    public void verifyTheQueryIsCreatedSuccessfullyAndReturnsAQueryId() {
+        // TODO: Add assertions
+    }
+
+    @And("User calls the MCP tool to execute the created query with headers:")
+    public void userCallsTheMcpToolToExecuteTheCreatedQueryWithHeaders(Map<String, String> headers) {
+        // TODO: Make API call using the saved query ID and headers Map
+    }
+
+    @Then("Verify the query execution response contains the retrieved data")
+    public void verifyTheQueryExecutionResponseContainsTheRetrievedData() {
+        // TODO: Add final data payload assertions
+    }
 }
