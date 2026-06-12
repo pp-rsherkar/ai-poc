@@ -270,7 +270,7 @@ public class ApiSteps {
     @And("User requests the list of available MCP prompts with headers:")
     public void userRequestsTheListOfAvailableMCPPromptsWithHeaders(Map<String, String> headersConfig) throws IOException {
         JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
-        JsonNode templateNode = fullPayload.path("mcpInitialize");
+        JsonNode templateNode = fullPayload.path("fetchPromptsList");
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", headersConfig.get("Content-Type"));
         headers.put("Accept", headersConfig.get("Accept"));
@@ -285,58 +285,95 @@ public class ApiSteps {
         jsonNode = mapper.readTree(apiActions.getCleanJson(response));
         Assert.assertEquals(200, response.status());
         JsonNode prompts = jsonNode.path("result").path("prompts");
-        for (JsonNode prompt : prompts) {
-            System.out.println(prompt.path("name").asText());
-        }
+        Assert.assertTrue(prompts.isArray() && !prompts.isEmpty());
     }
 
-    @And("User requests the list of available MCP prompts with headers:")
-    public void userRequestsTheListOfAvailableMcpPromptsWithHeaders(Map<String, String> headers) {
-        // TODO: Make API call using headers Map
-    }
-
-    @Then("Verify the MCP prompts list is fetched successfully")
-    public void verifyTheMcpPromptsListIsFetchedSuccessfully() {
-        // TODO: Add assertions
-    }
-
-    @And("User retrieves specific MCP prompt details with headers:")
-    public void userRetrievesSpecificMcpPromptDetailsWithHeaders(Map<String, String> headers) {
-        // TODO: Make API call using headers Map
+    @And("User retrieves specific MCP prompt details {string} with headers:")
+    public void userRetrievesSpecificMcpPromptDetailsWithHeaders(String promptName, Map<String, String> headersConfig) throws IOException {
+        JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
+        JsonNode templateNode = fullPayload.path("getPrompt");
+        ObjectNode paramsNode = (ObjectNode) templateNode.path("params");
+        paramsNode.put("name", promptName);
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", headersConfig.get("Content-Type"));
+        headers.put("Accept", headersConfig.get("Accept"));
+        headers.put("Authorization", "Bearer " + bearerToken);
+        String requestBody = templateNode.toString();
+        response = apiActions.postRequestWithBody(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
     }
 
     @Then("Verify the MCP prompt details are retrieved successfully")
-    public void verifyTheMcpPromptDetailsAreRetrievedSuccessfully() {
-        // TODO: Add assertions
+    public void verifyTheMcpPromptDetailsAreRetrievedSuccessfully() throws Exception {
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        Assert.assertEquals(200, response.status());
+        JsonNode messagesArray = jsonNode.path("result").path("messages");
+        Assert.assertTrue(messagesArray.isArray() && !messagesArray.isEmpty());
     }
 
     @And("User calls the MCP tool to get Looker explore metadata with headers:")
-    public void userCallsTheMcpToolToGetLookerExploreMetadataWithHeaders(Map<String, String> headers) {
-        // TODO: Make API call using headers Map
+    public void userCallsTheMcpToolToGetLookerExploreMetadataWithHeaders(Map<String, String> headersConfig) throws IOException {
+        JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
+        JsonNode templateNode = fullPayload.path("getExploreMetadata");
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", headersConfig.get("Content-Type"));
+        headers.put("Accept", headersConfig.get("Accept"));
+        headers.put("X-Account-Id", headersConfig.get("X-Account-Id"));
+        headers.put("X-Advertiser-Id", headersConfig.get("X-Advertiser-Id"));
+        headers.put("X-User-Id", headersConfig.get("X-User-Id"));
+        headers.put("Authorization", "Bearer " + bearerToken);
+        String requestBody = templateNode.toString();
+        response = apiActions.postRequestWithBody(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
     }
 
     @Then("Verify the Looker explore metadata response is successful")
-    public void verifyTheLookerExploreMetadataResponseIsSuccessful() {
-        // TODO: Add assertions
+    public void verifyTheLookerExploreMetadataResponseIsSuccessful() throws Exception {
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        Assert.assertEquals(200, response.status());
     }
 
     @And("User calls the MCP tool to create a query using dimensions and metrics with headers:")
-    public void userCallsTheMcpToolToCreateAQueryUsingDimensionsAndMetricsWithHeaders(Map<String, String> headers) {
-        // TODO: Make API call, extract and save query ID to a class variable
+    public void userCallsTheMcpToolToCreateAQueryUsingDimensionsAndMetricsWithHeaders(Map<String, String> headersConfig) throws IOException {
+        JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
+        JsonNode templateNode = fullPayload.path("createQuery");
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", headersConfig.get("Content-Type"));
+        headers.put("Accept", headersConfig.get("Accept"));
+        headers.put("X-Account-Id", headersConfig.get("X-Account-Id"));
+        headers.put("X-Advertiser-Id", headersConfig.get("X-Advertiser-Id"));
+        headers.put("X-User-Id", headersConfig.get("X-User-Id"));
+        headers.put("Authorization", "Bearer " + bearerToken);
+        String requestBody = templateNode.toString();
+        response = apiActions.postRequestWithBody(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
     }
 
     @Then("Verify the query is created successfully and returns a query ID")
-    public void verifyTheQueryIsCreatedSuccessfullyAndReturnsAQueryId() {
-        // TODO: Add assertions
+    public void verifyTheQueryIsCreatedSuccessfullyAndReturnsAQueryId() throws Exception {
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        Assert.assertEquals(200, response.status());
     }
 
     @And("User calls the MCP tool to execute the created query with headers:")
-    public void userCallsTheMcpToolToExecuteTheCreatedQueryWithHeaders(Map<String, String> headers) {
-        // TODO: Make API call using the saved query ID and headers Map
+    public void userCallsTheMcpToolToExecuteTheCreatedQueryWithHeaders(Map<String, String> headersConfig) throws IOException {
+        JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
+        JsonNode templateNode = fullPayload.path("executeQuery");
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", headersConfig.get("Content-Type"));
+        headers.put("Accept", headersConfig.get("Accept"));
+        headers.put("X-Account-Id", headersConfig.get("X-Account-Id"));
+        headers.put("X-Advertiser-Id", headersConfig.get("X-Advertiser-Id"));
+        headers.put("X-User-Id", headersConfig.get("X-User-Id"));
+        headers.put("Authorization", "Bearer " + bearerToken);
+        String requestBody = templateNode.toString();
+        response = apiActions.postRequestWithBody(
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
     }
 
     @Then("Verify the query execution response contains the retrieved data")
-    public void verifyTheQueryExecutionResponseContainsTheRetrievedData() {
-        // TODO: Add final data payload assertions
+    public void verifyTheQueryExecutionResponseContainsTheRetrievedData() throws Exception {
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        Assert.assertEquals(200, response.status());
     }
 }

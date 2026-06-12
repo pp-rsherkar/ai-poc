@@ -17,15 +17,15 @@ Feature: Fetch data using MCP Tools by retrieving metadata, creating query and e
       | audience     | studio-api                        |
     Then Verify the Token API response status and presence of a valid access token
     When User initializes the MCP server using the access token with headers:
-      | Content-Type  | application/json                    |
-      | Accept        | application/json, text/event-stream |
+      | Content-Type | application/json                    |
+      | Accept       | application/json, text/event-stream |
     Then Verify the MCP server initialization response is successful
     And User requests the list of available MCP prompts with headers:
       | Content-Type | application/json                    |
       | Accept       | application/json, text/event-stream |
     Then Verify the MCP prompts list is fetched successfully
-    And User retrieves specific MCP prompt details with headers:
-      | Content-Type | application/json |
+    And User retrieves specific MCP prompt details "platformtwenty_npi_facts_hint" with headers:
+      | Content-Type | application/json                    |
       | Accept       | application/json, text/event-stream |
     Then Verify the MCP prompt details are retrieved successfully
     And User calls the MCP tool to get Looker explore metadata with headers:
@@ -36,11 +36,11 @@ Feature: Fetch data using MCP Tools by retrieving metadata, creating query and e
       | Accept          | application/json, text/event-stream |
     Then Verify the Looker explore metadata response is successful
     And User calls the MCP tool to create a query using dimensions and metrics with headers:
-      | Content-Type    | application/json |
-      | Accept          | application/json |
-      | X-Account-Id    | 12345            |
-      | X-Advertiser-Id | 67890            |
-      | X-User-Id       | your-user-uuid   |
+      | Content-Type    | application/json                    |
+      | Accept          | application/json, text/event-stream |
+      | X-Account-Id    | 12345                               |
+      | X-Advertiser-Id | 67890                               |
+      | X-User-Id       | your-user-uuid                      |
     Then Verify the query is created successfully and returns a query ID
     And User calls the MCP tool to execute the created query with headers:
       | Content-Type    | application/json                    |

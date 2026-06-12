@@ -167,7 +167,7 @@
     "method": "prompts/get",
     "id": 11,
     "params": {
-      "name": "platformtwenty_npi_facts_hint"
+      "name": ""
     }
   },
   "getExploreMetadata": {
