@@ -260,6 +260,9 @@ public class ApiSteps {
 
     @Then("Verify the MCP server initialization response is successful")
     public void verifyTheMCPServerInitializationResponseIsSuccessful() throws Exception {
-        // Implementation pending
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        Assert.assertEquals(200, response.status());
+        String instructions = jsonNode.path("result").path("instructions").asText();
+        Assert.assertFalse("Instruction is empty", instructions.isEmpty());
     }
 }

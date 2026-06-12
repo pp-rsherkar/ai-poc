@@ -8,7 +8,7 @@ Feature: Fetch data using MCP Tools by retrieving metadata, creating query and e
   7. MCP Tool Call - Create Query
   8. MCP Tool Call - Execute Query
 
-  @api @todo
+  @e2e @todo
   Scenario: Retrieve data using dimensions and metrics through MCP workflow
     Given I call the Token API using the API key for authentication with configuration:
       | Content-Type | application/x-www-form-urlencoded |
