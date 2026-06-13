@@ -6996,7 +6996,6 @@ public class LifeSteps {
         List<String> bidCategoryList = bidCategory.asList(String.class);
         logger.info("Verifying Bid multiplier panel contains the following categories: {}", bidCategoryList);
         boolean isMatched = tacticSettings.fetchAndVerifyBidCategoryName(bidCategoryList);
-        logger.info("Bid category match result: {}", isMatched);
         Assert.assertTrue("Bid multiplier Category names are not matched", isMatched);
         logger.info("Bid multiplier categories verified successfully");
     }
@@ -7010,11 +7009,8 @@ public class LifeSteps {
         for (Map.Entry<String, List<String>> entry : bidCategoryNameAndTypeMap.entrySet()) {
             String key = entry.getKey();
             List<String> bidexpectedValues = entry.getValue();
-            logger.info("Checking category '{}' for expected bid types: {}", key, bidexpectedValues);
             List<String> actualValues = tacticSettings.getBidTypesForCategory(key);
-            logger.info("Actual Bid types found for '{}': {}", key, actualValues);
             for (String bidexpected : bidexpectedValues) {
-                logger.info("Verifying bid expected value '{}' is present in actual values", bidexpected);
                 Assert.assertTrue("Expected value '" + bidexpected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(bidexpected));
             }
         }
@@ -7029,7 +7025,6 @@ public class LifeSteps {
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
 
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            logger.info("Adding Bid Rule Type: {} with Options: {}", entry.getKey(), entry.getValue());
             keyBidType.add(entry.getKey());
             keyBidValues.addAll(entry.getValue());
             tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(),fillValue);
@@ -7043,7 +7038,6 @@ public class LifeSteps {
         logger.info("Starting verification of configured bid multiplier rules");
         List<String> expectedNormalizedBidRuleTypes = normalizeObjectList(keyBidType);
         int expectedBidCount = expectedNormalizedBidRuleTypes.size();
-        logger.info("Fetching actual Bid rule types (Expected Count: {})", expectedBidCount);
         tacticSettings.fetchBidRulesTypesCount(expectedBidCount);
         List<String> actualNormalizedBidRuleTypes = normalizeObjectList(tacticSettings.fetchBidRulesTypes());
 
@@ -7055,11 +7049,9 @@ public class LifeSteps {
 
         Collections.sort(expectedUniqueAndSortedBid);
         Collections.sort(actualUniqueAndSortedBid);
-        logger.info("Comparing Bid Rule Types. Expected: {}, Actual: {}", expectedUniqueAndSortedBid, actualUniqueAndSortedBid);
 
         List<String> expectedNormalizedBidRuleOptions = normalizeObjectList(keyBidValues);
         List<String> actualNormalizedBidRuleOptions = normalizeObjectList(tacticSettings.fetchBidRuleOptions());
-        logger.info("Comparing BidRule Options. Expected: {}, Actual: {}", expectedNormalizedBidRuleOptions, actualNormalizedBidRuleOptions);
         Assert.assertEquals("Rule types mismatch", expectedUniqueAndSortedBid, actualUniqueAndSortedBid);
 
         for (String expectedOption : expectedNormalizedBidRuleOptions) {
