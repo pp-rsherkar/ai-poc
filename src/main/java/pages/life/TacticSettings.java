@@ -1051,7 +1051,7 @@ public class TacticSettings {
         return Collections.emptyList();
     }
 
-    public void selectMultipleBidRuleTypes(String ruleType, List<String> ruleValues) {
+    public void selectMultipleBidRuleTypes(String ruleType, List<String> ruleValues,String fillValue) {
 
         switch (ruleType) {
             case "Behavioral Segment":
@@ -1062,7 +1062,7 @@ public class TacticSettings {
                     String cleanedValue = value.replace("[", "").replace("]", "");
                     String xpath2 = String.format("//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td//input", cleanedValue);
                     Locator categoryItems = page.locator(xpath2);
-                    categoryItems.fill("2");
+                    categoryItems.fill(fillValue);
                 }
                 clickRuleTypeOkButton();
                 break;
@@ -1074,7 +1074,7 @@ public class TacticSettings {
                     String cleanedValue = value.replace("[", "").replace("]", "");
                     String xpathNPIValue = String.format("//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td//input", cleanedValue);
                     Locator categoryItems = page.locator(xpathNPIValue);
-                    categoryItems.fill("3");
+                    categoryItems.fill(fillValue);
                 }
                 clickRuleTypeOkButton();
                 break;

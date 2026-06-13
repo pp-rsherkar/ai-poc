@@ -224,7 +224,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
       | DEMOGRAPHICS       | Age,Gender                                                                       |
       | GEOGRAPHY          | Geo Targets                                                                      |
       | MEDIA SUPPLY       | Browser,Device,Operating Systems,Inventory Source,Domains and Apps,Creative Size |
-    And User configures Bid multiplier rules as below
+    And User configures Bid multiplier rules as below with "<BID_VALUE>"
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
       | NPI                | AutoSmartList954103283                                             |
     Then Verify the configured Bid multiplier rules
@@ -234,8 +234,8 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |
-      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |BID_VALUE|
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |2        |
 
   @regression
   Scenario Outline: Verify campaign management fee is reflected in line item and line item override is reflected in tactic

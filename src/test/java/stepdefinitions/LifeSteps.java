@@ -7022,8 +7022,8 @@ public class LifeSteps {
         logger.info("All Bid types matched their respective categories successfully");
     }
 
-    @Given("User configures Bid multiplier rules as below")
-    public void user_selects_the_Bid_multiplier_rules(DataTable bidRuleTypeAndOptions) {
+    @Given("User configures Bid multiplier rules as below with {string}")
+    public void user_selects_the_Bid_multiplier_rules(String fillValue,DataTable bidRuleTypeAndOptions) {
         logger.info("Configuring Bid multiplier rules from DataTable");
         Map<String, String> rawMap = bidRuleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
@@ -7032,7 +7032,7 @@ public class LifeSteps {
             logger.info("Adding Bid Rule Type: {} with Options: {}", entry.getKey(), entry.getValue());
             keyBidType.add(entry.getKey());
             keyBidValues.addAll(entry.getValue());
-            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue());
+            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(),fillValue);
         }
         logger.info("Closing Bid Rule Type panel");
         tacticSettings.closeRuleTypePanel();
