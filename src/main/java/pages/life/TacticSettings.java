@@ -202,19 +202,20 @@ public class TacticSettings {
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
         this.DOLLAR_TYPE_FEE_INPUT = page.locator(
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
-        this.ADD_BID_MULTIPLIER = page.locator("//div[@class='no_content_center']//span[text()='Add Bid Multiplier']");
-        this.BEHAVIOUR_SEGMENT = page.locator("//div[@class='behavior bidMultiplierImages image ui ng-star-inserted']");
-        this.BEHAVIOUR_SEGMENT_ERROR = page.locator("//div[@class='noDataMessageHeader']");
-        this.BID_PANEL_CANCEL_BUTTON = page.locator("//button[@class='ui button secondary cancelbtn cancel']");
-        this.NPI_BID = page.locator("//div[@class='bidMultiplierImages image npi ui ng-star-inserted']");
-        this.NPI_ERROR = page.locator("//div[@class='noDataMessageHeader']");
-        this.INACTIVE_PANEL = page.locator("//div[@class='ui dimmer modals page transition visible active toprightModalContainer']");
-        this.NEW_TARGETING = page.locator("//span[@class='txt-color' and text()='Add Targeting Rule']");
+        this.ADD_BID_MULTIPLIER = page.locator(
+                "//div[contains(@class,'no_content_center')]//span[text()='Add Bid Multiplier']");
+        this.BEHAVIOUR_SEGMENT = page.locator("//div[contains(@class,'behavior') and contains(@class,'bidMultiplierImages')]");
+        this.BEHAVIOUR_SEGMENT_ERROR = page.locator("//div[contains(@class,'noDataMessageHeader')]");
+        this.BID_PANEL_CANCEL_BUTTON = page.locator("//button[contains(@class,'cancelbtn')]");
+        this.NPI_BID = page.locator("//div[contains(@class,'npi') and contains(@class,'bidMultiplierImages')]");
+        this.NPI_ERROR = page.locator("//div[contains(@class,'noDataMessageHeader')]");
+        this.INACTIVE_PANEL = page.locator("//div[contains(@class,'toprightModalContainer')]");
+        this.NEW_TARGETING = page.locator("//span[contains(@class,'txt-color') and text()='Add Targeting Rule']");
         this.BID_MULTIPLIER_CATEGORY_NAME = page.locator("//div[contains(@class,'bidMultiplierCategoryName')]");
-        this.FETCH_BID_MULTIPLIER_RULE_TYPES = page.locator("//div[contains(@class,'bidMultiplierData')]/div/div[contains(@class,'bold')]");
+        this.FETCH_BID_MULTIPLIER_RULE_TYPES = page.locator(
+                "//div[contains(@class,'bidMultiplierData')]//div[contains(@class,'bold')]");
         this.FETCH_BID_MULTIIPLIER_RULE_OPTIONS = page.locator("//div[contains(@class,'bmtName')]");
-        this.CREATIVE_TAB = page.locator("//div[contains(@class,'navbar')]//a[@class='nav-item ui header pointer gaTabCreatives'][1]");
-
+        this.CREATIVE_TAB = page.locator("(//div[contains(@class,'navbar')]//a[contains(@class,'gaTabCreatives')])[1]");
     }
 
     public String verifyTacticSettingsText() {
