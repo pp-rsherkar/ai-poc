@@ -14,7 +14,7 @@ import utils.WaitUtility;
 public class PMP {
     private final Page page;
     private final Locator VERIFY_TACTIC_SETTINGS_PAGE;
-    private final Locator ADD_TARGETING_RULE;
+    public Locator ADD_TARGETING_RULE;
     private final Locator NEW_TARGETING_RULE;
     private final Locator SAVE_TACTIC_SETTINGS;
     private final Locator SEARCH_RULE_TYPE;
