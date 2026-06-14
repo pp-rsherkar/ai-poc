@@ -4,6 +4,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1055,7 +1056,7 @@ public class TacticSettings {
         return Collections.emptyList();
     }
 
-    public void selectMultipleBidRuleTypes(String ruleType, List<String> ruleValues,String fillValue) {
+    public void selectMultipleBidRuleTypes(String ruleType, List<String> ruleValues, String fillValue) {
 
         switch (ruleType) {
             case "Behavioral Segment":
@@ -1086,7 +1087,8 @@ public class TacticSettings {
     }
 
     public void fetchBidRulesTypesCount(int expectedBidCount) {
-        FETCH_BID_MULTIPLIER_RULE_TYPES.nth(expectedBidCount-1).waitFor();
+        Locator target = FETCH_BID_MULTIPLIER_RULE_TYPES.nth(expectedBidCount - 1);
+        target.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(2000));
     }
 
     public List<Object> fetchBidRulesTypes() {
@@ -1108,6 +1110,7 @@ public class TacticSettings {
         }
         return ruleOptions;
     }
+
     public void clickCreativeTab() {
         CREATIVE_TAB.click();
     }
