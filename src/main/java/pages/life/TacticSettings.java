@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 import utils.WaitUtility;
 
 public class TacticSettings {
@@ -1022,10 +1023,12 @@ public class TacticSettings {
         List<String> actualCategories = new ArrayList<>();
         int count = BID_MULTIPLIER_CATEGORY_NAME.count();
         for (int i = 0; i < count; i++) {
-            String text = BID_MULTIPLIER_CATEGORY_NAME.nth(i).innerText().trim();
-            actualCategories.add(text);
+            String text = BID_MULTIPLIER_CATEGORY_NAME.nth(i).innerText();
+            if (text != null) actualCategories.add(text.trim());
         }
-        return new HashSet<>(bidCategoryList).containsAll(actualCategories);
+        return new HashSet<>(actualCategories).containsAll(
+                bidCategoryList.stream().filter(Objects::nonNull).map(String::trim).collect(Collectors.toSet())
+        );
     }
 
     public void clickBidMultipliers() {

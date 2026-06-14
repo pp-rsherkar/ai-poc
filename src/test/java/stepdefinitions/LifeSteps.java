@@ -6995,9 +6995,11 @@ public class LifeSteps {
         tacticSettings.clickBidMultipliers();
         List<String> bidCategoryList = bidCategory.asList(String.class);
         logger.info("Verifying Bid multiplier panel contains the following categories: {}", bidCategoryList);
-        boolean isMatched = tacticSettings.fetchAndVerifyBidCategoryName(bidCategoryList);
-        Assert.assertTrue("Bid multiplier Category names are not matched", isMatched);
-        logger.info("Bid multiplier categories verified successfully");
+        for (String category : bidCategoryList) {
+            boolean isPresent = tacticSettings.fetchAndVerifyBidCategoryName(Collections.singletonList(category));
+            Assert.assertTrue("Bid multiplier category '" + category + "' not found or not visible on UI", isPresent);
+        }
+        logger.info("All bid multiplier categories verified successfully");
     }
 
     @And("Verify Bid type with respect to category")
