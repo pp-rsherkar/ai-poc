@@ -9,7 +9,6 @@ import java.util.*;
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
-import java.util.stream.Collectors;
 
 public class TacticDetails {
     public final Locator TARGETING_RULES_ICON;
@@ -146,15 +145,18 @@ public class TacticDetails {
                 page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
         this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
-        this.TACTIC_COPY_NAME_FIELD = page.locator("//input[contains(@class, \"multi-line-input-box\")and @placeholder=\"Enter New Tactic Name\"]");
-        this.DUPLICATE_BUTTON = page.locator("//button[contains(@class, \"okButton\") and normalize-space(text())=\"Duplicate\"]");
+        this.TACTIC_COPY_NAME_FIELD = page.locator(
+                "//input[contains(@class, \"multi-line-input-box\")and @placeholder=\"Enter New Tactic Name\"]");
+        this.DUPLICATE_BUTTON =
+                page.locator("//button[contains(@class, \"okButton\") and normalize-space(text())=\"Duplicate\"]");
         this.CREATIVE_NAME = page.locator("//td[contains(@class,'semi-bold')]//span[contains(@class,'crt-name')]");
         this.TACTIC_CHANNEL = page.locator("(//div[@id='billingTypeDropdown'])[1]");
         this.TACTIC_PRIORITY = page.locator("//div[contains(@class, 'labeled input')] //input[@id='priority']");
         this.TACTIC_MEDIA_OPTIMIZATION = page.locator("(//div[@id='billingTypeDropdown'])[2]");
         this.DATA_COST_CPM = page.locator("(//span[contains(@class, 'cost-override')])[1]");
         this.HUMAN_COST_CPM = page.locator("(//span[contains(@class, 'cost-override')])[2]");
-        this.COPY_SUCCESS_ALERT = page.locator("//div[@id='toast-container' and contains(., 'Tactic(s)') and contains(., 'copied successfully')]");
+        this.COPY_SUCCESS_ALERT = page.locator(
+                "//div[@id='toast-container' and contains(., 'Tactic(s)') and contains(., 'copied successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
         this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
@@ -558,14 +560,16 @@ public class TacticDetails {
     }
 
     public boolean verifyTacticAvailable(String tacticName) {
-        Locator tacticItem = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName));
+        Locator tacticItem =
+                page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName));
         tacticItem.scrollIntoViewIfNeeded();
         return tacticItem.isVisible();
     }
 
     public void clickTacticOptions(String option) {
         TACTIC_OPTIONS.click();
-        Locator optionXpath = page.locator(String.format("//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
+        Locator optionXpath = page.locator(String.format(
+                "//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
         waitUtility.waitForLocatorVisible(optionXpath);
         optionXpath.click();
     }
@@ -580,14 +584,18 @@ public class TacticDetails {
     }
 
     public void navigateToTacticDetails(String tacticName) {
-        page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName)).click();
+        page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName))
+                .click();
     }
 
     public List<String> fetchTacticDetails() {
         List<String> originalTacticDetails = new ArrayList<>();
-        originalTacticDetails.add(TACTIC_CHANNEL.locator("div.text").textContent().trim());
-        originalTacticDetails.add(TACTIC_PRIORITY.evaluate("el => el.value").toString().trim());
-        originalTacticDetails.add(TACTIC_MEDIA_OPTIMIZATION.locator("div.text").textContent().trim());
+        originalTacticDetails.add(
+                TACTIC_CHANNEL.locator("div.text").textContent().trim());
+        originalTacticDetails.add(
+                TACTIC_PRIORITY.evaluate("el => el.value").toString().trim());
+        originalTacticDetails.add(
+                TACTIC_MEDIA_OPTIMIZATION.locator("div.text").textContent().trim());
         page.waitForCondition(() -> {
             String text = DATA_COST_CPM.nth(0).textContent().trim();
             return !text.equals("—") && !text.isEmpty();
