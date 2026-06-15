@@ -9,7 +9,7 @@ Feature: Brand Explorer Workspace creation in Studio
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
 
-  @e2e @ps
+  @regression @ps
   Scenario Outline: Create and save Brand Explorer workspace with specific filters
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
