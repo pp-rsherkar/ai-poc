@@ -360,7 +360,7 @@ jobs:
           echo "Calling Gemini API..."
           HTTP_RESPONSE=$(mktemp)
           HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$GEMINI_API_KEY" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=$GEMINI_API_KEY" \
             -H "Content-Type: application/json" \
             --data @request.json)
 
@@ -376,7 +376,7 @@ jobs:
             | sed 's/```//g' \
             > generated.feature
 
-          echo "MODEL_USED=Gemini (gemini-2.0-flash)" >> "$GITHUB_ENV"
+          echo "MODEL_USED=Gemini (gemini-2.0-flash-lite)" >> "$GITHUB_ENV"
 
       # =========================
       # Validate generated output
