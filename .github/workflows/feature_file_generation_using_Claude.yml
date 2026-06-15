@@ -15,6 +15,7 @@ on:
           - ""
           - claude
           - openai
+          - gemini
         default: "claude"
 
 permissions:
@@ -76,12 +77,12 @@ jobs:
             echo "Using repo default model: $AI_MODEL"
           else
             AI_MODEL="claude"
-            echo "No model configured, falling back to: $AI_MODEL"
+            echo "No model configured, falling back to: $AI_MODEL (hardcoded default)"
           fi
 
           # Validate
-          if [[ "$AI_MODEL" != "claude" && "$AI_MODEL" != "openai" ]]; then
-            echo "Invalid AI_MODEL value: '$AI_MODEL'. Must be 'claude' or 'openai'."
+          if [[ "$AI_MODEL" != "claude" && "$AI_MODEL" != "openai" && "$AI_MODEL" != "gemini" ]]; then
+            echo "Invalid AI_MODEL value: '$AI_MODEL'. Must be 'claude', 'openai' or 'gemini'."
             exit 1
           fi
 
@@ -289,7 +290,7 @@ jobs:
           jq -n \
             --rawfile prompt prompt.txt \
             '{
-              model: "openai/gpt-4.1",
+              model: "openai/gpt-4.1-nano",
               temperature: 0,
               messages: [
                 {
@@ -322,7 +323,60 @@ jobs:
             | sed 's/```//g' \
             > generated.feature
 
-          echo "MODEL_USED=OpenAI (gpt-4.1 via GitHub Models)" >> "$GITHUB_ENV"
+          echo "MODEL_USED=OpenAI (gpt-4.1-nano via GitHub Models)" >> "$GITHUB_ENV"
+
+      # =========================
+      # Generate via Gemini (Google)
+      # =========================
+      - name: Generate feature via Gemini
+        if: env.AI_MODEL == 'gemini'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          jq -n \
+            --rawfile prompt prompt.txt \
+            '{
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: $prompt }]
+                }
+              ],
+              systemInstruction: {
+                parts: [
+                  {
+                    text: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary"
+                  }
+                ]
+              },
+              generationConfig: {
+                temperature: 0,
+                maxOutputTokens: 4096
+              }
+            }' > request.json
+
+          echo "Calling Gemini API..."
+          HTTP_RESPONSE=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$GEMINI_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data @request.json)
+
+          echo "HTTP Status: $HTTP_CODE"
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Gemini API request failed:"
+            cat "$HTTP_RESPONSE"
+            exit 1
+          fi
+
+          jq -r '.candidates[0].content.parts[0].text // empty' "$HTTP_RESPONSE" \
+            | sed 's/```gherkin//g' \
+            | sed 's/```//g' \
+            > generated.feature
+
+          echo "MODEL_USED=Gemini (gemini-2.0-flash)" >> "$GITHUB_ENV"
 
       # =========================
       # Validate generated output
