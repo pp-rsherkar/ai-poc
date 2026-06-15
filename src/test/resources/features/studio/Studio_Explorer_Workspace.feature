@@ -48,7 +48,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | MeSH                 | Anatomy                                                                                                                 |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     Examples:
       | ADVERTISER | WORKSPACE_NAME |
