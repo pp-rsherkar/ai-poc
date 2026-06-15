@@ -1,0 +1,410 @@
+name: JIRA - Feature File (GHERKIN) Generator USING CLAUDE
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: "Enter JIRA Ticket ID (e.g., QA-1321)"
+        required: true
+        type: string
+      ai_model:
+        description: "AI model to use (leave blank to use repo default)"
+        required: false
+        type: choice
+        options:
+          - ""
+          - claude
+          - openai
+        default: "claude"
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+jobs:
+  generate-feature:
+    runs-on: ubuntu-latest
+
+    env:
+      FEATURE_DIR: src/test/resources/features
+
+    steps:
+      # =========================
+      # Checkout
+      # =========================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # =========================
+      # Install dependencies
+      # =========================
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq python3-yaml
+
+      # =========================
+      # Resolve which AI model to use
+      # =========================
+      - name: Resolve AI model
+        run: |
+          set -euo pipefail
+
+          DISPATCH_CHOICE="${{ inputs.ai_model }}"
+
+          # Read repo default from .github/ai-config.yml if it exists
+          REPO_DEFAULT=""
+          if [ -f ".github/ai-config.yml" ]; then
+            REPO_DEFAULT=$(python3 -c "
+          import yaml, sys
+          with open('.github/ai-config.yml') as f:
+            cfg = yaml.safe_load(f)
+          print(cfg.get('default_model', ''))
+          " 2>/dev/null || echo "")
+          fi
+
+          # Priority: dispatch input > repo config > hardcoded fallback
+          if [ -n "$DISPATCH_CHOICE" ]; then
+            AI_MODEL="$DISPATCH_CHOICE"
+            echo "Using dispatch-selected model: $AI_MODEL"
+          elif [ -n "$REPO_DEFAULT" ]; then
+            AI_MODEL="$REPO_DEFAULT"
+            echo "Using repo default model: $AI_MODEL"
+          else
+            AI_MODEL="claude"
+            echo "No model configured, falling back to: $AI_MODEL"
+          fi
+
+          # Validate
+          if [[ "$AI_MODEL" != "claude" && "$AI_MODEL" != "openai" ]]; then
+            echo "Invalid AI_MODEL value: '$AI_MODEL'. Must be 'claude' or 'openai'."
+            exit 1
+          fi
+
+          echo "AI_MODEL=$AI_MODEL" >> "$GITHUB_ENV"
+
+      # =========================
+      # Build reusable step dictionary
+      # =========================
+      - name: Build AI repository context
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$FEATURE_DIR"
+          FEATURE_COUNT=$(find "$FEATURE_DIR" -name "*.feature" | wc -l)
+
+          if [ "$FEATURE_COUNT" -gt 0 ]; then
+            TEMP_FILE=$(mktemp)
+            find "$FEATURE_DIR" -name "*.feature" \
+              -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
+              2>/dev/null \
+              | sed 's/^[[:space:]]*//g' \
+              | sort -u \
+              > "$TEMP_FILE"
+            head -n 300 "$TEMP_FILE" > step_dictionary.txt
+            rm -f "$TEMP_FILE"
+          else
+            touch step_dictionary.txt
+          fi
+
+          echo "Reusable step count:"
+          wc -l step_dictionary.txt
+
+      # =========================
+      # Create working branch
+      # =========================
+      - name: Create branch
+        run: |
+          set -euo pipefail
+          BRANCH="${{ inputs.jira_id }}"
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git fetch origin
+          git checkout -b "$BRANCH" || git checkout "$BRANCH"
+
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      # =========================
+      # Fetch Jira
+      # =========================
+      - name: Fetch Jira details
+        run: |
+          set -euo pipefail
+          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
+
+          RESPONSE=$(curl -s --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+
+          echo "$RESPONSE" > jira_response.json
+
+          if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
+            echo "Jira API returned an error:"
+            cat jira_response.json
+            exit 1
+          fi
+
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+          COMMENTS=$(echo "$RESPONSE" | jq -r '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+
+          [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
+          [ -z "$COMMENTS" ] && COMMENTS="No Comments"
+
+          DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
+          COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
+
+          {
+            echo "SUMMARY<<EOF"
+            echo "$SUMMARY"
+            echo "EOF"
+            echo "DESCRIPTION<<EOF"
+            echo "$DESCRIPTION"
+            echo "EOF"
+            echo "COMMENTS<<EOF"
+            echo "$COMMENTS"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      # =========================
+      # Build shared prompt file
+      # =========================
+      - name: Build prompt
+        env:
+          SUMMARY: ${{ env.SUMMARY }}
+          DESCRIPTION: ${{ env.DESCRIPTION }}
+          COMMENTS: ${{ env.COMMENTS }}
+        run: |
+          set -euo pipefail
+
+          STEP_CONTEXT=$(head -n 120 step_dictionary.txt)
+          FEATURE_EXAMPLES=$(
+            find "$FEATURE_DIR" -name "*.feature" \
+            | head -3 \
+            | while read -r f; do cat "$f"; done \
+            | head -n 350
+          )
+
+          cat <<EOF > prompt.txt
+          Generate a production-quality Cucumber Gherkin feature file matching repository conventions.
+          ==================================================
+          RULES
+          ==================================================
+          - Return ONLY raw valid Gherkin
+          - No markdown
+          - No code fences
+          - No explanations
+          - Reuse existing repository steps whenever possible
+          - Prefix every Scenario or Scenario Outline with @todo
+          - Keep scenarios concise and automation-friendly
+          - Use business-readable language
+          - Avoid duplicate scenarios
+          - Prefer repository wording over generating new steps
+          - Use Scenario Outline ONLY when permutations are required
+          Generate:
+          - Happy path scenarios
+          - Validation scenarios
+          - Negative scenarios
+          - Permission/security scenarios if implied
+          ==================================================
+          JIRA DETAILS
+          ==================================================
+          ID: ${{ inputs.jira_id }}
+          SUMMARY: $SUMMARY
+          DESCRIPTION: $DESCRIPTION
+          COMMENTS: $COMMENTS
+          ==================================================
+          REPOSITORY FEATURE EXAMPLES
+          ==================================================
+          $FEATURE_EXAMPLES
+          ==================================================
+          RELEVANT STEP DEFINITIONS
+          ==================================================
+          $STEP_CONTEXT
+          ==================================================
+          OUTPUT FORMAT
+          ==================================================
+          Feature: <name>
+          EOF
+
+      # =========================
+      # Generate via Claude (Anthropic)
+      # =========================
+      - name: Generate feature via Claude
+        if: env.AI_MODEL == 'claude'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          jq -n \
+            --rawfile prompt prompt.txt \
+            '{
+              model: "claude-sonnet-4-6",
+              max_tokens: 4096,
+              system: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary",
+              messages: [{ role: "user", content: $prompt }]
+            }' > request.json
+
+          echo "Calling Anthropic API (Claude)..."
+          HTTP_RESPONSE=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "Content-Type: application/json" \
+            --data @request.json)
+
+          echo "HTTP Status: $HTTP_CODE"
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Anthropic API request failed:"
+            cat "$HTTP_RESPONSE"
+            exit 1
+          fi
+
+          jq -r '.content[0].text // empty' "$HTTP_RESPONSE" \
+            | sed 's/```gherkin//g' \
+            | sed 's/```//g' \
+            > generated.feature
+
+          echo "MODEL_USED=Claude (claude-sonnet-4-6)" >> "$GITHUB_ENV"
+
+      # =========================
+      # Generate via OpenAI / GitHub Models
+      # =========================
+      - name: Generate feature via OpenAI (GitHub Models)
+        if: env.AI_MODEL == 'openai'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          jq -n \
+            --rawfile prompt prompt.txt \
+            '{
+              model: "openai/gpt-4.1",
+              temperature: 0,
+              messages: [
+                {
+                  role: "system",
+                  content: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary"
+                },
+                { role: "user", content: $prompt }
+              ]
+            }' > request.json
+
+          echo "Calling GitHub Models API (OpenAI)..."
+          HTTP_RESPONSE=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+            https://models.github.ai/inference/chat/completions \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            --data @request.json)
+
+          echo "HTTP Status: $HTTP_CODE"
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "GitHub Models API request failed:"
+            cat "$HTTP_RESPONSE"
+            exit 1
+          fi
+
+          jq -r '.choices[0].message.content // empty' "$HTTP_RESPONSE" \
+            | sed 's/```gherkin//g' \
+            | sed 's/```//g' \
+            > generated.feature
+
+          echo "MODEL_USED=OpenAI (gpt-4.1 via GitHub Models)" >> "$GITHUB_ENV"
+
+      # =========================
+      # Validate generated output
+      # =========================
+      - name: Validate generated feature
+        run: |
+          set -euo pipefail
+
+          echo "Model used: ${{ env.MODEL_USED }}"
+
+          if [ ! -s generated.feature ]; then
+            echo "generated.feature is empty"
+            exit 1
+          fi
+
+          if ! grep -q "^Feature:" generated.feature; then
+            echo "Invalid Gherkin: missing Feature block"
+            cat generated.feature
+            exit 1
+          fi
+
+          if ! grep -Eq "Scenario:|Scenario Outline:" generated.feature; then
+            echo "Invalid Gherkin: no Scenarios found"
+            cat generated.feature
+            exit 1
+          fi
+
+          echo "Validation passed"
+
+      # =========================
+      # Save feature file
+      # =========================
+      - name: Save feature file
+        run: |
+          set -euo pipefail
+          FILE="${{ inputs.jira_id }}.feature"
+          mkdir -p "$FEATURE_DIR"
+
+          awk '
+          /^(Scenario:|Scenario Outline:)/ {
+            if (prev != "@todo") print "@todo"
+            print $0; prev="@todo"; next
+          }
+          { prev=""; print }
+          ' generated.feature > "$FEATURE_DIR/$FILE"
+
+          if [ ! -s "$FEATURE_DIR/$FILE" ]; then
+            echo "Saved feature file is empty"
+            exit 1
+          fi
+
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
+
+      # =========================
+      # Commit and push
+      # =========================
+      - name: Commit & push
+        run: |
+          set -euo pipefail
+          git add "$FEATURE_DIR/${{ env.FILE }}"
+          git commit -m "feat(${{ inputs.jira_id }}): generate feature file via ${{ env.MODEL_USED }}" || true
+          git push origin "${{ env.BRANCH }}" --force
+
+      # =========================
+      # Create Pull Request
+      # =========================
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER=$(gh pr list --head "${{ env.BRANCH }}" --base main --json number --jq '.[0].number')
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Pull Request already exists: #$PR_NUMBER"
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head "${{ env.BRANCH }}" \
+            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
+            --body "Auto-generated BDD feature file from Jira ticket parameters.
+
+          **Model used:** ${{ env.MODEL_USED }}"
