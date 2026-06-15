@@ -58,7 +58,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Scenario Outline: Create and save HCP Explorer workspace by building audience using AI Configurator - <AI_PROMPT>
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -86,7 +86,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Scenario Outline: Create and save HCP Explorer workspace by applying filters one by one and validating NPI details are refined
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -115,7 +115,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Scenario Outline: Create and save HCP Explorer workspace using NPI Cross Filters
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -146,7 +146,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Top 20 IAB Categories      |
     And Verify that dashboard filters are displayed correctly in Filter section
     And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    Then Verify the "HCP Explorer" Workspace is saved
     And Verify dashboard filters are merged with Primary filters
     And Fetch and verify that NPI details are refined
     Examples:
@@ -157,7 +157,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Scenario Outline: Manage operations on Workspace - Rename, Duplication, and Delete on HCP Explorer workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -168,11 +168,11 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    Then Verify the "HCP Explorer" Workspace is saved
     And User clicks Edit button and updates workspace name to "<WORKSPACE_NAME_EDIT>"
     Then Verify the Workspace is updated with edited name
     And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    Then Verify the "HCP Explorer" Workspace is saved
     And Navigate to workspace dashboard
     And User searches the workspace created to perform Actions from More menu
     And User selects the "Rename" option by clicking More Actions menu
@@ -193,7 +193,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
   Scenario Outline: Validate Clinical and Contextual Recency filters in HCP Explorer workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -208,7 +208,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | IAB        | Arts & Entertainment | 1 Day   |
       | MeSH       | Anatomy              | 1 Week  |
     And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    Then Verify the "HCP Explorer" Workspace is saved
     Examples:
       | ADVERTISER | WORKSPACE_NAME |
       | Abbvie     | Explorer       |
