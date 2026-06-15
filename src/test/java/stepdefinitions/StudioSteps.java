@@ -348,7 +348,7 @@ public class StudioSteps {
         explorerWorkspace.saveExplorerWorkspace();
     }
 
-    @Then("Verify the HCP Explorer Workspace is saved")
+    @Then("Verify the {string} Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved() {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Save alert: {}", actualMessage);

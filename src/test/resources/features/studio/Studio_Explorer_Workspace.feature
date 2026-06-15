@@ -49,7 +49,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    Then Verify the "HCP Explorer" Workspace is saved
     Examples:
       | ADVERTISER | WORKSPACE_NAME |
       | Abbvie     | Explorer       |
