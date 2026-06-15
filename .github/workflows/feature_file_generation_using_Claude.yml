@@ -13,8 +13,8 @@ on:
         type: choice
         options:
           - ""
-          - claude
           - openai
+          - claude
           - gemini
         default: "claude"
 
