@@ -239,7 +239,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | NPI Age    | Below 25, 25 to 35, 35 to 45, 45 to 55, 55 to 65, 65 or Above |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Given This scenario will be executed in the "Pre-release" environment as a "External User"
     And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
     When External user Searches the "<WORKSPACE_NAME>" in studio application
