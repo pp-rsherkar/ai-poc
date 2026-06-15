@@ -164,7 +164,6 @@ public class ExplorerWorkspace {
     public void selectAdvertiser(String advertiser) {
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST);
         SEARCH_ADVERTISER.fill(advertiser);
-        //page.waitForTimeout(2000);
         assertThat(ADVERTISER_BUTTON).hasCount(1);
 
         for (int i = 0; i < ADVERTISER_BUTTON.count(); i++) {

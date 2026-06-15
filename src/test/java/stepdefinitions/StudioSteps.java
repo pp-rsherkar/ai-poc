@@ -1189,7 +1189,7 @@ public class StudioSteps {
     @Then("Verify Time Frame is selected as {string} by default in the workspace")
     public void verifyDefaultTimeFrameInTheWorkspace(String timeFrame) {
         logger.info("Verifying default Time Frame in the workspace");
-        String actualTimeFrame = brandExplorerWorkspace.getDefaultTimeFrame(timeFrame);
+        String actualTimeFrame = brandExplorerWorkspace.getDefaultTimeFrame();
         logger.info("Default Time Frame: {}", actualTimeFrame);
         Assert.assertEquals("Default Time Frame is not as expected", timeFrame, actualTimeFrame);
     }
