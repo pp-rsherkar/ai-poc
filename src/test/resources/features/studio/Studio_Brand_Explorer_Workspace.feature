@@ -13,7 +13,7 @@ Feature: Brand Explorer Workspace creation in Studio
   Scenario Outline: Create and save Brand Explorer workspace with specific filters
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on Brand Explorer workspace
+    And User clicks on "Brand Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     Then Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace

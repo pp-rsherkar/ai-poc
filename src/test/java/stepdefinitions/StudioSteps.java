@@ -240,17 +240,52 @@ public class StudioSteps {
         }
     */
 
-    @And("User clicks on HCP Explorer workspace")
-    public void user_clicks_on_hcp_explorer_workspace() {
-        logger.info("Selecting HCP Explorer workspace");
+//    @And("User clicks on HCP Explorer workspace")
+//    public void user_clicks_on_hcp_explorer_workspace() {
+//        logger.info("Selecting HCP Explorer workspace");
+//
+//        if (fetchedMetricNames.contains("HCP Explorer")) {
+//            String explorer = workspaceCreation.verifyHCPExplorer();
+//            logger.info("HCP Explorer permission: {}", explorer);
+//            Assert.assertEquals("HCP Explorer", explorer);
+//        }
+//
+//        workspaceCreation.clickHCPExplorerWorkspace();
+//    }
+//
+//    @And("User clicks on Brand Explorer workspace")
+//    public void userClicksOnBrandExplorerWorkspace() {
+//        logger.info("Selecting Brand Explorer workspace");
+//
+//        if (fetchedMetricNames.contains("Brand Explorer")) {
+//            String explorer = workspaceCreation.verifyBrandExplorer();
+//            logger.info("Brand Explorer permission: {}", explorer);
+//            Assert.assertEquals("Brand Explorer", explorer);
+//        }
+//
+//        workspaceCreation.clickBrandExplorerWorkspace();
+//    }
 
-        if (fetchedMetricNames.contains("HCP Explorer")) {
-            String explorer = workspaceCreation.verifyHCPExplorer();
-            logger.info("HCP Explorer permission: {}", explorer);
-            Assert.assertEquals("HCP Explorer", explorer);
+    @And("User clicks on {string} workspace")
+    public void userClicksOnWorkspace(String workspaceType) {
+        logger.info("Selecting {} workspace", workspaceType);
+
+        if (fetchedMetricNames.contains(workspaceType)) {
+            String explorer = switch (workspaceType) {
+                case "HCP Explorer" -> workspaceCreation.verifyHCPExplorer();
+                case "Brand Explorer" -> workspaceCreation.verifyBrandExplorer();
+                default -> throw new IllegalArgumentException("Unsupported workspace verification: " + workspaceType);
+            };
+
+            logger.info("{} permission: {}", workspaceType, explorer);
+            Assert.assertEquals(workspaceType, explorer);
         }
 
-        workspaceCreation.clickHCPExplorerWorkspace();
+        switch (workspaceType) {
+            case "HCP Explorer" -> workspaceCreation.clickHCPExplorerWorkspace();
+            case "Brand Explorer" -> workspaceCreation.clickBrandExplorerWorkspace();
+            default -> throw new IllegalArgumentException("Unsupported workspace click: " + workspaceType);
+        }
     }
 
     @And("User selects the advertiser {string}")
@@ -349,7 +384,7 @@ public class StudioSteps {
     }
 
     @Then("Verify the {string} Workspace is saved")
-    public void verify_the_hcp_explorer_workspace_is_saved() {
+    public void verify_the_hcp_explorer_workspace_is_saved(String workspaceType) {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
         logger.info("Save alert: {}", actualMessage);
         boolean isValid = actualMessage.equals("Workspace created successfully")
