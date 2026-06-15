@@ -20,7 +20,8 @@ public class BrandExplorerWorkspace {
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.BRAND_EXPLORER_CHART = WORKSPACE_FRAME.locator("//div[@class='recharts-responsive-container']");
         this.BRAND_EXPLORER_TABLE = WORKSPACE_FRAME.locator("//div[contains(@class,'Box')]//table");
-        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("//button[contains(@data-tour-id,'save-workspace-button')]//div[contains(text(),'Save')]");
+        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator(
+                "//button[contains(@data-tour-id,'save-workspace-button')]//div[contains(text(),'Save')]");
     }
 
     public void waitForDashboardLoad() {
