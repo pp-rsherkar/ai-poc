@@ -30,7 +30,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And User clicks on Ok and closes the filter popup
     #3
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     And Download button is enabled to the user
     #4
@@ -117,7 +117,7 @@ Feature: Create and Publish HCP Explorer Workspace in Studio and Verify in LIFE
     And Fetch and verify that NPI details are refined
     Then Delete the filter
     And Fetch and verify that NPI details are refined
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     And Navigate to workspace dashboard
     And User searches the workspace created to perform Actions from More menu

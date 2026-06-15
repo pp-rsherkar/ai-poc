@@ -25,7 +25,7 @@ Feature: E2E Workflow for Targeting a Studio HCP Explorer List in LIFE at the Ta
       | NPI Gender | Female   |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     And Download button is enabled to the user
     And User clicks on Publish NPI List

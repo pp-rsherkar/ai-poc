@@ -23,7 +23,7 @@ Feature: Studio Publish NPI List
       | NPI Gender | Female, Male, Unknown |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     Then Download button is enabled to the user
     And User clicks on Publish NPI List
@@ -50,7 +50,7 @@ Feature: Studio Publish NPI List
       | NPI Gender | Female, Male, Unknown |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     Then Download button is enabled to the user
     And User clicks on Publish NPI List

@@ -145,7 +145,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | Top 20 MeSH Categories     |
       | Top 20 IAB Categories      |
     And Verify that dashboard filters are displayed correctly in Filter section
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     And Verify dashboard filters are merged with Primary filters
     And Fetch and verify that NPI details are refined
@@ -167,11 +167,11 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | NPI Gender | Female, Male, Unknown |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     And User clicks Edit button and updates workspace name to "<WORKSPACE_NAME_EDIT>"
     Then Verify the Workspace is updated with edited name
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     And Navigate to workspace dashboard
     And User searches the workspace created to perform Actions from More menu
@@ -207,7 +207,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | FilterName | Option               | Recency |
       | IAB        | Arts & Entertainment | 1 Day   |
       | MeSH       | Anatomy              | 1 Week  |
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     Examples:
       | ADVERTISER | WORKSPACE_NAME |

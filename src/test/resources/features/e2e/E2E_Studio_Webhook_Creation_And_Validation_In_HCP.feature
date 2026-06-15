@@ -49,7 +49,7 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
     #5
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     Then Check the webhook icon is highlighted in green color
     #6
@@ -98,7 +98,7 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
     #6
-    And User saves the workspace
+    And User saves the "HCP Explorer" workspace
     Then Verify the "HCP Explorer" Workspace is saved
     Then Check the webhook icon is highlighted in green color
     #7
