@@ -30,7 +30,8 @@ public class BrandExplorerWorkspace {
     }
 
     public String getDefaultDimensions(String defaultDimension) {
-        Locator locator = WORKSPACE_FRAME.locator(String.format("//table//thead//th[@aria-selected='true']//p[normalize-space()='%s']", defaultDimension));
+        Locator locator = WORKSPACE_FRAME.locator(String.format(
+                "//table//thead//th[@aria-selected='true']//p[normalize-space()='%s']", defaultDimension));
         waitUtility.waitForLocatorVisible(locator);
         System.out.println("Default Dimension: " + locator.innerText().trim());
         return locator.innerText().trim();
