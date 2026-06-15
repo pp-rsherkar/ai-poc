@@ -38,7 +38,8 @@ public class BrandExplorerWorkspace {
     }
 
     public String getDefaultMetrics(String defaultMetric) {
-        Locator locator = WORKSPACE_FRAME.locator(String.format("//table//thead//th[@aria-selected='true']//p[normalize-space()='%s']", defaultMetric));
+        Locator locator = WORKSPACE_FRAME.locator(
+                String.format("//table//thead//th[@aria-selected='true']//p[normalize-space()='%s']", defaultMetric));
         waitUtility.waitForLocatorVisible(locator);
         System.out.println("Default Metric: " + locator.innerText().trim());
         return locator.innerText().trim();
