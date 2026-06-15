@@ -10,7 +10,7 @@ Feature: Brand Explorer Workspace creation in Studio
     And User navigates to Studio application
 
   @regression
-  Scenario Outline: Create and save Brand Explorer workspace with specific filters
+  Scenario Outline: Create and save Brand Explorer workspace with default selections
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
     And User clicks on "Brand Explorer" workspace
