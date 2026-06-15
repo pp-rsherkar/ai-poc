@@ -368,12 +368,12 @@ public class StudioSteps {
     @Then("Verify the {string} Workspace is saved")
     public void verify_the_hcp_explorer_workspace_is_saved(String workspaceType) {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Save alert: {}", actualMessage);
+        logger.info("Save alert for {} workspace: {}", workspaceType, actualMessage);
         boolean isValid = actualMessage.equals("Workspace created successfully")
                 || actualMessage.equals("Workspace saved successfully")
                 || actualMessage.equals(
                         "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
-        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
+        Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
 
