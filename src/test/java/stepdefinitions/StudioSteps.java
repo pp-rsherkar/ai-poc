@@ -243,11 +243,13 @@ public class StudioSteps {
         logger.info("Selecting {} workspace", workspaceType);
 
         if (fetchedMetricNames.contains(workspaceType)) {
-            String explorer = switch (workspaceType) {
-                case "HCP Explorer" -> workspaceCreation.verifyHCPExplorer();
-                case "Brand Explorer" -> workspaceCreation.verifyBrandExplorer();
-                default -> throw new IllegalArgumentException("Unsupported workspace verification: " + workspaceType);
-            };
+            String explorer =
+                    switch (workspaceType) {
+                        case "HCP Explorer" -> workspaceCreation.verifyHCPExplorer();
+                        case "Brand Explorer" -> workspaceCreation.verifyBrandExplorer();
+                        default -> throw new IllegalArgumentException(
+                                "Unsupported workspace verification: " + workspaceType);
+                    };
 
             logger.info("{} permission: {}", workspaceType, explorer);
             Assert.assertEquals(workspaceType, explorer);
