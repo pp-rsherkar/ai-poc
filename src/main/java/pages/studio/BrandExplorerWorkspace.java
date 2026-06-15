@@ -46,7 +46,8 @@ public class BrandExplorerWorkspace {
     }
 
     public String getDefaultTimeFrame() {
-        Locator locator = WORKSPACE_FRAME.locator("//div[.//p[normalize-space()='Time Frame']]//input[starts-with(@id,'listbox-input-')]");
+        Locator locator = WORKSPACE_FRAME.locator(
+                "//div[.//p[normalize-space()='Time Frame']]//input[starts-with(@id,'listbox-input-')]");
         waitUtility.waitForLocatorVisible(locator);
         System.out.println("Default TimeFrame: " + locator.innerText().trim());
         return locator.inputValue().trim();
