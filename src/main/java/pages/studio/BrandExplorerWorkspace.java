@@ -33,7 +33,6 @@ public class BrandExplorerWorkspace {
         Locator locator = WORKSPACE_FRAME.locator(String.format(
                 "//table//thead//th[@aria-selected='true']//p[normalize-space()='%s']", defaultDimension));
         waitUtility.waitForLocatorVisible(locator);
-        System.out.println("Default Dimension: " + locator.innerText().trim());
         return locator.innerText().trim();
     }
 
@@ -41,15 +40,13 @@ public class BrandExplorerWorkspace {
         Locator locator = WORKSPACE_FRAME.locator(
                 String.format("//table//thead//th[@aria-selected='true']//p[normalize-space()='%s']", defaultMetric));
         waitUtility.waitForLocatorVisible(locator);
-        System.out.println("Default Metric: " + locator.innerText().trim());
         return locator.innerText().trim();
     }
 
     public String getDefaultTimeFrame() {
         Locator locator = WORKSPACE_FRAME.locator(
-                "//div[.//p[normalize-space()='Time Frame']]//input[starts-with(@id,'listbox-input-')]");
+                "//p[normalize-space()='Time Frame']/following-sibling::div//input[starts-with(@id,'listbox-input-')]");
         waitUtility.waitForLocatorVisible(locator);
-        System.out.println("Default TimeFrame: " + locator.innerText().trim());
         return locator.inputValue().trim();
     }
 
