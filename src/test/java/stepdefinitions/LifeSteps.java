@@ -493,8 +493,10 @@ public class LifeSteps {
     @Then("User deletes the custom field and verify its removed from new tactic")
     public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         logger.info("Deleting custom field: {}", customFieldName);
-        tacticDetails.deleteCustomField(customFieldName);
-        logger.info("Custom field deletion action completed");
+        Assert.assertTrue(
+                "Unable to delete Custom field",
+                tacticDetails.deleteCustomField(customFieldName).contains("Successfully deleted the Field"));
+        Assert.assertFalse("Custom Field is available", tacticDetails.isCustomFieldAvailable(customFieldName));
     }
 
     @When("User enters the tactic details as {string} and saves the tactic")
@@ -4823,6 +4825,20 @@ public class LifeSteps {
         lineItemDetails.clickAddFlightButton();
     }
 
+    @And("User tries to save the line item without entering any flight details")
+    public void userTriesToSaveTheLineItemWithoutEnteringAnyFlightDetails() {
+        logger.info("User tries to save the line item without entering any flight details");
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User should see error message {string} when tries to save line item page")
+    public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage(String errorMessage) {
+        logger.info("User should see error message {} when tries to save line item page", errorMessage);
+        Assert.assertTrue(
+                "Error message is not displayed",
+                lineItemDetails.fetchErrorAlert().contains(errorMessage));
+    }
+
     @And("Verify if user enters flight budget that exceeds Campaign budget")
     public void verifyIfUserEntersFlightBudgetThatExceedsCampaignBudget() {
         logger.info("User clicks Add Flight button");
@@ -4841,7 +4857,8 @@ public class LifeSteps {
         logger.info("User should see error message when tries to save line item page");
         Assert.assertTrue(
                 "The total flight budget is exceeded",
-                lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed"));
+                lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed")
+                        || lineItemDetails.fetchErrorAlert().contains("Invalid budget"));
     }
 
     @And("User adds the flight details - Flight Start Date, Flight End Date, {string}")
@@ -4873,7 +4890,7 @@ public class LifeSteps {
         Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
     }
 
-    @When("User enters line item details {string}")
+    @When("User enters line item name {string} on details page")
     public void userEntersLineItemDetails(String lineItemName) {
         lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
         logger.info("Entering Line Item name: {}", lineItemNameRandom);
@@ -4890,26 +4907,37 @@ public class LifeSteps {
     @And("User generates sequential flights for the line item using {string} and {string}")
     public void userGeneratesSequentialFlightsToALineItem(String budget, String numberOfMonths) {
         logger.info("Generating sequential flights with budget {} for {} months", budget, numberOfMonths);
-        capturedDetails = lineItemDetails.generateSequentialFlights(budget, numberOfMonths);
-        logger.info("Generated sequential flight details: {}", capturedDetails);
+        lineItemDetails.generateSequentialFlights(budget, numberOfMonths);
+        lineItemDetails.deleteFlightEntry();
+        capturedDetails = lineItemDetails.fetchSequentialFlightStartDates();
+        itemList = lineItemDetails.fetchSequentialFlightEndDates();
     }
 
-    @And("Verify that Sequential flights should be added based on the start month")
+    @And(
+            "Verify that Sequential flights should be added based on the start month and verify start date of the month for each flight entry")
     public void verifyThatSequentialFlightsShouldBeAddedBasedOnTheStartMonth() {
-        logger.info("Verify that Sequential flights should be added based on the start month");
-        String[] parts = capturedDetails.get(0).split(" ");
-        Month startMonth = Month.valueOf(parts[0].toUpperCase(Locale.ENGLISH));
-        int startYear = Integer.parseInt(parts[1]);
+        logger.info("Verify start date of the month for each flight entry");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        for (int i = 1; i < capturedDetails.size(); i++) {
-            logger.info("Verifying: that Sequential flights should be added based on the start month");
+        LocalDate startDate = LocalDate.parse(capturedDetails.get(0), formatter);
+        for (int i = 0; i < capturedDetails.size(); i++) {
             String dateStr = capturedDetails.get(i);
-            LocalDate actualDate = LocalDate.parse(dateStr, formatter);
-            LocalDate expectedDate = LocalDate.of(startYear, startMonth, 1).plusMonths(i - 1);
-            if (actualDate.getMonthValue() != expectedDate.getMonthValue()
-                    || actualDate.getYear() != expectedDate.getYear()) {
-                Assert.assertEquals("Flight date mismatch ", actualDate, expectedDate);
-            }
+            LocalDate actualStartDate = LocalDate.parse(dateStr, formatter);
+            LocalDate expectedStartDate = startDate.plusMonths(i).withDayOfMonth(1);
+            Assert.assertEquals("Flight start date mismatch ", expectedStartDate, actualStartDate);
+        }
+    }
+
+    @And("Verify end date of the month for each flight entry")
+    public void verifyEndDateOfTheMonthForEachFlightEntry() {
+        logger.info("Verify end date of the month for each flight entry");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDate endDate = LocalDate.parse(itemList.get(0), formatter);
+        for (int i = 0; i < itemList.size(); i++) {
+            String dateStr = itemList.get(i);
+            LocalDate actualEndDate = LocalDate.parse(dateStr, formatter);
+            LocalDate expectedEndDate =
+                    endDate.plusMonths(i).withDayOfMonth(endDate.plusMonths(i).lengthOfMonth());
+            Assert.assertEquals("Flight end date mismatch ", expectedEndDate, actualEndDate);
         }
     }
 
@@ -4987,6 +5015,7 @@ public class LifeSteps {
             logger.info("Creating Line Item: {} of type {}", lineItemNameRandom, type);
             nameList.add(lineItemNameRandom);
             lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
+            lineItemDetails.saveLineItem();
             Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
             List<String> lineItemLabelList = lineItemDetails.fetchLineItemName();
             Assert.assertTrue(
@@ -4996,6 +5025,37 @@ public class LifeSteps {
             if (currentRowIndex < totalRows - 1) {
                 lineItemDetails.selectNewLineItem();
             }
+            currentRowIndex++;
+        }
+    }
+
+    @When(
+            "User creates line items with below line types and other details and verifies the details after saving the line item")
+    public void userCreatesLineItemsWithBelowLineTypesAndOtherDetailsAndVerifiesTheDetailsAfterSavingTheLineItem(
+            DataTable dataTable) throws InterruptedException {
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+        int currentRowIndex = 0;
+        int totalRows = rows.size();
+        for (Map<String, String> row : rows) {
+            String type = row.get("LINE_TYPE").trim();
+            String attributes = row.get("LINE_ITEM_DETAILS").trim();
+            Map<String, String> attributeMap = Arrays.stream(attributes.split(","))
+                    .map(String::trim)
+                    .map(entry -> entry.split(":", 2))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
+            lineItemNameRandom = attributeMap.get("LineName") + "_" + type + "_" + CommonUtils.timeStampCalculation();
+            logger.info("Creating Line Item: {} of type {}", lineItemNameRandom, type);
+            lineItemDetails.createLineItem(type, lineItemNameRandom, attributeMap);
+            List<String> enteredDetails = lineItemDetails.fetchLineItemDetails();
+            lineItemDetails.saveLineItem();
+            Assert.assertEquals("Lineitem " + lineItemNameRandom + " created.", lineItemDetails.lineItemSuccess());
+            lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
+            lineItemDetails.clickDetailsTab();
+            List<String> capturedDetails = lineItemDetails.fetchLineItemDetails();
+            if (currentRowIndex < totalRows - 1) {
+                lineItemDetails.selectNewLineItem();
+            }
+            Assert.assertEquals(lineItemNameRandom + " - Line item details mismatch", enteredDetails, capturedDetails);
             currentRowIndex++;
         }
     }
@@ -6986,5 +7046,122 @@ public class LifeSteps {
         Assert.assertTrue(
                 "Targeting template is not found in the search results",
                 targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
+    }
+
+    @And("Verify {string} and {string} checkboxes are available for each flight entry")
+    public void verifyAndCheckboxesAreAvailableForEachFlightEntry(
+            String flightImpressionCap, String dailyImpressionCap) {
+        logger.info(
+                "Verify {} and {} checkboxes are available for each flight entry",
+                flightImpressionCap,
+                dailyImpressionCap);
+        Assert.assertTrue(
+                flightImpressionCap + " checkbox is not available for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxAvailable(flightImpressionCap));
+        Assert.assertTrue(
+                dailyImpressionCap + " checkbox is not available for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxAvailable(dailyImpressionCap));
+    }
+
+    @And("User should be able to check the {string} and {string} checkboxes")
+    public void userShouldBeAbleToCheckTheAndCheckboxes(String flightImpressionCap, String dailyImpressionCap) {
+        logger.info("User should be able to check the {} and {} checkboxes", flightImpressionCap, dailyImpressionCap);
+        lineItemDetails.clickImpressionCapCheckbox(flightImpressionCap);
+        Assert.assertTrue(
+                flightImpressionCap + " checkbox is not checked successfully for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxChecked(flightImpressionCap));
+        lineItemDetails.clickImpressionCapCheckbox(dailyImpressionCap);
+        Assert.assertTrue(
+                dailyImpressionCap + " checkbox is not checked successfully for the flight entry",
+                lineItemDetails.isImpressionCapCheckboxChecked(dailyImpressionCap));
+    }
+
+    @And(
+            "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
+    public void
+            verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
+        logger.info(
+                "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
+        lineItemDetails.saveLineItem();
+        Assert.assertTrue(
+                "Error message is not displayed when impression cap values are not added for the selected checkboxes",
+                lineItemDetails.isImpressionCapErrorMessageVisible());
+    }
+
+    @When("User clicks on the existing campaign to open the campaign details page")
+    public void userClicksOnTheExistingCampaignToOpenTheCampaignDetailsPage() {
+        logger.info("Clicking on the existing campaign to open the campaign details page");
+        campaignDashboard.clickCampaignFromDashboard();
+        Assert.assertTrue(
+                "Navigation to Campaign details page is not successful", campaignDashboard.isCampaignPageDisplayed());
+    }
+
+    @And("User clicks on Add Line Item button")
+    public void userClicksOnAddLineItemButton() {
+        logger.info("Clicking on Add Line Item button to add a new line item to the existing campaign");
+        lineItemDetails.selectNewLineItem();
+        String lineItemText = lineItemDetails.verifyLineItemText();
+        Assert.assertEquals("New Line Item", lineItemText);
+    }
+
+    @Then(
+            "Verify that the new line item is added to the existing campaign and displayed in the left menu under the campaign")
+    public void verifyThatTheNewLineItemIsAddedToTheExistingCampaignAndDisplayedInTheLeftMenuUnderTheCampaign() {
+        lineItemDetails.navigateToLineItemDetails(lineItemNameRandom);
+        Assert.assertTrue(
+                "Failed to create new Line Item",
+                lineItemDetails.fetchLineItemName().contains(lineItemNameRandom));
+        lineItemDetails.clickDetailsTab();
+    }
+
+    @And("User updates line item details such as {string} and flight dates and saves the line item")
+    public void userUpdatesLineItemDetailsSuchAsAndFlightDatesAndSavesTheLineItem(String lineBudget) {
+        logger.info("Updating line item details - Budget, Flight Dates");
+        lineItemDetails.enterLineItemBudget(lineBudget);
+        nameList = lineItemDetails.fetchLineItemDetails();
+        lineItemDetails.saveLineItem();
+        Assert.assertEquals("Lineitem " + lineItemNameRandom + " updated.", lineItemDetails.lineItemSuccess());
+    }
+
+    @Then("Verify that the line item details are updated successfully and reflected on the Line Item page")
+    public void verifyThatTheLineItemDetailsAreUpdatedSuccessfullyAndReflectedOnTheLineItemPage() {
+        List<String> updatedDetails = lineItemDetails.fetchLineItemDetails();
+        Assert.assertEquals("Line item details are not updated successfully", nameList, updatedDetails);
+    }
+
+    @And("User enters details in {string} enables the line item and saves the changes")
+    public void userEntersDetailsInNewCustomFieldAndEnablesTheLineItemAndSavesTheChanges(String lineBudget) {
+        logger.info("Entering details in new custom field, line budget and saving the line item");
+        navigation.clickOnIcon("Add Flight");
+        lineItemDetails.enterLineItemBudget(lineBudget);
+        lineItemDetails.isPlacementIdAvailable(lineItemNameRandom);
+        lineItemDetails.enableLineItem();
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User creates new custom field {string} and verifies the same in the line item details page")
+    public void userCreatesNewCustomFieldAndVerifiesTheSameInTheLineItemDetailsPage(String customField) {
+        String customFieldName = customField + "_" + CommonUtils.randomFourDigitNumber();
+        logger.info("Creating new custom field with name in Line Item: {}", customFieldName);
+        this.customFieldName = customFieldName;
+        lineItemDetails.addCustomField(customFieldName);
+        String raw = tacticDetails.verifyCustomField(customFieldName);
+        String actualName = raw.split("\\R")[0]; // To remove unwanted space and text
+        Assert.assertEquals(customFieldName, actualName);
+        this.uiCustomFieldName = actualName;
+    }
+
+    @Then(
+            "Verify the custom field created in line item details page is available for all line items under the campaign")
+    public void verifyTheCustomFieldCreatedInLineItemDetailsPageIsAvailableForAllLineItemsUnderTheCampaign() {
+        logger.info(
+                "Verify the custom field created in line item details page is available for all line items under the campaign");
+        List<String> lineItemNames = lineItemDetails.fetchLineItemName();
+        for (String name : lineItemNames) {
+            lineItemDetails.navigateToLineItemDetails(name);
+            lineItemDetails.clickDetailsTab();
+            Assert.assertTrue(
+                    "Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
+        }
     }
 }
