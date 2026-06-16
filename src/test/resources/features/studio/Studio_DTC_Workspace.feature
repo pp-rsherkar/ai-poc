@@ -17,7 +17,7 @@ Feature: DTC Workspace creation in Studio
   Scenario: Create DTC workspace based on Unique Consumers
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "DTC Workspace"
+    And And User clicks on "DTC Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And User applies the filter and selects option

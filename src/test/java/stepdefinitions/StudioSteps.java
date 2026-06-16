@@ -1147,4 +1147,52 @@ public class StudioSteps {
                 "Search box is not cleared",
                 workspaceCreation.getSearchedWorkspaceName().isEmpty());
     }
+
+    @And("User clicks on {string} workspace")
+    public void userClicksOnWorkspace(String workspaceType) {
+        //Implementation in progress
+    }
+
+    @Then("Verify the DTC Workspace is saved")
+    public void verifyTheDTCWorkspaceIsSaved() {
+        //Implementation in progress
+    }
+
+    @When("User attempts to publish the workspace")
+    public void userAttemptsToPublishTheWorkspace() {
+        //Implementation in progress
+    }
+
+    private long uniqueConsumersCount;
+
+    @Then("User captures the {string} count")
+    public void userCapturesTheCount(String metricName) {
+        //Implementation in progress
+    }
+
+    @Then("Verify whether the {string} count is greater than or equals to {int}")
+    public void verifyWhetherTheCountIsGreaterThanOrEqualsTo(String metricName, int expectedCount) {
+        //Implementation in progress
+    }
+
+    @And("User clicks on Submit button")
+    public void userClicksOnSubmitButton() {
+        //Implementation in progress
+    }
+
+    @Then("Verify the dialog message as {string}")
+    public void verifyTheDialogMessageAs(String expectedMessage) {
+        //Implementation in progress
+    }
+
+    @When("User navigates to Workspace Management page")
+    public void userNavigatesToWorkspaceManagementPage() {
+        //Implementation in progress
+    }
+
+    @Then("Verify the workspace status as {string}")
+    public void verifyTheWorkspaceStatusAs(String expectedStatus) {
+        //Implementation in progress
+    }
 }
+
