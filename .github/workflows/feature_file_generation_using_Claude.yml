@@ -1,4 +1,4 @@
-name: JIRA - Feature File (GHERKIN) Generator USING CLAUDE
+name: JIRA - Feature File (GHERKIN) Generator Using AI Models
 
 on:
   workflow_dispatch:
