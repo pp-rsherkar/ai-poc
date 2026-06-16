@@ -253,9 +253,10 @@ jobs:
           EOF
 
           jq -n \
+            --arg model "${{ inputs.llm_model }}" \
             --rawfile prompt prompt.txt \
             '{
-              model: "openai/gpt-4.1",
+              model: "${{ inputs.llm_model }}",
               temperature: 0,
               messages: [
                 {
