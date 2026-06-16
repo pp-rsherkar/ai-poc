@@ -47,8 +47,8 @@ Feature: LIFE Regression - Create a Report Template
     And User deletes the created template
     Then Verify the template is deleted and not displayed in the template list
     Examples:
-      | TEMPLATE NAME         | DIMENSIONS                                                                                                           | METRICS                                                          |
-      | MultiCategoryTemplate | Advertiser Name, Campaign Name, NPI First Name, Device Type, Area code, Keywords, Deal Name, Age, Current Step Name, | Impressions, Clicks, Platform Fee, Complete Views, Midpoint Rate |
+      | TEMPLATE NAME         | DIMENSIONS                                                                                                          | METRICS                                                          |
+      | MultiCategoryTemplate | Advertiser Name, Campaign Name, NPI First Name, Device Type, Area code, Keywords, Deal Name, Age, Current Step Name | Impressions, Clicks, Platform Fee, Complete Views, Midpoint Rate |
 
   @regression
   Scenario Outline: Verify that user is able to delete the existing report template
