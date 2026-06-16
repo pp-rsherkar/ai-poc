@@ -6,6 +6,7 @@ import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import java.util.*;
+import java.util.stream.Collectors;
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -82,7 +83,7 @@ public class TacticDetails {
     private final Locator CONNECTION_LOCATOR;
     private final Locator VALUE_LOCATOR;
     public List<String> SHOW_EXPRESSION_RAW_VALUES;
-    List<String> SHOW_EXPRESSIOIN_VALUES;
+    List<String> showExpressionValues;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -244,7 +245,7 @@ public void fetchShowExpressionValues() {
 
     SHOW_EXPRESSION_RAW_VALUES = new ArrayList<>(values); // preserve raw for connector assertion
     // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
-    SHOW_EXPRESSIOIN_VALUES = values.stream()
+    showExpressionValues = values.stream()
             .filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR"))
             .distinct()
             .collect(Collectors.toList());
@@ -286,7 +287,7 @@ public void fetchShowExpressionValues() {
                     break;
             }
         }
-        return SHOW_EXPRESSIOIN_VALUES.equals(ruleTypeExpressions);
+        return showExpressionValues.equals(ruleTypeExpressions);
     }
 
     public boolean verifyShowExpressionValues(String ruleType) {

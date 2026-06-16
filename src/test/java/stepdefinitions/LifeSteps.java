@@ -12,6 +12,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,6 +25,7 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6408,16 +6410,6 @@ public class LifeSteps {
         tacticDetails.clickSettingsTab();
     }
 
-    @Then("User clicks on Show Expression and verifies if the displayed expression {string} {string}")
-    public void userClicksOnShowExpressionAndVerifiesIfTheDisplayedExpressionContains(String validation, String ruleType) {
-        logger.info("User clicks on Show Expression and verifies if the displayed expression contains {}", ruleType);
-        if (validation.contains("contains")) {
-            Assert.assertTrue("Expression doesn't contain " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
-        } else if (validation.contains("doesn't contain")) {
-            Assert.assertFalse("Expression contains " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
-        }
-    }
-
     @Then("The user clicks on show expression tab and fetch the values displayed")
     public void The_user_clicks_on_show_expression_tab_and_fetch_the_values_displayed() {
         tacticDetails.clickShowExpressionButton();
@@ -6444,19 +6436,6 @@ public class LifeSteps {
         logger.info("Removing targeting rule type: {}", ruleType);
         tacticDetails.removeTargetingRule(ruleType);
         tacticSettings.saveTacticSettings();
-    }
-
-    @Then("User clicks on Show Expression and verifies if the displayed expression does not contain {string}")
-    public void userClicksOnShowExpressionAndVerifiesIfTheDisplayedExpressionDoesNotContain(String ruleType) {
-        logger.info("Clicking Show Expression and verifying expression does not contain: {}", ruleType);
-        Assert.assertTrue("Expression doesn't contain " + ruleType, tacticDetails.verifyShowExpressionValues(ruleType));
-    }
-
-    private String getDisplayLabel(String ruleType) {
-        Map<String, String> labelMap = Map.of(
-                "behavioral segment", "Behavioral",
-                "health population", "Health");
-        return labelMap.getOrDefault(ruleType.toLowerCase(), ruleType);
     }
 
     @Then("User verifies that forecast data is unavailable when no targeting rules are applied")
@@ -7240,7 +7219,7 @@ public class LifeSteps {
     @And(
             "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
     public void
-            verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
+    verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
         logger.info(
                 "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
         lineItemDetails.saveLineItem();
