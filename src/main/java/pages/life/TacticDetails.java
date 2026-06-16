@@ -225,23 +225,28 @@ public class TacticDetails {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-    public void fetchShowExpressionValues() {
-        waitUtility.waitForLocatorVisible(VALUE_LOCATOR.first());
-        int valueCount = VALUE_LOCATOR.count();
-        List<String> values = new ArrayList<>(valueCount);
-        for (int i = 0; i < valueCount; i++) {
-            Locator connector = CONNECTION_LOCATOR.nth(i);
-            Locator value = VALUE_LOCATOR.nth(i);
-            values.add(connector.innerText());
-            values.add(value.innerText());
+public void fetchShowExpressionValues() {
+    waitUtility.waitForLocatorVisible(VALUE_LOCATOR.first());
+    int valueCount = VALUE_LOCATOR.count();
+    int connectorCount = CONNECTION_LOCATOR.count();
+    List<String> values = new ArrayList<>(valueCount * 2);
+
+    for (int i = 0; i < valueCount; i++) {
+        if (i < connectorCount) {
+            values.add(CONNECTION_LOCATOR.nth(i).innerText().trim());
+        } else {
+            values.add("");
         }
-        SHOW_EXPRESSION_RAW_VALUES = new ArrayList<>(values); // preserve raw for connector assertion
-        // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
-        SHOW_EXPRESSIOIN_VALUES = values.stream()
-                .filter(v -> !v.isBlank() && !v.equals("AND") && !v.equals("OR"))
-                .distinct()
-                .collect(Collectors.toList());
+        values.add(VALUE_LOCATOR.nth(i).innerText().trim());
     }
+
+    SHOW_EXPRESSION_RAW_VALUES = new ArrayList<>(values); // preserve raw for connector assertion
+    // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
+    SHOW_EXPRESSIOIN_VALUES = values.stream()
+            .filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR"))
+            .distinct()
+            .collect(Collectors.toList());
+}
 
     public boolean assertShowExpressionConnectorLogic(List<String> rawValues) {
         // Keywords are at odd indices (1, 3, 5, ...), connectors at even indices (2, 4, 6, ...)
