@@ -86,6 +86,7 @@ public class TacticSettings {
     private final Locator MANAGEMENT_FEE_LABEL_VALUE;
     private final Locator MANAGEMENT_FEE_OVERRIDE;
     private final Locator MANAGEMENT_FEE_OPTIONS;
+    private final Locator NEW_TARGETING_RULE_BUTTON;
     final Locator PERCENT_TYPE_FEE_INPUT;
     final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
@@ -193,6 +194,7 @@ public class TacticSettings {
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
         this.DOLLAR_TYPE_FEE_INPUT = page.locator(
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
+        this.NEW_TARGETING_RULE_BUTTON = page.locator("//span[text()='New Targeting Rule']");
     }
 
     public String verifyTacticSettingsText() {
@@ -977,51 +979,18 @@ public class TacticSettings {
         NEW_TACTIC.click();
     }
 
-    public void expandAllTargetingRules321() {
-        waitUtility.waitUntilSpinnerHidden();
-
-        int maxAttempts = Math.max(6, EXPAND_TARGETING_ICONS.count() + 2);
-        int attempts = 0;
-
-        while (attempts < maxAttempts) {
-            int currentCount = EXPAND_TARGETING_ICONS.count();
-
-            if (currentCount == 0) {
-                break;
-            }
-
-            Locator firstIcon = EXPAND_TARGETING_ICONS.first();
-
-            try {
-                firstIcon.scrollIntoViewIfNeeded();
-                firstIcon.click();
-
-                page.waitForFunction(
-                        "prev => document.querySelectorAll('i.gaExpandTargeting').length < prev",
-                        currentCount,
-                        new Page.WaitForFunctionOptions().setTimeout(2000));
-
-            } catch (Exception e) {
-                int newCount = EXPAND_TARGETING_ICONS.count();
-                if (newCount == currentCount) {
-                    // Count didn't decrease, move to next attempt
-                }
-            }
-
-            attempts++;
-        }
-    }
-
     public void expandAllTargetingRules() {
-        waitUtility.waitUntilSpinnerHidden();
-        List<ElementHandle> icons = EXPAND_TARGETING_ICONS.elementHandles();
-        for (ElementHandle icon : icons) {
-            try {
-                icon.scrollIntoViewIfNeeded();
-                icon.click();
-            } catch (Exception e) {
-                // Continue with the next icon if this one fails to click
-            }
+        waitUtility.waitForLocatorVisible(NEW_TARGETING_RULE_BUTTON);
+        System.out.println("Collapsed icons on return: " + EXPAND_TARGETING_ICONS.count());
+
+        int safetyLimit = 50;
+        int expanded = 0;
+
+        while (EXPAND_TARGETING_ICONS.count() > 0 && expanded < safetyLimit) {
+            Locator icon = EXPAND_TARGETING_ICONS.first();
+            icon.scrollIntoViewIfNeeded();
+            icon.click();
+            expanded++;
         }
     }
 }

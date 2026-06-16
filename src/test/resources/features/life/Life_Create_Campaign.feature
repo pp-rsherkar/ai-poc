@@ -195,7 +195,6 @@ Feature: LIFE Regression - Create a Campaign
       | Operating System  | Windows, macOS, Linux, Blackberry, iOS, Android, Mobile                                                                                                                                                |
       | Brand Suitability | Unknown Brand Safety, Highly Illicit Do Not Monetize                                                                                                                                                   |
       | Ethnicity         | African American, American Indian                                                                                                                                                                      |
-      | NPI               | AutoSmartList954103283, ATTRIBUTE_20260430_235013, STATIC_NPI_20260430_133910, Auto_Imported_20260426_235032, NPI_LIST_20260514_123551, PRESCRIBED_DRUG_NPI_20250831_132854, SMART_NPI_20251224_190216 |
     Then Verify the configured targeting rules
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
