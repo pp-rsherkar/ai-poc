@@ -55,6 +55,8 @@ public class LifeSteps {
     static String userType;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
+    List<Object> keyBidType = new ArrayList<>();
+    List<Object> keyBidValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
     Map<String, List<String>> rulesMap = new LinkedHashMap<>();
     List<String> nameList = new ArrayList<>();
@@ -4873,7 +4875,7 @@ public class LifeSteps {
         Assert.assertEquals("Flight overlap with other flights.", lineItemDetails.fetchInlineErrorMessage());
     }
 
-    @When("User enters line item details {string}")
+    @When("User enters line item name {string} on details page")
     public void userEntersLineItemDetails(String lineItemName) {
         lineItemNameRandom = lineItemName + CommonUtils.timeStampCalculation();
         logger.info("Entering Line Item name: {}", lineItemNameRandom);

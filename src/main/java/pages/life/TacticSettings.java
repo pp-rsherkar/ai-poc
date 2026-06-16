@@ -1088,7 +1088,7 @@ public class TacticSettings {
 
     public void fetchBidRulesTypesCount(int expectedBidCount) {
         Locator target = FETCH_BID_MULTIPLIER_RULE_TYPES.nth(expectedBidCount - 1);
-        target.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(2000));
+        waitUtility.waitForLocatorVisible(target);
     }
 
     public List<Object> fetchBidRulesTypes() {
