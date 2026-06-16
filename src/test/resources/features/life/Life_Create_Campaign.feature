@@ -196,6 +196,7 @@ Feature: LIFE Regression - Create a Campaign
       | Brand Suitability | Unknown Brand Safety, Highly Illicit Do Not Monetize                                                                                                                                                   |
       | Ethnicity         | African American, American Indian                                                                                                                                                                      |
     Then Verify the configured targeting rules
+    And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
     When User saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     When User navigates back to settings tab from creatives tab

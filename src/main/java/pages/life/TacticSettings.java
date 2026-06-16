@@ -981,7 +981,7 @@ public class TacticSettings {
 
     public void expandAllTargetingRules() {
         waitUtility.waitForLocatorVisible(NEW_TARGETING_RULE_BUTTON);
-        int safetyLimit = 50;
+        int safetyLimit = EXPAND_TARGETING_ICONS.count();
         int expanded = 0;
 
         while (EXPAND_TARGETING_ICONS.count() > 0 && expanded < safetyLimit) {
