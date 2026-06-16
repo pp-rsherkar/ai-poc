@@ -1155,17 +1155,15 @@ public class StudioSteps {
         explorerWorkspace.selectDraftOption(draftOption);
     }
 
-    @And("{string} logs out from the {string} application")
-    public void logsOutFromTheApplication(String arg0, String arg1) {
+    @And("Internal user logs out from the application")
+    public void internalUserLogsOutFromTheApplication() {
         accounts.internalUserLogout();
     }
 
-    @And("{string} switch the {string} account in Studio application")
-    public void switchTheAccountInStudioApplication(String arg0, String accountName) {
-        if (!accountName.contains("PP Engineering team")) {
+    @And("External User switches the {string}account in Studio application")
+    public void externalUserSwitchesTheAccountInStudioApplication(String accountName) {
             accounts.externalUserSwitchAccount(accountName);
             logger.info("Switching account in Studio application to: {}", accountName);
-        }
     }
 
     @When("External user Searches the workspace name in studio application with {string} draft option")

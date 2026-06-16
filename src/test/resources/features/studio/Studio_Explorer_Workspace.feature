@@ -226,7 +226,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | WORKSPACE_TYPE | ADVERTISER | CREATED_BY                     |
       | HCP Explorer   | Abbvie     | ppqa_automation@pulsepoint.com |
 
-  @np
+  @regression
   Scenario Outline: Create and save a Draft workspace with specific filters and verify visibility with External User
     When User clicks on Create New Workspace
     And User clicks on HCP Explorer workspace
@@ -240,9 +240,10 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     And User selects the Draft option as "<DRAFT_OPTION>"
     And User saves the workspace
     Then Verify the HCP Explorer Workspace is saved
-    And "Internal user" logs out from the "Studio" application
+    And Internal user logs out from the application
     Given This scenario will be executed in the "Pre-release" environment as a "External User"
     And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
+    #And External User switches the "<ACCOUNT_NAME>"account in Studio application -- commiting this step for future changes, if pp engineering test account does not appears in external user account list in studio application
     When External user Searches the workspace name in studio application with "<DRAFT_OPTION>" draft option
     Then External user Verifies whether the workspace with "<DRAFT_OPTION>" is visible in workspace management page
     Examples:
