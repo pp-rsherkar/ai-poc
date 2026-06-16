@@ -22,5 +22,5 @@ Feature: Brand Explorer Workspace creation in Studio
     And User saves the "Brand Explorer" workspace
     Then Verify the "Brand Explorer" Workspace is saved
     Examples:
-      | ADVERTISER         | WORKSPACE_NAME |
-      | TAMTESTING ACCOUNT | Brand_Explorer |
+      | ADVERTISER         | WORKSPACE_NAME            |
+      | TAMTESTING ACCOUNT | Automation_Brand_Explorer |
