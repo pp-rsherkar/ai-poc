@@ -474,7 +474,7 @@ public class ExplorerWorkspace {
     }
 
     public void selectDraftOption(String DraftOption) {
-        Locator DRAFT_OPTION = WORKSPACE_FRAME.locator(String.format("//div[@class='Space-sc-paugcr-0 eZDdYC' and contains(text(), '%s')]", DraftOption));
+        Locator DRAFT_OPTION = WORKSPACE_FRAME.locator(String.format("//button/div[text()='%s']", DraftOption));
         DRAFT_OPTION.click();
     }
 }

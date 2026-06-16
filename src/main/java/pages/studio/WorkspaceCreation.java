@@ -117,7 +117,7 @@ public class WorkspaceCreation {
         this.BACK_ARROW = WORKSPACE_FRAME.locator("//button[@color='textPrimary']");
         this.AI_PANEL = page.locator("//div[@class='ai-assistant-panel open']");
         this.AI_PANEL_CLOSE_BUTTON = page.locator("//button[@aria-label='Close AI Assistant' and @class='ai-icon-btn']");
-        this.ABSENT_WORKSPACE=WORKSPACE_FRAME.locator(("//p[text()='Nothing Found...']"));WORKSPACE_FRAME.locator(("//p[text()='Nothing Found...']"));
+        this.ABSENT_WORKSPACE=WORKSPACE_FRAME.locator(("//p[text()='Nothing Found...']"));
     }
 
     public String studioDashboard() {

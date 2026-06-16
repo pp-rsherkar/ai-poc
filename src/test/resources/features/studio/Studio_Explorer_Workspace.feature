@@ -226,7 +226,7 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
       | WORKSPACE_TYPE | ADVERTISER | CREATED_BY                     |
       | HCP Explorer   | Abbvie     | ppqa_automation@pulsepoint.com |
 
-  @regression
+  @regression1
   Scenario Outline: Create and save a Draft workspace with specific filters and verify visibility with External User
     When User clicks on Create New Workspace
     And User clicks on HCP Explorer workspace
