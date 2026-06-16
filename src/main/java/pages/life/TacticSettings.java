@@ -981,8 +981,6 @@ public class TacticSettings {
 
     public void expandAllTargetingRules() {
         waitUtility.waitForLocatorVisible(NEW_TARGETING_RULE_BUTTON);
-        System.out.println("Collapsed icons on return: " + EXPAND_TARGETING_ICONS.count());
-
         int safetyLimit = 50;
         int expanded = 0;
 
