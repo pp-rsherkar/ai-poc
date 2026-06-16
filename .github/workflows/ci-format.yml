@@ -27,7 +27,7 @@ jobs:
 
       - name: Run Spotless apply
         # We run 'apply' instead of 'check' so that the files are actually fixed locally
-        run: mvn -B -ntp spotless:apply
+        run: mvn -B -ntp spotless:apply -Dspotless.ratchetFrom=origin/main
 
       - name: Suggest formatting changes
         # This action takes any changed files in the workspace and converts
@@ -40,4 +40,4 @@ jobs:
       - name: Fail build if formatting was incorrect
         # We still want the check to fail if changes were needed,
         # so the PR cannot be merged until the suggestions are applied.
-        run: mvn -B -ntp spotless:check
+        run: mvn -B -ntp spotless:check -Dspotless.ratchetFrom=origin/main

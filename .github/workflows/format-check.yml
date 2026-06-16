@@ -1,12 +1,12 @@
 name: Weekly format check
 
-# Runs every Wednesday at 3:00 PM IST and verifies formatting across the repo using Spotless.
+# Runs every Sunday at 3:00 PM IST and verifies formatting across the repo using Spotless.
 # If anything is mis-formatted, it auto-applies the fixes and opens a pull
 # request so reviewers can approve the changes.
 on:
   schedule:
-    # 3:00 PM IST every Wednesday (IST is UTC+5:30, so Wednesday 09:30 UTC)
-    - cron: "30 9 * * 3"
+    # 3:00 PM IST every Sunday (IST is UTC+5:30, so Sunday 09:30 UTC)
+    - cron: "30 9 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -21,6 +21,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up JDK 21
@@ -52,3 +53,7 @@ jobs:
           labels: |
             automated
             formatting
+          add-paths: |
+            src/
+            pom.xml
+            .github/

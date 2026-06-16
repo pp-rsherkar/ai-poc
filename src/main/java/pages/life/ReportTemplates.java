@@ -6,15 +6,14 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-import utils.ExcelActions;
-import utils.WaitUtility;
-
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import utils.ExcelActions;
+import utils.WaitUtility;
 
 public class ReportTemplates {
     private final Page page;
@@ -56,9 +55,12 @@ public class ReportTemplates {
     public ReportTemplates(Page page) {
         this.page = page;
         this.REPORT_TEMPLATE_LINK = page.locator("//div[normalize-space(text())='Report Templates']");
-        this.VERIFY_TEMPLATES_TAB = page.locator("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'templates')]");
-        this.VERIFY_GENERATED_REPORTS_TAB = page.locator("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'generated reports')]");
-        this.VERIFY_SCHEDULING_TAB = page.locator("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'scheduling')]");
+        this.VERIFY_TEMPLATES_TAB = page.locator(
+                "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'templates')]");
+        this.VERIFY_GENERATED_REPORTS_TAB = page.locator(
+                "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'generated reports')]");
+        this.VERIFY_SCHEDULING_TAB = page.locator(
+                "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'scheduling')]");
         this.NEW_TEMPLATE = page.locator("//button[normalize-space(text())='New Template']");
         this.REPORT_DIMENSIONS = page.locator("//div[normalize-space(text())='Dimensions']");
         this.REPORT_METRICS = page.locator("//div[normalize-space(text())='Metrics']");
@@ -70,15 +72,18 @@ public class ReportTemplates {
         this.VERIFY_DIMENSION = page.locator("//sortable-item[contains(@class,'diemension')]");
         this.VERIFY_METRIC = page.locator("//sortable-item[contains(@class,'metric')]");
         this.SAVE_TEMPLATE = page.locator("//button[normalize-space(text())='Save']");
-        this.TEMPLATE_SUCCESS = page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
+        this.TEMPLATE_SUCCESS =
+                page.locator("//div[@role='alert' and contains(text(),'Template created successfully')]");
         this.SEARCH_TEMPLATE = page.locator("//input[contains(@class,'gaTableSearch') and @placeholder='Search']");
         this.CLICK_TEMPLATE_SEARCH = page.locator("//div[contains(@class,'gaTableSearchBtn')]");
         this.SELECT_TEMPLATE = page.locator("//input[@placeholder='Select Template']");
         this.SELECT_TACTIC = page.locator("//input[@placeholder='All Tactics']");
         this.SELECT_LIFETIME = page.locator("//button[normalize-space()='Lifetime']");
-        this.TEMPLATE_COLUMNS = page.locator("//tr[contains(@class, 'highlighted') and contains(@class, 'loadedall')]//td[1]/div");
+        this.TEMPLATE_COLUMNS =
+                page.locator("//tr[contains(@class, 'highlighted') and contains(@class, 'loadedall')]//td[1]/div");
         this.SEARCH_ICON = page.locator(".search-field > .ui");
-        this.RUN_REPORT = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Run").setExact(true));
+        this.RUN_REPORT = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Run").setExact(true));
         this.REPORT_DOWNLOAD_OPTION = page.locator("//img[@title='options']");
         this.REPORT_PANEL = page.locator(".reports-body > div").first();
         this.SEARCH_REPORT = page.locator("input.form-control.ng-untouched.ng-pristine.ng-valid");
@@ -86,7 +91,8 @@ public class ReportTemplates {
         this.DOWNLOAD_REPORT = page.locator("//span[text()='Download']");
         this.TEMPLATE_PAGINATION = page.locator("div.pagination-wrapper");
         this.TREE_COLLAPSED_ICON = page.locator("//i[@class='icon_custom tree-collapsed']");
-        this.DIMENSION_AND_METRICS_LABELS = page.locator("//div[contains(@class,'checkbox-group-item')]//sui-checkbox//label");
+        this.DIMENSION_AND_METRICS_LABELS =
+                page.locator("//div[contains(@class,'checkbox-group-item')]//sui-checkbox//label");
         this.CANCEL_BUTTON = page.locator("//div[@class='targetingFooter']//button[contains(text(),'Cancel')]");
     }
 
@@ -177,7 +183,8 @@ public class ReportTemplates {
     }
 
     public int searchResultRowCount() {
-        return page.locator("//tbody[@popuptrigger='manual']//tr[contains(@class,'fixedrow')]").count();
+        return page.locator("//tbody[@popuptrigger='manual']//tr[contains(@class,'fixedrow')]")
+                .count();
     }
 
     public void enterDetailsToRunReport(String reportTemplateName, String tactic) {
@@ -195,11 +202,13 @@ public class ReportTemplates {
     }
 
     public String verifyAutopopulatedCampaign(String createdCampaign) {
-        return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdCampaign)).innerText();
+        return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdCampaign))
+                .innerText();
     }
 
     public String verifyAutopopulatedLineitem(String createdLineitem) {
-        return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdLineitem)).innerText();
+        return page.locator(String.format("//a[contains(normalize-space(), '%s')]", createdLineitem))
+                .innerText();
     }
 
     public void runReport() {
@@ -211,7 +220,9 @@ public class ReportTemplates {
         SEARCH_REPORT.fill(templateNameRandom);
         SEARCH_BUTTON.click();
         waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom));
-        Locator reportProgressIcon = page.locator(String.format("//div[contains(text(), '%s')]/ancestor::div[contains(@class,'left data-container')]/preceding-sibling::div//div[contains(@class,'icon report-progress')]", templateNameRandom));
+        Locator reportProgressIcon = page.locator(String.format(
+                "//div[contains(text(), '%s')]/ancestor::div[contains(@class,'left data-container')]/preceding-sibling::div//div[contains(@class,'icon report-progress')]",
+                templateNameRandom));
         while (reportProgressIcon.isVisible()) {
             SEARCH_BUTTON.click();
             page.waitForTimeout(5000); // wait for 1 second
@@ -220,8 +231,10 @@ public class ReportTemplates {
         REPORT_DOWNLOAD_OPTION.click();
         Download download = page.waitForDownload(DOWNLOAD_REPORT::click);
         String REPORT_NAME = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String downloadPath = Paths.get(System.getProperty("user.home"), "Downloads").toString();
-        String filePath = Paths.get(downloadPath, "report_" + REPORT_NAME + ".csv").toString();
+        String downloadPath =
+                Paths.get(System.getProperty("user.home"), "Downloads").toString();
+        String filePath =
+                Paths.get(downloadPath, "report_" + REPORT_NAME + ".csv").toString();
         download.saveAs(Paths.get(filePath));
         return filePath;
     }
@@ -232,14 +245,18 @@ public class ReportTemplates {
         SEARCH_TEMPLATE.fill(templateNameRandom);
         SEARCH_ICON.click(new Locator.ClickOptions().setForce(true));
         waitUtility.waitForElementVisible(String.format("//div[contains(text(), '%s')]", templateNameRandom), 5000);
-        List<String> expectedHeaders = Arrays.stream(TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*")).map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize expected
+        List<String> expectedHeaders = Arrays.stream(
+                        TEMPLATE_COLUMNS.innerText().split("\\s*,\\s*"))
+                .map(h -> h.toLowerCase().replaceAll("\\s+", "")) // Normalize expected
                 .toList();
 
         List<String> rawActualHeaders = ExcelActions.readCsvExcludingFirstColumn(filePath);
-        List<String> actualHeaders = rawActualHeaders.stream().map(h -> h.toLowerCase().replaceAll("\\s+", ""))  // Normalize actual
+        List<String> actualHeaders = rawActualHeaders.stream()
+                .map(h -> h.toLowerCase().replaceAll("\\s+", "")) // Normalize actual
                 .toList();
 
-        return expectedHeaders.stream().allMatch(expected -> actualHeaders.stream().anyMatch(actual -> actual.contains(expected) || expected.contains(actual)));
+        return expectedHeaders.stream().allMatch(expected -> actualHeaders.stream()
+                .anyMatch(actual -> actual.contains(expected) || expected.contains(actual)));
     }
 
     public List<String> expandGroupsAndFetchDimensionsAndMetrics() {
@@ -255,7 +272,8 @@ public class ReportTemplates {
     }
 
     public boolean verifyReportGeneratedFromLineItemPage(String reportName) {
-        Locator xpath = page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]", reportName));
+        Locator xpath =
+                page.locator(String.format("//div[contains(@class,'scopelist') and contains(., '%s')]", reportName));
         return xpath.isVisible();
     }
 }
