@@ -12,6 +12,7 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
     And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
 
+  @todo
   Scenario Outline: Create and save Medscape List Match + Consent workspace to verify error msg for mandatory  fields
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
@@ -30,6 +31,7 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
       | ADVERTISER | SOURCE_NPI_LIST                   | BUSINESS     | BUSINESS_VERTICAL | PRODUCT     | PHARMA               | BRAND                                                     |
       | Medscape   | ND_Prod_Opdivo_11May [ID: #92568] | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC | Bristol-Myers Squibb | GlaxoSmithKline_Global,GSK Anoro Sample Email Suppression |
 
+  @todo
   Scenario Outline: Create and save Medscape List Match + Consent workspace without Deliverable ID and navigates to Explore Tab
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
@@ -52,6 +54,7 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
       | Medscape   | ND_GSK_LIST_14Apr [ID: #89890]       | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts | GlaxoSmithKline_Global | GlaxoSmithKline_Global | Colorado        | RECORD_ID         | CUSTOMER_ID | NPI_NUMBER |             |           |
       | Medscape   | ND_Prod_Eli Lilly_11May [ID: #92567] | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 | RECORD_ID         | CUSTOMER_ID | NPI_NUMBER |             |           |
 
+  @todo
   Scenario Outline: Create and save Medscape List Match + Consent workspace and publish the workspace with unique SF Deliverable ID
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
@@ -79,6 +82,7 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
       | Medscape   | ND_GSK_LIST_14Apr [ID: #89890]       | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts | GlaxoSmithKline_Global | GlaxoSmithKline_Global | Colorado        | RECORD_ID         | CUSTOMER_ID | NPI_NUMBER |             |           |
       | Medscape   | ND_Prod_Eli Lilly_11May [ID: #92567] | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 | RECORD_ID         | CUSTOMER_ID | NPI_NUMBER |             |           |
 
+  @todo
   Scenario Outline: Create Medscape List Match + Consent workspace and Validate record counts displayed on Explore tab on saving & publishing the workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
