@@ -122,44 +122,45 @@ jobs:
         run: |
           set -euo pipefail
           
-          cat <<EOF > prompt.txt
-          Analyze the following Jira ticket details and generate a thorough, professional suite of test cases. 
-          You must generate:
-          - Positive test scenarios (Happy Path workflow)
-          - Negative test scenarios (Validation errors, edge conditions, bad inputs)
-          - UI/Layout/Toggle states if mentioned in requirements
-          
-          You must output a single, raw, valid JSON object containing an array called "test_cases".
-          No markdown backticks, no wrapping text blocks.
-          
-          Generate sequential numbers for the 'index' property starting at 1 (e.g., 1, 2, 3...).
-          
-          Each object in the array must match this schema precisely:
-          {
-            "index": 1,
-            "description": "Verify user can toggle between Tactic and Line Item views",
-            "test_data": "Optional specific data parameters needed to execute, leave blank if none",
-            "expected_result": "Explicit step outcomes or data update confirmations. If multiple items are listed, use plain string newlines (\n) to separate them."
-          }
-
-          JIRA DETAILS:
-          ID: ${{ inputs.jira_id }}
-          SUMMARY: $SUMMARY
-          DESCRIPTION: $DESCRIPTION
-          COMMENTS: $COMMENTS
-          EOF
+          # Use jq safely to construct the prompt file with exact environmental context inserts
+          jq -n \
+            --arg id "${{ inputs.jira_id }}" \
+            --arg summary "$SUMMARY" \
+            --arg desc "$DESCRIPTION" \
+            --arg comm "$COMMENTS" \
+            '"" | 
+            . + "Analyze the following Jira ticket details and generate a thorough, professional suite of test cases.\n" +
+            "You must generate:\n" +
+            "- Positive test scenarios (Happy Path workflow)\n" +
+            "- Negative test scenarios (Validation errors, edge conditions, bad inputs)\n" +
+            "- UI/Layout/Toggle states if mentioned in requirements\n\n" +
+            "You must output a single, raw, valid JSON object containing an array called \"test_cases\".\n" +
+            "No markdown backticks, no wrapping text blocks.\n\n" +
+            "Generate sequential numbers for the '\''index'\'' property starting at 1 (e.g., 1, 2, 3...).\n\n" +
+            "Each object in the array must match this schema precisely:\n" +
+            "{\n" +
+            "  \"index\": 1,\n" +
+            "  \"description\": \"Verify user can toggle between Tactic and Line Item views\",\n" +
+            "  \"test_data\": \"Optional specific data parameters needed to execute, leave blank if none\",\n" +
+            "  \"expected_result\": \"Explicit step outcomes or data update confirmations.\"\n" +
+            "}\n\n" +
+            "JIRA DETAILS:\n" +
+            "ID: " + $id + "\n" +
+            "SUMMARY: " + $summary + "\n" +
+            "DESCRIPTION: " + $desc + "\n" +
+            "COMMENTS: " + $comm' > prompt.txt
 
           jq -n \
             --arg model "${{ inputs.llm_model }}" \
             --rawfile prompt prompt.txt \
             '{
-              model: "${{ inputs.llm_model }}",
+              model: $model,
               temperature: 0,
               response_format: { type: "json_object" },
               messages: [
                 {
                   role: "system",
-                  content: "You are an expert QA Engineer. Your goal is to dissect requirement descriptions and generate clean, descriptive test validations formatted exactly to the requested structural JSON parameters."
+                  content: "You are an expert QA Engineer. Your goal is to dissect requirement descriptions and generate clean, descriptive test validations formatted exactly to a valid JSON payload matching the requested structural parameters. Ensure you do not return markdown wrappers."
                 },
                 {
                   role: "user",
@@ -193,6 +194,7 @@ jobs:
         run: |
           import json
           import csv
+          import os
 
           with open('raw_output.json', 'r', encoding='utf-8') as f:
               data = json.load(f)
@@ -200,7 +202,7 @@ jobs:
           test_cases = data.get('test_cases', [])
           jira_id = "${{ inputs.jira_id }}"
           
-          # 1. Generate the standard CSV matrix matching your Excel template layout exactly
+          # 1. Generate the standard CSV matrix
           csv_file_path = f"Test_Cases_{jira_id}.csv"
           headers = ["Test ID", "Requirement ID", "Test Description", "Test Data", "Expected Result", "Actual Result", "Test Status", "Owner"]
           
@@ -213,16 +215,29 @@ jobs:
                   test_id = f"TC_{jira_id}_{idx}"
                   
                   writer.writerow([
-                      test_id,                   # Test ID
-                      jira_id,                   # Requirement ID
-                      tc.get('description', ''), # Test Description
-                      tc.get('test_data', ''),   # Test Data
-                      tc.get('expected_result', ''), # Expected Result
-                      "", "", "", ""             # Actual Result, Test Status, Owner (Left blank)
+                      test_id,
+                      jira_id,
+                      tc.get('description', ''),
+                      tc.get('test_data', ''),
+                      tc.get('expected_result', ''),
+                      "", "", ""
                   ])
 
-          # 2. Construct Jira v3 Atlassian Document Format (ADF) for a rich UI Table Comment
-          # Initialize ADF table structure header rows
+          # Helper function to convert text strings safely into valid inline ADF blocks with soft line break translations
+          def make_adf_text_content(input_text):
+              if not input_text:
+                  return [{"type": "text", "text": "N/A"}]
+              
+              lines = str(input_text).split('\n')
+              nodes = []
+              for i, line in enumerate(lines):
+                  if line.strip() or i == 0:
+                      nodes.append({"type": "text", "text": line})
+                  if i < len(lines) - 1:
+                      nodes.append({"type": "hardBreak"})
+              return nodes if nodes else [{"type": "text", "text": "N/A"}]
+
+          # 2. Construct Jira v3 Atlassian Document Format (ADF)
           table_rows = [
               {
                   "type": "tableRow",
@@ -235,7 +250,6 @@ jobs:
               }
           ]
 
-          # Populate data rows dynamically into the ADF body maps
           for tc in test_cases:
               idx = str(tc.get('index', '1')).zfill(2)
               test_id = f"TC_{jira_id}_{idx}"
@@ -245,12 +259,11 @@ jobs:
                   "content": [
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": test_id}]}]},
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": jira_id}]}]},
-                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": tc.get('description', 'N/A')}]}]},
-                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": tc.get('expected_result', 'N/A')}]}]}
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('description', ''))}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('expected_result', ''))}]}
                   ]
               })
 
-          # Combine into the finalized corporate ADF JSON schema along with your custom linking strings
           tracking_message = f"[Test_Cases_{jira_id}.csv] have been linked to this ticket for execution references."
           
           comment_payload = {
