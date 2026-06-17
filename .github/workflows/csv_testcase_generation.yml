@@ -150,7 +150,7 @@ jobs:
           EOF
 
           jq -n \
-            --arg model "${{ inputs.llm_model }}"
+            --arg model "${{ inputs.llm_model }}" \
             --rawfile prompt prompt.txt \
             '{
               model: "${{ inputs.llm_model }}",
