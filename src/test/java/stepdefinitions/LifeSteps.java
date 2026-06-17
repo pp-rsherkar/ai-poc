@@ -12,7 +12,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,7 +24,6 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6427,7 +6425,7 @@ public class LifeSteps {
     @Then("Verify show expression connector AND OR logic is correct")
     public void verifyShowExpressionConnectorLogicIsCorrect() {
         tacticDetails.fetchShowExpressionValues();
-        Assert.assertTrue("Show expression connector logic is incorrect. Raw values: " + tacticDetails.SHOW_EXPRESSION_RAW_VALUES, tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.SHOW_EXPRESSION_RAW_VALUES)
+        Assert.assertTrue("Show expression connector logic is incorrect. Raw values: " + tacticDetails.showExpressionRawValues, tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.showExpressionRawValues)
         );
     }
 
@@ -7219,7 +7217,7 @@ public class LifeSteps {
     @And(
             "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
     public void
-    verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
+            verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
         logger.info(
                 "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
         lineItemDetails.saveLineItem();

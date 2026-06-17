@@ -82,7 +82,7 @@ public class TacticDetails {
     private final Locator SHOW_EXPRESSION_BUTTON;
     private final Locator CONNECTION_LOCATOR;
     private final Locator VALUE_LOCATOR;
-    public List<String> SHOW_EXPRESSION_RAW_VALUES;
+    public List<String> showExpressionRawValues;
     List<String> showExpressionValues;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -243,7 +243,7 @@ public void fetchShowExpressionValues() {
         values.add(VALUE_LOCATOR.nth(i).innerText().trim());
     }
 
-    SHOW_EXPRESSION_RAW_VALUES = new ArrayList<>(values); // preserve raw for connector assertion
+    showExpressionRawValues = new ArrayList<>(values); // preserve raw for connector assertion
     // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
     showExpressionValues = values.stream()
             .filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR"))
