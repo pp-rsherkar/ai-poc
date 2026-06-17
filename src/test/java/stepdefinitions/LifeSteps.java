@@ -952,20 +952,6 @@ public class LifeSteps {
         tacticSettings.closeRuleTypePanel();
     }
 
-    @Given("User configures targeting rules with options {string} and {string}")
-    public void UserConfiguresTargetingRulesWithOptions(String ruleType, String ruleValue) {
-        logger.info("Configuring targeting rules from string variables - Rule Type: {}, Rule Value: {}", ruleType, ruleValue);
-        Map<String, String> rawMap = new HashMap<>();
-        rawMap.put(ruleType, ruleValue);
-        rulesMap = CommonUtils.processDataTable(rawMap);
-        for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            keyType.add(entry.getKey());
-            keyValues.addAll(entry.getValue());
-            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
-        }
-        tacticSettings.closeRuleTypePanel();
-    }
-
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         logger.info("Starting verification of configured targeting rules");
