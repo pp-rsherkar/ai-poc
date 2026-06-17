@@ -1043,7 +1043,7 @@ public class TacticSettings {
             String categoryText = BID_MULTIPLIER_CATEGORY_NAME.nth(i).innerText().trim();
 
             if (categoryText.contains(key)) {
-                String xpathString = String.format("//div[contains(@class,'bidMultiplierCategoryName') and contains(text(),'%s')]/following-sibling::div//div[2]", key);
+                String xpathString = String.format("//div[contains(@class,'bidMultiplierCategoryName') and contains(text(),'%s')]/following-sibling::div//div[contains(@class,'content')]", key);
                 Locator categoryItems = page.locator(xpathString);
                 List<String> actualValues = new ArrayList<>();
                 for (int j = 0; j < categoryItems.count(); j++) {

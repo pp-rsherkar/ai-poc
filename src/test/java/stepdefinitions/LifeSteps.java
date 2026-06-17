@@ -55,8 +55,6 @@ public class LifeSteps {
     static String userType;
     List<Object> keyType = new ArrayList<>();
     List<Object> keyValues = new ArrayList<>();
-    List<Object> keyBidType = new ArrayList<>();
-    List<Object> keyBidValues = new ArrayList<>();
     Map<String, Map<String, String>> keyValueMap = new LinkedHashMap<>();
     Map<String, List<String>> rulesMap = new LinkedHashMap<>();
     List<String> nameList = new ArrayList<>();
@@ -7185,10 +7183,11 @@ public class LifeSteps {
         logger.info("Configuring Bid multiplier rules from DataTable");
         Map<String, String> rawMap = bidRuleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
-
+        keyType.clear();
+        keyValues.clear();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            keyBidType.add(entry.getKey());
-            keyBidValues.addAll(entry.getValue());
+            keyType.add(entry.getKey());
+            keyValues.addAll(entry.getValue());
             tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(),fillValue);
         }
         logger.info("Closing Bid Rule Type panel");
@@ -7198,7 +7197,7 @@ public class LifeSteps {
     @Then("Verify the configured Bid multiplier rules")
     public void verify_the_configured_bid_multiplier_rules() {
         logger.info("Starting verification of configured bid multiplier rules");
-        List<String> expectedNormalizedBidRuleTypes = normalizeObjectList(keyBidType);
+        List<String> expectedNormalizedBidRuleTypes = normalizeObjectList(keyType);
         int expectedBidCount = expectedNormalizedBidRuleTypes.size();
         tacticSettings.fetchBidRulesTypesCount(expectedBidCount);
         List<String> actualNormalizedBidRuleTypes = normalizeObjectList(tacticSettings.fetchBidRulesTypes());
@@ -7212,7 +7211,7 @@ public class LifeSteps {
         Collections.sort(expectedUniqueAndSortedBid);
         Collections.sort(actualUniqueAndSortedBid);
 
-        List<String> expectedNormalizedBidRuleOptions = normalizeObjectList(keyBidValues);
+        List<String> expectedNormalizedBidRuleOptions = normalizeObjectList(keyValues);
         List<String> actualNormalizedBidRuleOptions = normalizeObjectList(tacticSettings.fetchBidRuleOptions());
         Assert.assertEquals("Rule types mismatch", expectedUniqueAndSortedBid, actualUniqueAndSortedBid);
 
