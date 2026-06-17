@@ -6418,7 +6418,7 @@ public class LifeSteps {
     @Then("Verify that all the rule types added in targeting rules are displayed in show expression with correct values")
     public void verify_all_rule_types_added_in_targeting_rules_are_displayed_in_show_expression_with_correct_values() {
         boolean result = tacticDetails.ruleMappingWithShowExpressionValues(rulesMap);
-        Assert.assertTrue("Targeting rules added is not matching with the once in show expression", result);
+        Assert.assertTrue("Targeting rules added is not matching with the ones in show expression", result);
 
     }
 
