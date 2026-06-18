@@ -163,38 +163,38 @@ jobs:
           FEATURE_EXAMPLES=""
           while IFS= read -r f; do
             FEATURE_EXAMPLES="$FEATURE_EXAMPLES
-$(cat "$f")"
-          done < <(find "$FEATURE_DIR" -name "*.feature" | head -2)
-
-          cat > prompt.txt <<EOF
-HARD RULES:
-- Output ONLY raw Gherkin
-- No markdown, no explanation
-- One @todo per scenario
-
-JIRA SUMMARY:
-$SUMMARY
-
-DESCRIPTION:
-$DESCRIPTION
-
-COMMENTS:
-$COMMENTS
-
-STEP DICTIONARY:
-$STEP_CONTEXT
-
-EXAMPLES:
-$FEATURE_EXAMPLES
-
-Feature: $SUMMARY
-
-@todo
-Scenario: Example
-  Given ...
-  When ...
-  Then ...
-EOF
+          $(cat "$f")"
+                    done < <(find "$FEATURE_DIR" -name "*.feature" | head -2)
+          
+                    cat > prompt.txt <<EOF
+          HARD RULES:
+          - Output ONLY raw Gherkin
+          - No markdown, no explanation
+          - One @todo per scenario
+          
+          JIRA SUMMARY:
+          $SUMMARY
+          
+          DESCRIPTION:
+          $DESCRIPTION
+          
+          COMMENTS:
+          $COMMENTS
+          
+          STEP DICTIONARY:
+          $STEP_CONTEXT
+          
+          EXAMPLES:
+          $FEATURE_EXAMPLES
+          
+          Feature: $SUMMARY
+          
+          @todo
+          Scenario: Example
+            Given ...
+            When ...
+            Then ...
+          EOF
 
           if [ "$TOKEN_PARAM" = "max_completion_tokens" ]; then
             jq -n \
