@@ -199,7 +199,6 @@ jobs:
       # =========================
       - name: Generate feature via GitHub Models
         env:
-          # Bound directly to your custom repository secret
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SUMMARY: ${{ env.SUMMARY }}
           DESCRIPTION: ${{ env.DESCRIPTION }}
@@ -207,17 +206,25 @@ jobs:
         run: |
           set -euo pipefail
           echo "Preparing repository context..."
-          
-          # Build context — raise limits so nothing is silently dropped
-          STEP_CONTEXT=$(head -n 300 step_dictionary.txt)     # was 120
+
+          STEP_CONTEXT=$(head -n 300 step_dictionary.txt)
           FEATURE_EXAMPLES=$(
             find "$FEATURE_DIR" -name "*.feature" \
             | head -3 \
             | while read -r f; do cat "$f"; done \
-            | head -n 600                                       # was 350
+            | head -n 600
           )
-          
-          cat <<'PROMPT_EOF' > prompt.txt
+
+          # Determine correct token parameter based on model family
+          MODEL="${{ inputs.llm_model }}"
+          if echo "$MODEL" | grep -Eq "^openai/(o[0-9]|gpt-5)"; then
+            TOKEN_PARAM="max_completion_tokens"
+          else
+            TOKEN_PARAM="max_tokens"
+          fi
+
+          # NOTE: unquoted PROMPT_EOF so variables are interpolated
+          cat <<PROMPT_EOF > prompt.txt
           ==================================================
           HARD RULES — non-negotiable, checked before output
           ==================================================
@@ -231,11 +238,11 @@ jobs:
              in the STEP DICTIONARY below, you MUST use that exact phrasing. Only coin a new step when no
              existing step covers the action — and mark it with an inline comment: # NEW STEP
           5. Do not invent test cases. Every scenario must be traceable to the Jira description or comments.
-          
+
           ==================================================
           DECISION RULES — choose the right construct
           ==================================================
-          
+
           [Scenario vs Scenario Outline]
           Use plain Scenario by default.
           Use Scenario Outline + Examples table ONLY when ALL of the following are true:
@@ -244,14 +251,14 @@ jobs:
                (e.g. multiple user roles, listed boundary values, enumerated statuses)
             c) The Examples table has at least 2 data rows
           If only one data row would appear in Examples — use a plain Scenario instead.
-          
+
           [When to use a data table]
           Use a Gherkin data table (pipe-delimited rows attached to a step) when:
             - A single step needs to supply 3 or more key-value pairs (e.g. filling a form)
             - A step needs to pass a list of items in one action (e.g. a set of permissions,
               a batch of records, multiple table rows to verify)
-          Do NOT use a data table for 1–2 values — use inline step parameters instead.
-          
+          Do NOT use a data table for 1-2 values — use inline step parameters instead.
+
           Data table example (form fill):
             When I submit the registration form with:
               | field     | value             |
@@ -259,14 +266,14 @@ jobs:
               | lastName  | Doe               |
               | email     | john@example.com  |
               | role      | admin             |
-          
+
           Data table example (list assertion):
             Then the following permissions should be visible:
               | permission         |
               | View reports       |
               | Export data        |
               | Manage users       |
-          
+
           ==================================================
           SCENARIO GENERATION INSTRUCTIONS
           ==================================================
@@ -274,21 +281,21 @@ jobs:
             Read the Jira DESCRIPTION and COMMENTS carefully.
             Identify every explicit or implied acceptance criterion.
             Each criterion maps to one or more scenarios.
-          
+
           Step 2 — Scenario types to cover (only if the ticket implies them):
             - Happy path (core success flow)
             - Input validation / boundary conditions
             - Negative / error flows
             - Permission / role-based access (only if roles are mentioned in the ticket)
             - Edge cases explicitly mentioned in comments
-          
+
           Step 3 — Write scenarios:
             - Keep steps in Given / When / Then / And / But order
             - Use business-readable language (no technical implementation details)
             - Keep each scenario focused on one behaviour
             - Avoid duplicate scenarios
             - Prefer repository step wording over generating new steps
-          
+
           ==================================================
           JIRA DETAILS
           ==================================================
@@ -296,50 +303,52 @@ jobs:
           SUMMARY: $SUMMARY
           DESCRIPTION: $DESCRIPTION
           COMMENTS: $COMMENTS
-          
+
           ==================================================
           REPOSITORY FEATURE EXAMPLES (follow these conventions exactly)
           ==================================================
           $FEATURE_EXAMPLES
-          
+
           ==================================================
           STEP DICTIONARY (reuse these steps with exact wording)
           ==================================================
           $STEP_CONTEXT
-          
+
           ==================================================
           OUTPUT FORMAT
           ==================================================
           Feature: <concise feature name derived from Jira summary>
-          
+
             Background: (include only if 2+ scenarios share the same Given steps)
               Given ...
-          
+
             @todo
             Scenario: <...>
               Given ...
               When ...
               Then ...
-          
+
             @todo
             Scenario Outline: <...>
               Given ...
               When ... "<param>"
               Then ...
-          
+
               Examples:
                 | param  |
                 | value1 |
                 | value2 |
           PROMPT_EOF
 
+          # Build request with correct token parameter for this model family
           jq -n \
-            --arg model "${{ inputs.llm_model }}" \
+            --arg model "$MODEL" \
+            --arg token_param "$TOKEN_PARAM" \
             --rawfile prompt prompt.txt \
             '{
               model: $model,
               temperature: 0,
-              max_tokens: 4096,
+              (($token_param): 4096),
               messages: [
                 {
                   role: "system",
@@ -373,12 +382,9 @@ jobs:
           fi
 
           RESPONSE=$(cat "$HTTP_RESPONSE")
-
           echo "$RESPONSE" > model_response.json
 
-          FEATURE=$(echo "$RESPONSE" | jq -r '
-            .choices[0].message.content // empty
-          ')
+          FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
 
           FEATURE=$(echo "$FEATURE" \
             | sed 's/```gherkin//g' \
@@ -403,7 +409,6 @@ jobs:
           fi
 
           echo "$FEATURE" > generated.feature
-
           echo "Feature file generated successfully"
 
       # =========================
