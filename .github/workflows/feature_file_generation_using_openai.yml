@@ -207,13 +207,19 @@ jobs:
           set -euo pipefail
           echo "Preparing repository context..."
 
-          STEP_CONTEXT=$(head -n 300 step_dictionary.txt)
+          # Cap context aggressively to stay within 8000 token limit
+          STEP_CONTEXT=$(head -n 80 step_dictionary.txt)
           FEATURE_EXAMPLES=$(
             find "$FEATURE_DIR" -name "*.feature" \
-            | head -3 \
+            | head -2 \
             | while read -r f; do cat "$f"; done \
-            | head -n 600
+            | head -n 100
           )
+
+          # Trim Jira fields at prompt-build time (not just at fetch time)
+          SUMMARY_TRIM=$(echo "$SUMMARY"     | cut -c1-300)
+          DESC_TRIM=$(echo "$DESCRIPTION"    | cut -c1-2000)
+          COMMENTS_TRIM=$(echo "$COMMENTS"   | cut -c1-1000)
 
           # Determine correct token parameter based on model family
           MODEL="${{ inputs.llm_model }}"
@@ -223,124 +229,70 @@ jobs:
             TOKEN_PARAM="max_tokens"
           fi
 
-          # NOTE: unquoted PROMPT_EOF so variables are interpolated
-          cat <<PROMPT_EOF > prompt.txt
-          ==================================================
-          HARD RULES — non-negotiable, checked before output
-          ==================================================
-          1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations, no preamble.
-          2. Every Scenario and Scenario Outline must be preceded by exactly one @todo tag on its own line.
-             Example:
-               @todo
-               Scenario: User logs in with valid credentials
+          # Write prompt to a temp file first to measure size
+          # IMPORTANT: cat > file << EOF (not cat << EOF > file) and flush-left
+          # to avoid heredoc indentation adding whitespace tokens
+          cat > prompt.txt << PROMPT_EOF
+          HARD RULES:
+          1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
+          2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
           3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-          4. Reuse existing repository steps with EXACT wording. If a semantically equivalent step exists
-             in the STEP DICTIONARY below, you MUST use that exact phrasing. Only coin a new step when no
-             existing step covers the action — and mark it with an inline comment: # NEW STEP
-          5. Do not invent test cases. Every scenario must be traceable to the Jira description or comments.
-
-          ==================================================
-          DECISION RULES — choose the right construct
-          ==================================================
-
-          [Scenario vs Scenario Outline]
-          Use plain Scenario by default.
-          Use Scenario Outline + Examples table ONLY when ALL of the following are true:
-            a) The exact same steps apply to 2 or more distinct input/output combinations
-            b) Those combinations are explicitly stated or clearly implied in the Jira ticket
-               (e.g. multiple user roles, listed boundary values, enumerated statuses)
-            c) The Examples table has at least 2 data rows
-          If only one data row would appear in Examples — use a plain Scenario instead.
-
-          [When to use a data table]
-          Use a Gherkin data table (pipe-delimited rows attached to a step) when:
-            - A single step needs to supply 3 or more key-value pairs (e.g. filling a form)
-            - A step needs to pass a list of items in one action (e.g. a set of permissions,
-              a batch of records, multiple table rows to verify)
-          Do NOT use a data table for 1-2 values — use inline step parameters instead.
-
-          Data table example (form fill):
-            When I submit the registration form with:
-              | field     | value             |
-              | firstName | John              |
-              | lastName  | Doe               |
-              | email     | john@example.com  |
-              | role      | admin             |
-
-          Data table example (list assertion):
-            Then the following permissions should be visible:
-              | permission         |
-              | View reports       |
-              | Export data        |
-              | Manage users       |
-
-          ==================================================
-          SCENARIO GENERATION INSTRUCTIONS
-          ==================================================
-          Step 1 — Extract acceptance criteria:
-            Read the Jira DESCRIPTION and COMMENTS carefully.
-            Identify every explicit or implied acceptance criterion.
-            Each criterion maps to one or more scenarios.
-
-          Step 2 — Scenario types to cover (only if the ticket implies them):
-            - Happy path (core success flow)
-            - Input validation / boundary conditions
-            - Negative / error flows
-            - Permission / role-based access (only if roles are mentioned in the ticket)
-            - Edge cases explicitly mentioned in comments
-
-          Step 3 — Write scenarios:
-            - Keep steps in Given / When / Then / And / But order
-            - Use business-readable language (no technical implementation details)
-            - Keep each scenario focused on one behaviour
-            - Avoid duplicate scenarios
-            - Prefer repository step wording over generating new steps
-
-          ==================================================
-          JIRA DETAILS
-          ==================================================
+          4. If a matching step exists in STEP DICTIONARY use its EXACT wording. Mark new steps: # NEW STEP
+          5. Do not invent test cases. Every scenario must trace to the Jira description or comments.
+          
+          DECISION RULES:
+          - Use plain Scenario by default.
+          - Use Scenario Outline + Examples ONLY when: same steps apply to 2+ distinct combos explicit in the ticket AND Examples has 2+ rows.
+          - Use a data table when a step needs 3+ key-value pairs or a list. Not for 1-2 values.
+          
+          Data table example:
+            When I submit the form with:
+              | field | value |
+              | email | a@b.c |
+              | role  | admin |
+          
+          SCENARIO GENERATION:
+          1. Extract every acceptance criterion from DESCRIPTION and COMMENTS.
+          2. Cover: happy path, validation, negative flows, role-based access (only if roles mentioned), edge cases from comments.
+          3. Steps in Given/When/Then/And/But order. Business language. One behaviour per scenario. No duplicates.
+          
+          JIRA:
           ID: ${{ inputs.jira_id }}
-          SUMMARY: $SUMMARY
-          DESCRIPTION: $DESCRIPTION
-          COMMENTS: $COMMENTS
-
-          ==================================================
-          REPOSITORY FEATURE EXAMPLES (follow these conventions exactly)
-          ==================================================
+          SUMMARY: $SUMMARY_TRIM
+          DESCRIPTION: $DESC_TRIM
+          COMMENTS: $COMMENTS_TRIM
+          
+          REPOSITORY EXAMPLES:
           $FEATURE_EXAMPLES
-
-          ==================================================
-          STEP DICTIONARY (reuse these steps with exact wording)
-          ==================================================
+          
+          STEP DICTIONARY:
           $STEP_CONTEXT
-
-          ==================================================
-          OUTPUT FORMAT
-          ==================================================
-          Feature: <concise feature name derived from Jira summary>
-
-            Background: (include only if 2+ scenarios share the same Given steps)
-              Given ...
-
+          
+          OUTPUT FORMAT:
+          Feature: <name from Jira summary>
+          
             @todo
-            Scenario: <...>
+            Scenario: <title>
               Given ...
               When ...
               Then ...
-
+          
             @todo
-            Scenario Outline: <...>
+            Scenario Outline: <title>
               Given ...
               When ... "<param>"
               Then ...
-
               Examples:
                 | param  |
                 | value1 |
                 | value2 |
           PROMPT_EOF
+          
+          PROMPT_BYTES=$(wc -c < prompt.txt)
+          PROMPT_WORDS=$(wc -w < prompt.txt)
+          echo "Prompt size: ${PROMPT_BYTES} bytes / ${PROMPT_WORDS} words (est. $(( PROMPT_WORDS / 3 )) tokens)"
 
-          # Build request with correct token parameter for this model family
+          # Build request
           if [ "$TOKEN_PARAM" = "max_completion_tokens" ]; then
             jq -n \
               --arg model "$MODEL" \
@@ -352,7 +304,7 @@ jobs:
                 messages: [
                   {
                     role: "system",
-                    content: "You are a senior QA automation engineer. Your sole output is raw valid Gherkin — no markdown, no fences, no commentary. You follow the hard rules and decision rules in the user prompt exactly, in order. When in doubt about a construct, default to the simpler one."
+                    content: "You are a senior QA automation engineer. Output raw valid Gherkin only — no markdown, no fences, no commentary."
                   },
                   {
                     role: "user",
@@ -371,7 +323,7 @@ jobs:
                 messages: [
                   {
                     role: "system",
-                    content: "You are a senior QA automation engineer. Your sole output is raw valid Gherkin — no markdown, no fences, no commentary. You follow the hard rules and decision rules in the user prompt exactly, in order. When in doubt about a construct, default to the simpler one."
+                    content: "You are a senior QA automation engineer. Output raw valid Gherkin only — no markdown, no fences, no commentary."
                   },
                   {
                     role: "user",
@@ -381,6 +333,7 @@ jobs:
               }' > request.json
           fi
 
+          echo "Request size: $(wc -c < request.json) bytes"
           echo "Generating feature file..."
 
           HTTP_RESPONSE=$(mktemp)
@@ -405,10 +358,7 @@ jobs:
           echo "$RESPONSE" > model_response.json
 
           FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
-
-          FEATURE=$(echo "$FEATURE" \
-            | sed 's/```gherkin//g' \
-            | sed 's/```//g')
+          FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
 
           if [ -z "$FEATURE" ]; then
             echo "Model returned empty output"
