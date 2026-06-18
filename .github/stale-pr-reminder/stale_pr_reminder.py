@@ -12,10 +12,17 @@ import requests
 from github import Github
 from github.PullRequest import PullRequest
 
-STALE_MINUTES = int(os.getenv("STALE_MINUTES", "30"))
-SPAM_PREVENTION_MINUTES = int(os.getenv("SPAM_PREVENTION_MINUTES", "10"))
 REQUIRED_APPROVALS = int(os.getenv("REQUIRED_APPROVALS", "2"))
 MERGER = os.getenv("MERGER", "pp-pmitra")
+STATUS_THRESHOLDS = {
+    "No Reviewers Assigned": 3,
+    "Waiting For Review": 2,
+    "Changes Requested": 5,
+    "Review Discussion In Progress": 1,
+    "Awaiting Additional Approval": 1,
+    "Ready To Merge": 1,
+    "Comments Received": 3,
+}
 
 # Per-status guidance shown in the reminder comment.
 STATUS_ACTIONS = {
@@ -44,13 +51,78 @@ STATUS_ACTIONS = {
 def get_now() -> datetime:
     return datetime.now(timezone.utc)
 
+def get_last_human_activity_days(pr: PullRequest) -> float:
 
-def get_pr_age_minutes(pr: PullRequest) -> float:
-    return (get_now() - pr.created_at).total_seconds() / 60
+    latest = pr.created_at
 
+    # commits
+    try:
+        for commit in pr.get_commits():
+            if commit.commit.author:
+                latest = max(
+                    latest,
+                    commit.commit.author.date
+                )
+    except Exception:
+        pass
 
-def get_last_activity_days(pr: PullRequest) -> float:
-    return (get_now() - pr.updated_at).total_seconds() / 86400
+    # reviews
+    try:
+        for review in pr.get_reviews():
+            if (
+                review.user
+                and review.user.type != "Bot"
+            ):
+                latest = max(
+                    latest,
+                    review.submitted_at
+                )
+    except Exception:
+        pass
+
+    # discussion comments
+    try:
+        for comment in pr.get_issue_comments():
+            if (
+                comment.user
+                and comment.user.type != "Bot"
+            ):
+                latest = max(
+                    latest,
+                    comment.created_at
+                )
+    except Exception:
+        pass
+
+    return (
+        get_now() - latest
+    ).total_seconds() / 86400
+
+def get_last_reminder_days(pr: PullRequest) -> float | None:
+
+    latest_reminder = None
+
+    for comment in pr.get_issue_comments():
+
+        if (
+            comment.user
+            and comment.user.type == "Bot"
+            and comment.body
+            and "🤖 Stale PR Reminder" in comment.body
+        ):
+
+            if (
+                latest_reminder is None
+                or comment.created_at > latest_reminder
+            ):
+                latest_reminder = comment.created_at
+
+    if latest_reminder is None:
+        return None
+
+    return (
+        get_now() - latest_reminder
+    ).total_seconds() / 86400
 
 
 def get_requested_reviewers(pr: PullRequest) -> List[str]:
@@ -317,39 +389,15 @@ def determine_status(
     return "No Reviewers Assigned", author, approved_by
 
 
-def recently_reminded(pr: PullRequest) -> bool:
-
-    comments = list(pr.get_issue_comments())
-
-    for comment in reversed(comments):
-
-        if (
-            comment.user
-            and comment.user.type == "Bot"
-            and "Stale PR Reminder" in comment.body
-        ):
-
-            age_minutes = (
-                get_now() - comment.created_at
-            ).total_seconds() / 60
-
-            return age_minutes < SPAM_PREVENTION_MINUTES
-
-    return False
-
-
 def build_comment(
     pr: PullRequest,
     status: str,
     responsible: str,
     approved_by: List[str],
-    pr_age_minutes: float,
     last_activity_days: float,
+    threshold_days: int,
     review_summary: str,
 ) -> str:
-
-    pr_age_days = pr_age_minutes / 1440
-    stale_days = STALE_MINUTES / 1440
 
     approvals = ", ".join(approved_by) if approved_by else "None"
 
@@ -368,7 +416,6 @@ def build_comment(
 |----------|----------|
 | PR | #{pr.number} |
 | Author | @{pr.user.login} |
-| PR Age | {pr_age_days:.2f} days |
 | Last Activity | {last_activity_days:.1f} days ago |
 | Status | {status} |
 | Action Item On | {responsible_display} |
@@ -392,7 +439,7 @@ Approved By:
 
 ---
 
-This PR has been open for more than {stale_days:.0f} days.
+This PR requires attention as no new activity has occurred within the expected timeframe.
 """
 
 
@@ -407,14 +454,6 @@ def main() -> None:
     for pr in repository.get_pulls(state="open"):
 
         if pr.draft:
-            continue
-
-        pr_age_minutes = get_pr_age_minutes(pr)
-
-        if pr_age_minutes < STALE_MINUTES:
-            continue
-
-        if recently_reminded(pr):
             continue
 
         unresolved_reviewers, review_summary = get_unresolved_review_threads(
@@ -459,13 +498,52 @@ def main() -> None:
             issue_commenters,
         )
 
+        if status == "Comments Received":
+
+            feedback_count = (
+                len(review_feedback)
+                + len(discussion_comments)
+            )
+        
+            threshold_days = (
+                3 if feedback_count <= 3
+                else 5
+            )
+        
+        else:
+            threshold_days = STATUS_THRESHOLDS[status]
+
+        last_human_activity_days = get_last_human_activity_days(pr)
+
+        last_reminder_days = get_last_reminder_days(pr)
+        
+        effective_age_days = last_human_activity_days
+        
+        if (
+            last_reminder_days is not None
+            and last_reminder_days < effective_age_days
+        ):
+            effective_age_days = last_reminder_days
+
+        print(
+            f"PR #{pr.number} | "
+            f"Status={status} | "
+            f"Threshold={threshold_days}d | "
+            f"Human={last_human_activity_days:.1f}d | "
+            f"Reminder={last_reminder_days} | "
+            f"Effective={effective_age_days:.1f}d"
+        )
+        
+        if effective_age_days < threshold_days:
+            continue
+
         comment = build_comment(
             pr=pr,
             status=status,
             responsible=responsible,
             approved_by=approved_by,
-            pr_age_minutes=pr_age_minutes,
-            last_activity_days=get_last_activity_days(pr),
+            last_activity_days=last_human_activity_days,
+            threshold_days=threshold_days,
             review_summary=review_summary,
         )
 
