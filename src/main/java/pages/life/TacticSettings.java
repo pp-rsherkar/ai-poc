@@ -95,7 +95,7 @@ public class TacticSettings {
     private final Locator NPI_BID;
     private final Locator NPI_ERROR;
     private final Locator INACTIVE_PANEL;
-    public Locator ADD_TARGETING;
+    private final Locator ADD_TARGETING;
     private final Locator BID_MULTIPLIER_CATEGORY_NAME;
     private final Locator FETCH_BID_MULTIPLIER_RULE_TYPES;
     private final Locator FETCH_BID_MULTIIPLIER_RULE_OPTIONS;
@@ -212,8 +212,7 @@ public class TacticSettings {
         this.NPI_BID = page.locator("//div[contains(@class,'npi') and contains(@class,'bidMultiplierImages')]");
         this.NPI_ERROR = page.locator("//div[contains(@class,'noDataMessageHeader')]");
         this.INACTIVE_PANEL = page.locator("//div[contains(@class,'toprightModalContainer')]");
-        PMP pmp = new PMP(page);
-        this.ADD_TARGETING = pmp.ADD_TARGETING_RULE;
+        this.ADD_TARGETING = page.locator("//span[text()='Add Targeting Rule']");
         this.BID_MULTIPLIER_CATEGORY_NAME = page.locator("//div[contains(@class,'bidMultiplierCategoryName')]");
         this.FETCH_BID_MULTIPLIER_RULE_TYPES = page.locator(
                 "//div[contains(@class,'bidMultiplierData')]//div[contains(@class,'bold')]");
