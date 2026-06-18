@@ -341,25 +341,45 @@ jobs:
           PROMPT_EOF
 
           # Build request with correct token parameter for this model family
-          jq -n \
-            --arg model "$MODEL" \
-            --arg token_param "$TOKEN_PARAM" \
-            --rawfile prompt prompt.txt \
-            '{
-              model: $model,
-              temperature: 0,
-              (($token_param): 4096),
-              messages: [
-                {
-                  role: "system",
-                  content: "You are a senior QA automation engineer. Your sole output is raw valid Gherkin — no markdown, no fences, no commentary. You follow the hard rules and decision rules in the user prompt exactly, in order. When in doubt about a construct, default to the simpler one."
-                },
-                {
-                  role: "user",
-                  content: $prompt
-                }
-              ]
-            }' > request.json
+          if [ "$TOKEN_PARAM" = "max_completion_tokens" ]; then
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                temperature: 0,
+                max_completion_tokens: 4096,
+                messages: [
+                  {
+                    role: "system",
+                    content: "You are a senior QA automation engineer. Your sole output is raw valid Gherkin — no markdown, no fences, no commentary. You follow the hard rules and decision rules in the user prompt exactly, in order. When in doubt about a construct, default to the simpler one."
+                  },
+                  {
+                    role: "user",
+                    content: $prompt
+                  }
+                ]
+              }' > request.json
+          else
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                temperature: 0,
+                max_tokens: 4096,
+                messages: [
+                  {
+                    role: "system",
+                    content: "You are a senior QA automation engineer. Your sole output is raw valid Gherkin — no markdown, no fences, no commentary. You follow the hard rules and decision rules in the user prompt exactly, in order. When in doubt about a construct, default to the simpler one."
+                  },
+                  {
+                    role: "user",
+                    content: $prompt
+                  }
+                ]
+              }' > request.json
+          fi
 
           echo "Generating feature file..."
 
