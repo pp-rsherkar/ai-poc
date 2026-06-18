@@ -123,36 +123,49 @@ jobs:
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # =========================
-      # Fetch Jira
+      # Fetch Jira details
       # =========================
       - name: Fetch Jira details
         run: |
           set -euo pipefail
-          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
-          
+      
           RESPONSE=$(curl -s --fail \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
-            
+      
           echo "$RESPONSE" > jira_response.json
-          
+      
           if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
             echo "Jira API returned an error:"
             cat jira_response.json
             exit 1
           fi
-          
+      
           SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-          COMMENTS=$(echo "$RESPONSE" | jq -r '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-          
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' \
+            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+          COMMENTS=$(echo "$RESPONSE" | jq -r \
+            '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' \
+            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+      
           [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
-          [ -z "$COMMENTS" ] && COMMENTS="No Comments"
-          
+          [ -z "$COMMENTS" ]    && COMMENTS="No Comments"
+      
+          # Warn if truncation would occur — don't silently drop content
+          DESC_LEN=${#DESCRIPTION}
+          COMM_LEN=${#COMMENTS}
+      
+          if [ "$DESC_LEN" -gt 12000 ]; then
+            echo "WARNING: Description is ${DESC_LEN} chars — exceeds 12000, will be truncated. Consider splitting the ticket."
+          fi
+          if [ "$COMM_LEN" -gt 8000 ]; then
+            echo "WARNING: Comments are ${COMM_LEN} chars — exceeds 8000, will be truncated."
+          fi
+      
           DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
           COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
-          
+      
           {
             echo "SUMMARY<<EOF"
             echo "$SUMMARY"
@@ -164,6 +177,7 @@ jobs:
             echo "$COMMENTS"
             echo "EOF"
           } >> "$GITHUB_ENV"
+
 
       # =========================
       # List Available Models
@@ -194,40 +208,87 @@ jobs:
           set -euo pipefail
           echo "Preparing repository context..."
           
-          STEP_CONTEXT=$(head -n 120 step_dictionary.txt)
+          # Build context — raise limits so nothing is silently dropped
+          STEP_CONTEXT=$(head -n 300 step_dictionary.txt)     # was 120
           FEATURE_EXAMPLES=$(
             find "$FEATURE_DIR" -name "*.feature" \
             | head -3 \
-            | while read -r f; do
-                cat "$f"
-              done \
-            | head -n 350
+            | while read -r f; do cat "$f"; done \
+            | head -n 600                                       # was 350
           )
           
-          cat <<EOF > prompt.txt
-          Generate a production-quality Cucumber Gherkin feature file matching repository conventions.
-
+          cat <<'PROMPT_EOF' > prompt.txt
           ==================================================
-          RULES
+          HARD RULES — non-negotiable, checked before output
           ==================================================
-          - Return ONLY raw valid Gherkin
-          - No markdown
-          - No code fences
-          - No explanations
-          - Reuse existing repository steps whenever possible
-          - Prefix every Scenario or Scenario Outline with @todo
-          - Keep scenarios concise and automation-friendly
-          - Use business-readable language
-          - Avoid duplicate scenarios
-          - Prefer repository wording over generating new steps
-          - Use Scenario Outline ONLY when permutations are required
-
-          Generate:
-          - Happy path scenarios
-          - Validation scenarios
-          - Negative scenarios
-          - Permission/security scenarios if implied
-
+          1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations, no preamble.
+          2. Every Scenario and Scenario Outline must be preceded by exactly one @todo tag on its own line.
+             Example:
+               @todo
+               Scenario: User logs in with valid credentials
+          3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
+          4. Reuse existing repository steps with EXACT wording. If a semantically equivalent step exists
+             in the STEP DICTIONARY below, you MUST use that exact phrasing. Only coin a new step when no
+             existing step covers the action — and mark it with an inline comment: # NEW STEP
+          5. Do not invent test cases. Every scenario must be traceable to the Jira description or comments.
+          
+          ==================================================
+          DECISION RULES — choose the right construct
+          ==================================================
+          
+          [Scenario vs Scenario Outline]
+          Use plain Scenario by default.
+          Use Scenario Outline + Examples table ONLY when ALL of the following are true:
+            a) The exact same steps apply to 2 or more distinct input/output combinations
+            b) Those combinations are explicitly stated or clearly implied in the Jira ticket
+               (e.g. multiple user roles, listed boundary values, enumerated statuses)
+            c) The Examples table has at least 2 data rows
+          If only one data row would appear in Examples — use a plain Scenario instead.
+          
+          [When to use a data table]
+          Use a Gherkin data table (pipe-delimited rows attached to a step) when:
+            - A single step needs to supply 3 or more key-value pairs (e.g. filling a form)
+            - A step needs to pass a list of items in one action (e.g. a set of permissions,
+              a batch of records, multiple table rows to verify)
+          Do NOT use a data table for 1–2 values — use inline step parameters instead.
+          
+          Data table example (form fill):
+            When I submit the registration form with:
+              | field     | value             |
+              | firstName | John              |
+              | lastName  | Doe               |
+              | email     | john@example.com  |
+              | role      | admin             |
+          
+          Data table example (list assertion):
+            Then the following permissions should be visible:
+              | permission         |
+              | View reports       |
+              | Export data        |
+              | Manage users       |
+          
+          ==================================================
+          SCENARIO GENERATION INSTRUCTIONS
+          ==================================================
+          Step 1 — Extract acceptance criteria:
+            Read the Jira DESCRIPTION and COMMENTS carefully.
+            Identify every explicit or implied acceptance criterion.
+            Each criterion maps to one or more scenarios.
+          
+          Step 2 — Scenario types to cover (only if the ticket implies them):
+            - Happy path (core success flow)
+            - Input validation / boundary conditions
+            - Negative / error flows
+            - Permission / role-based access (only if roles are mentioned in the ticket)
+            - Edge cases explicitly mentioned in comments
+          
+          Step 3 — Write scenarios:
+            - Keep steps in Given / When / Then / And / But order
+            - Use business-readable language (no technical implementation details)
+            - Keep each scenario focused on one behaviour
+            - Avoid duplicate scenarios
+            - Prefer repository step wording over generating new steps
+          
           ==================================================
           JIRA DETAILS
           ==================================================
@@ -235,33 +296,54 @@ jobs:
           SUMMARY: $SUMMARY
           DESCRIPTION: $DESCRIPTION
           COMMENTS: $COMMENTS
-
+          
           ==================================================
-          REPOSITORY FEATURE EXAMPLES
+          REPOSITORY FEATURE EXAMPLES (follow these conventions exactly)
           ==================================================
           $FEATURE_EXAMPLES
-
+          
           ==================================================
-          RELEVANT STEP DEFINITIONS
+          STEP DICTIONARY (reuse these steps with exact wording)
           ==================================================
           $STEP_CONTEXT
-
+          
           ==================================================
           OUTPUT FORMAT
           ==================================================
-          Feature: <name>
-          EOF
+          Feature: <concise feature name derived from Jira summary>
+          
+            Background: (include only if 2+ scenarios share the same Given steps)
+              Given ...
+          
+            @todo
+            Scenario: <...>
+              Given ...
+              When ...
+              Then ...
+          
+            @todo
+            Scenario Outline: <...>
+              Given ...
+              When ... "<param>"
+              Then ...
+          
+              Examples:
+                | param  |
+                | value1 |
+                | value2 |
+          PROMPT_EOF
 
           jq -n \
             --arg model "${{ inputs.llm_model }}" \
             --rawfile prompt prompt.txt \
             '{
-              model: "${{ inputs.llm_model }}",
+              model: $model,
               temperature: 0,
+              max_tokens: 4096,
               messages: [
                 {
                   role: "system",
-                  content: "You are a senior QA automation engineer generating enterprise-grade Cucumber Gherkin feature files.\n\nRules:\n- Return ONLY raw valid Gherkin\n- No markdown\n- No explanations\n- Follow repository conventions exactly\n- Prefer reusable repository steps\n- Use concise business-readable language\n- Generate deterministic automation-friendly scenarios\n- Avoid duplicate scenarios\n- Use Scenario Outline only when necessary"
+                  content: "You are a senior QA automation engineer. Your sole output is raw valid Gherkin — no markdown, no fences, no commentary. You follow the hard rules and decision rules in the user prompt exactly, in order. When in doubt about a construct, default to the simpler one."
                 },
                 {
                   role: "user",
@@ -332,19 +414,19 @@ jobs:
           set -euo pipefail
           FILE="${{ inputs.jira_id }}.feature"
           mkdir -p "$FEATURE_DIR"
-          
-          awk '
-          /^(Scenario:|Scenario Outline:)/ {
-            if (prev != "@todo") print "@todo"
-            print $0; prev="@todo"; next
-          }
-          { prev=""; print }
-          ' generated.feature > "$FEATURE_DIR/$FILE"
-          
+      
+          cp generated.feature "$FEATURE_DIR/$FILE"
+      
           if [ ! -s "$FEATURE_DIR/$FILE" ]; then
             echo "Generated feature file is empty"
             exit 1
           fi
+      
+          if ! grep -q "^Feature:" "$FEATURE_DIR/$FILE"; then
+            echo "Saved file missing Feature: declaration"
+            exit 1
+          fi
+      
           echo "FILE=$FILE" >> "$GITHUB_ENV"
             
       # =========================
