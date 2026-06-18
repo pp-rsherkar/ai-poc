@@ -23,7 +23,7 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     #1
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -49,8 +49,8 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
     #5
-    And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    And User saves the "HCP Explorer" workspace
+    Then Verify the "HCP Explorer" Workspace is saved
     Then Check the webhook icon is highlighted in green color
     #6
     When User tries to delete the workspace associated with active webhook from the workspace list
@@ -64,7 +64,7 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     #1
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
@@ -98,8 +98,8 @@ Feature: Webhook Creation and Validation in HCP Explorer Workspace
     When User saves the webhook setup
     Then Check that the success message appears once the webhook is successfully created
     #6
-    And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    And User saves the "HCP Explorer" workspace
+    Then Verify the "HCP Explorer" Workspace is saved
     Then Check the webhook icon is highlighted in green color
     #7
     When User tries to delete the workspace associated with active webhook from the workspace list
