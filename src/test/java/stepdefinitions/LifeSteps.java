@@ -1144,9 +1144,10 @@ public class LifeSteps {
     /*Roshani Sherkar - 18-06-2025
      * Campaign Dashbaord Features Start*/
     @And("Verify Campaign Dashboard is displayed with title {string}")
-    public void verifyCampaignDashboardIsDisplayedWithTitle(String title) {
+    public void verifyCampaignDashboardIsDisplayedWithTitle(String title) throws InterruptedException {
         logger.info("Verifying Campaign Dashboard is displayed with title: {}", title);
         Assert.assertEquals(title, campaignDashboard.isCampaignDashboardVisibleWithTitle(title));
+        Thread.sleep(3000);
     }
 
     @When("User enters {string} and click Search button")
