@@ -18,36 +18,13 @@ on:
           - openai/gpt-4.1-nano
           - openai/gpt-4o
           - openai/gpt-4o-mini
-          - openai/gpt-5
-          - openai/gpt-5-chat
-          - openai/gpt-5-mini
-          - openai/gpt-5-nano
           - openai/o1
           - openai/o1-mini
-          - openai/o1-preview
           - openai/o3
           - openai/o3-mini
           - openai/o4-mini
-          - cohere/cohere-command-a
-          - deepseek/deepseek-r1
-          - deepseek/deepseek-r1-0528
-          - deepseek/deepseek-v3-0324
-          - meta/llama-3.2-11b-vision-instruct
-          - meta/llama-3.2-90b-vision-instruct
           - meta/llama-3.3-70b-instruct
-          - meta/llama-4-maverick-17b-128e-instruct-fp8
-          - meta/llama-4-scout-17b-16e-instruct
-          - meta/meta-llama-3.1-405b-instruct
-          - meta/meta-llama-3.1-8b-instruct
-          - mistral-ai/codestral-2501
-          - mistral-ai/ministral-3b
-          - mistral-ai/mistral-medium-2505
           - mistral-ai/mistral-small-2503
-          - microsoft/phi-4
-          - microsoft/phi-4-mini-instruct
-          - microsoft/phi-4-mini-reasoning
-          - microsoft/phi-4-multimodal-instruct
-          - microsoft/phi-4-reasoning  
 
 permissions:
   contents: write
@@ -60,8 +37,10 @@ jobs:
 
     env:
       FEATURE_DIR: src/test/resources/features
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
+
       # =========================
       # Checkout
       # =========================
@@ -77,95 +56,81 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y jq
+          sudo apt-get install -y jq gh
 
       # =========================
-      # Build reusable step dictionary
+      # Build step dictionary
       # =========================
       - name: Build AI repository context
         run: |
           set -euo pipefail
-          
+
           mkdir -p "$FEATURE_DIR"
-          FEATURE_COUNT=$(find "$FEATURE_DIR" -name "*.feature" | wc -l)
-          
-          if [ "$FEATURE_COUNT" -gt 0 ]; then
-            TEMP_FILE=$(mktemp)
+
+          if find "$FEATURE_DIR" -name "*.feature" | grep -q .; then
             find "$FEATURE_DIR" -name "*.feature" \
               -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
-              2>/dev/null \
               | sed 's/^[[:space:]]*//g' \
               | sort -u \
-              > "$TEMP_FILE"
-            head -n 300 "$TEMP_FILE" > step_dictionary.txt
-            rm -f "$TEMP_FILE"
+              | head -n 300 > step_dictionary.txt
           else
             touch step_dictionary.txt
           fi
-          
-          echo "Reusable step count:"
-          wc -l step_dictionary.txt
 
       # =========================
-      # Create working branch
+      # Create branch
       # =========================
       - name: Create branch
         run: |
           set -euo pipefail
+
           BRANCH="${{ inputs.jira_id }}"
-          
+
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          
+
           git fetch origin
-          git checkout -b "$BRANCH" || git checkout "$BRANCH"
-          
+
+          git checkout "$BRANCH" 2>/dev/null || git checkout -b "$BRANCH"
+
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # =========================
-      # Fetch Jira details
+      # Fetch Jira details (SAFE ADF parsing)
       # =========================
       - name: Fetch Jira details
         run: |
           set -euo pipefail
-      
+
           RESPONSE=$(curl -s --fail \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
             "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
-      
+
           echo "$RESPONSE" > jira_response.json
-      
+
           if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
-            echo "Jira API returned an error:"
+            echo "Jira API error"
             cat jira_response.json
             exit 1
           fi
-      
+
           SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' \
-            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-          COMMENTS=$(echo "$RESPONSE" | jq -r \
-            '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' \
-            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-      
-          [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
-          [ -z "$COMMENTS" ]    && COMMENTS="No Comments"
-      
-          # Warn if truncation would occur — don't silently drop content
-          DESC_LEN=${#DESCRIPTION}
-          COMM_LEN=${#COMMENTS}
-      
-          if [ "$DESC_LEN" -gt 12000 ]; then
-            echo "WARNING: Description is ${DESC_LEN} chars — exceeds 12000, will be truncated. Consider splitting the ticket."
-          fi
-          if [ "$COMM_LEN" -gt 8000 ]; then
-            echo "WARNING: Comments are ${COMM_LEN} chars — exceeds 8000, will be truncated."
-          fi
-      
+
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '
+            [.fields.description.content[]?.content[]?.text] | join(" ")
+          ')
+
+          COMMENTS=$(echo "$RESPONSE" | jq -r '
+            [.fields.comment.comments[]?.body.content[]?.content[]?.text] | join(" ")
+          ')
+
+          DESCRIPTION=${DESCRIPTION:-"No Description"}
+          COMMENTS=${COMMENTS:-"No Comments"}
+
           DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
           COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
-      
+
           {
             echo "SUMMARY<<EOF"
             echo "$SUMMARY"
@@ -178,137 +143,59 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_ENV"
 
-
       # =========================
-      # List Available Models
+      # Write prompt + call model (FIXED SCOPE)
       # =========================
-      - name: List available models
-        env:
-          # Bound directly to your custom repository secret
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Generate Feature via Model
         run: |
           set -euo pipefail
-          RESPONSE=$(curl -sS \
-            https://models.github.ai/catalog/models \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json")
-          echo "$RESPONSE" | jq -r 'if type=="object" and (.data|type=="array") then .data[].id elif type=="array" then .[].id else empty end'
 
-      # =========================
-      # Write prompt file
-      # IMPORTANT: cat block MUST start at column 0
-      # =========================
-      - name: Write prompt file
-        env:
-          SUMMARY: ${{ env.SUMMARY }}
-          DESCRIPTION: ${{ env.DESCRIPTION }}
-          COMMENTS: ${{ env.COMMENTS }}
-        run: |
-          set -euo pipefail
+          MODEL="${{ inputs.llm_model }}"
+
+          if echo "$MODEL" | grep -Eq "^openai/o[0-9]"; then
+            TOKEN_PARAM="max_completion_tokens"
+          else
+            TOKEN_PARAM="max_tokens"
+          fi
 
           STEP_CONTEXT=$(head -n 80 step_dictionary.txt)
-          FEATURE_EXAMPLES=$(
-            find "$FEATURE_DIR" -name "*.feature" \
-            | head -2 \
-            | while read -r f; do cat "$f"; done \
-            | head -n 100
-          )
 
-          SUMMARY_TRIM=$(echo "$SUMMARY"   | cut -c1-300)
-          DESC_TRIM=$(echo "$DESCRIPTION"  | cut -c1-2000)
-          COMMENTS_TRIM=$(echo "$COMMENTS" | cut -c1-1000)
+          FEATURE_EXAMPLES=""
+          while IFS= read -r f; do
+            FEATURE_EXAMPLES="$FEATURE_EXAMPLES
+$(cat "$f")"
+          done < <(find "$FEATURE_DIR" -name "*.feature" | head -2)
 
-          cat > prompt.txt << PROMPT_EOF
-          HARD RULES:
-          1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
-          2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
-          3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-          4. If a matching step exists in STEP DICTIONARY use its EXACT wording. Mark new steps: # NEW STEP
-          5. Never use placeholder steps like "# NEW STEP something happens". Write the full step text always.
-          6. Never use angle bracket tokens like <WORKSPACE_NAME> unless they are Scenario Outline parameters defined in an Examples table.
-          
-          DECISION RULES:
-          - Use plain Scenario by default.
-          - Use Scenario Outline + Examples ONLY when: same steps apply to 2+ distinct combos explicit in the ticket AND Examples has 2+ rows.
-          - Use a data table when a step needs 3+ key-value pairs or a list. Not for 1-2 values.
-          
-          Data table example:
-            When I submit the form with:
-              | field | value |
-              | email | a@b.c |
-              | role  | admin |
-          
-          DESCRIPTION INTERPRETATION RULES:
-          The Jira description may be written in different styles. You must handle all of them:
-          
-          Style 1 — Explicit acceptance criteria (Given/When/Then already implied):
-            Interpret directly and write scenarios.
-          
-          Style 2 — Scope list or feature list (e.g. "FE: Dropdown Changes, Brand Multi Select"):
-            For each item in the list, infer the most likely user-facing behaviour and write a scenario.
-            Ask yourself: what would a QA engineer test for this item?
-            Example: "Brand Multi Select" → scenario where user selects multiple brands and verifies they are applied.
-          
-          Style 3 — Status notes or release notes (e.g. "6/9 - RELEASED. Remediating bugs."):
-            Ignore pure status lines. Focus only on functional items mentioned.
-          
-          Style 4 — Mixed (scope list + UPDATED section + status notes):
-            Process each section independently using the rules above.
-            UPDATED section items are high priority — always generate a scenario for each.
-          
-          For ANY description style:
-          - Every bullet point, numbered item, or named feature in SCOPE sections must produce at least one scenario.
-          - UPDATED section items must each produce at least one scenario.
-          - Never skip a scope item because it lacks explicit ACs — infer the behaviour from the item name and context.
-          - Use the COMMENTS section for additional context, edge cases, or clarifications.
-          
-          SCENARIO GENERATION:
-          1. Read the full DESCRIPTION and COMMENTS.
-          2. Identify every functional scope item regardless of description style.
-          3. For each item write scenarios covering:
-             - Happy path (the feature works as expected)
-             - Negative/validation (invalid input, missing data, boundary) — only if inferable from context
-             - Permission/role (only if roles are mentioned)
-          4. Steps must be in Given/When/Then/And/But order.
-          5. Use business-readable language. No technical implementation details.
-          6. One behaviour per scenario. No duplicates.
-          7. When step wording must be invented, write a full meaningful step — never a placeholder.
-          
-          JIRA:
-          ID: ${{ inputs.jira_id }}
-          SUMMARY: $SUMMARY_TRIM
-          DESCRIPTION: $DESC_TRIM
-          COMMENTS: $COMMENTS_TRIM
-          
-          REPOSITORY EXAMPLES:
-          $FEATURE_EXAMPLES
-          
-          STEP DICTIONARY:
-          $STEP_CONTEXT
-          
-          OUTPUT FORMAT:
-          Feature: <name from Jira summary>
-          
-            @todo
-            Scenario: <title>
-              Given ...
-              When ...
-              Then ...
-          
-            @todo
-            Scenario Outline: <title>
-              Given ...
-              When ... "<param>"
-              Then ...
-              Examples:
-                | param  |
-                | value1 |
-                | value2 |
-          PROMPT_EOF
+          cat > prompt.txt <<EOF
+HARD RULES:
+- Output ONLY raw Gherkin
+- No markdown, no explanation
+- One @todo per scenario
 
-          echo "Prompt size: $(wc -c < prompt.txt) bytes / $(wc -w < prompt.txt) words (est. $(( $(wc -w < prompt.txt) / 3 )) tokens)"
+JIRA SUMMARY:
+$SUMMARY
 
-          # Build request
+DESCRIPTION:
+$DESCRIPTION
+
+COMMENTS:
+$COMMENTS
+
+STEP DICTIONARY:
+$STEP_CONTEXT
+
+EXAMPLES:
+$FEATURE_EXAMPLES
+
+Feature: $SUMMARY
+
+@todo
+Scenario: Example
+  Given ...
+  When ...
+  Then ...
+EOF
+
           if [ "$TOKEN_PARAM" = "max_completion_tokens" ]; then
             jq -n \
               --arg model "$MODEL" \
@@ -318,14 +205,8 @@ jobs:
                 temperature: 0,
                 max_completion_tokens: 4096,
                 messages: [
-                  {
-                    role: "system",
-                    content: "You are a senior QA automation engineer. Output raw valid Gherkin only — no markdown, no fences, no commentary."
-                  },
-                  {
-                    role: "user",
-                    content: $prompt
-                  }
+                  {role: "system", content: "You are a QA automation engineer. Output only Gherkin."},
+                  {role: "user", content: $prompt}
                 ]
               }' > request.json
           else
@@ -337,20 +218,11 @@ jobs:
                 temperature: 0,
                 max_tokens: 4096,
                 messages: [
-                  {
-                    role: "system",
-                    content: "You are a senior QA automation engineer. Output raw valid Gherkin only — no markdown, no fences, no commentary."
-                  },
-                  {
-                    role: "user",
-                    content: $prompt
-                  }
+                  {role: "system", content: "You are a QA automation engineer. Output only Gherkin."},
+                  {role: "user", content: $prompt}
                 ]
               }' > request.json
           fi
-
-          echo "Request size: $(wc -c < request.json) bytes"
-          echo "Generating feature file..."
 
           HTTP_RESPONSE=$(mktemp)
 
@@ -358,96 +230,67 @@ jobs:
             https://models.github.ai/inference/chat/completions \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
             --data @request.json)
 
-          echo "HTTP Status: $HTTP_CODE"
-          cat "$HTTP_RESPONSE"
-
           if [ "$HTTP_CODE" -ne 200 ]; then
-            echo "Model API request failed"
+            cat "$HTTP_RESPONSE"
             exit 1
           fi
 
-          RESPONSE=$(cat "$HTTP_RESPONSE")
-          echo "$RESPONSE" > model_response.json
+          FEATURE=$(jq -r '.choices[0].message.content // empty' "$HTTP_RESPONSE")
+          FEATURE=$(echo "$FEATURE" | sed 's/```//g')
 
-          FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
-          FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
-
-          if [ -z "$FEATURE" ]; then
-            echo "Model returned empty output"
-            cat model_response.json
-            exit 1
-          fi
-
-          if ! echo "$FEATURE" | grep -q "^Feature:"; then
-            echo "Invalid Gherkin generated"
-            echo "$FEATURE"
-            exit 1
-          fi
-
-          if ! echo "$FEATURE" | grep -Eq "Scenario:|Scenario Outline:"; then
-            echo "No scenarios generated"
+          if ! echo "$FEATURE" | grep -qi "^Feature:"; then
+            echo "Invalid output"
             echo "$FEATURE"
             exit 1
           fi
 
           echo "$FEATURE" > generated.feature
-          echo "Feature file generated successfully"
 
       # =========================
-      # Save feature file
+      # Save feature
       # =========================
       - name: Save feature file
         run: |
           set -euo pipefail
+
           FILE="${{ inputs.jira_id }}.feature"
           mkdir -p "$FEATURE_DIR"
-      
+
           cp generated.feature "$FEATURE_DIR/$FILE"
-      
-          if [ ! -s "$FEATURE_DIR/$FILE" ]; then
-            echo "Generated feature file is empty"
-            exit 1
-          fi
-      
-          if ! grep -q "^Feature:" "$FEATURE_DIR/$FILE"; then
-            echo "Saved file missing Feature: declaration"
-            exit 1
-          fi
-      
+
           echo "FILE=$FILE" >> "$GITHUB_ENV"
-            
+
       # =========================
-      # Commit and push
+      # Commit & push (safe)
       # =========================
       - name: Commit & push
         run: |
           set -euo pipefail
+
           git add "$FEATURE_DIR/${{ env.FILE }}"
-          git commit -m "feat(${{ inputs.jira_id }}): generate feature file" || true
-          git push origin "${{ env.BRANCH }}" --force
+
+          git commit -m "feat(${{ inputs.jira_id }}): generate feature" || true
+
+          git push origin "${{ env.BRANCH }}" --force-with-lease
 
       # =========================
-      # Create Pull Request
+      # Create PR
       # =========================
       - name: Create Pull Request
-        env:
-          # Using your custom repository secret for the GitHub CLI client mapping layer
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           set -euo pipefail
-          PR_NUMBER=$(gh pr list --head "${{ env.BRANCH }}" --base main --json number --jq '.[0].number')
-          
-          if [ -n "$PR_NUMBER" ]; then
-            echo "Pull Request already exists"
+
+          PR=$(gh pr list --head "${{ env.BRANCH }}" --json number --jq '.[0].number')
+
+          if [ -n "$PR" ]; then
+            echo "PR exists"
             exit 0
           fi
-          
+
           gh pr create \
             --base main \
             --head "${{ env.BRANCH }}" \
-            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
-            --body "Auto-generated BDD feature file from Jira ticket parameters."
+            --title "feat(${{ inputs.jira_id }}): $SUMMARY" \
+            --body "Auto-generated Gherkin feature from Jira."
