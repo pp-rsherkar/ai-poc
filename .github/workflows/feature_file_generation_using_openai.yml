@@ -195,19 +195,17 @@ jobs:
           echo "$RESPONSE" | jq -r 'if type=="object" and (.data|type=="array") then .data[].id elif type=="array" then .[].id else empty end'
 
       # =========================
-      # Generate Feature File
+      # Write prompt file
+      # IMPORTANT: cat block MUST start at column 0
       # =========================
-      - name: Generate feature via GitHub Models
+      - name: Write prompt file
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SUMMARY: ${{ env.SUMMARY }}
           DESCRIPTION: ${{ env.DESCRIPTION }}
           COMMENTS: ${{ env.COMMENTS }}
         run: |
           set -euo pipefail
-          echo "Preparing repository context..."
 
-          # Cap context aggressively to stay within 8000 token limit
           STEP_CONTEXT=$(head -n 80 step_dictionary.txt)
           FEATURE_EXAMPLES=$(
             find "$FEATURE_DIR" -name "*.feature" \
@@ -216,29 +214,18 @@ jobs:
             | head -n 100
           )
 
-          # Trim Jira fields at prompt-build time (not just at fetch time)
-          SUMMARY_TRIM=$(echo "$SUMMARY"     | cut -c1-300)
-          DESC_TRIM=$(echo "$DESCRIPTION"    | cut -c1-2000)
-          COMMENTS_TRIM=$(echo "$COMMENTS"   | cut -c1-1000)
+          SUMMARY_TRIM=$(echo "$SUMMARY"   | cut -c1-300)
+          DESC_TRIM=$(echo "$DESCRIPTION"  | cut -c1-2000)
+          COMMENTS_TRIM=$(echo "$COMMENTS" | cut -c1-1000)
 
-          # Determine correct token parameter based on model family
-          MODEL="${{ inputs.llm_model }}"
-          if echo "$MODEL" | grep -Eq "^openai/(o[0-9]|gpt-5)"; then
-            TOKEN_PARAM="max_completion_tokens"
-          else
-            TOKEN_PARAM="max_tokens"
-          fi
-
-          # Write prompt to a temp file first to measure size
-          # IMPORTANT: cat > file << EOF (not cat << EOF > file) and flush-left
-          # to avoid heredoc indentation adding whitespace tokens
           cat > prompt.txt << PROMPT_EOF
           HARD RULES:
           1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
           2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
           3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
           4. If a matching step exists in STEP DICTIONARY use its EXACT wording. Mark new steps: # NEW STEP
-          5. Do not invent test cases. Every scenario must trace to the Jira description or comments.
+          5. Never use placeholder steps like "# NEW STEP something happens". Write the full step text always.
+          6. Never use angle bracket tokens like <WORKSPACE_NAME> unless they are Scenario Outline parameters defined in an Examples table.
           
           DECISION RULES:
           - Use plain Scenario by default.
@@ -251,10 +238,41 @@ jobs:
               | email | a@b.c |
               | role  | admin |
           
+          DESCRIPTION INTERPRETATION RULES:
+          The Jira description may be written in different styles. You must handle all of them:
+          
+          Style 1 — Explicit acceptance criteria (Given/When/Then already implied):
+            Interpret directly and write scenarios.
+          
+          Style 2 — Scope list or feature list (e.g. "FE: Dropdown Changes, Brand Multi Select"):
+            For each item in the list, infer the most likely user-facing behaviour and write a scenario.
+            Ask yourself: what would a QA engineer test for this item?
+            Example: "Brand Multi Select" → scenario where user selects multiple brands and verifies they are applied.
+          
+          Style 3 — Status notes or release notes (e.g. "6/9 - RELEASED. Remediating bugs."):
+            Ignore pure status lines. Focus only on functional items mentioned.
+          
+          Style 4 — Mixed (scope list + UPDATED section + status notes):
+            Process each section independently using the rules above.
+            UPDATED section items are high priority — always generate a scenario for each.
+          
+          For ANY description style:
+          - Every bullet point, numbered item, or named feature in SCOPE sections must produce at least one scenario.
+          - UPDATED section items must each produce at least one scenario.
+          - Never skip a scope item because it lacks explicit ACs — infer the behaviour from the item name and context.
+          - Use the COMMENTS section for additional context, edge cases, or clarifications.
+          
           SCENARIO GENERATION:
-          1. Extract every acceptance criterion from DESCRIPTION and COMMENTS.
-          2. Cover: happy path, validation, negative flows, role-based access (only if roles mentioned), edge cases from comments.
-          3. Steps in Given/When/Then/And/But order. Business language. One behaviour per scenario. No duplicates.
+          1. Read the full DESCRIPTION and COMMENTS.
+          2. Identify every functional scope item regardless of description style.
+          3. For each item write scenarios covering:
+             - Happy path (the feature works as expected)
+             - Negative/validation (invalid input, missing data, boundary) — only if inferable from context
+             - Permission/role (only if roles are mentioned)
+          4. Steps must be in Given/When/Then/And/But order.
+          5. Use business-readable language. No technical implementation details.
+          6. One behaviour per scenario. No duplicates.
+          7. When step wording must be invented, write a full meaningful step — never a placeholder.
           
           JIRA:
           ID: ${{ inputs.jira_id }}
@@ -287,10 +305,8 @@ jobs:
                 | value1 |
                 | value2 |
           PROMPT_EOF
-          
-          PROMPT_BYTES=$(wc -c < prompt.txt)
-          PROMPT_WORDS=$(wc -w < prompt.txt)
-          echo "Prompt size: ${PROMPT_BYTES} bytes / ${PROMPT_WORDS} words (est. $(( PROMPT_WORDS / 3 )) tokens)"
+
+          echo "Prompt size: $(wc -c < prompt.txt) bytes / $(wc -w < prompt.txt) words (est. $(( $(wc -w < prompt.txt) / 3 )) tokens)"
 
           # Build request
           if [ "$TOKEN_PARAM" = "max_completion_tokens" ]; then
