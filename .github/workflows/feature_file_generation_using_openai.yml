@@ -7,6 +7,10 @@ on:
         description: "Enter JIRA Ticket ID (e.g., QA-1321)"
         required: true
         type: string
+      domain:
+        description: "Target domain/sub-folder (e.g., checkout, login). Leave empty for general."
+        required: false
+        type: string
       llm_model:
         description: "Select LLM Model"
         required: true
@@ -229,17 +233,30 @@ jobs:
           DESCRIPTION: ${{ env.DESCRIPTION }}
           COMMENTS: ${{ env.COMMENTS }}
           JIRA_ID: ${{ inputs.jira_id }}
+          DOMAIN: ${{ inputs.domain }}
         run: |
           set -euo pipefail
 
-          STEP_CONTEXT=$(head -n 200 step_dictionary.txt || echo "")
-          SCENARIO_CONTEXT=$(head -n 100 scenario_dictionary.txt || echo "")
-          FEATURE_EXAMPLES=$(
-            find "$FEATURE_DIR" -name "*.feature" \
-            | head -2 \
-            | while read -r f; do cat "$f"; done \
-            | head -n 100
-          )
+          # Pass full step and scenario dictionaries instead of truncating
+          STEP_CONTEXT=$(cat step_dictionary.txt || echo "")
+          SCENARIO_CONTEXT=$(cat scenario_dictionary.txt || echo "")
+          
+          # Pick domain-specific feature examples if a domain is provided
+          if [ -n "$DOMAIN" ] && [ -d "$FEATURE_DIR/$DOMAIN" ]; then
+            FEATURE_EXAMPLES=$(
+              find "$FEATURE_DIR/$DOMAIN" -name "*.feature" \
+              | head -2 \
+              | while read -r f; do cat "$f"; done \
+              | head -n 100
+            )
+          else
+            FEATURE_EXAMPLES=$(
+              find "$FEATURE_DIR" -name "*.feature" \
+              | head -2 \
+              | while read -r f; do cat "$f"; done \
+              | head -n 100
+            )
+          fi
 
           # Export so Python can read them
           export STEP_CONTEXT
@@ -256,12 +273,14 @@ jobs:
           desc_trim        = os.environ.get("DESCRIPTION", "")[:2000]
           comments_trim    = os.environ.get("COMMENTS", "")[:1000]
           jira_id          = os.environ.get("JIRA_ID", "")
+          domain           = os.environ.get("DOMAIN", "")
+          domain_text      = domain if domain else "general"
           
           prompt = f"""HARD RULES:
           1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
           2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
           3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-          4. If a matching step exists in STEP DICTIONARY use its EXACT wording. Mark new steps with a comment: # NEW STEP
+          4. You MUST heavily prioritize reusing steps from the provided STEP DICTIONARY for the target domain ({domain_text}). Penalise invented steps. If a matching step exists, use its EXACT wording. Mark any unavoidably new steps with a comment: # NEW STEP
           5. Never use placeholder steps. Write the full meaningful step text always.
           6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
           
@@ -307,6 +326,7 @@ jobs:
           
           JIRA:
           ID: {jira_id}
+          TARGET DOMAIN: {domain_text}
           SUMMARY: {summary_trim}
           DESCRIPTION: {desc_trim}
           COMMENTS: {comments_trim}
@@ -460,24 +480,66 @@ jobs:
       # Save feature file
       # =========================
       - name: Save feature file
+        env:
+          DOMAIN: ${{ inputs.domain }}
         run: |
           set -euo pipefail
           FILE="${{ inputs.jira_id }}.feature"
-          mkdir -p "$FEATURE_DIR"
+          
+          if [ -n "$DOMAIN" ]; then
+            TARGET_DIR="$FEATURE_DIR/$DOMAIN"
+          else
+            TARGET_DIR="$FEATURE_DIR"
+          fi
+          
+          mkdir -p "$TARGET_DIR"
+          cp generated.feature "$TARGET_DIR/$FILE"
 
-          cp generated.feature "$FEATURE_DIR/$FILE"
-
-          if [ ! -s "$FEATURE_DIR/$FILE" ]; then
+          if [ ! -s "$TARGET_DIR/$FILE" ]; then
             echo "Generated feature file is empty"
             exit 1
           fi
 
-          if ! grep -q "^Feature:" "$FEATURE_DIR/$FILE"; then
+          if ! grep -q "^Feature:" "$TARGET_DIR/$FILE"; then
             echo "Saved file missing Feature: declaration"
             exit 1
           fi
+          
+          if [ -n "$DOMAIN" ]; then
+            echo "FILE=$DOMAIN/$FILE" >> "$GITHUB_ENV"
+          else
+            echo "FILE=$FILE" >> "$GITHUB_ENV"
+          fi
 
-          echo "FILE=$FILE" >> "$GITHUB_ENV"
+      # =========================
+      # Validate Output
+      # =========================
+      - name: Validate Output
+        run: |
+          set -euo pipefail
+          echo "Verifying step reuse..."
+          
+          # Extract all steps from the generated feature
+          grep -E '^\s*(Given|When|Then|And|But)\s+' generated.feature | sed -E 's/^\s+//' > generated_steps.txt || true
+          
+          # Extract all existing steps from dictionary
+          grep -E '^(Given|When|Then|And|But)\s+' step_dictionary.txt > all_existing_steps.txt || true
+          
+          # Find new steps
+          grep -v -F -x -f all_existing_steps.txt generated_steps.txt > new_steps.txt || true
+          
+          NEW_STEPS_COUNT=$(wc -l < new_steps.txt || echo 0)
+          TOTAL_STEPS=$(wc -l < generated_steps.txt || echo 0)
+          
+          echo "Total steps: $TOTAL_STEPS"
+          echo "New invented steps: $NEW_STEPS_COUNT"
+          
+          if [ -s new_steps.txt ]; then
+            echo "::warning::The model invented the following new steps:"
+            cat new_steps.txt
+          else
+            echo "SUCCESS: All generated steps match existing steps."
+          fi
 
       # =========================
       # Commit and push
