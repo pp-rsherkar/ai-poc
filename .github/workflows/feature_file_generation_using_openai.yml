@@ -87,24 +87,50 @@ jobs:
           set -euo pipefail
 
           mkdir -p "$FEATURE_DIR"
-          FEATURE_COUNT=$(find "$FEATURE_DIR" -name "*.feature" | wc -l)
-
-          if [ "$FEATURE_COUNT" -gt 0 ]; then
-            TEMP_FILE=$(mktemp)
-            find "$FEATURE_DIR" -name "*.feature" \
-              -exec grep -hE "^\s*(Given|When|Then|And|But) " {} \; \
-              2>/dev/null \
-              | sed 's/^[[:space:]]*//g' \
-              | sort -u \
-              > "$TEMP_FILE"
-            head -n 300 "$TEMP_FILE" > step_dictionary.txt
-            rm -f "$TEMP_FILE"
-          else
-            touch step_dictionary.txt
-          fi
+          
+          python3 << 'PYEOF'
+          import os, glob, re
+          from collections import defaultdict
+          
+          feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
+          
+          steps_by_domain = defaultdict(set)
+          scenarios = []
+          
+          for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
+              domain = os.path.basename(os.path.dirname(file_path))
+              if domain == "features" or domain == "":
+                  domain = "general"
+                  
+              with open(file_path, 'r', encoding='utf-8') as f:
+                  content = f.read()
+                  
+                  # Extract scenarios
+                  for match in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
+                      scenarios.append(f"[{domain}] {match.group(0).strip()}")
+                  
+                  # Extract steps
+                  for line in content.split('\n'):
+                      line = line.strip()
+                      if re.match(r'^(Given|When|Then|And|But)\s+', line):
+                          steps_by_domain[domain].add(line)
+          
+          # Write step dictionary
+          with open('step_dictionary.txt', 'w', encoding='utf-8') as f:
+              for domain, steps in sorted(steps_by_domain.items()):
+                  f.write(f"\n--- Domain: {domain} ---\n")
+                  f.write('\n'.join(sorted(steps)))
+                  f.write('\n')
+                  
+          # Write scenario dictionary
+          with open('scenario_dictionary.txt', 'w', encoding='utf-8') as f:
+              f.write('\n'.join(scenarios))
+          PYEOF
 
           echo "Reusable step count:"
-          wc -l step_dictionary.txt
+          wc -l step_dictionary.txt 2>/dev/null || echo "0 step_dictionary.txt"
+          echo "Scenario count:"
+          wc -l scenario_dictionary.txt 2>/dev/null || echo "0 scenario_dictionary.txt"
 
       # =========================
       # Create working branch
@@ -206,7 +232,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          STEP_CONTEXT=$(head -n 80 step_dictionary.txt)
+          STEP_CONTEXT=$(head -n 200 step_dictionary.txt || echo "")
+          SCENARIO_CONTEXT=$(head -n 100 scenario_dictionary.txt || echo "")
           FEATURE_EXAMPLES=$(
             find "$FEATURE_DIR" -name "*.feature" \
             | head -2 \
@@ -216,12 +243,14 @@ jobs:
 
           # Export so Python can read them
           export STEP_CONTEXT
+          export SCENARIO_CONTEXT
           export FEATURE_EXAMPLES
 
           python3 << 'PYEOF'
           import os
           
           step_context     = os.environ.get("STEP_CONTEXT", "")
+          scenario_context = os.environ.get("SCENARIO_CONTEXT", "")
           feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
           summary_trim     = os.environ.get("SUMMARY", "")[:300]
           desc_trim        = os.environ.get("DESCRIPTION", "")[:2000]
@@ -284,6 +313,9 @@ jobs:
           
           REPOSITORY EXAMPLES:
           {feature_examples}
+          
+          EXISTING SCENARIOS (Domain-aware):
+          {scenario_context}
           
           STEP DICTIONARY:
           {step_context}
