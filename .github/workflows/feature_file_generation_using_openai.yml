@@ -128,9 +128,9 @@ jobs:
           PYEOF
 
           echo "Reusable step count:"
-          wc -l step_dictionary.txt || echo 0
+          wc -l step_dictionary.txt 2>/dev/null || echo "0 step_dictionary.txt"
           echo "Scenario count:"
-          wc -l scenario_dictionary.txt || echo 0
+          wc -l scenario_dictionary.txt 2>/dev/null || echo "0 scenario_dictionary.txt"
 
       # =========================
       # Create working branch
