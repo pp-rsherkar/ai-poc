@@ -280,7 +280,7 @@ jobs:
                   content = f.read()
                   blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
                   steps = []
-                  for i in range(1, len(blocks), 2):
+                  for i in range(1, len(blocks) - 1, 2):
                       d = blocks[i]
                       s = blocks[i+1]
                       if d == domain_text or d == "general":
@@ -572,7 +572,7 @@ jobs:
               with open("step_dictionary.txt", "r", encoding="utf-8") as f:
                   content = f.read()
                   blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-                  for i in range(1, len(blocks), 2):
+                  for i in range(1, len(blocks) - 1, 2):
                       d = blocks[i]
                       s = blocks[i+1]
                       if d == domain_text or d == "general":
