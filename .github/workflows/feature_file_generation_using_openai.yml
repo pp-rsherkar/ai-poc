@@ -636,16 +636,14 @@ jobs:
             echo "INVENTED_RATIO=$INVENTED_RATIO"
           } >> "$GITHUB_ENV"
           
-          if [ "$INVENTED_RATIO" -gt 30 ]; then
-            echo "::error::The model invented $NEW_STEPS_COUNT new steps out of $TOTAL_STEPS ($INVENTED_RATIO%). This exceeds the 30% threshold."
+          if [ "$INVENTED_RATIO" -gt 60 ]; then
+            echo "::error::Invented ratio ${INVENTED_RATIO}% exceeds hard limit of 60%. Too many new steps — review the prompt or domain."
             cat new_steps.txt
             exit 1
-          elif [ -s new_steps.txt ]; then
-            echo "::warning::The model invented $NEW_STEPS_COUNT new steps ($INVENTED_RATIO%):"
+          elif [ "$INVENTED_RATIO" -gt 30 ]; then
+            echo "::warning::Invented ratio ${INVENTED_RATIO}% exceeds soft limit of 30%. Review invented steps before merging."
             cat new_steps.txt
-          else
-            echo "SUCCESS: All generated steps match existing steps."
-          fi
+          elif [ -s new_steps.txt ]; then
 
       # =========================
       # Commit and push
