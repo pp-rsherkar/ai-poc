@@ -283,25 +283,29 @@ jobs:
           domain           = os.environ.get("DOMAIN", "")
           domain_text      = domain if domain else "general"
           
-          # Extract domain-specific step context
+          # ── Step context: target domain only ────────────────────────────────
           step_context = ""
           if os.path.exists("step_dictionary.txt"):
               with open("step_dictionary.txt", "r", encoding="utf-8") as f:
                   content = f.read()
-                  blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-                  steps = []
-                  for i in range(1, len(blocks) - 1, 2):
-                      d = blocks[i]
-                      s = blocks[i+1]
-                      if d == domain_text or d == "general":
-                          steps.append(f"--- {d} steps ---\n{s.strip()}")
-                  step_context = "\n\n".join(steps)
-                  
-          # ── Cap step context to stay within token budget ────────────────────
-          step_lines = step_context.split('\n')
-          if len(step_lines) > 150:
-              step_context = '\n'.join(step_lines[:150])
-              print(f"::warning::Step context trimmed to 200 lines to fit token budget")        
+              blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
+              steps = []
+              for i in range(1, len(blocks) - 1, 2):
+                  d = blocks[i]
+                  s = blocks[i + 1]
+                  if d == domain_text:
+                      steps.append(f"--- {d} steps ---\n{s.strip()}")
+
+          # ── Cap per domain block — not total ────────────────────────────────
+          MAX_LINES_PER_DOMAIN = 120
+          capped_steps = []
+          for block in steps:
+              block_lines = block.split('\n')
+              if len(block_lines) > MAX_LINES_PER_DOMAIN:
+                  block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
+                  print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines to fit token budget")
+              capped_steps.append('\n'.join(block_lines))
+          step_context = "\n\n".join(capped_steps)      
 
           scenario_context = ""
           if os.path.exists("scenario_dictionary.txt"):
