@@ -1,0 +1,935 @@
+And  External user selects the workspace
+And  User gets Max Bid Base Bid values and Highest Possible Max Bid value from Campaign Settings
+And  User navigates to Campaign Dashboard
+And  Verify Max Bid and Base Bid values on the tactic settings match with Campaign Settings values
+And "Internal User" logs out from the "Studio" application
+And "Life" application is logged in successfully with Account "automation@pulsepoint"
+And "Studio" application is logged in successfully with Account "<ACCOUNT_NAME>"
+And "Studio" application is logged in successfully with Account "automation@pulsepoint"
+And Add NPIs to the existing NPI list "<LIST_ID>" using patch API
+And Admin user approves the campaign
+And An error message is displayed when a blank template "<BLANK_TEMPLATE>" is uploaded
+And Check Activity buttons "Active" and verify following filters are available and working
+And Check Activity buttons "Archived" and verify following filters are available and working
+And Check the Download icon is highlighted in green color
+And Confirms that the report panel retains the entered data
+And Create a tactic with "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>" and import the template in Tactic
+And Create a tactic with below targeting rules and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
+And Create and verify a tactic with "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>" and assign the created creatives to it
+And Download button is enabled to the user
+And Expand all the groups and fetch dimensions and metrics
+And Fetch and verify that NPI details are refined
+And Filter icon should display in the column header to which filter is applied and a red bullet "<RED BULLET>" on the filter icon present next to global search
+And Go to users tab and search "<EXTERNAL_USER>" and select studio tab
+And Internal User is able to view "<WORKSPACE_NAME>" in workspace management page
+And Locate an account "<EXTERNAL_ACCOUNT>" with external user permission and select it
+And Navigate to Campaign Dashboard and clicks on Create Campaign
+And Navigate to workspace dashboard
+And Pass token in the API Header and run it to upload the data into the list
+And Refresh the Browser to view the data uploaded
+And Report button is enabled to the user
+And Status is updated to Public
+And Template drop-down should display templates created under "automation@pulsepoint"
+And The Send On field should contain all days of the week when "Weekly" is selected as Frequency
+And The advertiser "<ADVERTISER>" is selected for "Display" creative the following sections are visible
+And The advertiser "<ADVERTISER>" is selected for "Native" creative the following sections are visible
+And The advertiser "<ADVERTISER>" is selected for "Video" creative the following sections are visible
+And The user saves the Smart List without selecting any other Population options and verifies error message
+And This scenario will be executed in the "Demo" environment as a "User"
+And User add and configure "<RULE_TYPE>" targeting rule and verify list is displayed in the targeting rule
+And User add and configure "NPI" targeting rule and verify list is displayed in the targeting rule
+And User adds "<NUMBER_OF_FLIGHTS>" flights, fills in the details with "<BUDGET>" for each flight section, and saves the line item
+And User adds NPI list to the smart action
+And User adds new flight and enter overlapping flight details - Flight Start Date, Flight End Date, "<BUDGET>"
+And User adds the associated Smart List and enters list details as "<LIST_NAME>"
+And User adds the flight details - Flight Start Date, Flight End Date, "<BUDGET>"
+And User adds the workspace name as "<WORKSPACE_NAME>" and selects the advertiser "<ADVERTISER>"
+And User applies "Clinical" filter, selects filter options as below and verifies the clinical recency filter is updated correctly
+And User applies "Contextual" filter, selects filter options as below and verifies the clinical recency filter is updated correctly
+And User applies the filter and selects option
+And User applies the following filters one by one and checks that NPI details are refined after each filter:
+And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
+And User checks Archive option is working for creative and verify the creative is moved to "Archived" tab
+And User checks Copy option is working for creative and verify details before and after saving the creative
+And User checks Prime list with historical data check box
+And User checks Unarchive option is working for creative and verify the creative is moved to "Active" tab
+And User clicks "<CONTEXTUAL_CATEGORY>" primary concept dropdown, enters "<MEDSCAPE_PRIMARY_CONCEPT>" and selects it
+And User clicks "<CONTEXTUAL_CATEGORY>" primary concept dropdown, enters "<WEBMD_PRIMARY_TOPIC>" and selects it
+And User clicks "<FREQUENCY_VALUE>" as frequency
+And User clicks "Active Flight" filter
+And User clicks "Add Filter", selects below filters and apply using "Done" button
+And User clicks "Archived" button from the search section of deal listing page
+And User clicks "Custom" filter
+And User clicks "DEALS" tab
+And User clicks "Flights" report period button
+And User clicks "Lifetime" report period button
+And User clicks "Today" filter
+And User clicks "Yesterday" filter
+And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
+And User clicks Add Flight button
+And User clicks Browse button to upload "<TYPE>" file "<FILE_NAME>"
+And User clicks Creative Library options present under Activation tab
+And User clicks Download NPI option
+And User clicks Edit button and updates workspace name to "<WORKSPACE_NAME_EDIT>"
+And User clicks Edit button from Destination dropdown field
+And User clicks HideAll option from Menu and verifies Dashboard columns are hidden accordingly
+And User clicks Import Deals button
+And User clicks Lifetime filter
+And User clicks MESH dropdown, enters "<MESH_CONDITION>" and selects it
+And User clicks New Tactic button, create tactic with details - "<RULE_TYPE>", "<CREATIVE>"
+And User clicks PulsePoint icon to navigate back to Life
+And User clicks Schedule NPI button
+And User clicks Schedule Report button
+And User clicks Schedule button to generate the report
+And User clicks Setup Import button to import File details
+And User clicks ShowAll option from Menu and verifies Dashboard columns are shown accordingly
+And User clicks Tactic Setting tab
+And User clicks Test Connection link to verify if connection happened successfully
+And User clicks on "HCP365" tab present under Advertisers tab
+And User clicks on AI Configurator and build audience using the AIPrompt "<AI_PROMPT>"
+And User clicks on Add New Deal button
+And User clicks on Add Targeting Rule
+And User clicks on Create Campaign
+And User clicks on Download Report
+And User clicks on HCP 365 module from main menu
+And User clicks on HCP Explorer workspace
+And User clicks on Ok and closes the filter popup
+And User clicks on Preview link from Creative Details page
+And User clicks on Publish NPI List
+And User clicks on Published button, verifies the "<LIST_TYPE>" and "NPIs engaging" text are displayed
+And User clicks on Show Expression and verifies the query is displayed for the "Template"
+And User clicks on accounts tab
+And User clicks on create new Campaign
+And User clicks on the published workspace
+And User clicks the Settings icon and selects the following group by options and verify dashboard data is grouped accordingly
+And User clicks the comments icon in the tactic "header" section and add "<HEADER_COMMENT>"
+And User clicks the comments icon in the tactic "navigation" section and add "<NAV_COMMENT>"
+And User clicks the three-dot menu and verifies that "Generate Report" is enabled and "Delete" is disabled
+And User clicks the three-dot menu, selects the General variable - "$CampaignName$" and Time variable - "$ReportDateTime[Date/Timestamp]$" with Date-Time format "%Y-%m-%d"
+And User clicks the three-dot menu, selects the General variable - "$LineItemName$" and Time variable - "$ReportDateTime[Date/Timestamp]$" with Date-Time format "%Y-%m-%d"
+And User configures Bid multiplier rules as below
+And User configures targeting rules as below
+And User creates a curated market with details "<MARKET_NAME>", "<ACCOUNTS>", "<DESCRIPTION>", "<MARKET_KPI_BENCHMARK>"
+And User creates a curated market with only "<DESCRIPTION>"
+And User deletes a creative not associated with any Campaign
+And User deletes an existing targeting template and verifies it is removed from the list for the "Template"
+And User deletes the custom field for which campaign is not created and verifies if it is deleted
+And User disables tactic through bulk action and verifies the status
+And User downloads the curated market template
+And User edits an existing targeting template and verifies the changes are saved for the "Template"
+And User enables tactic through bulk action and verifies the status
+And User enables the "<ADVERTISER_PERMISSIONS>" permission for the "<ADVERTISER_NAME>" advertiser
+And User enables the "<STUDIO_PERMISSIONS>" permission for the "<ACCOUNT_NAME>" for an external user
+And User enables the Curated Market created
+And User enables the studio for "<ACCOUNT_NAME>" account
+And User enters "<ADVERTISER_DSA>", "<FINANCER>" mandatory fields data for Display creative
+And User enters "<LIST_NAME>" in the List Name field
+And User enters Destination details - "Auto_Destination_", "SFTP", "ma2-qa-automation01", "22"
+And User enters Destination name "<DESTINATION_NAME>", Destination Type "<DESTINATION_TYPE>" and other required details - "<HOST>", "<PORT>", "<SERVER_PATH>"
+And User enters NPI column "Name" "<NPI_COLUMN_NAME>"
+And User enters data "<CUSTOM_FIELD_VALUE>" in the custom field
+And User enters data and clicks Save button
+And User enters file details "<FILE_LOCATION>" "<FILE_PATH>" "<FILE_NAME>"
+And User enters other campaign details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+And User enters smart action details as "<SMART_ACTION_NAME>" "<ADVERTISER>"
+And User enters the Attributes list details as "<LIST_NAME>" "<ADVERTISER>"
+And User enters the NPI Static list details as "<LIST_NAME>" "<ADVERTISER>"
+And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>"
+And User enters the NPI list details as "<LIST_NAME>" "<ADVERTISER>" "<NPI_NUMBER>"
+And User enters the Report Name
+And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>"
+And User enters the Smart NPI list details as "<LIST_NAME>" "<ADVERTISER>" and selects the created "Smart Pixel"
+And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+And User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+And User enters the custom date range from "07/01/2025" to "07/16/2025" and applies the filter
+And User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+And User enters the list name as "<LIST_NAME>" and uploads the file "<UPLOAD_FILENAME1>"
+And User enters the pixel details as "<PIXEL_NAME>" "<ADVERTISER>"
+And User enters the pixel details as "<PIXEL_NAME>" "<ADVERTISER>" "<SCOPE>" "<TYPE>"
+And User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+And User fetches PulsePoint Data Fees, NPI Targeting Gross CPM and calculates the data cost
+And User fetches all the Flight details and verifies that selected Line Item flight details appear in the Flight tab of the Run Report panel
+And User fetches all the flight details added
+And User fetches floor price for the imported deal
+And User fetches the Identified NPI count from the workspace
+And User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using "<Campaign ID>" and verifies the same status in the respective Line Item and Tactic pages
+And User fetches the logged in username
+And User fills the template with deal details and uploads the template
+And User generates sequential flights for the line item using "<BUDGET>" and "<NUMBER_OF_MONTHS>"
+And User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
+And User hovers over the "<CONTEXTUAL_CATEGORY>" question icon and fetches tool-tip "Primary Concept"
+And User hovers over the "<CONTEXTUAL_CATEGORY>" question icon and fetches tool-tip "Primary Topic"
+And User hovers over the dashboard filters, selects the region with maximum NPIs and clicks on it
+And User is able to add a DoubleVerify pixel
+And User is able to browse and select a template "<FILE_NAME>" from the system
+And User is able to click a third-party tracking pixel and add details "Test"
+And User is able to delete third-party tracking pixel entries
+And User is able to download a blank template using the Download Blank Template option
+And User is able to search the workspace after performing operation - "Duplicate"
+And User is able to search the workspace after performing operation - "Rename"
+And User is able to select a "<CAMPAIGN_NAME>" from the Campaign Restrict dropdown
+And User logs out from the application
+And User makes list available in LIFE and HCP365 module
+And User navigates to "Studio" application
+And User navigates to "studio" application
+And User navigates to Accounts Tab
+And User navigates to Administrative section and fetches the advertiser for the account "automation@pulsepoint"
+And User navigates to Administrative section and fetches the advertisers and client value for the account "automation@pulsepoint"
+And User navigates to Advertisers tab
+And User navigates to Campaign Dashboard
+And User navigates to Curated Markets section
+And User navigates to Line item from Association Tab
+And User navigates to NPI Lists page
+And User navigates to NPI Lists page in LIFE
+And User navigates to Pixels page
+And User navigates to Report Templates page
+And User navigates to Reporting tab
+And User navigates to Setup Tab
+And User navigates to Smart actions from the main menu
+And User navigates to Studio application
+And User navigates to administration tab
+And User navigates to advertisers page under the selected account
+And User navigates to another page within Studio and then returns to the workspace list page
+And User navigates to campaign
+And User navigates to campaign, line item and tactic using "<Campaign ID>" and verifies that the comments are displayed in the respective tile comment boxes
+And User navigates to run report from mega menu of the life application
+And User navigates to tactic setting tab
+And User navigates to the "Email Lists" page
+And User navigates to the "IP Address Lists" page
+And User navigates to the Pixel Codes tab
+And User navigates to the created campaign
+And User navigates to users page under the selected account
+And User navigates to workspace permissions
+And User opens Life Settings
+And User performs "Bulk Unarchive" action using "Unarchive Creatives" option on multiple creatives - "3" and verifies the selected creatives are moved to "Active" tab
+And User performs Bulk approve action using "Bulk Approve" option on multiple creatives - "3" with status other than Approved and verifies the selected creatives are marked as "Approved"
+And User removes all the filters applied on the Dashboard
+And User removes all the filters applied on the Dashboard and verifies the data is reset to default state
+And User retrieves all the entered data after saving the Static List
+And User retrieves all the entered data before saving the Static List
+And User retrieves all the entered data before saving the list "<TYPE>"
+And User retrieves all the entered data, saves the Campaign and verifies successful creation
+And User saves tactic details as a target template "<LINE_ITEMS>" and verifies the template is saved successfully
+And User saves tactic details as a target template "Display" and verifies the template is saved successfully
+And User saves the Email list and verify that the list is created successfully
+And User saves the Smart List and verifies the error message is displayed
+And User saves the Smart List and verifies the successful creation of the list
+And User saves the campaign
+And User saves the creative
+And User saves the custom destination
+And User saves the pixel
+And User saves the rule configured in the tactic
+And User saves the settings
+And User saves the targeting
+And User saves the workspace
+And User searches and selects the NPI List "<LIST_NAME>"
+And User searches and selects the account "<ACCOUNT_NAME>"
+And User searches for a workspace by name using the search box on the Workspace Details page
+And User searches for the created Curated Market
+And User searches the "<WORKSPACE>" and selects it
+And User searches the account "PP engineering test" and checks Studio permissions
+And User searches the account "automation@pulsepoint" and selects the account
+And User searches the campaign created in the above steps
+And User searches the created workspace
+And User searches the creative and clicks the creative details from Creative Library page
+And User searches the report and verify the details in report listing page - Template name, "<FREQUENCY_VALUE>", "<REPORTING_PERIOD>" and Generated By
+And User searches the workspace created to perform Actions from More menu
+And User searches the workspace in "<PLATFORM>" and selects it
+And User searches the workspace in LIFE and selects it
+And User select the "<PLATFORM>" to publish the list
+And User select the platform to publish the list
+And User selects "<ADVERTISER>" from the Studio Workspace Advertiser dropdown
+And User selects "<CREATED_BY>" from the Studio Workspace Created By dropdown
+And User selects "<DIAGNOSIS>" from "<TYPE>" dropdown
+And User selects "<DRUG>" from "<TYPE>" dropdown
+And User selects "<EXPANDED_AUDIENCE>"
+And User selects "<FILE_BREAKDOWN_TYPE>" button
+And User selects "<MEDICAL_PROCEDURE>" from "<TYPE>" dropdown
+And User selects "<NPI_RETENTION_OPTION>" as Keep NPIs on the list option
+And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
+And User selects "<RULE_TYPE>" as rule type and selects the created Smart list
+And User selects "<RULE_TYPE>" as rule type and selects the created pixel
+And User selects "<RULE_TYPE>" as rule type and selects the published Studio list
+And User selects "Behavioral Segment" as rule type and configures the targeting rules, and saves the settings
+And User selects "Custom Dates" option from Report Period field and verify the fields displayed on selecting the option
+And User selects "Flights" option from Report Period field and verify the fields displayed on selecting the option
+And User selects "Lifetime" option from Report Period field and verify the fields displayed on selecting the option
+And User selects Engagement Type "<ENGAGEMENT_TYPE>" and contextual category "<CONTEXTUAL_CATEGORY>"
+And User selects Engagement Type "<ENGAGEMENT_TYPE>" and enter related details "<VISITED_URLS>", "<IGNORED_URLS>", "<KEYWORDS>"
+And User selects Send On date
+And User selects Smart List
+And User selects Smart NPI list as "<TYPE>"
+And User selects Smart NPI list as below with mandatory details
+And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+And User selects Static List
+And User selects content type "<CONTENT_TYPE>"
+And User selects download format as "<FILE_EXTENSION>" and clicks Download button
+And User selects download format as "<FORMAT>" and clicks Download button
+And User selects publish "<LIST_TYPE>"
+And User selects start "12:00" and end time "09:00" when Custom Dates option is selected
+And User selects start date and end date when Custom Dates option is selected
+And User selects the "<ADVERTISER>" and fetches Smart pixel list
+And User selects the "<ADVERTISER>" and the associated campaign
+And User selects the "<CHANNEL>" as channel
+And User selects the "<COLUMN_NAME>" column and clicks on Next
+And User selects the "<IMPORT_TYPE>"
+And User selects the "<LIST_TYPE>" radio button
+And User selects the "<PIXEL_TYPE>" type
+And User selects the "<USER_NAME>" external user
+And User selects the "App Bundles" radio button from create new list page
+And User selects the "Delete" option by clicking More Actions menu
+And User selects the "Display Advanced" as channel
+And User selects the "Domains" radio button from create new list page
+And User selects the "Duplicate" option by clicking More Actions menu
+And User selects the "Image" pixel
+And User selects the "JavaScript" pixel
+And User selects the "New Prescribers" tab under Prescription Behavior Change
+And User selects the "Recency" value as "<RECENCY>" from the slider
+And User selects the "Rename" option by clicking More Actions menu
+And User selects the "Time Frame Selector" value as "<TIME_FRAME_SELECTOR>" from the slider
+And User selects the "Top Dropper Percentage" value as "<TOP_DROPPER_PERCENT>" from the slider
+And User selects the Approval status "<STATUS>"
+And User selects the Attributes List and uploads the file "<FILE_NAME>"
+And User selects the Auto-Imported List
+And User selects the Decile value as "<DECILE>" from the slider for "Diagnosis Code"
+And User selects the Decile value as "<DECILE>" from the slider for "Medical Procedure"
+And User selects the Decile value as "<DECILE>" from the slider for "Prescribed Drug"
+And User selects the Draft option as "<DRAFT_OPTION>"
+And User selects the HCP switch "<HCP_SWITCH>"
+And User selects the NPI Group "<NPI_GROUP_NAME>"
+And User selects the NPI data "<NPI_DATA>" for "<TYPE>"
+And User selects the Profession "<PROFESSION>"
+And User selects the Speciality "<SPECIALITY>"
+And User selects the Workspace Type as "HCP Audience Expansion"
+And User selects the Workspace Type as "HCP Explorer"
+And User selects the advertiser "<ADVERTISER>"
+And User selects the advertiser as "<ADVERTISER>"
+And User selects the associated campaign
+And User selects the created Smart Pixel
+And User selects the option Only Report on Impressions with Identifiable NPIs
+And User selects the prescription drug name "<DRUG_NAME>"
+And User sets campaign management fee as "<CAMPAIGN_FEE_OPTION>" "<CAMPAIGN_PERCENT>" "<CAMPAIGN_AMOUNT>"
+And User sets the HCP365 permission "<PERMISSION_FLAG>" for "<ADVERTISER>" and saves the changes
+And User should be able to add multiple emails in Deliver to External Emails field
+And User should be able to fetch details - Advertiser, Campaign, Line Item, Tactic
+And User should be able to generate the report
+And User should be able to select "<DIMENSIONS>" and "<METRICS>"
+And User should be able to select advertiser as "<ADVERTISER>"
+And User should be able to select multiple advertisers from the list
+And User should be able to select template "<TEMPLATE>" from the dropdown
+And User should be able to select the created template from the dropdown
+And User should navigate back to Template drop-down by clicking "Select Existing Template"
+And User should see error message when tries to save line item page and dates fields should get highlighted with inline error message
+And User tries to save the targeting template with targeting rule "Behavioral Segment" and without specifying a template name
+And User tries to save the targeting template with template name "<TEMPLATE_NAME>" without specifying any targeting
+And User unassigns active deal from the applied deals section of All Deals tab
+And User unchecks Favorite Only checkbox
+And User unchecks Hide Finished checkbox
+And User updates the workspace name as "<WORKSPACE_NAME>"
+And User uploads a valid file "<FILE_NAME>" for "<CREATIVE_TYPE>" creative and previews the creative details
+And User uploads a valid file "<FILE_NAME>" for "Display" creative
+And User uploads a valid file "Downloaded" for "Display" creative and previews the creative details
+And User uploads a valid file "Downloaded" for "Native" creative and previews the creative details
+And User uploads the file "<FILE_NAME>"
+And User verifies if Add Custom Field button is available
+And User verifies if new custom field is visible and empty in new tactic
+And User verifies if the added custom field is available on New Campaign creation page
+And User verifies if the deleted custom field is available on New Campaign creation page
+And User verifies that the campaigns displayed on the Dashboard include all past and current flights
+And User verifies that the help text displays the file name with the value of General and Time variables
+And User verifies the Smart Pixel dropdown displays all Smart Pixels for the selected advertiser and select the pixel
+And User verifies the calculated data cost is similar to the displayed data cost
+And User verifies the comments in the campaign, line item, and tactic dashboard's comment boxes
+And User verifies the custom destination fields - Destination Name, Destination Type, Host, Username, Password, Port textfields, Test Access, Create and Cancel buttons
+And User verifies the total Identified "NPI" count in the downloaded file - "<FILE_EXTENSION>"
+And Validate report details such as Created By, Reporting period, Report Name from Report Listing page
+And Validate that the template name matches the file name, and ensure the help text displays the file name in the ".csv" format
+And Verify "<TYPE>" population option is disabled when Advertiser value is not selected
+And Verify "Add Destination" button is available in Destination dropdown field
+And Verify "Delete" is available for each item, and deleted items are removed from the Left menu
+And Verify "Edit" button is available in Destination dropdown field
+And Verify "Generate Report" option opens the Run report screen for user and run the report for "<TEMPLATE>"
+And Verify Advertiser field should be mandatory
+And Verify Archive option is available based on the campaign state
+And Verify Base Bid Price "<BASE_BID_PRICE>" and Max Bid Price "<MAX_BID_PRICE>" fields are editable when deals are targeted
+And Verify Bid type with respect to category
+And Verify Bulk Edit Mode successfully "disables" multiple selected line items
+And Verify Bulk Edit Mode successfully "enables" multiple selected line items
+And Verify Bulk Upload template "<FILE_NAME>" records count matches UI count post upload
+And Verify Campaign Dashboard is displayed with title "Campaigns"
+And Verify Clearing Price field is available and fetch the tool-tip details on hover for the field
+And Verify Compression field is available with below options and default value is "None"
+And Verify Control File checkbox is present and by default it should be unchecked
+And Verify Creative Preview tab is displayed with correct creative name
+And Verify Creative Type field is present and default value is "Standard VAST"
+And Verify Curated Market tab is displayed
+And Verify Curator field is available with default value as "Client"
+And Verify Data Granularity dropdown should show below list of values
+And Verify Data Granularity field should allow selection any of the values "Weekly" from the dropdown
+And Verify Deal Type field is available with default value as "PMP"
+And Verify Delivery field has two methods - "Email" and "Custom Destination"
+And Verify Edit icon availability for the deals listed under "Life Marketplace" Deals tab
+And Verify File Name field is available
+And Verify File Name field is available on report panel
+And Verify File Path field is available
+And Verify Line Coding field is available with below options and default value is "Unix (LF)"
+And Verify Line Item page has below tabs
+And Verify Owned And Operated section is "<VISIBILITY_FLAG>" within the Cross-Filter section of the Workspace
+And Verify Pricing Strategy is editable and update it with "<PRICING_STRATEGY>" and "<VALUE>" for Deals present in Curated Markets and Deals section
+And Verify Pricing Type field is available with default value as "Floor"
+And Verify Reload Now button is available and enabled
+And Verify Report Name field is available and accepts input "<REPORT_NAME>"
+And Verify Report Period field is available with default value "Month to Date"
+And Verify Report Period is selected as "<REPORTING_PERIOD>"
+And Verify Report Period is selected as "Month to Date"
+And Verify Report Timing checkbox is available and by default it is unchecked
+And Verify Rich Media checkbox should be present and selectable "Up"
+And Verify Run Report panel should be opened
+And Verify Search Box is available and working
+And Verify Send At field is available with Start Time and Timezone fields
+And Verify Send On field is visible and user should be able to select the day "2" of the month
+And Verify Targeting template section opens by clicking New Template button
+And Verify Webhook panel is disabled before applying filters
+And Verify after adding ai prompt filter selected manually should be overwritten
+And Verify an appropriate error message when user attempts to click the Preview or OK button without selecting a creative file
+And Verify availability of frequency field with options below
+And Verify column selection icon is available and upon clicking it below columns should display
+And Verify dashboard filters are merged with Primary filters
+And Verify data persistence when user creates and saves "Audio" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Display" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "HTML" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Native Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Native Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Native" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Search Extension" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Video" Bulk upload creative using details "<ADVERTISER>" as Advertiser, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify data persistence when user creates and saves "Video" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
+And Verify default value of Data Timezone is "(GMT-04:00) Eastern Time"
+And Verify default value of Send At fields - Start Time is "06:00" and Timezone is "(GMT+05:30) India Standard Time"
+And Verify default value of Send On is "Sun"
+And Verify default value of the AdChoices Icon should be "TopRight"
+And Verify default value of the Approval Status field is "Pending"
+And Verify default value of the File field should be "DCM File"
+And Verify default value of the Frequency field is "Weekly"
+And Verify default value of the Notes Column field should be "None"
+And Verify destination created should populate in the Destination dropdown field
+And Verify dropdown dimensions with the template
+And Verify dropdown metrics with the template
+And Verify error message when webhook setup is failed using "<ERROR_DATA>"
+And Verify filter icon is available and upon clicking it "Add Filter", "Done" and "No Filters applied." text should display
+And Verify if "Hide All" hides all the columns in the Association tab
+And Verify if "Show All" displays all the columns in the Association tab
+And Verify if user enters flight budget that exceeds Campaign budget
+And Verify if user navigates to the Auto-Imported List page
+And Verify list data is uploaded successfully
+And Verify management fee is set as "<CAMPAIGN_DISPLAY_VALUE>"
+And Verify on refresh of the page, the filters are reset and search input is cleared
+And Verify on selecting "All Advertisers" option, previously selected individual advertisers should be cleared
+And Verify only Custom date range Flights from "07/01/2025" to "07/16/2025" should render on the Dashboard if available
+And Verify only life marketplace tab is displayed under Targeting templates section for "Deals" rule type
+And Verify only valid Clickthrough URL "<CLICKTHROUGH_URL>" values should be permitted
+And Verify only valid Landing Domain "<LANDING_DOMAIN>" values should be permitted
+And Verify pagination is working properly on the Creative Library page
+And Verify status of line item is Incomplete when there are no tactics under the line item
+And Verify target type with respect to category
+And Verify that "Active" and "Archived" buttons are available and by default "Active" button is selected
+And Verify that "Deliver to Users" field is pre-populated with logged in user email and user should be able to edit the email address "<USER_EMAIL>"
+And Verify that "Droppers" tab should be selected by default
+And Verify that "Email" tab is selected as Delivery method by default
+And Verify that "Lifetime" and "Flights" options are disabled until a Line Item is selected
+And Verify that "Lifetime" and "Flights" options are enabled
+And Verify that "Medscape" is disabled under Endemic Network
+And Verify that "Notify User for Failures" field is pre-populated with logged in user email and user should be able to edit the email address "<USER_EMAIL>"
+And Verify that "Premium Publisher" should not display in deals listing under Life Marketplace Deals tab
+And Verify that "WebMD" is disabled under Endemic Network
+And Verify that Add Emails link is available below Deliver to Users
+And Verify that Budget Status has the below options, and the default status is "Approved"
+And Verify that Campaign Budget accepts only numeric values "<INVALID_CP_BUDGET>"
+And Verify that Campaign Type default value is set to "Regular"
+And Verify that Destination Type has values "<DESTINATION_TYPE>"
+And Verify that Flight details field is displayed with value
+And Verify that Prescribed Behavior Change should display below tabs
+And Verify that PulsePoint provided domain list "Automation_AppBundleList" is denoted with a purple P icon
+And Verify that PulsePoint provided domain list "Automation_DomainList" is denoted with a purple P icon
+And Verify that PulsePoint provided domain list "Automation_KeywordList" is denoted with a purple P icon
+And Verify that Recency is set to "365" by default for "<TYPE>"
+And Verify that Recency slider should range from "1" to "60" days and should be set to "1 day" by default
+And Verify that Report Period field has below options
+And Verify that Sequential flights should be added based on the start month
+And Verify that Time Frame Selector slider should range from "6" to "12" months and should be set to "6 months" by default
+And Verify that Token is fetched successfully from URL "BuyerProxy.ashx"
+And Verify that Top Droppers percentage slider should range from "1" to "100" and should be set to "100%" by default
+And Verify that advertiser field is disabled and displayed in "rgba(34, 34, 34, 0.55)" after saving the workspace
+And Verify that an appropriate error message is displayed when invalid data "<INVALID_LANDING_DOMAIN>" is entered for the Landing Domain
+And Verify that an error message is displayed when no Advertiser is selected
+And Verify that an error message is displayed when no list names is specified and user tries to upload a file "<UPLOAD_FILENAME1>"
+And Verify that an error message is displayed when no listname "<LIST_NAME>" or "AppBundle" names are specified
+And Verify that an error message is displayed when no listname "<LIST_NAME>" or "Domains" names are specified
+And Verify that an error message is displayed when no listname "<LIST_NAME>" or "IP Address" names are specified
+And Verify that an error message is displayed when no listname "<LIST_NAME>" or "Keywords" names are specified
+And Verify that by default "Custom Dates" option is selected for Report Period Field
+And Verify that dashboard filters are displayed correctly in Filter section
+And Verify that download option should not be available for uploaded Email list
+And Verify that each selected line item is "Disabled"
+And Verify that each selected line item is "Enabled"
+And Verify that if multiple "<DOMAIN_NAMES>" are specified on a single line, a validation error is shown
+And Verify that if multiple "<IP_ADDRESS>" are specified on a single line, a validation error is shown
+And Verify that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection "<CP_CLIENT>"
+And Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled
+And Verify that the Landing Domain field is mandatory when all other required fields, including "<ADVERTISER>" are filled
+And Verify that the count of items in the downloaded "App Bundle" list is the same as the item count displayed in the UI
+And Verify that the count of items in the downloaded "Domain" list is the same as the item count displayed in the UI
+And Verify that the count of items in the downloaded "IP" list is the same as the item count displayed in the UI
+And Verify that the count of items in the downloaded "Keyword" list is the same as the item count displayed in the UI
+And Verify that the count of items in the downloaded "NPI" list is the same as the item count displayed in the UI
+And Verify that the counter on the left displays the correct value after file upload "<UPLOAD_FILENAME1>"
+And Verify that the counter on the left displays the correct value after file upload for "Email list"
+And Verify that the counter on the left displays the correct value for each list in the navigation panel
+And Verify that the counter on the left displays the updated value after new file upload "<UPLOAD_FILENAME2>"
+And Verify that the reports generated on the Line Item page are available on the Generate Report page
+And Verify that the retrieved data for the "<TYPE>" list was saved correctly
+And Verify that the saved Campaign data matches the entered data
+And Verify that the search option is present on the "Domain/App Lists" tab
+And Verify that the search option is present on the "IP Lists" tab
+And Verify that the search option is present on the "Keyword Lists" tab
+And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
+And Verify that the sub-tabs "<SUB_TABS>" on the left navigation panel are available and "Both" is selected by default
+And Verify that the total NPI count and the matched NPI count from the list are correctly displayed in the targeting rule
+And Verify that the user is able to browse the computer, upload the following file types, and create creatives using details - "<ADVERTISER>", "<ADVERTISER_DSA>", "<FINANCER>", "<LANDING_DOMAIN>", "<STATUS>", "<CREATIVE_NAME>", "<SIZE>", "<DURATION>", "<FILE_TYPE>", "<FILE_NAME>"
+And Verify that the user is able to create a "AppBundle" list by specifying names manually
+And Verify that the user is able to create a "AppBundle" list through file upload
+And Verify that the user is able to create a "Domains" list by specifying names manually
+And Verify that the user is able to create a "Domains" list through file upload
+And Verify that the user is able to create a "IP Address" list by specifying names manually
+And Verify that the user is able to create a "IP Address" list through file upload
+And Verify that the user is able to create a "Keywords" list by specifying names manually
+And Verify that the user is able to create a "Keywords" list through file upload
+And Verify that the user is able to delete an existing "AppBundle" name list
+And Verify that the user is able to delete an existing "Domains" name list
+And Verify that the user is able to delete an existing "IP Address" name list
+And Verify that the user is able to delete an existing "Keywords" name list
+And Verify that the user is able to delete the uploaded file "<UPLOAD_FILENAME1>"
+And Verify that the user is able to edit an existing "AppBundle" name list "<EDITED_APP_BUNDLES>"
+And Verify that the user is able to edit an existing "Domains" name list "<EDITED_DOMAIN_NAMES>"
+And Verify that the user is able to edit an existing "IP Address" name list "<EDITED_IP_ADDRESS>"
+And Verify that the user is able to edit an existing "Keywords" name list "<EDITED_KEYWORDS_NAMES>"
+And Verify that the user is able to edit an existing list by uploading same file "<UPLOAD_FILENAME1>" again and verify the changes
+And Verify that the user is able to edit and save an existing "AppBundle" list by uploading another file "<UPLOAD_FILENAME2>" and verify the changes
+And Verify that the user is able to edit and save an existing "Domains" list by uploading another file "<UPLOAD_FILENAME2>" and verify the changes
+And Verify that the user is able to edit and save an existing "IP Address" list by uploading another file "<UPLOAD_FILENAME2>" and verify the changes
+And Verify that the user is able to edit and save an existing "Keywords" list by uploading another file "<UPLOAD_FILENAME2>" and verify the changes
+And Verify that the user is able to enter data in the selected Management Fee option - "<MANAGEMENT_FEE>", "<PERCENT>", "<AMOUNT>"
+And Verify that user is able to download the "NPI" list
+And Verify that user is able to download the uploaded "App Bundle" list
+And Verify that user is able to download the uploaded "Domain" list
+And Verify that user is able to download the uploaded "IP" list
+And Verify that user is able to download the uploaded "Keyword" list
+And Verify that user is able to download the uploaded "NPI" list
+And Verify that user is able to download the uploaded file "<UPLOAD_FILENAME1>", "<UPLOAD_FILENAME2>"
+And Verify that user is able to enter and select the drug "<DRUG_NAME>"
+And Verify that user is able to enter the data "<DESCRIPTION>" in the Description field
+And Verify that user is able to select Data Timezone field value "<TIME_ZONE>"
+And Verify that user is able to select Schedule start date and Schedule end date
+And Verify that user is able to select Send On day "Tue"
+And Verify that user is able to select Timezone field value "<TIME_ZONE>"
+And Verify that user is able to select start "12:00" and end time "09:00" when Custom Dates option is selected
+And Verify that user is able to select start date and end date when Custom Dates option is selected
+And Verify that user is not able to remove the pre-populated logged in user email from "Notify User for Failures" field
+And Verify that when "<APP_BUNDLES>" names are specified manually, the option to upload a file disappears
+And Verify that when "<DOMAIN_NAMES>" names are specified manually, the option to upload a file disappears
+And Verify that when "<IP_ADDRESS>" names are specified manually, the option to upload a file disappears
+And Verify that when "<KEYWORD_NAMES>" names are specified manually, the option to upload a file disappears
+And Verify that when enters "<LIST_NAME>" and upload file "<UPLOAD_FILENAME1>" option is selected, the text area to direct enter the names disappears
+And Verify that when the "App Bundles" tab is selected, only "applist" lists are visible in the panel
+And Verify that when the "Domains" tab is selected, only "domain" lists are visible in the panel
+And Verify the API response contains a successful status code
+And Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account
+And Verify the Campaign Dashboard data should filter as per the selected filter values
+And Verify the NPI Numbers from the uploaded file "<FILE_NAME>" are displayed correctly in the list details page
+And Verify the Retrofit checkbox is selected
+And Verify the Tactic Link is available in the confirmation pop-up
+And Verify the Tactic Link is clickable and navigates to the respective tactic page
+And Verify the Total NPI count displayed in Matched NPI section is similar to NPI records present in "<FILE_NAME>"
+And Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file "<UPLOAD_FILENAME1>" is uploaded
+And Verify the availability of below Creative Type options and the Default option is "Display"
+And Verify the availability of the Management Fee checkbox and when clicked, below options should be displayed
+And Verify the availability of various options of the Report Format field - "<REPORT_FORMATS>"
+And Verify the count of rules added for the selected targeting rule type on the Tactic Settings page
+And Verify the creative is removed from the Creative Library page
+And Verify the dashboard data should reflect campaigns with Finished status
+And Verify the dashboard results should show campaigns which are marked as favorite and nonfavorite
+And Verify the following sort options are available and working
+And Verify the list should be available for LIFE platform by default
+And Verify the newly created creative is displayed in the Creative Library page
+And Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation
+And Verify the notes added to each line item
+And Verify the presence of Advanced Export checkbox and by default it should be unchecked
+And Verify the presence of Report Format field and default value - "CSV"
+And Verify the presence of Text Qualifier checkbox and by default it should be checked
+And Verify the report panel retains the entered data
+And Verify the status of first tactic under line item is "Incomplete"
+And Verify under the "Spreadsheet Template and Images" section the options "Download Blank Template" and "Upload Images to Get Template With URLs" are available
+And Verify under the "Third Party Tracking Pixel/Tag" section the fields Add Third Party Tracking Pixel and Add DoubleVerify Pixel are available
+And Verify under the "Upload Creatives" section the fields "Campaign Restrict", "Spreadsheet", "Approval Status" are available
+And Verify unselected columns are not displayed in the Association tab
+And Verify user can add new "Private" deals by clicking Add Deal button present in Curated Markets and Deals section using details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+And Verify user is able to close the Creative Preview tab
+And Verify user is able to create a copy of the line items using "Duplicate" option
+And Verify user is able to delete the workspace
+And Verify user is able to duplicate the workspace
+And Verify user is able to rename the workspace as "<NEW_WORKSPACE_NAME>"
+And Verify user is able to select Time "10:00" and Timezone "<TIME_ZONE>" for Send At fields
+And Verify user is able to type in "<IAB>" categories
+And Verify user is able to upload images "<IMAGE_FILENAME>" to get a template with URLs
+And verify that Decile is set to "1-10" by default for "<TYPE>"
+Given I call the Token API for user "<USERNAME>" and password "<PASSWORD>" for authentication
+Given Life application is logged in as "<USER>"
+Given This scenario will be executed in the "Demo" environment as a "External User"
+Given This scenario will be executed in the "Demo" environment as a "User"
+Given This scenario will be executed in the "Pre-release" environment as a "External User"
+Given This scenario will be executed in the "Pre-release" environment as a "User"
+Given User clicks Bulk Upload button on Creative Library page
+Given User navigates to the "Domain & App Lists" page
+Given User navigates to the "Keyword Lists" page
+Then "Filter Report" section should be visible with label "Only Report on Impressions with Identifiable NPIs" checkbox
+Then "Filter Report" section should be visible with label "Only Report on Impressions with Identifiable NPIs", "Only Report on Running Advertisers", "Only Report on Running Campaigns" checkbox
+Then "Run Now" and "Schedule" tabs should be present in the Run Report pop-up
+Then Advertiser drop-down should list advertisers mapped to "automation@pulsepoint"
+Then Check that the success message appears once the webhook is successfully created
+Then Check the webhook icon is highlighted in green color
+Then Data Granularity should have default value "Daily"
+Then Deal details should appear on Tactic Settings tab under Targeting section, Curated Markets and Deals section depending on toggle button status
+Then Deals should get assigned to the Tactic
+Then Delete the filter
+Then Dimensions and Metrics fields should be displayed
+Then Download button is enabled to the user
+Then External user Verifies whether the "<WORKSPACE_NAME>" is visible in workspace management page
+Then External user Verifies whether the workspace with "<DRAFT_OPTION>" is visible in workspace management page
+Then External user should be able to see the "<STUDIO_PERMISSIONS>" permission in the workspace
+Then New Deal panel should open and user should be able to add new deal with details "<EXCHANGE_TYPE>", "<DEAL_ID>", "<DEAL_NAME>", "<MEDIA_TYPE>", "<ADVERTISER>", "<DEAL_PRICE_TYPE>", "<PRICE>", "<CURATOR>"
+Then Save and Verify the list gets saved successfully
+Then Selected Deals should appear in Applied Deals panel
+Then Studio should be enabled for that account
+Then Template drop-down should be visible
+Then The API response should have status "<STATUS_CODE>", errors "<EXPECTED_ERRORS>", and contain the submitted NPI list "<NPIs>" if applicable
+Then User Verify the list is displayed in the LIFE
+Then User Verify the list is displayed in the Life
+Then User adds Comments or Notes "<LINE_ITEM_NOTE>" to each line item
+Then User adds frequency cap with details "<ON_CAMPAIGN_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+Then User adds frequency cap with details "<ON_LI_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+Then User adds frequency cap with details "<ON_TACTIC_LEVEL>" "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>"
+Then User applies the filter and selects option
+Then User clears the custom field text
+Then User clicks Add Destination button
+Then User clicks Check File button to verify the file details are correct
+Then User clicks on create new tactic
+Then User clicks on details tab
+Then User clicks on first tactic and goes to details tab
+Then User creates a new tactic with details "<TACTIC_NAME>" "<CHANNEL>" "<COUNT>"
+Then User creates below tactics under same line item and verifies it
+Then User creates new custom field "<CUSTOM_NAME>" and verifies the same
+Then User deletes the custom field and verify its removed from new tactic
+Then User deletes the tactic and verifies it
+Then User downloads the report and verify the data in downloaded report
+Then User hover on the image icon for creative in red color and check whether creative is assigned to the campaign
+Then User navigates to LineItem
+Then User navigates to Tactic and clicks on settings tab
+Then User navigates to campaign
+Then User navigates to creative details and clicks Association tab
+Then User navigates to generate report field and verifies the report name by campaign name
+Then User navigates to line item and clicks on details tab
+Then User navigates to tactic setting tab
+Then User navigates to the Flights tab and verifies the flight details
+Then User runs the connection test and creates the destination
+Then User saves the import settings and verifies the data is imported successfully
+Then User searches and verifies the already created targeting template using the search option
+Then User searches and verifies the created targeting template is available on Targeting Templates page
+Then User searches the Campaign "<CAMPAIGN_NAME>", navigates to LineItem and fetches the flight details
+Then User sees the types of workspaces they have permissions for
+Then User selects Draft option as "<DRAFT>"
+Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
+Then User selects destination name created, and other details - "<FILE_PATH>", "<FILE_NAME>"
+Then User selects the report template created tactic and other fields for running the report
+Then User should be able to see Studio for that account
+Then User should be able to select multiple values from dropdown
+Then User should be able to select value from dropdown
+Then User should navigate to respective Tactic Setting tab
+Then User should not be able to see the studio permission for that account
+Then User should see Add New Deal button, filters such as Exchange, Search
+Then User should see an error message to add flight details
+Then User should see error message when tries to save line item page
+Then User should see the remaining flights listed under the Flights section
+Then User tries to save the Auto-Imported list without entering any details, an error message should be displayed
+Then User turns on studio toggle for external users and verifies that it is enabled
+Then User validates the comment added in "header" is "<HEADER_COMMENT>" then clear it
+Then User validates the comment added in "navigation" is "<NAV_COMMENT>" then clear it
+Then User verifies if Frequency Cap is in disabled state by default
+Then User verifies if Studio appears in submenu for "<ACCOUNT_NAME>" account
+Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_CAMPAIGN_LEVEL>"
+Then User verifies if frequency cap is saved with details "<FREQUENCY_VALUE>" "<TIMES_PER>" "<SCOPE>" "<ON_LI_LEVEL>"
+Then User verifies that forecast data is unavailable when no targeting rules are applied
+Then User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - "<WORKSPACE_TYPE>", "<ADVERTISER>", "<CREATED_BY>"
+Then User verifies the expanded audience count
+Then User verifies the forecast data refreshes and displays values after adding targeting rule
+Then User verifies the selected campaign,line item, tactic and runs report by clicking on Run button
+Then User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules
+Then Verify Advertiser dropdown should show values which are mapped to the account
+Then Verify Bid multiplier panel with all options under below categories
+Then Verify Bulk Upload panel is displayed with following options - Creative Type and Advertiser Dropdown
+Then Verify Campaigns, line items, tactics names matching the "<Campaign ID>" should display on Dashboard table
+Then Verify Creative Library page is displayed
+Then Verify Creative Preview tab is displayed with correct creative name
+Then Verify Deliver to Users field is available
+Then Verify Destination Name, Destination Type fields are displayed
+Then Verify Destination dropdown field is available
+Then Verify Edit icon availability for the deals listed under "Private" Deals tab
+Then Verify Import Deal panel is opened
+Then Verify NPI list created is present
+Then Verify New Template button is present above the Search option
+Then Verify Schedule Report panel should be opened
+Then Verify Smart List Creation Panel should display the following List Population Options
+Then Verify Tabs and Subtabs of Email tab on HCP Dashboard
+Then Verify Tabs and Subtabs of Media tab on HCP Dashboard
+Then Verify Tabs and Subtabs of Overview tab on HCP Dashboard
+Then Verify Tabs and Subtabs of Search tab on HCP Dashboard
+Then Verify Tabs and Subtabs of Site tab on HCP Dashboard
+Then Verify Tabs and Subtabs of Social tab on HCP Dashboard
+Then Verify Tabs and Subtabs of shall change on HCP Dashboard
+Then Verify Webhook panel is enabled after applying engagement filters
+Then Verify campaign details are saved and user is navigated to the line item page
+Then Verify comments, icon should display in bluish-green color "<COLOUR>" and comments should available on individual panel
+Then Verify creation of NPI List screen is displayed
+Then Verify creative details are saved
+Then Verify dashboard is customized and only selected columns are displayed
+Then Verify data after change in filter of HCP Dashboard
+Then Verify data is saved successfully
+Then Verify drug details are added
+Then Verify file "<FILE_NAME>" is uploaded successfully
+Then Verify if Macros Appended to the Body "<BODY>"
+Then Verify if Macros Appended to the URL
+Then Verify inline error message for the invalid webhook entries "<INVALID_WEBHOOK_DATA>"
+Then Verify line item details are saved and user is navigated to the tactic page
+Then Verify list gets deleted successfully
+Then Verify list gets saved successfully
+Then Verify list gets updated successfully
+Then Verify list is published
+Then Verify list is targeted in the tactic successfully
+Then Verify new template is saved and displayed in the template list
+Then Verify only Current Month's Flights should render on the Dashboard
+Then Verify settings details are saved and user is navigated to the creatives tab
+Then Verify smart action creation page is displayed
+Then Verify smart action is saved successfully and navigates to Audience tab
+Then Verify tactic details are saved and user is navigated to the settings tab
+Then Verify targeting panel with all targeting under below categories
+Then Verify that Line Items and Tactics reflect the correct enabled or disabled state
+Then Verify that below tabs gets enabled only after saving tactics
+Then Verify that frequency cap is saved in tactic
+Then Verify that the "<RULE_TYPE>" rule is added to the tactic and retrieve the count of selected lists
+Then Verify that the "IP" rule is added to the tactic and retrieve the count of selected lists
+Then Verify that the "NPI" rule is added to the tactic and retrieve the count of selected lists
+Then Verify that the Create New List screen is displayed
+Then Verify that the applied filters are displayed correctly
+Then Verify that the approval status of the campaign is "Approved"
+Then Verify that the approval status of the campaign is "Pending Appr"
+Then Verify that the campaign budget status is "Pending Appr" and is greyed out
+Then Verify that the campaign is in "Pending Appr" state
+Then Verify that the campaign is in "Running" state
+Then Verify that the custom field is added on the campaign creation page
+Then Verify that the custom field is updated with new label
+Then Verify that the custom field value "<CUSTOM_FIELD_VALUE>" is saved and displayed in the campaign details page
+Then Verify that the deal is moved to archived deal section
+Then Verify that the workspace cannot be deleted and appropriate message is displayed to the user
+Then Verify that user is able to export the audit log for "campaign"
+Then Verify that user is able to export the audit log for "line item"
+Then Verify that user is able to export the audit log for "tactic"
+Then Verify that user is able to export the campaign settings
+Then Verify the "<PIXEL_TYPE>" gets updated successfully
+Then Verify the Advertiser dropdown and search box are displayed on the Pixels page
+Then Verify the Attributes list is saved successfully
+Then Verify the Create NPI API with Attributes API response contains the same list name and a successful status code
+Then Verify the Create New Pixel panel and types of Pixel
+Then Verify the GET NPI List API response contains the NPI details and a successful status code
+Then Verify the GET NPI List API response contains the expected NPI block and a successful status code
+Then Verify the HCP Explorer Workspace is saved
+Then Verify the NPI block contains the newly added NPIs
+Then Verify the Smart Pixel name is auto populated with "<ADVERTISER>" and Smart Pixel text
+Then Verify the Token API response status and presence of a valid bearer token
+Then Verify the Workspace is saved
+Then Verify the Workspace is updated with edited name
+Then Verify the configured Bid multiplier rules
+Then Verify the configured targeting rules
+Then Verify the count of rule options for the selected targeting rule "<RULE_TYPE>" on the Tactic Settings page
+Then Verify the dashboard data should not reflect campaigns with Finished status
+Then Verify the dashboard results should show only campaigns which are marked as favorite
+Then Verify the deactivated pixel should not be displayed in the pixel list
+Then Verify the file is reloaded successfully
+Then Verify the filter is applied correctly "<PRIMARY_FILTERS>"
+Then Verify the filter list displays only the selected filter values
+Then Verify the header message for "<STATUS>" status
+Then Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template
+Then Verify the list is deleted successfully
+Then Verify the market id, media type, and floor price displayed in Curated Markets section matches the media type in Admin Setup for the same market
+Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
+Then Verify the newly created campaign is in running state
+Then Verify the newly created creative is displayed in the Creative Library page
+Then Verify the pixel gets deactivated successfully
+Then Verify the pixel gets removed successfully
+Then Verify the pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+Then Verify the removed pixel should not be displayed in the pixel list
+Then Verify the selected "<ADVERTISER>" and Smart Pixel
+Then Verify the selected Smart List should be reflected in the Associated Smartlists tab
+Then Verify the selected Smart Pixel
+Then Verify the selected dimensions and metrics under the Template Structure section
+Then Verify the selected targeting rule "<RULE_TYPE>"
+Then Verify the selected targeting rule "<RULE_TYPE>" and rule option
+Then Verify the selected targeting rule "<RULE_TYPE>" for Smart list
+Then Verify the smart pixel is saved successfully, search for it by name, and confirm it is displayed in the pixel list
+Then Verify the tabs displayed on the Create New Template panel
+Then Verify the tabs displayed on the Pixels page
+Then Verify the tabs displayed on the Report Templates page
+Then Verify the template created are saved
+Then Verify the template created can be imported in the Tactic
+Then Verify the updates are applied successfully
+Then Verify the workspace is visible in workspace management page
+Then Verify user is able to update and save the "base" bid price
+Then Verify user is able to update and save the "max" bid price
+Then Verify user is not able to delete a creative associated with a Campaign and appropriate error message is displayed
+Then Verify user is not able to update "base" bid price more than allowed limit
+Then Verify user is not able to update "max" bid price more than allowed limit
+Then Verify user is on default bid settings page
+Then Verify user receives a warning when attempting to delete a workspace with an active webhook
+Then Verify user should not be able to deactivate the Smart Pixel if any Smart list is associated with it
+Then user should navigate to PMP Deals Panel
+When "Life" application is logged in successfully with Account "automation@pulsepoint"
+When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+When Creative of selected tactic should load when user types creative names initials "<CREATIVE_INITIALS>" in "Creative" field
+When External user Searches the "<WORKSPACE_NAME>" in studio application
+When External user Searches the workspace name in studio application with "<DRAFT_OPTION>" draft option
+When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+When Navigate to any Dashboard column, select the filter and apply
+When On Run Now tab, Report Period field should have options below
+When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+When The advertiser "<ADVERTISER>" is selected for "Display" creative the following sections are visible
+When User add and save comments to Campaign, Line Items and Tactics
+When User add new targeting rule for Rule Type "Deals"
+When User adds a custom field with "<FIELD_NAME>" on the campaign creation page successfully
+When User adds valid URL and append Macros with "<PARAM>" to the "URL" as follow
+When User adds valid body "<BODY>" and append Macros with "<PARAM>" to the "Body" as follow
+When User applies the filter and selects option
+When User assigns a campaign to the creative using "Bulk Assign" option
+When User calls the Create NPI API with account ID "<ACCOUNT_ID>", list name "<LIST_NAME>"
+When User calls the Create NPI API with account ID "<ACCOUNT_ID>", list name "<LIST_NAME>" and NPIs "<NPIs>"
+When User change filters of HCP Dashboard Overview tabs
+When User change settings of HCP Dashboard Display modules
+When User clicks "Add Destination" button
+When User clicks "GET" request method
+When User clicks "Life Marketplace Deals" Deals Tab
+When User clicks "POST" request method
+When User clicks "Private" Deals Tab
+When User clicks Add Emails link, Deliver to External Emails field should display
+When User clicks Campaign "<Campaign ID>", Line Item and Tactic and verify navigation to respective pages
+When User clicks Create Curated Market link
+When User clicks Favorite Only checkbox
+When User clicks Hide Finished checkbox
+When User clicks Menu option and selects column names
+When User clicks Save button from Tactic Setting tab
+When User clicks Tactic Setting tab
+When User clicks on "<ACTIVITY_TAB_NAME>" tab and verify following filters value
+When User clicks on "Custom Destination" tab as Delivery Method
+When User clicks on "Email" tab as Delivery Method
+When User clicks on "Pick Dimensions/Metrics" link
+When User clicks on "Prescribed Drug" and enters the drug details "<DRUG_NAME>"
+When User clicks on Action and enters the details and saves
+When User clicks on Add Pixel button
+When User clicks on Add Smart Action
+When User clicks on Add Targeting Rule
+When User clicks on Advanced Settings
+When User clicks on Campaign Settings
+When User clicks on Create Campaign
+When User clicks on Create New List
+When User clicks on Create New Workspace
+When User clicks on Email tab on HCP Dashboard
+When User clicks on Media tab on HCP Dashboard
+When User clicks on NPI Lists
+When User clicks on New Template
+When User clicks on OK button
+When User clicks on Ok and Save
+When User clicks on Preview icon for a creative from Creative Library page
+When User clicks on Reload Now button
+When User clicks on Response and enter the details and creates smart list "<SMART_LIST_NAME>" "<DAYS>" and saves
+When User clicks on Search tab on HCP Dashboard
+When User clicks on Site tab on HCP Dashboard
+When User clicks on Social tab on HCP Dashboard
+When User clicks on create new Campaign
+When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
+When User creates below tactics under same line item and verifies it
+When User creates line items with below line types and other details, enables the line item and saves the changes
+When User deactivates the created pixel
+When User deletes some flight entries
+When User deletes the Attribute list
+When User deletes the created list
+When User deletes the custom field for which campaign is created and verifies if it is deleted
+When User disables the studio permission for "<ACCOUNT_NAME>" account
+When User edits the created list
+When User edits the name of the created "<PIXEL_TYPE>"
+When User edits the saved list
+When User enters "<Campaign ID>" and click Search button
+When User enters below details in respective search field, verify that the deal list appears based on the selected filters
+When User enters line item details "<LINE_ITEM>"
+When User enters the Auto-Imported list details as "<LIST_NAME>" "<ADVERTISER>"
+When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
+When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "20000" and saves the campaign
+When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>"
+When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
+When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>" "<LINE_ITEMS>", enables the line item and saves the changes
+When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
+When User enters the line item details as "Line" "500", enables the line item and saves the changes
+When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
+When User enters the tactic details as "Tactic" and saves the tactic
+When User enters the template details as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
+When User enters the template details for end to end as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
+When User fills in required details "<LINE_ITEM>" except for flight information and save
+When User land on Overview tab on HCP Dashboard
+When User makes list available in "LIFE" and saves the list
+When User makes list available in LIFE and HCP365 and clicks on next
+When User makes list available in LIFE, HCP365 and saves the list
+When User modifies the custom field label to new label "<NEW_FIELD_NAME>"
+When User navigates to "line item" page
+When User navigates to "tactic" page
+When User navigates to Administrative section
+When User navigates to Administrative section and go to Accounts Tab
+When User navigates to Schedule report from mega menu of the life application
+When User navigates to Tactic and assigns creative of status "<STATUS>" to the Tactic
+When User navigates to Tactic and clicks on settings tab
+When User navigates to Targeting template page by clicking the icon from Activation section
+When User navigates to run report from mega menu of the life application
+When User overrides line item management fee and verifies tactic reflection for the following fee types
+When User performs "Bulk Archive" action using "Archive Creatives" option on multiple creatives - "2" and verifies the selected creatives are moved to "Archived" tab
+When User removes the created pixel
+When User saves the new template
+When User saves the settings
+When User saves the smart action
+When User saves the webhook setup
+When User searches the deal and assign it from the deal list
+When User selects "<ADVERTISER>" as advertiser
+When User selects pagination values "<PAGINATION_VALUE>" from the dropdown
+When User selects the "<CHANNEL>" as channel
+When User selects the "<CHANNEL>" channel, configure "NPI" targeting rule
+When User selects the "<CREATIVE_TYPE>" creative type
+When User selects the "Delete" option by clicking More Actions menu
+When User selects the "Display" creative type
+When User selects the "HTML" creative type
+When User selects the "Native" creative type
+When User selects the "Video" creative type
+When User selects the workspace type "<WORKSPACE_TYPE>"
+When User selects the workspace types and saves the settings
+When User toggles the Enabled button for Line Items and Tactics
+When User tries to delete the workspace associated with active webhook from the workspace list
+When User tries to save the Attribute list without entering any details, an error message should be displayed
+When User tries to save the Conversion pixel without entering any details, an error message should be displayed
+When User tries to save the Retargeting pixel without entering any details, an error message should be displayed
+When User tries to save the list without entering any details, an error message should be displayed
+When User uses the token to call the GET NPI List API with account ID "<ACCOUNT_ID>"
+When User uses the token to call the GET NPI List API with list ID "<LIST_ID>"
+When Verify data persistence when user creates and saves "Display" creative using details "<ADVERTISER>" as Advertiser, "<CREATIVE_NAME>" as Creative Name, "<ADVERTISER_DSA>", "<FINANCER>" and below Creative attributes
