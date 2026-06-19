@@ -58,7 +58,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: main
+          fetch-depth: 1
 
       # =========================
       # Install dependencies
@@ -80,42 +81,42 @@ jobs:
           mkdir -p "$FEATURE_DIR"
 
           python3 << 'PYEOF'
-          import os, glob, re
-          from collections import defaultdict
-          
-          feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
-          steps_by_domain = defaultdict(set)
-          scenarios = []
-          
-          for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
-              domain = os.path.basename(os.path.dirname(file_path))
-              if domain == "features" or domain == "":
-                  domain = "general"
-              with open(file_path, 'r', encoding='utf-8') as f:
-                  content = f.read()
-              for match in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
-                  scenarios.append(f"[{domain}] {match.group(0).strip()}")
-              for line in content.split('\n'):
-                  line = line.strip()
-                  if re.match(r'^(Given|When|Then|And|But)\s+', line):
-                      steps_by_domain[domain].add(line)
-          
-          with open('step_dictionary.txt', 'w', encoding='utf-8') as f:
-              for domain, steps in sorted(steps_by_domain.items()):
-                  f.write(f"\n--- Domain: {domain} ---\n")
-                  f.write('\n'.join(sorted(steps)))
-                  f.write('\n')
-          
-          with open('scenario_dictionary.txt', 'w', encoding='utf-8') as f:
-              f.write('\n'.join(scenarios))
-          
-          print(f"Domains found  : {sorted(steps_by_domain.keys())}")
-          print(f"Total steps    : {sum(len(v) for v in steps_by_domain.values())}")
-          print(f"Total scenarios: {len(scenarios)}")
-          PYEOF
-          
-                    echo "Step dictionary  : $(wc -l < step_dictionary.txt) lines"
-                    echo "Scenario dict    : $(wc -l < scenario_dictionary.txt) lines"
+import os, glob, re
+from collections import defaultdict
+
+feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
+steps_by_domain = defaultdict(set)
+scenarios = []
+
+for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
+    domain = os.path.basename(os.path.dirname(file_path))
+    if domain == "features" or domain == "":
+        domain = "general"
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    for match in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
+        scenarios.append(f"[{domain}] {match.group(0).strip()}")
+    for line in content.split('\n'):
+        line = line.strip()
+        if re.match(r'^(Given|When|Then|And|But)\s+', line):
+            steps_by_domain[domain].add(line)
+
+with open('step_dictionary.txt', 'w', encoding='utf-8') as f:
+    for domain, steps in sorted(steps_by_domain.items()):
+        f.write(f"\n--- Domain: {domain} ---\n")
+        f.write('\n'.join(sorted(steps)))
+        f.write('\n')
+
+with open('scenario_dictionary.txt', 'w', encoding='utf-8') as f:
+    f.write('\n'.join(scenarios))
+
+print(f"Domains found  : {sorted(steps_by_domain.keys())}")
+print(f"Total steps    : {sum(len(v) for v in steps_by_domain.values())}")
+print(f"Total scenarios: {len(scenarios)}")
+PYEOF
+
+          echo "Step dictionary  : $(wc -l < step_dictionary.txt) lines"
+          echo "Scenario dict    : $(wc -l < scenario_dictionary.txt) lines"
 
       # =========================
       # Create working branch
@@ -126,8 +127,8 @@ jobs:
           BRANCH="${{ inputs.jira_id }}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git fetch origin
-          git checkout -b "$BRANCH" || git checkout "$BRANCH"
+          git fetch origin main
+          git checkout -b "$BRANCH" origin/main || git checkout "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # =========================
@@ -228,143 +229,143 @@ jobs:
           export FEATURE_EXAMPLES
 
           python3 << 'PYEOF'
-          import os, re
-          
-          domain      = os.environ.get("DOMAIN", "")
-          domain_text = domain if domain else "general"
-          
-          # ── Step context: target domain + general ───────────────────────────────────
-          # steps is always defined before the file check — prevents NameError on
-          # missing file and keeps blocks/for loop safely inside the if scope.
-          steps = []
-          if os.path.exists("step_dictionary.txt"):
-              with open("step_dictionary.txt", "r", encoding="utf-8") as f:
-                  content = f.read()
-              blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-              for i in range(1, len(blocks), 2):
-                  d = blocks[i]
-                  s = blocks[i + 1]
-                  if d == domain_text or d == "general":
-                      steps.append(f"--- {d} steps ---\n{s.strip()}")
-          
-          # ── Cap per domain block individually (not total) ────────────────────────────
-          # 120 lines × ~8 tokens/line = ~960 tokens per block — safe within 8k limit.
-          MAX_LINES_PER_DOMAIN = 120
-          capped_steps = []
-          for block in steps:
-              block_lines = block.split('\n')
-              if len(block_lines) > MAX_LINES_PER_DOMAIN:
-                  block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
-                  print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines to fit token budget")
-              capped_steps.append('\n'.join(block_lines))
-          step_context = "\n\n".join(capped_steps)
-          
-          # ── Guard: warn loudly if step context is empty ──────────────────────────────
-          if not step_context.strip():
-              print(f"::warning::No steps found for domain '{domain_text}' — model will invent all steps")
-          else:
-              print(f"Step context: {len(step_context.splitlines())} lines for domain '{domain_text}'")
-          
-          # ── Scenario context: target domain only, last 30 ───────────────────────────
-          scenario_context = ""
-          if os.path.exists("scenario_dictionary.txt"):
-              with open("scenario_dictionary.txt", "r", encoding="utf-8") as f:
-                  lines = f.readlines()
-              scenarios = [l.strip() for l in lines if l.startswith(f"[{domain_text}]")]
-              scenario_context = "\n".join(scenarios[-30:])
-              print(f"Scenario context: {len(scenarios)} titles, showing last 30")
-          
-          feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
-          summary_trim     = os.environ.get("SUMMARY",      "")[:300]
-          desc_trim        = os.environ.get("DESCRIPTION",  "")
-          comments_trim    = os.environ.get("COMMENTS",     "")[:1000]
-          jira_id          = os.environ.get("JIRA_ID",      "")
-          
-          prompt = f"""HARD RULES:
-          1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
-          2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
-          3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-          4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
-          5. Never use placeholder steps. Write the full meaningful step text always.
-          6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
-          
-          DECISION RULES:
-          - Use plain Scenario by default.
-          - Use Scenario Outline + Examples ONLY when: same steps apply to 2+ distinct data combinations explicit in the ticket AND Examples has 2+ rows.
-          - Use a data table when a step needs 3+ key-value pairs or a list. Not for 1-2 values.
-          
-          Data table example:
-            When I submit the form with:
-              | field | value |
-              | email | a@b.c |
-              | role  | admin |
-          
-          DESCRIPTION INTERPRETATION RULES:
-          Style 1 - Explicit acceptance criteria: interpret directly and write scenarios.
-          Style 2 - Scope list (e.g. "FE: Dropdown, Brand Multi Select"): infer user-facing behaviour per item.
-          Style 3 - Status notes (e.g. "6/9 - RELEASED"): ignore entirely.
-          Style 4 - Mixed: process each section independently. UPDATED section is highest priority.
-          
-          For ANY style:
-          - Every bullet, numbered item, or named feature must produce at least one scenario.
-          - Every UPDATED section item must produce at least one scenario.
-          - Never skip a scope item. Infer behaviour from the name if ACs are missing.
-          - Use COMMENTS for edge cases and supplementary context.
-          
-          SCENARIO GENERATION:
-          1. Read full DESCRIPTION and COMMENTS.
-          2. Identify every functional scope item.
-          3. For each item write scenarios covering:
-             - Happy path
-             - Negative/validation (only if inferable)
-             - Permission/role (only if roles mentioned)
-          4. Steps: Given / When / Then / And / But order.
-          5. Business-readable language only. No technical details.
-          6. One behaviour per scenario. No duplicates.
-          
-          JIRA:
-          ID: {jira_id}
-          TARGET DOMAIN: {domain_text}
-          SUMMARY: {summary_trim}
-          DESCRIPTION: {desc_trim}
-          COMMENTS: {comments_trim}
-          
-          REPOSITORY EXAMPLES (mirror this style exactly):
-          {feature_examples}
-          
-          EXISTING SCENARIOS (do not duplicate these):
-          {scenario_context}
-          
-          STEP DICTIONARY (use verbatim — invent only if no match exists):
-          {step_context}
-          
-          OUTPUT FORMAT:
-          Feature: <name from Jira summary>
-          
-            @todo
-            Scenario: <actor action expected outcome>
-              Given ...
-              When  ...
-              Then  ...
-          
-            @todo
-            Scenario Outline: <actor action expected outcome>
-              Given ...
-              When  ... "<param>"
-              Then  ...
-              Examples:
-                | param  |
-                | value1 |
-                | value2 |
-          """
-          
-          with open("prompt.txt", "w") as f:
-              f.write(prompt)
-          
-          size  = os.path.getsize("prompt.txt")
-          words = len(prompt.split())
-          print(f"Prompt size  : {size} bytes / {words} words (est. {words // 3} tokens)")
-          PYEOF
+import os, re
+
+domain      = os.environ.get("DOMAIN", "")
+domain_text = domain if domain else "general"
+
+# ── Step context: target domain + general ───────────────────────────────────
+# steps is always defined before the file check — prevents NameError on
+# missing file and keeps blocks/for loop safely inside the if scope.
+steps = []
+if os.path.exists("step_dictionary.txt"):
+    with open("step_dictionary.txt", "r", encoding="utf-8") as f:
+        content = f.read()
+    blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
+    for i in range(1, len(blocks), 2):
+        d = blocks[i]
+        s = blocks[i + 1]
+        if d == domain_text or d == "general":
+            steps.append(f"--- {d} steps ---\n{s.strip()}")
+
+# ── Cap per domain block individually (not total) ────────────────────────────
+# 120 lines × ~8 tokens/line = ~960 tokens per block — safe within 8k limit.
+MAX_LINES_PER_DOMAIN = 120
+capped_steps = []
+for block in steps:
+    block_lines = block.split('\n')
+    if len(block_lines) > MAX_LINES_PER_DOMAIN:
+        block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
+        print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines to fit token budget")
+    capped_steps.append('\n'.join(block_lines))
+step_context = "\n\n".join(capped_steps)
+
+# ── Guard: warn loudly if step context is empty ──────────────────────────────
+if not step_context.strip():
+    print(f"::warning::No steps found for domain '{domain_text}' — model will invent all steps")
+else:
+    print(f"Step context: {len(step_context.splitlines())} lines for domain '{domain_text}'")
+
+# ── Scenario context: target domain only, last 30 ───────────────────────────
+scenario_context = ""
+if os.path.exists("scenario_dictionary.txt"):
+    with open("scenario_dictionary.txt", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    scenarios = [l.strip() for l in lines if l.startswith(f"[{domain_text}]")]
+    scenario_context = "\n".join(scenarios[-30:])
+    print(f"Scenario context: {len(scenarios)} titles, showing last 30")
+
+feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
+summary_trim     = os.environ.get("SUMMARY",      "")[:300]
+desc_trim        = os.environ.get("DESCRIPTION",  "")
+comments_trim    = os.environ.get("COMMENTS",     "")[:1000]
+jira_id          = os.environ.get("JIRA_ID",      "")
+
+prompt = f"""HARD RULES:
+1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
+2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
+3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
+4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
+5. Never use placeholder steps. Write the full meaningful step text always.
+6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
+
+DECISION RULES:
+- Use plain Scenario by default.
+- Use Scenario Outline + Examples ONLY when: same steps apply to 2+ distinct data combinations explicit in the ticket AND Examples has 2+ rows.
+- Use a data table when a step needs 3+ key-value pairs or a list. Not for 1-2 values.
+
+Data table example:
+  When I submit the form with:
+    | field | value |
+    | email | a@b.c |
+    | role  | admin |
+
+DESCRIPTION INTERPRETATION RULES:
+Style 1 - Explicit acceptance criteria: interpret directly and write scenarios.
+Style 2 - Scope list (e.g. "FE: Dropdown, Brand Multi Select"): infer user-facing behaviour per item.
+Style 3 - Status notes (e.g. "6/9 - RELEASED"): ignore entirely.
+Style 4 - Mixed: process each section independently. UPDATED section is highest priority.
+
+For ANY style:
+- Every bullet, numbered item, or named feature must produce at least one scenario.
+- Every UPDATED section item must produce at least one scenario.
+- Never skip a scope item. Infer behaviour from the name if ACs are missing.
+- Use COMMENTS for edge cases and supplementary context.
+
+SCENARIO GENERATION:
+1. Read full DESCRIPTION and COMMENTS.
+2. Identify every functional scope item.
+3. For each item write scenarios covering:
+   - Happy path
+   - Negative/validation (only if inferable)
+   - Permission/role (only if roles mentioned)
+4. Steps: Given / When / Then / And / But order.
+5. Business-readable language only. No technical details.
+6. One behaviour per scenario. No duplicates.
+
+JIRA:
+ID: {jira_id}
+TARGET DOMAIN: {domain_text}
+SUMMARY: {summary_trim}
+DESCRIPTION: {desc_trim}
+COMMENTS: {comments_trim}
+
+REPOSITORY EXAMPLES (mirror this style exactly):
+{feature_examples}
+
+EXISTING SCENARIOS (do not duplicate these):
+{scenario_context}
+
+STEP DICTIONARY (use verbatim — invent only if no match exists):
+{step_context}
+
+OUTPUT FORMAT:
+Feature: <name from Jira summary>
+
+  @todo
+  Scenario: <actor action expected outcome>
+    Given ...
+    When  ...
+    Then  ...
+
+  @todo
+  Scenario Outline: <actor action expected outcome>
+    Given ...
+    When  ... "<param>"
+    Then  ...
+    Examples:
+      | param  |
+      | value1 |
+      | value2 |
+"""
+
+with open("prompt.txt", "w") as f:
+    f.write(prompt)
+
+size  = os.path.getsize("prompt.txt")
+words = len(prompt.split())
+print(f"Prompt size  : {size} bytes / {words} words (est. {words // 3} tokens)")
+PYEOF
 
       # =========================
       # Pre-flight size check
@@ -540,24 +541,24 @@ jobs:
 
           # ── Extract existing steps for this domain ───────────────────────────
           python3 << 'PYEOF'
-          import os, re
-          domain_text = os.environ.get("DOMAIN", "general")
-          steps = set()
-          if os.path.exists("step_dictionary.txt"):
-              with open("step_dictionary.txt", "r", encoding="utf-8") as f:
-                  content = f.read()
-              blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-              for i in range(1, len(blocks), 2):
-                  d = blocks[i]
-                  s = blocks[i + 1]
-                  if d == domain_text or d == "general":
-                      for line in s.split('\n'):
-                          if line.strip():
-                              steps.add(line.strip())
-          with open("domain_existing_steps.txt", "w", encoding="utf-8") as f:
-              f.write('\n'.join(sorted(steps)) + '\n')
-          print(f"Existing steps loaded: {len(steps)} for domain '{domain_text}'")
-          PYEOF
+import os, re
+domain_text = os.environ.get("DOMAIN", "general")
+steps = set()
+if os.path.exists("step_dictionary.txt"):
+    with open("step_dictionary.txt", "r", encoding="utf-8") as f:
+        content = f.read()
+    blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
+    for i in range(1, len(blocks), 2):
+        d = blocks[i]
+        s = blocks[i + 1]
+        if d == domain_text or d == "general":
+            for line in s.split('\n'):
+                if line.strip():
+                    steps.add(line.strip())
+with open("domain_existing_steps.txt", "w", encoding="utf-8") as f:
+    f.write('\n'.join(sorted(steps)) + '\n')
+print(f"Existing steps loaded: {len(steps)} for domain '{domain_text}'")
+PYEOF
 
           # ── Keyword normalisation + trailing space strip ─────────────────────
           sed -E 's/^(Given|When|Then|And|But)\s+//' generated_steps.txt       > generated_steps_norm.txt      || true
