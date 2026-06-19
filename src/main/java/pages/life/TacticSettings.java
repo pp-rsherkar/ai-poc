@@ -1069,18 +1069,6 @@ public class TacticSettings {
                 }
                 clickRuleTypeOkButton();
                 break;
-            case "NPI":
-                String xpathNPI = String.format("//div[contains(@class,'content ng-star-inserted') and contains(text(),'%s')]", ruleType);
-                Locator bidNPIRuleType = page.locator(xpathNPI);
-                bidNPIRuleType.click();
-                for (String value : ruleValues) {
-                    String cleanedValue = value.replace("[", "").replace("]", "");
-                    String xpathNPIValue = String.format("//div[contains(text(),'%s')]/ancestor::td/preceding-sibling::td//input", cleanedValue);
-                    Locator categoryItems = page.locator(xpathNPIValue);
-                    categoryItems.fill(fillValue);
-                }
-                clickRuleTypeOkButton();
-                break;
         }
     }
 
