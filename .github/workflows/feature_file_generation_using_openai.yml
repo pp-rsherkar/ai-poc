@@ -284,12 +284,11 @@ jobs:
           domain_text      = domain if domain else "general"
           
           # ── Step context: target domain only ────────────────────────────────
-          step_context = ""
+          steps = []  # always initialise BEFORE the file check
           if os.path.exists("step_dictionary.txt"):
               with open("step_dictionary.txt", "r", encoding="utf-8") as f:
                   content = f.read()
               blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-              steps = []
               for i in range(1, len(blocks) - 1, 2):
                   d = blocks[i]
                   s = blocks[i + 1]
@@ -305,7 +304,13 @@ jobs:
                   block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
                   print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines to fit token budget")
               capped_steps.append('\n'.join(block_lines))
-          step_context = "\n\n".join(capped_steps)      
+          step_context = "\n\n".join(capped_steps)
+
+          # ── Guard: warn loudly if step context is empty ──────────────────────
+          if not step_context.strip():
+              print(f"::warning::No steps found for domain '{domain_text}' in step_dictionary.txt — model will invent all steps")
+          else:
+              print(f"Step context: {len(step_context.splitlines())} lines for domain '{domain_text}'")  
 
           scenario_context = ""
           if os.path.exists("scenario_dictionary.txt"):
