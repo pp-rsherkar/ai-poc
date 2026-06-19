@@ -298,13 +298,13 @@ jobs:
                   steps.append(f"--- {d} steps ---\n{s.strip()}")
 
           # ── Cap per domain block — not total ────────────────────────────────
-          MAX_LINES_PER_DOMAIN = 120
+          MAX_LINES_PER_DOMAIN = 2000 
           capped_steps = []
           for block in steps:
               block_lines = block.split('\n')
               if len(block_lines) > MAX_LINES_PER_DOMAIN:
                   block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
-                  print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines to fit token budget")
+                  print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines.")
               capped_steps.append('\n'.join(block_lines))
           step_context = "\n\n".join(capped_steps)
 
@@ -635,7 +635,13 @@ jobs:
           sed -i 's/[[:space:]]*$//' domain_existing_steps_norm.txt || true
           
           # Find new steps
-          grep -v -F -x -f domain_existing_steps_norm.txt generated_steps_norm.txt > new_steps.txt || true
+          # Add safety check: if domain_existing is empty, grep -f will fail to filter anything
+          if [ ! -s domain_existing_steps_norm.txt ]; then
+            echo "::warning::domain_existing_steps_norm.txt is empty! Is the repository missing .feature files?"
+            cp generated_steps_norm.txt new_steps.txt || true
+          else
+            grep -v -F -x -f domain_existing_steps_norm.txt generated_steps_norm.txt > new_steps.txt || true
+          fi
           
           NEW_STEPS_COUNT=$(wc -l < new_steps.txt || echo 0)
           TOTAL_STEPS=$(wc -l < generated_steps.txt || echo 0)
@@ -656,12 +662,14 @@ jobs:
             echo "INVENTED_RATIO=$INVENTED_RATIO"
           } >> "$GITHUB_ENV"
           
-          if [ "$INVENTED_RATIO" -gt 60 ]; then
-            echo "::error::Invented ratio ${INVENTED_RATIO}% exceeds hard limit of 60%. Too many new steps — review the prompt or domain."
+          # Increased hard limit to 85% to allow for brand-new feature development
+          if [ "$INVENTED_RATIO" -gt 85 ]; then
+            echo "::error::Invented ratio ${INVENTED_RATIO}% exceeds hard limit of 85%. Too many new steps."
+            echo "--- INVENTED STEPS ---"
             cat new_steps.txt
             exit 1
-          elif [ "$INVENTED_RATIO" -gt 30 ]; then
-            echo "::warning::Invented ratio ${INVENTED_RATIO}% exceeds soft limit of 30%. Review invented steps before merging."
+          elif [ "$INVENTED_RATIO" -gt 40 ]; then
+            echo "::warning::Invented ratio ${INVENTED_RATIO}% exceeds soft limit of 40%. Review invented steps before merging."
             cat new_steps.txt
           elif [ -s new_steps.txt ]; then
             echo "::warning::${NEW_STEPS_COUNT} new step(s) invented (${INVENTED_RATIO}% — within threshold):"
