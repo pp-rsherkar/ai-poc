@@ -168,7 +168,7 @@ public class LifeSteps {
     }
 
     @Given("User clicks on Create Campaign")
-    public void user_clicks_on_create_campaign() {
+    public void user_clicks_on_create_campaign() throws InterruptedException {
         logger.info("Clicking on Create Campaign button");
         campaigns.createCampaign();
         String campaignText = campaigns.verifyCampaignText();
@@ -1144,10 +1144,9 @@ public class LifeSteps {
     /*Roshani Sherkar - 18-06-2025
      * Campaign Dashbaord Features Start*/
     @And("Verify Campaign Dashboard is displayed with title {string}")
-    public void verifyCampaignDashboardIsDisplayedWithTitle(String title) throws InterruptedException {
+    public void verifyCampaignDashboardIsDisplayedWithTitle(String title){
         logger.info("Verifying Campaign Dashboard is displayed with title: {}", title);
         Assert.assertEquals(title, campaignDashboard.isCampaignDashboardVisibleWithTitle(title));
-        Thread.sleep(3000);
     }
 
     @When("User enters {string} and click Search button")
@@ -1926,7 +1925,7 @@ public class LifeSteps {
             String budget,
             String lineItemName,
             String lineBudget,
-            String tacticName) {
+            String tacticName) throws InterruptedException {
         logger.info(
                 "Creating a tactic and importing template. Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}",
                 lineItemType,
@@ -2069,7 +2068,7 @@ public class LifeSteps {
             String lineItemName,
             String lineBudget,
             String tacticName,
-            DataTable ruleTypeAndOptions) {
+            DataTable ruleTypeAndOptions) throws InterruptedException {
         logger.info(
                 "Creating a tactic with inline targeting rules. Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}",
                 lineItemType,
@@ -2491,7 +2490,7 @@ public class LifeSteps {
             String budget,
             String lineItemName,
             String lineBudget,
-            String tacticName) {
+            String tacticName) throws InterruptedException {
         logger.info("Creating tactic to assign recently created creatives. Allowed Line Item Types: {}", lineItemType);
         List<String> lineItemTypeList =
                 Arrays.stream(lineItemType.split(",")).map(String::trim).toList();
@@ -3062,7 +3061,7 @@ public class LifeSteps {
      * 20-08-2025
      * Atrribute NPI List creation and targeting it at tactic level*/
     @And("Navigate to Campaign Dashboard and clicks on Create Campaign")
-    public void navigateToCampaignDashboardAndClicksOnCreateCampaign() {
+    public void navigateToCampaignDashboardAndClicksOnCreateCampaign() throws InterruptedException {
         logger.info("Navigate to Campaign Dashboard and clicks on Create Campaign");
         navigation.clickSubMenu();
         navigation.clickCampaigns();
@@ -5453,7 +5452,7 @@ public class LifeSteps {
     }
 
     @When("User clicks on create new Campaign")
-    public void userClicksOnCreateNewCampaign() {
+    public void userClicksOnCreateNewCampaign() throws InterruptedException {
         logger.info("User clicks on create new Campaign");
         campaigns.createCampaign();
     }
@@ -6074,7 +6073,7 @@ public class LifeSteps {
     }
 
     @And("User verifies if the added custom field is available on New Campaign creation page")
-    public void userVerifiesIfTheAddedCustomFieldIsAvailableOnNewCampaignCreationPage() {
+    public void userVerifiesIfTheAddedCustomFieldIsAvailableOnNewCampaignCreationPage() throws InterruptedException {
         logger.info("User verifies if the added custom field is available on New Campaign creation page");
         campaigns.navigateToCampaignDashboard();
         campaigns.createCampaign();
@@ -6107,7 +6106,7 @@ public class LifeSteps {
     }
 
     @And("User verifies if the deleted custom field is available on New Campaign creation page")
-    public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() {
+    public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() throws InterruptedException {
         logger.info("User verifies if the deleted custom field is available on New Campaign creation page");
         navigation.clickPulsePointLogo();
         campaigns.createCampaign();

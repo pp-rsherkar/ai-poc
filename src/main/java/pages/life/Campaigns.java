@@ -172,7 +172,8 @@ public class Campaigns {
         this.FAVORITE_ONLY_CHECKBOX = page.locator("//sui-checkbox[contains(@class,'gaFavoritesOnly')]");
     }
 
-    public void createCampaign() {
+    public void createCampaign() throws InterruptedException {
+        Thread.sleep(3000);
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
     }

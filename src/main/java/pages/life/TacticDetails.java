@@ -322,7 +322,7 @@ public class TacticDetails {
             String lineBudget,
             String tacticName,
             List<String> templateNameList,
-            List<Map<String, String>> ruleCountAndValueList) {
+            List<Map<String, String>> ruleCountAndValueList) throws InterruptedException {
         List<Map<String, String>> labelCountMapList = new ArrayList<>();
         for (String lineItemType : lineItemTypeList) {
             navigation.clickSubMenu();
@@ -351,7 +351,7 @@ public class TacticDetails {
             String lineItemName,
             String lineBudget,
             String tacticName,
-            Map<String, List<String>> rulesMap) {
+            Map<String, List<String>> rulesMap) throws InterruptedException {
         List<String> templateNameList = new ArrayList<>();
         for (String lineItemType : lineItemTypeList) {
             navigation.clickSubMenu();
@@ -392,7 +392,7 @@ public class TacticDetails {
         waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
     }
 
-    private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {
+    private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) throws InterruptedException {
         campaigns.createCampaign();
         campaigns.verifyCampaignText();
         campaigns.selectAdvertiser(advertiser);
@@ -473,7 +473,7 @@ public class TacticDetails {
             String lineItemName,
             String lineBudget,
             String tacticName,
-            String CreativeName) {
+            String CreativeName) throws InterruptedException {
         npiSmartList.clickPulsepointIcon();
         campaigns.campaignDashboard();
 
