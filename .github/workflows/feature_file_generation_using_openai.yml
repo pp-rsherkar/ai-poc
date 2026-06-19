@@ -8,9 +8,14 @@ on:
         required: true
         type: string
       domain:
-        description: "Target domain/sub-folder (e.g., checkout, login). Leave empty for general."
-        required: false
-        type: string
+        description: "Target domain/sub-folder"
+        required: true                        # make it required
+        type: choice
+        default: "studio"
+        options:
+          - studio
+          - life
+          - hcp
       llm_model:
         description: "Select LLM Model"
         required: true
