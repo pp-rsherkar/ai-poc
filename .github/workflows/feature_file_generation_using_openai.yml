@@ -11,10 +11,10 @@ on:
         description: "Target domain/sub-folder"
         required: true                        # make it required
         type: choice
-        default: "studio"
+        default: "life"
         options:
-          - studio
           - life
+          - studio
           - hcp
       llm_model:
         description: "Select LLM Model"
