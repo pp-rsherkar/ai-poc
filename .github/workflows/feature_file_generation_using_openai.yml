@@ -260,7 +260,7 @@ jobs:
               | sort \
               | head -2 \
               | while read -r f; do cat "$f"; done \
-              | head -n 200
+              | head -n 60
             )
           else
             FEATURE_EXAMPLES=$(
@@ -268,7 +268,7 @@ jobs:
               | sort \
               | head -2 \
               | while read -r f; do cat "$f"; done \
-              | head -n 200
+              | head -n 60
             )
           fi
 
@@ -294,6 +294,12 @@ jobs:
                       if d == domain_text or d == "general":
                           steps.append(f"--- {d} steps ---\n{s.strip()}")
                   step_context = "\n\n".join(steps)
+                  
+          # ── Cap step context to stay within token budget ────────────────────
+          step_lines = step_context.split('\n')
+          if len(step_lines) > 200:
+              step_context = '\n'.join(step_lines[:200])
+              print(f"::warning::Step context trimmed to 200 lines to fit token budget")        
 
           scenario_context = ""
           if os.path.exists("scenario_dictionary.txt"):
