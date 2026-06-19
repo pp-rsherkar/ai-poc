@@ -1925,7 +1925,7 @@ public class LifeSteps {
             String budget,
             String lineItemName,
             String lineBudget,
-            String tacticName) throws InterruptedException {
+            String tacticName) {
         logger.info(
                 "Creating a tactic and importing template. Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}",
                 lineItemType,
@@ -2068,7 +2068,7 @@ public class LifeSteps {
             String lineItemName,
             String lineBudget,
             String tacticName,
-            DataTable ruleTypeAndOptions) throws InterruptedException {
+            DataTable ruleTypeAndOptions) {
         logger.info(
                 "Creating a tactic with inline targeting rules. Line Item Type: {}, Advertiser: {}, Campaign: {}, Tactic: {}",
                 lineItemType,
@@ -2490,7 +2490,7 @@ public class LifeSteps {
             String budget,
             String lineItemName,
             String lineBudget,
-            String tacticName) throws InterruptedException {
+            String tacticName) {
         logger.info("Creating tactic to assign recently created creatives. Allowed Line Item Types: {}", lineItemType);
         List<String> lineItemTypeList =
                 Arrays.stream(lineItemType.split(",")).map(String::trim).toList();
