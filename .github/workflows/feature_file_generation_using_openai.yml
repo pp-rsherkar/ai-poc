@@ -259,16 +259,18 @@ jobs:
               find "$FEATURE_DIR/$DOMAIN" -name "*.feature" \
               | sort \
               | head -2 \
-              | while read -r f; do cat "$f"; done \
-              | head -n 60
+              | xargs cat 2>/dev/null \
+              | head -n 60 \
+              || true
             )
           else
             FEATURE_EXAMPLES=$(
               find "$FEATURE_DIR" -name "*.feature" \
               | sort \
               | head -2 \
-              | while read -r f; do cat "$f"; done \
-              | head -n 60
+              | xargs cat 2>/dev/null \
+              | head -n 60 \
+              || true
             )
           fi
 
