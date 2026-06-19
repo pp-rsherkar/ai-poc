@@ -24,3 +24,24 @@ Feature: Brand Explorer Workspace creation in Studio
     Examples:
       | ADVERTISER         | WORKSPACE_NAME            |
       | TAMTESTING ACCOUNT | Automation_Brand_Explorer |
+
+  @regression
+  Scenario Outline: Verify all 9 preset timeframe options are present and correctly labeled
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    When User clicks the TimeFrame selector
+    Then All 9 preset timeframe options are visible in the dropdown with correct labels
+      | Yesterday     |
+      | Last 7 Days   |
+      | Last 14 Days  |
+      | Last 30 Days  |
+      | Last 60 Days  |
+      | Last 90 Days  |
+      | Last 180 Days |
+      | Last 365 Days |
+      | Custom        |
+    Examples:
+      | ADVERTISER          |
+      | TAMTESTING ACCOUNT  |
