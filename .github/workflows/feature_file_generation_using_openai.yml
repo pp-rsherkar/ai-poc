@@ -657,6 +657,12 @@ jobs:
           - **Invented steps:** ${{ env.NEW_STEPS_COUNT }} (${{ env.INVENTED_RATIO }}%)
           EOF
 
+          if [ -s new_steps.txt ]; then
+            printf '\n### Invented steps (needs review)\n```\n' >> pr_body.txt
+            cat new_steps.txt >> pr_body.txt
+            printf '```\n' >> pr_body.txt
+          fi
+
           gh pr create \
             --base main \
             --head "${{ env.BRANCH }}" \
