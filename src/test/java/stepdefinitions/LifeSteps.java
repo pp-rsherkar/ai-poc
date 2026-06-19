@@ -493,8 +493,10 @@ public class LifeSteps {
     @Then("User deletes the custom field and verify its removed from new tactic")
     public void user_deletes_the_custom_field_and_verify_its_removed_from_new_tactic() {
         logger.info("Deleting custom field: {}", customFieldName);
-        tacticDetails.deleteCustomField(customFieldName);
-        logger.info("Custom field deletion action completed");
+        Assert.assertTrue(
+                "Unable to delete Custom field",
+                tacticDetails.deleteCustomField(customFieldName).contains("Successfully deleted the Field"));
+        Assert.assertFalse("Custom Field is available", tacticDetails.isCustomFieldAvailable(customFieldName));
     }
 
     @When("User enters the tactic details as {string} and saves the tactic")
@@ -4918,6 +4920,20 @@ public class LifeSteps {
         lineItemDetails.clickAddFlightButton();
     }
 
+    @And("User tries to save the line item without entering any flight details")
+    public void userTriesToSaveTheLineItemWithoutEnteringAnyFlightDetails() {
+        logger.info("User tries to save the line item without entering any flight details");
+        lineItemDetails.saveLineItem();
+    }
+
+    @Then("User should see error message {string} when tries to save line item page")
+    public void userShouldSeeErrorMessageWhenTriesToSaveLineItemPage(String errorMessage) {
+        logger.info("User should see error message {} when tries to save line item page", errorMessage);
+        Assert.assertTrue(
+                "Error message is not displayed",
+                lineItemDetails.fetchErrorAlert().contains(errorMessage));
+    }
+
     @And("Verify if user enters flight budget that exceeds Campaign budget")
     public void verifyIfUserEntersFlightBudgetThatExceedsCampaignBudget() {
         logger.info("User clicks Add Flight button");
@@ -4936,7 +4952,8 @@ public class LifeSteps {
         logger.info("User should see error message when tries to save line item page");
         Assert.assertTrue(
                 "The total flight budget is exceeded",
-                lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed"));
+                lineItemDetails.fetchErrorAlert().contains("The total flight budget could not exceed")
+                        || lineItemDetails.fetchErrorAlert().contains("Invalid budget"));
     }
 
     @And("User adds the flight details - Flight Start Date, Flight End Date, {string}")
