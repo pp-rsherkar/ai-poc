@@ -252,7 +252,7 @@ jobs:
               | sort \
               | head -2 \
               | while read -r f; do cat "$f"; done \
-              | head -n 100
+              | head -n 200
             )
           else
             FEATURE_EXAMPLES=$(
@@ -260,7 +260,7 @@ jobs:
               | sort \
               | head -2 \
               | while read -r f; do cat "$f"; done \
-              | head -n 100
+              | head -n 200
             )
           fi
 
@@ -648,7 +648,7 @@ jobs:
           DOMAIN_TEXT="${{ inputs.domain }}"
           [ -z "$DOMAIN_TEXT" ] && DOMAIN_TEXT="general"
           
-          cat <<EOF > pr_body.txt
+          cat <<-EOF > pr_body.txt
           Auto-generated BDD feature file from Jira ticket parameters.
           
           ### Generation Stats
@@ -666,5 +666,5 @@ jobs:
           gh pr create \
             --base main \
             --head "${{ env.BRANCH }}" \
-            --title "feat(${{ inputs.jira_id }}): $SUMMARY" \
+            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
             --body-file pr_body.txt
