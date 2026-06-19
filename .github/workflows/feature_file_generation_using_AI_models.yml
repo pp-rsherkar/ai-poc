@@ -1,4 +1,4 @@
-name: JIRA - Feature File (GHERKIN) Generator Using OPENAI
+name: JIRA - Feature File (GHERKIN) Generator Using CLAUDE
 
 on:
   workflow_dispatch:
