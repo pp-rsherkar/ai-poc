@@ -583,8 +583,12 @@ jobs:
               f.write('\n'.join(sorted(steps)) + '\n')
           PYEOF
           
+          # Normalize steps by removing Given/When/Then/And/But for accurate comparison
+          sed -E 's/^(Given|When|Then|And|But)\s+//' generated_steps.txt > generated_steps_norm.txt || true
+          sed -E 's/^(Given|When|Then|And|But)\s+//' domain_existing_steps.txt > domain_existing_steps_norm.txt || true
+          
           # Find new steps
-          grep -v -F -x -f domain_existing_steps.txt generated_steps.txt > new_steps.txt || true
+          grep -v -F -x -f domain_existing_steps_norm.txt generated_steps_norm.txt > new_steps.txt || true
           
           NEW_STEPS_COUNT=$(wc -l < new_steps.txt || echo 0)
           TOTAL_STEPS=$(wc -l < generated_steps.txt || echo 0)
@@ -644,15 +648,17 @@ jobs:
           DOMAIN_TEXT="${{ inputs.domain }}"
           [ -z "$DOMAIN_TEXT" ] && DOMAIN_TEXT="general"
           
-          PR_BODY="Auto-generated BDD feature file from Jira ticket parameters.
+          cat <<EOF > pr_body.txt
+          Auto-generated BDD feature file from Jira ticket parameters.
           
           ### Generation Stats
           - **Target Domain:** $DOMAIN_TEXT
           - **Total steps:** ${{ env.TOTAL_STEPS }}
-          - **Invented steps:** ${{ env.NEW_STEPS_COUNT }} (${{ env.INVENTED_RATIO }}%)"
+          - **Invented steps:** ${{ env.NEW_STEPS_COUNT }} (${{ env.INVENTED_RATIO }}%)
+          EOF
 
           gh pr create \
             --base main \
             --head "${{ env.BRANCH }}" \
-            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
-            --body "$PR_BODY"
+            --title "feat(${{ inputs.jira_id }}): $SUMMARY" \
+            --body-file pr_body.txt
