@@ -602,7 +602,7 @@ jobs:
                   for i in range(1, len(blocks) - 1, 2):
                       d = blocks[i]
                       s = blocks[i+1]
-                      if d == domain_text or d == "general":
+                      if d == domain_text:
                           for line in s.split('\n'):
                               if line.strip():
                                   steps.add(line.strip())
@@ -644,6 +644,11 @@ jobs:
             echo "::warning::Invented ratio ${INVENTED_RATIO}% exceeds soft limit of 30%. Review invented steps before merging."
             cat new_steps.txt
           elif [ -s new_steps.txt ]; then
+            echo "::warning::${NEW_STEPS_COUNT} new step(s) invented (${INVENTED_RATIO}% — within threshold):"
+            cat new_steps.txt
+          else
+            echo "SUCCESS: All generated steps match existing step library."
+          fi
 
       # =========================
       # Commit and push
