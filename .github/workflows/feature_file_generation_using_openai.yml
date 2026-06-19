@@ -260,7 +260,7 @@ jobs:
               | sort \
               | head -2 \
               | xargs cat 2>/dev/null \
-              | head -n 60 \
+              | head -n 40 \
               || true
             )
           else
@@ -269,7 +269,7 @@ jobs:
               | sort \
               | head -2 \
               | xargs cat 2>/dev/null \
-              | head -n 60 \
+              | head -n 40 \
               || true
             )
           fi
@@ -299,8 +299,8 @@ jobs:
                   
           # ── Cap step context to stay within token budget ────────────────────
           step_lines = step_context.split('\n')
-          if len(step_lines) > 200:
-              step_context = '\n'.join(step_lines[:200])
+          if len(step_lines) > 150:
+              step_context = '\n'.join(step_lines[:150])
               print(f"::warning::Step context trimmed to 200 lines to fit token budget")        
 
           scenario_context = ""
@@ -311,7 +311,8 @@ jobs:
                   for line in lines:
                       if line.startswith(f"[{domain_text}]") or line.startswith("[general]"):
                           scenarios.append(line.strip())
-                  scenario_context = "\n".join(scenarios)
+                  # Cap to 30 titles — enough to avoid duplicates
+                  scenario_context = "\n".join(scenarios[-30:])
           
           feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
           summary_trim     = os.environ.get("SUMMARY", "")[:300]
