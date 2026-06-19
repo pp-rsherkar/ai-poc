@@ -58,7 +58,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: main
+          fetch-depth: 1
 
       # =========================
       # Install dependencies
@@ -126,8 +127,8 @@ PYEOF
           BRANCH="${{ inputs.jira_id }}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git fetch origin
-          git checkout -b "$BRANCH" || git checkout "$BRANCH"
+          git fetch origin main
+          git checkout -b "$BRANCH" origin/main || git checkout "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # =========================
