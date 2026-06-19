@@ -464,6 +464,17 @@ jobs:
           fi
 
           echo "Request size: $(wc -c < request.json) bytes"
+          # ── Debug: size breakdown before sending ───────────────
+          PROMPT_CHARS=$(jq -r '.messages[1].content' request.json | wc -c)
+          SYSTEM_CHARS=$(jq -r '.messages[0].content' request.json | wc -c)
+          TOTAL_BYTES=$(wc -c < request.json)
+          echo "System prompt : $SYSTEM_CHARS chars (~$(( SYSTEM_CHARS / 4 )) tokens)"
+          echo "User prompt   : $PROMPT_CHARS chars (~$(( PROMPT_CHARS / 4 )) tokens)"
+          echo "Total request : $TOTAL_BYTES bytes (~$(( TOTAL_BYTES / 4 )) tokens)"
+          echo "--- User prompt content ---"
+          jq -r '.messages[1].content' request.json
+          # ──────────────────────────────────────────────────────
+
           echo "Generating feature file..."
 
           HTTP_RESPONSE=$(mktemp)
