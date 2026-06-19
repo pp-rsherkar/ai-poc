@@ -7328,9 +7328,9 @@ public class LifeSteps {
     @And("User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules")
     public void userVerifyBehavioursegmentandNPIareNotAllowedinbidMultiplier() {
         logger.info("Verifying Behaviour segment and NPI are not allowed in Bid multiplier if the same are not targeted in tactic");
-        String displaySegmentError = tacticSettings.checkErrorofBidMultiplierSegmentRule();
+        String displaySegmentError = tacticSettings.checkErrorOfBidMultiplierSegmentRule();
         Assert.assertEquals("Application allows Behaviour segment in bid multiplier even if its not targeted in tactic", ("No Behavioral Targeting is Selected"), displaySegmentError);
-        String displayNPIError = tacticSettings.checkErrorofBidMultiplierNPIRule();
+        String displayNPIError = tacticSettings.checkErrorOfBidMultiplierNPIRule();
         Assert.assertEquals("Application allows NPI in bid multiplier even if its not targeted in tactic", ("No NPI Targeting is Selected"), displayNPIError);
     }
 

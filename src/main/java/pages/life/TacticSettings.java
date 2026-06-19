@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
-import com.microsoft.playwright.options.WaitForSelectorState;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -98,7 +97,7 @@ public class TacticSettings {
     private final Locator ADD_TARGETING;
     private final Locator BID_MULTIPLIER_CATEGORY_NAME;
     private final Locator FETCH_BID_MULTIPLIER_RULE_TYPES;
-    private final Locator FETCH_BID_MULTIIPLIER_RULE_OPTIONS;
+    private final Locator FETCH_BID_MULTIPLIER_RULE_OPTIONS;
     private final Locator CREATIVE_TAB;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     List<Object> ruleTypes;
@@ -216,7 +215,7 @@ public class TacticSettings {
         this.BID_MULTIPLIER_CATEGORY_NAME = page.locator("//div[contains(@class,'bidMultiplierCategoryName')]");
         this.FETCH_BID_MULTIPLIER_RULE_TYPES = page.locator(
                 "//div[contains(@class,'bidMultiplierData')]//div[contains(@class,'bold')]");
-        this.FETCH_BID_MULTIIPLIER_RULE_OPTIONS = page.locator("//div[contains(@class,'bmtName')]");
+        this.FETCH_BID_MULTIPLIER_RULE_OPTIONS = page.locator("//div[contains(@class,'bmtName')]");
         this.CREATIVE_TAB = page.locator("(//div[contains(@class,'navbar')]//a[contains(@class,'gaTabCreatives')])[1]");
     }
 
@@ -1001,13 +1000,13 @@ public class TacticSettings {
         NEW_TACTIC.click();
     }
 
-    public String checkErrorofBidMultiplierSegmentRule() {
+    public String checkErrorOfBidMultiplierSegmentRule() {
         ADD_BID_MULTIPLIER.click();
         BEHAVIOUR_SEGMENT.click();
         return BEHAVIOUR_SEGMENT_ERROR.innerText();
     }
 
-    public String checkErrorofBidMultiplierNPIRule() {
+    public String checkErrorOfBidMultiplierNPIRule() {
         BID_PANEL_CANCEL_BUTTON.click();
         NPI_BID.click();
         return NPI_ERROR.innerText();
@@ -1102,7 +1101,7 @@ public class TacticSettings {
 
     public List<Object> fetchBidRuleOptions() {
         ruleOptions = new ArrayList<>();
-        for (int i = 0; i < FETCH_BID_MULTIIPLIER_RULE_OPTIONS.count(); i++) {
+        for (int i = 0; i < FETCH_BID_MULTIPLIER_RULE_OPTIONS.count(); i++) {
             String text = FETCH_TARGET_RULE_OPTIONS.nth(i).innerText();
             text = text.replaceAll("≥", "").trim();
             ruleOptions.add(text);
