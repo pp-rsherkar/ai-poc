@@ -318,7 +318,7 @@ jobs:
                   lines = f.readlines()
                   scenarios = []
                   for line in lines:
-                      if line.startswith(f"[{domain_text}]") or line.startswith("[general]"):
+                      if line.startswith(f"[{domain_text}]"):
                           scenarios.append(line.strip())
                   # Cap to 30 titles — enough to avoid duplicates
                   scenario_context = "\n".join(scenarios[-30:])
