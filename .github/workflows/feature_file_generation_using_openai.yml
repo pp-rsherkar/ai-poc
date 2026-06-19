@@ -221,7 +221,7 @@ jobs:
         run: |
           set -euo pipefail
           RESPONSE=$(curl -sS \
-            https://models.github.ai/catalog/models \
+            https://models.github.ai/inference/chat/completions \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json")
           echo "$RESPONSE" | jq -r 'if type=="object" and (.data|type=="array") then .data[].id elif type=="array" then .[].id else empty end'
