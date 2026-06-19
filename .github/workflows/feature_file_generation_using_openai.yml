@@ -403,7 +403,7 @@ jobs:
       # =========================
       # Generate Feature File
       # =========================
-      - name: Generate feature via GitHub Models
+      - name: Generate feature via OpenAI
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
@@ -466,7 +466,7 @@ jobs:
           HTTP_RESPONSE=$(mktemp)
 
           HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
-            https://models.github.ai/inference/chat/completions \
+            https://api.openai.com/v1/chat/completions \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -H "Accept: application/vnd.github+json" \
