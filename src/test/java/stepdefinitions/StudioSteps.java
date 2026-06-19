@@ -17,10 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pages.Navigation;
 import pages.admin.Accounts;
-import pages.studio.ExpansionWorkspace;
-import pages.studio.ExplorerWorkspace;
-import pages.studio.Workspace;
-import pages.studio.WorkspaceCreation;
+import pages.studio.*;
 import utils.CommonUtils;
 import utils.ConfigReader;
 import utils.Constants;
@@ -40,6 +37,7 @@ public class StudioSteps {
     ExpansionWorkspace expansionWorkspace = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
+    BrandExplorerWorkspace brandExplorerWorkspace = new BrandExplorerWorkspace(DriverFactory.getPage());
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
@@ -240,17 +238,28 @@ public class StudioSteps {
         }
     */
 
-    @And("User clicks on HCP Explorer workspace")
-    public void user_clicks_on_hcp_explorer_workspace() {
-        logger.info("Selecting HCP Explorer workspace");
+    @And("User clicks on {string} workspace")
+    public void userClicksOnWorkspace(String workspaceType) {
+        logger.info("Selecting {} workspace", workspaceType);
 
-        if (fetchedMetricNames.contains("HCP Explorer")) {
-            String explorer = workspaceCreation.verifyHCPExplorer();
-            logger.info("HCP Explorer permission: {}", explorer);
-            Assert.assertEquals("HCP Explorer", explorer);
+        if (fetchedMetricNames.contains(workspaceType)) {
+            String explorer =
+                    switch (workspaceType) {
+                        case "HCP Explorer" -> workspaceCreation.verifyHCPExplorer();
+                        case "Brand Explorer" -> workspaceCreation.verifyBrandExplorer();
+                        default -> throw new IllegalArgumentException(
+                                "Unsupported workspace verification: " + workspaceType);
+                    };
+
+            logger.info("{} permission: {}", workspaceType, explorer);
+            Assert.assertEquals(workspaceType, explorer);
         }
 
-        workspaceCreation.clickHCPExplorerWorkspace();
+        switch (workspaceType) {
+            case "HCP Explorer" -> workspaceCreation.clickHCPExplorerWorkspace();
+            case "Brand Explorer" -> workspaceCreation.clickBrandExplorerWorkspace();
+            default -> throw new IllegalArgumentException("Unsupported workspace click: " + workspaceType);
+        }
     }
 
     @And("User selects the advertiser {string}")
@@ -342,21 +351,29 @@ public class StudioSteps {
         }
     }
 
-    @Then("User saves the workspace")
-    public void user_saves_the_workspace() {
-        logger.info("Saving HCP Explorer workspace");
-        explorerWorkspace.saveExplorerWorkspace();
+    @Then("User saves the {string} workspace")
+    public void user_saves_the_workspace(String workspaceType) {
+        logger.info("Saving {} workspace", workspaceType);
+
+        switch (workspaceType) {
+            case "HCP Explorer":
+                explorerWorkspace.saveExplorerWorkspace();
+                break;
+            case "Brand Explorer":
+                brandExplorerWorkspace.saveBrandExplorerWorkspace();
+                break;
+        }
     }
 
-    @Then("Verify the HCP Explorer Workspace is saved")
-    public void verify_the_hcp_explorer_workspace_is_saved() {
+    @Then("Verify the {string} Workspace is saved")
+    public void verify_the_hcp_explorer_workspace_is_saved(String workspaceType) {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Save alert: {}", actualMessage);
+        logger.info("Save alert for {} workspace: {}", workspaceType, actualMessage);
         boolean isValid = actualMessage.equals("Workspace created successfully")
                 || actualMessage.equals("Workspace saved successfully")
                 || actualMessage.equals(
                         "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
-        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
+        Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
 
@@ -1146,5 +1163,36 @@ public class StudioSteps {
         Assert.assertTrue(
                 "Search box is not cleared",
                 workspaceCreation.getSearchedWorkspaceName().isEmpty());
+    }
+
+    @And("User edits the workspace name as {string}")
+    public void userEditsTheWorkspaceNameAs(String wName) {
+        workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Adding workspace name: {}", workspaceName);
+        brandExplorerWorkspace.waitForDashboardLoad();
+        explorerWorkspace.clickEditWorkspace();
+        explorerWorkspace.enterWorkspaceName(workspaceName);
+        explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitUntilAlertDisappears();
+        brandExplorerWorkspace.waitForDashboardLoad();
+    }
+
+    @Then("Verify Dimension {string} and Metric {string} are selected by default in the workspace")
+    public void verifyDefaultDimensionAndMetricInTheWorkspace(String dimension, String metric) {
+        logger.info("Verifying default Dimension and Metric in the workspace");
+        String actualDimension = brandExplorerWorkspace.getDefaultDimensions(dimension);
+        logger.info("Default Dimension: {}", actualDimension);
+        Assert.assertEquals("Default Dimension is not as expected", dimension, actualDimension);
+        String actualMetric = brandExplorerWorkspace.getDefaultMetrics(metric);
+        logger.info("Default Metric: {}", actualMetric);
+        Assert.assertEquals("Default Metric is not as expected", metric, actualMetric);
+    }
+
+    @Then("Verify Time Frame is selected as {string} by default in the workspace")
+    public void verifyDefaultTimeFrameInTheWorkspace(String timeFrame) {
+        logger.info("Verifying default Time Frame in the workspace");
+        String actualTimeFrame = brandExplorerWorkspace.getDefaultTimeFrame();
+        logger.info("Default Time Frame: {}", actualTimeFrame);
+        Assert.assertEquals("Default Time Frame is not as expected", timeFrame, actualTimeFrame);
     }
 }

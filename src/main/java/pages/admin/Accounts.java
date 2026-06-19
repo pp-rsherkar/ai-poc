@@ -124,7 +124,7 @@ public class Accounts {
         this.DESTINATION_TYPE_DROPDOWN = page.locator("//label[text()='Destination Type']/following-sibling::select");
         this.HOSTNAME = page.locator("//input[@placeholder='Enter Host Name']");
         this.USERNAME = page.locator("//input[@placeholder='Enter User Name']");
-        this.PASSWORD = page.locator("//input[@placeholder='Enter Password']");
+        this.PASSWORD = page.locator("//input[contains(@placeholder,'Password')]");
         this.PORT = page.locator("//input[@placeholder='Enter Port Number']");
         this.TEST_CONNECTION_LINK = page.locator("//span[text()='Test Connection' or text()='Test Access']");
         this.CONNECTION_CONFIRMATION_TEXT = page.locator(
