@@ -237,14 +237,19 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Pass full step and scenario dictionaries instead of truncating
-          STEP_CONTEXT=$(cat step_dictionary.txt || echo "")
-          SCENARIO_CONTEXT=$(cat scenario_dictionary.txt || echo "")
-          
+          # Validate Domain Input
+          if [ -n "$DOMAIN" ]; then
+            if [ ! -d "$FEATURE_DIR/$DOMAIN" ]; then
+              echo "::error::Domain '$DOMAIN' does not exist in $FEATURE_DIR. Please check for typos."
+              exit 1
+            fi
+          fi
+
           # Pick domain-specific feature examples if a domain is provided
-          if [ -n "$DOMAIN" ] && [ -d "$FEATURE_DIR/$DOMAIN" ]; then
+          if [ -n "$DOMAIN" ]; then
             FEATURE_EXAMPLES=$(
               find "$FEATURE_DIR/$DOMAIN" -name "*.feature" \
+              | sort \
               | head -2 \
               | while read -r f; do cat "$f"; done \
               | head -n 100
@@ -252,6 +257,7 @@ jobs:
           else
             FEATURE_EXAMPLES=$(
               find "$FEATURE_DIR" -name "*.feature" \
+              | sort \
               | head -2 \
               | while read -r f; do cat "$f"; done \
               | head -n 100
@@ -259,28 +265,49 @@ jobs:
           fi
 
           # Export so Python can read them
-          export STEP_CONTEXT
-          export SCENARIO_CONTEXT
           export FEATURE_EXAMPLES
 
           python3 << 'PYEOF'
-          import os
+          import os, re
           
-          step_context     = os.environ.get("STEP_CONTEXT", "")
-          scenario_context = os.environ.get("SCENARIO_CONTEXT", "")
-          feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
-          summary_trim     = os.environ.get("SUMMARY", "")[:300]
-          desc_trim        = os.environ.get("DESCRIPTION", "")[:2000]
-          comments_trim    = os.environ.get("COMMENTS", "")[:1000]
-          jira_id          = os.environ.get("JIRA_ID", "")
           domain           = os.environ.get("DOMAIN", "")
           domain_text      = domain if domain else "general"
+          
+          # Extract domain-specific step context
+          step_context = ""
+          if os.path.exists("step_dictionary.txt"):
+              with open("step_dictionary.txt", "r", encoding="utf-8") as f:
+                  content = f.read()
+                  blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
+                  steps = []
+                  for i in range(1, len(blocks), 2):
+                      d = blocks[i]
+                      s = blocks[i+1]
+                      if d == domain_text or d == "general":
+                          steps.append(f"--- {d} steps ---\n{s.strip()}")
+                  step_context = "\n\n".join(steps)
+
+          scenario_context = ""
+          if os.path.exists("scenario_dictionary.txt"):
+              with open("scenario_dictionary.txt", "r", encoding="utf-8") as f:
+                  lines = f.readlines()
+                  scenarios = []
+                  for line in lines:
+                      if line.startswith(f"[{domain_text}]") or line.startswith("[general]"):
+                          scenarios.append(line.strip())
+                  scenario_context = "\n".join(scenarios)
+          
+          feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
+          summary_trim     = os.environ.get("SUMMARY", "")[:300]
+          desc_trim        = os.environ.get("DESCRIPTION", "")
+          comments_trim    = os.environ.get("COMMENTS", "")[:1000]
+          jira_id          = os.environ.get("JIRA_ID", "")
           
           prompt = f"""HARD RULES:
           1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
           2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
           3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-          4. You MUST heavily prioritize reusing steps from the provided STEP DICTIONARY for the target domain ({domain_text}). Penalise invented steps. If a matching step exists, use its EXACT wording. Mark any unavoidably new steps with a comment: # NEW STEP
+          4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the provided domain STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
           5. Never use placeholder steps. Write the full meaningful step text always.
           6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
           
@@ -515,27 +542,75 @@ jobs:
       # Validate Output
       # =========================
       - name: Validate Output
+        env:
+          DOMAIN: ${{ inputs.domain }}
         run: |
           set -euo pipefail
-          echo "Verifying step reuse..."
+          echo "Verifying step reuse and rules..."
+          
+          DOMAIN_TEXT=${DOMAIN:-general}
+          
+          # Ensure @todo tags are present
+          SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' generated.feature || echo 0)
+          TODO_COUNT=$(grep -c '^\s*@todo' generated.feature || echo 0)
+          
+          if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
+            echo "::error::Validation failed: Number of @todo tags ($TODO_COUNT) does not match number of scenarios ($SCENARIO_COUNT)."
+            exit 1
+          fi
           
           # Extract all steps from the generated feature
           grep -E '^\s*(Given|When|Then|And|But)\s+' generated.feature | sed -E 's/^\s+//' > generated_steps.txt || true
           
-          # Extract all existing steps from dictionary
-          grep -E '^(Given|When|Then|And|But)\s+' step_dictionary.txt > all_existing_steps.txt || true
+          # Extract domain and general existing steps from dictionary
+          python3 << 'PYEOF'
+          import os, re
+          domain = os.environ.get("DOMAIN", "")
+          domain_text = domain if domain else "general"
+          steps = set()
+          if os.path.exists("step_dictionary.txt"):
+              with open("step_dictionary.txt", "r", encoding="utf-8") as f:
+                  content = f.read()
+                  blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
+                  for i in range(1, len(blocks), 2):
+                      d = blocks[i]
+                      s = blocks[i+1]
+                      if d == domain_text or d == "general":
+                          for line in s.split('\n'):
+                              if line.strip():
+                                  steps.add(line.strip())
+          with open("domain_existing_steps.txt", "w", encoding="utf-8") as f:
+              f.write('\n'.join(sorted(steps)) + '\n')
+          PYEOF
           
           # Find new steps
-          grep -v -F -x -f all_existing_steps.txt generated_steps.txt > new_steps.txt || true
+          grep -v -F -x -f domain_existing_steps.txt generated_steps.txt > new_steps.txt || true
           
           NEW_STEPS_COUNT=$(wc -l < new_steps.txt || echo 0)
           TOTAL_STEPS=$(wc -l < generated_steps.txt || echo 0)
           
+          if [ "$TOTAL_STEPS" -eq 0 ]; then
+            INVENTED_RATIO=0
+          else
+            INVENTED_RATIO=$(( NEW_STEPS_COUNT * 100 / TOTAL_STEPS ))
+          fi
+          
           echo "Total steps: $TOTAL_STEPS"
           echo "New invented steps: $NEW_STEPS_COUNT"
+          echo "Invented ratio: ${INVENTED_RATIO}%"
           
-          if [ -s new_steps.txt ]; then
-            echo "::warning::The model invented the following new steps:"
+          {
+            echo "TOTAL_STEPS=$TOTAL_STEPS"
+            echo "NEW_STEPS_COUNT=$NEW_STEPS_COUNT"
+            echo "INVENTED_RATIO=$INVENTED_RATIO"
+          } >> "$GITHUB_ENV"
+          
+          if [ "$INVENTED_RATIO" -gt 30 ]; then
+            echo "::error::The model invented $NEW_STEPS_COUNT new steps out of $TOTAL_STEPS ($INVENTED_RATIO%). This exceeds the 30% threshold."
+            cat new_steps.txt
+            exit 1
+          elif [ -s new_steps.txt ]; then
+            echo "::warning::The model invented $NEW_STEPS_COUNT new steps ($INVENTED_RATIO%):"
             cat new_steps.txt
           else
             echo "SUCCESS: All generated steps match existing steps."
@@ -565,9 +640,19 @@ jobs:
             echo "Pull Request already exists: #$PR_NUMBER"
             exit 0
           fi
+          
+          DOMAIN_TEXT="${{ inputs.domain }}"
+          [ -z "$DOMAIN_TEXT" ] && DOMAIN_TEXT="general"
+          
+          PR_BODY="Auto-generated BDD feature file from Jira ticket parameters.
+          
+          ### Generation Stats
+          - **Target Domain:** $DOMAIN_TEXT
+          - **Total steps:** ${{ env.TOTAL_STEPS }}
+          - **Invented steps:** ${{ env.NEW_STEPS_COUNT }} (${{ env.INVENTED_RATIO }}%)"
 
           gh pr create \
             --base main \
             --head "${{ env.BRANCH }}" \
             --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
-            --body "Auto-generated BDD feature file from Jira ticket parameters."
+            --body "$PR_BODY"
