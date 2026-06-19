@@ -392,7 +392,7 @@ public class TacticDetails {
         waitUtility.waitForElementVisible(String.format("//span[contains(text(),'%s')]", expectedFeeValue));
     }
 
-    private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) throws InterruptedException {
+    private void createCampaign(String advertiser, String campaignName, String campaignType, String budget) {
         campaigns.createCampaign();
         campaigns.verifyCampaignText();
         campaigns.selectAdvertiser(advertiser);

@@ -168,7 +168,7 @@ public class LifeSteps {
     }
 
     @Given("User clicks on Create Campaign")
-    public void user_clicks_on_create_campaign() throws InterruptedException {
+    public void user_clicks_on_create_campaign() {
         logger.info("Clicking on Create Campaign button");
         campaigns.createCampaign();
         String campaignText = campaigns.verifyCampaignText();
@@ -3061,7 +3061,7 @@ public class LifeSteps {
      * 20-08-2025
      * Atrribute NPI List creation and targeting it at tactic level*/
     @And("Navigate to Campaign Dashboard and clicks on Create Campaign")
-    public void navigateToCampaignDashboardAndClicksOnCreateCampaign() throws InterruptedException {
+    public void navigateToCampaignDashboardAndClicksOnCreateCampaign() {
         logger.info("Navigate to Campaign Dashboard and clicks on Create Campaign");
         navigation.clickSubMenu();
         navigation.clickCampaigns();
@@ -5452,7 +5452,7 @@ public class LifeSteps {
     }
 
     @When("User clicks on create new Campaign")
-    public void userClicksOnCreateNewCampaign() throws InterruptedException {
+    public void userClicksOnCreateNewCampaign() {
         logger.info("User clicks on create new Campaign");
         campaigns.createCampaign();
     }
@@ -6073,7 +6073,7 @@ public class LifeSteps {
     }
 
     @And("User verifies if the added custom field is available on New Campaign creation page")
-    public void userVerifiesIfTheAddedCustomFieldIsAvailableOnNewCampaignCreationPage() throws InterruptedException {
+    public void userVerifiesIfTheAddedCustomFieldIsAvailableOnNewCampaignCreationPage() {
         logger.info("User verifies if the added custom field is available on New Campaign creation page");
         campaigns.navigateToCampaignDashboard();
         campaigns.createCampaign();
@@ -6106,7 +6106,7 @@ public class LifeSteps {
     }
 
     @And("User verifies if the deleted custom field is available on New Campaign creation page")
-    public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() throws InterruptedException {
+    public void userVerifiesIfTheDeletedCustomFieldIsAvailableOnNewCampaignCreationPage() {
         logger.info("User verifies if the deleted custom field is available on New Campaign creation page");
         navigation.clickPulsePointLogo();
         campaigns.createCampaign();
