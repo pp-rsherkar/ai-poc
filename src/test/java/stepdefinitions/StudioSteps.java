@@ -2,6 +2,7 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -372,7 +373,7 @@ public class StudioSteps {
         boolean isValid = actualMessage.equals("Workspace created successfully")
                 || actualMessage.equals("Workspace saved successfully")
                 || actualMessage.equals(
-                        "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+                "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
@@ -1049,8 +1050,8 @@ public class StudioSteps {
     @And(
             "User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
     public void
-            userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
-                    String filterType, DataTable dataTable) {
+    userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
+            String filterType, DataTable dataTable) {
         logger.info("Applying '{}' filter and verifying clinical recency values", filterType);
         List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
 
@@ -1128,8 +1129,8 @@ public class StudioSteps {
     @Then(
             "User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
     public void
-            userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
-                    String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
+    userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
+            String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
         String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
         logger.info("Workspace type: {}", actualWorkspaceType);
         Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
@@ -1195,4 +1196,21 @@ public class StudioSteps {
         logger.info("Default Time Frame: {}", actualTimeFrame);
         Assert.assertEquals("Default Time Frame is not as expected", timeFrame, actualTimeFrame);
     }
+
+    @When("User clicks the TimeFrame selector")
+    public void userClicksTimeframeSelector() {
+        logger.info("Clicking the TimeFrame selector");
+        brandExplorerWorkspace.clickTimeFrameSelector();
+    }
+
+    @Then("All 9 preset timeframe options are visible in the dropdown with correct labels")
+    public void allPresetOptionsAreVisibleInDropdownWithCorrectLabels(DataTable dataTable) {
+        List<String> expected = dataTable.asList(String.class);
+        logger.info("Expected timeframe options: {}", expected);
+        List<String> actual = brandExplorerWorkspace.getTimeFrameOptions();
+        logger.info("Actual timeframe options: {}", actual);
+        Assert.assertEquals("Timeframe option count mismatch", expected.size(), actual.size());
+        Assert.assertTrue("Actual timeframe options do not match expected timeframe options", actual.containsAll(expected));;
+    }
 }
+
