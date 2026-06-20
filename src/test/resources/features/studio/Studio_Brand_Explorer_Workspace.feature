@@ -45,3 +45,18 @@ Feature: Brand Explorer Workspace creation in Studio
     Examples:
       | ADVERTISER          |
       | TAMTESTING ACCOUNT  |
+
+  @regression
+  Scenario Outline: Verify chart and table update immediately when a preset timeframe is selected
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    When User clicks the TimeFrame selector
+    When User selects the timeframe preset "<TIMEFRAME>"
+    Then Verify the chart and table update immediately to reflect "<TIMEFRAME>" data
+    And Verify the Day column shows <DAYS> dates in ascending order
+    Examples:
+      | ADVERTISER         | TIMEFRAME    | DAYS |
+      | TAMTESTING ACCOUNT | Last 14 Days | 14   |
+      | TAMTESTING ACCOUNT | Last 30 Days | 30   |

@@ -45,6 +45,7 @@ public class StudioSteps {
     List<String> metricNames = new ArrayList<>();
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
+    String selectedTimeFrame;
     Path targetFilePath;
 
     @When("the user clicks on Create New Workspace")
@@ -1210,7 +1211,45 @@ public class StudioSteps {
         List<String> actual = brandExplorerWorkspace.getTimeFrameOptions();
         logger.info("Actual timeframe options: {}", actual);
         Assert.assertEquals("Timeframe option count mismatch", expected.size(), actual.size());
-        Assert.assertTrue("Actual timeframe options do not match expected timeframe options", actual.containsAll(expected));;
+        Assert.assertTrue("Actual timeframe options do not match expected timeframe options", actual.containsAll(expected));
+    }
+
+    @When("User selects the timeframe preset {string}")
+    public void userSelectsTimeframePreset(String timeFrame) {
+        logger.info("Selecting timeframe preset: {}", timeFrame);
+        selectedTimeFrame = timeFrame;
+        brandExplorerWorkspace.selectTimeFramePreset(timeFrame);
+    }
+
+    @Then("Verify the chart and table update immediately to reflect {string} data")
+    public void verifyChartAndTableUpdateForSelectedTimeFrame(String timeFrame) {
+        logger.info("Verifying chart and table updated for timeframe: {}", timeFrame);
+        String actual = brandExplorerWorkspace.getSelectedTimeFrameAfterUpdate();
+        logger.info("Time Frame input after selection: {}", actual);
+        Assert.assertTrue(
+                "Chart and table did not update for selected timeframe: " + timeFrame,
+                actual.equalsIgnoreCase(timeFrame));
+    }
+
+    @And("Verify the Day column shows {int} dates in ascending order")
+    public void verifyDayColumnShowsDatesInAscendingOrder(int expectedDays) {
+        logger.info("Verifying Day column shows {} dates in ascending order", expectedDays);
+        List<String> dates = brandExplorerWorkspace.getTableDates(expectedDays);
+        logger.info("Dates from Day column: {}", dates);
+
+        Assert.assertEquals("Expected " + expectedDays + " rows in the Day column", expectedDays, dates.size());
+
+        for (int i = 0; i < dates.size() - 1; i++) {
+            Assert.assertTrue(
+                    "Dates are not in ascending order: " + dates.get(i) + " is not before " + dates.get(i + 1),
+                    dates.get(i).compareTo(dates.get(i + 1)) < 0);
+        }
+
+        String expectedEnd = java.time.LocalDate.now().minusDays(1).toString();
+        String expectedStart = java.time.LocalDate.now().minusDays(expectedDays).toString();
+        logger.info("Expected date range: {} to {}", expectedStart, expectedEnd);
+        Assert.assertEquals("Last date in table does not match yesterday", expectedEnd, dates.get(dates.size() - 1));
+        Assert.assertEquals("First date in table does not match expected start", expectedStart, dates.get(0));
     }
 }
 

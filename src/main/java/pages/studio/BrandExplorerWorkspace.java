@@ -4,7 +4,11 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import utils.WaitUtility;
 
 public class BrandExplorerWorkspace {
@@ -74,5 +78,72 @@ public class BrandExplorerWorkspace {
             optionlabels.add(options.nth(i).innerText().trim());
         }
         return optionlabels;
+    }
+
+    public void selectTimeFramePreset(String timeFrame) {
+        Locator option = WORKSPACE_FRAME.locator(
+                String.format("//div[@role='dialog']//li[@role='option']/span[normalize-space()='%s']", timeFrame));
+        waitUtility.waitForLocatorVisible(option);
+        option.click();
+        page.keyboard().press("Escape");
+        waitForDashboardLoad();
+    }
+
+    public String getSelectedTimeFrameAfterUpdate() {
+        waitForDashboardLoad();
+        return getDefaultTimeFrame();
+    }
+
+    public List<String> getTableDates(int days) {
+        Locator dateCells = WORKSPACE_FRAME.locator(
+                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
+
+        waitUtility.waitForLocatorVisible(dateCells.first());
+
+        Set<String> seenDates = new LinkedHashSet<>();
+        String previousLastDate = "";
+
+        while (seenDates.size() < days) {
+
+            int visibleRowCount = dateCells.count();
+
+            // Capture all currently visible dates
+            for (int i = 0; i < visibleRowCount; i++) {
+                String date = dateCells.nth(i).innerText().trim();
+
+                if (!date.isEmpty()) {
+                    seenDates.add(date);
+                }
+            }
+
+            if (seenDates.size() >= days) {
+                break;
+            }
+
+            String currentLastDate = dateCells.last().innerText().trim();
+
+            // Hover over table before scrolling
+            dateCells.last().hover();
+
+            // Scroll down
+            page.mouse().wheel(0, 75);
+
+            // Wait for virtualized rows to refresh
+            page.waitForTimeout(1000);
+
+            String newLastDate = dateCells.last().innerText().trim();
+
+            // No new data loaded
+            if (currentLastDate.equals(newLastDate)
+                    || currentLastDate.equals(previousLastDate)) {
+                break;
+            }
+
+            previousLastDate = currentLastDate;
+        }
+
+        return seenDates.stream()
+                .limit(days)
+                .collect(Collectors.toList());
     }
 }
