@@ -135,10 +135,13 @@ def analyze_reviews(
     return approved_by, changes_requested_by, commented_by, len(seen)
 
 
-def get_review_feedback(pr: PullRequest) -> List[str]:
+def get_review_feedback(pr: PullRequest, approved_by: List[str]) -> List[str]:
+    approved = set(approved_by)
     feedback = []
     for review in pr.get_reviews():
         if not review.user or review.user.type == "Bot":
+            continue
+        if review.user.login in approved:
             continue
         body = (review.body or "").strip()
         if not body:
@@ -482,18 +485,23 @@ def main() -> None:
             if pr.draft:
                 continue
 
-            unresolved_reviewers, review_summary, thread_timestamps, review_decision = (
+            unresolved_reviewers, thread_summary, thread_timestamps, review_decision = (
                 get_unresolved_review_threads(repository.full_name, pr.number)
             )
 
             issue_commenters = get_issue_commenters(pr)
-            review_feedback = get_review_feedback(pr)
+
+            status, responsible, approved_by = determine_status(
+                pr, unresolved_reviewers, issue_commenters, review_decision
+            )
+
+            review_feedback = get_review_feedback(pr, approved_by)
             discussion_comments = get_discussion_comments(pr)
 
             feedback_sections = []
 
-            if review_summary != "_No unresolved review items_":
-                feedback_sections.append("### Code Review Threads\n\n" + review_summary)
+            if thread_summary != "_No unresolved review items_":
+                feedback_sections.append("### Code Review Threads\n\n" + thread_summary)
 
             if review_feedback:
                 feedback_sections.append(
@@ -507,10 +515,6 @@ def main() -> None:
 
             review_summary = (
                 "\n\n".join(feedback_sections) if feedback_sections else "_No feedback found_"
-            )
-
-            status, responsible, approved_by = determine_status(
-                pr, unresolved_reviewers, issue_commenters, review_decision
             )
 
             # Per-status threshold (days)
