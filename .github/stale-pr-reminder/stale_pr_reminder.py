@@ -168,8 +168,12 @@ def get_discussion_comments(pr: PullRequest) -> List[str]:
 def get_unresolved_review_threads(
     repository_name: str,
     pr_number: int,
-) -> Tuple[List[str], str, List[datetime], Optional[str]]:
-    """Return (unresolved_reviewer_logins, summary_text, thread_timestamps, review_decision).
+) -> Tuple[List[str], List[str], List[str], List[datetime], Optional[str]]:
+    """Return (unresolved_reviewer_logins, summary_lines, thread_reviewers, thread_timestamps, review_decision).
+
+    summary_lines and thread_reviewers are parallel lists — each entry in
+    summary_lines has the corresponding opener's login in thread_reviewers.
+    Callers filter both by approved_by to drop stale threads from display.
 
     review_decision is GitHub's official PR review decision:
       "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | None
@@ -229,6 +233,7 @@ def get_unresolved_review_threads(
 
     unresolved_reviewers: set[str] = set()
     summary_lines: List[str] = []
+    thread_reviewers: List[str] = []
     thread_timestamps: List[datetime] = []
 
     for thread in threads:
@@ -252,6 +257,7 @@ def get_unresolved_review_threads(
             first_comment["createdAt"].replace("Z", "+00:00")
         )
         thread_timestamps.append(created_at)
+        thread_reviewers.append(reviewer)
 
         summary_lines.append(
             f"- **{first_comment['path']}** "
@@ -259,9 +265,7 @@ def get_unresolved_review_threads(
             f"{first_comment['body']}"
         )
 
-    summary = "\n".join(summary_lines) if summary_lines else "_No unresolved review items_"
-
-    return list(unresolved_reviewers), summary, thread_timestamps, review_decision
+    return list(unresolved_reviewers), summary_lines, thread_reviewers, thread_timestamps, review_decision
 
 
 def determine_status(
@@ -485,7 +489,7 @@ def main() -> None:
             if pr.draft:
                 continue
 
-            unresolved_reviewers, thread_summary, thread_timestamps, review_decision = (
+            unresolved_reviewers, summary_lines, thread_reviewers, thread_timestamps, review_decision = (
                 get_unresolved_review_threads(repository.full_name, pr.number)
             )
 
@@ -498,10 +502,22 @@ def main() -> None:
             review_feedback = get_review_feedback(pr, approved_by)
             discussion_comments = get_discussion_comments(pr)
 
+            # Filter both display lines and timestamps to exclude threads from
+            # reviewers who have since approved — their threads are no longer blocking.
+            approved_set = set(approved_by)
+            active_lines = [
+                line for line, reviewer in zip(summary_lines, thread_reviewers)
+                if reviewer not in approved_set
+            ]
+            active_timestamps = [
+                ts for ts, reviewer in zip(thread_timestamps, thread_reviewers)
+                if reviewer not in approved_set
+            ]
+
             feedback_sections = []
 
-            if thread_summary != "_No unresolved review items_":
-                feedback_sections.append("### Code Review Threads\n\n" + thread_summary)
+            if active_lines:
+                feedback_sections.append("### Code Review Threads\n\n" + "\n".join(active_lines))
 
             if review_feedback:
                 feedback_sections.append(
@@ -524,7 +540,7 @@ def main() -> None:
             else:
                 threshold_days = STATUS_THRESHOLDS[status]
 
-            status_age_days = get_status_age_days(status, pr, thread_timestamps)
+            status_age_days = get_status_age_days(status, pr, active_timestamps)
             last_reminder_days = get_last_reminder_days(pr)
 
             print(

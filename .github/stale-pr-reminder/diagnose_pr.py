@@ -45,7 +45,7 @@ for r in pr.get_reviews():
 print()
 
 # Run actual pipeline
-unresolved_reviewers, thread_summary, thread_timestamps, review_decision = (
+unresolved_reviewers, summary_lines, thread_reviewers, thread_timestamps, review_decision = (
     get_unresolved_review_threads(REPO, PR_NUM)
 )
 issue_commenters = get_issue_commenters(pr)
@@ -63,8 +63,19 @@ status, responsible, approved_by = determine_status(
 review_feedback     = get_review_feedback(pr, approved_by)
 discussion_comments = get_discussion_comments(pr)
 
+approved_set = set(approved_by)
+active_lines = [
+    line for line, reviewer in zip(summary_lines, thread_reviewers)
+    if reviewer not in approved_set
+]
+active_timestamps = [
+    ts for ts, reviewer in zip(thread_timestamps, thread_reviewers)
+    if reviewer not in approved_set
+]
+
 print(f"review_feedback       : {len(review_feedback)} items")
 print(f"discussion_comments   : {len(discussion_comments)} items")
+print(f"active_thread_lines   : {len(active_lines)} (of {len(summary_lines)} total unresolved)")
 
 REQUIRED_APPROVALS = int(os.getenv("REQUIRED_APPROVALS", "2"))
 if status == "Comments Received":
@@ -73,7 +84,7 @@ if status == "Comments Received":
 else:
     threshold_days = STATUS_THRESHOLDS[status]
 
-status_age_days    = get_status_age_days(status, pr, thread_timestamps)
+status_age_days    = get_status_age_days(status, pr, active_timestamps)
 last_reminder_days = get_last_reminder_days(pr)
 
 print(f"STATUS               : >>> {status} <<<")
