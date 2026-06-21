@@ -370,6 +370,7 @@ def get_last_reminder_days(pr: PullRequest) -> Optional[float]:
         if (
             comment.user
             and comment.user.type == "Bot"
+            and comment.body
             and "Stale PR Reminder" in comment.body
         ):
             return (get_now() - comment.created_at).total_seconds() / 86400
