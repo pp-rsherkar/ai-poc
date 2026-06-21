@@ -1,5 +1,5 @@
 """
-Stale PR Reminder Bot - V2 (per-status thresholds)
+Stale PR Reminder Bot - V3 (GitHub reviewDecision + per-status thresholds)
 """
 
 from __future__ import annotations
@@ -62,8 +62,24 @@ def get_pr_age_minutes(pr: PullRequest) -> float:
     return (get_now() - pr.created_at).total_seconds() / 60
 
 
-def get_last_activity_days(pr: PullRequest) -> float:
-    return (get_now() - pr.updated_at).total_seconds() / 86400
+def get_last_human_activity_days(pr: PullRequest) -> float:
+    """Return days since the last non-bot review or comment, falling back to PR creation."""
+    now = get_now()
+    latest = pr.created_at
+
+    for review in pr.get_reviews():
+        if not review.user or review.user.type == "Bot":
+            continue
+        if review.submitted_at > latest:
+            latest = review.submitted_at
+
+    for comment in pr.get_issue_comments():
+        if not comment.user or comment.user.type == "Bot":
+            continue
+        if comment.created_at > latest:
+            latest = comment.created_at
+
+    return (now - latest).total_seconds() / 86400
 
 
 def get_requested_reviewers(pr: PullRequest) -> List[str]:
@@ -149,11 +165,13 @@ def get_discussion_comments(pr: PullRequest) -> List[str]:
 def get_unresolved_review_threads(
     repository_name: str,
     pr_number: int,
-) -> Tuple[List[str], str, List[datetime]]:
-    """Return (unresolved_reviewer_logins, summary_text, thread_timestamps).
+) -> Tuple[List[str], str, List[datetime], Optional[str]]:
+    """Return (unresolved_reviewer_logins, summary_text, thread_timestamps, review_decision).
 
+    review_decision is GitHub's official PR review decision:
+      "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | None
     thread_timestamps holds the creation time of each unresolved thread's first
-    comment, used to compute how long the PR has been in "Changes Requested".
+    comment, used to anchor the "Changes Requested" status clock.
     """
     owner, repo = repository_name.split("/")
 
@@ -161,6 +179,7 @@ def get_unresolved_review_threads(
     query($owner:String!, $repo:String!, $number:Int!) {
       repository(owner:$owner, name:$repo) {
         pullRequest(number:$number) {
+          reviewDecision
           reviewThreads(first:100) {
             nodes {
               isResolved
@@ -198,10 +217,12 @@ def get_unresolved_review_threads(
 
     response.raise_for_status()
 
-    threads = (
+    pr_data = (
         response.json()["data"]["repository"]["pullRequest"]
-        ["reviewThreads"]["nodes"]
     )
+
+    review_decision: Optional[str] = pr_data.get("reviewDecision")
+    threads = pr_data["reviewThreads"]["nodes"]
 
     unresolved_reviewers: set[str] = set()
     summary_lines: List[str] = []
@@ -237,15 +258,24 @@ def get_unresolved_review_threads(
 
     summary = "\n".join(summary_lines) if summary_lines else "_No unresolved review items_"
 
-    return list(unresolved_reviewers), summary, thread_timestamps
+    return list(unresolved_reviewers), summary, thread_timestamps, review_decision
 
 
 def determine_status(
     pr: PullRequest,
     unresolved_reviewers: List[str],
     issue_commenters: List[str],
+    review_decision: Optional[str],
 ) -> Tuple[str, str, List[str]]:
+    """Two-level status decision.
 
+    Level 1: GitHub's reviewDecision (APPROVED / CHANGES_REQUESTED / REVIEW_REQUIRED / None)
+    Level 2: our fine-grained logic within each bucket.
+
+    Using reviewDecision as the outer gate means we stay in sync with what
+    GitHub's UI actually shows, and avoids false "Changes Requested" when a
+    reviewer opened threads but has since approved.
+    """
     approved_by, changes_requested_by, commented_by, review_count = (
         analyze_reviews(pr)
     )
@@ -253,24 +283,47 @@ def determine_status(
     approval_count = len(approved_by)
     author = pr.user.login
 
-    # 1. Open unresolved review threads always win
+    # ── GitHub says: all required reviews satisfied, no active change requests ──
+    if review_decision == "APPROVED":
+        # Still apply our REQUIRED_APPROVALS as an additional gate — our bar
+        # may be higher than the repo's branch-protection setting.
+        if approval_count >= REQUIRED_APPROVALS:
+            return "Ready To Merge", MERGER, approved_by
+        pending = [r for r in requested_reviewers if r not in set(approved_by)]
+        responsible = ", ".join(f"@{r}" for r in pending) if pending else "@reviewers"
+        return "Awaiting Additional Approval", responsible, approved_by
+
+    # ── GitHub says: at least one reviewer has an active change request ──
+    if review_decision == "CHANGES_REQUESTED":
+        if unresolved_reviewers:
+            return "Changes Requested", author, approved_by
+        # CHANGES_REQUESTED review verdict exists but no inline threads
+        participants = sorted(
+            set([author] + changes_requested_by + commented_by
+                + requested_reviewers + issue_commenters)
+            - set(approved_by)
+        )
+        responsible = ", ".join(f"@{user}" for user in participants)
+        return "Review Discussion In Progress", responsible, approved_by
+
+    # ── "REVIEW_REQUIRED" or None (no branch-protection review rules) ──
+    # Use the full fine-grained V1 decision tree. This also ensures repos
+    # without branch protection still get all statuses correctly.
+
+    # Unresolved inline threads always signal outstanding changes.
     if unresolved_reviewers:
         return "Changes Requested", author, approved_by
 
-    # Ready To Merge - only when nothing is blocking. A standing
-    # CHANGES_REQUESTED review blocks merge on GitHub even with enough
-    # approvals, so it takes precedence over Ready (handled in 4 & 5 below).
+    # Our internal approval gate (may differ from branch-protection settings).
     if approval_count >= REQUIRED_APPROVALS and not changes_requested_by:
         return "Ready To Merge", MERGER, approved_by
 
-    # 2 & 3. Nothing has been reviewed yet
     if review_count == 0:
         if requested_reviewers:
             responsible = ", ".join(f"@{r}" for r in requested_reviewers)
             return "Waiting For Review", responsible, approved_by
         return "No Reviewers Assigned", author, approved_by
 
-    # 4 & 5. A change was requested
     if changes_requested_by:
         participants = sorted(
             set([author] + changes_requested_by + commented_by
@@ -280,7 +333,6 @@ def determine_status(
         responsible = ", ".join(f"@{user}" for user in participants)
         return "Review Discussion In Progress", responsible, approved_by
 
-    # 6. Comments only, no block
     if commented_by:
         participants = sorted(
             set([author] + commented_by + requested_reviewers + issue_commenters)
@@ -289,9 +341,10 @@ def determine_status(
         responsible = ", ".join(f"@{user}" for user in participants)
         return "Comments Received", responsible, approved_by
 
-    # 7. Some approvals, still short of the bar
     if approval_count > 0:
-        return "Awaiting Additional Approval", "@reviewers", approved_by
+        pending = [r for r in requested_reviewers if r not in set(approved_by)]
+        responsible = ", ".join(f"@{r}" for r in pending) if pending else "@reviewers"
+        return "Awaiting Additional Approval", responsible, approved_by
 
     # Fallback: only dismissed/withdrawn reviews remain.
     if requested_reviewers:
@@ -387,7 +440,7 @@ def build_comment(
 | PR | #{pr.number} |
 | Author | @{pr.user.login} |
 | PR Age | {pr_age_days:.2f} days |
-| Last Activity | {last_activity_days:.1f} days ago |
+| Last Activity | {last_activity_days:.2f} days ago |
 | Status | {status} |
 | Action Item On | {responsible_display} |
 
@@ -422,78 +475,82 @@ def main() -> None:
     print(f"Scanning repository {repository.full_name}")
 
     for pr in repository.get_pulls(state="open"):
+        try:
+            if pr.draft:
+                continue
 
-        if pr.draft:
-            continue
-
-        unresolved_reviewers, review_summary, thread_timestamps = (
-            get_unresolved_review_threads(repository.full_name, pr.number)
-        )
-
-        issue_commenters = get_issue_commenters(pr)
-        review_feedback = get_review_feedback(pr)
-        discussion_comments = get_discussion_comments(pr)
-
-        feedback_sections = []
-
-        if review_summary != "_No unresolved review items_":
-            feedback_sections.append("### Code Review Threads\n\n" + review_summary)
-
-        if review_feedback:
-            feedback_sections.append(
-                "### Review Feedback\n\n" + "\n\n".join(review_feedback)
+            unresolved_reviewers, review_summary, thread_timestamps, review_decision = (
+                get_unresolved_review_threads(repository.full_name, pr.number)
             )
 
-        if discussion_comments:
-            feedback_sections.append(
-                "### Discussion Comments\n\n" + "\n\n".join(discussion_comments)
+            issue_commenters = get_issue_commenters(pr)
+            review_feedback = get_review_feedback(pr)
+            discussion_comments = get_discussion_comments(pr)
+
+            feedback_sections = []
+
+            if review_summary != "_No unresolved review items_":
+                feedback_sections.append("### Code Review Threads\n\n" + review_summary)
+
+            if review_feedback:
+                feedback_sections.append(
+                    "### Review Feedback\n\n" + "\n\n".join(review_feedback)
+                )
+
+            if discussion_comments:
+                feedback_sections.append(
+                    "### Discussion Comments\n\n" + "\n\n".join(discussion_comments)
+                )
+
+            review_summary = (
+                "\n\n".join(feedback_sections) if feedback_sections else "_No feedback found_"
             )
 
-        review_summary = (
-            "\n\n".join(feedback_sections) if feedback_sections else "_No feedback found_"
-        )
+            status, responsible, approved_by = determine_status(
+                pr, unresolved_reviewers, issue_commenters, review_decision
+            )
 
-        status, responsible, approved_by = determine_status(
-            pr, unresolved_reviewers, issue_commenters
-        )
+            # Per-status threshold (days)
+            if status == "Comments Received":
+                feedback_count = len(review_feedback) + len(discussion_comments)
+                threshold_days = 0.010 if feedback_count <= 3 else 0.017  # prod: 3 or 5
+            else:
+                threshold_days = STATUS_THRESHOLDS[status]
 
-        # Per-status threshold (days)
-        if status == "Comments Received":
-            feedback_count = len(review_feedback) + len(discussion_comments)
-            threshold_days = 0.010 if feedback_count <= 3 else 0.017  # prod: 3 or 5
-        else:
-            threshold_days = STATUS_THRESHOLDS[status]
+            status_age_days = get_status_age_days(status, pr, thread_timestamps)
+            last_reminder_days = get_last_reminder_days(pr)
 
-        status_age_days = get_status_age_days(status, pr, thread_timestamps)
-        last_reminder_days = get_last_reminder_days(pr)
+            print(
+                f"PR #{pr.number} | reviewDecision={review_decision!r} | "
+                f"Status={status!r} | "
+                f"Threshold={threshold_days:.4f}d | "
+                f"StatusAge={status_age_days:.4f}d | "
+                f"LastReminder={last_reminder_days}"
+            )
 
-        print(
-            f"PR #{pr.number} | Status={status!r} | "
-            f"Threshold={threshold_days:.4f}d | "
-            f"StatusAge={status_age_days:.4f}d | "
-            f"LastReminder={last_reminder_days}"
-        )
+            # Skip if the PR hasn't been in this status long enough
+            if status_age_days < threshold_days:
+                continue
 
-        # Skip if the PR hasn't been in this status long enough
-        if status_age_days < threshold_days:
-            continue
+            # Skip if a reminder was posted recently — wait another full threshold interval
+            if last_reminder_days is not None and last_reminder_days < threshold_days:
+                continue
 
-        # Skip if a reminder was posted recently — wait another full threshold interval
-        if last_reminder_days is not None and last_reminder_days < threshold_days:
-            continue
+            comment = build_comment(
+                pr=pr,
+                status=status,
+                responsible=responsible,
+                approved_by=approved_by,
+                pr_age_minutes=get_pr_age_minutes(pr),
+                last_activity_days=get_last_human_activity_days(pr),
+                review_summary=review_summary,
+            )
 
-        comment = build_comment(
-            pr=pr,
-            status=status,
-            responsible=responsible,
-            approved_by=approved_by,
-            pr_age_minutes=get_pr_age_minutes(pr),
-            last_activity_days=get_last_activity_days(pr),
-            review_summary=review_summary,
-        )
+            pr.create_issue_comment(comment)
+            print(f"Reminder posted for PR #{pr.number}")
 
-        pr.create_issue_comment(comment)
-        print(f"Reminder posted for PR #{pr.number}")
+        except Exception as exc:
+            print(f"PR #{pr.number}: skipping due to error — {exc}")
 
 
 if __name__ == "__main__":
