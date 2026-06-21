@@ -293,11 +293,15 @@ def determine_status(
         responsible = ", ".join(f"@{r}" for r in pending) if pending else "@reviewers"
         return "Awaiting Additional Approval", responsible, approved_by
 
+    # Exclude thread-openers who have since approved — their approval supersedes
+    # their open threads regardless of which reviewDecision branch we land in.
+    active_unresolved = [r for r in unresolved_reviewers if r not in set(approved_by)]
+
     # ── GitHub says: at least one reviewer has an active change request ──
     if review_decision == "CHANGES_REQUESTED":
-        if unresolved_reviewers:
+        if active_unresolved:
             return "Changes Requested", author, approved_by
-        # CHANGES_REQUESTED review verdict exists but no inline threads
+        # CHANGES_REQUESTED verdict exists but no active unresolved threads
         participants = sorted(
             set([author] + changes_requested_by + commented_by
                 + requested_reviewers + issue_commenters)
@@ -310,8 +314,7 @@ def determine_status(
     # Use the full fine-grained V1 decision tree. This also ensures repos
     # without branch protection still get all statuses correctly.
 
-    # Unresolved inline threads always signal outstanding changes.
-    if unresolved_reviewers:
+    if active_unresolved:
         return "Changes Requested", author, approved_by
 
     # Our internal approval gate (may differ from branch-protection settings).
