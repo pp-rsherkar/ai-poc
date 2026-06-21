@@ -1,28 +1,34 @@
 """
-Stale PR Reminder Bot - V1
+Stale PR Reminder Bot - V2 (per-status thresholds)
 """
 
 from __future__ import annotations
 
 import os
 from datetime import datetime, timezone
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import requests
 from github import Github
 from github.PullRequest import PullRequest
 
+# Per-status thresholds in days.
+# TESTING values (scale: ~5 min per prod-day)
+# To switch to prod: replace each value with the comment's prod value.
+STATUS_THRESHOLDS = {
+    "No Reviewers Assigned":         0.010,   # prod: 3
+    "Waiting For Review":            0.007,   # prod: 2
+    "Changes Requested":             0.017,   # prod: 5
+    "Review Discussion In Progress": 0.0035,  # prod: 1
+    "Awaiting Additional Approval":  0.0035,  # prod: 1
+    "Ready To Merge":                0.0035,  # prod: 1
+}
+# "Comments Received" threshold is feedback-count dependent:
+#   <= 3 items → 0.010  (prod: 3)
+#    > 3 items → 0.017  (prod: 5)
+
 REQUIRED_APPROVALS = int(os.getenv("REQUIRED_APPROVALS", "2"))
 MERGER = os.getenv("MERGER", "pp-pmitra")
-STATUS_THRESHOLDS = {
-    "No Reviewers Assigned": 3,
-    "Waiting For Review": 2,
-    "Changes Requested": 5,
-    "Review Discussion In Progress": 1,
-    "Awaiting Additional Approval": 1,
-    "Ready To Merge": 1,
-    "Comments Received": 3,
-}
 
 # Per-status guidance shown in the reminder comment.
 STATUS_ACTIONS = {
@@ -51,78 +57,13 @@ STATUS_ACTIONS = {
 def get_now() -> datetime:
     return datetime.now(timezone.utc)
 
-def get_last_human_activity_days(pr: PullRequest) -> float:
 
-    latest = pr.created_at
+def get_pr_age_minutes(pr: PullRequest) -> float:
+    return (get_now() - pr.created_at).total_seconds() / 60
 
-    # commits
-    try:
-        for commit in pr.get_commits():
-            if commit.commit.author:
-                latest = max(
-                    latest,
-                    commit.commit.author.date
-                )
-    except Exception:
-        pass
 
-    # reviews
-    try:
-        for review in pr.get_reviews():
-            if (
-                review.user
-                and review.user.type != "Bot"
-            ):
-                latest = max(
-                    latest,
-                    review.submitted_at
-                )
-    except Exception:
-        pass
-
-    # discussion comments
-    try:
-        for comment in pr.get_issue_comments():
-            if (
-                comment.user
-                and comment.user.type != "Bot"
-            ):
-                latest = max(
-                    latest,
-                    comment.created_at
-                )
-    except Exception:
-        pass
-
-    return (
-        get_now() - latest
-    ).total_seconds() / 86400
-
-def get_last_reminder_days(pr: PullRequest) -> float | None:
-
-    latest_reminder = None
-
-    for comment in pr.get_issue_comments():
-
-        if (
-            comment.user
-            and comment.user.type == "Bot"
-            and comment.body
-            and "🤖 Stale PR Reminder" in comment.body
-        ):
-
-            if (
-                latest_reminder is None
-                or comment.created_at > latest_reminder
-            ):
-                latest_reminder = comment.created_at
-
-    if latest_reminder is None:
-        return None
-
-    return (
-        get_now() - latest_reminder
-    ).total_seconds() / 86400
+def get_last_activity_days(pr: PullRequest) -> float:
+    return (get_now() - pr.updated_at).total_seconds() / 86400
 
 
 def get_requested_reviewers(pr: PullRequest) -> List[str]:
@@ -133,15 +74,12 @@ def get_requested_reviewers(pr: PullRequest) -> List[str]:
         print(f"Unable to fetch reviewers for PR #{pr.number}: {exc}")
         return []
 
+
 def get_issue_commenters(pr: PullRequest) -> List[str]:
     commenters = set()
     for comment in pr.get_issue_comments():
-        if (
-            comment.user
-            and comment.user.type != "Bot"
-        ):
+        if comment.user and comment.user.type != "Bot":
             commenters.add(comment.user.login)
-
     return list(commenters)
 
 
@@ -180,56 +118,43 @@ def analyze_reviews(
     ]
     return approved_by, changes_requested_by, commented_by, len(seen)
 
+
 def get_review_feedback(pr: PullRequest) -> List[str]:
-
     feedback = []
-
     for review in pr.get_reviews():
-
         if not review.user or review.user.type == "Bot":
             continue
-
         body = (review.body or "").strip()
-
         if not body:
             continue
-
         if review.state in ("CHANGES_REQUESTED", "COMMENTED"):
-
             feedback.append(
                 f"- @{review.user.login} [{review.state}]\n  {body}"
             )
-
     return feedback
 
+
 def get_discussion_comments(pr: PullRequest) -> List[str]:
-
     comments = []
-
     for comment in pr.get_issue_comments():
-
-        if (
-            not comment.user
-            or comment.user.type == "Bot"
-        ):
+        if not comment.user or comment.user.type == "Bot":
             continue
-
         body = (comment.body or "").strip()
-
         if not body:
             continue
-
-        comments.append(
-            f"- @{comment.user.login}\n  {body}"
-        )
+        comments.append(f"- @{comment.user.login}\n  {body}")
     return comments
 
 
 def get_unresolved_review_threads(
     repository_name: str,
     pr_number: int,
-) -> Tuple[List[str], str]:
+) -> Tuple[List[str], str, List[datetime]]:
+    """Return (unresolved_reviewer_logins, summary_text, thread_timestamps).
 
+    thread_timestamps holds the creation time of each unresolved thread's first
+    comment, used to compute how long the PR has been in "Changes Requested".
+    """
     owner, repo = repository_name.split("/")
 
     query = """
@@ -243,8 +168,10 @@ def get_unresolved_review_threads(
                 nodes {
                   body
                   path
+                  createdAt
                   author {
                     login
+                    __typename
                   }
                 }
               }
@@ -276,23 +203,31 @@ def get_unresolved_review_threads(
         ["reviewThreads"]["nodes"]
     )
 
-    unresolved_reviewers = set()
-    summary_lines = []
+    unresolved_reviewers: set[str] = set()
+    summary_lines: List[str] = []
+    thread_timestamps: List[datetime] = []
 
     for thread in threads:
-
         if thread["isResolved"]:
             continue
 
         comments = thread["comments"]["nodes"]
-
         if not comments:
             continue
 
         first_comment = comments[0]
-        reviewer = first_comment["author"]["login"]
 
+        # Skip threads opened by bots or accounts that no longer exist
+        if not first_comment["author"] or first_comment["author"]["__typename"] == "Bot":
+            continue
+
+        reviewer = first_comment["author"]["login"]
         unresolved_reviewers.add(reviewer)
+
+        created_at = datetime.fromisoformat(
+            first_comment["createdAt"].replace("Z", "+00:00")
+        )
+        thread_timestamps.append(created_at)
 
         summary_lines.append(
             f"- **{first_comment['path']}** "
@@ -300,12 +235,9 @@ def get_unresolved_review_threads(
             f"{first_comment['body']}"
         )
 
-    if not summary_lines:
-        summary = "_No unresolved review items_"
-    else:
-        summary = "\n".join(summary_lines)
+    summary = "\n".join(summary_lines) if summary_lines else "_No unresolved review items_"
 
-    return list(unresolved_reviewers), summary
+    return list(unresolved_reviewers), summary, thread_timestamps
 
 
 def determine_status(
@@ -325,7 +257,7 @@ def determine_status(
     if unresolved_reviewers:
         return "Changes Requested", author, approved_by
 
-    # 1. Ready To Merge - only when nothing is blocking. A standing
+    # Ready To Merge - only when nothing is blocking. A standing
     # CHANGES_REQUESTED review blocks merge on GitHub even with enough
     # approvals, so it takes precedence over Ready (handled in 4 & 5 below).
     if approval_count >= REQUIRED_APPROVALS and not changes_requested_by:
@@ -340,47 +272,26 @@ def determine_status(
 
     # 4 & 5. A change was requested
     if changes_requested_by:
-
         participants = sorted(
-                            set([author]
-                                + changes_requested_by
-                                + commented_by
-                                + requested_reviewers
-                                + issue_commenters
-                            )
-                            - set(approved_by)
-                        )
-    
-        responsible = ", ".join(
-            f"@{user}" for user in participants
+            set([author] + changes_requested_by + commented_by
+                + requested_reviewers + issue_commenters)
+            - set(approved_by)
         )
-    
+        responsible = ", ".join(f"@{user}" for user in participants)
         return "Review Discussion In Progress", responsible, approved_by
-        
-    # 6. Comments only, no block (changes already handled above)
+
+    # 6. Comments only, no block
     if commented_by:
         participants = sorted(
-                            set([author]
-                                + commented_by
-                                + requested_reviewers
-                                + issue_commenters
-                            )
-                            - set(approved_by)
-                        )
-        
-        responsible = ", ".join(
-            f"@{user}" for user in participants
+            set([author] + commented_by + requested_reviewers + issue_commenters)
+            - set(approved_by)
         )
-        
+        responsible = ", ".join(f"@{user}" for user in participants)
         return "Comments Received", responsible, approved_by
 
     # 7. Some approvals, still short of the bar
     if approval_count > 0:
-        return (
-            "Awaiting Additional Approval",
-            "@reviewers",
-            approved_by,
-        )
+        return "Awaiting Additional Approval", "@reviewers", approved_by
 
     # Fallback: only dismissed/withdrawn reviews remain.
     if requested_reviewers:
@@ -389,17 +300,76 @@ def determine_status(
     return "No Reviewers Assigned", author, approved_by
 
 
+def get_last_reminder_days(pr: PullRequest) -> Optional[float]:
+    """Return days since the last bot reminder comment, or None if never reminded."""
+    comments = list(pr.get_issue_comments())
+    for comment in reversed(comments):
+        if (
+            comment.user
+            and comment.user.type == "Bot"
+            and "Stale PR Reminder" in comment.body
+        ):
+            return (get_now() - comment.created_at).total_seconds() / 86400
+    return None
+
+
+def get_status_age_days(
+    status: str,
+    pr: PullRequest,
+    thread_timestamps: List[datetime],
+) -> float:
+    """Return how many days the PR has been in its current status.
+
+    The clock is anchored to the event that caused the current status,
+    not to generic last-activity or PR creation date.
+    """
+    now = get_now()
+
+    if status in ("No Reviewers Assigned", "Waiting For Review"):
+        return (now - pr.created_at).total_seconds() / 86400
+
+    if status == "Changes Requested":
+        # Clock from the most recently opened unresolved thread
+        if thread_timestamps:
+            return (now - max(thread_timestamps)).total_seconds() / 86400
+        return 0.0
+
+    # Review-verdict-based statuses: find the most recent matching review
+    verdict_map = {
+        "Review Discussion In Progress": ("CHANGES_REQUESTED",),
+        "Comments Received":            ("COMMENTED",),
+        "Awaiting Additional Approval": ("APPROVED",),
+        "Ready To Merge":               ("APPROVED",),
+    }
+    target_states = verdict_map.get(status)
+    if target_states:
+        latest: Optional[datetime] = None
+        for review in pr.get_reviews():
+            if not review.user or review.user.type == "Bot":
+                continue
+            if review.state in target_states:
+                if latest is None or review.submitted_at > latest:
+                    latest = review.submitted_at
+        if latest:
+            return (now - latest).total_seconds() / 86400
+
+    # Fallback
+    return (now - pr.created_at).total_seconds() / 86400
+
+
 def build_comment(
     pr: PullRequest,
     status: str,
     responsible: str,
     approved_by: List[str],
+    pr_age_minutes: float,
     last_activity_days: float,
-    threshold_days: int,
     review_summary: str,
 ) -> str:
 
-    approvals = ", ".join(approved_by) if approved_by else "None"
+    pr_age_days = pr_age_minutes / 1440
+
+    approvals = ", ".join(f"@{u}" for u in approved_by) if approved_by else "None"
 
     responsible_display = responsible
     if not responsible.startswith("@"):
@@ -416,6 +386,7 @@ def build_comment(
 |----------|----------|
 | PR | #{pr.number} |
 | Author | @{pr.user.login} |
+| PR Age | {pr_age_days:.2f} days |
 | Last Activity | {last_activity_days:.1f} days ago |
 | Status | {status} |
 | Action Item On | {responsible_display} |
@@ -439,14 +410,13 @@ Approved By:
 
 ---
 
-This PR requires attention as no new activity has occurred within the expected timeframe.
+_This is an automated reminder. Please take action to keep this PR moving._
 """
 
 
 def main() -> None:
 
     github_client = Github(os.environ["GITHUB_TOKEN"])
-
     repository = github_client.get_repo(os.environ["GITHUB_REPOSITORY"])
 
     print(f"Scanning repository {repository.full_name}")
@@ -456,85 +426,60 @@ def main() -> None:
         if pr.draft:
             continue
 
-        unresolved_reviewers, review_summary = get_unresolved_review_threads(
-            repository.full_name,
-            pr.number,
+        unresolved_reviewers, review_summary, thread_timestamps = (
+            get_unresolved_review_threads(repository.full_name, pr.number)
         )
 
         issue_commenters = get_issue_commenters(pr)
-
         review_feedback = get_review_feedback(pr)
-        
         discussion_comments = get_discussion_comments(pr)
 
         feedback_sections = []
-        
+
         if review_summary != "_No unresolved review items_":
-            feedback_sections.append(
-                "### Code Review Threads\n\n" + review_summary
-            )
-        
+            feedback_sections.append("### Code Review Threads\n\n" + review_summary)
+
         if review_feedback:
             feedback_sections.append(
-                "### Review Feedback\n\n" +
-                "\n\n".join(review_feedback)
+                "### Review Feedback\n\n" + "\n\n".join(review_feedback)
             )
-        
+
         if discussion_comments:
             feedback_sections.append(
-                "### Discussion Comments\n\n" +
-                "\n\n".join(discussion_comments)
+                "### Discussion Comments\n\n" + "\n\n".join(discussion_comments)
             )
-        
+
         review_summary = (
-            "\n\n".join(feedback_sections)
-            if feedback_sections
-            else "_No feedback found_"
+            "\n\n".join(feedback_sections) if feedback_sections else "_No feedback found_"
         )
 
         status, responsible, approved_by = determine_status(
-            pr,
-            unresolved_reviewers,
-            issue_commenters,
+            pr, unresolved_reviewers, issue_commenters
         )
 
+        # Per-status threshold (days)
         if status == "Comments Received":
-
-            feedback_count = (
-                len(review_feedback)
-                + len(discussion_comments)
-            )
-        
-            threshold_days = (
-                3 if feedback_count <= 3
-                else 5
-            )
-        
+            feedback_count = len(review_feedback) + len(discussion_comments)
+            threshold_days = 0.010 if feedback_count <= 3 else 0.017  # prod: 3 or 5
         else:
             threshold_days = STATUS_THRESHOLDS[status]
 
-        last_human_activity_days = get_last_human_activity_days(pr)
-
+        status_age_days = get_status_age_days(status, pr, thread_timestamps)
         last_reminder_days = get_last_reminder_days(pr)
-        
-        effective_age_days = last_human_activity_days
-        
-        if (
-            last_reminder_days is not None
-            and last_reminder_days < effective_age_days
-        ):
-            effective_age_days = last_reminder_days
 
         print(
-            f"PR #{pr.number} | "
-            f"Status={status} | "
-            f"Threshold={threshold_days}d | "
-            f"Human={last_human_activity_days:.1f}d | "
-            f"Reminder={last_reminder_days} | "
-            f"Effective={effective_age_days:.1f}d"
+            f"PR #{pr.number} | Status={status!r} | "
+            f"Threshold={threshold_days:.4f}d | "
+            f"StatusAge={status_age_days:.4f}d | "
+            f"LastReminder={last_reminder_days}"
         )
-        
-        if effective_age_days < threshold_days:
+
+        # Skip if the PR hasn't been in this status long enough
+        if status_age_days < threshold_days:
+            continue
+
+        # Skip if a reminder was posted recently — wait another full threshold interval
+        if last_reminder_days is not None and last_reminder_days < threshold_days:
             continue
 
         comment = build_comment(
@@ -542,13 +487,12 @@ def main() -> None:
             status=status,
             responsible=responsible,
             approved_by=approved_by,
-            last_activity_days=last_human_activity_days,
-            threshold_days=threshold_days,
+            pr_age_minutes=get_pr_age_minutes(pr),
+            last_activity_days=get_last_activity_days(pr),
             review_summary=review_summary,
         )
 
         pr.create_issue_comment(comment)
-
         print(f"Reminder posted for PR #{pr.number}")
 
 
