@@ -96,8 +96,8 @@ if os.path.exists("scenario_dictionary.txt"):
 
 # ── Build prompt ──────────────────────────────────────────────────────────────
 prompt = f"""HARD RULES:
-1. You must output a brief <coverage_plan> BEFORE outputting the Gherkin. 
-2. Every Scenario/Scenario Outline must have exactly one @todo tag...
+1. You must output a brief coverage checklist BEFORE outputting the Gherkin. Do not use markdown code fences around the output.
+2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
 3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
 4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
 5. Never use placeholder steps. Write the full meaningful step text always.
@@ -105,6 +105,7 @@ prompt = f"""HARD RULES:
 
 DECISION RULES:
 - Use plain Scenario by default.
+- CRITICAL TOKEN LIMIT RULE: If a feature or edge case applies to multiple modules, you MUST use a single Scenario Outline with an Examples table. DO NOT write separate, repetitive Scenarios for each list type.
 - Use Scenario Outline + Examples ONLY when same steps apply to 2+ distinct data combinations AND Examples has 2+ rows.
 - Use a data table when a step needs 3+ key-value pairs or a list.
 
@@ -210,12 +211,11 @@ STEP DICTIONARY (use verbatim - invent only if no match exists):
 {step_context}
 
 OUTPUT FORMAT:
-<coverage_plan>
 - User Roles identified: [list roles, e.g., Internal, External]
 - UI Interactions required: [list interactions, e.g., Manual Sort Last Updated, Search Filter]
 - Historical Risks identified: [list risks from comments, e.g., PROD-13338]
 - Ambiguities resolved: [list how you handled unclear requirements]
-</coverage_plan>
+
 Feature: <name from Jira summary>
 
   @todo
