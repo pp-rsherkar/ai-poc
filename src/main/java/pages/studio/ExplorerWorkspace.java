@@ -11,6 +11,8 @@ import java.util.List;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class ExplorerWorkspace {
     private final Page page;
     private final Locator WORKSPACE_NAME;
@@ -162,6 +164,8 @@ public class ExplorerWorkspace {
     public void selectAdvertiser(String advertiser) {
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST);
         SEARCH_ADVERTISER.fill(advertiser);
+        assertThat(ADVERTISER_BUTTON).hasCount(1);
+
         for (int i = 0; i < ADVERTISER_BUTTON.count(); i++) {
             if (ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)) {
                 ADVERTISER_BUTTON.nth(i).click();
