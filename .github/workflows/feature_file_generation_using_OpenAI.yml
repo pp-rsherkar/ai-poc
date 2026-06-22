@@ -227,7 +227,7 @@ jobs:
               }' > request.json
           fi
 
-          for attempt in 1 2 3 4 5; do
+          for attempt in 1 2 3; do
             echo "Attempt $attempt..."
 
             HTTP_RESPONSE=$(mktemp)
