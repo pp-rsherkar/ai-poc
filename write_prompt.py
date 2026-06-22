@@ -96,7 +96,7 @@ if os.path.exists("scenario_dictionary.txt"):
 
 # ── Build prompt ──────────────────────────────────────────────────────────────
 prompt = f"""HARD RULES:
-1. You must output a brief coverage checklist BEFORE outputting the Gherkin. Do not use markdown code fences around the output.
+1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
 2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
 3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
 4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
