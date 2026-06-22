@@ -21,10 +21,28 @@ domain      = sys.argv[2]
 domain_text = domain if domain else "general"
 feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 
-# ── Pull Jira content from env ────────────────────────────────────────────────
-summary_trim  = os.environ.get("SUMMARY",      "No Summary")[:300]
-desc_trim     = os.environ.get("DESCRIPTION",  "No Description")[:8000]
-comments_trim = os.environ.get("COMMENTS",     "No Comments")[:2000]
+# ── Pull Jira content ─────────────────────────────────────────────────────────
+summary_trim = os.environ.get("SUMMARY", "No Summary")[:300]
+
+# Read description from file (avoids GitHub Actions env var truncation)
+desc_file = "jira_description.txt"
+if os.path.exists(desc_file):
+    with open(desc_file, "r", encoding="utf-8") as f:
+        desc_trim = f.read().strip()[:8000]
+    print(f"Description loaded from file: {len(desc_trim)} chars")
+else:
+    desc_trim = os.environ.get("DESCRIPTION", "No Description")[:8000]
+    print("::warning::jira_description.txt not found, falling back to env var")
+
+# Read comments from file
+comments_file = "jira_comments.txt"
+if os.path.exists(comments_file):
+    with open(comments_file, "r", encoding="utf-8") as f:
+        comments_trim = f.read().strip()[:2000]
+    print(f"Comments loaded from file: {len(comments_trim)} chars")
+else:
+    comments_trim = os.environ.get("COMMENTS", "No Comments")[:2000]
+    print("::warning::jira_comments.txt not found, falling back to env var")
 
 # ── Feature examples from target domain (up to 40 lines from 2 files) ────────
 example_files = sorted(
