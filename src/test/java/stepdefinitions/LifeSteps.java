@@ -955,6 +955,7 @@ public class LifeSteps {
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         logger.info("Starting verification of configured targeting rules");
+        tacticSettings.expandAllTargetingRules();
         List<String> expectedNormalizedRuleTypes = normalizeObjectList(keyType);
         int expectedCount = expectedNormalizedRuleTypes.size();
         logger.info("Fetching actual rule types (Expected Count: {})", expectedCount);
@@ -1144,7 +1145,7 @@ public class LifeSteps {
     /*Roshani Sherkar - 18-06-2025
      * Campaign Dashbaord Features Start*/
     @And("Verify Campaign Dashboard is displayed with title {string}")
-    public void verifyCampaignDashboardIsDisplayedWithTitle(String title) {
+    public void verifyCampaignDashboardIsDisplayedWithTitle(String title){
         logger.info("Verifying Campaign Dashboard is displayed with title: {}", title);
         Assert.assertEquals(title, campaignDashboard.isCampaignDashboardVisibleWithTitle(title));
     }
@@ -7355,5 +7356,19 @@ public class LifeSteps {
     public void userCloseTheBidPanelToAddTargetingRules() {
         logger.info("Navigating to page to add targeting");
         tacticSettings.navigateToAddTargeting();
+    @When("User navigates back to settings tab from creatives tab")
+    public void user_navigates_back_to_settings_tab_from_creatives_tab() {
+        logger.info("Navigating back to settings tab from creatives tab");
+        tacticDetails.clickSettingsTab();
+        String settingsText = tacticSettings.verifyTacticSettingsText();
+        Assert.assertEquals("Bid Strategy", settingsText);
+    }
+
+    @When("User navigates back to creatives tab")
+    public void user_navigates_back_to_creatives_tab() {
+        logger.info("Navigating back to creatives tab");
+        tacticCreatives.clickCreativeTab();
+        String creativesText = tacticCreatives.verifyTacticCreativesText();
+        Assert.assertEquals("Creative(s)", creativesText);
     }
 }

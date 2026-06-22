@@ -1,5 +1,6 @@
 package pages.life;
 
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
@@ -31,6 +32,7 @@ public class TacticSettings {
     private final Locator VERIFY_NPI;
     private final Locator FETCH_TARGET_RULE_TYPES;
     private final Locator FETCH_TARGET_RULE_OPTIONS;
+    private final Locator EXPAND_TARGETING_ICONS;
     private final Locator TARGET_CATEGORY_NAME;
     private final Locator PERSON_TAB;
     private final Locator HOUSEHOLD_TAB;
@@ -85,6 +87,7 @@ public class TacticSettings {
     private final Locator MANAGEMENT_FEE_LABEL_VALUE;
     private final Locator MANAGEMENT_FEE_OVERRIDE;
     private final Locator MANAGEMENT_FEE_OPTIONS;
+    private final Locator NEW_TARGETING_RULE_BUTTON;
     final Locator PERCENT_TYPE_FEE_INPUT;
     final Locator DOLLAR_TYPE_FEE_INPUT;
     private final Locator ADD_BID_MULTIPLIER;
@@ -125,6 +128,7 @@ public class TacticSettings {
         this.VERIFY_NPI = page.locator("//label[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//label[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//span[contains(@class,'target-ellipse')]");
+        this.EXPAND_TARGETING_ICONS = page.locator("//i[@class='dropdown icon gaExpandTargeting']");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
         this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
@@ -790,6 +794,7 @@ public class TacticSettings {
     }
 
     public void fetchRulesTypesCount(int expectedCount) {
+        waitUtility.waitUntilSpinnerHidden();
         FETCH_TARGET_RULE_TYPES.nth(expectedCount - 1).waitFor();
     }
 
@@ -1099,5 +1104,16 @@ public class TacticSettings {
 
     public void clickCreativeTab() {
         CREATIVE_TAB.click();
+    public void expandAllTargetingRules() {
+        waitUtility.waitForLocatorVisible(NEW_TARGETING_RULE_BUTTON);
+        int safetyLimit = EXPAND_TARGETING_ICONS.count();
+        int expanded = 0;
+
+        while (EXPAND_TARGETING_ICONS.count() > 0 && expanded < safetyLimit) {
+            Locator icon = EXPAND_TARGETING_ICONS.first();
+            icon.scrollIntoViewIfNeeded();
+            icon.click();
+            expanded++;
+        }
     }
 }
