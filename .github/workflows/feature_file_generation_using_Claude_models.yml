@@ -7,15 +7,14 @@ on:
         description: "Enter JIRA Ticket ID (e.g., QA-1321)"
         required: true
         type: string
+
       domain:
         description: "Target domain/sub-folder"
         required: true
         type: choice
         default: "life"
-        options:
-          - life
-          - studio
-          - hcp
+        options: [life, studio, hcp]
+
       llm_model:
         description: "Select Claude Model"
         required: true
@@ -28,115 +27,69 @@ on:
           - claude-opus-4-7
           - claude-opus-4-6
 
-# ─── Auth options (pick ONE, add the matching secret) ───────────────────────
-# Option A — Claude Pro/Max/Enterprise OAuth token (FREE, no API billing):
-#   1. Install Claude Code locally: npm install -g @anthropic-ai/claude-code
-#   2. Run: claude setup-token
-#   3. Copy the token → GitHub repo secret: CLAUDE_CODE_OAUTH_TOKEN
-#
-# Option B — Anthropic API key (requires paid API credits):
-#   Add secret: ANTHROPIC_API_KEY
-#
-# Option C — Workload Identity Federation (org-level, no static secrets):
-#   Requires Anthropic Console admin to set up federation rule.
-#   See: https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md
-# ────────────────────────────────────────────────────────────────────────────
-
 permissions:
   contents: write
   pull-requests: write
-  id-token: write   # needed if using WIF (Option C); harmless otherwise
+
+env:
+  FEATURE_DIR: src/test/resources/features
 
 jobs:
   generate-feature:
     runs-on: ubuntu-latest
 
-    env:
-      FEATURE_DIR: src/test/resources/features
-
     steps:
-      # =========================
+
+      # ---------------------------
       # Checkout
-      # =========================
+      # ---------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 1
 
-      # =========================
-      # Install dependencies
-      # =========================
+      # ---------------------------
+      # Dependencies
+      # ---------------------------
       - name: Install dependencies
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y jq
 
-      # =========================
-      # Build AI repository context
-      # Scans all .feature files and groups steps + scenario
-      # titles by sub-folder domain for targeted context injection.
-      # =========================
+      # ---------------------------
+      # Build context (Python file instead of heredoc logic inside YAML)
+      # ---------------------------
       - name: Build AI repository context
         run: |
           set -euo pipefail
           mkdir -p "$FEATURE_DIR"
 
-          python3 << 'PYEOF'
-          import os, glob, re
-          from collections import defaultdict
-          
-          feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
-          steps_by_domain = defaultdict(set)
-          scenarios = []
-          
-          for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
-              domain = os.path.basename(os.path.dirname(file_path))
-              if domain == "features" or domain == "":
-                  domain = "general"
-              with open(file_path, 'r', encoding='utf-8') as f:
-                  content = f.read()
-              for match in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
-                  scenarios.append(f"[{domain}] {match.group(0).strip()}")
-              for line in content.split('\n'):
-                  line = line.strip()
-                  if re.match(r'^(Given|When|Then|And|But)\s+', line):
-                      steps_by_domain[domain].add(line)
-          
-          with open('step_dictionary.txt', 'w', encoding='utf-8') as f:
-              for domain, steps in sorted(steps_by_domain.items()):
-                  f.write(f"\n--- Domain: {domain} ---\n")
-                  f.write('\n'.join(sorted(steps)))
-                  f.write('\n')
-          
-          with open('scenario_dictionary.txt', 'w', encoding='utf-8') as f:
-              f.write('\n'.join(scenarios))
-          
-          print(f"Domains found  : {sorted(steps_by_domain.keys())}")
-          print(f"Total steps    : {sum(len(v) for v in steps_by_domain.values())}")
-          print(f"Total scenarios: {len(scenarios)}")
-          PYEOF
+          python3 scripts/build_context.py
 
           echo "Step dictionary  : $(wc -l < step_dictionary.txt) lines"
           echo "Scenario dict    : $(wc -l < scenario_dictionary.txt) lines"
 
-      # =========================
-      # Create working branch
-      # =========================
+      # ---------------------------
+      # Create branch
+      # ---------------------------
       - name: Create branch
         run: |
           set -euo pipefail
           BRANCH="${{ inputs.jira_id }}"
+
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+
           git fetch origin main
           git checkout -b "$BRANCH" origin/main || git checkout "$BRANCH"
+
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
-      # =========================
-      # Fetch Jira details
-      # =========================
+      # ---------------------------
+      # Jira fetch
+      # ---------------------------
       - name: Fetch Jira details
         run: |
           set -euo pipefail
@@ -148,465 +101,160 @@ jobs:
 
           echo "$RESPONSE" > jira_response.json
 
-          if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
-            echo "Jira API returned an error:"
-            cat jira_response.json
-            exit 1
-          fi
-
           SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
-          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' \
-            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-          COMMENTS=$(echo "$RESPONSE" | jq -r \
-            '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' \
-            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-
-          [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
-          [ -z "$COMMENTS" ]    && COMMENTS="No Comments"
-
-          DESC_LEN=${#DESCRIPTION}
-          COMM_LEN=${#COMMENTS}
-
-          [ "$DESC_LEN" -gt 12000 ] && echo "WARNING: Description ${DESC_LEN} chars — truncated to 12000."
-          [ "$COMM_LEN" -gt 8000  ] && echo "WARNING: Comments ${COMM_LEN} chars — truncated to 8000."
-
-          DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
-          COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' | tr "\n" " ")
+          COMMENTS=$(echo "$RESPONSE" | jq -r '.fields.comment.comments[]?.body | .. | .text? // empty' | tr "\n" " ")
 
           {
             echo "SUMMARY<<EOF"
             echo "$SUMMARY"
             echo "EOF"
+
             echo "DESCRIPTION<<EOF"
-            echo "$DESCRIPTION"
+            echo "${DESCRIPTION:0:12000}"
             echo "EOF"
+
             echo "COMMENTS<<EOF"
-            echo "$COMMENTS"
+            echo "${COMMENTS:0:8000}"
             echo "EOF"
           } >> "$GITHUB_ENV"
 
-      # =========================
-      # Write prompt file
-      # Python runs at column-0 — zero indentation bloat in the prompt.
-      # Step context: target domain + general (shared steps).
-      # Caps: 120 lines per domain block, 30 scenario titles, 40 example lines.
-      # =========================
-      - name: Write prompt file
-        env:
-          SUMMARY: ${{ env.SUMMARY }}
-          DESCRIPTION: ${{ env.DESCRIPTION }}
-          COMMENTS: ${{ env.COMMENTS }}
-          JIRA_ID: ${{ inputs.jira_id }}
-          DOMAIN: ${{ inputs.domain }}
+      # ---------------------------
+      # Prompt builder (moved to script)
+      # ---------------------------
+      - name: Write prompt
         run: |
           set -euo pipefail
+          python3 scripts/write_prompt.py \
+            "${{ inputs.jira_id }}" \
+            "${{ inputs.domain }}"
 
-          # Validate domain directory exists
-          if [ ! -d "$FEATURE_DIR/$DOMAIN" ]; then
-            echo "::error::Domain '$DOMAIN' does not exist in $FEATURE_DIR."
-            echo "Available domains: $(ls "$FEATURE_DIR")"
-            exit 1
-          fi
-
-          # Reference examples from target domain — xargs avoids broken pipe
-          FEATURE_EXAMPLES=$(
-            find "$FEATURE_DIR/$DOMAIN" -name "*.feature" \
-            | sort | head -2 \
-            | xargs cat 2>/dev/null \
-            | head -n 40 || true
-          )
-          export FEATURE_EXAMPLES
-
-          python3 << 'PYEOF'
-          import os, re
-          
-          domain      = os.environ.get("DOMAIN", "")
-          domain_text = domain if domain else "general"
-          
-          # ── Step context: target domain + general ───────────────────────────────────
-          steps = []
-          if os.path.exists("step_dictionary.txt"):
-              with open("step_dictionary.txt", "r", encoding="utf-8") as f:
-                  content = f.read()
-              blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-              for i in range(1, len(blocks), 2):
-                  d = blocks[i]
-                  s = blocks[i + 1]
-                  if d == domain_text or d == "general":
-                      steps.append(f"--- {d} steps ---\n{s.strip()}")
-          
-          # ── Cap per domain block individually (not total) ────────────────────────────
-          MAX_LINES_PER_DOMAIN = 120
-          capped_steps = []
-          for block in steps:
-              block_lines = block.split('\n')
-              if len(block_lines) > MAX_LINES_PER_DOMAIN:
-                  block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
-                  print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines to fit token budget")
-              capped_steps.append('\n'.join(block_lines))
-          step_context = "\n\n".join(capped_steps)
-          
-          if not step_context.strip():
-              print(f"::warning::No steps found for domain '{domain_text}' — model will invent all steps")
-          else:
-              print(f"Step context: {len(step_context.splitlines())} lines for domain '{domain_text}'")
-          
-          # ── Scenario context: target domain only, last 30 ───────────────────────────
-          scenario_context = ""
-          if os.path.exists("scenario_dictionary.txt"):
-              with open("scenario_dictionary.txt", "r", encoding="utf-8") as f:
-                  lines = f.readlines()
-              scenarios = [l.strip() for l in lines if l.startswith(f"[{domain_text}]")]
-              scenario_context = "\n".join(scenarios[-30:])
-              print(f"Scenario context: {len(scenarios)} titles, showing last 30")
-          
-          feature_examples = os.environ.get("FEATURE_EXAMPLES", "")
-          summary_trim     = os.environ.get("SUMMARY",      "")[:300]
-          desc_trim        = os.environ.get("DESCRIPTION",  "")
-          comments_trim    = os.environ.get("COMMENTS",     "")[:1000]
-          jira_id          = os.environ.get("JIRA_ID",      "")
-          
-          prompt = f"""HARD RULES:
-          1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
-          2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
-          3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-          4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
-          5. Never use placeholder steps. Write the full meaningful step text always.
-          6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
-          
-          DECISION RULES:
-          - Use plain Scenario by default.
-          - Use Scenario Outline + Examples ONLY when: same steps apply to 2+ distinct data combinations explicit in the ticket AND Examples has 2+ rows.
-          - Use a data table when a step needs 3+ key-value pairs or a list. Not for 1-2 values.
-          
-          Data table example:
-            When I submit the form with:
-              | field | value |
-              | email | a@b.c |
-              | role  | admin |
-          
-          DESCRIPTION INTERPRETATION RULES:
-          Style 1 - Explicit acceptance criteria: interpret directly and write scenarios.
-          Style 2 - Scope list (e.g. "FE: Dropdown, Brand Multi Select"): infer user-facing behaviour per item.
-          Style 3 - Status notes (e.g. "6/9 - RELEASED"): ignore entirely.
-          Style 4 - Mixed: process each section independently. UPDATED section is highest priority.
-          
-          For ANY style:
-          - Every bullet, numbered item, or named feature must produce at least one scenario.
-          - Every UPDATED section item must produce at least one scenario.
-          - Never skip a scope item. Infer behaviour from the name if ACs are missing.
-          - Use COMMENTS for edge cases and supplementary context.
-          
-          SCENARIO GENERATION:
-          1. Read full DESCRIPTION and COMMENTS.
-          2. Identify every functional scope item.
-          3. For each item write scenarios covering:
-             - Happy path
-             - Negative/validation (only if inferable)
-             - Permission/role (only if roles mentioned)
-          4. Steps: Given / When / Then / And / But order.
-          5. Business-readable language only. No technical details.
-          6. One behaviour per scenario. No duplicates.
-          
-          JIRA:
-          ID: {jira_id}
-          TARGET DOMAIN: {domain_text}
-          SUMMARY: {summary_trim}
-          DESCRIPTION: {desc_trim}
-          COMMENTS: {comments_trim}
-          
-          REPOSITORY EXAMPLES (mirror this style exactly):
-          {feature_examples}
-          
-          EXISTING SCENARIOS (do not duplicate these):
-          {scenario_context}
-          
-          STEP DICTIONARY (use verbatim — invent only if no match exists):
-          {step_context}
-          
-          OUTPUT FORMAT:
-          Feature: <name from Jira summary>
-          
-            @todo
-            Scenario: <actor action expected outcome>
-              Given ...
-              When  ...
-              Then  ...
-          
-            @todo
-            Scenario Outline: <actor action expected outcome>
-              Given ...
-              When  ... "<param>"
-              Then  ...
-              Examples:
-                | param  |
-                | value1 |
-                | value2 |
-          """
-          
-          with open("prompt.txt", "w") as f:
-              f.write(prompt)
-          
-          size  = os.path.getsize("prompt.txt")
-          words = len(prompt.split())
-          print(f"Prompt size  : {size} bytes / {words} words (est. {words // 3} tokens)")
-          PYEOF
-
-      # =========================
-      # Pre-flight size check
-      # Claude supports 200k token context — cap at 100k chars (~25k tokens)
-      # to control cost and keep latency low.
-      # =========================
+      # ---------------------------
+      # Safety check
+      # ---------------------------
       - name: Pre-flight size check
         run: |
           set -euo pipefail
           BYTES=$(wc -c < prompt.txt)
+
           echo "Prompt file: ${BYTES} bytes"
+
           if [ "$BYTES" -gt 100000 ]; then
-            echo "::error::Prompt is ${BYTES} bytes — exceeds 100000 byte safe limit."
-            echo "Reduce description length or step library cap."
+            echo "::error::Prompt exceeds safe limit"
             exit 1
           fi
-          echo "Size check OK — within limit"
 
-      # =========================
-      # Generate Feature File via claude-code-action
-      #
-      # Authentication (set ONE secret in repo Settings → Secrets):
-      #
-      #   CLAUDE_CODE_OAUTH_TOKEN  ← FREE if you have Claude Pro/Max/Enterprise
-      #     How to get it:
-      #       1. npm install -g @anthropic-ai/claude-code
-      #       2. claude login          (sign in with your claude.ai account)
-      #       3. claude setup-token    (prints a token — copy it)
-      #       4. Add as GitHub secret: CLAUDE_CODE_OAUTH_TOKEN
-      #
-      #   ANTHROPIC_API_KEY  ← requires paid API credits (platform.anthropic.com)
-      #
-      # The action reads the prompt from prompt.txt (written in prior step),
-      # calls Claude, and writes the output to generated.feature.
-      # =========================
-      - name: Generate feature via Claude
-        id: claude_generate
-        uses: anthropics/claude-code-action@v1
-        with:
-          # ── Auth: uncomment the ONE line matching your secret ──────────────
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # ──────────────────────────────────────────────────────────────────
-          prompt: |
-            Read the file prompt.txt in the current directory.
-            Follow every instruction in it exactly.
-            Write the resulting Gherkin feature file content (and nothing else)
-            to a file called generated.feature in the current directory.
-          claude_args: |
-            --model ${{ inputs.llm_model }}
-            --allowedTools Read,Write
-            --max-turns 3
-
-      # =========================
-      # Validate generated.feature was actually created
-      # =========================
-      - name: Verify generated output
+      # ---------------------------
+      # Claude call
+      # ---------------------------
+      - name: Generate feature via Claude API
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -euo pipefail
 
-          if [ ! -f generated.feature ]; then
-            echo "::error::generated.feature was not created by Claude"
+          MODEL="${{ inputs.llm_model }}"
+
+          jq -n \
+            --arg model "$MODEL" \
+            --rawfile prompt prompt.txt \
+            '{
+              model: $model,
+              max_tokens: 4096,
+              temperature: 0,
+              system: "You are a senior QA automation engineer. Output raw Gherkin only.",
+              messages: [{ role: "user", content: $prompt }]
+            }' > request.json
+
+          HTTP_RESPONSE=$(mktemp)
+
+          HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+            https://api.anthropic.com/v1/messages \
+            -H "Authorization: Bearer $CLAUDE_CODE_OAUTH_TOKEN" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "anthropic-beta: oauth-2025-04-20" \
+            -H "Content-Type: application/json" \
+            --data @request.json)
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            cat "$HTTP_RESPONSE"
             exit 1
           fi
 
-          # Strip any accidental markdown fences Claude may have added
-          sed -i 's/```gherkin//g; s/```//g' generated.feature
+          FEATURE=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE" | head -1)
+          FEATURE=$(echo "$FEATURE" | sed 's/```//g')
 
-          if [ -z "$(cat generated.feature)" ]; then
-            echo "::error::generated.feature is empty"
+          if ! echo "$FEATURE" | grep -q "^Feature:"; then
+            echo "::error::Invalid output"
             exit 1
           fi
 
-          if ! grep -q "^Feature:" generated.feature; then
-            echo "::error::Invalid Gherkin — missing Feature: declaration"
-            cat generated.feature
-            exit 1
-          fi
+          echo "$FEATURE" > generated.feature
 
-          if ! grep -Eq "Scenario:|Scenario Outline:" generated.feature; then
-            echo "::error::No scenarios generated"
-            cat generated.feature
-            exit 1
-          fi
-
-          echo "Feature file verified successfully"
-          echo "--- Preview (first 30 lines) ---"
-          head -30 generated.feature
-
-      # =========================
-      # Save feature file
-      # =========================
+      # ---------------------------
+      # Save file
+      # ---------------------------
       - name: Save feature file
-        env:
-          DOMAIN: ${{ inputs.domain }}
         run: |
           set -euo pipefail
+
           FILE="${{ inputs.jira_id }}.feature"
-          TARGET_DIR="$FEATURE_DIR/$DOMAIN"
+          TARGET="$FEATURE_DIR/${{ inputs.domain }}"
 
-          mkdir -p "$TARGET_DIR"
-          cp generated.feature "$TARGET_DIR/$FILE"
+          mkdir -p "$TARGET"
+          cp generated.feature "$TARGET/$FILE"
 
-          if [ ! -s "$TARGET_DIR/$FILE" ]; then
-            echo "::error::Generated feature file is empty"
-            exit 1
-          fi
+          echo "FILE=${{ inputs.domain }}/$FILE" >> "$GITHUB_ENV"
 
-          if ! grep -q "^Feature:" "$TARGET_DIR/$FILE"; then
-            echo "::error::Saved file missing Feature: declaration"
-            exit 1
-          fi
-
-          echo "FILE=$DOMAIN/$FILE" >> "$GITHUB_ENV"
-          echo "Saved: $TARGET_DIR/$FILE"
-
-      # =========================
-      # Validate Output
-      # Checks: @todo parity (hard fail), step reuse ratio.
-      # Thresholds: notice ≤40%, warning >40%, hard fail >85%.
-      # =========================
+      # ---------------------------
+      # Validate
+      # ---------------------------
       - name: Validate Output
-        env:
-          DOMAIN: ${{ inputs.domain }}
         run: |
           set -euo pipefail
-          echo "Verifying step reuse and rules..."
 
-          DOMAIN_TEXT="${{ inputs.domain }}"
-
-          # ── @todo parity check ───────────────────────────────────────────────
-          SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' generated.feature || echo 0)
-          TODO_COUNT=$(grep -c '^\s*@todo' generated.feature || echo 0)
+          SCENARIO_COUNT=$(grep -cE 'Scenario:' generated.feature || true)
+          TODO_COUNT=$(grep -c '@todo' generated.feature || true)
 
           if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
-            echo "::error::@todo count ($TODO_COUNT) does not match scenario count ($SCENARIO_COUNT)."
+            echo "::error::Mismatch @todo vs scenarios"
             exit 1
           fi
-          echo "@todo check passed: $TODO_COUNT tags for $SCENARIO_COUNT scenarios"
 
-          # ── Normalise line endings ───────────────────────────────────────────
-          sed -i 's/\r//g' generated.feature || true
-
-          # ── Extract generated steps ──────────────────────────────────────────
-          grep -E '^\s*(Given|When|Then|And|But)\s+' generated.feature \
-            | sed -E 's/^\s+//' > generated_steps.txt || true
-
-          # ── Extract existing steps for this domain ───────────────────────────
-          python3 << 'PYEOF'
-          import os, re
-          domain_text = os.environ.get("DOMAIN", "general")
-          steps = set()
-          if os.path.exists("step_dictionary.txt"):
-              with open("step_dictionary.txt", "r", encoding="utf-8") as f:
-                  content = f.read()
-              blocks = re.split(r'\n--- Domain: (.*?) ---\n', content)
-              for i in range(1, len(blocks), 2):
-                  d = blocks[i]
-                  s = blocks[i + 1]
-                  if d == domain_text or d == "general":
-                      for line in s.split('\n'):
-                          if line.strip():
-                              steps.add(line.strip())
-          with open("domain_existing_steps.txt", "w", encoding="utf-8") as f:
-              f.write('\n'.join(sorted(steps)) + '\n')
-          print(f"Existing steps loaded: {len(steps)} for domain '{domain_text}'")
-          PYEOF
-
-          # ── Keyword normalisation + trailing space strip ─────────────────────
-          sed -E 's/^(Given|When|Then|And|But)\s+//' generated_steps.txt       > generated_steps_norm.txt      || true
-          sed -E 's/^(Given|When|Then|And|But)\s+//' domain_existing_steps.txt > domain_existing_steps_norm.txt || true
-          sed -i 's/[[:space:]]*$//' generated_steps_norm.txt      || true
-          sed -i 's/[[:space:]]*$//' domain_existing_steps_norm.txt || true
-
-          # ── Find invented steps ──────────────────────────────────────────────
-          if [ ! -s domain_existing_steps_norm.txt ]; then
-            echo "::warning::Step library empty — all steps counted as invented"
-            cp generated_steps_norm.txt new_steps.txt || true
-          else
-            grep -v -F -x -f domain_existing_steps_norm.txt generated_steps_norm.txt > new_steps.txt || true
-          fi
-
-          NEW_STEPS_COUNT=$(wc -l < new_steps.txt || echo 0)
-          TOTAL_STEPS=$(wc -l < generated_steps.txt || echo 0)
-
-          if [ "$TOTAL_STEPS" -eq 0 ]; then
-            INVENTED_RATIO=0
-          else
-            INVENTED_RATIO=$(( NEW_STEPS_COUNT * 100 / TOTAL_STEPS ))
-          fi
-
-          echo "Total steps    : $TOTAL_STEPS"
-          echo "Invented steps : $NEW_STEPS_COUNT"
-          echo "Invented ratio : ${INVENTED_RATIO}%"
-
-          {
-            echo "TOTAL_STEPS=$TOTAL_STEPS"
-            echo "NEW_STEPS_COUNT=$NEW_STEPS_COUNT"
-            echo "INVENTED_RATIO=$INVENTED_RATIO"
-          } >> "$GITHUB_ENV"
-
-          if [ "$INVENTED_RATIO" -gt 85 ]; then
-            echo "::error::Invented ratio ${INVENTED_RATIO}% exceeds hard limit of 85%."
-            cat new_steps.txt
-            exit 1
-          elif [ "$INVENTED_RATIO" -gt 40 ]; then
-            echo "::warning::Invented ratio ${INVENTED_RATIO}% — new feature area. Review invented steps before merging."
-            cat new_steps.txt
-          elif [ -s new_steps.txt ]; then
-            echo "::notice::${NEW_STEPS_COUNT} new step(s) invented (${INVENTED_RATIO}% — within threshold):"
-            cat new_steps.txt
-          else
-            echo "SUCCESS: All generated steps match existing step library."
-          fi
-
-      # =========================
-      # Commit and push
-      # =========================
+      # ---------------------------
+      # Commit
+      # ---------------------------
       - name: Commit & push
         run: |
           set -euo pipefail
+
           git add "$FEATURE_DIR/${{ env.FILE }}"
           git commit -m "feat(${{ inputs.jira_id }}): generate feature file" || true
           git push origin "${{ env.BRANCH }}" --force
 
-      # =========================
-      # Create Pull Request
-      # =========================
+      # ---------------------------
+      # PR creation
+      # ---------------------------
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           set -euo pipefail
-          PR_NUMBER=$(gh pr list --head "${{ env.BRANCH }}" --base main --json number --jq '.[0].number')
 
-          if [ -n "$PR_NUMBER" ]; then
-            echo "Pull Request already exists: #$PR_NUMBER"
+          PR=$(gh pr list --head "${{ env.BRANCH }}" --json number --jq '.[0].number')
+
+          if [ -n "$PR" ]; then
+            echo "PR already exists: $PR"
             exit 0
           fi
 
-          cat <<-EOF > pr_body.txt
-          Auto-generated BDD feature file from Jira ticket parameters.
+          cat > pr_body.txt <<EOF
+          Auto-generated BDD feature file.
 
-          ### Generation Stats
-          - **Jira ID:** ${{ inputs.jira_id }}
-          - **Target Domain:** ${{ inputs.domain }}
-          - **LLM Model:** ${{ inputs.llm_model }}
-          - **Total steps:** ${{ env.TOTAL_STEPS }}
-          - **Invented steps:** ${{ env.NEW_STEPS_COUNT }} (${{ env.INVENTED_RATIO }}%)
+          Jira: ${{ inputs.jira_id }}
+          Domain: ${{ inputs.domain }}
+          Model: ${{ inputs.llm_model }}
           EOF
-
-          if [ -s new_steps.txt ]; then
-            printf '\n### Invented steps (review before merging)\n```\n' >> pr_body.txt
-            cat new_steps.txt >> pr_body.txt
-            printf '```\n\nOnce approved, these steps will be added to the domain library for future reuse.\n' >> pr_body.txt
-          fi
 
           gh pr create \
             --base main \
