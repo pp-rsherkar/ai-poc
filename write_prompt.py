@@ -2,8 +2,9 @@
 write_prompt.py
 Usage: python3 write_prompt.py <jira_id> <domain>
 
-Reads env vars: SUMMARY, DESCRIPTION, COMMENTS, FEATURE_DIR
-Reads files:    step_dictionary.txt, scenario_dictionary.txt
+Reads env vars: SUMMARY, FEATURE_DIR
+Reads files:    jira_description.txt, jira_comments.txt,
+                step_dictionary.txt, scenario_dictionary.txt
 Writes:         prompt.txt
 """
 import os
@@ -24,7 +25,6 @@ feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 # ── Pull Jira content ─────────────────────────────────────────────────────────
 summary_trim = os.environ.get("SUMMARY", "No Summary")[:300]
 
-# Read description from file (avoids GitHub Actions env var truncation)
 desc_file = "jira_description.txt"
 if os.path.exists(desc_file):
     with open(desc_file, "r", encoding="utf-8") as f:
@@ -34,7 +34,6 @@ else:
     desc_trim = os.environ.get("DESCRIPTION", "No Description")[:8000]
     print("::warning::jira_description.txt not found, falling back to env var")
 
-# Read comments from file
 comments_file = "jira_comments.txt"
 if os.path.exists(comments_file):
     with open(comments_file, "r", encoding="utf-8") as f:
@@ -95,18 +94,76 @@ if os.path.exists("scenario_dictionary.txt"):
     print(f"Scenario context: {len(scenarios)} titles, showing last 30")
 
 # ── Build prompt ──────────────────────────────────────────────────────────────
-prompt = f"""HARD RULES:
-1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
+prompt = f"""STEP 1 — READ THE TICKET
+Read the JIRA ticket below completely before doing anything else.
+
+JIRA:
+ID: {jira_id}
+TARGET DOMAIN: {domain_text}
+SUMMARY: {summary_trim}
+DESCRIPTION: {desc_trim}
+COMMENTS: {comments_trim}
+
+STEP 2 — EXTRACT (fill every field below before writing any Gherkin)
+
+USER ROLES EXTRACTION — search the ticket for every user type mentioned or implied:
+  - Look for words: user, admin, internal, external, permissioned, read-only, viewer, editor, owner
+  - Look for phrases: "if permitted", "access level", "logged in as", "role"
+  - If a role is implied by context (e.g. "admin panel" → admin user), include it
+  - Write every role you found as a comma-separated list
+  - If truly none found, write "default authenticated user" — never leave this blank
+
+UI COMPONENTS EXTRACTION — list every UI element mentioned:
+  - Look for: list, table, form, dropdown, modal, panel, button, column, filter, search, sort, page, tab
+  - Write every component found as a comma-separated list, or "none" if absent
+
+DATA OPERATIONS EXTRACTION — list every data action mentioned:
+  - Look for: create, edit, update, delete, save, import, export, modify, clear, reset
+  - Write every operation found, or "none" if absent
+
+HISTORICAL RISKS EXTRACTION — list every related ticket or defect pattern mentioned:
+  - Look for: ticket IDs (e.g. ET-XXXX, PROD-XXXX), words like "regression", "related to", "similar issue"
+  - Write each as "TICKET-ID: risk description", or "none" if absent
+
+AMBIGUITIES EXTRACTION — list every statement with two possible interpretations:
+  - Look for: "should", "expected to", "may", "depending on", "based on", unclear scope
+  - Write each ambiguity and both interpretations, or "none" if absent
+
+PAGES/MODULES EXTRACTION — list every distinct page or feature area mentioned:
+  - Write each area separately, or "none" if absent
+
+STEP 3 — WRITE COVERAGE PLAN
+Using your extractions above, fill in this exact block:
+
+<coverage_plan>
+- User roles identified: [paste your USER ROLES EXTRACTION result here]
+- UI components identified: [paste your UI COMPONENTS EXTRACTION result here]
+- Data operations identified: [paste your DATA OPERATIONS EXTRACTION result here]
+- Historical risks identified: [paste your HISTORICAL RISKS EXTRACTION result here]
+- Ambiguities to resolve: [paste your AMBIGUITIES EXTRACTION result here]
+- Pages or modules to cover: [paste your PAGES/MODULES EXTRACTION result here]
+- Scenario count planned: [exact number of scenarios you will write — commit to this number]
+</coverage_plan>
+
+STEP 4 — GENERATE SCENARIOS
+Using the coverage_plan above, generate Gherkin scenarios.
+Every single item listed in coverage_plan MUST produce at least one scenario.
+
+HARD RULES:
+1. Output ONLY raw valid Gherkin after </coverage_plan>. No markdown, no code fences, no explanations.
 2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
 3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
+4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST
+   be selected from the STEP DICTIONARY if a functional equivalent exists.
+   If you must invent a new step, mark it with a comment: # NEW STEP
 5. Never use placeholder steps. Write the full meaningful step text always.
-6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
+6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters
+   defined in an Examples table.
 
 DECISION RULES:
 - Use plain Scenario by default.
-- CRITICAL TOKEN LIMIT RULE: If a feature or edge case applies to multiple modules, you MUST use a single Scenario Outline with an Examples table. DO NOT write separate, repetitive Scenarios for each list type.
-- Use Scenario Outline + Examples ONLY when same steps apply to 2+ distinct data combinations AND Examples has 2+ rows.
+- Use Scenario Outline + Examples ONLY when same steps apply to 2+ distinct data combinations
+  AND Examples has 2+ rows.
 - Use a data table when a step needs 3+ key-value pairs or a list.
 
 DESCRIPTION INTERPRETATION RULES:
@@ -120,97 +177,40 @@ For ANY style:
 - Never skip a scope item. Infer behaviour from the name if ACs are missing.
 - Use COMMENTS for edge cases and supplementary context.
 
-SCENARIO GENERATION:
-1. Read full DESCRIPTION and COMMENTS.
-2. Identify every functional scope item.
-3. For each item write scenarios covering happy path and negative/validation (only if inferable).
-4. Steps: Given / When / Then / And / But order.
-5. Business-readable language only. No technical details.
-6. One behaviour per scenario. No duplicates.
+SCENARIO GENERATION RULES:
+1. For each scope item: write happy path + negative/validation (only if inferable).
+2. For each USER ROLE listed in coverage_plan: write at least one scenario per role.
+3. For each UI COMPONENT listed: cover happy path AND post-action state.
+4. For each HISTORICAL RISK listed: write one scenario targeting that specific risk.
+5. For each AMBIGUITY listed: write one scenario per interpretation.
+6. For each PAGE/MODULE listed: write at least one scenario.
+7. Steps order: Given / When / Then / And / But.
+8. Business-readable language only. No technical details.
+9. One behaviour per scenario. No duplicates.
 
-COVERAGE COMPLETENESS RULES (apply after generating initial scenarios):
-After writing your initial scenarios, perform a coverage gap check against these dimensions:
-
-A. USER ROLE COVERAGE
-   - If the ticket mentions multiple user types (internal, external, admin, read-only, permissioned),
-     each must have at least one scenario.
-   - Never assume only one user type unless explicitly stated.
-   - If roles are implied but not named, infer from context (e.g. "admin panel" implies admin role).
-
-B. UI INTERACTION COVERAGE
-   - For any UI component mentioned (list, table, form, dropdown, modal, panel, search bar):
-     * Happy path interaction
-     * Interaction after a data-changing action (save, edit, delete, submit)
-     * Interaction with another active UI state (filter applied, sort active, search term present)
-   - For sorting/ordering specifically:
-     * Default sort order
-     * Manual sort by each mentioned column
-     * Sort behavior after save/edit
-   - For forms specifically:
-     * Valid submission
-     * Invalid/missing required fields
-     * Boundary values (min/max length, special characters)
-
-C. DATA STATE COVERAGE
-   - For any operation that changes data (create, edit, delete, import, export):
-     * Empty state (no records exist)
-     * Single record
-     * Multiple records / paginated list
-     * Record with optional fields left empty
-     * Rapid/successive operations (if implied by the ticket)
-
-D. SYSTEM BEHAVIOR COVERAGE
-   - For any action that triggers a system response:
-     * Immediate feedback (success/error message)
-     * State after page refresh (cache/persistence behavior)
-     * State after navigation away and back
-   - For any background process (sync, sort, filter, search):
-     * Expected output when process completes correctly
-     * Expected output when input is edge-case (null, empty, special chars)
-
-E. HISTORICAL RISK COVERAGE
-   - If COMMENTS or DESCRIPTION reference related tickets, known defects, or regression areas,
-     write at least one scenario targeting each risk area called out.
-   - Pay special attention to phrases like "regression", "also affects", "related to", "similar issue".
-
-F. AMBIGUITY RESOLUTION
-   - If the description contains ambiguous behavior or two possible interpretations,
-     write one scenario for EACH interpretation, clearly named to distinguish them.
-   - Look for words like "should", "expected to", "may", "depending on" as ambiguity signals.
-
-G. CROSS-COMPONENT COVERAGE
-   - If the ticket mentions that a fix/feature affects multiple areas, pages, or modules,
-     write at least one scenario per affected area.
-   - Do not write one generic scenario and assume it covers all areas.
-
-GAP CHECK INSTRUCTION:
-Before finalizing output, mentally verify:
-- Have I covered every user role mentioned or implied?
-- Have I covered every UI component mentioned (happy path + post-action state)?
-- Have I covered empty, single, and multi-record data states where relevant?
-- Have I covered system behavior after save/refresh/navigation?
-- Have I addressed every historical risk or related ticket mentioned in COMMENTS?
-- Have I written scenarios for both interpretations of any ambiguous requirement?
-- Have I covered every module/page/area explicitly mentioned in the ticket?
-If any answer is NO, add the missing scenarios before outputting.
-
-JIRA:
-ID: {jira_id}
-TARGET DOMAIN: {domain_text}
-SUMMARY: {summary_trim}
-DESCRIPTION: {desc_trim}
-COMMENTS: {comments_trim}
-
-REPOSITORY EXAMPLES (mirror this style exactly):
+REPOSITORY EXAMPLES (mirror this Gherkin style exactly):
 {feature_examples}
 
 EXISTING SCENARIOS (do not duplicate these):
 {scenario_context}
 
-STEP DICTIONARY (use verbatim - invent only if no match exists):
+STEP DICTIONARY (use verbatim — invent only if no match exists):
 {step_context}
 
-OUTPUT FORMAT:
+OUTPUT FORMAT — follow exactly:
+
+PART 1: coverage_plan block (mandatory, comes first)
+<coverage_plan>
+- User roles identified: ...
+- UI components identified: ...
+- Data operations identified: ...
+- Historical risks identified: ...
+- Ambiguities to resolve: ...
+- Pages or modules to cover: ...
+- Scenario count planned: N
+</coverage_plan>
+
+PART 2: Gherkin (raw, immediately after </coverage_plan>)
 Feature: <name from Jira summary>
 
   @todo
@@ -228,6 +228,17 @@ Feature: <name from Jira summary>
       | param  |
       | value1 |
       | value2 |
+
+FINAL ENFORCEMENT — verify before submitting output:
+[ ] Every user role in coverage_plan has at least one scenario
+[ ] Every UI component in coverage_plan has a happy path and post-action scenario
+[ ] Every historical risk in coverage_plan has a dedicated scenario
+[ ] Every ambiguity in coverage_plan has one scenario per interpretation
+[ ] Every page/module in coverage_plan has at least one scenario
+[ ] Total scenario count matches "Scenario count planned" in coverage_plan
+[ ] No scenario duplicates existing scenarios listed above
+[ ] Every step exists in STEP DICTIONARY or is marked # NEW STEP
+If any checkbox would be unchecked, add the missing scenarios before outputting.
 """
 
 with open("prompt.txt", "w", encoding="utf-8") as f:
