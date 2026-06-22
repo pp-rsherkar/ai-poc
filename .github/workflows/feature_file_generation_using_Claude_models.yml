@@ -143,9 +143,14 @@ jobs:
       - name: Parse Jira fields
         run: |
           set -euo pipefail
-          python3 parse_jira_fields.py
+          echo "=== Running parse script ==="
+          python3 scripts/parse_jira_fields.py
+          echo "=== jira_fields.env contents ==="
+          cat jira_fields.env
+          echo "=== Appending to GITHUB_ENV ==="
           cat jira_fields.env >> "$GITHUB_ENV"
-
+          echo "=== Done ==="
+          
       # ---------------------------
       # Prompt builder
       # ---------------------------
