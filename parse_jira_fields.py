@@ -2,7 +2,9 @@ import json
 import os
 
 print("=== parse_jira_fields.py started ===")
-
+print("=== parse_jira_fields.py: script started ===", flush=True)
+print(f"=== Working directory: {os.getcwd()} ===", flush=True)
+print(f"=== Files in cwd: {os.listdir('.')} ===", flush=True)
 
 def extract_adf_text(node):
     if not isinstance(node, dict):
