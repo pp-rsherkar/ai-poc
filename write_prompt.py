@@ -102,6 +102,14 @@ prompt = f"""HARD RULES:
 4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
 5. Never use placeholder steps. Write the full meaningful step text always.
 6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
+7. PERMISSION BOUNDARY RULE — Phrases like "if permitted", "if applicable", "where applicable",
+   "if allowed", "if access is granted" attached to ANY user role are NEVER exclusions.
+   They are PERMISSION BOUNDARY signals. You MUST write TWO scenarios for each such phrase:
+     a. The user HAS permission → verify the expected behaviour occurs correctly.
+     b. The user DOES NOT have permission → verify they are blocked, redirected, or shown
+        an appropriate error.
+   Skipping or merging these into one scenario is a HARD RULE VIOLATION.
+   The word "if" defines the test condition — it does not make the scenario optional.
 
 DECISION RULES:
 - Use plain Scenario by default.
@@ -136,6 +144,9 @@ A. USER ROLE COVERAGE
      each must have at least one scenario.
    - Never assume only one user type unless explicitly stated.
    - If roles are implied but not named, infer from context (e.g. "admin panel" implies admin role).
+   - HARD RULE 7 APPLIES: Any role qualified with "if permitted", "if applicable", or similar
+     conditional language requires TWO scenarios (permitted state + blocked state).
+     Do not skip. Do not merge into one.
 
 B. UI INTERACTION COVERAGE
    - For any UI component mentioned (list, table, form, dropdown, modal, panel, search bar):
@@ -186,6 +197,8 @@ G. CROSS-COMPONENT COVERAGE
 GAP CHECK INSTRUCTION:
 Before finalizing output, mentally verify:
 - Have I covered every user role mentioned or implied?
+- For every role with conditional language ("if permitted"), have I written both the
+  permitted AND blocked scenario? (HARD RULE 7)
 - Have I covered every UI component mentioned (happy path + post-action state)?
 - Have I covered empty, single, and multi-record data states where relevant?
 - Have I covered system behavior after save/refresh/navigation?
