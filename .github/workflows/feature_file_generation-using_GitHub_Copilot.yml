@@ -1,0 +1,347 @@
+name: JIRA - Feature File (GHERKIN) Generator Using GitHub Copilot Models
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: "Enter JIRA Ticket ID (e.g., QA-1321)"
+        required: true
+        type: string
+
+      domain:
+        description: "Target domain/sub-folder"
+        required: true
+        type: choice
+        default: "life"
+        options: [life, studio, hcp]
+
+      llm_model:
+        description: "Select Model"
+        required: true
+        type: choice
+        default: "gpt-4o-mini"
+        options:
+          - gpt-4o-mini       # fastest, cheapest — good default
+          - gpt-4o            # stronger reasoning
+          - gpt-4.1           # latest GPT-4 class
+          - gpt-4.1-mini      # lightweight GPT-4.1
+          - o4-mini           # reasoning model, cost-efficient
+          - gpt-5.3-codex     # Codex agent model
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  FEATURE_DIR: src/test/resources/features
+
+jobs:
+  generate-feature:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ---------------------------
+      # Checkout
+      # ---------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      # ---------------------------
+      # Dependencies
+      # ---------------------------
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      # ---------------------------
+      # Build context (SAFE INLINE PYTHON)
+      # ---------------------------
+      - name: Build AI repository context
+        run: |
+          set -euo pipefail
+          mkdir -p "$FEATURE_DIR"
+
+          python3 - << 'PY'
+          import os, glob, re
+          from collections import defaultdict
+
+          feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
+
+          steps_by_domain = defaultdict(set)
+          scenarios = []
+
+          for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
+              domain = os.path.basename(os.path.dirname(file_path))
+              if domain in ["features", ""]:
+                  domain = "general"
+
+              with open(file_path, "r", encoding="utf-8") as f:
+                  content = f.read()
+
+              for m in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
+                  scenarios.append(f"[{domain}] {m.group(0).strip()}")
+
+              for line in content.split("\n"):
+                  line = line.strip()
+                  if re.match(r'^(Given|When|Then|And|But)\s+', line):
+                      steps_by_domain[domain].add(line)
+
+          with open("step_dictionary.txt", "w", encoding="utf-8") as f:
+              for d, steps in sorted(steps_by_domain.items()):
+                  f.write(f"\n--- Domain: {d} ---\n")
+                  f.write("\n".join(sorted(steps)) + "\n")
+
+          with open("scenario_dictionary.txt", "w", encoding="utf-8") as f:
+              f.write("\n".join(scenarios))
+
+          print("Domains:", sorted(steps_by_domain.keys()))
+          print("Total steps:", sum(len(v) for v in steps_by_domain.values()))
+          print("Total scenarios:", len(scenarios))
+          PY
+
+          echo "Step dictionary  : $(wc -l < step_dictionary.txt) lines"
+          echo "Scenario dict    : $(wc -l < scenario_dictionary.txt) lines"
+
+      # ---------------------------
+      # Create branch
+      # ---------------------------
+      - name: Create branch
+        run: |
+          set -euo pipefail
+
+          BRANCH="${{ inputs.jira_id }}"
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git fetch origin main
+          git checkout -b "$BRANCH" origin/main || git checkout "$BRANCH"
+
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      # ---------------------------
+      # Fetch Jira
+      # ---------------------------
+      - name: Fetch Jira details
+        run: |
+          set -euo pipefail
+
+          RESPONSE=$(curl -s --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+
+          echo "$RESPONSE" > jira_response.json
+
+          echo "=== Description field type ==="
+          jq -r '.fields.description | type' jira_response.json
+
+      # ---------------------------
+      # Parse Jira (SAFE ADF HANDLING)
+      # ---------------------------
+      - name: Parse Jira fields
+        run: |
+          set -euo pipefail
+          python3 parse_jira_fields.py
+          cat jira_fields.env >> "$GITHUB_ENV"
+          echo "=== Description file size ==="
+          wc -c jira_description.txt
+
+      # ---------------------------
+      # Prompt builder
+      # ---------------------------
+      - name: Write prompt
+        run: |
+          set -euo pipefail
+          python3 write_prompt.py \
+            "${{ inputs.jira_id }}" \
+            "${{ inputs.domain }}"
+
+      # ---------------------------
+      # Pre-flight check
+      # ---------------------------
+      - name: Pre-flight size check
+        run: |
+          set -euo pipefail
+
+          BYTES=$(wc -c < prompt.txt)
+          echo "Prompt file: ${BYTES} bytes"
+
+          if [ "$BYTES" -gt 100000 ]; then
+            echo "::error::Prompt exceeds safe limit"
+            exit 1
+          fi
+
+      # ---------------------------
+      # GitHub Models API call (with retry + exponential backoff)
+      # ── Uses your existing GH_TOKEN — no new API key needed
+      # ── Endpoint: models.inference.ai.azure.com (GitHub Models)
+      # ── Auth: Authorization: Bearer $GH_TOKEN
+      # ── Request/response: OpenAI-compatible format
+      # ── o-series models don't support temperature — handled below
+      # ---------------------------
+      - name: Generate feature via GitHub Models API
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          MODEL="${{ inputs.llm_model }}"
+          PROMPT=$(cat prompt.txt)
+
+          # o-series reasoning models do not support temperature parameter
+          if [[ "$MODEL" == o4* || "$MODEL" == o3* || "$MODEL" == o1* ]]; then
+            echo "Reasoning model detected ($MODEL) — omitting temperature"
+            jq -n \
+              --arg model "$MODEL" \
+              --arg prompt "$PROMPT" \
+              '{
+                model: $model,
+                max_tokens: 8192,
+                messages: [
+                  { role: "system", content: "You are a senior QA automation engineer. Output raw Gherkin only." },
+                  { role: "user",   content: $prompt }
+                ]
+              }' > request.json
+          else
+            jq -n \
+              --arg model "$MODEL" \
+              --arg prompt "$PROMPT" \
+              '{
+                model: $model,
+                temperature: 0,
+                max_tokens: 8192,
+                messages: [
+                  { role: "system", content: "You are a senior QA automation engineer. Output raw Gherkin only." },
+                  { role: "user",   content: $prompt }
+                ]
+              }' > request.json
+          fi
+
+          for attempt in 1 2 3 4 5; do
+            echo "Attempt $attempt..."
+
+            HTTP_RESPONSE=$(mktemp)
+
+            HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+              -X POST \
+              "https://models.inference.ai.azure.com/chat/completions" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data @request.json)
+
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              echo "Success on attempt $attempt"
+              break
+            fi
+
+            echo "HTTP $HTTP_CODE on attempt $attempt:"
+            cat "$HTTP_RESPONSE"
+
+            # 429 = rate limit, 503 = overloaded — both retryable
+            if [[ "$HTTP_CODE" -eq 429 || "$HTTP_CODE" -eq 503 ]]; then
+              if [ "$attempt" -lt 5 ]; then
+                WAIT=$((attempt * 30))
+                echo "Retryable error. Waiting ${WAIT}s before retry..."
+                sleep "$WAIT"
+              else
+                echo "::error::GitHub Models API unavailable after 5 attempts"
+                exit 1
+              fi
+            else
+              # 400 bad request, 401 auth, 403 forbidden — fail immediately
+              echo "::error::GitHub Models API returned non-retryable error $HTTP_CODE"
+              exit 1
+            fi
+          done
+
+          FEATURE=$(jq -r '.choices[0].message.content' "$HTTP_RESPONSE")
+          FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g; s/```//g')
+
+          if ! echo "$FEATURE" | grep -q "^Feature:"; then
+            echo "::error::Invalid Gherkin output"
+            echo "=== Raw response ==="
+            cat "$HTTP_RESPONSE"
+            exit 1
+          fi
+
+          echo "$FEATURE" > generated.feature
+
+      # ---------------------------
+      # Save feature
+      # ---------------------------
+      - name: Save feature file
+        run: |
+          set -euo pipefail
+
+          FILE="${{ inputs.jira_id }}.feature"
+          TARGET="$FEATURE_DIR/${{ inputs.domain }}"
+
+          mkdir -p "$TARGET"
+          cp generated.feature "$TARGET/$FILE"
+
+          echo "FILE=${{ inputs.domain }}/$FILE" >> "$GITHUB_ENV"
+
+      # ---------------------------
+      # Validate
+      # ---------------------------
+      - name: Validate Output
+        run: |
+          set -euo pipefail
+
+          SCENARIO_COUNT=$(grep -cE "Scenario:|Scenario Outline:" generated.feature || true)
+          TODO_COUNT=$(grep -c "@todo" generated.feature || true)
+
+          if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
+            echo "::error::Mismatch @todo vs scenarios (Found $TODO_COUNT @todo tags but $SCENARIO_COUNT Scenarios/Outlines)"
+            exit 1
+          fi
+
+          echo "Validation passed: $SCENARIO_COUNT scenarios, $TODO_COUNT @todo tags"
+
+      # ---------------------------
+      # Commit + Push
+      # ---------------------------
+      - name: Commit & push
+        run: |
+          set -euo pipefail
+
+          git add "$FEATURE_DIR/${{ env.FILE }}"
+          git commit -m "feat(${{ inputs.jira_id }}): generate feature file via GitHub Models" || true
+          git push origin "${{ env.BRANCH }}" --force
+
+      # ---------------------------
+      # PR creation
+      # ---------------------------
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          PR=$(gh pr list --head "${{ env.BRANCH }}" --json number --jq '.[0].number')
+
+          if [ -n "$PR" ]; then
+            echo "PR already exists: $PR"
+            exit 0
+          fi
+
+          cat > pr_body.txt <<EOF
+          Auto-generated BDD feature file.
+
+          Jira: ${{ inputs.jira_id }}
+          Domain: ${{ inputs.domain }}
+          Model: ${{ inputs.llm_model }}
+          EOF
+
+          gh pr create \
+            --base main \
+            --head "${{ env.BRANCH }}" \
+            --title "feat(${{ inputs.jira_id }}): ${{ env.SUMMARY }}" \
+            --body-file pr_body.txt
