@@ -211,11 +211,6 @@ STEP DICTIONARY (use verbatim - invent only if no match exists):
 {step_context}
 
 OUTPUT FORMAT:
-- User Roles identified: [list roles, e.g., Internal, External]
-- UI Interactions required: [list interactions, e.g., Manual Sort Last Updated, Search Filter]
-- Historical Risks identified: [list risks from comments, e.g., PROD-13338]
-- Ambiguities resolved: [list how you handled unclear requirements]
-
 Feature: <name from Jira summary>
 
   @todo
