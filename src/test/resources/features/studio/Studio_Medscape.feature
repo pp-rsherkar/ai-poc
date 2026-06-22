@@ -1,5 +1,5 @@
 Feature: Medscape List Match + Consent Workspace in Studio Application
-  1.Verify the workspace creation for Medscape List Match + Consent in Studio Application
+  1. Verify the workspace creation for Medscape List Match + Consent in Studio Application
   2. Verify the saved & published workspace, Explore tab for the valid data
   3. Verify workspace displayed on Dashboard management page with valid data
 
@@ -13,10 +13,10 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
     And User navigates to Studio application
 
   @todo
-  Scenario Outline: Create and save Medscape List Match + Consent workspace to verify error msg for mandatory  fields
+  Scenario Outline: Create and save Medscape List Match + Consent workspace to verify error msg for mandatory fields
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on Medscape List Match + Consent
+    And User clicks on "Medscape List Match + Consent" workspace
     And User selects the advertiser "<ADVERTISER>"
     And Verify the Workspace is created
     Then User clicks the Save button without selecting values in any fields
@@ -24,7 +24,7 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
     Then User selects values in each fields as "<SOURCE_NPI_LIST>", "<BUSINESS>", "<BUSINESS_VERTICAL>", "<PRODUCT>", "<PHARMA>" & "<BRAND>"
     And Verify user is able to select multiple brands options
     And Verify user is able to deselect the multiple selected brand options
-    And  Verify the in-line error messages is displayed for Brand field
+    And Verify the in-line error messages is displayed for Brand field
     And User clicks "Select Columns with Required Attributes" & deselects NPI
     And Verify the error displayed as "Please map the following required attributes before submitting: NPI_NUMBER, CUSTOMER_ID"
     Examples:
@@ -35,15 +35,15 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
   Scenario Outline: Create and save Medscape List Match + Consent workspace without Deliverable ID and navigates to Explore Tab
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on Medscape List Match + Consent
+    And User clicks on "Medscape List Match + Consent" workspace
     And User selects the advertiser "<ADVERTISER>"
     And Verify the Workspace is created
     Then User selects values in each fields as "<SOURCE_NPI_LIST>", "<BUSINESS>", "<BUSINESS_VERTICAL>", "<PRODUCT>", "<PHARMA>", "<BRAND>" and "<STATE_EXCLUSION>"
     And User clicks "Select Columns with Required Attributes" & deselects NPI
     And User maps fields as "<CUSTOMER_ID_FIELD>","<VALUE>" "<NPI_ID>", "<ZIP_FIELD>" and "<ZIP_VALUE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    And Verify the Workspace is saved
+    And User saves the "Medscape List Match + Consent" workspace
+    And Verify the "Medscape List Match + Consent" Workspace is saved
     And Verify the Publish button is disabled
     And Verify system navigate on "Explore" tab from "Mapping" tab
     Then Verify the workspace is visible in workspace management page
@@ -58,7 +58,7 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
   Scenario Outline: Create and save Medscape List Match + Consent workspace and publish the workspace with unique SF Deliverable ID
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on Medscape List Match + Consent
+    And User clicks on "Medscape List Match + Consent" workspace
     And User selects the advertiser "<ADVERTISER>"
     And Verify the Workspace is created
     Then User selects values in each fields as "<SOURCE_NPI_LIST>","<DELIVERABLE_ID>", "<BUSINESS>", "<BUSINESS_VERTICAL>", "<PRODUCT>", "<PHARMA>", "<BRAND>" and "<STATE_EXCLUSION>"
@@ -66,13 +66,13 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
     And User clicks "Select Columns with Required Attributes" & deselects NPI
     And User maps fields as "<CUSTOMER_ID_FIELD>","<VALUE>" "<NPI_ID>", "<ZIP_FIELD>" and "<ZIP_VALUE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    And Verify the Workspace is saved
+    And User saves the "Medscape List Match + Consent" workspace
+    And Verify the "Medscape List Match + Consent" Workspace is saved
     And Verify system navigate on "Explore" tab from "Mapping" tab
     Then User clicks on Publish or download NPI List button
     And User selects Push to Artemis option
-    And User selects Push to Artemis button
-    And Verify workspace is published successfully only with unique SF Deliverable ID
+    And User clicks on Push to Artemis button
+    And Verify "Medscape List Match + Consent" workspace is published successfully only with unique SF Deliverable ID
     And Verify workspace is in Read only mode once published successfully
     Then Verify the workspace is visible in workspace management page
     And Workspace status is updated & Workspace Definition is displayed as per selected fields
@@ -86,22 +86,21 @@ Feature: Medscape List Match + Consent Workspace in Studio Application
   Scenario Outline: Create Medscape List Match + Consent workspace and Validate record counts displayed on Explore tab on saving & publishing the workspace
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on Medscape List Match + Consent
+    And User clicks on "Medscape List Match + Consent" workspace
     And User selects the advertiser "<ADVERTISER>"
     And Verify the Workspace is created
     Then User selects values in each fields as "<SOURCE_NPI_LIST>","<DELIVERABLE_ID>", "<BUSINESS>", "<BUSINESS_VERTICAL>", "<PRODUCT>", "<PHARMA>", "<BRAND>" and "<STATE_EXCLUSION>"
     And And User clicks "Select Columns with Required Attributes" & deselects NPI
     And User maps fields as "<CUSTOMER_ID_FIELD>","<VALUE>" "<NPI_ID>", "<ZIP_FIELD>" and "<ZIP_VALUE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    And Verify the Workspace is saved
+    And User saves the "Medscape List Match + Consent" workspace
+    And Verify the "Medscape List Match + Consent" Workspace is saved
     And Verify the values displayed on Explore tab
     Then User clicks on Publish or download NPI List button
     And User selects Push to Artemis option
     And User selects Push to Artemis button
-    And Verify workspace is published successfully only with unique SF Deliverable ID
+    And Verify "Medscape List Match + Consent" workspace is published
     And Verify the values displayed on Explore tab
-    Then Verify the HCP Explorer Workspace is saved
     Examples:
       | ADVERTISER | SOURCE_NPI_LIST                      | DELIVERABLE_ID | BUSINESS     | BUSINESS_VERTICAL | PRODUCT           | PHARMA                 | BRAND                  | STATE_EXCLUSION | CUSTOMER_ID_FIELD | VALUE       | NPI_ID     | ZIP_FIELD   | ZIP_VALUE |
       | Medscape   | ND_Prod_Opdivo_11May [ID: #92568]    | 338482.141     | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       |                        |                        |                 | Compass_ID        | CUSTOMER_ID | NPI_NUMBER | POSTAL_CODE |           |
