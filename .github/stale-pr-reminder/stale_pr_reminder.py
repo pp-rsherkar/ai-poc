@@ -12,20 +12,17 @@ import requests
 from github import Github
 from github.PullRequest import PullRequest
 
-# Per-status thresholds in days.
-# TESTING values (scale: ~5 min per prod-day)
-# To switch to prod: replace each value with the comment's prod value.
 STATUS_THRESHOLDS = {
-    "No Reviewers Assigned":         0.010,   # prod: 3
-    "Waiting For Review":            0.007,   # prod: 2
-    "Changes Requested":             0.017,   # prod: 5
-    "Review Discussion In Progress": 0.0035,  # prod: 1
-    "Awaiting Additional Approval":  0.0035,  # prod: 1
-    "Ready To Merge":                0.0035,  # prod: 1
+    "No Reviewers Assigned":         3,
+    "Waiting For Review":            2,
+    "Changes Requested":             5,
+    "Review Discussion In Progress": 1,
+    "Awaiting Additional Approval":  1,
+    "Ready To Merge":                1,
 }
 # "Comments Received" threshold is feedback-count dependent:
-#   <= 3 items → 0.010  (prod: 3)
-#    > 3 items → 0.017  (prod: 5)
+#   <= 3 items → 3 days
+#    > 3 items → 5 days
 
 REQUIRED_APPROVALS = int(os.getenv("REQUIRED_APPROVALS", "2"))
 MERGER = os.getenv("MERGER", "pp-pmitra")
@@ -537,7 +534,7 @@ def main() -> None:
             # Per-status threshold (days)
             if status == "Comments Received":
                 feedback_count = len(review_feedback) + len(discussion_comments)
-                threshold_days = 0.010 if feedback_count <= 3 else 0.017  # prod: 3 or 5
+                threshold_days = 3 if feedback_count <= 3 else 5
             else:
                 threshold_days = STATUS_THRESHOLDS[status]
 

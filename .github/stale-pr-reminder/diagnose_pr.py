@@ -80,7 +80,7 @@ print(f"active_thread_lines   : {len(active_lines)} (of {len(summary_lines)} tot
 REQUIRED_APPROVALS = int(os.getenv("REQUIRED_APPROVALS", "2"))
 if status == "Comments Received":
     feedback_count = len(review_feedback) + len(discussion_comments)
-    threshold_days = 0.010 if feedback_count <= 3 else 0.017
+    threshold_days = 3 if feedback_count <= 3 else 5
 else:
     threshold_days = STATUS_THRESHOLDS[status]
 
