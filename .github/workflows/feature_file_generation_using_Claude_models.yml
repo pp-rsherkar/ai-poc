@@ -164,7 +164,7 @@ jobs:
       - name: Write prompt
         run: |
           set -euo pipefail
-          python3 scripts/write_prompt.py \
+          python3 write_prompt.py \
             "${{ inputs.jira_id }}" \
             "${{ inputs.domain }}"
 
