@@ -1,6 +1,6 @@
 """
 write_prompt.py
-Usage: python3 scripts/write_prompt.py <jira_id> <domain>
+Usage: python3 write_prompt.py <jira_id> <domain>
 
 Reads env vars: SUMMARY, DESCRIPTION, COMMENTS, FEATURE_DIR
 Reads files:    step_dictionary.txt, scenario_dictionary.txt
@@ -9,6 +9,7 @@ Writes:         prompt.txt
 import os
 import re
 import sys
+import glob
 
 # ── Args ──────────────────────────────────────────────────────────────────────
 if len(sys.argv) < 3:
@@ -22,12 +23,10 @@ feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 
 # ── Pull Jira content from env ────────────────────────────────────────────────
 summary_trim  = os.environ.get("SUMMARY",      "No Summary")[:300]
-desc_trim = os.environ.get("DESCRIPTION", "No Description")[:8000]
-comments_trim = os.environ.get("COMMENTS",     "No Comments")[:1000]
+desc_trim     = os.environ.get("DESCRIPTION",  "No Description")[:8000]
+comments_trim = os.environ.get("COMMENTS",     "No Comments")[:2000]
 
 # ── Feature examples from target domain (up to 40 lines from 2 files) ────────
-import glob, subprocess
-
 example_files = sorted(
     glob.glob(f"{feature_dir}/{domain_text}/*.feature")
 )[:2]
@@ -109,6 +108,72 @@ SCENARIO GENERATION:
 4. Steps: Given / When / Then / And / But order.
 5. Business-readable language only. No technical details.
 6. One behaviour per scenario. No duplicates.
+
+COVERAGE COMPLETENESS RULES (apply after generating initial scenarios):
+After writing your initial scenarios, perform a coverage gap check against these dimensions:
+
+A. USER ROLE COVERAGE
+   - If the ticket mentions multiple user types (internal, external, admin, read-only, permissioned),
+     each must have at least one scenario.
+   - Never assume only one user type unless explicitly stated.
+   - If roles are implied but not named, infer from context (e.g. "admin panel" implies admin role).
+
+B. UI INTERACTION COVERAGE
+   - For any UI component mentioned (list, table, form, dropdown, modal, panel, search bar):
+     * Happy path interaction
+     * Interaction after a data-changing action (save, edit, delete, submit)
+     * Interaction with another active UI state (filter applied, sort active, search term present)
+   - For sorting/ordering specifically:
+     * Default sort order
+     * Manual sort by each mentioned column
+     * Sort behavior after save/edit
+   - For forms specifically:
+     * Valid submission
+     * Invalid/missing required fields
+     * Boundary values (min/max length, special characters)
+
+C. DATA STATE COVERAGE
+   - For any operation that changes data (create, edit, delete, import, export):
+     * Empty state (no records exist)
+     * Single record
+     * Multiple records / paginated list
+     * Record with optional fields left empty
+     * Rapid/successive operations (if implied by the ticket)
+
+D. SYSTEM BEHAVIOR COVERAGE
+   - For any action that triggers a system response:
+     * Immediate feedback (success/error message)
+     * State after page refresh (cache/persistence behavior)
+     * State after navigation away and back
+   - For any background process (sync, sort, filter, search):
+     * Expected output when process completes correctly
+     * Expected output when input is edge-case (null, empty, special chars)
+
+E. HISTORICAL RISK COVERAGE
+   - If COMMENTS or DESCRIPTION reference related tickets, known defects, or regression areas,
+     write at least one scenario targeting each risk area called out.
+   - Pay special attention to phrases like "regression", "also affects", "related to", "similar issue".
+
+F. AMBIGUITY RESOLUTION
+   - If the description contains ambiguous behavior or two possible interpretations,
+     write one scenario for EACH interpretation, clearly named to distinguish them.
+   - Look for words like "should", "expected to", "may", "depending on" as ambiguity signals.
+
+G. CROSS-COMPONENT COVERAGE
+   - If the ticket mentions that a fix/feature affects multiple areas, pages, or modules,
+     write at least one scenario per affected area.
+   - Do not write one generic scenario and assume it covers all areas.
+
+GAP CHECK INSTRUCTION:
+Before finalizing output, mentally verify:
+- Have I covered every user role mentioned or implied?
+- Have I covered every UI component mentioned (happy path + post-action state)?
+- Have I covered empty, single, and multi-record data states where relevant?
+- Have I covered system behavior after save/refresh/navigation?
+- Have I addressed every historical risk or related ticket mentioned in COMMENTS?
+- Have I written scenarios for both interpretations of any ambiguous requirement?
+- Have I covered every module/page/area explicitly mentioned in the ticket?
+If any answer is NO, add the missing scenarios before outputting.
 
 JIRA:
 ID: {jira_id}
