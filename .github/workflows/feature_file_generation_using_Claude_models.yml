@@ -262,10 +262,14 @@ jobs:
           SCENARIO_COUNT=$(grep -c "Scenario:" generated.feature || true)
           TODO_COUNT=$(grep -c "@todo" generated.feature || true)
 
-          if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
-            echo "::error::Mismatch @todo vs scenarios"
-            exit 1
-          fi
+          # Update this line to catch both "Scenario:" and "Scenario Outline:"
+            SCENARIO_COUNT=$(grep -cE "Scenario:|Scenario Outline:" generated.feature || true)
+            TODO_COUNT=$(grep -c "@todo" generated.feature || true)
+            
+            if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
+              echo "::error::Mismatch @todo vs scenarios (Found $TODO_COUNT @todo tags but $SCENARIO_COUNT Scenarios/Outlines)"
+              exit 1
+            fi
 
       # ---------------------------
       # Commit + Push
