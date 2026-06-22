@@ -178,13 +178,7 @@ jobs:
           fi
 
       # ---------------------------
-      # Gemini API call (with retry)
-      # ── Key differences from Claude:
-      #    1. API key passed as ?key= query param, NOT a header
-      #    2. Request body uses contents/parts structure
-      #    3. System instruction is a separate top-level field
-      #    4. Response extracted from candidates[0].content.parts[0].text
-      #    5. No oauth token needed — API key never expires
+      # Gemini API call
       # ---------------------------
       - name: Generate feature via Gemini API
         env:
@@ -196,8 +190,6 @@ jobs:
           PROMPT=$(cat prompt.txt)
 
           # Build Gemini request body
-          # systemInstruction sets the system prompt
-          # contents/parts carries the user message
           jq -n \
             --arg prompt "$PROMPT" \
             '{
@@ -219,7 +211,6 @@ jobs:
 
             HTTP_RESPONSE=$(mktemp)
 
-            # Note: API key goes in the URL as ?key=, not in headers
             HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
               -X POST \
               "https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}" \
@@ -241,8 +232,6 @@ jobs:
             fi
           done
 
-          # Gemini response structure differs from Claude:
-          # .candidates[0].content.parts[0].text
           FEATURE=$(jq -r '.candidates[0].content.parts[0].text' "$HTTP_RESPONSE")
           FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g; s/```//g')
 
