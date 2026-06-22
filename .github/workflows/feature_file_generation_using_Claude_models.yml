@@ -59,54 +59,51 @@ jobs:
           sudo apt-get install -y jq
 
       # ---------------------------
-      # Build context (Python file instead of heredoc logic inside YAML)
+      # Build context (SAFE INLINE PYTHON)
       # ---------------------------
       - name: Build AI repository context
         run: |
           set -euo pipefail
           mkdir -p "$FEATURE_DIR"
-      
-          cat > /tmp/build_context.py << 'PYEOF'
-          import os, glob, re
-          from collections import defaultdict
-          
-          feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
-          
-          steps_by_domain = defaultdict(set)
-          scenarios = []
-          
-          for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
-              domain = os.path.basename(os.path.dirname(file_path))
-              if domain in ["features", ""]:
-                  domain = "general"
-          
-              with open(file_path, "r", encoding="utf-8") as f:
-                  content = f.read()
-          
-              for match in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
-                  scenarios.append(f"[{domain}] {match.group(0).strip()}")
-          
-              for line in content.split("\n"):
-                  line = line.strip()
-                  if re.match(r'^(Given|When|Then|And|But)\s+', line):
-                      steps_by_domain[domain].add(line)
-          
-          with open("step_dictionary.txt", "w", encoding="utf-8") as f:
-              for domain, steps in sorted(steps_by_domain.items()):
-                  f.write(f"\n--- Domain: {domain} ---\n")
-                  f.write("\n".join(sorted(steps)))
-                  f.write("\n")
-          
-          with open("scenario_dictionary.txt", "w", encoding="utf-8") as f:
-              f.write("\n".join(scenarios))
-          
-          print("Domains found:", sorted(steps_by_domain.keys()))
-          print("Total steps:", sum(len(v) for v in steps_by_domain.values()))
-          print("Total scenarios:", len(scenarios))
-          PYEOF
-      
-          python3 /tmp/build_context.py
-      
+
+          python3 - << 'PY'
+import os, glob, re
+from collections import defaultdict
+
+feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
+
+steps_by_domain = defaultdict(set)
+scenarios = []
+
+for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
+    domain = os.path.basename(os.path.dirname(file_path))
+    if domain in ["features", ""]:
+        domain = "general"
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    for m in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
+        scenarios.append(f"[{domain}] {m.group(0).strip()}")
+
+    for line in content.split("\n"):
+        line = line.strip()
+        if re.match(r'^(Given|When|Then|And|But)\s+', line):
+            steps_by_domain[domain].add(line)
+
+with open("step_dictionary.txt", "w", encoding="utf-8") as f:
+    for d, steps in sorted(steps_by_domain.items()):
+        f.write(f"\n--- Domain: {d} ---\n")
+        f.write("\n".join(sorted(steps)) + "\n")
+
+with open("scenario_dictionary.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(scenarios))
+
+print("Domains:", sorted(steps_by_domain.keys()))
+print("Total steps:", sum(len(v) for v in steps_by_domain.values()))
+print("Total scenarios:", len(scenarios))
+PY
+
           echo "Step dictionary  : $(wc -l < step_dictionary.txt) lines"
           echo "Scenario dict    : $(wc -l < scenario_dictionary.txt) lines"
 
@@ -116,6 +113,7 @@ jobs:
       - name: Create branch
         run: |
           set -euo pipefail
+
           BRANCH="${{ inputs.jira_id }}"
 
           git config user.name "github-actions"
@@ -127,73 +125,64 @@ jobs:
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # ---------------------------
-      # Jira fetch
+      # Fetch Jira
       # ---------------------------
       - name: Fetch Jira details
         run: |
           set -euo pipefail
 
-          RESPONSE=$(curl -s --fail \
+          curl -s --fail \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
-            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
-
-          echo "$RESPONSE" > jira_response.json
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}" \
+            > jira_response.json
 
       # ---------------------------
-      # Parse Jira fields (ADF-aware)
+      # Parse Jira (SAFE ADF HANDLING)
       # ---------------------------
       - name: Parse Jira fields
         run: |
           set -euo pipefail
-          python3 - << 'PYEOF'
-          import json, os
-          
-          def extract_adf_text(node):
-              if not isinstance(node, dict):
-                  return ""
-              text = ""
-              node_type = node.get("type", "")
-              if node_type == "text":
-                  return node.get("text", "")
-              block_types = {"paragraph", "heading", "bulletList",
-                             "orderedList", "listItem", "blockquote",
-                             "codeBlock", "panel", "rule", "mediaGroup"}
-              for child in node.get("content", []):
-                  text += extract_adf_text(child)
-              if node_type in block_types:
-                  text += "\n"
-              return text
-          
-          with open("jira_response.json", "r", encoding="utf-8") as f:
-              data = json.load(f)
-          
-          fields      = data.get("fields", {})
-          summary     = fields.get("summary", "No Summary")[:300]
-          desc_node   = fields.get("description") or {}
-          description = extract_adf_text(desc_node).strip()[:12000]
-          
-          comments_parts = []
-          for c in fields.get("comment", {}).get("comments", []):
-              body = c.get("body") or {}
-              comments_parts.append(extract_adf_text(body).strip())
-          comments = "\n".join(comments_parts)[:8000]
-          
-          with open("jira_fields.env", "w", encoding="utf-8") as f:
-              f.write(f"SUMMARY<<ENVSEP\n{summary}\nENVSEP\n")
-              f.write(f"DESCRIPTION<<ENVSEP\n{description}\nENVSEP\n")
-              f.write(f"COMMENTS<<ENVSEP\n{comments}\nENVSEP\n")
-          
-          print(f"Summary     : {len(summary)} chars")
-          print(f"Description : {len(description)} chars")
-          print(f"Comments    : {len(comments)} chars")
-          PYEOF
 
-          cat jira_fields.env >> "$GITHUB_ENV"        
+          python3 - << 'PY'
+import json
 
-    
+def extract(node):
+    if not isinstance(node, dict):
+        return ""
+    if node.get("type") == "text":
+        return node.get("text", "")
+    out = ""
+    for c in node.get("content", []):
+        out += extract(c)
+    return out
+
+with open("jira_response.json") as f:
+    data = json.load(f)
+
+fields = data.get("fields", {})
+
+summary = (fields.get("summary") or "No Summary")[:300]
+desc = extract(fields.get("description") or {})[:12000]
+
+comments = []
+for c in fields.get("comment", {}).get("comments", []):
+    comments.append(extract(c.get("body") or {}))
+
+comments = "\n".join(comments)[:8000]
+
+with open("jira_fields.env", "w") as f:
+    f.write(f"SUMMARY<<EOF\n{summary}\nEOF\n")
+    f.write(f"DESCRIPTION<<EOF\n{desc}\nEOF\n")
+    f.write(f"COMMENTS<<EOF\n{comments}\nEOF\n")
+
+print("Jira parsed OK")
+PY
+
+          cat jira_fields.env >> "$GITHUB_ENV"
+
       # ---------------------------
-      # Prompt builder (moved to script)
+      # Prompt builder
       # ---------------------------
       - name: Write prompt
         run: |
@@ -203,13 +192,13 @@ jobs:
             "${{ inputs.domain }}"
 
       # ---------------------------
-      # Safety check
+      # Pre-flight check
       # ---------------------------
       - name: Pre-flight size check
         run: |
           set -euo pipefail
-          BYTES=$(wc -c < prompt.txt)
 
+          BYTES=$(wc -c < prompt.txt)
           echo "Prompt file: ${BYTES} bytes"
 
           if [ "$BYTES" -gt 100000 ]; then
@@ -218,13 +207,14 @@ jobs:
           fi
 
       # ---------------------------
-      # Claude call
+      # Claude API call (with retry)
       # ---------------------------
       - name: Generate feature via Claude API
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -euo pipefail
+
           MODEL="${{ inputs.llm_model }}"
 
           jq -n \
@@ -240,7 +230,9 @@ jobs:
 
           for attempt in 1 2 3; do
             echo "Attempt $attempt..."
+
             HTTP_RESPONSE=$(mktemp)
+
             HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
               https://api.anthropic.com/v1/messages \
               -H "Authorization: Bearer $CLAUDE_CODE_OAUTH_TOKEN" \
@@ -253,14 +245,12 @@ jobs:
               break
             fi
 
-            echo "HTTP $HTTP_CODE — response:"
             cat "$HTTP_RESPONSE"
 
             if [ "$attempt" -lt 3 ]; then
-              echo "Waiting 60s before retry..."
               sleep 60
             else
-              echo "::error::Claude API failed after 3 attempts"
+              echo "::error::Claude API failed after retries"
               exit 1
             fi
           done
@@ -269,15 +259,14 @@ jobs:
           FEATURE=$(echo "$FEATURE" | sed 's/```//g')
 
           if ! echo "$FEATURE" | grep -q "^Feature:"; then
-            echo "::error::Invalid output"
+            echo "::error::Invalid Gherkin output"
             exit 1
           fi
 
           echo "$FEATURE" > generated.feature
-          echo "Feature file generated successfully"
 
       # ---------------------------
-      # Save file
+      # Save feature
       # ---------------------------
       - name: Save feature file
         run: |
@@ -298,8 +287,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          SCENARIO_COUNT=$(grep -cE 'Scenario:' generated.feature || true)
-          TODO_COUNT=$(grep -c '@todo' generated.feature || true)
+          SCENARIO_COUNT=$(grep -c "Scenario:" generated.feature || true)
+          TODO_COUNT=$(grep -c "@todo" generated.feature || true)
 
           if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
             echo "::error::Mismatch @todo vs scenarios"
@@ -307,7 +296,7 @@ jobs:
           fi
 
       # ---------------------------
-      # Commit
+      # Commit + Push
       # ---------------------------
       - name: Commit & push
         run: |
@@ -334,12 +323,12 @@ jobs:
           fi
 
           cat > pr_body.txt <<EOF
-          Auto-generated BDD feature file.
+Auto-generated BDD feature file.
 
-          Jira: ${{ inputs.jira_id }}
-          Domain: ${{ inputs.domain }}
-          Model: ${{ inputs.llm_model }}
-          EOF
+Jira: ${{ inputs.jira_id }}
+Domain: ${{ inputs.domain }}
+Model: ${{ inputs.llm_model }}
+EOF
 
           gh pr create \
             --base main \
