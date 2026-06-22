@@ -152,7 +152,7 @@ jobs:
           ls -lh jira_response.json
 
           echo "=== Running parse script ==="
-          python3 scripts/parse_jira_fields.py
+          python3 parse_jira_fields.py
 
           echo "=== jira_fields.env contents ==="
           cat jira_fields.env
