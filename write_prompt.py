@@ -22,7 +22,7 @@ feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 
 # ── Pull Jira content from env ────────────────────────────────────────────────
 summary_trim  = os.environ.get("SUMMARY",      "No Summary")[:300]
-desc_trim     = os.environ.get("DESCRIPTION",  "No Description")
+desc_trim = os.environ.get("DESCRIPTION", "No Description")[:8000]
 comments_trim = os.environ.get("COMMENTS",     "No Comments")[:1000]
 
 # ── Feature examples from target domain (up to 40 lines from 2 files) ────────
