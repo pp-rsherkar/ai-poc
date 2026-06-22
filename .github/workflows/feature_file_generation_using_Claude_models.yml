@@ -131,11 +131,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          curl -s --fail \
+          RESPONSE=$(curl -s --fail \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
             -H "Accept: application/json" \
-            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}" \
-            > jira_response.json
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+
+          echo "$RESPONSE" > jira_response.json
+
+          # Debug: show what format description is in
+          echo "=== Description field type ==="
+          jq -r '.fields.description | type' jira_response.json
+          echo "=== Description preview ==="
+          jq -r '.fields.description' jira_response.json | head -c 500
 
       # ---------------------------
       # Parse Jira (SAFE ADF HANDLING)
