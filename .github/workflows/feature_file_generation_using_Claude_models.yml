@@ -231,7 +231,7 @@ jobs:
             fi
           done
 
-          FEATURE=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE" | head -1)
+          FEATURE=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE")
           FEATURE=$(echo "$FEATURE" | sed 's/```//g')
 
           if ! echo "$FEATURE" | grep -q "^Feature:"; then
