@@ -183,10 +183,9 @@ jobs:
       # ---------------------------
       - name: Generate feature via Claude API
         env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set -euo pipefail
-
           MODEL="${{ inputs.llm_model }}"
 
           jq -n \
@@ -202,14 +201,11 @@ jobs:
 
           for attempt in 1 2 3; do
             echo "Attempt $attempt..."
-
             HTTP_RESPONSE=$(mktemp)
-
             HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
               https://api.anthropic.com/v1/messages \
-              -H "Authorization: Bearer $CLAUDE_CODE_OAUTH_TOKEN" \
+              -H "x-api-key: $ANTHROPIC_API_KEY" \
               -H "anthropic-version: 2023-06-01" \
-              -H "anthropic-beta: oauth-2025-04-20" \
               -H "Content-Type: application/json" \
               --data @request.json)
 
@@ -217,18 +213,21 @@ jobs:
               break
             fi
 
+            echo "HTTP $HTTP_CODE — response:"
             cat "$HTTP_RESPONSE"
 
             if [ "$attempt" -lt 3 ]; then
+              echo "Waiting 60s before retry..."
               sleep 60
             else
-              echo "::error::Claude API failed after retries"
+              echo "::error::Claude API failed after 3 attempts"
               exit 1
             fi
           done
 
           FEATURE=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE")
-          FEATURE=$(echo "$FEATURE" | sed 's/```//g')
+          FEATURE=$(echo "$FEATURE" | sed '/<coverage_plan>/,/<\/coverage_plan>/d')
+          FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g; s/```//g')
 
           if ! echo "$FEATURE" | grep -q "^Feature:"; then
             echo "::error::Invalid Gherkin output"
@@ -236,6 +235,7 @@ jobs:
           fi
 
           echo "$FEATURE" > generated.feature
+          echo "Feature file generated successfully"
 
       # ---------------------------
       # Save feature
