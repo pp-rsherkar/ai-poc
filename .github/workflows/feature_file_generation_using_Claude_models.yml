@@ -17,32 +17,20 @@ on:
           - studio
           - hcp
       llm_model:
-        description: "Select LLM Model"
+        description: "Select Claude Model"
         required: true
         type: choice
-        default: "meta/llama-3.3-70b-instruct"
+        default: "claude-sonnet-4-6"
         options:
-          - meta/llama-3.3-70b-instruct
-          - meta/llama-4-maverick-17b-128e-instruct-fp8
-          - meta/llama-4-scout-17b-16e-instruct
-          - meta/meta-llama-3.1-405b-instruct
-          - meta/meta-llama-3.1-8b-instruct
-          - mistral-ai/mistral-medium-2505
-          - mistral-ai/mistral-small-2503
-          - mistral-ai/codestral-2501
-          - deepseek/deepseek-r1
-          - deepseek/deepseek-r1-0528
-          - deepseek/deepseek-v3-0324
-          - cohere/cohere-command-a
-          - openai/gpt-4.1
-          - openai/gpt-4.1-mini
-          - openai/gpt-4o
-          - openai/gpt-4o-mini
+          - claude-haiku-4-5
+          - claude-sonnet-4-6
+          - claude-opus-4-8
+          - claude-opus-4-7
+          - claude-opus-4-6
 
 permissions:
   contents: write
   pull-requests: write
-  models: read
 
 jobs:
   generate-feature:
@@ -183,20 +171,6 @@ jobs:
           } >> "$GITHUB_ENV"
 
       # =========================
-      # List Available Models
-      # =========================
-      - name: List available models
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          set -euo pipefail
-          RESPONSE=$(curl -sS \
-            https://models.github.ai/catalog/models \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json")
-          echo "$RESPONSE" | jq -r 'if type=="object" and (.data|type=="array") then .data[].id elif type=="array" then .[].id else empty end'
-
-      # =========================
       # Write prompt file
       # Python runs at column-0 — zero indentation bloat in the prompt.
       # Step context: target domain + general (shared steps).
@@ -235,8 +209,6 @@ jobs:
           domain_text = domain if domain else "general"
           
           # ── Step context: target domain + general ───────────────────────────────────
-          # steps is always defined before the file check — prevents NameError on
-          # missing file and keeps blocks/for loop safely inside the if scope.
           steps = []
           if os.path.exists("step_dictionary.txt"):
               with open("step_dictionary.txt", "r", encoding="utf-8") as f:
@@ -249,7 +221,6 @@ jobs:
                       steps.append(f"--- {d} steps ---\n{s.strip()}")
           
           # ── Cap per domain block individually (not total) ────────────────────────────
-          # 120 lines × ~8 tokens/line = ~960 tokens per block — safe within 8k limit.
           MAX_LINES_PER_DOMAIN = 120
           capped_steps = []
           for block in steps:
@@ -369,57 +340,53 @@ jobs:
 
       # =========================
       # Pre-flight size check
-      # Fails fast before wasting an API call.
-      # 8000 tokens × ~4 chars/token = 32000. Leave 10% headroom → 29000 chars.
+      # Claude supports up to 200k tokens — limit kept conservative at 100k chars
+      # (~25k tokens) to stay well within budget and control costs.
       # =========================
       - name: Pre-flight size check
         run: |
           set -euo pipefail
           BYTES=$(wc -c < prompt.txt)
           echo "Prompt file: ${BYTES} bytes"
-          if [ "$BYTES" -gt 29000 ]; then
-            echo "::error::Prompt is ${BYTES} bytes — exceeds 29000 byte safe limit (~7250 tokens)."
+          if [ "$BYTES" -gt 100000 ]; then
+            echo "::error::Prompt is ${BYTES} bytes — exceeds 100000 byte safe limit."
             echo "Reduce description length or step library cap."
             exit 1
           fi
           echo "Size check OK — within limit"
 
       # =========================
-      # Generate Feature File
-      # GitHub Models (Copilot Enterprise tier).
-      # Default model: meta/llama-3.3-70b-instruct — higher token limit.
-      # OpenAI models on GitHub Models are capped at 8k tokens input.
+      # Generate Feature File via Anthropic Claude API
+      # Endpoint : https://api.anthropic.com/v1/messages
+      # Auth     : x-api-key header using ANTHROPIC_API_KEY secret
+      # Models   : claude-haiku-4-5 | claude-sonnet-4-6 | claude-opus-4-8
+      # Note     : Claude uses "messages" array with role:user/assistant.
+      #            System prompt is a top-level "system" field (not a message role).
+      #            max_tokens is always required for Claude.
       # =========================
-      - name: Generate feature via GitHub Models
+      - name: Generate feature via Anthropic Claude API
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set -euo pipefail
           echo "Preparing to generate feature file..."
 
           MODEL="${{ inputs.llm_model }}"
+          echo "Model: $MODEL"
 
-          if echo "$MODEL" | grep -Eq "^openai/(o[0-9]|gpt-5)"; then
-            TOKEN_PARAM="max_completion_tokens"
-          else
-            TOKEN_PARAM="max_tokens"
-          fi
-
-          echo "Model: $MODEL | Token param: $TOKEN_PARAM"
-
+          # Build request JSON — Claude API format
+          # system: top-level string (not inside messages array)
+          # messages: array of { role: "user"|"assistant", content: "..." }
+          # max_tokens: required field
           jq -n \
             --arg model "$MODEL" \
-            --arg tp "$TOKEN_PARAM" \
             --rawfile prompt prompt.txt \
             '{
               model: $model,
+              max_tokens: 4096,
               temperature: 0,
-              ($tp): 4096,
+              system: "You are a senior QA automation engineer. Output raw valid Gherkin only — no markdown, no fences, no commentary.",
               messages: [
-                {
-                  role: "system",
-                  content: "You are a senior QA automation engineer. Output raw valid Gherkin only — no markdown, no fences, no commentary."
-                },
                 {
                   role: "user",
                   content: $prompt
@@ -427,8 +394,8 @@ jobs:
               ]
             }' > request.json
 
-          PROMPT_CHARS=$(jq -r '.messages[1].content' request.json | wc -c)
-          SYSTEM_CHARS=$(jq -r '.messages[0].content' request.json | wc -c)
+          PROMPT_CHARS=$(jq -r '.messages[0].content' request.json | wc -c)
+          SYSTEM_CHARS=$(jq -r '.system' request.json | wc -c)
           TOTAL_BYTES=$(wc -c < request.json)
           echo "Request size  : ${TOTAL_BYTES} bytes"
           echo "System prompt : ${SYSTEM_CHARS} chars (~$(( SYSTEM_CHARS / 4 )) tokens)"
@@ -437,29 +404,30 @@ jobs:
 
           HTTP_RESPONSE=$(mktemp)
           HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
-            https://models.github.ai/inference/chat/completions \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
             -H "Content-Type: application/json" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
             --data @request.json)
 
           echo "HTTP Status: $HTTP_CODE"
           cat "$HTTP_RESPONSE"
 
           if [ "$HTTP_CODE" -ne 200 ]; then
-            echo "::error::Model API request failed with HTTP $HTTP_CODE"
+            echo "::error::Claude API request failed with HTTP $HTTP_CODE"
             exit 1
           fi
 
           RESPONSE=$(cat "$HTTP_RESPONSE")
           echo "$RESPONSE" > model_response.json
 
-          FEATURE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+          # Claude returns: { "content": [{ "type": "text", "text": "..." }], ... }
+          # Extract the text from the first content block
+          FEATURE=$(echo "$RESPONSE" | jq -r '.content[] | select(.type == "text") | .text' | head -1)
           FEATURE=$(echo "$FEATURE" | sed 's/```gherkin//g' | sed 's/```//g')
 
           if [ -z "$FEATURE" ]; then
-            echo "::error::Model returned empty output"
+            echo "::error::Claude returned empty output"
             cat model_response.json
             exit 1
           fi
@@ -475,6 +443,11 @@ jobs:
             echo "$FEATURE"
             exit 1
           fi
+
+          # Log token usage for cost tracking
+          INPUT_TOKENS=$(echo "$RESPONSE" | jq -r '.usage.input_tokens // "unknown"')
+          OUTPUT_TOKENS=$(echo "$RESPONSE" | jq -r '.usage.output_tokens // "unknown"')
+          echo "Token usage — input: $INPUT_TOKENS | output: $OUTPUT_TOKENS"
 
           echo "$FEATURE" > generated.feature
           echo "Feature file generated successfully"
@@ -594,9 +567,6 @@ jobs:
           } >> "$GITHUB_ENV"
 
           # ── Threshold gate ───────────────────────────────────────────────────
-          # >85% hard fail  — step dict empty or completely wrong domain
-          # >40% soft warn  — new feature area, review before merging
-          # ≤40% clean pass
           if [ "$INVENTED_RATIO" -gt 85 ]; then
             echo "::error::Invented ratio ${INVENTED_RATIO}% exceeds hard limit of 85%."
             echo "Step dictionary may be empty or wrong domain selected."
@@ -626,7 +596,6 @@ jobs:
       # =========================
       # Create Pull Request
       # Body: domain, model, step stats, invented step list.
-      # --body-file avoids shell quoting issues with SUMMARY special chars.
       # =========================
       - name: Create Pull Request
         env:
