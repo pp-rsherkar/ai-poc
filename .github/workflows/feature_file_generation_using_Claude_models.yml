@@ -156,7 +156,7 @@ jobs:
           ls -lh jira_response.json || echo "FILE NOT FOUND"
 
           echo "=== Running script ==="
-          python3 scripts/parse_jira_fields.py
+          python3 parse_jira_fields.py
 
           echo "=== Script exit code: $? ==="
 
