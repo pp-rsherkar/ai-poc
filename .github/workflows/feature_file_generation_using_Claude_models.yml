@@ -147,30 +147,11 @@ jobs:
       - name: Parse Jira fields
         run: |
           set -euo pipefail
-
-          echo "=== STEP STARTED ==="
-          echo "=== Python version ==="
-          python3 --version
-
-          echo "=== jira_response.json exists? ==="
-          ls -lh jira_response.json || echo "FILE NOT FOUND"
-
-          echo "=== Running script ==="
           python3 parse_jira_fields.py
-
-          echo "=== Script exit code: $? ==="
-
-          echo "=== jira_fields.env exists? ==="
-          ls -lh jira_fields.env || echo "FILE NOT FOUND"
-
-          echo "=== jira_fields.env full contents ==="
-          cat jira_fields.env
-
-          echo "=== Appending to GITHUB_ENV ==="
+          # Only SUMMARY goes through GITHUB_ENV (it's short and safe)
           cat jira_fields.env >> "$GITHUB_ENV"
-
-          echo "=== GITHUB_ENV DESCRIPTION entry ==="
-          grep -A3 "DESCRIPTION<<ENVSEP" "$GITHUB_ENV" | head -10
+          echo "=== Description file size ==="
+          wc -c jira_description.txt
           
       # ---------------------------
       # Prompt builder
