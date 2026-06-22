@@ -143,42 +143,7 @@ jobs:
       - name: Parse Jira fields
         run: |
           set -euo pipefail
-
-          python3 - << 'PY'
-          import json
-          
-          def extract(node):
-              if not isinstance(node, dict):
-                  return ""
-              if node.get("type") == "text":
-                  return node.get("text", "")
-              out = ""
-              for c in node.get("content", []):
-                  out += extract(c)
-              return out
-          
-          with open("jira_response.json") as f:
-              data = json.load(f)
-          
-          fields = data.get("fields", {})
-          
-          summary = (fields.get("summary") or "No Summary")[:300]
-          desc = extract(fields.get("description") or {})[:12000]
-          
-          comments = []
-          for c in fields.get("comment", {}).get("comments", []):
-              comments.append(extract(c.get("body") or {}))
-          
-          comments = "\n".join(comments)[:8000]
-          
-          with open("jira_fields.env", "w") as f:
-              f.write(f"SUMMARY<<EOF\n{summary}\nEOF\n")
-              f.write(f"DESCRIPTION<<EOF\n{desc}\nEOF\n")
-              f.write(f"COMMENTS<<EOF\n{comments}\nEOF\n")
-          
-          print("Jira parsed OK")
-          PY
-
+          python3 parse_jira_fields.py
           cat jira_fields.env >> "$GITHUB_ENV"
 
       # ---------------------------
