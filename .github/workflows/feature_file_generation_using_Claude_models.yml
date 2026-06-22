@@ -186,25 +186,38 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -euo pipefail
-
+      
           MODEL="${{ inputs.llm_model }}"
-
-          jq -n \
-            --arg model "$MODEL" \
-            --rawfile prompt prompt.txt \
-            '{
-              model: $model,
-              max_tokens: 4096,
-              temperature: 0,
-              system: "You are a senior QA automation engineer. Output raw Gherkin only.",
-              messages: [{ role: "user", content: $prompt }]
-            }' > request.json
-
+      
+          # Claude Opus 4.7+ and 4.8 do not support temperature — omit it for these models
+          # Claude Sonnet 4.6, Haiku 4.5 and older models still support temperature
+          if [[ "$MODEL" == *"opus-4-7"* || "$MODEL" == *"opus-4-8"* ]]; then
+            echo "Extended model detected ($MODEL) — omitting temperature"
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                max_tokens: 4096,
+                system: "You are a senior QA automation engineer. Output raw Gherkin only.",
+                messages: [{ role: "user", content: $prompt }]
+              }' > request.json
+          else
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                max_tokens: 4096,
+                temperature: 0,
+                system: "You are a senior QA automation engineer. Output raw Gherkin only.",
+                messages: [{ role: "user", content: $prompt }]
+              }' > request.json
+          fi
+      
           for attempt in 1 2 3; do
             echo "Attempt $attempt..."
-
             HTTP_RESPONSE=$(mktemp)
-
             HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
               https://api.anthropic.com/v1/messages \
               -H "Authorization: Bearer $CLAUDE_CODE_OAUTH_TOKEN" \
@@ -212,13 +225,13 @@ jobs:
               -H "anthropic-beta: oauth-2025-04-20" \
               -H "Content-Type: application/json" \
               --data @request.json)
-
+      
             if [ "$HTTP_CODE" -eq 200 ]; then
               break
             fi
-
+      
             cat "$HTTP_RESPONSE"
-
+      
             if [ "$attempt" -lt 3 ]; then
               sleep 60
             else
@@ -226,17 +239,18 @@ jobs:
               exit 1
             fi
           done
-
+      
           FEATURE=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE")
           FEATURE=$(echo "$FEATURE" | sed 's/```//g')
-
+      
           if ! echo "$FEATURE" | grep -q "^Feature:"; then
             echo "::error::Invalid Gherkin output"
             exit 1
           fi
-
+      
           echo "$FEATURE" > generated.feature
 
+    
       # ---------------------------
       # Save feature
       # ---------------------------
