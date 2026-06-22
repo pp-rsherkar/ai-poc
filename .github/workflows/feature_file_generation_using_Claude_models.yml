@@ -65,9 +65,48 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$FEATURE_DIR"
-
-          python3 scripts/build_context.py
-
+      
+          cat > /tmp/build_context.py << 'PYEOF'
+          import os, glob, re
+          from collections import defaultdict
+          
+          feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
+          
+          steps_by_domain = defaultdict(set)
+          scenarios = []
+          
+          for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
+              domain = os.path.basename(os.path.dirname(file_path))
+              if domain in ["features", ""]:
+                  domain = "general"
+          
+              with open(file_path, "r", encoding="utf-8") as f:
+                  content = f.read()
+          
+              for match in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
+                  scenarios.append(f"[{domain}] {match.group(0).strip()}")
+          
+              for line in content.split("\n"):
+                  line = line.strip()
+                  if re.match(r'^(Given|When|Then|And|But)\s+', line):
+                      steps_by_domain[domain].add(line)
+          
+          with open("step_dictionary.txt", "w", encoding="utf-8") as f:
+              for domain, steps in sorted(steps_by_domain.items()):
+                  f.write(f"\n--- Domain: {domain} ---\n")
+                  f.write("\n".join(sorted(steps)))
+                  f.write("\n")
+          
+          with open("scenario_dictionary.txt", "w", encoding="utf-8") as f:
+              f.write("\n".join(scenarios))
+          
+          print("Domains found:", sorted(steps_by_domain.keys()))
+          print("Total steps:", sum(len(v) for v in steps_by_domain.values()))
+          print("Total scenarios:", len(scenarios))
+          PYEOF
+      
+          python3 /tmp/build_context.py
+      
           echo "Step dictionary  : $(wc -l < step_dictionary.txt) lines"
           echo "Scenario dict    : $(wc -l < scenario_dictionary.txt) lines"
 
