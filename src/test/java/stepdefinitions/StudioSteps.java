@@ -2,7 +2,6 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -1236,15 +1235,12 @@ public class StudioSteps {
         logger.info("Verifying Day column shows {} dates in ascending order", expectedDays);
         List<String> dates = brandExplorerWorkspace.getTableDates(expectedDays);
         logger.info("Dates from Day column: {}", dates);
-
         Assert.assertEquals("Expected " + expectedDays + " rows in the Day column", expectedDays, dates.size());
-
         for (int i = 0; i < dates.size() - 1; i++) {
             Assert.assertTrue(
                     "Dates are not in ascending order: " + dates.get(i) + " is not before " + dates.get(i + 1),
                     dates.get(i).compareTo(dates.get(i + 1)) < 0);
         }
-
         String expectedEnd = java.time.LocalDate.now().minusDays(1).toString();
         String expectedStart = java.time.LocalDate.now().minusDays(expectedDays).toString();
         logger.info("Expected date range: {} to {}", expectedStart, expectedEnd);

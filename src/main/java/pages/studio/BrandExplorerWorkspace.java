@@ -24,7 +24,7 @@ public class BrandExplorerWorkspace {
     public BrandExplorerWorkspace(Page page) {
         this.page = page;
         this.waitUtility = new WaitUtility(page);
-        this.WORKSPACE_FRAME = this.page.frameLocator("iframe").frameLocator("iframe");
+        this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
         this.BRAND_EXPLORER_CHART = WORKSPACE_FRAME.locator("//div[@class='recharts-responsive-container']");
         this.BRAND_EXPLORER_TABLE = WORKSPACE_FRAME.locator("//div[contains(@class,'Box')]//table");
         this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator(
@@ -72,12 +72,12 @@ public class BrandExplorerWorkspace {
     public List<String> getTimeFrameOptions() {
         Locator options = WORKSPACE_FRAME.locator("//div[@role='dialog']//li[@role='option']");
         waitUtility.waitForLocatorVisible(options.first());
-        List<String> optionlabels = new ArrayList<>();
+        List<String> optionLabels = new ArrayList<>();
         int count = options.count();
         for (int i = 0; i < count; i++) {
-            optionlabels.add(options.nth(i).innerText().trim());
+            optionLabels.add(options.nth(i).innerText().trim());
         }
-        return optionlabels;
+        return optionLabels;
     }
 
     public void selectTimeFramePreset(String timeFrame) {
@@ -97,51 +97,36 @@ public class BrandExplorerWorkspace {
     public List<String> getTableDates(int days) {
         Locator dateCells = WORKSPACE_FRAME.locator(
                 "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
-
         waitUtility.waitForLocatorVisible(dateCells.first());
-
         Set<String> seenDates = new LinkedHashSet<>();
         String previousLastDate = "";
-
         while (seenDates.size() < days) {
-
             int visibleRowCount = dateCells.count();
-
             // Capture all currently visible dates
             for (int i = 0; i < visibleRowCount; i++) {
                 String date = dateCells.nth(i).innerText().trim();
-
                 if (!date.isEmpty()) {
                     seenDates.add(date);
                 }
             }
-
             if (seenDates.size() >= days) {
                 break;
             }
-
             String currentLastDate = dateCells.last().innerText().trim();
-
             // Hover over table before scrolling
             dateCells.last().hover();
-
             // Scroll down
             page.mouse().wheel(0, 75);
-
             // Wait for virtualized rows to refresh
             page.waitForTimeout(1000);
-
             String newLastDate = dateCells.last().innerText().trim();
-
             // No new data loaded
             if (currentLastDate.equals(newLastDate)
                     || currentLastDate.equals(previousLastDate)) {
                 break;
             }
-
             previousLastDate = currentLastDate;
         }
-
         return seenDates.stream()
                 .limit(days)
                 .collect(Collectors.toList());
