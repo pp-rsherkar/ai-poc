@@ -87,6 +87,7 @@ public class TacticSettings {
     private final Locator MANAGEMENT_FEE_LABEL_VALUE;
     private final Locator MANAGEMENT_FEE_OVERRIDE;
     private final Locator MANAGEMENT_FEE_OPTIONS;
+    private final Locator NEW_TARGETING_RULE_BUTTON;
     final Locator PERCENT_TYPE_FEE_INPUT;
     final Locator DOLLAR_TYPE_FEE_INPUT;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
@@ -169,6 +170,7 @@ public class TacticSettings {
         this.MANAGEMENT_FEE_OPTIONS = page.locator("//div[contains(@class,'management-fee-contanier')]//div//button");
         this.PERCENT_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
         this.DOLLAR_TYPE_FEE_INPUT = page.locator("//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
+        this.NEW_TARGETING_RULE_BUTTON = page.locator("//span[text()='New Targeting Rule']");
     }
 
     public String verifyTacticSettingsText() {
@@ -863,43 +865,15 @@ public List<String> fetchEnteredManagementFeeValues() {
     }
 
     public void expandAllTargetingRules() {
-        waitUtility.waitUntilSpinnerHidden();
+        waitUtility.waitForLocatorVisible(NEW_TARGETING_RULE_BUTTON);
+        int safetyLimit = EXPAND_TARGETING_ICONS.count();
+        int expanded = 0;
 
-        int maxAttempts = 6;
-        int attempts = 0;
-        
-        while (attempts < maxAttempts) {
-            int currentCount = EXPAND_TARGETING_ICONS.count();
-
-            if (currentCount == 0) {
-                break;
-            }
-
-            Locator firstIcon = EXPAND_TARGETING_ICONS.first();
-            
-            try {
-                firstIcon.scrollIntoViewIfNeeded();
-                firstIcon.click();
-
-                try {
-                    firstIcon.waitFor(new Locator.WaitForOptions()
-                            .setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
-                            .setTimeout(2000));
-                } catch (Exception e) {
-                    page.waitForFunction(
-                            "prev => document.querySelectorAll(\"i.dropdown.icon.gaExpandTargeting\").length < prev",
-                            currentCount,
-                            new Page.WaitForFunctionOptions().setTimeout(1000));
-                }
-                
-            } catch (Exception e) {
-                int newCount = EXPAND_TARGETING_ICONS.count();
-                if (newCount == currentCount) {
-                    // Count didn't decrease, move to next attempt
-                }
-            }
-            
-            attempts++;
+        while (EXPAND_TARGETING_ICONS.count() > 0 && expanded < safetyLimit) {
+            Locator icon = EXPAND_TARGETING_ICONS.first();
+            icon.scrollIntoViewIfNeeded();
+            icon.click();
+            expanded++;
         }
     }
 }

@@ -523,10 +523,10 @@ public class TacticDetails {
 
             createTactic(tacticName);
             tacticSettings.selectChannel(channel);
-            clickTargetingRuleIcon();
+            navigation.clickOnIcon("Add Targeting Rule");
 
             Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
-            for (int j = 1; j <= 6; j++) {
+            for (int j = 1; row.containsKey("RULE_" + j); j++) {
                 String rule   = row.get("RULE_"   + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
