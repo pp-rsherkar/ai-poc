@@ -7373,4 +7373,28 @@ public class LifeSteps {
         String creativesText = tacticCreatives.verifyTacticCreativesText();
         Assert.assertEquals("Creative(s)", creativesText);
     }
+
+    @When("User creates line items with tactics and targeting rules as below and assigns existing creative named {string}")
+    public void userCreatesLineItemsWithTacticsAndTargetingRules(String creative, DataTable dataTable) {
+        logger.info("Creating line items with tactics and targeting rules");
+        tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative, perTacticRules -> {
+            logger.info("Running per-tactic targeting rule verifications for: {}", perTacticRules.keySet());
+            rulesMap = new LinkedHashMap<>(perTacticRules);
+            keyType = new ArrayList<>(perTacticRules.keySet());
+            keyValues = new ArrayList<>();
+            for (List<String> v : perTacticRules.values()) {
+                keyValues.addAll(v);
+            }
+            verify_the_configured_targeting_rules();
+            verifyTheCountOfRulesAddedForTheSelectedTargetingRuleTypeOnTheTacticSettingsPage();
+        });
+    }
+
+    @Then("Verify the newly created campaign details in the campaign list")
+    public void verifyTheNewlyCreatedCampaignDetailsInTheCampaignList() {
+        campaigns.navigateToCampaignDashboard();
+        logger.info("Searching for Campaign: {}", campaignNameRandom);
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+    }
 }

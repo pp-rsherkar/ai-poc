@@ -488,6 +488,10 @@ public class TacticSettings {
                     }
                     break;
                 case "Endemics":
+                    for (String val : ruleValues) {
+                        String xpath = String.format("//sui-radio-button//label[normalize-space(text())='%s']", val);
+                        isElementVisible(xpath);
+                    }
                     break;
                 case "Geo Targets":
                     GEO_TARGETS_BULK_UPLOAD.click();
@@ -506,11 +510,13 @@ public class TacticSettings {
                         String latitude = parts[0].trim();
                         String longitude = parts[1].trim();
                         String distance = parts[2].trim();
-                        String pointName = parts[3].trim();
+                        String pointName = parts.length > 3 ? parts[3].trim() : "";
                         GEO_RADIUS_LAT.fill(latitude);
                         GEO_RADIUS_LONG.fill(longitude);
                         GEO_RADIUS_DISTANCE.fill(distance);
-                        GEO_RADIUS_POINT_NAME.fill(pointName);
+                        if (!pointName.isEmpty()) {
+                            GEO_RADIUS_POINT_NAME.fill(pointName);
+                        }
                         GEO_RADIUS_SAVE.click();
                     }
                     break;
