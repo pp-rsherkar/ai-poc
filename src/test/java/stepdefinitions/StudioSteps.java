@@ -205,43 +205,6 @@ public class StudioSteps {
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 
-    /*
-        @Then("User selects the Workspace Type as {string}")
-        public void user_selects_the_workspace_type_as(String string) {
-
-        }
-
-        @Then("User selects the advertiser as {string}")
-        public void user_selects_the_advertiser_as(String string) {
-
-        }
-
-        @Then("User selects Source Audience details as {string},{string}")
-        public void user_selects_source_audience_details_as(String string, String string2) {
-
-        }
-
-        @Then("User selects {string}")
-        public void user_selects(String string) {
-
-        }
-
-        @Then("User applies filters to the workspace")
-        public void user_applies_filters_to_the_workspace() {
-
-        }
-
-        @Then("User clicks on Edit button to rename the workspace to {string}")
-        public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
-
-        }
-
-        @Then("Verify the workspace in workspace management page")
-        public void verify_the_workspace_in_workspace_management_page() {
-
-        }
-    */
-
     @And("User clicks on {string} workspace")
     public void userClicksOnWorkspace(String workspaceType) {
         logger.info("Selecting {} workspace", workspaceType);
@@ -1230,11 +1193,6 @@ public class StudioSteps {
         Assert.assertEquals("Default Metric is not as expected", metric, actualMetric);
     }
 
-    @Then("Verify the DTC Workspace is saved")
-    public void verifyTheDTCWorkspaceIsSaved() {
-        //Implementation in progress
-    }
-
     @Then("Verify Time Frame is selected as {string} by default in the workspace")
     public void verifyDefaultTimeFrameInTheWorkspace(String timeFrame) {
         logger.info("Verifying default Time Frame in the workspace");
@@ -1291,42 +1249,5 @@ public class StudioSteps {
         logger.info("Expected date range: {} to {}", expectedStart, expectedEnd);
         Assert.assertEquals("Last date in table does not match yesterday", expectedEnd, dates.get(dates.size() - 1));
         Assert.assertEquals("First date in table does not match expected start", expectedStart, dates.get(0));
-    }
-
-    @When("User attempts to publish the workspace")
-    public void userAttemptsToPublishTheWorkspace() {
-        //Implementation in progress
-    }
-
-    private long uniqueConsumersCount;
-
-    @Then("User captures the {string} count")
-    public void userCapturesTheCount(String metricName) {
-        //Implementation in progress
-    }
-
-    @Then("Verify whether the {string} count is greater than or equals to {int}")
-    public void verifyWhetherTheCountIsGreaterThanOrEqualsTo(String metricName, int expectedCount) {
-        //Implementation in progress
-    }
-
-    @And("User clicks on Submit button")
-    public void userClicksOnSubmitButton() {
-        //Implementation in progress
-    }
-
-    @Then("Verify the dialog message as {string}")
-    public void verifyTheDialogMessageAs(String expectedMessage) {
-        //Implementation in progress
-    }
-
-    @When("User navigates to Workspace Management page")
-    public void userNavigatesToWorkspaceManagementPage() {
-        //Implementation in progress
-    }
-
-    @Then("Verify the workspace status as {string}")
-    public void verifyTheWorkspaceStatusAs(String expectedStatus) {
-        //Implementation in progress
     }
 }
