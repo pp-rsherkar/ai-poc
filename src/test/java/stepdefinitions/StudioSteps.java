@@ -205,43 +205,6 @@ public class StudioSteps {
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 
-    /*
-        @Then("User selects the Workspace Type as {string}")
-        public void user_selects_the_workspace_type_as(String string) {
-
-        }
-
-        @Then("User selects the advertiser as {string}")
-        public void user_selects_the_advertiser_as(String string) {
-
-        }
-
-        @Then("User selects Source Audience details as {string},{string}")
-        public void user_selects_source_audience_details_as(String string, String string2) {
-
-        }
-
-        @Then("User selects {string}")
-        public void user_selects(String string) {
-
-        }
-
-        @Then("User applies filters to the workspace")
-        public void user_applies_filters_to_the_workspace() {
-
-        }
-
-        @Then("User clicks on Edit button to rename the workspace to {string}")
-        public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
-
-        }
-
-        @Then("Verify the workspace in workspace management page")
-        public void verify_the_workspace_in_workspace_management_page() {
-
-        }
-    */
-
     @And("User clicks on {string} workspace")
     public void userClicksOnWorkspace(String workspaceType) {
         logger.info("Selecting {} workspace", workspaceType);
@@ -1288,4 +1251,3 @@ public class StudioSteps {
         Assert.assertEquals("First date in table does not match expected start", expectedStart, dates.get(0));
     }
 }
-
