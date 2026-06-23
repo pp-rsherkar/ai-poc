@@ -1,5 +1,7 @@
 package pages.studio;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -10,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import utils.CommonUtils;
 import utils.WaitUtility;
-
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class ExplorerWorkspace {
     private final Page page;
