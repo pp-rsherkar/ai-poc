@@ -154,7 +154,10 @@
     "params": {
       "protocolVersion": "2024-11-05",
       "capabilities": {},
-      "clientInfo": { "name": "curl", "version": "1.0" }
+      "clientInfo": {
+        "name": "curl",
+        "version": "1.0"
+      }
     }
   },
   "fetchPromptsList": {
@@ -182,19 +185,19 @@
   },
   "createQuery": {
     "jsonrpc": "2.0",
-    "id": 4,
+    "id": 8,
     "method": "tools/call",
     "params": {
       "name": "create_query",
       "arguments": {
         "fields": [
-          "resolved_dimensions.campaign_name",
-          "resolved_measures.total_events"
         ],
         "filters": {
-          "hcp365_core.day": "last 7 days"
         },
-        "limit": "5"
+        "sorts": [
+        ],
+        "limit": "",
+        "looker_pseudo_filters": {}
       }
     }
   },
@@ -205,7 +208,7 @@
     "params": {
       "name": "execute_query",
       "arguments": {
-        "query_slug": "JsrvGZVMy6GvXfy3nCbMbPBxbyKBsJXJ"
+        "query_slug": ""
       }
     }
   }

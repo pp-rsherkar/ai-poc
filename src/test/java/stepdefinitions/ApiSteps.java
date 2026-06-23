@@ -26,6 +26,7 @@ public class ApiSteps {
     JsonNode jsonNode;
     String bearerToken;
     String modifiedName;
+    String query_id;
     Path path = Paths.get("src/main/resources/apiRequest/request.json");
     ApiActions apiActions = new ApiActions();
     ObjectMapper mapper = new ObjectMapper();
@@ -337,6 +338,29 @@ public class ApiSteps {
     public void userCallsTheMcpToolToCreateAQueryUsingDimensionsAndMetricsWithHeaders(Map<String, String> headersConfig) throws IOException {
         JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
         JsonNode templateNode = fullPayload.path("createQuery");
+        ObjectNode arguments =
+                (ObjectNode) templateNode.path("params").path("arguments");
+        // Fields
+        String fieldsValue = headersConfig.get("Dimension");
+        ArrayNode fields = mapper.createArrayNode();
+        Arrays.stream(fieldsValue.split(",")).map(field -> field.replace("\"", "").trim()).forEach(fields::add);
+        arguments.set("fields", fields);
+
+        // Filters
+        ObjectNode filters = mapper.createObjectNode();
+        String filterText = headersConfig.get("Filter");
+        String[] filterParts = filterText.split(",", 2);
+        filters.put(filterParts[0].trim(), filterParts[1].trim());
+        arguments.set("filters", filters);
+
+        // Sorts
+        ArrayNode sorts = mapper.createArrayNode();
+        sorts.add(headersConfig.get("Sort"));
+        arguments.set("sorts", sorts);
+
+        // Limit
+        arguments.put("limit", headersConfig.get("Limit"));
+
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", headersConfig.get("Content-Type"));
         headers.put("Accept", headersConfig.get("Accept"));
@@ -344,6 +368,7 @@ public class ApiSteps {
         headers.put("X-Advertiser-Id", headersConfig.get("X-Advertiser-Id"));
         headers.put("X-User-Id", headersConfig.get("X-User-Id"));
         headers.put("Authorization", "Bearer " + bearerToken);
+
         String requestBody = templateNode.toString();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
@@ -353,12 +378,18 @@ public class ApiSteps {
     public void verifyTheQueryIsCreatedSuccessfullyAndReturnsAQueryId() throws Exception {
         jsonNode = mapper.readTree(apiActions.getCleanJson(response));
         Assert.assertEquals(200, response.status());
+        query_id = jsonNode.path("result").path("structuredContent").path("query_id").asText();
+        Assert.assertFalse( "Slug should not be empty", query_id.isEmpty());
     }
 
     @And("User calls the MCP tool to execute the created query with headers:")
     public void userCallsTheMcpToolToExecuteTheCreatedQueryWithHeaders(Map<String, String> headersConfig) throws IOException {
         JsonNode fullPayload = mapper.readTree(Files.newBufferedReader(path));
         JsonNode templateNode = fullPayload.path("executeQuery");
+        ObjectNode arguments =
+                (ObjectNode) templateNode.path("params").path("arguments");
+        arguments.put("query_slug", query_id);
+
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", headersConfig.get("Content-Type"));
         headers.put("Accept", headersConfig.get("Accept"));
@@ -373,7 +404,18 @@ public class ApiSteps {
 
     @Then("Verify the query execution response contains the retrieved data")
     public void verifyTheQueryExecutionResponseContainsTheRetrievedData() throws Exception {
+        int totalNpi = 0;
+        int totalActiveUsers = 0;
         jsonNode = mapper.readTree(apiActions.getCleanJson(response));
         Assert.assertEquals(200, response.status());
+        String queryResultStr = jsonNode.path("result").path("structuredContent").path("query_result").asText();
+        ArrayNode queryArray = (ArrayNode) mapper.readTree(queryResultStr);
+        Assert.assertFalse( "query_result is empty", queryResultStr.trim().isEmpty());
+        for (JsonNode row : queryArray) {
+            totalNpi += row.path("resolved_measures.distinct_npis").asInt();
+            totalActiveUsers += row.path("custom_measures_ga4.active_user_count_").asInt();
+        }
+        Assert.assertTrue(totalNpi >= 0);
+        Assert.assertTrue(totalActiveUsers >= 0);
     }
 }
