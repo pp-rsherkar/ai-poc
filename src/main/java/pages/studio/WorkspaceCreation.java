@@ -18,6 +18,7 @@ public class WorkspaceCreation {
     private final Locator CREATE_WORKSPACE;
     private final Locator HCP_EXPLORER;
     private final Locator HCP_EXPANSION;
+    private final Locator BRAND_EXPLORER;
     private final Locator BACK_TO_WORKSPACE_DASHBOARD;
     private final Locator WORKSPACE_CREATED_ALERT;
     private final Locator MENU_ICON;
@@ -66,6 +67,7 @@ public class WorkspaceCreation {
                 "//div[text()='Create New Workspace' or contains(text(),'Open New Workspace')]");
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
+        this.BRAND_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'Brand Explorer')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
         this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator(
                 "//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
@@ -134,12 +136,21 @@ public class WorkspaceCreation {
         return HCP_EXPLORER.innerText();
     }
 
+    public String verifyBrandExplorer() {
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        return BRAND_EXPLORER.innerText();
+    }
+
     public String verifyHCPAudienceExpansion() {
         return HCP_EXPANSION.innerText();
     }
 
     public void clickHCPExplorerWorkspace() {
         HCP_EXPLORER.click();
+    }
+
+    public void clickBrandExplorerWorkspace() {
+        BRAND_EXPLORER.click();
     }
 
     public String isWorkspaceCreationAlertDisplayed() {
