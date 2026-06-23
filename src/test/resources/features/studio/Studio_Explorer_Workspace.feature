@@ -246,6 +246,6 @@ Feature: HCP Explorer Workspace creation in Studio using filters, AI Configurato
     When External user searches the workspace name in studio application with "<DRAFT_OPTION>" draft option
     Then External user verifies whether the workspace with "<DRAFT_OPTION>" is visible in workspace management page
     Examples:
-      | ADVERTISER |  | DRAFT_OPTION | WORKSPACE_NAME | ACCOUNT_NAME        |
-      | Abbvie     |  | Public       | Explorer       | PP engineering test |
-      | Abbvie     |  | Private      | Explorer       | PP engineering test |
+      | ADVERTISER |   DRAFT_OPTION | WORKSPACE_NAME | ACCOUNT_NAME        |
+      | Abbvie     |   Public       | Explorer       | PP engineering test |
+      | Abbvie     |   Private      | Explorer       | PP engineering test |
