@@ -44,7 +44,6 @@ public class StudioSteps {
     List<String> metricNames = new ArrayList<>();
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
-    String selectedTimeFrame;
     Path targetFilePath;
 
     @When("the user clicks on Create New Workspace")
@@ -1216,7 +1215,6 @@ public class StudioSteps {
     @When("User selects the timeframe preset {string}")
     public void userSelectsTimeframePreset(String timeFrame) {
         logger.info("Selecting timeframe preset: {}", timeFrame);
-        selectedTimeFrame = timeFrame;
         brandExplorerWorkspace.selectTimeFramePreset(timeFrame);
     }
 
