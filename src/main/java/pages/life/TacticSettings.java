@@ -207,6 +207,7 @@ public class TacticSettings {
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'percent-img')]");
         this.DOLLAR_TYPE_FEE_INPUT = page.locator(
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
+        this.NEW_TARGETING_RULE_BUTTON = page.locator("//span[text()='New Targeting Rule']");
         this.ADD_BID_MULTIPLIER = page.locator(
                 "//div[contains(@class,'no_content_center')]//span[text()='Add Bid Multiplier']");
         this.BEHAVIOUR_SEGMENT = page.locator("//div[contains(@class,'behavior') and contains(@class,'bidMultiplierImages')]");
@@ -1104,6 +1105,8 @@ public class TacticSettings {
 
     public void clickCreativeTab() {
         CREATIVE_TAB.click();
+    }
+
     public void expandAllTargetingRules() {
         waitUtility.waitForLocatorVisible(NEW_TARGETING_RULE_BUTTON);
         int safetyLimit = EXPAND_TARGETING_ICONS.count();
