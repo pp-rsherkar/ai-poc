@@ -526,3 +526,21 @@ Feature: LIFE regression - Create NPI List of following types:
     Examples:
       | ADVERTISER     | LIST_NAME       | TYPE                                                                                                   |
       | 01- Advertiser | SMART_Pixel_NPI | Smart Pixel, NPI List, Prescription Behavior Change, Expand based on Practice and Hospital Affiliation |
+
+    @todo
+  Scenario Outline: Create and delete Medscape List by uploading file "<FILE_NAME>"
+    And User navigates to NPI Lists page
+    When User clicks on Create New List
+    Then Verify creation of NPI List screen is displayed
+    And User selects Medscape List
+    And User enters the Medscape NPI list details as "<LIST_NAME>"
+    And Verify Advertiser is auto selected as "Medscape"
+    And User uploads the file "<FILE_NAME>"
+    And User maps required fields as "<RECORD_ID>","<NPI_ID>","<FIRST_NAME>","<LAST_NAME>" & "<POSTAL_CODE>"
+    And User saves the Medscape List & navigates to loading page with "<MESSAGE>" content
+    And Verify valid details are displayed on Medscape list details preview page
+    When User deletes the created list
+    Then Verify list gets deleted successfully
+    Examples:
+      | LIST_NAME     | FILE_NAME            | RECORD_ID             | NPI_ID     | FIRST_NAME | LAST_NAME | POSTAL_CODE | MESSAGE                                                          |
+      | Medscape_List | NPI_MedscapeList.csv | CUSTOMER_ID(Required) | NPI_NUMBER | FIRST_NAME | LAST_NAME | ZIP         | Soft Matching in Progress... This process may take a few minutes |

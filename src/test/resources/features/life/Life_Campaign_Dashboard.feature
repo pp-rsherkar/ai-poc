@@ -36,7 +36,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     And User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using "<Campaign ID>" and verifies the same status in the respective Line Item and Tactic pages
     Examples:
       | Campaign ID          |
-      | Auto_20260218_024705 |
+      | Auto_20260531_235701 |
 
   @regression
   Scenario Outline: Verify filtering and column customization on Campaign Dashboard

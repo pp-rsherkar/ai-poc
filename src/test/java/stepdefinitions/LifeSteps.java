@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -772,9 +771,7 @@ public class LifeSteps {
     @And("Verify Template tab is selected by default on the Report Templates page")
     public void verifyTabIsSelectedByDefaultOnTheReportTemplatesPage() {
         logger.info("Verifying Template tab is selected by default");
-        Assert.assertTrue(
-                "Template tab is not selected by default",
-                reportTemplates.isTabSelectedByDefault());
+        Assert.assertTrue("Template tab is not selected by default", reportTemplates.isTabSelectedByDefault());
     }
 
     @When("User clicks on New Template")
@@ -874,11 +871,17 @@ public class LifeSteps {
     }
 
     @And("Verify availability of {string}, {string} and {string} actions for the created template")
-    public void verifyAvailabilityOfAndActionsForTheCreatedTemplate(String runReportIcon, String copyIcon, String deleteIcon) {
+    public void verifyAvailabilityOfAndActionsForTheCreatedTemplate(
+            String runReportIcon, String copyIcon, String deleteIcon) {
         logger.info("Verifying availability of action icons for template: {}", templateNameRandom);
-        Assert.assertTrue("Run report Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, runReportIcon));
-        Assert.assertTrue("Copy Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, copyIcon));
-        Assert.assertTrue("Delete Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, deleteIcon));
+        Assert.assertTrue(
+                "Run report Icon is not present",
+                reportTemplates.checkActionIconsForTemplate(templateNameRandom, runReportIcon));
+        Assert.assertTrue(
+                "Copy Icon is not present", reportTemplates.checkActionIconsForTemplate(templateNameRandom, copyIcon));
+        Assert.assertTrue(
+                "Delete Icon is not present",
+                reportTemplates.checkActionIconsForTemplate(templateNameRandom, deleteIcon));
     }
 
     @And("Verify the details of the created template")
@@ -911,9 +914,12 @@ public class LifeSteps {
         reportTemplates.clickDeleteIconFromTemplatePanel();
     }
 
-    @And("Verify error message when no dimensions and metrics are selected and user tries to save the template {string}")
-    public void verifyErrorMessageWhenNoDimensionsAndMetricsAreSelectedAndUserTriesToSaveTheTemplate(String templateName) {
-        logger.info("Verifying error message when no dimensions and metrics are selected for template: {}", templateName);
+    @And(
+            "Verify error message when no dimensions and metrics are selected and user tries to save the template {string}")
+    public void verifyErrorMessageWhenNoDimensionsAndMetricsAreSelectedAndUserTriesToSaveTheTemplate(
+            String templateName) {
+        logger.info(
+                "Verifying error message when no dimensions and metrics are selected for template: {}", templateName);
         reportTemplates.enterTemplateName(templateName);
         reportTemplates.saveReportTemplate();
         Assert.assertEquals("Please select at least 1 dimension and 1 metric", reportTemplates.fetchAlertMessage());
@@ -927,12 +933,13 @@ public class LifeSteps {
 
     @Then("Verify the template is deleted and not displayed in the template list")
     public void verifyTheTemplateIsDeletedAndNotDisplayedInTheTemplateList() {
-        Assert.assertTrue("Delete Report Template Confirmation pop-up is not displayed", reportTemplates.isDeleteReportTemplateConfirmationPopupDisplayed());
+        Assert.assertTrue(
+                "Delete Report Template Confirmation pop-up is not displayed",
+                reportTemplates.isDeleteReportTemplateConfirmationPopupDisplayed());
         reportTemplates.clickDeleteButtonFromConfirmationPopup();
         String actualMessage = reportTemplates.fetchAlertMessage();
-        Assert.assertTrue(
-                actualMessage.contains("Deleted the template.") ||
-                        actualMessage.contains("Can not delete template: This template is being used by grouped templates"));
+        Assert.assertTrue(actualMessage.contains("Deleted the template.")
+                || actualMessage.contains("Can not delete template: This template is being used by grouped templates"));
         logger.info("Verifying template {} is deleted and not displayed in list", templateNameRandom);
         reportTemplates.searchCreatedReportTemplate(templateNameRandom);
         Assert.assertEquals(0, reportTemplates.searchResultRowCount());
@@ -955,6 +962,7 @@ public class LifeSteps {
     @Then("Verify the configured targeting rules")
     public void verify_the_configured_targeting_rules() {
         logger.info("Starting verification of configured targeting rules");
+        tacticSettings.expandAllTargetingRules();
         List<String> expectedNormalizedRuleTypes = normalizeObjectList(keyType);
         int expectedCount = expectedNormalizedRuleTypes.size();
         logger.info("Fetching actual rule types (Expected Count: {})", expectedCount);
@@ -7258,5 +7266,142 @@ public class LifeSteps {
             Assert.assertTrue(
                     "Custom Field is not available", lineItemDetails.isCustomFieldAvailable(uiCustomFieldName));
         }
+    }
+
+    @Then("Verify Bid multiplier panel with all options under below categories")
+    public void verifyTargetingPanelWithAllBidmultiplierUnderBelowCategories(DataTable bidCategory) {
+        tacticSettings.clickBidMultipliers();
+        List<String> bidCategoryList = bidCategory.asList(String.class);
+        logger.info("Verifying Bid multiplier panel contains the following categories: {}", bidCategoryList);
+        for (String category : bidCategoryList) {
+            boolean isPresent = tacticSettings.fetchAndVerifyBidCategoryName(Collections.singletonList(category));
+            Assert.assertTrue("Bid multiplier category '" + category + "' not found or not visible on UI", isPresent);
+        }
+        logger.info("All bid multiplier categories verified successfully");
+    }
+
+    @And("Verify Bid type with respect to category")
+    public void verifyBidTypeWithRespectToCategory(DataTable bidCategoryNameAndType) {
+        logger.info("Verifying Bid types with respect to their categories");
+        Map<String, String> rawMap = bidCategoryNameAndType.asMap(String.class, String.class);
+        Map<String, List<String>> bidCategoryNameAndTypeMap = CommonUtils.processDataTable(rawMap);
+
+        for (Map.Entry<String, List<String>> entry : bidCategoryNameAndTypeMap.entrySet()) {
+            String key = entry.getKey();
+            List<String> bidexpectedValues = entry.getValue();
+            List<String> actualValues = tacticSettings.getBidTypesForCategory(key);
+            for (String bidexpected : bidexpectedValues) {
+                Assert.assertTrue("Expected value '" + bidexpected + "' not found for category '" + key + "'. Found: " + actualValues, actualValues.contains(bidexpected));
+            }
+        }
+
+        logger.info("All Bid types matched their respective categories successfully");
+    }
+
+    @Given("User configures Bid multiplier rules as below with {string}")
+    public void user_selects_the_Bid_multiplier_rules(String fillValue,DataTable bidRuleTypeAndOptions) {
+        logger.info("Configuring Bid multiplier rules from DataTable");
+        Map<String, String> rawMap = bidRuleTypeAndOptions.asMap(String.class, String.class);
+        Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
+        keyType.clear();
+        keyValues.clear();
+        for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
+            keyType.add(entry.getKey());
+            keyValues.addAll(entry.getValue());
+            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(),fillValue);
+        }
+        logger.info("Closing Bid Rule Type panel");
+        tacticSettings.closeRuleTypePanel();
+    }
+
+    @Then("Verify the configured Bid multiplier rules")
+    public void verify_the_configured_bid_multiplier_rules() {
+        logger.info("Starting verification of configured bid multiplier rules");
+        List<String> expectedNormalizedBidRuleTypes = normalizeObjectList(keyType);
+        int expectedBidCount = expectedNormalizedBidRuleTypes.size();
+        tacticSettings.fetchBidRulesTypesCount(expectedBidCount);
+        List<String> actualNormalizedBidRuleTypes = normalizeObjectList(tacticSettings.fetchBidRulesTypes());
+
+        Set<String> expectedBidSet = new LinkedHashSet<>(expectedNormalizedBidRuleTypes);
+        Set<String> actualBidSet = new LinkedHashSet<>(actualNormalizedBidRuleTypes);
+
+        List<String> expectedUniqueAndSortedBid = new ArrayList<>(expectedBidSet);
+        List<String> actualUniqueAndSortedBid = new ArrayList<>(actualBidSet);
+
+        Collections.sort(expectedUniqueAndSortedBid);
+        Collections.sort(actualUniqueAndSortedBid);
+
+        List<String> expectedNormalizedBidRuleOptions = normalizeObjectList(keyValues);
+        List<String> actualNormalizedBidRuleOptions = normalizeObjectList(tacticSettings.fetchBidRuleOptions());
+        Assert.assertEquals("Rule types mismatch", expectedUniqueAndSortedBid, actualUniqueAndSortedBid);
+
+        for (String expectedOption : expectedNormalizedBidRuleOptions) {
+            boolean matchFound = actualNormalizedBidRuleOptions.stream().anyMatch(actual -> actual.equalsIgnoreCase(expectedOption));
+            Assert.assertTrue("Expected rule option not found: " + expectedOption, matchFound);
+        }
+
+        logger.info("All Bid rules verified successfully");
+    }
+
+    @When("User saves the Bid multiplier settings")
+    public void user_saves_the_bid_multiplier_settings() {
+        logger.info("Saving Tactic and Bid settings");
+        tacticSettings.saveTacticSettings();
+        tacticSettings.clickCreativeTab();
+    }
+
+    @And("User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules")
+    public void userVerifyBehavioursegmentandNPIareNotAllowedinbidMultiplier() {
+        logger.info("Verifying Behaviour segment and NPI are not allowed in Bid multiplier if the same are not targeted in tactic");
+        String displaySegmentError = tacticSettings.checkErrorOfBidMultiplierSegmentRule();
+        Assert.assertEquals("Application allows Behaviour segment in bid multiplier even if its not targeted in tactic", ("No Behavioral Targeting is Selected"), displaySegmentError);
+        String displayNPIError = tacticSettings.checkErrorOfBidMultiplierNPIRule();
+        Assert.assertEquals("Application allows NPI in bid multiplier even if its not targeted in tactic", ("No NPI Targeting is Selected"), displayNPIError);
+    }
+
+    @Then("User close the bid panel to add targeting rules")
+    public void userCloseTheBidPanelToAddTargetingRules() {
+        logger.info("Navigating to page to add targeting");
+        tacticSettings.navigateToAddTargeting();
+    }
+
+    @When("User navigates back to settings tab from creatives tab")
+    public void user_navigates_back_to_settings_tab_from_creatives_tab() {
+        logger.info("Navigating back to settings tab from creatives tab");
+        tacticDetails.clickSettingsTab();
+        String settingsText = tacticSettings.verifyTacticSettingsText();
+        Assert.assertEquals("Bid Strategy", settingsText);
+    }
+
+    @When("User navigates back to creatives tab")
+    public void user_navigates_back_to_creatives_tab() {
+        logger.info("Navigating back to creatives tab");
+        tacticCreatives.clickCreativeTab();
+        String creativesText = tacticCreatives.verifyTacticCreativesText();
+        Assert.assertEquals("Creative(s)", creativesText);
+    }
+
+    @When("User creates line items with tactics and targeting rules as below and assigns existing creative named {string}")
+    public void userCreatesLineItemsWithTacticsAndTargetingRules(String creative, DataTable dataTable) {
+        logger.info("Creating line items with tactics and targeting rules");
+        tacticDetails.createLineItemsWithTacticsAndTargetingRules(dataTable.asMaps(String.class, String.class), creative, perTacticRules -> {
+            logger.info("Running per-tactic targeting rule verifications for: {}", perTacticRules.keySet());
+            rulesMap = new LinkedHashMap<>(perTacticRules);
+            keyType = new ArrayList<>(perTacticRules.keySet());
+            keyValues = new ArrayList<>();
+            for (List<String> v : perTacticRules.values()) {
+                keyValues.addAll(v);
+            }
+            verify_the_configured_targeting_rules();
+            verifyTheCountOfRulesAddedForTheSelectedTargetingRuleTypeOnTheTacticSettingsPage();
+        });
+    }
+
+    @Then("Verify the newly created campaign details in the campaign list")
+    public void verifyTheNewlyCreatedCampaignDetailsInTheCampaignList() {
+        campaigns.navigateToCampaignDashboard();
+        logger.info("Searching for Campaign: {}", campaignNameRandom);
+        campaignDashboard.searchCreatedCampaign(campaignNameRandom);
+        Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
     }
 }

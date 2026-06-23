@@ -20,13 +20,13 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     Then User verifies the expanded audience count
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
+    And User saves the "HCP Audience Expansion" workspace
     Then Verify the workspace is visible in workspace management page
     Examples:
       | ADVERTISER | WORKSPACE_NAME | SOURCE_AUDIENCE  | OPTIONS      | EXPANDED_AUDIENCE             |
@@ -41,7 +41,7 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
@@ -64,8 +64,8 @@ Feature: HCP Audience Workspace in Studio Application
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Download button is enabled to the user
     And User clicks on Publish NPI List
     And User selects publish "<LIST_TYPE>"
@@ -90,14 +90,14 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     Then User selects Draft option as "<DRAFT>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Internal User is able to view "<WORKSPACE_NAME>" in workspace management page
     And "Internal User" logs out from the "Studio" application
     Given This scenario will be executed in the "Pre-release" environment as a "External User"
@@ -115,14 +115,14 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     Then User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     Then User verifies the expanded audience count
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Download button is enabled to the user
     And User clicks on Publish NPI List
     And User selects publish "<LIST_TYPE>"
@@ -144,13 +144,13 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Download button is enabled to the user
     And User clicks Download NPI option
     And User selects download format as "<FORMAT>" and clicks Download button
@@ -165,13 +165,13 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Download button is enabled to the user
     And User clicks Schedule NPI button
     And User enters data and clicks Save button
@@ -186,13 +186,13 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Report button is enabled to the user
     And User clicks on Download Report
     And User enters the Report Name
@@ -208,13 +208,13 @@ Feature: HCP Audience Workspace in Studio Application
     And "Studio" application is logged in successfully with Account "automation@pulsepoint"
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User selects the Workspace Type as "HCP Audience Expansion"
+    And User clicks on "HCP Audience Expansion" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User selects Source Audience details as "<SOURCE_AUDIENCE>","<OPTIONS>"
     And User selects "<EXPANDED_AUDIENCE>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
-    And User saves the workspace
-    Then Verify the Workspace is saved
+    And User saves the "HCP Audience Expansion" workspace
+    Then Verify the "HCP Audience Expansion" Workspace is saved
     And Report button is enabled to the user
     And User clicks Schedule Report button
     And User enters data and clicks Save button
