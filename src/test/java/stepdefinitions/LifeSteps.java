@@ -7356,6 +7356,8 @@ public class LifeSteps {
     public void userCloseTheBidPanelToAddTargetingRules() {
         logger.info("Navigating to page to add targeting");
         tacticSettings.navigateToAddTargeting();
+    }
+
     @When("User navigates back to settings tab from creatives tab")
     public void user_navigates_back_to_settings_tab_from_creatives_tab() {
         logger.info("Navigating back to settings tab from creatives tab");
