@@ -476,4 +476,9 @@ public class ExplorerWorkspace {
                 "//p[normalize-space()='%s Recency']/parent::div//following-sibling::div//p", filterType));
         return recencyLocator.textContent().trim();
     }
+
+    public void selectDraftOption(String DraftOption) {
+        Locator DRAFT_OPTION = WORKSPACE_FRAME.locator(String.format("//button/div[text()='%s']", DraftOption));
+        DRAFT_OPTION.click();
+    }
 }
