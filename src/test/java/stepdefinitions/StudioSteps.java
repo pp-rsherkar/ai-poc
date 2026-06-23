@@ -6,6 +6,7 @@ import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -374,7 +376,7 @@ public class StudioSteps {
         boolean isValid = actualMessage.equals("Workspace created successfully")
                 || actualMessage.equals("Workspace saved successfully")
                 || actualMessage.equals(
-                        "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+                "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
@@ -1051,8 +1053,8 @@ public class StudioSteps {
     @And(
             "User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
     public void
-            userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
-                    String filterType, DataTable dataTable) {
+    userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
+            String filterType, DataTable dataTable) {
         logger.info("Applying '{}' filter and verifying clinical recency values", filterType);
         List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
 
@@ -1130,8 +1132,8 @@ public class StudioSteps {
     @Then(
             "User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
     public void
-            userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
-                    String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
+    userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
+            String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
         String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
         logger.info("Workspace type: {}", actualWorkspaceType);
         Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
@@ -1179,22 +1181,24 @@ public class StudioSteps {
 
     @And("External User switches the {string}account in Studio application")
     public void externalUserSwitchesTheAccountInStudioApplication(String accountName) {
-            accounts.externalUserSwitchAccount(accountName);
-            logger.info("Switching account in Studio application to: {}", accountName);
+        accounts.externalUserSwitchAccount(accountName);
+        logger.info("Switching account in Studio application to: {}", accountName);
     }
 
-    @When("External user Searches the workspace name in studio application with {string} draft option")
+    @When("External user searches the workspace name in studio application with {string} draft option")
     public void externalUserSearchesTheWorkspaceNameInStudioApplicationWithDraftOption(String draftOption) {
         logger.info("External user searching and selecting the workspace: {}", workspaceName);
         workspaceCreation.searchByWorkspaceName(workspaceName);
         if (draftOption.equals("Public")) {
             workspaceCreation.isWorkspacePresent(workspaceName);
+            Assert.assertTrue("Workspace is present for external user with draft option: " + draftOption, true);
         } else {
             workspaceCreation.isWorkspaceAbsent();
+            Assert.assertTrue("Workspace is absent for external user with draft option: " + draftOption, true);
         }
     }
 
-    @Then("External user Verifies whether the workspace with {string} is visible in workspace management page")
+    @Then("External user verifies whether the workspace with {string} is visible in workspace management page")
     public void externalUserVerifiesWhetherTheWorkspaceWithIsVisibleInWorkspaceManagementPage(String draftOption) {
         logger.info("External user verifying workspace visibility with draft option: {}", draftOption);
         boolean isWorkspaceVisible = workspaceCreation.isWorkspaceVisible(workspaceName, draftOption);

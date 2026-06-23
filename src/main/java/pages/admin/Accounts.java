@@ -75,7 +75,6 @@ public class Accounts {
     private final Locator RUN_BUTTON;
     private final Locator TEST_ACCESS_FAILED_TEXT;
     private final Locator STUDIO_TOGGLE_ACTIVE;
-
     private final Locator DETAILS_TAB;
     private final Locator LIFE_SETTINGS;
     private final Locator PULSEPOINT_DATA_FEE;
