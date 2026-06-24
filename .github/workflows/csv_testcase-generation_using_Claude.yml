@@ -1,0 +1,456 @@
+name: JIRA - Testcase (CSV) Generator Using CLAUDE
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: "Enter JIRA Ticket ID (e.g., PROD-14604)"
+        required: true
+        type: string
+      llm_model:
+        description: "Select Claude Model"
+        required: true
+        type: choice
+        default: "claude-haiku-4-5"
+        options:
+          - claude-haiku-4-5
+          - claude-sonnet-4-6
+          - claude-opus-4-6
+          - claude-opus-4-7
+          - claude-opus-4-8
+
+permissions:
+  contents: read
+  models: read
+
+jobs:
+  generate-and-attach:
+    runs-on: ubuntu-latest
+
+    steps:
+      # =========================
+      # Checkout
+      # =========================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # =========================
+      # Install dependencies
+      # =========================
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      # =========================
+      # Fetch Jira details
+      # =========================
+      - name: Fetch Jira details
+        run: |
+          set -euo pipefail
+          echo "Fetching Jira issue: ${{ inputs.jira_id }}"
+
+          RESPONSE=$(curl -s --fail \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}")
+
+          echo "$RESPONSE" > jira_response.json
+
+          if echo "$RESPONSE" | jq -e '.errorMessages' >/dev/null; then
+            echo "Jira API returned an error:"
+            cat jira_response.json
+            exit 1
+          fi
+
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
+          DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' \
+            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+          COMMENTS=$(echo "$RESPONSE" | jq -r \
+            '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' \
+            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+
+          [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
+          [ -z "$COMMENTS" ]    && COMMENTS="No Comments"
+
+          DESC_LEN=${#DESCRIPTION}
+          COMM_LEN=${#COMMENTS}
+
+          if [ "$DESC_LEN" -gt 12000 ]; then
+            echo "WARNING: Description is ${DESC_LEN} chars — exceeds 12000, will be truncated. Consider splitting the ticket."
+          fi
+          if [ "$COMM_LEN" -gt 8000 ]; then
+            echo "WARNING: Comments are ${COMM_LEN} chars — exceeds 8000, will be truncated."
+          fi
+
+          DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
+          COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
+
+          {
+            echo "SUMMARY<<EOF"
+            echo "$SUMMARY"
+            echo "EOF"
+            echo "DESCRIPTION<<EOF"
+            echo "$DESCRIPTION"
+            echo "EOF"
+            echo "COMMENTS<<EOF"
+            echo "$COMMENTS"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      # =========================
+      # Write prompt file
+      # Uses Python to avoid jq string escaping issues and heredoc
+      # indentation bloat — prompt.txt will have zero leading whitespace
+      # =========================
+      - name: Write prompt file
+        env:
+          SUMMARY: ${{ env.SUMMARY }}
+          DESCRIPTION: ${{ env.DESCRIPTION }}
+          COMMENTS: ${{ env.COMMENTS }}
+          JIRA_ID: ${{ inputs.jira_id }}
+        run: |
+          set -euo pipefail
+          python3 << 'PYEOF'
+          import os
+          
+          summary_trim  = os.environ.get("SUMMARY", "")[:300]
+          desc_trim     = os.environ.get("DESCRIPTION", "")[:2000]
+          comments_trim = os.environ.get("COMMENTS", "")[:1000]
+          jira_id       = os.environ.get("JIRA_ID", "")
+          
+          prompt = f"""You are an expert QA Engineer. Analyze the Jira ticket below and generate a thorough suite of test cases.
+          
+          HARD RULES:
+          1. Output a single raw valid JSON object only. No markdown, no code fences, no explanation text.
+          2. The JSON must contain exactly one key: "test_cases" which is an array of objects.
+          3. Every object must have exactly these four keys: "index", "description", "test_data", "expected_result".
+          4. "index" must be a sequential integer starting at 1.
+          5. "test_data" must be a string — use empty string "" if not applicable, never omit the key.
+          6. Never truncate or summarise — generate a complete test case for every item found.
+          
+          DESCRIPTION INTERPRETATION RULES:
+          The Jira description may be written in different styles. Handle all of them:
+          
+          Style 1 - Explicit acceptance criteria: Map each AC to one or more test cases.
+          Style 2 - Scope list (e.g. "FE: Dropdown Changes, Brand Multi Select"):
+            For each item infer the most likely user-facing behaviour and write a test case.
+            Ask: what would a QA engineer test for this item?
+            Example: "Brand Multi Select" means user selects multiple brands and verifies they are applied.
+          Style 3 - Status notes (e.g. "6/9 - RELEASED"): Ignore pure status lines.
+          Style 4 - Mixed: Process each section independently. UPDATED section items are high priority.
+          
+          For ANY description style:
+          - Every bullet, numbered item, or named feature in SCOPE must produce at least one test case.
+          - Every UPDATED section item must produce at least one test case.
+          - Never skip a scope item because it lacks explicit ACs. Infer the behaviour from the item name.
+          - Use COMMENTS for additional context and edge cases.
+          
+          TEST CASE TYPES TO GENERATE (only if implied by the ticket):
+          - Positive / happy path
+          - Negative / validation / boundary conditions
+          - UI state and toggle verification
+          - Permission and role-based access
+          - Edge cases mentioned in comments
+          
+          EXACT OUTPUT SCHEMA:
+          {{
+            "test_cases": [
+              {{
+                "index": 1,
+                "description": "Verify user can do X",
+                "test_data": "specific input values or empty string",
+                "expected_result": "explicit outcome that can be verified"
+              }}
+            ]
+          }}
+          
+          JIRA:
+          ID: {jira_id}
+          SUMMARY: {summary_trim}
+          DESCRIPTION: {desc_trim}
+          COMMENTS: {comments_trim}
+          """
+          
+          with open("prompt.txt", "w") as f:
+              f.write(prompt)
+          
+          size  = os.path.getsize("prompt.txt")
+          words = len(prompt.split())
+          print(f"Prompt size: {size} bytes / {words} words (est. {words // 3} tokens)")
+          PYEOF
+
+      # =========================
+      # Pre-flight size check
+      # =========================
+      - name: Pre-flight size check
+        run: |
+          set -euo pipefail
+
+          BYTES=$(wc -c < prompt.txt)
+          echo "Prompt file: ${BYTES} bytes"
+
+          if [ "$BYTES" -gt 100000 ]; then
+            echo "::error::Prompt exceeds safe limit"
+            exit 1
+          fi
+
+      # =========================
+      # Generate Testcases via Claude API (with retry)
+      # =========================
+      - name: Generate structured test cases
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          MODEL="${{ inputs.llm_model }}"
+
+          # Claude Opus 4.7+ does not support temperature — omit it for these models
+          if [[ "$MODEL" == *"opus-4-7"* || "$MODEL" == *"opus-4-8"* ]]; then
+            echo "Extended model detected ($MODEL) — omitting temperature"
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                max_tokens: 4096,
+                system: "You are an expert QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
+                messages: [{ role: "user", content: $prompt }]
+              }' > request.json
+          else
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                max_tokens: 4096,
+                temperature: 0,
+                system: "You are an expert QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
+                messages: [{ role: "user", content: $prompt }]
+              }' > request.json
+          fi
+
+          echo "Request size: $(wc -c < request.json) bytes"
+          echo "Calling Claude API..."
+
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt..."
+            HTTP_RESPONSE=$(mktemp)
+            HTTP_CODE=$(curl -s -o "$HTTP_RESPONSE" -w "%{http_code}" \
+              https://api.anthropic.com/v1/messages \
+              -H "Authorization: Bearer $CLAUDE_CODE_OAUTH_TOKEN" \
+              -H "anthropic-version: 2023-06-01" \
+              -H "anthropic-beta: oauth-2025-04-20" \
+              -H "Content-Type: application/json" \
+              --data @request.json)
+
+            echo "HTTP Status: $HTTP_CODE"
+
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              break
+            fi
+
+            cat "$HTTP_RESPONSE"
+
+            if [ "$attempt" -lt 3 ]; then
+              echo "Retrying in 60 seconds..."
+              sleep 60
+            else
+              echo "::error::Claude API failed after retries"
+              exit 1
+            fi
+          done
+
+          # Extract content and strip any markdown fences the model may emit
+          jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE" \
+            | sed 's/```json//g' \
+            | sed 's/```//g' \
+            | sed '/^[[:space:]]*$/d' \
+            > raw_output.json
+
+          # Validate parseable JSON before handing to Python
+          if ! jq empty raw_output.json 2>/dev/null; then
+            echo "Model returned invalid JSON:"
+            cat raw_output.json
+            exit 1
+          fi
+
+          # Validate test_cases key exists and is non-empty
+          TC_COUNT=$(jq '.test_cases | length' raw_output.json)
+          if [ "$TC_COUNT" -eq 0 ]; then
+            echo "Model returned empty test_cases array"
+            cat raw_output.json
+            exit 1
+          fi
+
+          echo "Generated $TC_COUNT test cases successfully"
+
+      # =========================
+      # Build CSV & Jira Comment Payload
+      # =========================
+      - name: Process JSON into CSV and Jira Comment
+        shell: python3 {0}
+        run: |
+          import json
+          import csv
+          import os
+
+          with open('raw_output.json', 'r', encoding='utf-8') as f:
+              data = json.load(f)
+
+          test_cases = data.get('test_cases', [])
+          jira_id = "${{ inputs.jira_id }}"
+
+          # 1. Generate CSV
+          csv_file_path = f"Test_Cases_{jira_id}.csv"
+          headers = [
+              "Test ID", "Requirement ID", "Test Description",
+              "Test Data", "Expected Result", "Actual Result",
+              "Test Status", "Owner"
+          ]
+
+          with open(csv_file_path, 'w', newline='', encoding='utf-8') as cf:
+              writer = csv.writer(cf)
+              writer.writerow(headers)
+              for tc in test_cases:
+                  idx = str(tc.get('index', '1')).zfill(2)
+                  writer.writerow([
+                      f"TC_{jira_id}_{idx}",
+                      jira_id,
+                      tc.get('description', ''),
+                      tc.get('test_data', ''),
+                      tc.get('expected_result', ''),
+                      "", "", ""
+                  ])
+
+          print(f"CSV written: {csv_file_path} ({len(test_cases)} rows)")
+
+          # 2. ADF helper
+          def make_adf_text_content(input_text):
+              if not input_text:
+                  return [{"type": "text", "text": "N/A"}]
+              lines = str(input_text).split('\n')
+              nodes = []
+              for i, line in enumerate(lines):
+                  if line.strip() or i == 0:
+                      nodes.append({"type": "text", "text": line})
+                  if i < len(lines) - 1:
+                      nodes.append({"type": "hardBreak"})
+              return nodes if nodes else [{"type": "text", "text": "N/A"}]
+
+          # 3. Build Jira ADF comment table
+          table_rows = [
+              {
+                  "type": "tableRow",
+                  "content": [
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test ID", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Requirement ID", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test Description", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Expected Result", "marks": [{"type": "strong"}]}]}]}
+                  ]
+              }
+          ]
+
+          for tc in test_cases:
+              idx = str(tc.get('index', '1')).zfill(2)
+              table_rows.append({
+                  "type": "tableRow",
+                  "content": [
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": f"TC_{jira_id}_{idx}"}]}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": jira_id}]}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('description', ''))}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('expected_result', ''))}]}
+                  ]
+              })
+
+          comment_payload = {
+              "body": {
+                  "type": "doc",
+                  "version": 1,
+                  "content": [
+                      {
+                          "type": "heading",
+                          "attrs": {"level": 3},
+                          "content": [{"type": "text", "text": "AI-Generated Test Matrix Summary"}]
+                      },
+                      {
+                          "type": "paragraph",
+                          "content": [
+                              {"type": "text", "text": "Test cases extracted from requirements and compiled below. Full tracking file attached to this ticket."}
+                          ]
+                      },
+                      {
+                          "type": "table",
+                          "content": table_rows
+                      },
+                      {
+                          "type": "paragraph",
+                          "content": [
+                              {
+                                  "type": "text",
+                                  "text": f"Test_Cases_{jira_id}.csv has been attached to this ticket for execution tracking.",
+                                  "marks": [{"type": "em"}]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          }
+
+          with open('jira_comment_payload.json', 'w', encoding='utf-8') as jf:
+              json.dump(comment_payload, jf, ensure_ascii=False, indent=2)
+
+          print(f"Comment payload written: jira_comment_payload.json")
+          print(f"Total test cases processed: {len(test_cases)}")
+
+      # =========================
+      # Post Test Case Comment to Jira
+      # =========================
+      - name: Post table comment to Jira ticket
+        run: |
+          set -euo pipefail
+          echo "Posting test case table to Jira comment section..."
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data @jira_comment_payload.json \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/comment")
+
+          echo "Jira comment POST status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -gt 299 ]; then
+            echo "Failed to post comment to Jira"
+            exit 1
+          fi
+
+          echo "Comment posted successfully"
+
+      # =========================
+      # Attach CSV to Jira ticket
+      # =========================
+      - name: Attach CSV to Jira ticket
+        run: |
+          set -euo pipefail
+          CSV_PATH="Test_Cases_${{ inputs.jira_id }}.csv"
+          echo "Uploading $CSV_PATH to Jira issue ${{ inputs.jira_id }}..."
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+            -X POST \
+            -H "X-Atlassian-Token: no-check" \
+            --form "file=@$CSV_PATH" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ inputs.jira_id }}/attachments")
+
+          echo "Jira attachment POST status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -gt 299 ]; then
+            echo "Failed to attach CSV to Jira"
+            exit 1
+          fi
+
+          echo "CSV attached successfully"
