@@ -385,7 +385,7 @@ public class SharedList {
         return listDetails;
     }
 
-    public boolean isListNameAvailableInLeftPanel() {
+    public boolean isNothingFoundDisplayed() {
         return NOTHING_FOUND_TEXT.isVisible();
     }
 }

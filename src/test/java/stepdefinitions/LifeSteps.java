@@ -2952,7 +2952,7 @@ public class LifeSteps {
         sharedList.searchCreatedList(metricName);
         Assert.assertTrue(
                 "Deleted list is still displayed in the left panel (expected 'Nothing Found' after search)",
-                sharedList.isListNameAvailableInLeftPanel());
+                sharedList.isNothingFoundDisplayed());
     }
 
     @And(
