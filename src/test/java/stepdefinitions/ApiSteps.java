@@ -345,22 +345,19 @@ public class ApiSteps {
         ArrayNode fields = mapper.createArrayNode();
         Arrays.stream(fieldsValue.split(",")).map(field -> field.replace("\"", "").trim()).forEach(fields::add);
         arguments.set("fields", fields);
-
         // Filters
         ObjectNode filters = mapper.createObjectNode();
         String filterText = headersConfig.get("Filter");
         String[] filterParts = filterText.split(",", 2);
         filters.put(filterParts[0].trim(), filterParts[1].trim());
         arguments.set("filters", filters);
-
         // Sorts
         ArrayNode sorts = mapper.createArrayNode();
         sorts.add(headersConfig.get("Sort"));
         arguments.set("sorts", sorts);
-
         // Limit
         arguments.put("limit", headersConfig.get("Limit"));
-
+        //Headers
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", headersConfig.get("Content-Type"));
         headers.put("Accept", headersConfig.get("Accept"));
@@ -389,7 +386,7 @@ public class ApiSteps {
         ObjectNode arguments =
                 (ObjectNode) templateNode.path("params").path("arguments");
         arguments.put("query_slug", query_id);
-
+        //Headers
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", headersConfig.get("Content-Type"));
         headers.put("Accept", headersConfig.get("Accept"));
@@ -411,7 +408,6 @@ public class ApiSteps {
         String queryResultStr = jsonNode.path("result").path("structuredContent").path("query_result").asText();
         ArrayNode queryArray = (ArrayNode) mapper.readTree(queryResultStr);
         Assert.assertFalse( "query_result is empty", queryResultStr.trim().isEmpty());
-
         for (JsonNode row : queryArray) {
             switch(promptDimensions){
                 case "resolved_measures.distinct_npis, custom_measures_ga4.active_user_count_":
@@ -427,10 +423,6 @@ public class ApiSteps {
                     Assert.assertTrue(totalActiveUsers >= 0);
                     break;
             }
-
         }
-        System.out.println("Total NPIs = " + totalNpi);
-        System.out.println("Total Active Users = " + totalActiveUsers);
-
     }
 }
