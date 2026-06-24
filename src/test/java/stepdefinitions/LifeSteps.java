@@ -2950,7 +2950,9 @@ public class LifeSteps {
     public void verifyTheDeletedListIsNoLongerDisplayedInTheLeftPanel() {
         logger.info("Verifying that the deleted list '{}' is no longer displayed in the left panel", metricName);
         sharedList.searchCreatedList(metricName);
-        Assert.assertTrue("List is found even after deletion", sharedList.isListNameAvailableInLeftPanel());
+        Assert.assertTrue(
+                "Deleted list is still displayed in the left panel (expected 'Nothing Found' after search)",
+                sharedList.isListNameAvailableInLeftPanel());
     }
 
     @And(
