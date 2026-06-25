@@ -315,38 +315,38 @@ jobs:
 
           # Write the recovery script to a file so it is never inside a heredoc
           cat > recover.py << 'RECOVEREOF'
-import json, sys
-
-with open("raw_output.json", "r", encoding="utf-8") as f:
-    raw = f.read().strip()
-
-last_complete = raw.rfind('},')
-if last_complete == -1:
-    last_complete = raw.rfind('}')
-
-if last_complete == -1:
-    print("Cannot recover: no complete test case objects found")
-    sys.exit(1)
-
-recovered = raw[:last_complete + 1] + "\n  ]\n}"
-
-brace_start = recovered.find('{')
-if brace_start > 0:
-    recovered = recovered[brace_start:]
-
-try:
-    data = json.loads(recovered)
-except json.JSONDecodeError as e:
-    print(f"Recovery failed: {e}")
-    print(recovered[:500])
-    sys.exit(1)
-
-tc = data.get("test_cases", [])
-print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
-
-with open("raw_output.json", "w", encoding="utf-8") as f:
-    json.dump(data, f, ensure_ascii=False, indent=2)
-RECOVEREOF
+          import json, sys
+          
+          with open("raw_output.json", "r", encoding="utf-8") as f:
+              raw = f.read().strip()
+          
+          last_complete = raw.rfind('},')
+          if last_complete == -1:
+              last_complete = raw.rfind('}')
+          
+          if last_complete == -1:
+              print("Cannot recover: no complete test case objects found")
+              sys.exit(1)
+          
+          recovered = raw[:last_complete + 1] + "\n  ]\n}"
+          
+          brace_start = recovered.find('{')
+          if brace_start > 0:
+              recovered = recovered[brace_start:]
+          
+          try:
+              data = json.loads(recovered)
+          except json.JSONDecodeError as e:
+              print(f"Recovery failed: {e}")
+              print(recovered[:500])
+              sys.exit(1)
+          
+          tc = data.get("test_cases", [])
+          print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
+          
+          with open("raw_output.json", "w", encoding="utf-8") as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+          RECOVEREOF
 
           MODEL="${{ inputs.llm_model }}"
 
