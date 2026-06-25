@@ -246,20 +246,107 @@ jobs:
           11. REGRESSION / POINTS TO NOTE (if present)
               Every item flagged for regression or listed as a verification point needs at least one test case.
           
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           RULES FOR EVERY TEST CASE
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          - test_data must be concrete: use real field names, actual values, specific counts, named roles, timestamps, page numbers.
-            BAD:  "some records with different timestamps"
-            GOOD: "NPI List with 5 records created on 2025-01-01, 2025-01-05, 2025-01-10, 2025-01-15, 2025-01-20"
           
-          - expected_result must be specific and verifiable. Never write "the page works correctly" or "data is displayed".
-            BAD:  "Coverage Rate is displayed correctly"
-            GOOD: "Coverage Rate displays 75% and the progress bar fills to 75% of its total width"
+          FIELD: test_data
+          Must be concrete — use real values, not descriptions of values.
+            REJECT: "some records", "various inputs", "a tactic with HCP2DTC factor"
+            ACCEPT: "NPI List with 100 NPIs; 75 with ≥1 exposed patient; 25 with 0 exposed patients"
           
-          - Do NOT generate test cases for things this ticket explicitly says are out of scope.
-          - Do NOT generate duplicate test cases for the same scenario.
-          - Never skip a checklist item. If in doubt, write the test case.
+          FIELD: expected_result
+          Must be specific and verifiable. State exact values, exact text, exact UI state.
+            REJECT: "displays correctly", "works as expected", "tooltip is shown", "data is displayed"
+            ACCEPT: "Coverage Rate displays 75% and the progress bar fills to 75% of its total width"
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          SPECIFIC RULES FOR COMMON GAPS
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          
+          TOOLTIPS — CRITICAL:
+          When the ticket defines a tooltip string verbatim, the expected_result MUST quote it exactly
+          in single quotes. Never write "tooltip text matches specification."
+            REJECT: "Tooltip displays the correct text per the specification"
+            ACCEPT: "Tooltip displays: 'Percentage of seed NPIs where at least one patient was reached.'"
+          
+          FORMULAS — CRITICAL:
+          For every formula A/B or A÷B in the ticket, you MUST generate all five of these:
+            (a) Happy path — concrete numbers, expected result with correct value
+            (b) Denominator = 0 — what does the UI show? State the exact display: N/A, 0, or hidden
+            (c) Numerator = 0 — result is zero; verify UI shows 0 or N/A, not blank space
+            (d) Boundary values — 0%, 100%, exactly 1.0 for multipliers/indexes
+            (e) Rounding — non-integer result; verify the exact decimal precision displayed (e.g. "4.11" not "4.1")
+          Never collapse these into one test case.
+          
+          COLOUR CODING:
+          When the spec defines colour logic (e.g. green if > 1, grey if ≤ 1), generate three cases:
+            (a) Value clearly above the threshold → correct colour
+            (b) Value clearly below the threshold → correct colour
+            (c) Value at EXACTLY the threshold (e.g. index = 1.00 exactly) → this boundary is mandatory
+          
+          PROGRESS BARS:
+          When a progress bar is specified, generate two separate test cases:
+            (a) Percentage fill is correct (e.g. 30% fills 30% of the bar)
+            (b) The full-bar denominator matches the spec definition — not always 100%.
+                If spec says "entire bar = total brand drug prescriptions for exposed patients",
+                verify this with a test where exposed_total ≠ unexposed_total.
+          
+          OUT-OF-SCOPE FEATURES:
+          For each item explicitly marked out of scope, generate one test case confirming
+          the feature is absent or disabled in the UI. Never skip these.
+          
+          DISPLAY CONDITIONS:
+          For every "if X show Y" rule, generate:
+            (a) Condition is met → component/section is visible
+            (b) Condition is not met → component/section is absent
+          
+          EDGE CASES:
+          Every named edge case gets its own test case. Never merge two edge cases into one.
+          
+          DISCREPANCIES:
+          For each discrepancy or ambiguity, generate one test case per interpretation (A and B).
+          
+          COMMENTS:
+          Every human comment that adds context, a bug, a constraint, or a scenario gets
+          at least one test case labelled: "Comment: [Author Name] [YYYY-MM-DD]"
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          SELF-AUDIT — REQUIRED BEFORE OUTPUTTING
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          Before writing the final JSON, mentally verify every item below.
+          Fix any failure before outputting. Do not output until all pass.
+          
+          TOOLTIPS
+          [ ] Every tooltip string defined in the spec has a test case that quotes the exact text verbatim
+          [ ] No expected_result says "tooltip text matches specification" or similar
+          
+          FORMULAS
+          [ ] Every formula has all five cases: happy path, denominator=0, numerator=0, boundary, rounding
+          [ ] The denominator=0 expected_result states exactly what the UI shows (not "handled correctly")
+          
+          COLOUR CODING
+          [ ] Every colour rule has: above threshold + below threshold + exactly AT the threshold
+          
+          PROGRESS BARS
+          [ ] Every progress bar has a percentage test AND a denominator/scale test
+          
+          EXPECTED RESULTS
+          [ ] No expected_result contains: "correctly", "as expected", "per specification",
+              "matches spec", "is displayed", "works", or "appropriate"
+          [ ] Every expected_result states an exact value, exact text, or exact UI state
+          
+          TEST DATA
+          [ ] No test_data contains: "some records", "various", "a record", "a tactic",
+              or any other vague placeholder
+          [ ] Every test_data has concrete values (numbers, names, timestamps, role names)
+          
+          COMPLETENESS
+          [ ] Every named edge case has its own separate test case
+          [ ] Every discrepancy has one test case per interpretation
+          [ ] Every out-of-scope item has a test confirming its absence
+          [ ] Every AC has at least one positive and one negative/boundary test case
+          [ ] No duplicate test cases
           
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           JIRA TICKET
@@ -299,7 +386,7 @@ jobs:
 
       # =========================
       # Generate Testcases via Claude API (with retry)
-      # max_tokens: 16000 — handles 80+ test cases without truncation.
+      # max_tokens: set to each model's actual ceiling (64k for Haiku/Sonnet, 128k for Opus).
       # Opus 4.7+ omits temperature (unsupported by those models).
       #
       # NOTE: the truncation recovery logic is written to recover.py during
@@ -350,24 +437,42 @@ jobs:
 
           MODEL="${{ inputs.llm_model }}"
 
+          # Set max_tokens to each model's actual ceiling so large tickets
+          # (100+ test cases) are never truncated mid-response.
+          # Opus 4.6/4.7/4.8 → 128,000 tokens
+          # Sonnet 4.6 / Haiku 4.5 → 64,000 tokens
+          # Opus 4.7+ also omits temperature (unsupported by those models).
           if [[ "$MODEL" == *"opus-4-7"* || "$MODEL" == *"opus-4-8"* ]]; then
-            echo "Extended model detected ($MODEL) — omitting temperature"
+            echo "Opus 4.7/4.8 detected — omitting temperature, max_tokens 128000"
             jq -n \
               --arg model "$MODEL" \
               --rawfile prompt prompt.txt \
               '{
                 model: $model,
-                max_tokens: 16000,
+                max_tokens: 128000,
+                system: "You are a senior QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
+                messages: [{ role: "user", content: $prompt }]
+              }' > request.json
+          elif [[ "$MODEL" == *"opus-4-6"* ]]; then
+            echo "Opus 4.6 detected — max_tokens 128000"
+            jq -n \
+              --arg model "$MODEL" \
+              --rawfile prompt prompt.txt \
+              '{
+                model: $model,
+                max_tokens: 128000,
+                temperature: 0,
                 system: "You are a senior QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
                 messages: [{ role: "user", content: $prompt }]
               }' > request.json
           else
+            echo "Sonnet/Haiku detected — max_tokens 64000"
             jq -n \
               --arg model "$MODEL" \
               --rawfile prompt prompt.txt \
               '{
                 model: $model,
-                max_tokens: 16000,
+                max_tokens: 64000,
                 temperature: 0,
                 system: "You are a senior QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
                 messages: [{ role: "user", content: $prompt }]
