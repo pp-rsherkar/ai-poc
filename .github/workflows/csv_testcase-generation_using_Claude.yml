@@ -136,9 +136,15 @@ jobs:
 
       # =========================
       # Write prompt file
-      # Reads description/comments from files (not GITHUB_ENV).
-      # Two-pass prompt forces the model to extract all requirement sources
-      # before generating any test case JSON.
+      # The prompt is written directly to prompt.txt using Python's write(),
+      # which means it is exactly what you see — no string escaping, no
+      # concatenation, no heredoc quoting issues. Easy to read and maintain.
+      #
+      # The prompt instructs the model to:
+      #   1. Read the ENTIRE description and ALL comments before generating anything
+      #   2. Extract every testable item from every section of the ticket
+      #   3. Generate test cases with concrete test data and verifiable expected results
+      #   4. Trace each test case back to its source requirement
       # =========================
       - name: Write prompt file
         env:
@@ -149,79 +155,131 @@ jobs:
           python3 - <<'PYPROMPT'
           import os
           
-          summary = os.environ.get("SUMMARY", "")[:500]
-          jira_id = os.environ.get("JIRA_ID", "")
+          summary     = os.environ.get("SUMMARY", "")[:500]
+          jira_id     = os.environ.get("JIRA_ID", "")
           
           with open("jira_description.txt", "r", encoding="utf-8") as f:
               description = f.read()
           with open("jira_comments.txt", "r", encoding="utf-8") as f:
               comments = f.read()
           
-          print(f"Description loaded: {len(description)} chars")
-          print(f"Comments loaded   : {len(comments)} chars")
+          print(f"Description loaded : {len(description)} chars")
+          print(f"Comments loaded    : {len(comments)} chars")
           
-          prompt = (
-              "You are a senior QA Engineer generating a complete, traceable test suite from a Jira ticket.\n\n"
-              "===== STRICT OUTPUT RULE =====\n"
-              "Output a single raw valid JSON object. No markdown, no code fences, no commentary, no preamble.\n"
-              "Schema:\n"
-              "{\n"
-              '  "test_cases": [\n'
-              "    {\n"
-              '      "index": 1,\n'
-              '      "requirement_source": "AC-1 | Edge Case: Rapid Edits | Regression Note: Cache Latency | Discrepancy-1 | Comment: <author>",\n'
-              '      "description": "Verify <specific behaviour>",\n'
-              '      "test_data": "concrete inputs, roles, dataset sizes — or empty string if not applicable",\n'
-              '      "expected_result": "specific, verifiable outcome"\n'
-              "    }\n"
-              "  ]\n"
-              "}\n\n"
-              "The \"requirement_source\" field is mandatory. It must name the exact section and item from the ticket.\n\n"
-              "===== TWO-PASS INSTRUCTION =====\n\n"
-              "PASS 1 — EXTRACT (do this mentally before writing any JSON):\n"
-              "Read the full ticket below and extract every testable item from ALL sources:\n\n"
-              "  [A] ACCEPTANCE CRITERIA\n"
-              "      Every numbered/bulleted AC must produce at least one positive test case\n"
-              "      and at least one negative/boundary test case.\n\n"
-              "  [B] EDGE CASES & NEGATIVE SCENARIOS\n"
-              "      Every named edge case must produce at least one test case.\n"
-              "      Do not collapse multiple edge cases into one test case.\n\n"
-              "  [C] REGRESSION / POINTS TO NOTE\n"
-              "      Every regression item or verification note must produce at least one\n"
-              "      test case. These are the most commonly missed section.\n\n"
-              "  [D] DISCREPANCIES / AMBIGUITIES (e.g. [DISCREPANCIES-START] sections)\n"
-              "      Each ambiguity has Interpretation A and Interpretation B.\n"
-              "      Write one test case per interpretation.\n\n"
-              "  [E] RELATED TICKETS (Historical Data / Risk Signals)\n"
-              "      Direct Match / Functional Match tickets: at least one regression test case.\n"
-              "      Risk Signal tickets: at least one test case for the flagged risk area.\n\n"
-              "  [F] COMMENTS (human-authored only)\n"
-              "      Each comment adding context, a scenario, a constraint, or a bug\n"
-              "      observation must produce at least one test case.\n\n"
-              "  [G] IMPLICIT BEHAVIOURS\n"
-              "      For each list type or component mentioned, check: cross-list consistency,\n"
-              "      UI states (loading, empty, pagination cross-page jumps) not covered by A-F.\n\n"
-              "PASS 2 — GENERATE:\n"
-              "For every item from Pass 1, write one or more test cases. Rules:\n"
-              "- Never skip a Pass 1 item. If in doubt, write the test case.\n"
-              "- test_data must be concrete: role names, record counts, column names,\n"
-              "  field values, timestamps, page numbers where relevant.\n"
-              "- expected_result must be specific and verifiable — never 'the page works correctly'.\n"
-              "- Do NOT generate test cases for out-of-scope items from unrelated tickets.\n"
-              "- Do NOT generate duplicate test cases for the same scenario.\n\n"
-              "===== JIRA TICKET =====\n"
-              f"ID: {jira_id}\n"
-              f"SUMMARY: {summary}\n\n"
-              f"DESCRIPTION:\n{description}\n\n"
-              f"COMMENTS:\n{comments}\n"
-          )
+          prompt = f"""You are a senior QA Engineer. Your job is to read a Jira ticket in full and generate a complete, traceable test suite that covers every testable requirement in it.
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          OUTPUT FORMAT — STRICT
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          Output a single raw valid JSON object only.
+          No markdown. No code fences. No explanation. No preamble. Start with {{ and end with }}.
+          
+          Each test case must have exactly these five fields:
+            "index"              — sequential integer starting at 1
+            "requirement_source" — name of the exact section/item this test covers (e.g. "AC-2: Modification Behavior", "Edge Case: Pagination", "Comment: John Smith 2025-01-10")
+            "description"        — starts with "Verify", describes one specific behaviour
+            "test_data"          — concrete: field names, values, counts, roles, timestamps — never vague
+            "expected_result"    — specific and verifiable: exact text, exact value, exact UI state — never "works correctly"
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          HOW TO READ THIS TICKET
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          Before writing a single test case, read the ENTIRE description and ALL comments below.
+          Do not start generating until you have finished reading everything.
+          
+          As you read, mentally build a checklist of every testable item you find. Only then generate test cases — one or more per checklist item.
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          WHAT TO COVER — READ EVERY ONE OF THESE
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          
+          1. ACCEPTANCE CRITERIA
+             Every AC item needs:
+             - At least one positive/happy-path test case
+             - At least one negative or boundary test case
+          
+          2. SCOPE & FEATURE ITEMS
+             Every bullet, numbered item, named feature, or component in the scope section needs at least one test case.
+             Never skip a scope item because it lacks explicit ACs — infer the testable behaviour from its name and context.
+          
+          3. DISPLAY CONDITIONS & TRIGGERS
+             For every "if X then show Y" rule: test both when the condition is met and when it is not.
+          
+          4. FORMULAS & CALCULATIONS
+             For every formula in the ticket, generate test cases for:
+             - The happy-path calculation with concrete numbers
+             - Division by zero: what does the UI show when the denominator is 0?
+             - Zero result: when numerator is 0, does UI show 0, N/A, or hide the field?
+             - Boundary values: 0%, 100%, and exactly 1.0 for multipliers or index values
+             - Rounding: when the result is non-integer, what precision does the UI display?
+          
+          5. UI COMPONENTS & ELEMENT-LEVEL SPEC
+             For every UI element described (tooltip, progress bar, table, column, tab, badge, colour rule, popup, subtitle), verify:
+             - Tooltip: exact text matches the spec verbatim
+             - Progress bar: the bar's full-width denominator matches spec, not just the percentage
+             - Colour coding: correct colour at exact boundary values (e.g. index = 1.0 exactly)
+             - Table columns: all specified columns are present, in the correct order, with no extras
+             - Tabs: each tab's display condition and content are verified separately
+             - Popup: opening, content, scrollability, sort order, and out-of-scope features absent
+          
+          6. EDGE CASES & NEGATIVE SCENARIOS
+             Every named edge case needs its own test case. Do not collapse multiple into one.
+             Also consider:
+             - Empty state: what does each component show when it has no data?
+             - Zero records / zero patients / zero DMAs
+             - Large datasets: do counts and percentages display correctly at scale?
+          
+          7. OUT-OF-SCOPE ITEMS
+             For each item explicitly marked out of scope, verify it is absent or disabled in the UI.
+          
+          8. COMMENTS (human-authored only)
+             Read every comment. Each comment that adds context, a new scenario, a constraint, a bug observation, or a clarification must produce at least one test case.
+             Label its requirement_source as: "Comment: [Author] [date]"
+          
+          9. RELATED TICKETS & RISK SIGNALS (if present)
+             Direct Match / Functional Match tickets: at least one regression test case for the flagged area.
+             Risk Signal tickets: at least one test case for the identified risk.
+          
+          10. DISCREPANCIES & AMBIGUITIES (if present, e.g. [DISCREPANCIES-START] sections)
+              Each ambiguity describes two possible interpretations. Write one test case per interpretation.
+          
+          11. REGRESSION / POINTS TO NOTE (if present)
+              Every item flagged for regression or listed as a verification point needs at least one test case.
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          RULES FOR EVERY TEST CASE
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          - test_data must be concrete: use real field names, actual values, specific counts, named roles, timestamps, page numbers.
+            BAD:  "some records with different timestamps"
+            GOOD: "NPI List with 5 records created on 2025-01-01, 2025-01-05, 2025-01-10, 2025-01-15, 2025-01-20"
+          
+          - expected_result must be specific and verifiable. Never write "the page works correctly" or "data is displayed".
+            BAD:  "Coverage Rate is displayed correctly"
+            GOOD: "Coverage Rate displays 75% and the progress bar fills to 75% of its total width"
+          
+          - Do NOT generate test cases for things this ticket explicitly says are out of scope.
+          - Do NOT generate duplicate test cases for the same scenario.
+          - Never skip a checklist item. If in doubt, write the test case.
+          
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          JIRA TICKET
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          ID      : {jira_id}
+          SUMMARY : {summary}
+          
+          --- DESCRIPTION (read completely before generating) ---
+          {description}
+          
+          --- COMMENTS (read completely before generating) ---
+          {comments}
+          """
           
           with open("prompt.txt", "w", encoding="utf-8") as f:
               f.write(prompt)
           
           size  = len(prompt.encode("utf-8"))
           words = len(prompt.split())
-          print(f"Prompt size: {size} bytes / {words} words (est. {words // 3} tokens)")
+          print(f"Prompt written     : {size} bytes / {words} words (est. {words // 3} tokens)")
           PYPROMPT
 
       # =========================
@@ -318,38 +376,38 @@ jobs:
           if ! jq empty raw_output.json 2>/dev/null; then
             echo "WARNING: Raw output is not valid JSON — attempting truncation recovery..."
             python3 << 'PYEOF'
-          import json, sys
-          
-          with open("raw_output.json", "r", encoding="utf-8") as f:
-              raw = f.read().strip()
-          
-          last_complete = raw.rfind('},')
-          if last_complete == -1:
-              last_complete = raw.rfind('}')
-          
-          if last_complete == -1:
-              print("Cannot recover: no complete test case objects found")
-              sys.exit(1)
-          
-          recovered = raw[:last_complete + 1] + "\n  ]\n}"
-          
-          brace_start = recovered.find('{')
-          if brace_start > 0:
-              recovered = recovered[brace_start:]
-          
-          try:
-              data = json.loads(recovered)
-          except json.JSONDecodeError as e:
-              print(f"Recovery failed: {e}")
-              print(recovered[:500])
-              sys.exit(1)
-          
-          tc = data.get("test_cases", [])
-          print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
-          
-          with open("raw_output.json", "w", encoding="utf-8") as f:
-              json.dump(data, f, ensure_ascii=False, indent=2)
-          PYEOF
+            import json, sys
+            
+            with open("raw_output.json", "r", encoding="utf-8") as f:
+                raw = f.read().strip()
+            
+            last_complete = raw.rfind('},')
+            if last_complete == -1:
+                last_complete = raw.rfind('}')
+            
+            if last_complete == -1:
+                print("Cannot recover: no complete test case objects found")
+                sys.exit(1)
+            
+            recovered = raw[:last_complete + 1] + "\n  ]\n}"
+            
+            brace_start = recovered.find('{')
+            if brace_start > 0:
+                recovered = recovered[brace_start:]
+            
+            try:
+                data = json.loads(recovered)
+            except json.JSONDecodeError as e:
+                print(f"Recovery failed: {e}")
+                print(recovered[:500])
+                sys.exit(1)
+            
+            tc = data.get("test_cases", [])
+            print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
+            
+            with open("raw_output.json", "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            PYEOF
           fi
 
           TC_COUNT=$(jq '.test_cases | length' raw_output.json)
