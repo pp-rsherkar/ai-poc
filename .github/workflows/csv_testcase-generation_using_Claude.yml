@@ -67,9 +67,19 @@ jobs:
           SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
           DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' \
             | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-          COMMENTS=$(echo "$RESPONSE" | jq -r \
-            '.fields.comment.comments | sort_by(.created) | .[] | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)' \
-            | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
+          # Filter out AI-generated bot comments (posted by this workflow) to avoid
+          # feeding previous test case output back as context on re-runs.
+          # Bot comments contain the heading "AI-Generated Test Matrix Summary".
+          COMMENTS=$(echo "$RESPONSE" | jq -r '
+            .fields.comment.comments
+            | sort_by(.created)
+            | map(select(
+                (.body | .. | .text? // empty)
+                | test("AI-Generated Test Matrix Summary"; "i") | not
+              ))
+            | .[]
+            | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)
+          ' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
 
           [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
           [ -z "$COMMENTS" ]    && COMMENTS="No Comments"
@@ -113,11 +123,13 @@ jobs:
         run: |
           set -euo pipefail
           python3 << 'PYEOF'
-          import os
+          import os, re
           
-          summary_trim  = os.environ.get("SUMMARY", "")[:300]
-          desc_trim     = os.environ.get("DESCRIPTION", "")[:2000]
-          comments_trim = os.environ.get("COMMENTS", "")[:1000]
+          # No secondary truncation here — Jira fetch already caps at 12000/8000 chars.
+          # Cutting again here was silently discarding most of the ticket content.
+          summary_trim  = os.environ.get("SUMMARY", "")[:500]
+          desc_trim     = os.environ.get("DESCRIPTION", "")   # up to 12000 chars from fetch step
+          comments_trim = os.environ.get("COMMENTS", "")       # up to 8000 chars from fetch step
           jira_id       = os.environ.get("JIRA_ID", "")
           
           prompt = f"""You are an expert QA Engineer. Analyze the Jira ticket below and generate a thorough suite of test cases.
