@@ -11,7 +11,7 @@ on:
         description: "Select Claude Model"
         required: true
         type: choice
-        default: "claude-sonnet-4-6"
+        default: "claude-haiku-4-5"
         options:
           - claude-haiku-4-5
           - claude-sonnet-4-6
@@ -301,12 +301,52 @@ jobs:
       # Generate Testcases via Claude API (with retry)
       # max_tokens: 16000 — handles 80+ test cases without truncation.
       # Opus 4.7+ omits temperature (unsupported by those models).
+      #
+      # NOTE: the truncation recovery logic is written to recover.py during
+      # this step rather than inlined as a heredoc, because nesting <<'PYEOF'
+      # inside the step that is itself launched by <<'PYPROMPT' causes bash to
+      # lose track of the outer delimiter and fail with "unexpected end of file".
       # =========================
       - name: Generate structured test cases
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -euo pipefail
+
+          # Write the recovery script to a file so it is never inside a heredoc
+          cat > recover.py << 'RECOVEREOF'
+import json, sys
+
+with open("raw_output.json", "r", encoding="utf-8") as f:
+    raw = f.read().strip()
+
+last_complete = raw.rfind('},')
+if last_complete == -1:
+    last_complete = raw.rfind('}')
+
+if last_complete == -1:
+    print("Cannot recover: no complete test case objects found")
+    sys.exit(1)
+
+recovered = raw[:last_complete + 1] + "\n  ]\n}"
+
+brace_start = recovered.find('{')
+if brace_start > 0:
+    recovered = recovered[brace_start:]
+
+try:
+    data = json.loads(recovered)
+except json.JSONDecodeError as e:
+    print(f"Recovery failed: {e}")
+    print(recovered[:500])
+    sys.exit(1)
+
+tc = data.get("test_cases", [])
+print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
+
+with open("raw_output.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+RECOVEREOF
 
           MODEL="${{ inputs.llm_model }}"
 
@@ -375,39 +415,7 @@ jobs:
           # Recovery: if response was cut mid-object, salvage all fully-formed test cases
           if ! jq empty raw_output.json 2>/dev/null; then
             echo "WARNING: Raw output is not valid JSON — attempting truncation recovery..."
-            python3 << 'PYEOF'
-            import json, sys
-            
-            with open("raw_output.json", "r", encoding="utf-8") as f:
-                raw = f.read().strip()
-            
-            last_complete = raw.rfind('},')
-            if last_complete == -1:
-                last_complete = raw.rfind('}')
-            
-            if last_complete == -1:
-                print("Cannot recover: no complete test case objects found")
-                sys.exit(1)
-            
-            recovered = raw[:last_complete + 1] + "\n  ]\n}"
-            
-            brace_start = recovered.find('{')
-            if brace_start > 0:
-                recovered = recovered[brace_start:]
-            
-            try:
-                data = json.loads(recovered)
-            except json.JSONDecodeError as e:
-                print(f"Recovery failed: {e}")
-                print(recovered[:500])
-                sys.exit(1)
-            
-            tc = data.get("test_cases", [])
-            print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
-            
-            with open("raw_output.json", "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            PYEOF
+            python3 recover.py
           fi
 
           TC_COUNT=$(jq '.test_cases | length' raw_output.json)
