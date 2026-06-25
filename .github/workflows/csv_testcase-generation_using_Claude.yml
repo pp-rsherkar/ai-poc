@@ -11,7 +11,7 @@ on:
         description: "Select Claude Model"
         required: true
         type: choice
-        default: "claude-haiku-4-5"
+        default: "claude-sonnet-4-6"
         options:
           - claude-haiku-4-5
           - claude-sonnet-4-6
@@ -45,6 +45,8 @@ jobs:
 
       # =========================
       # Fetch Jira details
+      # Full description + human-only comments (bot comments filtered out).
+      # No secondary truncation — limits are enforced here only.
       # =========================
       - name: Fetch Jira details
         run: |
@@ -65,11 +67,12 @@ jobs:
           fi
 
           SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "No Summary"')
+
           DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description | .. | .text? // empty' \
             | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
-          # Filter out AI-generated bot comments (posted by this workflow) to avoid
-          # feeding previous test case output back as context on re-runs.
-          # Bot comments contain the heading "AI-Generated Test Matrix Summary".
+
+          # Filter out AI-generated bot comments to avoid re-feeding previous
+          # test matrix output as context on re-runs.
           COMMENTS=$(echo "$RESPONSE" | jq -r '
             .fields.comment.comments
             | sort_by(.created)
@@ -78,7 +81,8 @@ jobs:
                 | test("AI-Generated Test Matrix Summary"; "i") | not
               ))
             | .[]
-            | (.author.displayName // "Unknown") + ": " + (.body | .. | .text? // empty)
+            | "COMMENT [" + (.author.displayName // "Unknown") + " | " + .created + "]: "
+              + (.body | .. | .text? // empty)
           ' | tr "\n" " " | sed 's/[[:space:]]\+/ /g')
 
           [ -z "$DESCRIPTION" ] && DESCRIPTION="No Description"
@@ -87,15 +91,15 @@ jobs:
           DESC_LEN=${#DESCRIPTION}
           COMM_LEN=${#COMMENTS}
 
-          if [ "$DESC_LEN" -gt 12000 ]; then
-            echo "WARNING: Description is ${DESC_LEN} chars — exceeds 12000, will be truncated. Consider splitting the ticket."
+          if [ "$DESC_LEN" -gt 15000 ]; then
+            echo "WARNING: Description is ${DESC_LEN} chars — truncated to 15000. Consider splitting the ticket."
           fi
-          if [ "$COMM_LEN" -gt 8000 ]; then
-            echo "WARNING: Comments are ${COMM_LEN} chars — exceeds 8000, will be truncated."
+          if [ "$COMM_LEN" -gt 10000 ]; then
+            echo "WARNING: Comments are ${COMM_LEN} chars — truncated to 10000."
           fi
 
-          DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-12000)
-          COMMENTS=$(echo "$COMMENTS" | cut -c1-8000)
+          DESCRIPTION=$(echo "$DESCRIPTION" | cut -c1-15000)
+          COMMENTS=$(echo "$COMMENTS"    | cut -c1-10000)
 
           {
             echo "SUMMARY<<EOF"
@@ -111,8 +115,14 @@ jobs:
 
       # =========================
       # Write prompt file
-      # Uses Python to avoid jq string escaping issues and heredoc
-      # indentation bloat — prompt.txt will have zero leading whitespace
+      # Two-pass prompt:
+      #   Pass 1 — instruct the model to extract every requirement source
+      #            into a structured checklist (ACs, edge cases, regression
+      #            notes, discrepancies, related-ticket signals).
+      #   Pass 2 — instruct the model to generate one or more test cases
+      #            per checklist item, then produce the final JSON.
+      # This prevents the model from generating test cases before it has
+      # read the entire ticket, which caused coverage gaps.
       # =========================
       - name: Write prompt file
         env:
@@ -123,66 +133,87 @@ jobs:
         run: |
           set -euo pipefail
           python3 << 'PYEOF'
-          import os, re
+          import os
           
-          # No secondary truncation here — Jira fetch already caps at 12000/8000 chars.
-          # Cutting again here was silently discarding most of the ticket content.
-          summary_trim  = os.environ.get("SUMMARY", "")[:500]
-          desc_trim     = os.environ.get("DESCRIPTION", "")   # up to 12000 chars from fetch step
-          comments_trim = os.environ.get("COMMENTS", "")       # up to 8000 chars from fetch step
-          jira_id       = os.environ.get("JIRA_ID", "")
+          summary     = os.environ.get("SUMMARY", "")[:500]
+          description = os.environ.get("DESCRIPTION", "")   # up to 15000 chars
+          comments    = os.environ.get("COMMENTS", "")       # up to 10000 chars
+          jira_id     = os.environ.get("JIRA_ID", "")
           
-          prompt = f"""You are an expert QA Engineer. Analyze the Jira ticket below and generate a thorough suite of test cases.
+          prompt = f"""You are a senior QA Engineer generating a complete, traceable test suite from a Jira ticket.
           
-          HARD RULES:
-          1. Output a single raw valid JSON object only. No markdown, no code fences, no explanation text.
-          2. The JSON must contain exactly one key: "test_cases" which is an array of objects.
-          3. Every object must have exactly these four keys: "index", "description", "test_data", "expected_result".
-          4. "index" must be a sequential integer starting at 1.
-          5. "test_data" must be a string — use empty string "" if not applicable, never omit the key.
-          6. Never truncate or summarise — generate a complete test case for every item found.
-          
-          DESCRIPTION INTERPRETATION RULES:
-          The Jira description may be written in different styles. Handle all of them:
-          
-          Style 1 - Explicit acceptance criteria: Map each AC to one or more test cases.
-          Style 2 - Scope list (e.g. "FE: Dropdown Changes, Brand Multi Select"):
-            For each item infer the most likely user-facing behaviour and write a test case.
-            Ask: what would a QA engineer test for this item?
-            Example: "Brand Multi Select" means user selects multiple brands and verifies they are applied.
-          Style 3 - Status notes (e.g. "6/9 - RELEASED"): Ignore pure status lines.
-          Style 4 - Mixed: Process each section independently. UPDATED section items are high priority.
-          
-          For ANY description style:
-          - Every bullet, numbered item, or named feature in SCOPE must produce at least one test case.
-          - Every UPDATED section item must produce at least one test case.
-          - Never skip a scope item because it lacks explicit ACs. Infer the behaviour from the item name.
-          - Use COMMENTS for additional context and edge cases.
-          
-          TEST CASE TYPES TO GENERATE (only if implied by the ticket):
-          - Positive / happy path
-          - Negative / validation / boundary conditions
-          - UI state and toggle verification
-          - Permission and role-based access
-          - Edge cases mentioned in comments
-          
-          EXACT OUTPUT SCHEMA:
+          ===== STRICT OUTPUT RULE =====
+          Output a single raw valid JSON object. No markdown, no code fences, no commentary, no preamble.
+          Schema:
           {{
             "test_cases": [
               {{
                 "index": 1,
-                "description": "Verify user can do X",
-                "test_data": "specific input values or empty string",
-                "expected_result": "explicit outcome that can be verified"
+                "requirement_source": "AC-1 | Edge Case: Rapid Edits | Regression Note: Cache Latency | Discrepancy-1 | Comment: <author>",
+                "description": "Verify <specific behaviour>",
+                "test_data": "concrete inputs, roles, dataset sizes — or empty string if not applicable",
+                "expected_result": "specific, verifiable outcome"
               }}
             ]
           }}
           
-          JIRA:
+          The "requirement_source" field is mandatory. It must name the exact section and item from the ticket that this test case covers.
+          
+          ===== TWO-PASS INSTRUCTION =====
+          
+          PASS 1 — EXTRACT (do this mentally before writing any JSON):
+          Read the full ticket below. Extract every testable item from ALL of the following sources:
+          
+            [A] ACCEPTANCE CRITERIA
+                Every numbered or bulleted AC must produce at least one positive test case
+                and at least one negative/boundary test case.
+          
+            [B] EDGE CASES & NEGATIVE SCENARIOS
+                Every named edge case must produce at least one test case.
+                Do not collapse multiple edge cases into one test case.
+          
+            [C] REGRESSION / POINTS TO NOTE
+                Every item flagged for regression or noted as a verification point must
+                produce at least one test case. These are often the most missed.
+          
+            [D] DISCREPANCIES / AMBIGUITIES (sections like [DISCREPANCIES-START])
+                Each ambiguity represents two possible behaviours (Interpretation A and B).
+                Write one test case per interpretation to cover both paths.
+          
+            [E] RELATED TICKETS (Historical Data / Risk Signals)
+                Every ticket listed as "Direct Match" or "Functional Match" must produce
+                at least one regression test case for the area it flags.
+                "Risk Signal" tickets must produce at least one test case for the risk area.
+          
+            [F] COMMENTS (human-authored only)
+                Each comment that adds context, a new scenario, a constraint, or a bug
+                observation must produce at least one test case.
+          
+            [G] IMPLICIT BEHAVIOURS
+                For each list type or component mentioned (e.g. NPI List, Keywords List),
+                ask: are there cross-list consistency cases? Are there UI state cases
+                (loading, empty state, pagination) not yet covered by A–F?
+          
+          PASS 2 — GENERATE:
+          For every item extracted in Pass 1, write one or more test cases.
+          Rules:
+          - Never skip an item from Pass 1. If in doubt, write the test case.
+          - "test_data" must be concrete: include role names, record counts, column names,
+            field values, timestamps, or page numbers where relevant.
+          - "expected_result" must be specific and verifiable — never "the page works correctly".
+          - Do NOT generate test cases for unrelated tickets or scope (e.g. a UX colour
+            change from a different ticket is out of scope unless this ticket's AC mentions it).
+          - Do NOT generate duplicate test cases for the same scenario.
+          
+          ===== JIRA TICKET =====
           ID: {jira_id}
-          SUMMARY: {summary_trim}
-          DESCRIPTION: {desc_trim}
-          COMMENTS: {comments_trim}
+          SUMMARY: {summary}
+          
+          DESCRIPTION:
+          {description}
+          
+          COMMENTS:
+          {comments}
           """
           
           with open("prompt.txt", "w") as f:
@@ -203,13 +234,15 @@ jobs:
           BYTES=$(wc -c < prompt.txt)
           echo "Prompt file: ${BYTES} bytes"
 
-          if [ "$BYTES" -gt 100000 ]; then
-            echo "::error::Prompt exceeds safe limit"
+          if [ "$BYTES" -gt 120000 ]; then
+            echo "::error::Prompt exceeds safe limit (120000 bytes). Consider splitting the ticket."
             exit 1
           fi
 
       # =========================
       # Generate Testcases via Claude API (with retry)
+      # max_tokens: 16000 — handles 80+ test cases without truncation.
+      # Opus 4.7+ omits temperature (unsupported by those models).
       # =========================
       - name: Generate structured test cases
         env:
@@ -219,8 +252,6 @@ jobs:
 
           MODEL="${{ inputs.llm_model }}"
 
-          # Claude Opus 4.7+ does not support temperature — omit it for these models
-          # max_tokens set to 16000 to handle large ticket outputs (50+ test cases)
           if [[ "$MODEL" == *"opus-4-7"* || "$MODEL" == *"opus-4-8"* ]]; then
             echo "Extended model detected ($MODEL) — omitting temperature"
             jq -n \
@@ -229,7 +260,7 @@ jobs:
               '{
                 model: $model,
                 max_tokens: 16000,
-                system: "You are an expert QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
+                system: "You are a senior QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
                 messages: [{ role: "user", content: $prompt }]
               }' > request.json
           else
@@ -240,7 +271,7 @@ jobs:
                 model: $model,
                 max_tokens: 16000,
                 temperature: 0,
-                system: "You are an expert QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
+                system: "You are a senior QA Engineer. Output only a raw valid JSON object with a test_cases array. No markdown, no fences, no commentary.",
                 messages: [{ role: "user", content: $prompt }]
               }' > request.json
           fi
@@ -276,60 +307,51 @@ jobs:
             fi
           done
 
-          # Extract content and strip any markdown fences the model may emit
+          # Extract content — strip any markdown fences the model may emit
           jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE" \
             | sed 's/```json//g' \
             | sed 's/```//g' \
             | sed '/^[[:space:]]*$/d' \
             > raw_output.json
 
-          # Attempt to recover truncated JSON before hard-failing.
-          # If the response was cut mid-object (token limit hit), Python will
-          # close the array and object so we keep all fully-formed test cases.
+          # Recovery: if response was cut mid-object, salvage all fully-formed test cases
           if ! jq empty raw_output.json 2>/dev/null; then
             echo "WARNING: Raw output is not valid JSON — attempting truncation recovery..."
             python3 << 'PYEOF'
-          import json, sys, re
-
-          with open("raw_output.json", "r", encoding="utf-8") as f:
-              raw = f.read().strip()
-
-          # Find the last fully-closed test case object
-          # Strategy: locate the last complete '}' that closes a test case
-          # by finding the last occurrence of the pattern ending a test case entry
-          last_complete = raw.rfind('},')
-          if last_complete == -1:
-              last_complete = raw.rfind('}')
-
-          if last_complete == -1:
-              print("Cannot recover: no complete test case objects found")
-              sys.exit(1)
-
-          # Truncate at last complete object and close the JSON structure
-          recovered = raw[:last_complete + 1] + "\n  ]\n}"
-
-          # Strip any leading characters before the opening brace
-          brace_start = recovered.find('{')
-          if brace_start > 0:
-              recovered = recovered[brace_start:]
-
-          try:
-              data = json.loads(recovered)
-          except json.JSONDecodeError as e:
-              print(f"Recovery failed: {e}")
-              print("Recovered attempt:")
-              print(recovered[:500])
-              sys.exit(1)
-
-          tc = data.get("test_cases", [])
-          print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
-
-          with open("raw_output.json", "w", encoding="utf-8") as f:
-              json.dump(data, f, ensure_ascii=False, indent=2)
-          PYEOF
+            import json, sys
+            
+            with open("raw_output.json", "r", encoding="utf-8") as f:
+                raw = f.read().strip()
+            
+            last_complete = raw.rfind('},')
+            if last_complete == -1:
+                last_complete = raw.rfind('}')
+            
+            if last_complete == -1:
+                print("Cannot recover: no complete test case objects found")
+                sys.exit(1)
+            
+            recovered = raw[:last_complete + 1] + "\n  ]\n}"
+            
+            brace_start = recovered.find('{')
+            if brace_start > 0:
+                recovered = recovered[brace_start:]
+            
+            try:
+                data = json.loads(recovered)
+            except json.JSONDecodeError as e:
+                print(f"Recovery failed: {e}")
+                print(recovered[:500])
+                sys.exit(1)
+            
+            tc = data.get("test_cases", [])
+            print(f"Recovery succeeded — salvaged {len(tc)} complete test cases")
+            
+            with open("raw_output.json", "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            PYEOF
           fi
 
-          # Validate test_cases key exists and is non-empty
           TC_COUNT=$(jq '.test_cases | length' raw_output.json)
           if [ "$TC_COUNT" -eq 0 ]; then
             echo "Model returned empty test_cases array"
@@ -340,7 +362,31 @@ jobs:
           echo "Generated $TC_COUNT test cases successfully"
 
       # =========================
+      # Coverage gate
+      # Fails the run if fewer test cases were generated than expected,
+      # acting as a canary for prompt regressions or token truncation.
+      # Default minimum is 10; override via the min_test_cases input if needed.
+      # =========================
+      - name: Coverage gate
+        run: |
+          set -euo pipefail
+
+          TC_COUNT=$(jq '.test_cases | length' raw_output.json)
+          MIN_EXPECTED=10
+
+          echo "Test cases generated : $TC_COUNT"
+          echo "Minimum expected     : $MIN_EXPECTED"
+
+          if [ "$TC_COUNT" -lt "$MIN_EXPECTED" ]; then
+            echo "::error::Coverage gate failed — only $TC_COUNT test cases generated (minimum: $MIN_EXPECTED). Check prompt or model output."
+            exit 1
+          fi
+
+          echo "Coverage gate passed"
+
+      # =========================
       # Build CSV & Jira Comment Payload
+      # CSV now includes the requirement_source column for traceability.
       # =========================
       - name: Process JSON into CSV and Jira Comment
         shell: python3 {0}
@@ -355,12 +401,12 @@ jobs:
           test_cases = data.get('test_cases', [])
           jira_id = "${{ inputs.jira_id }}"
 
-          # 1. Generate CSV
+          # 1. Generate CSV — includes Requirement Source for traceability
           csv_file_path = f"Test_Cases_{jira_id}.csv"
           headers = [
-              "Test ID", "Requirement ID", "Test Description",
-              "Test Data", "Expected Result", "Actual Result",
-              "Test Status", "Owner"
+              "Test ID", "Requirement ID", "Requirement Source",
+              "Test Description", "Test Data", "Expected Result",
+              "Actual Result", "Test Status", "Owner"
           ]
 
           with open(csv_file_path, 'w', newline='', encoding='utf-8') as cf:
@@ -371,6 +417,7 @@ jobs:
                   writer.writerow([
                       f"TC_{jira_id}_{idx}",
                       jira_id,
+                      tc.get('requirement_source', ''),
                       tc.get('description', ''),
                       tc.get('test_data', ''),
                       tc.get('expected_result', ''),
@@ -392,15 +439,15 @@ jobs:
                       nodes.append({"type": "hardBreak"})
               return nodes if nodes else [{"type": "text", "text": "N/A"}]
 
-          # 3. Build Jira ADF comment table
+          # 3. Build Jira ADF comment table — includes Requirement Source column
           table_rows = [
               {
                   "type": "tableRow",
                   "content": [
-                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test ID", "marks": [{"type": "strong"}]}]}]},
-                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Requirement ID", "marks": [{"type": "strong"}]}]}]},
-                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test Description", "marks": [{"type": "strong"}]}]}]},
-                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Expected Result", "marks": [{"type": "strong"}]}]}]}
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test ID",            "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Requirement Source", "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Test Description",   "marks": [{"type": "strong"}]}]}]},
+                      {"type": "tableHeader", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Expected Result",    "marks": [{"type": "strong"}]}]}]}
                   ]
               }
           ]
@@ -411,7 +458,7 @@ jobs:
                   "type": "tableRow",
                   "content": [
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": f"TC_{jira_id}_{idx}"}]}]},
-                      {"type": "tableCell", "content": [{"type": "paragraph", "content": [{"type": "text", "text": jira_id}]}]},
+                      {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('requirement_source', ''))}]},
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('description', ''))}]},
                       {"type": "tableCell", "content": [{"type": "paragraph", "content": make_adf_text_content(tc.get('expected_result', ''))}]}
                   ]
@@ -430,7 +477,7 @@ jobs:
                       {
                           "type": "paragraph",
                           "content": [
-                              {"type": "text", "text": "Test cases extracted from requirements and compiled below. Full tracking file attached to this ticket."}
+                              {"type": "text", "text": f"Generated {len(test_cases)} test cases. Each row is traced to its source requirement. Full tracking file attached."}
                           ]
                       },
                       {
