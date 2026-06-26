@@ -1,64 +1,107 @@
 """
-write_prompt.py
+write_prompt.py  — model-aware, truncation-safe version
 Usage: python3 write_prompt.py <jira_id> <domain>
 
-Reads env vars: SUMMARY, DESCRIPTION, COMMENTS, FEATURE_DIR
-Reads files:    step_dictionary.txt, scenario_dictionary.txt
-Writes:         prompt.txt
+Reads env vars : SUMMARY, LLM_MODEL
+Reads files    : jira_description.txt, jira_comments.txt,
+                 step_dictionary.txt, scenario_dictionary.txt
+Writes         : prompt.txt
 """
 import os
 import re
 import sys
 import glob
 
-# ── Args ──────────────────────────────────────────────────────────────────────
+# ── Args ───────────────────────────────────────────────────────────────────────
 if len(sys.argv) < 3:
-    print("Usage: write_prompt.py <jira_id> <domain>")
-    sys.exit(1)
+    sys.exit("Usage: write_prompt.py <jira_id> <domain>")
 
 jira_id     = sys.argv[1]
 domain      = sys.argv[2]
-domain_text = domain if domain else "general"
+domain_text = domain or "general"
 feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
+MODEL       = os.environ.get("LLM_MODEL", "claude-sonnet-4-6")
 
-# ── Pull Jira content ─────────────────────────────────────────────────────────
-summary_trim = os.environ.get("SUMMARY", "No Summary")[:300]
+print(f"Model         : {MODEL}")
 
-# Read description from file (avoids GitHub Actions env var truncation)
-desc_file = "jira_description.txt"
-if os.path.exists(desc_file):
-    with open(desc_file, "r", encoding="utf-8") as f:
-        desc_trim = f.read().strip()[:8000]
-    print(f"Description loaded from file: {len(desc_trim)} chars")
-else:
-    desc_trim = os.environ.get("DESCRIPTION", "No Description")[:8000]
-    print("::warning::jira_description.txt not found, falling back to env var")
+# ── Model-aware context budgets ────────────────────────────────────────────────
+# Official context windows from Anthropic docs (as of June 2026):
+#   claude-haiku-4-5   → 200k tokens
+#   claude-sonnet-4-6  → 1M tokens
+#   claude-opus-4-6    → 1M tokens
+#   claude-opus-4-7    → 1M tokens
+#   claude-opus-4-8    → 1M tokens
+#
+# We apply a 25% safety margin, then subtract fixed overhead for prompt
+# boilerplate, step dictionary, scenario context, and feature examples.
+# 1 token ≈ 4 chars (conservative for English + Gherkin mixed content).
 
-# Read comments from file
-comments_file = "jira_comments.txt"
-if os.path.exists(comments_file):
-    with open(comments_file, "r", encoding="utf-8") as f:
-        comments_trim = f.read().strip()[:2000]
-    print(f"Comments loaded from file: {len(comments_trim)} chars")
-else:
-    comments_trim = os.environ.get("COMMENTS", "No Comments")[:2000]
-    print("::warning::jira_comments.txt not found, falling back to env var")
+CONTEXT_WINDOWS = {
+    "claude-haiku-4-5":  200_000,
+    "claude-sonnet-4-6": 1_000_000,
+    "claude-opus-4-6":   1_000_000,
+    "claude-opus-4-7":   1_000_000,
+    "claude-opus-4-8":   1_000_000,
+}
 
-# ── Feature examples from target domain (up to 40 lines from 2 files) ────────
-example_files = sorted(
-    glob.glob(f"{feature_dir}/{domain_text}/*.feature")
-)[:2]
+CHARS_PER_TOKEN   = 4
+SAFETY_MARGIN     = 0.75   # use 75% of window to leave room for model response
+FIXED_OVERHEAD    = 40_000 # chars reserved for: rules text + step dict + examples + scenario ctx
 
+token_window      = CONTEXT_WINDOWS.get(MODEL, 200_000)  # default to most restrictive if unknown
+if MODEL not in CONTEXT_WINDOWS:
+    print(f"::warning::Unknown model '{MODEL}' — defaulting to 200k token budget (most restrictive)")
+
+usable_chars      = int(token_window * CHARS_PER_TOKEN * SAFETY_MARGIN) - FIXED_OVERHEAD
+DESC_BUDGET       = int(usable_chars * 0.80)   # 80% of jira budget for description
+COMMENTS_BUDGET   = int(usable_chars * 0.20)   # 20% of jira budget for comments
+
+print(f"Token window  : {token_window:,} tokens")
+print(f"Usable budget : {usable_chars:,} chars total")
+print(f"Desc budget   : {DESC_BUDGET:,} chars")
+print(f"Comments budget: {COMMENTS_BUDGET:,} chars")
+
+# ── Safe loader — warns loudly, never silently truncates ───────────────────────
+def load_with_budget(path, fallback_env, label, budget):
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        print(f"{label}: {len(content):,} chars loaded from {path}")
+    else:
+        content = os.environ.get(fallback_env, "").strip()
+        print(f"::warning::{path} not found — falling back to env var ({len(content):,} chars)")
+
+    if not content:
+        print(f"::error::{label} is empty — Jira parse step may have failed")
+        sys.exit(1)
+
+    if len(content) > budget:
+        # Cut at paragraph boundary, not mid-sentence
+        truncated = content[:budget].rsplit('\n\n', 1)[0]
+        print(f"::warning::{label} is {len(content):,} chars — exceeds {budget:,} char budget for {MODEL}.")
+        print(f"::warning::This ticket is unusually large. Truncated to {len(truncated):,} chars at paragraph boundary.")
+        print(f"::warning::Consider using claude-sonnet-4-6 or an Opus model for full coverage.")
+        return truncated
+
+    print(f"{label}: fits within budget ✓  ({len(content):,} / {budget:,} chars)")
+    return content
+
+# ── Load Jira content ──────────────────────────────────────────────────────────
+summary_raw   = os.environ.get("SUMMARY", "No Summary")[:300]  # summary is always short
+desc_full     = load_with_budget("jira_description.txt", "DESCRIPTION", "Description", DESC_BUDGET)
+comments_full = load_with_budget("jira_comments.txt",    "COMMENTS",    "Comments",    COMMENTS_BUDGET)
+
+# ── Feature examples from target domain (up to 40 lines from 2 files) ─────────
+example_files = sorted(glob.glob(f"{feature_dir}/{domain_text}/*.feature"))[:2]
 feature_examples = ""
 for ef in example_files:
     try:
         with open(ef, "r", encoding="utf-8") as f:
-            lines = f.readlines()[:40]
-            feature_examples += "".join(lines) + "\n"
+            feature_examples += "".join(f.readlines()[:40]) + "\n"
     except Exception:
         pass
 
-# ── Step context: target domain + general ────────────────────────────────────
+# ── Step context: target domain + general ─────────────────────────────────────
 steps = []
 if os.path.exists("step_dictionary.txt"):
     with open("step_dictionary.txt", "r", encoding="utf-8") as f:
@@ -67,34 +110,34 @@ if os.path.exists("step_dictionary.txt"):
     for i in range(1, len(blocks), 2):
         d = blocks[i]
         s = blocks[i + 1]
-        if d == domain_text or d == "general":
+        if d in (domain_text, "general"):
             steps.append(f"--- {d} steps ---\n{s.strip()}")
 
 MAX_LINES_PER_DOMAIN = 120
 capped_steps = []
 for block in steps:
-    block_lines = block.split("\n")
-    if len(block_lines) > MAX_LINES_PER_DOMAIN:
-        block_lines = block_lines[:MAX_LINES_PER_DOMAIN]
+    lines = block.split("\n")
+    if len(lines) > MAX_LINES_PER_DOMAIN:
+        lines = lines[:MAX_LINES_PER_DOMAIN]
         print(f"::warning::Step block trimmed to {MAX_LINES_PER_DOMAIN} lines")
-    capped_steps.append("\n".join(block_lines))
-step_context = "\n\n".join(capped_steps)
+    capped_steps.append("\n".join(lines))
+step_context = "\n\n".join(capped_steps) or "(none — model must invent all steps)"
 
-if not step_context.strip():
+if step_context.strip() == "(none — model must invent all steps)":
     print(f"::warning::No steps found for domain '{domain_text}' — model will invent all steps")
 else:
-    print(f"Step context: {len(step_context.splitlines())} lines for domain '{domain_text}'")
+    print(f"Step context  : {len(step_context.splitlines())} lines for domain '{domain_text}'")
 
-# ── Scenario context: last 30 titles for this domain ─────────────────────────
+# ── Scenario context: last 30 titles for this domain ──────────────────────────
 scenario_context = ""
 if os.path.exists("scenario_dictionary.txt"):
     with open("scenario_dictionary.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
-    scenarios = [l.strip() for l in lines if l.startswith(f"[{domain_text}]")]
-    scenario_context = "\n".join(scenarios[-30:])
-    print(f"Scenario context: {len(scenarios)} titles, showing last 30")
+    domain_scenarios = [l.strip() for l in lines if l.startswith(f"[{domain_text}]")]
+    scenario_context = "\n".join(domain_scenarios[-30:])
+    print(f"Scenario ctx  : {len(domain_scenarios)} titles, showing last 30")
 
-# ── Build prompt ──────────────────────────────────────────────────────────────
+# ── Build prompt ───────────────────────────────────────────────────────────────
 prompt = f"""HARD RULES:
 1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
 2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
@@ -210,9 +253,12 @@ If any answer is NO, add the missing scenarios before outputting.
 JIRA:
 ID: {jira_id}
 TARGET DOMAIN: {domain_text}
-SUMMARY: {summary_trim}
-DESCRIPTION: {desc_trim}
-COMMENTS: {comments_trim}
+SUMMARY: {summary_raw}
+DESCRIPTION:
+{desc_full}
+
+COMMENTS:
+{comments_full}
 
 REPOSITORY EXAMPLES (mirror this style exactly):
 {feature_examples}
@@ -246,6 +292,7 @@ Feature: <name from Jira summary>
 with open("prompt.txt", "w", encoding="utf-8") as f:
     f.write(prompt)
 
-size  = os.path.getsize("prompt.txt")
-words = len(prompt.split())
-print(f"Prompt size  : {size} bytes / {words} words (est. {words // 3} tokens)")
+size   = os.path.getsize("prompt.txt")
+tokens = size // CHARS_PER_TOKEN
+print(f"Prompt size   : {size:,} bytes (~{tokens:,} tokens)")
+print(f"Window used   : {tokens / token_window * 100:.1f}% of {MODEL} context window")
