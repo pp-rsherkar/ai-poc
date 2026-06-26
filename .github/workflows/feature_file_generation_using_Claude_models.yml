@@ -180,7 +180,7 @@ jobs:
             exit 1
           fi
 
-      # ---------------------------
+     # ---------------------------
       # Generate feature via Claude API (with retry)
       # ---------------------------
       - name: Generate feature via Claude API
@@ -288,6 +288,11 @@ jobs:
           FEATURE_COUNT=$(echo "$CLEANED" | grep -c "^Feature:" || true)
           if [ "$FEATURE_COUNT" -eq 0 ]; then
             echo "::error::Invalid Gherkin output — no Feature: line found"
+            exit 1
+          fi
+          if [ "$FEATURE_COUNT" -gt 2 ]; then
+            echo "::error::Model produced $FEATURE_COUNT Feature blocks — maximum allowed is 2."
+            echo "::error::Re-run the workflow; if this persists the ticket may need to be split in Jira."
             exit 1
           fi
 
