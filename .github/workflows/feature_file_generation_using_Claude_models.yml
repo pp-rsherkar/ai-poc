@@ -158,6 +158,24 @@ jobs:
       - name: Write prompt
         run: |
           set -euo pipefail
+
+          MODEL="${{ inputs.llm_model }}"
+
+          # Warn early if Haiku is selected for a large/multi-component ticket.
+          # Haiku has weaker multi-component reasoning — it reliably misses the
+          # second component on complex tickets even with sufficient token budget.
+          # The write_prompt.py injects a component checklist to compensate,
+          # but Sonnet or Opus is strongly preferred for tickets > 3,000 bytes.
+          if [[ "$MODEL" == *"haiku"* ]]; then
+            DESC_SIZE=$(wc -c < jira_description.txt 2>/dev/null || echo 0)
+            echo "Description size : ${DESC_SIZE} bytes"
+            if [ "$DESC_SIZE" -gt 3000 ]; then
+              echo "::warning::Large ticket (${DESC_SIZE} bytes) with Haiku model selected."
+              echo "::warning::Haiku may miss requirements on tickets with multiple components."
+              echo "::warning::Re-run with claude-sonnet-4-6 if any components are missing from output."
+            fi
+          fi
+
           python3 write_prompt.py \
             "${{ inputs.jira_id }}" \
             "${{ inputs.domain }}"
