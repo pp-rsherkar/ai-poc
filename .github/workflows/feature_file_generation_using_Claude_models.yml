@@ -386,7 +386,7 @@ jobs:
                   file_list.append(fname)
 
           with open("feature_files.txt", "w") as f:
-              f.write("\n".join(file_list))
+              f.write("\n".join(file_list) + "\n")  # trailing newline so wc -l counts correctly
 
           shutil.copy(file_list[0], "generated.feature")
           PY
@@ -408,7 +408,7 @@ jobs:
 
           echo "=== feature_files.txt contents ==="
           cat feature_files.txt
-          echo "=== Total files to stage: $(wc -l < feature_files.txt) ==="
+          echo "=== Total files to stage: $(grep -c . feature_files.txt || true) ==="
 
           while IFS= read -r fname; do
             if [ -z "$fname" ]; then continue; fi
@@ -463,7 +463,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          FILE_COUNT=$(wc -l < feature_files.txt | tr -d ' ')
+          FILE_COUNT=$(grep -c . feature_files.txt || true)
 
           # Re-add ALL staged feature files explicitly as a safety net.
           # The Save step stages files, but git may drop them between steps
@@ -503,7 +503,7 @@ jobs:
             exit 0
           fi
 
-          FILE_COUNT=$(wc -l < feature_files.txt | tr -d ' ')
+          FILE_COUNT=$(grep -c . feature_files.txt || true)
           FILE_LIST=$(cat feature_files.txt | sed 's/^/- /')
 
           cat > pr_body.txt << EOF
