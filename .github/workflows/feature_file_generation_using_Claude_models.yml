@@ -59,7 +59,7 @@ jobs:
           sudo apt-get install -y jq
 
       # ---------------------------
-      # Build context (SAFE INLINE PYTHON)
+      # Build context
       # ---------------------------
       - name: Build AI repository context
         run: |
@@ -69,36 +69,36 @@ jobs:
           python3 - << 'PY'
           import os, glob, re
           from collections import defaultdict
-          
+
           feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
-          
+
           steps_by_domain = defaultdict(set)
           scenarios = []
-          
+
           for file_path in glob.glob(f"{feature_dir}/**/*.feature", recursive=True):
               domain = os.path.basename(os.path.dirname(file_path))
               if domain in ["features", ""]:
                   domain = "general"
-          
+
               with open(file_path, "r", encoding="utf-8") as f:
                   content = f.read()
-          
+
               for m in re.finditer(r'^\s*(Scenario|Scenario Outline):\s*(.+)', content, re.MULTILINE):
                   scenarios.append(f"[{domain}] {m.group(0).strip()}")
-          
+
               for line in content.split("\n"):
                   line = line.strip()
                   if re.match(r'^(Given|When|Then|And|But)\s+', line):
                       steps_by_domain[domain].add(line)
-          
+
           with open("step_dictionary.txt", "w", encoding="utf-8") as f:
               for d, steps in sorted(steps_by_domain.items()):
                   f.write(f"\n--- Domain: {d} ---\n")
                   f.write("\n".join(sorted(steps)) + "\n")
-          
+
           with open("scenario_dictionary.txt", "w", encoding="utf-8") as f:
               f.write("\n".join(scenarios))
-          
+
           print("Domains:", sorted(steps_by_domain.keys()))
           print("Total steps:", sum(len(v) for v in steps_by_domain.values()))
           print("Total scenarios:", len(scenarios))
@@ -142,17 +142,16 @@ jobs:
           jq -r '.fields.description | type' jira_response.json
 
       # ---------------------------
-      # Parse Jira (SAFE ADF HANDLING)
+      # Parse Jira fields
       # ---------------------------
       - name: Parse Jira fields
         run: |
           set -euo pipefail
           python3 parse_jira_fields.py
-          # Only SUMMARY goes through GITHUB_ENV (it's short and safe)
           cat jira_fields.env >> "$GITHUB_ENV"
           echo "=== Description file size ==="
           wc -c jira_description.txt
-          
+
       # ---------------------------
       # Prompt builder
       # ---------------------------
@@ -166,21 +165,51 @@ jobs:
           LLM_MODEL: ${{ inputs.llm_model }}
 
       # ---------------------------
-      # Pre-flight check
+      # Pre-flight size check
+      # IMPORTANT: limit is based on the selected model's actual context window.
+      #   claude-haiku-4-5   → 200k tokens → ~800,000 bytes
+      #   claude-sonnet-4-6  → 1M tokens   → ~4,000,000 bytes
+      #   claude-opus-4-6/7/8 → 1M tokens  → ~4,000,000 bytes
+      # The old hardcoded 100,000 byte limit was cutting off large tickets
+      # BEFORE they reached Claude, causing incomplete generation (e.g. entire
+      # Geographic Performance component missing from output).
       # ---------------------------
       - name: Pre-flight size check
         run: |
           set -euo pipefail
 
+          MODEL="${{ inputs.llm_model }}"
           BYTES=$(wc -c < prompt.txt)
-          echo "Prompt file: ${BYTES} bytes"
+          echo "Prompt size : ${BYTES} bytes"
+          echo "Model       : ${MODEL}"
 
-          if [ "$BYTES" -gt 100000 ]; then
-            echo "::error::Prompt exceeds safe limit"
+          # Set byte limit per model (tokens * 4 bytes/token * 75% safety margin)
+          case "$MODEL" in
+            *"haiku-4-5"*)
+              # 200k tokens * 4 * 0.75 = 600,000 bytes
+              LIMIT=600000
+              ;;
+            *"sonnet-4-6"*|*"opus-4-6"*|*"opus-4-7"*|*"opus-4-8"*)
+              # 1M tokens * 4 * 0.75 = 3,000,000 bytes
+              LIMIT=3000000
+              ;;
+            *)
+              echo "::warning::Unknown model '$MODEL' — applying conservative 600,000 byte limit"
+              LIMIT=600000
+              ;;
+          esac
+
+          echo "Byte limit  : ${LIMIT} (for ${MODEL})"
+
+          if [ "$BYTES" -gt "$LIMIT" ]; then
+            echo "::error::Prompt (${BYTES} bytes) exceeds the context limit for ${MODEL} (${LIMIT} bytes)."
+            echo "::error::Switch to claude-sonnet-4-6 or an Opus model, or reduce ticket scope."
             exit 1
           fi
 
-     # ---------------------------
+          echo "Pre-flight passed: ${BYTES} / ${LIMIT} bytes used ($(( BYTES * 100 / LIMIT ))%)"
+
+      # ---------------------------
       # Generate feature via Claude API (with retry)
       # ---------------------------
       - name: Generate feature via Claude API
@@ -197,8 +226,6 @@ jobs:
           #   claude-opus-4-6    → 128,000 output tokens
           #   claude-opus-4-7    → 128,000 output tokens
           #   claude-opus-4-8    → 128,000 output tokens
-          # We use the full limit so no ticket is ever truncated mid-output.
-          # Note: Opus 4.7+ does not support temperature — omitted for those models.
           case "$MODEL" in
             *"opus-4-6"*|*"opus-4-7"*|*"opus-4-8"*)
               MAX_TOKENS=128000
@@ -212,15 +239,15 @@ jobs:
               ;;
           esac
 
-          echo "Model         : $MODEL"
-          echo "Max tokens    : $MAX_TOKENS"
+          echo "Model      : $MODEL"
+          echo "Max tokens : $MAX_TOKENS"
 
           # Build request JSON — omit temperature for Opus 4.7+
           if [[ "$MODEL" == *"opus-4-7"* || "$MODEL" == *"opus-4-8"* ]]; then
-            echo "Extended model detected ($MODEL) — omitting temperature"
+            echo "Extended model detected — omitting temperature"
             jq -n \
-              --arg model   "$MODEL" \
-              --argjson max  "$MAX_TOKENS" \
+              --arg model  "$MODEL" \
+              --argjson max "$MAX_TOKENS" \
               --rawfile prompt prompt.txt \
               '{
                 model: $model,
@@ -230,8 +257,8 @@ jobs:
               }' > request.json
           else
             jq -n \
-              --arg model   "$MODEL" \
-              --argjson max  "$MAX_TOKENS" \
+              --arg model  "$MODEL" \
+              --argjson max "$MAX_TOKENS" \
               --rawfile prompt prompt.txt \
               '{
                 model: $model,
@@ -270,13 +297,12 @@ jobs:
             fi
           done
 
-          # Check for truncation — stop_reason must be "end_turn", not "max_tokens"
+          # Guard: stop_reason must be "end_turn" — not "max_tokens"
           STOP_REASON=$(jq -r '.stop_reason' "$HTTP_RESPONSE")
-          echo "Stop reason   : $STOP_REASON"
+          echo "Stop reason : $STOP_REASON"
           if [ "$STOP_REASON" = "max_tokens" ]; then
-            echo "::error::Output was truncated despite using the model's full max_tokens ($MAX_TOKENS)."
-            echo "::error::This ticket has an unusually large number of scenarios."
-            echo "::error::Consider splitting the Jira ticket into smaller stories, or use an Opus model."
+            echo "::error::Output truncated at max_tokens ($MAX_TOKENS) — feature file is incomplete."
+            echo "::error::Switch to an Opus model (128k output) or split the Jira ticket."
             exit 1
           fi
 
@@ -284,7 +310,7 @@ jobs:
           RAW=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE")
           CLEANED=$(echo "$RAW" | sed 's/```gherkin//g; s/```//g')
 
-          # Validate at least one Feature block exists
+          # Validate Feature block count
           FEATURE_COUNT=$(echo "$CLEANED" | grep -c "^Feature:" || true)
           if [ "$FEATURE_COUNT" -eq 0 ]; then
             echo "::error::Invalid Gherkin output — no Feature: line found"
@@ -297,8 +323,8 @@ jobs:
           fi
 
           echo "$CLEANED" > raw_output.gherkin
-          echo "Feature blocks in output : $FEATURE_COUNT"
-          echo "Total scenarios generated: $(echo "$CLEANED" | grep -cE '^\s*Scenario:|^\s*Scenario Outline:' || true)"
+          echo "Feature blocks     : $FEATURE_COUNT"
+          echo "Scenarios generated: $(echo "$CLEANED" | grep -cE '^\s*Scenario:|^\s*Scenario Outline:' || true)"
 
       # ---------------------------
       # Split into feature files (1 file per Feature block)
@@ -307,17 +333,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          JIRA_ID="${{ inputs.jira_id }}"
           python3 - << 'PY'
-          import re, os, sys
+          import re, os, sys, shutil
 
           jira_id = os.environ["JIRA_ID"]
 
           with open("raw_output.gherkin", "r", encoding="utf-8") as f:
               content = f.read().strip()
 
-          # Split on Feature: boundaries, keeping the Feature: line with its block
-          # Pattern: split before every line that starts with "Feature:"
           raw_blocks = re.split(r'(?=^Feature:)', content, flags=re.MULTILINE)
           blocks = [b.strip() for b in raw_blocks if b.strip().startswith("Feature:")]
 
@@ -327,8 +350,6 @@ jobs:
 
           print(f"Feature blocks found: {len(blocks)}")
 
-          # Write files: single block → <JIRA_ID>.feature
-          #              multiple blocks → <JIRA_ID>_1.feature, <JIRA_ID>_2.feature, ...
           file_list = []
           if len(blocks) == 1:
               fname = f"{jira_id}.feature"
@@ -341,16 +362,13 @@ jobs:
                   fname = f"{jira_id}_{i}.feature"
                   with open(fname, "w", encoding="utf-8") as f:
                       f.write(block)
-                  scenario_count = len(re.findall(r'^\s*(Scenario:|Scenario Outline:)', block, re.MULTILINE))
-                  print(f"  File {i}: {fname} ({scenario_count} scenarios)")
+                  count = len(re.findall(r'^\s*(Scenario:|Scenario Outline:)', block, re.MULTILINE))
+                  print(f"  File {i}: {fname} ({count} scenarios)")
                   file_list.append(fname)
 
-          # Write manifest for downstream steps
           with open("feature_files.txt", "w") as f:
               f.write("\n".join(file_list))
 
-          # Copy first file as generated.feature for backward compat with validate step
-          import shutil
           shutil.copy(file_list[0], "generated.feature")
           PY
 
@@ -360,7 +378,7 @@ jobs:
           JIRA_ID: ${{ inputs.jira_id }}
 
       # ---------------------------
-      # Save feature file(s)
+      # Save feature files
       # ---------------------------
       - name: Save feature files
         run: |
@@ -369,20 +387,12 @@ jobs:
           TARGET="$FEATURE_DIR/${{ inputs.domain }}"
           mkdir -p "$TARGET"
 
-          # Track all committed files for the commit step
-          COMMITTED_FILES=""
-
           while IFS= read -r fname; do
             cp "$fname" "$TARGET/$fname"
             git add "$TARGET/$fname"
-            COMMITTED_FILES="$COMMITTED_FILES $TARGET/$fname"
             echo "Staged: $TARGET/$fname"
           done < feature_files.txt
 
-          # Also store file list with target path for commit message / PR body
-          echo "$COMMITTED_FILES" | tr ' ' '\n' | grep -v '^$' > committed_files.txt
-
-          # Keep FILE env var pointing to first file (used in PR title)
           FIRST=$(head -1 feature_files.txt)
           echo "FILE=${{ inputs.domain }}/$FIRST" >> "$GITHUB_ENV"
 
