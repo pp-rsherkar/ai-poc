@@ -1,4 +1,4 @@
-name: JIRA - Feature File (GHERKIN) Generator Using CLAUDE
+name: AI-Powered BDD Feature File Generator Using Claude
 
 on:
   workflow_dispatch:
