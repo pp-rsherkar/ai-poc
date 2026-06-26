@@ -181,6 +181,7 @@ jobs:
             "${{ inputs.domain }}"
         env:
           LLM_MODEL: ${{ inputs.llm_model }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
       # ---------------------------
       # Pre-flight size check
@@ -405,11 +406,21 @@ jobs:
           TARGET="$FEATURE_DIR/${{ inputs.domain }}"
           mkdir -p "$TARGET"
 
+          echo "=== feature_files.txt contents ==="
+          cat feature_files.txt
+          echo "=== Total files to stage: $(wc -l < feature_files.txt) ==="
+
           while IFS= read -r fname; do
+            if [ -z "$fname" ]; then continue; fi
+            echo "Copying $fname → $TARGET/$fname"
             cp "$fname" "$TARGET/$fname"
             git add "$TARGET/$fname"
+            git status --short "$TARGET/$fname"
             echo "Staged: $TARGET/$fname"
           done < feature_files.txt
+
+          echo "=== Git status after staging ==="
+          git status --short
 
           FIRST=$(head -1 feature_files.txt)
           echo "FILE=${{ inputs.domain }}/$FIRST" >> "$GITHUB_ENV"
@@ -454,13 +465,26 @@ jobs:
 
           FILE_COUNT=$(wc -l < feature_files.txt | tr -d ' ')
 
+          # Re-add ALL staged feature files explicitly as a safety net.
+          # The Save step stages files, but git may drop them between steps
+          # in some runner environments. Belt-and-suspenders approach.
+          TARGET="$FEATURE_DIR/${{ inputs.domain }}"
+          while IFS= read -r fname; do
+            if [ -z "$fname" ]; then continue; fi
+            git add "$TARGET/$fname"
+            echo "Re-staged for commit: $TARGET/$fname"
+          done < feature_files.txt
+
+          echo "=== Files in commit ==="
+          git diff --cached --name-only
+
           if [ "$FILE_COUNT" -eq 1 ]; then
             COMMIT_MSG="feat(${{ inputs.jira_id }}): generate feature file"
           else
             COMMIT_MSG="feat(${{ inputs.jira_id }}): generate $FILE_COUNT feature files"
           fi
 
-          git commit -m "$COMMIT_MSG" || true
+          git commit -m "$COMMIT_MSG" || echo "Nothing new to commit"
           git push origin "${{ env.BRANCH }}" --force
 
       # ---------------------------
