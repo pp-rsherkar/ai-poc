@@ -1,8 +1,8 @@
 """
-write_prompt.py  — model-aware, truncation-safe version
+write_prompt.py  — model-aware, truncation-safe, format-agnostic version
 Usage: python3 write_prompt.py <jira_id> <domain>
 
-Reads env vars : SUMMARY, LLM_MODEL
+Reads env vars : SUMMARY, LLM_MODEL, CLAUDE_CODE_OAUTH_TOKEN
 Reads files    : jira_description.txt, jira_comments.txt,
                  step_dictionary.txt, scenario_dictionary.txt
 Writes         : prompt.txt
@@ -11,6 +11,9 @@ import os
 import re
 import sys
 import glob
+import json
+import urllib.request
+import urllib.error
 
 # ── Args ───────────────────────────────────────────────────────────────────────
 if len(sys.argv) < 3:
@@ -21,25 +24,16 @@ domain      = sys.argv[2]
 domain_text = domain or "general"
 feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 MODEL       = os.environ.get("LLM_MODEL", "claude-sonnet-4-6")
+OAUTH_TOKEN = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN", "")
 
 print(f"Model         : {MODEL}")
 
-# ── Model capability tiers ─────────────────────────────────────────────────────
-# Haiku is fast but has weaker multi-component reasoning.
-# For tickets with two distinct functional components, it reliably misses the second.
-# We inject an explicit component checklist into the prompt to compensate.
 IS_HAIKU = "haiku" in MODEL.lower()
 if IS_HAIKU:
-    print("::warning::Haiku model selected. Component checklist injection enabled.")
-    print("::warning::For tickets with 2 components or 30+ scenarios, consider claude-sonnet-4-6.")
+    print("::warning::Haiku model selected.")
+    print("::warning::For tickets with 2+ components or 30+ scenarios, consider claude-sonnet-4-6.")
 
 # ── Model-aware context budgets ────────────────────────────────────────────────
-# Official context windows from Anthropic docs (as of June 2026):
-#   claude-haiku-4-5   → 200k tokens
-#   claude-sonnet-4-6  → 1M tokens
-#   claude-opus-4-6/7/8 → 1M tokens
-# 1 token ≈ 4 chars (conservative for English + Gherkin mixed content).
-
 CONTEXT_WINDOWS = {
     "claude-haiku-4-5":  200_000,
     "claude-sonnet-4-6": 1_000_000,
@@ -48,8 +42,6 @@ CONTEXT_WINDOWS = {
     "claude-opus-4-8":   1_000_000,
 }
 
-# Max output tokens per model (official Anthropic limits, June 2026)
-# Used only for logging — the workflow shell step sets max_tokens on the API call.
 MAX_OUTPUT_TOKENS = {
     "claude-haiku-4-5":  64_000,
     "claude-sonnet-4-6": 64_000,
@@ -59,23 +51,22 @@ MAX_OUTPUT_TOKENS = {
 }
 
 CHARS_PER_TOKEN = 4
-SAFETY_MARGIN   = 0.75   # use 75% of window to leave room for model response
-FIXED_OVERHEAD  = 40_000 # chars reserved for: rules text + step dict + examples + scenario ctx
+SAFETY_MARGIN   = 0.75
+FIXED_OVERHEAD  = 40_000
 
 token_window = CONTEXT_WINDOWS.get(MODEL, 200_000)
 if MODEL not in CONTEXT_WINDOWS:
-    print(f"::warning::Unknown model '{MODEL}' — defaulting to 200k token budget (most restrictive)")
+    print(f"::warning::Unknown model '{MODEL}' — defaulting to 200k token budget")
 
 usable_chars    = int(token_window * CHARS_PER_TOKEN * SAFETY_MARGIN) - FIXED_OVERHEAD
 DESC_BUDGET     = int(usable_chars * 0.80)
 COMMENTS_BUDGET = int(usable_chars * 0.20)
 
 print(f"Token window   : {token_window:,} tokens")
-print(f"Usable budget  : {usable_chars:,} chars total")
 print(f"Desc budget    : {DESC_BUDGET:,} chars")
 print(f"Comments budget: {COMMENTS_BUDGET:,} chars")
 
-# ── Safe loader — warns loudly, never silently truncates ───────────────────────
+# ── Safe loader ────────────────────────────────────────────────────────────────
 def load_with_budget(path, fallback_env, label, budget):
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
@@ -83,7 +74,7 @@ def load_with_budget(path, fallback_env, label, budget):
         print(f"{label}: {len(content):,} chars loaded from {path}")
     else:
         content = os.environ.get(fallback_env, "").strip()
-        print(f"::warning::{path} not found — falling back to env var ({len(content):,} chars)")
+        print(f"::warning::{path} not found — falling back to env var")
 
     if not content:
         print(f"::error::{label} is empty — Jira parse step may have failed")
@@ -91,9 +82,8 @@ def load_with_budget(path, fallback_env, label, budget):
 
     if len(content) > budget:
         truncated = content[:budget].rsplit('\n\n', 1)[0]
-        print(f"::warning::{label} is {len(content):,} chars — exceeds {budget:,} char budget for {MODEL}.")
-        print(f"::warning::Truncated to {len(truncated):,} chars at paragraph boundary.")
-        print(f"::warning::Consider using claude-sonnet-4-6 or an Opus model for full coverage.")
+        print(f"::warning::{label} truncated {len(content):,} → {len(truncated):,} chars")
+        print(f"::warning::Consider using claude-sonnet-4-6 or Opus for full coverage.")
         return truncated
 
     print(f"{label}: fits within budget ✓  ({len(content):,} / {budget:,} chars)")
@@ -104,62 +94,101 @@ summary_raw   = os.environ.get("SUMMARY", "No Summary")[:300]
 desc_full     = load_with_budget("jira_description.txt", "DESCRIPTION", "Description", DESC_BUDGET)
 comments_full = load_with_budget("jira_comments.txt",    "COMMENTS",    "Comments",    COMMENTS_BUDGET)
 
-# ── Extract component checklist from description ───────────────────────────────
-# Scan the description for top-level numbered/bulleted sections and named components.
-# This becomes a mandatory checklist injected into the prompt so the model cannot
-# skip any component — critical for Haiku which loses track of later components.
-def extract_components(description):
-    """
-    Heuristic: find lines that look like top-level component/section headings.
-    Matches patterns like:
-      - "Prescriptions Component:"
-      - "Addressable NPI Geographic Performance:"
-      - "1. Display Logic"
-      - "## Summary Metrics"
-    Returns a list of component name strings.
-    """
-    components = []
-    patterns = [
-        r'^#+\s+(.+)',                          # Markdown headings ## Foo
-        r'^\d+\.\s+([A-Z][^:.\n]{5,60}):?',    # Numbered: "1. Display Logic"
-        r'^[*\-]\s+\*\*([^*]{5,60})\*\*',      # Bold bullet: **Component Name**
-        r'^([A-Z][A-Za-z ]{5,60})(?:\s*Component)?:', # "Prescriptions Component:"
-    ]
-    for line in description.split('\n'):
-        line = line.strip()
-        for pat in patterns:
-            m = re.match(pat, line)
-            if m:
-                name = m.group(1).strip().rstrip(':')
-                if len(name) > 5 and name not in components:
-                    components.append(name)
-                break
-    return components
+# ── Component extraction via Claude (format-agnostic) ─────────────────────────
+# Instead of fragile regex heuristics that only work for one ticket format,
+# we make a cheap haiku call to extract functional components from ANY
+# ticket format — prose, bullet lists, numbered ACs, custom templates, etc.
+# Falls back to empty checklist if API call fails (non-blocking).
 
-components = extract_components(desc_full)
-if components:
-    print(f"Components detected: {components}")
-else:
-    print("No distinct components detected — single-component ticket assumed")
+def extract_components_via_llm(description, summary, token, timeout=30):
+    """
+    Ask claude-haiku-4-5 to extract functional testing components from the
+    ticket description. Returns a list of component name strings.
+    Works for any ticket format.
+    """
+    if not token:
+        print("::warning::No CLAUDE_CODE_OAUTH_TOKEN — skipping LLM component extraction")
+        return []
 
-# Build the checklist block injected into the prompt
+    extraction_prompt = f"""You are a QA analyst. Read this Jira ticket description and extract the distinct functional components that need to be tested.
+
+A "functional component" is a named UI section, feature area, or system behaviour that is large enough to deserve its own group of test scenarios (e.g. "Prescriptions Component", "Geographic Performance", "Display Logic", "Search Filter").
+
+Do NOT include:
+- Sub-items within a component (e.g. "Coverage Rate formula" is part of Prescriptions, not its own component)
+- Metadata sections (Related Tickets, Discrepancies, Historical Data, Reference Links)
+- Implementation notes or background information
+- Edge cases and regression notes (these are scenarios within components, not components themselves)
+
+Return ONLY a JSON array of strings — the component names. No explanation. No markdown.
+Example: ["Display Logic", "Prescriptions Component", "Geographic Performance"]
+
+If the ticket covers only one functional area, return a single-item array.
+If you cannot identify any functional components, return [].
+
+JIRA SUMMARY: {summary}
+
+DESCRIPTION:
+{description[:6000]}"""
+
+    payload = json.dumps({
+        "model": "claude-haiku-4-5",
+        "max_tokens": 256,
+        "temperature": 0,
+        "messages": [{"role": "user", "content": extraction_prompt}]
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "anthropic-version": "2023-06-01",
+            "anthropic-beta": "oauth-2025-04-20",
+            "Content-Type": "application/json",
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read())
+        raw = next(
+            (b["text"] for b in data.get("content", []) if b.get("type") == "text"),
+            "[]"
+        )
+        # Strip any accidental markdown fences
+        raw = re.sub(r"```[a-z]*|```", "", raw).strip()
+        components = json.loads(raw)
+        if isinstance(components, list):
+            return [str(c).strip() for c in components if str(c).strip()]
+        return []
+    except urllib.error.HTTPError as e:
+        print(f"::warning::Component extraction API call failed: HTTP {e.code} — checklist skipped")
+        return []
+    except Exception as e:
+        print(f"::warning::Component extraction failed ({type(e).__name__}: {e}) — checklist skipped")
+        return []
+
+components = extract_components_via_llm(desc_full, summary_raw, OAUTH_TOKEN)
+
 if components:
+    print(f"Components detected ({len(components)}): {components}")
     checklist_lines = "\n".join(f"  - [ ] {c}" for c in components)
     component_checklist = f"""
 MANDATORY COMPONENT CHECKLIST — YOU MUST GENERATE SCENARIOS FOR EVERY ITEM BELOW.
-This list was automatically extracted from the ticket description.
-DO NOT output anything until you have written at least one scenario for each item.
-Tick each off mentally before finalising output:
+This list was extracted from the ticket description. Every item is a distinct functional
+area that requires test coverage. DO NOT finish outputting until every item has scenarios.
 
 {checklist_lines}
 
-If ANY item above has zero scenarios written for it, you are in HARD RULE VIOLATION.
-Add the missing scenarios before outputting.
+VIOLATION: If ANY item above has zero scenarios written for it, add them before outputting.
 """
 else:
+    print("No components detected — single-component ticket or extraction skipped")
     component_checklist = ""
 
-# ── Feature examples from target domain (up to 40 lines from 2 files) ─────────
+# ── Feature examples from target domain ───────────────────────────────────────
 example_files = sorted(glob.glob(f"{feature_dir}/{domain_text}/*.feature"))[:2]
 feature_examples = ""
 for ef in example_files:
@@ -238,8 +267,6 @@ DECISION RULES — SCENARIO OUTLINE AND DATA TABLE ARE MANDATORY IN THESE CASES:
 You MUST use Scenario Outline + Examples (not plain Scenario) when ANY of these are true:
   a. The same behaviour is verified for 2 or more distinct input values, metric types,
      colour states, tab names, column names, or data combinations.
-     EXAMPLE: Rx Index colour logic (Green >1, Grey <=1, Grey =1.00) →
-     ONE Scenario Outline, NOT three separate Scenarios.
   b. The same formula/calculation is tested with multiple sets of input/output numbers.
      Collapse into ONE Scenario Outline with numeric columns in Examples.
   c. The same UI column, tab, or metric is tested across multiple named items →
@@ -305,7 +332,7 @@ GAP CHECK — BEFORE OUTPUTTING, VERIFY:
 - Every item in the MANDATORY COMPONENT CHECKLIST above has at least one scenario.
 - Every user role has coverage. Every conditional role has TWO scenarios (HARD RULE 7).
 - Every UI component: happy path + post-action state.
-- Every mentioned tab has a loading scenario and a tab-switching scenario.
+- Every mentioned tab: loading scenario + tab-switching scenario.
 - Every pop-up/modal: open, content, and empty state.
 - Every sortable column has a sort scenario.
 - Every historical risk ticket has a regression scenario.
@@ -349,9 +376,7 @@ Feature: <descriptive name — max 2 Feature blocks per ticket>
     Examples:
       | metric        | input_a | input_b | expected_value | color |
       | Coverage Rate | 75      | 100     | 75%            | n/a   |
-      | Coverage Rate | 0       | 100     | 0%             | n/a   |
       | Rx Index      | 40%     | 20%     | 2.00           | Green |
-      | Rx Index      | 15%     | 30%     | 0.50           | Grey  |
       | Rx Index      | 25%     | 25%     | 1.00           | Grey  |
 
   @todo
