@@ -163,20 +163,37 @@ prompt = f"""HARD RULES:
         an appropriate error.
    Skipping or merging these into one scenario is a HARD RULE VIOLATION.
    The word "if" defines the test condition — it does not make the scenario optional.
-8. FEATURE FILE SPLIT RULE — Use your judgement to decide how many Feature blocks to output:
-   - If the ticket covers ONE logical component or tightly related scenarios → ONE Feature block.
-   - If the ticket covers TWO OR MORE clearly distinct functional components (e.g. a Prescriptions
-     component AND a Geographic Performance component) → output a SEPARATE Feature block for each.
-   - Each Feature block must have its own descriptive "Feature: <name>" line.
-   - NEVER mix scenarios from different components under one Feature block just to keep it short.
-   - The pipeline will automatically split multiple Feature blocks into separate .feature files,
-     each of which will appear as a separate file in the Pull Request.
+8. FEATURE FILE SPLIT RULE — MAXIMUM 2 Feature blocks per ticket. Hard limit, no exceptions.
+   - ONE Feature block: default for all tickets. Use unless the ticket explicitly names two
+     completely separate UI components with no shared steps (e.g. a standalone Prescriptions
+     panel AND a completely separate Geographic Performance panel described as distinct sections).
+   - TWO Feature blocks: only when the ticket is explicitly divided into exactly two named
+     components that are functionally independent. Sub-sections, edge cases, label changes,
+     regression notes, and permission checks are NOT separate components — fold them into the
+     single Feature block using tags (e.g. @edge_case, @regression, @permissions).
+   - NEVER produce 3 or more Feature blocks. If in doubt, use ONE.
+   - Each Feature block must have its own "Feature: <descriptive name>" line.
+   - The pipeline splits Feature blocks into separate .feature files in the PR.
 
-DECISION RULES:
-- Use plain Scenario by default.
-- CRITICAL TOKEN LIMIT RULE: If a feature or edge case applies to multiple modules, you MUST use a single Scenario Outline with an Examples table. DO NOT write separate, repetitive Scenarios for each list type.
-- Use Scenario Outline + Examples ONLY when same steps apply to 2+ distinct data combinations AND Examples has 2+ rows.
-- Use a data table when a step needs 3+ key-value pairs or a list.
+DECISION RULES — SCENARIO OUTLINE AND DATA TABLE ARE MANDATORY IN THESE CASES:
+You MUST use Scenario Outline + Examples (not plain Scenario) when ANY of these are true:
+  a. The same behaviour is being verified for 2 or more distinct input values, metric types,
+     colour states, tab names, column names, or data combinations.
+     EXAMPLE: Rx Index colour logic (Green when >1, Grey when <=1, Grey when =1.00) ->
+     ONE Scenario Outline with an Examples table, NOT three separate Scenarios.
+  b. The same formula or calculation is tested with multiple sets of input/output numbers
+     (e.g. Coverage Rate at 0%, 75%, 100%; Avg TRx with different divisor/dividend pairs).
+     Collapse into ONE Scenario Outline with numeric columns in Examples.
+  c. The same UI column, tab, or metric is tested across multiple named items
+     (e.g. NRx row AND NBRx row with same column structure) ->
+     ONE Scenario Outline with metric name as an Examples column.
+
+You MUST use a data table when a step verifies 3 or more key-value pairs or column names
+in a single assertion (e.g. verifying all columns in a table, all rows in a result set).
+
+Plain Scenario is ONLY correct when the scenario is truly unique and cannot share steps
+with any other scenario even after parameterisation. Before writing a plain Scenario, ask:
+"Is there another scenario with identical step structure and only different data?" If yes -> Outline.
 
 DESCRIPTION INTERPRETATION RULES:
 Style 1 - Explicit acceptance criteria: interpret directly and write scenarios.
@@ -288,36 +305,51 @@ STEP DICTIONARY (use verbatim - invent only if no match exists):
 {step_context}
 
 OUTPUT FORMAT:
-Feature: <descriptive name for this component — one Feature block per distinct component>
+Feature: <descriptive name — max 2 Feature blocks per ticket>
 
   @todo
-  Scenario: <actor action expected outcome>
+  Scenario: <use ONLY when steps are unique and cannot be parameterised>
     Given ...
     When  ...
     Then  ...
 
   @todo
-  Scenario Outline: <actor action expected outcome>
+  Scenario Outline: <PREFERRED — collapse any 2+ scenarios sharing step structure into ONE Outline>
     Given ...
-    When  ... "<param>"
-    Then  ...
+    When  User views the "<metric>" metric
+    Then  "<metric>" displays "<expected_value>"
+    And   Color is "<color>"
     Examples:
-      | param  |
-      | value1 |
-      | value2 |
+      | metric        | input_a | input_b | expected_value | color |
+      | Coverage Rate | 75      | 100     | 75%            | n/a   |
+      | Coverage Rate | 0       | 100     | 0%             | n/a   |
+      | Rx Index      | 40%     | 20%     | 2.00           | Green |
+      | Rx Index      | 15%     | 30%     | 0.50           | Grey  |
+      | Rx Index      | 25%     | 25%     | 1.00           | Grey  |
 
-If the ticket covers multiple distinct components, repeat the Feature block:
+  @todo
+  Scenario: <use a data table when a step must verify 3+ key-value pairs in one assertion>
+    Given ...
+    When  User views the Prescriptions table
+    Then  the table displays the following columns in order:
+      | Column             |
+      | Metric             |
+      | Exposed Rx Share   |
+      | Unexposed Rx Share |
+      | Rx Index           |
+
+If the ticket covers exactly two distinct components, add a second Feature block:
 
 Feature: <descriptive name for second component>
 
   @todo
-  Scenario: ...
+  Scenario Outline: ...
 
 REMINDER BEFORE YOU OUTPUT:
-- Have you covered every component mentioned in the ticket with its own Feature block?
-- Is every Scenario fully complete with at least one Given/When/Then line?
-- If you are running low on output space, complete the current Scenario cleanly then stop.
-  Do NOT start a Scenario you cannot finish.
+- Count your Feature blocks. MAXIMUM IS 2. If you have 3 or more, merge extras into the nearest Feature.
+- Scan every group of plain Scenarios: if two or more share identical step structure with different data values, collapse them into ONE Scenario Outline immediately.
+- Is every Scenario/Outline fully complete with at least one Given/When/Then?
+- If running low on output space, complete the current Scenario cleanly and stop. Do NOT start one you cannot finish.
 """
 
 with open("prompt.txt", "w", encoding="utf-8") as f:
