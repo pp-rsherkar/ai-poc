@@ -44,6 +44,16 @@ CONTEXT_WINDOWS = {
     "claude-opus-4-8":   1_000_000,
 }
 
+# Max output tokens per model (official Anthropic limits, June 2026)
+# Used only for logging — the workflow shell step sets max_tokens on the API call.
+MAX_OUTPUT_TOKENS = {
+    "claude-haiku-4-5":  64_000,
+    "claude-sonnet-4-6": 64_000,
+    "claude-opus-4-6":   128_000,
+    "claude-opus-4-7":   128_000,
+    "claude-opus-4-8":   128_000,
+}
+
 CHARS_PER_TOKEN   = 4
 SAFETY_MARGIN     = 0.75   # use 75% of window to leave room for model response
 FIXED_OVERHEAD    = 40_000 # chars reserved for: rules text + step dict + examples + scenario ctx
@@ -153,6 +163,14 @@ prompt = f"""HARD RULES:
         an appropriate error.
    Skipping or merging these into one scenario is a HARD RULE VIOLATION.
    The word "if" defines the test condition — it does not make the scenario optional.
+8. FEATURE FILE SPLIT RULE — Use your judgement to decide how many Feature blocks to output:
+   - If the ticket covers ONE logical component or tightly related scenarios → ONE Feature block.
+   - If the ticket covers TWO OR MORE clearly distinct functional components (e.g. a Prescriptions
+     component AND a Geographic Performance component) → output a SEPARATE Feature block for each.
+   - Each Feature block must have its own descriptive "Feature: <name>" line.
+   - NEVER mix scenarios from different components under one Feature block just to keep it short.
+   - The pipeline will automatically split multiple Feature blocks into separate .feature files,
+     each of which will appear as a separate file in the Pull Request.
 
 DECISION RULES:
 - Use plain Scenario by default.
@@ -270,7 +288,7 @@ STEP DICTIONARY (use verbatim - invent only if no match exists):
 {step_context}
 
 OUTPUT FORMAT:
-Feature: <name from Jira summary>
+Feature: <descriptive name for this component — one Feature block per distinct component>
 
   @todo
   Scenario: <actor action expected outcome>
@@ -287,12 +305,27 @@ Feature: <name from Jira summary>
       | param  |
       | value1 |
       | value2 |
+
+If the ticket covers multiple distinct components, repeat the Feature block:
+
+Feature: <descriptive name for second component>
+
+  @todo
+  Scenario: ...
+
+REMINDER BEFORE YOU OUTPUT:
+- Have you covered every component mentioned in the ticket with its own Feature block?
+- Is every Scenario fully complete with at least one Given/When/Then line?
+- If you are running low on output space, complete the current Scenario cleanly then stop.
+  Do NOT start a Scenario you cannot finish.
 """
 
 with open("prompt.txt", "w", encoding="utf-8") as f:
     f.write(prompt)
 
-size   = os.path.getsize("prompt.txt")
-tokens = size // CHARS_PER_TOKEN
-print(f"Prompt size   : {size:,} bytes (~{tokens:,} tokens)")
-print(f"Window used   : {tokens / token_window * 100:.1f}% of {MODEL} context window")
+size        = os.path.getsize("prompt.txt")
+input_toks  = size // CHARS_PER_TOKEN
+output_toks = MAX_OUTPUT_TOKENS.get(MODEL, 64_000)
+print(f"Prompt size   : {size:,} bytes (~{input_toks:,} input tokens)")
+print(f"Window used   : {input_toks / token_window * 100:.1f}% of {MODEL} context window")
+print(f"Max output    : {output_toks:,} tokens for {MODEL}")
