@@ -4,9 +4,11 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 import factory.DriverFactory;
+import utils.WaitUtility;
+
 import java.util.ArrayList;
 import java.util.List;
-import utils.WaitUtility;
+
 
 public class Campaigns {
     private final Page page;
@@ -456,23 +458,26 @@ public class Campaigns {
 
     public String fetchCustomFieldSuccessAlert() {
         String text = CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
+        System.out.println("debugging" + text);
         waitUtility.waitForLocatorHidden(CUSTOM_FIELD_SUCCESS_ALERT);
         return text;
     }
 
     public boolean isAddedCustomFieldAvailable(String metricName) {
-        return page.locator(String.format("//label[normalize-space(text())='%s']", metricName))
+        return page.locator(String.format("//span[contains(normalize-space(.),'%s')]", metricName))
                 .isVisible();
     }
 
     public void clickCustomFieldLabel(String metricName) {
-        page.locator(String.format("//label[normalize-space(text())='%s']//img", metricName))
+        page.locator(String.format("//span[contains(normalize-space(.),'%s')]/ancestor::label//img", metricName))
                 .click();
     }
 
     public void enterCustomFieldData(String customFieldName, String customFieldData) {
-        page.locator(String.format("//label[normalize-space(text())='%s']/following-sibling::input", customFieldName))
-                .fill(customFieldData);
+        Locator fieldRow = page.locator("app-life-custom-field-setting div")
+                .filter(new Locator.FilterOptions().setHasText(customFieldName))
+                .last();
+        fieldRow.locator("input").fill(customFieldData);
     }
 
     public void navigateToCampaign(String campaignName) {
@@ -482,13 +487,14 @@ public class Campaigns {
     }
 
     public String fetchCustomFieldData(String customFieldName) {
-        return page.locator(String.format(
-                        "//label[normalize-space(text())='%s']/following-sibling::input", customFieldName))
-                .inputValue();
+        Locator fieldRow = page.locator("app-life-custom-field-setting div, .form-group")
+                .filter(new Locator.FilterOptions().setHasText(customFieldName))
+                .last();
+        return fieldRow.locator("input").inputValue();
     }
 
     public String deleteCustomField(String customFieldName) {
-        page.locator(String.format("//label[normalize-space(text())='%s']//img", customFieldName))
+        page.locator(String.format("//span[contains(normalize-space(.),'%s')]/ancestor::label//img", customFieldName))
                 .click();
         waitUtility.waitForLocatorVisible(CUSTOM_FIELD_DELETE_ICON);
         CUSTOM_FIELD_DELETE_ICON.click();
