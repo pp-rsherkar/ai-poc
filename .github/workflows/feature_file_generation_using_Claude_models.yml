@@ -181,42 +181,68 @@ jobs:
           fi
 
       # ---------------------------
-      # Claude API call (with retry)
+      # Generate feature via Claude API (with retry)
       # ---------------------------
       - name: Generate feature via Claude API
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -euo pipefail
-      
+
           MODEL="${{ inputs.llm_model }}"
-      
-          # Claude Opus 4.7+ and 4.8 do not support temperature — omit it for these models
-          # Claude Sonnet 4.6, Haiku 4.5 and older models still support temperature
+
+          # Model-aware max_tokens based on official Anthropic output limits (June 2026):
+          #   claude-haiku-4-5   → 64,000 output tokens
+          #   claude-sonnet-4-6  → 64,000 output tokens
+          #   claude-opus-4-6    → 128,000 output tokens
+          #   claude-opus-4-7    → 128,000 output tokens
+          #   claude-opus-4-8    → 128,000 output tokens
+          # We use the full limit so no ticket is ever truncated mid-output.
+          # Note: Opus 4.7+ does not support temperature — omitted for those models.
+          case "$MODEL" in
+            *"opus-4-6"*|*"opus-4-7"*|*"opus-4-8"*)
+              MAX_TOKENS=128000
+              ;;
+            *"haiku-4-5"*|*"sonnet-4-6"*)
+              MAX_TOKENS=64000
+              ;;
+            *)
+              echo "::warning::Unknown model '$MODEL' — defaulting max_tokens to 64000"
+              MAX_TOKENS=64000
+              ;;
+          esac
+
+          echo "Model         : $MODEL"
+          echo "Max tokens    : $MAX_TOKENS"
+
+          # Build request JSON — omit temperature for Opus 4.7+
           if [[ "$MODEL" == *"opus-4-7"* || "$MODEL" == *"opus-4-8"* ]]; then
             echo "Extended model detected ($MODEL) — omitting temperature"
             jq -n \
-              --arg model "$MODEL" \
+              --arg model   "$MODEL" \
+              --argjson max  "$MAX_TOKENS" \
               --rawfile prompt prompt.txt \
               '{
                 model: $model,
-                max_tokens: 4096,
+                max_tokens: $max,
                 system: "You are a senior QA automation engineer. Output raw Gherkin only.",
                 messages: [{ role: "user", content: $prompt }]
               }' > request.json
           else
             jq -n \
-              --arg model "$MODEL" \
+              --arg model   "$MODEL" \
+              --argjson max  "$MAX_TOKENS" \
               --rawfile prompt prompt.txt \
               '{
                 model: $model,
-                max_tokens: 4096,
+                max_tokens: $max,
                 temperature: 0,
                 system: "You are a senior QA automation engineer. Output raw Gherkin only.",
                 messages: [{ role: "user", content: $prompt }]
               }' > request.json
           fi
-      
+
+          # Call Claude API with up to 3 retries
           for attempt in 1 2 3; do
             echo "Attempt $attempt..."
             HTTP_RESPONSE=$(mktemp)
@@ -227,79 +253,185 @@ jobs:
               -H "anthropic-beta: oauth-2025-04-20" \
               -H "Content-Type: application/json" \
               --data @request.json)
-      
+
             if [ "$HTTP_CODE" -eq 200 ]; then
               break
             fi
-      
+
+            echo "HTTP $HTTP_CODE — response body:"
             cat "$HTTP_RESPONSE"
-      
+
             if [ "$attempt" -lt 3 ]; then
+              echo "Retrying in 60s..."
               sleep 60
             else
-              echo "::error::Claude API failed after retries"
+              echo "::error::Claude API failed after 3 attempts (last HTTP code: $HTTP_CODE)"
               exit 1
             fi
           done
-      
-          FEATURE=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE")
-          FEATURE=$(echo "$FEATURE" | sed 's/```//g')
-      
-          if ! echo "$FEATURE" | grep -q "^Feature:"; then
-            echo "::error::Invalid Gherkin output"
+
+          # Check for truncation — stop_reason must be "end_turn", not "max_tokens"
+          STOP_REASON=$(jq -r '.stop_reason' "$HTTP_RESPONSE")
+          echo "Stop reason   : $STOP_REASON"
+          if [ "$STOP_REASON" = "max_tokens" ]; then
+            echo "::error::Output was truncated despite using the model's full max_tokens ($MAX_TOKENS)."
+            echo "::error::This ticket has an unusually large number of scenarios."
+            echo "::error::Consider splitting the Jira ticket into smaller stories, or use an Opus model."
             exit 1
           fi
-      
-          echo "$FEATURE" > generated.feature
 
-    
+          # Extract and clean Gherkin
+          RAW=$(jq -r '.content[] | select(.type=="text") | .text' "$HTTP_RESPONSE")
+          CLEANED=$(echo "$RAW" | sed 's/```gherkin//g; s/```//g')
+
+          # Validate at least one Feature block exists
+          FEATURE_COUNT=$(echo "$CLEANED" | grep -c "^Feature:" || true)
+          if [ "$FEATURE_COUNT" -eq 0 ]; then
+            echo "::error::Invalid Gherkin output — no Feature: line found"
+            exit 1
+          fi
+
+          echo "$CLEANED" > raw_output.gherkin
+          echo "Feature blocks in output : $FEATURE_COUNT"
+          echo "Total scenarios generated: $(echo "$CLEANED" | grep -cE '^\s*Scenario:|^\s*Scenario Outline:' || true)"
+
       # ---------------------------
-      # Save feature
+      # Split into feature files (1 file per Feature block)
       # ---------------------------
-      - name: Save feature file
+      - name: Split feature files
         run: |
           set -euo pipefail
 
-          FILE="${{ inputs.jira_id }}.feature"
+          JIRA_ID="${{ inputs.jira_id }}"
+          python3 - << 'PY'
+          import re, os, sys
+
+          jira_id = os.environ["JIRA_ID"]
+
+          with open("raw_output.gherkin", "r", encoding="utf-8") as f:
+              content = f.read().strip()
+
+          # Split on Feature: boundaries, keeping the Feature: line with its block
+          # Pattern: split before every line that starts with "Feature:"
+          raw_blocks = re.split(r'(?=^Feature:)', content, flags=re.MULTILINE)
+          blocks = [b.strip() for b in raw_blocks if b.strip().startswith("Feature:")]
+
+          if not blocks:
+              print("::error::No Feature: blocks found in output")
+              sys.exit(1)
+
+          print(f"Feature blocks found: {len(blocks)}")
+
+          # Write files: single block → <JIRA_ID>.feature
+          #              multiple blocks → <JIRA_ID>_1.feature, <JIRA_ID>_2.feature, ...
+          file_list = []
+          if len(blocks) == 1:
+              fname = f"{jira_id}.feature"
+              with open(fname, "w", encoding="utf-8") as f:
+                  f.write(blocks[0])
+              file_list.append(fname)
+              print(f"Single feature file: {fname}")
+          else:
+              for i, block in enumerate(blocks, start=1):
+                  fname = f"{jira_id}_{i}.feature"
+                  with open(fname, "w", encoding="utf-8") as f:
+                      f.write(block)
+                  scenario_count = len(re.findall(r'^\s*(Scenario:|Scenario Outline:)', block, re.MULTILINE))
+                  print(f"  File {i}: {fname} ({scenario_count} scenarios)")
+                  file_list.append(fname)
+
+          # Write manifest for downstream steps
+          with open("feature_files.txt", "w") as f:
+              f.write("\n".join(file_list))
+
+          # Copy first file as generated.feature for backward compat with validate step
+          import shutil
+          shutil.copy(file_list[0], "generated.feature")
+          PY
+
+          echo "Feature files manifest:"
+          cat feature_files.txt
+        env:
+          JIRA_ID: ${{ inputs.jira_id }}
+
+      # ---------------------------
+      # Save feature file(s)
+      # ---------------------------
+      - name: Save feature files
+        run: |
+          set -euo pipefail
+
           TARGET="$FEATURE_DIR/${{ inputs.domain }}"
-
           mkdir -p "$TARGET"
-          cp generated.feature "$TARGET/$FILE"
 
-          echo "FILE=${{ inputs.domain }}/$FILE" >> "$GITHUB_ENV"
+          # Track all committed files for the commit step
+          COMMITTED_FILES=""
+
+          while IFS= read -r fname; do
+            cp "$fname" "$TARGET/$fname"
+            git add "$TARGET/$fname"
+            COMMITTED_FILES="$COMMITTED_FILES $TARGET/$fname"
+            echo "Staged: $TARGET/$fname"
+          done < feature_files.txt
+
+          # Also store file list with target path for commit message / PR body
+          echo "$COMMITTED_FILES" | tr ' ' '\n' | grep -v '^$' > committed_files.txt
+
+          # Keep FILE env var pointing to first file (used in PR title)
+          FIRST=$(head -1 feature_files.txt)
+          echo "FILE=${{ inputs.domain }}/$FIRST" >> "$GITHUB_ENV"
 
       # ---------------------------
-      # Validate
+      # Validate all feature files
       # ---------------------------
-      - name: Validate Output
+      - name: Validate feature files
         run: |
           set -euo pipefail
 
-          SCENARIO_COUNT=$(grep -c "Scenario:" generated.feature || true)
-          TODO_COUNT=$(grep -c "@todo" generated.feature || true)
+          ALL_PASS=true
 
-          # Update this line to catch both "Scenario:" and "Scenario Outline:"
-            SCENARIO_COUNT=$(grep -cE "Scenario:|Scenario Outline:" generated.feature || true)
-            TODO_COUNT=$(grep -c "@todo" generated.feature || true)
-            
+          while IFS= read -r fname; do
+            FILE_PATH="$FEATURE_DIR/${{ inputs.domain }}/$fname"
+            echo "=== Validating $FILE_PATH ==="
+
+            SCENARIO_COUNT=$(grep -cE '^\s*(Scenario:|Scenario Outline:)' "$FILE_PATH" || true)
+            TODO_COUNT=$(grep -c '@todo' "$FILE_PATH" || true)
+
+            echo "  Scenarios : $SCENARIO_COUNT"
+            echo "  @todo tags: $TODO_COUNT"
+
             if [ "$SCENARIO_COUNT" -ne "$TODO_COUNT" ]; then
-              echo "::error::Mismatch @todo vs scenarios (Found $TODO_COUNT @todo tags but $SCENARIO_COUNT Scenarios/Outlines)"
-              exit 1
+              echo "::error::$fname — @todo mismatch: $TODO_COUNT @todo tags for $SCENARIO_COUNT Scenarios"
+              ALL_PASS=false
+            else
+              echo "  ✓ Validation passed"
             fi
+          done < feature_files.txt
+
+          if [ "$ALL_PASS" = "false" ]; then
+            exit 1
+          fi
 
       # ---------------------------
-      # Commit + Push
+      # Commit & push
       # ---------------------------
       - name: Commit & push
         run: |
           set -euo pipefail
 
-          git add "$FEATURE_DIR/${{ env.FILE }}"
-          git commit -m "feat(${{ inputs.jira_id }}): generate feature file" || true
+          FILE_COUNT=$(wc -l < feature_files.txt | tr -d ' ')
+
+          if [ "$FILE_COUNT" -eq 1 ]; then
+            COMMIT_MSG="feat(${{ inputs.jira_id }}): generate feature file"
+          else
+            COMMIT_MSG="feat(${{ inputs.jira_id }}): generate $FILE_COUNT feature files"
+          fi
+
+          git commit -m "$COMMIT_MSG" || true
           git push origin "${{ env.BRANCH }}" --force
 
       # ---------------------------
-      # PR creation
+      # Create Pull Request
       # ---------------------------
       - name: Create Pull Request
         env:
@@ -314,12 +446,18 @@ jobs:
             exit 0
           fi
 
-          cat > pr_body.txt <<EOF
-          Auto-generated BDD feature file.
-          
-          Jira: ${{ inputs.jira_id }}
-          Domain: ${{ inputs.domain }}
-          Model: ${{ inputs.llm_model }}
+          FILE_COUNT=$(wc -l < feature_files.txt | tr -d ' ')
+          FILE_LIST=$(cat feature_files.txt | sed 's/^/- /')
+
+          cat > pr_body.txt << EOF
+          Auto-generated BDD feature file(s).
+
+          Jira   : ${{ inputs.jira_id }}
+          Domain : ${{ inputs.domain }}
+          Model  : ${{ inputs.llm_model }}
+          Files  : $FILE_COUNT feature file(s)
+
+          $FILE_LIST
           EOF
 
           gh pr create \
