@@ -162,6 +162,8 @@ jobs:
           python3 write_prompt.py \
             "${{ inputs.jira_id }}" \
             "${{ inputs.domain }}"
+        env:
+          LLM_MODEL: ${{ inputs.llm_model }}
 
       # ---------------------------
       # Pre-flight check
