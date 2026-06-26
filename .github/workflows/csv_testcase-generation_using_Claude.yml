@@ -1,4 +1,4 @@
-name: JIRA - Testcase (CSV) Generator Using CLAUDE
+name: JIRA - Test Matrix Generator Using CLAUDE
 
 on:
   workflow_dispatch:
