@@ -24,16 +24,20 @@ MODEL       = os.environ.get("LLM_MODEL", "claude-sonnet-4-6")
 
 print(f"Model         : {MODEL}")
 
+# ── Model capability tiers ─────────────────────────────────────────────────────
+# Haiku is fast but has weaker multi-component reasoning.
+# For tickets with two distinct functional components, it reliably misses the second.
+# We inject an explicit component checklist into the prompt to compensate.
+IS_HAIKU = "haiku" in MODEL.lower()
+if IS_HAIKU:
+    print("::warning::Haiku model selected. Component checklist injection enabled.")
+    print("::warning::For tickets with 2 components or 30+ scenarios, consider claude-sonnet-4-6.")
+
 # ── Model-aware context budgets ────────────────────────────────────────────────
 # Official context windows from Anthropic docs (as of June 2026):
 #   claude-haiku-4-5   → 200k tokens
 #   claude-sonnet-4-6  → 1M tokens
-#   claude-opus-4-6    → 1M tokens
-#   claude-opus-4-7    → 1M tokens
-#   claude-opus-4-8    → 1M tokens
-#
-# We apply a 25% safety margin, then subtract fixed overhead for prompt
-# boilerplate, step dictionary, scenario context, and feature examples.
+#   claude-opus-4-6/7/8 → 1M tokens
 # 1 token ≈ 4 chars (conservative for English + Gherkin mixed content).
 
 CONTEXT_WINDOWS = {
@@ -54,21 +58,21 @@ MAX_OUTPUT_TOKENS = {
     "claude-opus-4-8":   128_000,
 }
 
-CHARS_PER_TOKEN   = 4
-SAFETY_MARGIN     = 0.75   # use 75% of window to leave room for model response
-FIXED_OVERHEAD    = 40_000 # chars reserved for: rules text + step dict + examples + scenario ctx
+CHARS_PER_TOKEN = 4
+SAFETY_MARGIN   = 0.75   # use 75% of window to leave room for model response
+FIXED_OVERHEAD  = 40_000 # chars reserved for: rules text + step dict + examples + scenario ctx
 
-token_window      = CONTEXT_WINDOWS.get(MODEL, 200_000)  # default to most restrictive if unknown
+token_window = CONTEXT_WINDOWS.get(MODEL, 200_000)
 if MODEL not in CONTEXT_WINDOWS:
     print(f"::warning::Unknown model '{MODEL}' — defaulting to 200k token budget (most restrictive)")
 
-usable_chars      = int(token_window * CHARS_PER_TOKEN * SAFETY_MARGIN) - FIXED_OVERHEAD
-DESC_BUDGET       = int(usable_chars * 0.80)   # 80% of jira budget for description
-COMMENTS_BUDGET   = int(usable_chars * 0.20)   # 20% of jira budget for comments
+usable_chars    = int(token_window * CHARS_PER_TOKEN * SAFETY_MARGIN) - FIXED_OVERHEAD
+DESC_BUDGET     = int(usable_chars * 0.80)
+COMMENTS_BUDGET = int(usable_chars * 0.20)
 
-print(f"Token window  : {token_window:,} tokens")
-print(f"Usable budget : {usable_chars:,} chars total")
-print(f"Desc budget   : {DESC_BUDGET:,} chars")
+print(f"Token window   : {token_window:,} tokens")
+print(f"Usable budget  : {usable_chars:,} chars total")
+print(f"Desc budget    : {DESC_BUDGET:,} chars")
 print(f"Comments budget: {COMMENTS_BUDGET:,} chars")
 
 # ── Safe loader — warns loudly, never silently truncates ───────────────────────
@@ -86,10 +90,9 @@ def load_with_budget(path, fallback_env, label, budget):
         sys.exit(1)
 
     if len(content) > budget:
-        # Cut at paragraph boundary, not mid-sentence
         truncated = content[:budget].rsplit('\n\n', 1)[0]
         print(f"::warning::{label} is {len(content):,} chars — exceeds {budget:,} char budget for {MODEL}.")
-        print(f"::warning::This ticket is unusually large. Truncated to {len(truncated):,} chars at paragraph boundary.")
+        print(f"::warning::Truncated to {len(truncated):,} chars at paragraph boundary.")
         print(f"::warning::Consider using claude-sonnet-4-6 or an Opus model for full coverage.")
         return truncated
 
@@ -97,9 +100,64 @@ def load_with_budget(path, fallback_env, label, budget):
     return content
 
 # ── Load Jira content ──────────────────────────────────────────────────────────
-summary_raw   = os.environ.get("SUMMARY", "No Summary")[:300]  # summary is always short
+summary_raw   = os.environ.get("SUMMARY", "No Summary")[:300]
 desc_full     = load_with_budget("jira_description.txt", "DESCRIPTION", "Description", DESC_BUDGET)
 comments_full = load_with_budget("jira_comments.txt",    "COMMENTS",    "Comments",    COMMENTS_BUDGET)
+
+# ── Extract component checklist from description ───────────────────────────────
+# Scan the description for top-level numbered/bulleted sections and named components.
+# This becomes a mandatory checklist injected into the prompt so the model cannot
+# skip any component — critical for Haiku which loses track of later components.
+def extract_components(description):
+    """
+    Heuristic: find lines that look like top-level component/section headings.
+    Matches patterns like:
+      - "Prescriptions Component:"
+      - "Addressable NPI Geographic Performance:"
+      - "1. Display Logic"
+      - "## Summary Metrics"
+    Returns a list of component name strings.
+    """
+    components = []
+    patterns = [
+        r'^#+\s+(.+)',                          # Markdown headings ## Foo
+        r'^\d+\.\s+([A-Z][^:.\n]{5,60}):?',    # Numbered: "1. Display Logic"
+        r'^[*\-]\s+\*\*([^*]{5,60})\*\*',      # Bold bullet: **Component Name**
+        r'^([A-Z][A-Za-z ]{5,60})(?:\s*Component)?:', # "Prescriptions Component:"
+    ]
+    for line in description.split('\n'):
+        line = line.strip()
+        for pat in patterns:
+            m = re.match(pat, line)
+            if m:
+                name = m.group(1).strip().rstrip(':')
+                if len(name) > 5 and name not in components:
+                    components.append(name)
+                break
+    return components
+
+components = extract_components(desc_full)
+if components:
+    print(f"Components detected: {components}")
+else:
+    print("No distinct components detected — single-component ticket assumed")
+
+# Build the checklist block injected into the prompt
+if components:
+    checklist_lines = "\n".join(f"  - [ ] {c}" for c in components)
+    component_checklist = f"""
+MANDATORY COMPONENT CHECKLIST — YOU MUST GENERATE SCENARIOS FOR EVERY ITEM BELOW.
+This list was automatically extracted from the ticket description.
+DO NOT output anything until you have written at least one scenario for each item.
+Tick each off mentally before finalising output:
+
+{checklist_lines}
+
+If ANY item above has zero scenarios written for it, you are in HARD RULE VIOLATION.
+Add the missing scenarios before outputting.
+"""
+else:
+    component_checklist = ""
 
 # ── Feature examples from target domain (up to 40 lines from 2 files) ─────────
 example_files = sorted(glob.glob(f"{feature_dir}/{domain_text}/*.feature"))[:2]
@@ -152,9 +210,12 @@ prompt = f"""HARD RULES:
 1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
 2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
 3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
-4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step MUST be selected from the STEP DICTIONARY if a functional equivalent exists. If you must invent a new step, mark it with a comment: # NEW STEP
+4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step
+   MUST be selected from the STEP DICTIONARY if a functional equivalent exists.
+   If you must invent a new step, mark it with a comment: # NEW STEP
 5. Never use placeholder steps. Write the full meaningful step text always.
-6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters defined in an Examples table.
+6. Never use angle bracket tokens like <NAME> unless they are Scenario Outline parameters
+   defined in an Examples table.
 7. PERMISSION BOUNDARY RULE — Phrases like "if permitted", "if applicable", "where applicable",
    "if allowed", "if access is granted" attached to ANY user role are NEVER exclusions.
    They are PERMISSION BOUNDARY signals. You MUST write TWO scenarios for each such phrase:
@@ -162,11 +223,9 @@ prompt = f"""HARD RULES:
      b. The user DOES NOT have permission → verify they are blocked, redirected, or shown
         an appropriate error.
    Skipping or merging these into one scenario is a HARD RULE VIOLATION.
-   The word "if" defines the test condition — it does not make the scenario optional.
 8. FEATURE FILE SPLIT RULE — MAXIMUM 2 Feature blocks per ticket. Hard limit, no exceptions.
    - ONE Feature block: default for all tickets. Use unless the ticket explicitly names two
-     completely separate UI components with no shared steps (e.g. a standalone Prescriptions
-     panel AND a completely separate Geographic Performance panel described as distinct sections).
+     completely separate UI components with no shared steps.
    - TWO Feature blocks: only when the ticket is explicitly divided into exactly two named
      components that are functionally independent. Sub-sections, edge cases, label changes,
      regression notes, and permission checks are NOT separate components — fold them into the
@@ -174,26 +233,24 @@ prompt = f"""HARD RULES:
    - NEVER produce 3 or more Feature blocks. If in doubt, use ONE.
    - Each Feature block must have its own "Feature: <descriptive name>" line.
    - The pipeline splits Feature blocks into separate .feature files in the PR.
-
+{component_checklist}
 DECISION RULES — SCENARIO OUTLINE AND DATA TABLE ARE MANDATORY IN THESE CASES:
 You MUST use Scenario Outline + Examples (not plain Scenario) when ANY of these are true:
-  a. The same behaviour is being verified for 2 or more distinct input values, metric types,
+  a. The same behaviour is verified for 2 or more distinct input values, metric types,
      colour states, tab names, column names, or data combinations.
-     EXAMPLE: Rx Index colour logic (Green when >1, Grey when <=1, Grey when =1.00) ->
-     ONE Scenario Outline with an Examples table, NOT three separate Scenarios.
-  b. The same formula or calculation is tested with multiple sets of input/output numbers
-     (e.g. Coverage Rate at 0%, 75%, 100%; Avg TRx with different divisor/dividend pairs).
+     EXAMPLE: Rx Index colour logic (Green >1, Grey <=1, Grey =1.00) →
+     ONE Scenario Outline, NOT three separate Scenarios.
+  b. The same formula/calculation is tested with multiple sets of input/output numbers.
      Collapse into ONE Scenario Outline with numeric columns in Examples.
-  c. The same UI column, tab, or metric is tested across multiple named items
-     (e.g. NRx row AND NBRx row with same column structure) ->
+  c. The same UI column, tab, or metric is tested across multiple named items →
      ONE Scenario Outline with metric name as an Examples column.
 
 You MUST use a data table when a step verifies 3 or more key-value pairs or column names
-in a single assertion (e.g. verifying all columns in a table, all rows in a result set).
+in a single assertion.
 
 Plain Scenario is ONLY correct when the scenario is truly unique and cannot share steps
 with any other scenario even after parameterisation. Before writing a plain Scenario, ask:
-"Is there another scenario with identical step structure and only different data?" If yes -> Outline.
+"Is there another scenario with identical step structure and only different data?" If yes → Outline.
 
 DESCRIPTION INTERPRETATION RULES:
 Style 1 - Explicit acceptance criteria: interpret directly and write scenarios.
@@ -214,75 +271,45 @@ SCENARIO GENERATION:
 5. Business-readable language only. No technical details.
 6. One behaviour per scenario. No duplicates.
 
-COVERAGE COMPLETENESS RULES (apply after generating initial scenarios):
-After writing your initial scenarios, perform a coverage gap check against these dimensions:
+COVERAGE COMPLETENESS RULES:
+After writing your initial scenarios, perform a gap check:
 
 A. USER ROLE COVERAGE
-   - If the ticket mentions multiple user types (internal, external, admin, read-only, permissioned),
-     each must have at least one scenario.
-   - Never assume only one user type unless explicitly stated.
-   - If roles are implied but not named, infer from context (e.g. "admin panel" implies admin role).
-   - HARD RULE 7 APPLIES: Any role qualified with "if permitted", "if applicable", or similar
-     conditional language requires TWO scenarios (permitted state + blocked state).
-     Do not skip. Do not merge into one.
+   - Every mentioned user type must have at least one scenario.
+   - HARD RULE 7: Any role with conditional language ("if permitted") needs TWO scenarios.
 
 B. UI INTERACTION COVERAGE
-   - For any UI component mentioned (list, table, form, dropdown, modal, panel, search bar):
+   - For any UI component (list, table, form, dropdown, modal, panel, search bar):
      * Happy path interaction
      * Interaction after a data-changing action (save, edit, delete, submit)
-     * Interaction with another active UI state (filter applied, sort active, search term present)
-   - For sorting/ordering specifically:
-     * Default sort order
-     * Manual sort by each mentioned column
-     * Sort behavior after save/edit
-   - For forms specifically:
-     * Valid submission
-     * Invalid/missing required fields
-     * Boundary values (min/max length, special characters)
+     * Interaction with another active UI state (filter/sort/search active)
+   - For sorting: default order, sort by each mentioned column, sort after save/edit.
+   - For tabs: each tab loads correctly, tab switching, rapid tab switching if mentioned.
 
 C. DATA STATE COVERAGE
-   - For any operation that changes data (create, edit, delete, import, export):
-     * Empty state (no records exist)
-     * Single record
-     * Multiple records / paginated list
-     * Record with optional fields left empty
-     * Rapid/successive operations (if implied by the ticket)
+   - For any data-changing operation: empty state, single record, multiple records.
 
 D. SYSTEM BEHAVIOR COVERAGE
-   - For any action that triggers a system response:
-     * Immediate feedback (success/error message)
-     * State after page refresh (cache/persistence behavior)
-     * State after navigation away and back
-   - For any background process (sync, sort, filter, search):
-     * Expected output when process completes correctly
-     * Expected output when input is edge-case (null, empty, special chars)
+   - For any triggered system response: success/error feedback, state after refresh/navigation.
 
 E. HISTORICAL RISK COVERAGE
-   - If COMMENTS or DESCRIPTION reference related tickets, known defects, or regression areas,
-     write at least one scenario targeting each risk area called out.
-   - Pay special attention to phrases like "regression", "also affects", "related to", "similar issue".
+   - Every related ticket, known defect, or regression area mentioned → at least one scenario.
 
 F. AMBIGUITY RESOLUTION
-   - If the description contains ambiguous behavior or two possible interpretations,
-     write one scenario for EACH interpretation, clearly named to distinguish them.
-   - Look for words like "should", "expected to", "may", "depending on" as ambiguity signals.
+   - Two interpretations of any ambiguous requirement → one scenario per interpretation.
 
 G. CROSS-COMPONENT COVERAGE
-   - If the ticket mentions that a fix/feature affects multiple areas, pages, or modules,
-     write at least one scenario per affected area.
-   - Do not write one generic scenario and assume it covers all areas.
+   - Every module/page/area explicitly mentioned → at least one scenario.
 
-GAP CHECK INSTRUCTION:
-Before finalizing output, mentally verify:
-- Have I covered every user role mentioned or implied?
-- For every role with conditional language ("if permitted"), have I written both the
-  permitted AND blocked scenario? (HARD RULE 7)
-- Have I covered every UI component mentioned (happy path + post-action state)?
-- Have I covered empty, single, and multi-record data states where relevant?
-- Have I covered system behavior after save/refresh/navigation?
-- Have I addressed every historical risk or related ticket mentioned in COMMENTS?
-- Have I written scenarios for both interpretations of any ambiguous requirement?
-- Have I covered every module/page/area explicitly mentioned in the ticket?
+GAP CHECK — BEFORE OUTPUTTING, VERIFY:
+- Every item in the MANDATORY COMPONENT CHECKLIST above has at least one scenario.
+- Every user role has coverage. Every conditional role has TWO scenarios (HARD RULE 7).
+- Every UI component: happy path + post-action state.
+- Every mentioned tab has a loading scenario and a tab-switching scenario.
+- Every pop-up/modal: open, content, and empty state.
+- Every sortable column has a sort scenario.
+- Every historical risk ticket has a regression scenario.
+- Every formula edge case (zero divisor, zero numerator, boundary values) is covered.
 If any answer is NO, add the missing scenarios before outputting.
 
 JIRA:
@@ -345,11 +372,14 @@ Feature: <descriptive name for second component>
   @todo
   Scenario Outline: ...
 
-REMINDER BEFORE YOU OUTPUT:
-- Count your Feature blocks. MAXIMUM IS 2. If you have 3 or more, merge extras into the nearest Feature.
-- Scan every group of plain Scenarios: if two or more share identical step structure with different data values, collapse them into ONE Scenario Outline immediately.
-- Is every Scenario/Outline fully complete with at least one Given/When/Then?
-- If running low on output space, complete the current Scenario cleanly and stop. Do NOT start one you cannot finish.
+FINAL REMINDER BEFORE YOU OUTPUT:
+- Count your Feature blocks. MAXIMUM IS 2.
+- Go through the MANDATORY COMPONENT CHECKLIST above one more time.
+  Every item must have at least one scenario. If any is missing, write it now.
+- Scan every group of plain Scenarios: collapse any with identical structure into ONE Outline.
+- Every Scenario/Outline must be fully complete with at least one Given/When/Then.
+- If running low on output space, complete the current Scenario cleanly and stop.
+  Do NOT start a Scenario you cannot finish.
 """
 
 with open("prompt.txt", "w", encoding="utf-8") as f:
@@ -361,3 +391,4 @@ output_toks = MAX_OUTPUT_TOKENS.get(MODEL, 64_000)
 print(f"Prompt size   : {size:,} bytes (~{input_toks:,} input tokens)")
 print(f"Window used   : {input_toks / token_window * 100:.1f}% of {MODEL} context window")
 print(f"Max output    : {output_toks:,} tokens for {MODEL}")
+print(f"Components    : {len(components)} detected — checklist {'injected' if components else 'skipped'}")
