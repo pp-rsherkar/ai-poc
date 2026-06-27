@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.CommonUtils;
 import utils.ConfigReader;
 
@@ -32,6 +34,7 @@ public class ApiSteps {
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode data;
     static String p2McpAgentApiKey;
+    private static final Logger logger = LoggerFactory.getLogger(ApiSteps.class);
 
     static {
         try {
@@ -347,9 +350,16 @@ public class ApiSteps {
         arguments.set("fields", fields);
         // Filters
         ObjectNode filters = mapper.createObjectNode();
-        String filterText = headersConfig.get("Filter");
-        String[] filterParts = filterText.split(",", 2);
-        filters.put(filterParts[0].trim(), filterParts[1].trim());
+        String filterLabelsStr = headersConfig.get("FilterLabel");
+        String filterValuesStr = headersConfig.get("FilterValue");
+        if (filterLabelsStr != null && filterValuesStr != null && !filterLabelsStr.isEmpty()) {
+            String[] labels = filterLabelsStr.split(",");
+            String[] values = filterValuesStr.split(",");
+            for (int i = 0; i < labels.length; i++) {
+                String val = (i < values.length) ? values[i].trim() : "";
+                filters.put(labels[i].trim(), val);
+            }
+        }
         arguments.set("filters", filters);
         // Sorts
         ArrayNode sorts = mapper.createArrayNode();
@@ -401,27 +411,28 @@ public class ApiSteps {
 
     @Then("Verify the query execution response contains the retrieved data {string}")
     public void verifyTheQueryExecutionResponseContainsTheRetrievedData(String promptDimensions) throws Exception {
-        int totalNpi = 0;
-        int totalActiveUsers = 0;
-        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
         Assert.assertEquals(200, response.status());
-        String queryResultStr = jsonNode.path("result").path("structuredContent").path("query_result").asText();
-        ArrayNode queryArray = (ArrayNode) mapper.readTree(queryResultStr);
-        Assert.assertFalse( "query_result is empty", queryResultStr.trim().isEmpty());
-        for (JsonNode row : queryArray) {
-            switch(promptDimensions){
-                case "resolved_measures.distinct_npis, custom_measures_ga4.active_user_count_":
-                    totalNpi += row.path("resolved_measures.distinct_npis").asInt();
-                    totalActiveUsers += row.path("custom_measures_ga4.active_user_count_").asInt();
-                    Assert.assertTrue(totalNpi >= 0);
-                    Assert.assertTrue(totalActiveUsers >= 0);
-                    break;
-                case "custom_measures_ga4.npi_first_visits, custom_measures_ga4.npi_returning_visits":
-                    totalNpi += row.path("custom_measures_ga4.npi_first_visits").asInt();
-                    totalActiveUsers += row.path("custom_measures_ga4.npi_returning_visits").asInt();
-                    Assert.assertTrue(totalNpi >= 0);
-                    Assert.assertTrue(totalActiveUsers >= 0);
-                    break;
+        jsonNode = mapper.readTree(apiActions.getCleanJson(response));
+        JsonNode structuredContent = jsonNode.path("result").path("structuredContent");
+        String queryResultStr = structuredContent.path("query_result").asText();
+        if (queryResultStr.trim().isEmpty() && structuredContent.path("error").asBoolean(true)) {
+            String errorMessage = structuredContent.path("errorDesc").asText("Unknown error");
+            Assert.fail("Query execution failed with error: " + errorMessage);
+        } else {
+            Assert.assertFalse("query_result string is empty without an API error", queryResultStr.trim().isEmpty());
+            ArrayNode queryArray = (ArrayNode) mapper.readTree(queryResultStr);
+            String[] expectedFields = promptDimensions.split(",");
+            for (int i = 0; i < queryArray.size(); i++) {
+                JsonNode row = queryArray.get(i);
+                logger.info("Row {}:", i + 1);
+                for (String field : expectedFields) {
+                    String fieldName = field.trim();
+                    JsonNode valueNode = row.path(fieldName);
+                    Assert.assertFalse("Missing expected field: " + fieldName, valueNode.isMissingNode());
+                    String fetchedValue = valueNode.asText();
+                    logger.info("  -> {} : {}", fieldName, fetchedValue);
+                }
+                logger.info("-----------------------------------");
             }
         }
     }
