@@ -1009,12 +1009,11 @@ public class CreateCreatives {
         creativeDetails.add(DOMAIN_LANDING_FROM_CREATIVE_TILE.textContent().trim());
         if (ADSIZE_FROM_CREATIVE_TILE.isVisible()){
             String size = ADSIZE_FROM_CREATIVE_TILE.textContent().replace("px", "").trim();
-        creativeDetails.add(size);
-    }
-        if (DURATION_FROM_CREATIVE_TILE.isVisible()){ {
+            creativeDetails.add(size);
+        }
+        if (DURATION_FROM_CREATIVE_TILE.isVisible()){
                 String duration = DURATION_FROM_CREATIVE_TILE.inputValue();
                 creativeDetails.add((duration == null || duration.trim().isEmpty()) ? "0" : duration.trim());
-            }
         }
         creativeDetails.add(CREATIVE_STATUS_FROM_CREATIVE_TILE.textContent().trim());
         return creativeDetails;
