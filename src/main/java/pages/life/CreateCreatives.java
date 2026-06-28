@@ -1004,8 +1004,8 @@ public class CreateCreatives {
         List<String> creativeDetails = new ArrayList<>();
         creativeDetails.add(CREATIVE_NAME_LIST.textContent().trim());
         creativeDetails.add(DOMAIN_LANDING_FROM_CREATIVE_TILE.textContent().trim());
-        String size = ADSIZE_FROM_CREATIVE_TILE.textContent().replace("px", "").trim();
-        creativeDetails.add(size);
+//        String size = ADSIZE_FROM_CREATIVE_TILE.textContent().replace("px", "").trim();
+//        creativeDetails.add(size);
         creativeDetails.add(CREATIVE_STATUS_FROM_CREATIVE_TILE.textContent().trim());
         return creativeDetails;
     }
