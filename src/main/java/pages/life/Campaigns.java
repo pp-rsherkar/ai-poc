@@ -173,6 +173,7 @@ public class Campaigns {
     }
 
     public void createCampaign() {
+        page.waitForTimeout(3000);
         CREATE_CAMPAIGN.click();
         waitUtility.waitUntilSpinnerHidden();
     }

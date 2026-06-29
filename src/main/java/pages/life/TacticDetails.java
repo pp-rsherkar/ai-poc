@@ -9,7 +9,8 @@ import java.util.*;
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
-import java.util.stream.Collectors;
+
+import java.util.function.Consumer;
 
 public class TacticDetails {
     public final Locator TARGETING_RULES_ICON;
@@ -146,15 +147,18 @@ public class TacticDetails {
                 page.locator("//span[@class='notes-dark-icon-empty'] | //span[@class='notes-dark-icon-provided']");
         this.COMMENT_TEXT_BOX = page.locator("//textarea[@id='notesId']");
         this.COMMENT_SUCCESS_ALERT = page.locator("//div[contains(text(),'Notes saved successfully')]");
-        this.TACTIC_COPY_NAME_FIELD = page.locator("//input[contains(@class, \"multi-line-input-box\")and @placeholder=\"Enter New Tactic Name\"]");
-        this.DUPLICATE_BUTTON = page.locator("//button[contains(@class, \"okButton\") and normalize-space(text())=\"Duplicate\"]");
+        this.TACTIC_COPY_NAME_FIELD = page.locator(
+                "//input[contains(@class, \"multi-line-input-box\")and @placeholder=\"Enter New Tactic Name\"]");
+        this.DUPLICATE_BUTTON =
+                page.locator("//button[contains(@class, \"okButton\") and normalize-space(text())=\"Duplicate\"]");
         this.CREATIVE_NAME = page.locator("//td[contains(@class,'semi-bold')]//span[contains(@class,'crt-name')]");
         this.TACTIC_CHANNEL = page.locator("(//div[@id='billingTypeDropdown'])[1]");
         this.TACTIC_PRIORITY = page.locator("//div[contains(@class, 'labeled input')] //input[@id='priority']");
         this.TACTIC_MEDIA_OPTIMIZATION = page.locator("(//div[@id='billingTypeDropdown'])[2]");
         this.DATA_COST_CPM = page.locator("(//span[contains(@class, 'cost-override')])[1]");
         this.HUMAN_COST_CPM = page.locator("(//span[contains(@class, 'cost-override')])[2]");
-        this.COPY_SUCCESS_ALERT = page.locator("//div[@id='toast-container' and contains(., 'Tactic(s)') and contains(., 'copied successfully')]");
+        this.COPY_SUCCESS_ALERT = page.locator(
+                "//div[@id='toast-container' and contains(., 'Tactic(s)') and contains(., 'copied successfully')]");
         this.TARGETING_RULE_CONFIRMATION_DIALOG = page.locator("//div[contains(@class,'confirm-modal header-title')]");
         this.CONTINUE_BUTTON = page.locator("//span[text()='Continue']");
         this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
@@ -270,13 +274,17 @@ public class TacticDetails {
         TACTIC_TAB.last().click();
     }
 
-    public void deleteCustomField(String customFieldName) {
+    public String deleteCustomField(String customFieldName) {
+        waitUtility.waitForLocatorVisible(
+                page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
+                        .last());
         Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
         FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
+        String text = DELETE_SUCCESS.innerText();
         waitUtility.waitForLocatorVisible(DELETE_SUCCESS);
-        waitUtility.waitForElementHidden(String.format("//label[contains(text(),'%s')]", customFieldName));
+        return text;
     }
 
     public void clickTargetingRuleIcon() {
@@ -558,14 +566,16 @@ public class TacticDetails {
     }
 
     public boolean verifyTacticAvailable(String tacticName) {
-        Locator tacticItem = page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName));
+        Locator tacticItem =
+                page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName));
         tacticItem.scrollIntoViewIfNeeded();
         return tacticItem.isVisible();
     }
 
     public void clickTacticOptions(String option) {
         TACTIC_OPTIONS.click();
-        Locator optionXpath = page.locator(String.format("//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
+        Locator optionXpath = page.locator(String.format(
+                "//div[contains(@class,'menu-items-popover')]/div/app-icon-lable-link[@title='%s']", option));
         waitUtility.waitForLocatorVisible(optionXpath);
         optionXpath.click();
     }
@@ -580,14 +590,18 @@ public class TacticDetails {
     }
 
     public void navigateToTacticDetails(String tacticName) {
-        page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName)).click();
+        page.locator(String.format("//div[@class='tactic-main-details' and text()='%s']", tacticName))
+                .click();
     }
 
     public List<String> fetchTacticDetails() {
         List<String> originalTacticDetails = new ArrayList<>();
-        originalTacticDetails.add(TACTIC_CHANNEL.locator("div.text").textContent().trim());
-        originalTacticDetails.add(TACTIC_PRIORITY.evaluate("el => el.value").toString().trim());
-        originalTacticDetails.add(TACTIC_MEDIA_OPTIMIZATION.locator("div.text").textContent().trim());
+        originalTacticDetails.add(
+                TACTIC_CHANNEL.locator("div.text").textContent().trim());
+        originalTacticDetails.add(
+                TACTIC_PRIORITY.evaluate("el => el.value").toString().trim());
+        originalTacticDetails.add(
+                TACTIC_MEDIA_OPTIMIZATION.locator("div.text").textContent().trim());
         page.waitForCondition(() -> {
             String text = DATA_COST_CPM.nth(0).textContent().trim();
             return !text.equals("—") && !text.isEmpty();
@@ -607,5 +621,78 @@ public class TacticDetails {
                 "//div[text()='%s']/ancestor::div[contains(@class,'lineitem-list-wrapper')]//app-icon-lable-link[@class='tactic-new-button']//div",
                 name);
         page.locator(xpath).click();
+    }
+
+    public boolean isCustomFieldAvailable(String customFieldName) {
+        return page.locator(String.format("//label[contains(text(),'%s')]", customFieldName))
+                .isVisible();
+    }
+
+    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative, Consumer<Map<String, List<String>>> perTacticVerification) {
+        String currentLiName = null;
+
+        for (int i = 0; i < rows.size(); i++) {
+            Map<String, String> row = rows.get(i);
+            String liType    = row.get("LI_TYPE");
+            String liName    = row.get("LI_NAME");
+            String liBudget  = row.get("LI_BUDGET");
+            String tacticName = row.get("TACTIC_NAME");
+            String channel   = row.get("CHANNEL");
+
+            if (!liName.equals(currentLiName)) {
+                if (currentLiName != null) {
+                    lineItemDetails.selectNewLineItem();
+                }
+                lineItemDetails.enterLineItemName(liName);
+                lineItemDetails.selectLineItemType(liType);
+                lineItemDetails.clickAddFlightButton();
+                lineItemDetails.enterLineItemBudget(liBudget);
+                lineItemDetails.enableLineItem();
+                lineItemDetails.saveLineItem();
+                waitUtility.waitUntilSpinnerHidden();
+                lineItemDetails.lineItemSuccess();
+                currentLiName = liName;
+            }
+
+            createTactic(tacticName);
+            tacticSettings.selectChannel(channel);
+            navigation.clickOnIcon("Add Targeting Rule");
+
+            Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
+            for (int j = 1; row.containsKey("RULE_" + j); j++) {
+                String rule   = row.get("RULE_"   + j);
+                String values = row.get("VALUES_" + j);
+                if (rule != null && !rule.isEmpty()) {
+                    List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
+                    tacticSettings.selectMultipleRuleTypes(rule, parsedValues);
+                    perTacticRules.put(rule, parsedValues);
+                }
+            }
+
+            tacticSettings.closeRuleTypePanel();
+
+            if (perTacticVerification != null) {
+                perTacticVerification.accept(perTacticRules);
+            }
+
+            saveTacticDetails();
+            navigation.clickOnIcon("Assign Existing Creatives");
+            tacticCreatives.assignCreatives(creative);
+            tacticCreatives.enableCreative();
+            tacticCreatives.saveTacticCreatives();
+            waitUtility.waitUntilSpinnerHidden();
+
+            if (i + 1 < rows.size()) {
+                String nextLiName = rows.get(i + 1).get("LI_NAME");
+                if (nextLiName.equals(liName)) {
+                    addNewTactic();
+                }
+            }
+        }
+    }
+
+    public void addNewTactic() {
+        NEW_TACTIC_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
     }
 }

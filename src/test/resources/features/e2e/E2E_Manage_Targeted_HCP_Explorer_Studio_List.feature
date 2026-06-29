@@ -16,7 +16,7 @@ Feature: E2E Workflow for Targeting a Studio HCP Explorer List in LIFE at the Ta
     And User navigates to Studio application
     When User clicks on Create New Workspace
     Then User sees the types of workspaces they have permissions for
-    And User clicks on HCP Explorer workspace
+    And User clicks on "HCP Explorer" workspace
     And User selects the advertiser "<ADVERTISER>"
     And User updates the workspace name as "<WORKSPACE_NAME>"
     And User applies the filter and selects option
@@ -25,8 +25,8 @@ Feature: E2E Workflow for Targeting a Studio HCP Explorer List in LIFE at the Ta
       | NPI Gender | Female   |
     And User clicks on Ok and closes the filter popup
     Then Verify that the applied filters are displayed correctly
-    And User saves the workspace
-    Then Verify the HCP Explorer Workspace is saved
+    And User saves the "HCP Explorer" workspace
+    Then Verify the "HCP Explorer" Workspace is saved
     And Download button is enabled to the user
     And User clicks on Publish NPI List
     And User selects publish "<LIST_TYPE>"

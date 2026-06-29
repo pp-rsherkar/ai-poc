@@ -2,9 +2,11 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -12,15 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pages.Navigation;
 import pages.admin.Accounts;
-import pages.studio.ExpansionWorkspace;
-import pages.studio.ExplorerWorkspace;
-import pages.studio.Workspace;
-import pages.studio.WorkspaceCreation;
+import pages.studio.*;
 import utils.CommonUtils;
 import utils.ConfigReader;
 import utils.Constants;
@@ -30,6 +30,7 @@ public class StudioSteps {
     private static final Logger logger = LoggerFactory.getLogger(StudioSteps.class);
     static String workspaceName;
     static String newWorkspaceName;
+    static String draftOption;
     Boolean flag = true;
     Boolean isOverwritten = false;
     List<String[]> fileContent;
@@ -40,6 +41,7 @@ public class StudioSteps {
     ExpansionWorkspace expansionWorkspace = new ExpansionWorkspace(DriverFactory.getPage());
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
+    BrandExplorerWorkspace brandExplorerWorkspace = new BrandExplorerWorkspace(DriverFactory.getPage());
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
@@ -203,54 +205,28 @@ public class StudioSteps {
         Assert.assertTrue("Admin and Studio permissions don't match", metricNames.containsAll(fetchedMetricNames));
     }
 
-    /*
-        @Then("User selects the Workspace Type as {string}")
-        public void user_selects_the_workspace_type_as(String string) {
+    @And("User clicks on {string} workspace")
+    public void userClicksOnWorkspace(String workspaceType) {
+        logger.info("Selecting {} workspace", workspaceType);
 
+        if (fetchedMetricNames.contains(workspaceType)) {
+            String explorer =
+                    switch (workspaceType) {
+                        case "HCP Explorer" -> workspaceCreation.verifyHCPExplorer();
+                        case "Brand Explorer" -> workspaceCreation.verifyBrandExplorer();
+                        default -> throw new IllegalArgumentException(
+                                "Unsupported workspace verification: " + workspaceType);
+                    };
+
+            logger.info("{} permission: {}", workspaceType, explorer);
+            Assert.assertEquals(workspaceType, explorer);
         }
 
-        @Then("User selects the advertiser as {string}")
-        public void user_selects_the_advertiser_as(String string) {
-
+        switch (workspaceType) {
+            case "HCP Explorer" -> workspaceCreation.clickHCPExplorerWorkspace();
+            case "Brand Explorer" -> workspaceCreation.clickBrandExplorerWorkspace();
+            default -> throw new IllegalArgumentException("Unsupported workspace click: " + workspaceType);
         }
-
-        @Then("User selects Source Audience details as {string},{string}")
-        public void user_selects_source_audience_details_as(String string, String string2) {
-
-        }
-
-        @Then("User selects {string}")
-        public void user_selects(String string) {
-
-        }
-
-        @Then("User applies filters to the workspace")
-        public void user_applies_filters_to_the_workspace() {
-
-        }
-
-        @Then("User clicks on Edit button to rename the workspace to {string}")
-        public void user_clicks_on_edit_button_to_rename_the_workspace_to(String string) {
-
-        }
-
-        @Then("Verify the workspace in workspace management page")
-        public void verify_the_workspace_in_workspace_management_page() {
-
-        }
-    */
-
-    @And("User clicks on HCP Explorer workspace")
-    public void user_clicks_on_hcp_explorer_workspace() {
-        logger.info("Selecting HCP Explorer workspace");
-
-        if (fetchedMetricNames.contains("HCP Explorer")) {
-            String explorer = workspaceCreation.verifyHCPExplorer();
-            logger.info("HCP Explorer permission: {}", explorer);
-            Assert.assertEquals("HCP Explorer", explorer);
-        }
-
-        workspaceCreation.clickHCPExplorerWorkspace();
     }
 
     @And("User selects the advertiser {string}")
@@ -342,21 +318,29 @@ public class StudioSteps {
         }
     }
 
-    @Then("User saves the workspace")
-    public void user_saves_the_workspace() {
-        logger.info("Saving HCP Explorer workspace");
-        explorerWorkspace.saveExplorerWorkspace();
+    @Then("User saves the {string} workspace")
+    public void user_saves_the_workspace(String workspaceType) {
+        logger.info("Saving {} workspace", workspaceType);
+
+        switch (workspaceType) {
+            case "HCP Explorer":
+                explorerWorkspace.saveExplorerWorkspace();
+                break;
+            case "Brand Explorer":
+                brandExplorerWorkspace.saveBrandExplorerWorkspace();
+                break;
+        }
     }
 
-    @Then("Verify the HCP Explorer Workspace is saved")
-    public void verify_the_hcp_explorer_workspace_is_saved() {
+    @Then("Verify the {string} Workspace is saved")
+    public void verify_the_hcp_explorer_workspace_is_saved(String workspaceType) {
         String actualMessage = workspaceCreation.isWorkspaceCreationAlertDisplayed();
-        logger.info("Save alert: {}", actualMessage);
+        logger.info("Save alert for {} workspace: {}", workspaceType, actualMessage);
         boolean isValid = actualMessage.equals("Workspace created successfully")
                 || actualMessage.equals("Workspace saved successfully")
                 || actualMessage.equals(
-                        "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
-        Assert.assertTrue("Unexpected message: " + actualMessage, isValid);
+                "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
+        Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
     }
 
@@ -1032,8 +1016,8 @@ public class StudioSteps {
     @And(
             "User applies {string} filter, selects filter options as below and verifies the clinical recency filter is updated correctly")
     public void
-            userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
-                    String filterType, DataTable dataTable) {
+    userAppliesClinicalFilterSelectsFilterOptionsAsBelowAndVerifiesTheClinicalRecencyFilterIsUpdatedCorrectly(
+            String filterType, DataTable dataTable) {
         logger.info("Applying '{}' filter and verifying clinical recency values", filterType);
         List<Map<String, String>> filters = dataTable.asMaps(String.class, String.class);
 
@@ -1111,8 +1095,8 @@ public class StudioSteps {
     @Then(
             "User verifies that the selected filters, dropdown values, and search input remain persistent unless they are manually deselected or cleared - {string}, {string}, {string}")
     public void
-            userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
-                    String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
+    userVerifiesThatTheSelectedFiltersDropdownValuesAndSearchInputRemainPersistentUnlessTheyAreManuallyDeselectedOrCleared(
+            String expectedWorkspaceType, String expectedAdvertiser, String expectedCreatedBy) {
         String actualWorkspaceType = workspaceCreation.getSelectedWorkspaceType();
         logger.info("Workspace type: {}", actualWorkspaceType);
         Assert.assertEquals("Selected workspace type is not persistent", expectedWorkspaceType, actualWorkspaceType);
@@ -1146,5 +1130,124 @@ public class StudioSteps {
         Assert.assertTrue(
                 "Search box is not cleared",
                 workspaceCreation.getSearchedWorkspaceName().isEmpty());
+    }
+
+    @And("User selects the Draft option as {string}")
+    public void userSelectsTheDraftOptionAs(String draftOption) {
+        explorerWorkspace.selectDraftOption(draftOption);
+    }
+
+    @And("Internal user logs out from the application")
+    public void internalUserLogsOutFromTheApplication() {
+        accounts.internalUserLogout();
+    }
+
+    @And("External User switches the {string}account in Studio application")
+    public void externalUserSwitchesTheAccountInStudioApplication(String accountName) {
+        accounts.externalUserSwitchAccount(accountName);
+        logger.info("Switching account in Studio application to: {}", accountName);
+    }
+
+    @When("External user searches the workspace name in studio application with {string} draft option")
+    public void externalUserSearchesTheWorkspaceNameInStudioApplicationWithDraftOption(String draftOption) {
+        logger.info("External user searching and selecting the workspace: {}", workspaceName);
+        workspaceCreation.searchByWorkspaceName(workspaceName);
+        if (draftOption.equals("Public")) {
+            workspaceCreation.isWorkspacePresent(workspaceName);
+            Assert.assertTrue("Workspace is present for external user with draft option: " + draftOption, true);
+        } else {
+            workspaceCreation.isWorkspaceAbsent();
+            Assert.assertTrue("Workspace is absent for external user with draft option: " + draftOption, true);
+        }
+    }
+
+    @Then("External user verifies whether the workspace with {string} is visible in workspace management page")
+    public void externalUserVerifiesWhetherTheWorkspaceWithIsVisibleInWorkspaceManagementPage(String draftOption) {
+        logger.info("External user verifying workspace visibility with draft option: {}", draftOption);
+        boolean isWorkspaceVisible = workspaceCreation.isWorkspaceVisible(workspaceName, draftOption);
+        logger.info("Is workspace visible for external user: {}", isWorkspaceVisible);
+        Assert.assertTrue("Workspace is not visible for external user with draft option: " + draftOption, isWorkspaceVisible);
+
+    }
+
+    @And("User edits the workspace name as {string}")
+    public void userEditsTheWorkspaceNameAs(String wName) {
+        workspaceName = wName + '_' + CommonUtils.timeStampCalculation();
+        logger.info("Adding workspace name: {}", workspaceName);
+        brandExplorerWorkspace.waitForDashboardLoad();
+        explorerWorkspace.clickEditWorkspace();
+        explorerWorkspace.enterWorkspaceName(workspaceName);
+        explorerWorkspace.saveWorkspaceName();
+        explorerWorkspace.waitUntilAlertDisappears();
+        brandExplorerWorkspace.waitForDashboardLoad();
+    }
+
+    @Then("Verify Dimension {string} and Metric {string} are selected by default in the workspace")
+    public void verifyDefaultDimensionAndMetricInTheWorkspace(String dimension, String metric) {
+        logger.info("Verifying default Dimension and Metric in the workspace");
+        String actualDimension = brandExplorerWorkspace.getDefaultDimensions(dimension);
+        logger.info("Default Dimension: {}", actualDimension);
+        Assert.assertEquals("Default Dimension is not as expected", dimension, actualDimension);
+        String actualMetric = brandExplorerWorkspace.getDefaultMetrics(metric);
+        logger.info("Default Metric: {}", actualMetric);
+        Assert.assertEquals("Default Metric is not as expected", metric, actualMetric);
+    }
+
+    @Then("Verify Time Frame is selected as {string} by default in the workspace")
+    public void verifyDefaultTimeFrameInTheWorkspace(String timeFrame) {
+        logger.info("Verifying default Time Frame in the workspace");
+        String actualTimeFrame = brandExplorerWorkspace.getDefaultTimeFrame();
+        logger.info("Default Time Frame: {}", actualTimeFrame);
+        Assert.assertEquals("Default Time Frame is not as expected", timeFrame, actualTimeFrame);
+    }
+
+    @When("User clicks the TimeFrame selector")
+    public void userClicksTimeframeSelector() {
+        logger.info("Clicking the TimeFrame selector");
+        brandExplorerWorkspace.clickTimeFrameSelector();
+    }
+
+    @Then("All 9 preset timeframe options are visible in the dropdown with correct labels")
+    public void allPresetOptionsAreVisibleInDropdownWithCorrectLabels(DataTable dataTable) {
+        List<String> expected = dataTable.asList(String.class);
+        logger.info("Expected timeframe options: {}", expected);
+        List<String> actual = brandExplorerWorkspace.getTimeFrameOptions();
+        logger.info("Actual timeframe options: {}", actual);
+        Assert.assertEquals("Timeframe option count mismatch", expected.size(), actual.size());
+        Assert.assertTrue("Actual timeframe options do not match expected timeframe options", actual.containsAll(expected));
+    }
+
+    @When("User selects the timeframe preset {string}")
+    public void userSelectsTimeframePreset(String timeFrame) {
+        logger.info("Selecting timeframe preset: {}", timeFrame);
+        brandExplorerWorkspace.selectTimeFramePreset(timeFrame);
+    }
+
+    @Then("Verify the chart and table update immediately to reflect {string} data")
+    public void verifyChartAndTableUpdateForSelectedTimeFrame(String timeFrame) {
+        logger.info("Verifying chart and table updated for timeframe: {}", timeFrame);
+        String actual = brandExplorerWorkspace.getSelectedTimeFrameAfterUpdate();
+        logger.info("Time Frame input after selection: {}", actual);
+        Assert.assertTrue(
+                "Chart and table did not update for selected timeframe: " + timeFrame,
+                actual.equalsIgnoreCase(timeFrame));
+    }
+
+    @And("Verify the Day column shows {int} dates in ascending order")
+    public void verifyDayColumnShowsDatesInAscendingOrder(int expectedDays) {
+        logger.info("Verifying Day column shows {} dates in ascending order", expectedDays);
+        List<String> dates = brandExplorerWorkspace.getTableDates(expectedDays);
+        logger.info("Dates from Day column: {}", dates);
+        Assert.assertEquals("Expected " + expectedDays + " rows in the Day column", expectedDays, dates.size());
+        for (int i = 0; i < dates.size() - 1; i++) {
+            Assert.assertTrue(
+                    "Dates are not in ascending order: " + dates.get(i) + " is not before " + dates.get(i + 1),
+                    dates.get(i).compareTo(dates.get(i + 1)) < 0);
+        }
+        String expectedEnd = java.time.LocalDate.now().minusDays(1).toString();
+        String expectedStart = java.time.LocalDate.now().minusDays(expectedDays).toString();
+        logger.info("Expected date range: {} to {}", expectedStart, expectedEnd);
+        Assert.assertEquals("Last date in table does not match yesterday", expectedEnd, dates.get(dates.size() - 1));
+        Assert.assertEquals("First date in table does not match expected start", expectedStart, dates.get(0));
     }
 }
