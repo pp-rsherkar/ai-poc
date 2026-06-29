@@ -108,6 +108,7 @@ public class Navigation {
         SUB_MENU.click();
         STUDIO.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         STUDIO.click();
+        page.waitForTimeout(4000);
         waitUtility.waitForLocatorVisible(STUDIO_TITLE);
     }
 
