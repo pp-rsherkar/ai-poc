@@ -1,6 +1,5 @@
 package pages.life;
 
-import ch.qos.logback.core.joran.conditional.IfAction;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import factory.DriverFactory;
