@@ -59,6 +59,39 @@ jobs:
           sudo apt-get install -y jq
 
       # ---------------------------
+      # Resolve environment for this domain
+      # life    -> Demo
+      # studio  -> Pre-release
+      # hcp     -> Demo (default until confirmed otherwise)
+      # ---------------------------
+      - name: Resolve domain environment
+        run: |
+          set -euo pipefail
+ 
+          DOMAIN="${{ inputs.domain }}"
+ 
+          case "$DOMAIN" in
+            life)
+              ENVIRONMENT="Demo"
+              ;;
+            studio)
+              ENVIRONMENT="Pre-release"
+              ;;
+            hcp)
+              ENVIRONMENT="Demo"
+              echo "::warning::No explicit environment mapping confirmed for 'hcp' domain — defaulting to Demo. Update this mapping if hcp should use a different environment."
+              ;;
+            *)
+              echo "::error::Unrecognized domain '$DOMAIN' — no environment mapping defined."
+              exit 1
+              ;;
+          esac
+ 
+          echo "Domain      : $DOMAIN"
+          echo "Environment : $ENVIRONMENT"
+          echo "ENVIRONMENT=$ENVIRONMENT" >> "$GITHUB_ENV"    
+
+      # ---------------------------
       # Build context
       # ---------------------------
       - name: Build AI repository context
