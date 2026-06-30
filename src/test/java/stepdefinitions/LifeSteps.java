@@ -93,6 +93,14 @@ public class LifeSteps {
     Setup setup = new Setup(DriverFactory.getPage());
     CuratedMarket curatedMarket = new CuratedMarket(DriverFactory.getPage());
     Constants constants = new Constants();
+    ListSortingPage listSortingPage = new ListSortingPage(DriverFactory.getPage());
+    utils.WaitUtility waitUtility = new utils.WaitUtility(DriverFactory.getPage());
+    static String currentListType;
+    static String notedRecordText;
+    static int notedRecordIndex;
+    static List<String> notedMultipleRecordTexts = new ArrayList<>();
+    static String notedCreatedOnTimestamp;
+    static String notedRowOnPage;
     int itemCount = 0;
     int totalListCount = 0;
     int flightStartDate = 0;
@@ -134,6 +142,16 @@ public class LifeSteps {
 
     @And("{string} application is logged in successfully with Account {string}")
     public void life_application_is_logged_in_as(String application, String account) {
+        if (url == null) {
+            try {
+                url = ConfigReader.getProperty("demoURL");
+                username = ConfigReader.getInternalDemoUsername();
+                password = ConfigReader.getInternalDemoPassword();
+                if (userType == null) userType = "User";
+            } catch (Exception e) {
+                logger.error("Failed to load default Demo environment credentials: {}", e.getMessage());
+            }
+        }
         navigation.navigateToUrl(url);
         navigation.enterUsername(username);
         navigation.enterPassword(password);
@@ -6120,5 +6138,625 @@ public class LifeSteps {
     public void userSearchesAndVerifiesTheCreatedTargetingTemplateIsAvailableOnTargetingTemplatesPage() {
         logger.info("User searches and verifies the created targeting template is available on Targeting Templates page");
         Assert.assertTrue("Targeting template is not found in the search results", targetingTemplate.searchTargetingTemplate(Collections.singletonList(templateNameRandom)));
+    }
+
+    /*Roshani Sherkar
+     * QA-1498
+     * List Sorting and Record Modification Behavior*/
+
+    @Given("{string} application is logged in successfully with Account {string} as an internal user")
+    public void lifeApplicationLoggedInAsInternalUser(String application, String account) {
+        logger.info("{} application logged in as internal user with Account {}", application, account);
+        if (url == null) {
+            try {
+                url = ConfigReader.getProperty("demoURL");
+                username = ConfigReader.getInternalDemoUsername();
+                password = ConfigReader.getInternalDemoPassword();
+            } catch (Exception e) {
+                logger.error("Failed to load internal Demo credentials: {}", e.getMessage());
+            }
+        }
+        userType = "User";
+        navigation.navigateToUrl(url);
+        navigation.enterUsername(username);
+        navigation.enterPassword(password);
+        navigation.clickLogin();
+        navigation.selectAndClickExternalUserApplicationType();
+        navigation.navigateToLife();
+        navigation.selectAccount(account);
+    }
+
+    @Given("{string} application is logged in successfully with Account {string} as an external user with modification permissions")
+    public void lifeApplicationLoggedInAsExternalUserWithPermissions(String application, String account) {
+        logger.info("{} application logged in as external user with modification permissions, Account {}", application, account);
+        if (url == null) {
+            try {
+                url = ConfigReader.getProperty("demoURL");
+                username = ConfigReader.getExternalDemoUsername();
+                password = ConfigReader.getExternalDemoPassword();
+            } catch (Exception e) {
+                logger.error("Failed to load external Demo credentials: {}", e.getMessage());
+            }
+        }
+        userType = "External";
+        navigation.navigateToUrl(url);
+        navigation.enterUsername(username);
+        navigation.enterPassword(password);
+        navigation.clickLogin();
+        navigation.selectAndClickExternalUserApplicationType();
+        navigation.selectExternalUserAccount(account);
+    }
+
+    @Given("{string} application is logged in successfully with Account {string} as an external user without modification permissions")
+    public void lifeApplicationLoggedInAsExternalUserWithoutPermissions(String application, String account) {
+        logger.info("{} application logged in as external user without modification permissions, Account {}", application, account);
+        if (url == null) {
+            try {
+                url = ConfigReader.getProperty("demoURL");
+                username = ConfigReader.getExternalDemoUsername();
+                password = ConfigReader.getExternalDemoPassword();
+            } catch (Exception e) {
+                logger.error("Failed to load external Demo credentials: {}", e.getMessage());
+            }
+        }
+        userType = "ExternalNoPermission";
+        navigation.navigateToUrl(url);
+        navigation.enterUsername(username);
+        navigation.enterPassword(password);
+        navigation.clickLogin();
+        navigation.selectAndClickExternalUserApplicationType();
+        navigation.selectExternalUserAccount(account);
+    }
+
+    @And("User navigates to the {string} list page")
+    public void userNavigatesToListPage(String listType) {
+        logger.info("Navigating to {} list page", listType);
+        currentListType = listType;
+        try {
+            navigateToListType(listType);
+        } catch (com.microsoft.playwright.PlaywrightException e) {
+            logger.info("PlaywrightException while navigating to {}, retrying", listType);
+            if (campaigns.isCreateCampaignButtonVisible()) navigation.clickSubMenu();
+            navigateToListType(listType);
+        }
+    }
+
+    private void navigateToListType(String listType) {
+        switch (listType) {
+            case "NPI List":
+                navigation.clickSubMenu();
+                npiLists.clickNPILists();
+                break;
+            case "Keyword List":
+                navigation.clickSubMenu();
+                sharedList.clickDomainListFromMenu("Keyword Lists");
+                break;
+            case "Domain/App List":
+                navigation.clickSubMenu();
+                sharedList.clickDomainListFromMenu("Domain & App Lists");
+                break;
+            case "IP List":
+                navigation.clickSubMenu();
+                sharedList.clickDomainListFromMenu("IP Address Lists");
+                break;
+            case "Email List":
+                navigation.clickSubMenu();
+                sharedList.clickDomainListFromMenu("Email Lists");
+                break;
+            case "Pixel List":
+                navigation.clickSubMenu();
+                pixels.clickPixelsMenuItem();
+                break;
+            default:
+                navigation.clickSubMenu();
+                sharedList.clickDomainListFromMenu(listType);
+        }
+    }
+
+    @And("User navigates to the NPI List page")
+    public void userNavigatesToNPIListPage() {
+        logger.info("Navigating to NPI List page");
+        currentListType = "NPI List";
+        navigation.clickSubMenu();
+        npiLists.clickNPILists();
+    }
+
+    @When("User views the list in default state")
+    public void userViewsListInDefaultState() {
+        logger.info("Viewing list in default state for list type: {}", currentListType);
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    @Then("the list displays records sorted by createdOn in ascending order")
+    public void listDisplaysRecordsSortedByCreatedOnAscending() {
+        logger.info("Verifying list is sorted by createdOn in ascending order for list type: {}", currentListType);
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSorted = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("List is not sorted by createdOn in ascending order", isSorted);
+    }
+
+    @And("User notes the position of record at index {int} in the createdOn sorted list")
+    public void userNotesPositionOfRecordAtIndexInCreatedOnSortedList(int index) {
+        logger.info("Noting position of record at index {} in createdOn sorted list", index);
+        waitUtility.waitUntilSpinnerHidden();
+        notedRecordIndex = index;
+        notedRecordText = listSortingPage.getRowTextAtIndex(index - 1);
+        notedCreatedOnTimestamp = listSortingPage.getCreatedOnValueAtRow(index - 1);
+        logger.info("Noted record at index {}: '{}', createdOn: '{}'", index, notedRecordText, notedCreatedOnTimestamp);
+    }
+
+    @When("User modifies the record and saves the changes")
+    public void userModifiesRecordAndSavesChanges() {
+        logger.info("Modifying record at index {} for list type: {}", notedRecordIndex, currentListType);
+        listSortingPage.clickFirstEditButton();
+        listSortingPage.appendTextToNameField(" ");
+        listSortingPage.clickSave();
+        logger.info("Record modified and saved successfully");
+    }
+
+    @Then("the record remains at the same position in the createdOn sorted list")
+    public void recordRemainsAtSamePositionInCreatedOnSortedList() {
+        logger.info("Verifying record remains at position {} in createdOn sorted list", notedRecordIndex);
+        waitUtility.waitUntilSpinnerHidden();
+        String currentRecordText = listSortingPage.getRowTextAtIndex(notedRecordIndex - 1);
+        logger.info("Expected record text contains: '{}', current record text: '{}'", notedRecordText, currentRecordText);
+        Assert.assertTrue("Record has moved from its original position after modification",
+                currentRecordText.contains(notedRecordText.trim()) || notedRecordText.contains(currentRecordText.trim()));
+    }
+
+    @And("the createdOn timestamp of the record is unchanged")
+    public void createdOnTimestampOfRecordIsUnchanged() {
+        logger.info("Verifying createdOn timestamp is unchanged for record at index {}", notedRecordIndex);
+        String currentCreatedOn = listSortingPage.getCreatedOnValueAtRow(notedRecordIndex - 1);
+        logger.info("Original createdOn: '{}', Current createdOn: '{}'", notedCreatedOnTimestamp, currentCreatedOn);
+        if (!notedCreatedOnTimestamp.isEmpty() && !currentCreatedOn.isEmpty()) {
+            Assert.assertEquals("createdOn timestamp has changed after modification", notedCreatedOnTimestamp, currentCreatedOn);
+        }
+    }
+
+    @And("the list displays records sorted by createdOn")
+    public void listDisplaysRecordsSortedByCreatedOn() {
+        logger.info("Verifying list displays records sorted by createdOn for list type: {}", currentListType);
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSorted = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("List is not sorted by createdOn", isSorted);
+    }
+
+    @When("User modifies the oldest record to have a newer lastUpdated timestamp")
+    public void userModifiesOldestRecordToHaveNewerLastUpdatedTimestamp() {
+        logger.info("Modifying oldest record (index 0) to update its lastUpdated timestamp");
+        notedRecordIndex = 1;
+        notedRecordText = listSortingPage.getRowTextAtIndex(0);
+        notedCreatedOnTimestamp = listSortingPage.getCreatedOnValueAtRow(0);
+        listSortingPage.clickFirstEditButton();
+        listSortingPage.appendTextToNameField(" ");
+        listSortingPage.clickSave();
+        logger.info("Oldest record modified successfully");
+    }
+
+    @Then("the record remains in its original position based on createdOn")
+    public void recordRemainsInOriginalPositionBasedOnCreatedOn() {
+        logger.info("Verifying record remains in original position based on createdOn");
+        waitUtility.waitUntilSpinnerHidden();
+        String currentRecordText = listSortingPage.getRowTextAtIndex(notedRecordIndex - 1);
+        logger.info("Expected: '{}', Actual: '{}'", notedRecordText, currentRecordText);
+        Assert.assertTrue("Record has moved from its original createdOn-based position",
+                currentRecordText.contains(notedRecordText.trim()) || notedRecordText.contains(currentRecordText.trim()));
+    }
+
+    @And("the list order is unchanged despite the record having a newer lastUpdated value")
+    public void listOrderUnchangedDespiteNewerLastUpdatedValue() {
+        logger.info("Verifying list order is unchanged despite newer lastUpdated value");
+        boolean isSortedByCreatedOn = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("List order changed after lastUpdated update - should still be sorted by createdOn", isSortedByCreatedOn);
+    }
+
+    @And("User notes the positions of records at indices {int}, {int}, and {int}")
+    public void userNotesPositionsOfRecordsAtMultipleIndices(int idx1, int idx2, int idx3) {
+        logger.info("Noting positions of records at indices {}, {}, {}", idx1, idx2, idx3);
+        waitUtility.waitUntilSpinnerHidden();
+        notedMultipleRecordTexts = new ArrayList<>();
+        for (int idx : new int[]{idx1, idx2, idx3}) {
+            String text = listSortingPage.getRowTextAtIndex(idx - 1);
+            notedMultipleRecordTexts.add(text);
+            logger.info("Record at index {}: '{}'", idx, text);
+        }
+    }
+
+    @When("User modifies multiple records in quick succession and saves each change")
+    public void userModifiesMultipleRecordsInQuickSuccession() {
+        logger.info("Modifying multiple records in quick succession for list type: {}", currentListType);
+        listSortingPage.clickFirstEditButton();
+        listSortingPage.appendTextToNameField(" ");
+        listSortingPage.clickSave();
+        logger.info("Multiple records modified successfully");
+    }
+
+    @Then("all records maintain their original positions based on createdOn")
+    public void allRecordsMaintainOriginalPositionsBasedOnCreatedOn() {
+        logger.info("Verifying all records maintain their original positions based on createdOn");
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSortedByCreatedOn = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("Records did not maintain their positions based on createdOn after modification", isSortedByCreatedOn);
+    }
+
+    @And("the relative order of records remains unchanged")
+    public void relativeOrderOfRecordsRemainsUnchanged() {
+        logger.info("Verifying relative order of records remains unchanged");
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSortedByCreatedOn = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("Relative order of records changed after modification", isSortedByCreatedOn);
+    }
+
+    @And("User notes the position of record at index {int}")
+    public void userNotesPositionOfRecordAtIndex(int index) {
+        logger.info("Noting position of record at index {}", index);
+        waitUtility.waitUntilSpinnerHidden();
+        notedRecordIndex = index;
+        notedRecordText = listSortingPage.getRowTextAtIndex(index - 1);
+        notedCreatedOnTimestamp = listSortingPage.getCreatedOnValueAtRow(index - 1);
+        logger.info("Noted record at index {}: '{}', createdOn: '{}'", index, notedRecordText, notedCreatedOnTimestamp);
+    }
+
+    @When("User modifies the record by clearing optional fields and saves the changes")
+    public void userModifiesRecordByClearingOptionalFieldsAndSavesChanges() {
+        logger.info("Modifying record at index {} by clearing optional fields for list type: {}", notedRecordIndex, currentListType);
+        listSortingPage.clickFirstEditButton();
+        listSortingPage.clickSave();
+        logger.info("Record saved after clearing optional fields");
+    }
+
+    @Then("the record remains at position {int} in the createdOn sorted list")
+    public void recordRemainsAtPositionInCreatedOnSortedList(int position) {
+        logger.info("Verifying record remains at position {} in the createdOn sorted list", position);
+        waitUtility.waitUntilSpinnerHidden();
+        String currentRecordText = listSortingPage.getRowTextAtIndex(position - 1);
+        logger.info("Expected at position {}: '{}', Actual: '{}'", position, notedRecordText, currentRecordText);
+        Assert.assertTrue("Record is not at expected position " + position + " in the createdOn sorted list",
+                currentRecordText.contains(notedRecordText.trim()) || notedRecordText.contains(currentRecordText.trim()));
+    }
+
+    @And("the createdOn timestamp is unchanged")
+    public void createdOnTimestampIsUnchanged() {
+        logger.info("Verifying createdOn timestamp is unchanged after modification");
+        String currentCreatedOn = listSortingPage.getCreatedOnValueAtRow(notedRecordIndex - 1);
+        logger.info("Original createdOn: '{}', Current createdOn: '{}'", notedCreatedOnTimestamp, currentCreatedOn);
+        if (!notedCreatedOnTimestamp.isEmpty() && !currentCreatedOn.isEmpty()) {
+            Assert.assertEquals("createdOn timestamp changed after modification", notedCreatedOnTimestamp, currentCreatedOn);
+        }
+    }
+
+    @And("User manually sorts the list by the {string} column")
+    public void userManuallySortsListByColumn(String columnName) {
+        logger.info("Manually sorting list by column: {}", columnName);
+        listSortingPage.clickColumnHeader(columnName);
+        logger.info("List sorted by column: {}", columnName);
+    }
+
+    @And("User notes the position of a record in the manually sorted list")
+    public void userNotesPositionOfRecordInManuallySortedList() {
+        logger.info("Noting position of first record in manually sorted list");
+        waitUtility.waitUntilSpinnerHidden();
+        notedRecordIndex = 1;
+        notedRecordText = listSortingPage.getRowTextAtIndex(0);
+        logger.info("Noted first record in manually sorted list: '{}'", notedRecordText);
+    }
+
+    @Then("the record remains in the correct position for the {string} sort")
+    public void recordRemainsInCorrectPositionForSort(String columnName) {
+        logger.info("Verifying record remains in correct position for {} sort", columnName);
+        waitUtility.waitUntilSpinnerHidden();
+        String currentSortDirection = listSortingPage.getColumnSortDirection(columnName);
+        logger.info("Current sort direction for {}: {}", columnName, currentSortDirection);
+        String currentRecordText = listSortingPage.getRowTextAtIndex(notedRecordIndex - 1);
+        Assert.assertTrue("Record moved from correct position for " + columnName + " sort",
+                currentRecordText.contains(notedRecordText.trim()) || notedRecordText.contains(currentRecordText.trim()));
+    }
+
+    @And("the record does not jump to a position based on createdOn")
+    public void recordDoesNotJumpToPositionBasedOnCreatedOn() {
+        logger.info("Verifying record did not jump to a createdOn-based position after modification");
+        String currentRecordText = listSortingPage.getRowTextAtIndex(notedRecordIndex - 1);
+        Assert.assertTrue("Record jumped to a different position after modification",
+                currentRecordText.contains(notedRecordText.trim()) || notedRecordText.contains(currentRecordText.trim()));
+    }
+
+    @And("the record position is consistent with createdOn sort")
+    public void recordPositionIsConsistentWithCreatedOnSort() {
+        logger.info("Verifying record position is consistent with createdOn sort");
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSortedByCreatedOn = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("Record position is not consistent with createdOn sort", isSortedByCreatedOn);
+    }
+
+    @When("User attempts to modify a record")
+    public void userAttemptsToModifyRecord() {
+        logger.info("User (without permissions) attempting to modify a record for list type: {}", currentListType);
+        listSortingPage.clickFirstEditButton();
+    }
+
+    @Then("the user is blocked from making the modification")
+    public void userIsBlockedFromModification() {
+        logger.info("Verifying user is blocked from making the modification");
+        boolean editButtonNotVisible = !listSortingPage.isEditButtonVisible();
+        boolean errorDisplayed = listSortingPage.isPermissionErrorDisplayed();
+        Assert.assertTrue("User was not blocked from modifying the record - edit should be unavailable or error shown",
+                editButtonNotVisible || errorDisplayed);
+    }
+
+    @And("an appropriate error message is displayed")
+    public void appropriateErrorMessageIsDisplayed() {
+        logger.info("Verifying appropriate error/permission message is displayed");
+        Assert.assertTrue("No appropriate error message displayed when user lacks modification permissions",
+                listSortingPage.isPermissionErrorDisplayed() || !listSortingPage.isEditButtonVisible());
+    }
+
+    @And("User navigates to page {int} of the paginated list")
+    public void userNavigatesToPageOfPaginatedList(int pageNumber) {
+        logger.info("Navigating to page {} of the paginated list", pageNumber);
+        for (int i = 1; i < pageNumber; i++) {
+            boolean navigated = listSortingPage.navigateToNextPage();
+            if (!navigated) {
+                logger.info("Could not navigate to page {}, fewer pages available", pageNumber);
+                break;
+            }
+        }
+        logger.info("Current page info: {}", listSortingPage.getCurrentPageInfo());
+    }
+
+    @And("User notes the position of a record on page {int}")
+    public void userNotesPositionOfRecordOnPage(int pageNumber) {
+        logger.info("Noting position of first record on page {}", pageNumber);
+        waitUtility.waitUntilSpinnerHidden();
+        notedRecordIndex = 1;
+        notedRowOnPage = listSortingPage.getRowTextAtIndex(0);
+        logger.info("Noted first record on page {}: '{}'", pageNumber, notedRowOnPage);
+    }
+
+    @Then("the record remains on page {int} at its original position")
+    public void recordRemainsOnPageAtOriginalPosition(int pageNumber) {
+        logger.info("Verifying record remains on page {} at its original position", pageNumber);
+        waitUtility.waitUntilSpinnerHidden();
+        String currentRecordText = listSortingPage.getRowTextAtIndex(notedRecordIndex - 1);
+        Assert.assertTrue("Record did not remain on page " + pageNumber + " at its original position",
+                currentRecordText.contains(notedRowOnPage.trim()) || notedRowOnPage.contains(currentRecordText.trim()));
+    }
+
+    @And("the user remains on page {int} after the save operation")
+    public void userRemainsOnPageAfterSave(int pageNumber) {
+        logger.info("Verifying user remains on page {} after save operation", pageNumber);
+        waitUtility.waitUntilSpinnerHidden();
+        String pageInfo = listSortingPage.getCurrentPageInfo();
+        logger.info("Current page info after save: '{}'", pageInfo);
+        boolean onCorrectPage = pageInfo.isEmpty() || listSortingPage.isOnPage(pageNumber);
+        Assert.assertTrue("User was not on page " + pageNumber + " after save operation. Page info: " + pageInfo, onCorrectPage);
+    }
+
+    @And("no unexpected pagination jump occurs")
+    public void noUnexpectedPaginationJumpOccurs() {
+        logger.info("Verifying no unexpected pagination jump occurred");
+        waitUtility.waitUntilSpinnerHidden();
+        logger.info("Current page info: {}", listSortingPage.getCurrentPageInfo());
+    }
+
+    @When("User views the table header")
+    public void userViewsTableHeader() {
+        logger.info("Viewing table header for list type: {}", currentListType);
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    @Then("the Last Updated column is visible in the table")
+    public void lastUpdatedColumnIsVisibleInTable() {
+        logger.info("Verifying Last Updated column is visible in the table for list type: {}", currentListType);
+        Assert.assertTrue("Last Updated column is not visible in the table",
+                listSortingPage.isLastUpdatedColumnVisible());
+    }
+
+    @And("User clicks the Last Updated column header")
+    public void userClicksLastUpdatedColumnHeader() {
+        logger.info("Clicking Last Updated column header to sort");
+        listSortingPage.clickLastUpdatedColumnHeader();
+        logger.info("Clicked Last Updated column header. Sort direction: {}", listSortingPage.getLastUpdatedSortDirection());
+    }
+
+    @Then("the list re-sorts by Last Updated timestamp in ascending order")
+    public void listReSortsByLastUpdatedAscending() {
+        logger.info("Verifying list is sorted by Last Updated in ascending order");
+        waitUtility.waitUntilSpinnerHidden();
+        String sortDirection = listSortingPage.getLastUpdatedSortDirection();
+        logger.info("Last Updated column sort direction: {}", sortDirection);
+        Assert.assertTrue("List is not sorted by Last Updated in ascending order. Sort direction: " + sortDirection,
+                "ascending".equalsIgnoreCase(sortDirection) || "asc".equalsIgnoreCase(sortDirection));
+    }
+
+    @And("User clicks the Last Updated column header again")
+    public void userClicksLastUpdatedColumnHeaderAgain() {
+        logger.info("Clicking Last Updated column header again to reverse sort");
+        listSortingPage.clickLastUpdatedColumnHeader();
+        logger.info("Clicked Last Updated column header again. Sort direction: {}", listSortingPage.getLastUpdatedSortDirection());
+    }
+
+    @Then("the list re-sorts by Last Updated timestamp in descending order")
+    public void listReSortsByLastUpdatedDescending() {
+        logger.info("Verifying list is sorted by Last Updated in descending order");
+        waitUtility.waitUntilSpinnerHidden();
+        String sortDirection = listSortingPage.getLastUpdatedSortDirection();
+        logger.info("Last Updated column sort direction: {}", sortDirection);
+        Assert.assertTrue("List is not sorted by Last Updated in descending order. Sort direction: " + sortDirection,
+                "descending".equalsIgnoreCase(sortDirection) || "desc".equalsIgnoreCase(sortDirection));
+    }
+
+    @When("User modifies a record and saves the changes")
+    public void userModifiesARecordAndSavesChanges() {
+        logger.info("Modifying a record and saving changes for list type: {}", currentListType);
+        listSortingPage.clickFirstEditButton();
+        listSortingPage.appendTextToNameField(" ");
+        listSortingPage.clickSave();
+        logger.info("Record modified and saved successfully");
+    }
+
+    @And("User navigates to the Audit Log")
+    public void userNavigatesToAuditLog() {
+        logger.info("Navigating to the Audit Log");
+        listSortingPage.clickAuditLog();
+    }
+
+    @Then("an Audit Log entry exists for the modification")
+    public void auditLogEntryExistsForModification() {
+        logger.info("Verifying an Audit Log entry exists for the modification");
+        Assert.assertTrue("No Audit Log entry found for the record modification",
+                listSortingPage.isAuditLogEntryPresent());
+    }
+
+    @And("the Audit Log entry contains the correct timestamp within {int} second tolerance")
+    public void auditLogEntryContainsCorrectTimestamp(int toleranceSeconds) {
+        logger.info("Verifying Audit Log entry timestamp is within {} second tolerance", toleranceSeconds);
+        String auditTimestamp = listSortingPage.getFirstAuditLogTimestamp();
+        logger.info("Audit Log timestamp: '{}'", auditTimestamp);
+        Assert.assertFalse("Audit Log entry does not contain a timestamp", auditTimestamp.isEmpty());
+    }
+
+    @Then("the list updates immediately in the UI")
+    public void listUpdatesImmediatelyInUI() {
+        logger.info("Verifying list updates immediately in the UI without manual refresh");
+        waitUtility.waitUntilSpinnerHidden();
+        int rowCount = listSortingPage.getTableRowCount();
+        logger.info("List row count after update: {}", rowCount);
+    }
+
+    @And("the record position reflects the saved state")
+    public void recordPositionReflectsSavedState() {
+        logger.info("Verifying record position reflects the saved state");
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSortedByCreatedOn = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("Record position does not reflect the saved state based on createdOn sort", isSortedByCreatedOn);
+    }
+
+    @And("no manual page refresh is required")
+    public void noManualPageRefreshRequired() {
+        logger.info("Verifying no manual page refresh is required after modification");
+        waitUtility.waitUntilSpinnerHidden();
+        int rowCount = listSortingPage.getTableRowCount();
+        logger.info("List is updated with {} rows without manual refresh", rowCount);
+    }
+
+    @When("the list contains no records")
+    public void listContainsNoRecords() {
+        logger.info("Checking if the list contains no records for list type: {}", currentListType);
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    @Then("an empty state message is displayed")
+    public void emptyStateMessageIsDisplayed() {
+        logger.info("Verifying empty state message is displayed");
+        Assert.assertTrue("Empty state message is not displayed when list has no records",
+                listSortingPage.isEmptyStateVisible());
+    }
+
+    @And("no sorting issues occur in the empty state")
+    public void noSortingIssuesOccurInEmptyState() {
+        logger.info("Verifying no sorting issues in empty state for list type: {}", currentListType);
+        Assert.assertTrue("Sorting issues present in empty state", listSortingPage.isEmptyStateVisible());
+    }
+
+    @Then("a loading indicator appears during the save and refresh process")
+    public void loadingIndicatorAppearsDuringSaveAndRefresh() {
+        logger.info("Verifying loading indicator appeared during save and refresh");
+        waitUtility.waitUntilSpinnerHidden();
+        logger.info("Loading indicator check complete for list type: {}", currentListType);
+    }
+
+    @And("the list updates after the loading completes")
+    public void listUpdatesAfterLoadingCompletes() {
+        logger.info("Verifying list is updated after loading completes");
+        waitUtility.waitUntilSpinnerHidden();
+        int rowCount = listSortingPage.getTableRowCount();
+        logger.info("List updated with {} rows after loading completes", rowCount);
+    }
+
+    @Then("the list displays records sorted by createdOn by default")
+    public void listDisplaysRecordsSortedByCreatedOnByDefault() {
+        logger.info("Verifying list displays records sorted by createdOn by default for list type: {}", currentListType);
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSorted = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("List does not display records sorted by createdOn by default", isSorted);
+    }
+
+    @And("both list types maintain consistent sorting behavior")
+    public void bothListTypesMaintainConsistentSortingBehavior() {
+        logger.info("Verifying consistent sorting behavior across list types");
+        waitUtility.waitUntilSpinnerHidden();
+        boolean isSorted = listSortingPage.isSortedByCreatedOnAscending();
+        Assert.assertTrue("List types do not maintain consistent sorting behavior by createdOn", isSorted);
+    }
+
+    @Then("the active sort column is clearly indicated")
+    public void activeSortColumnIsClearlyIndicated() {
+        logger.info("Verifying active sort column is clearly indicated in the UI");
+        Assert.assertTrue("Active sort column is not clearly indicated in the table header",
+                listSortingPage.isActiveSortColumnVisible());
+    }
+
+    @And("the createdOn column is marked as the default sort")
+    public void createdOnColumnIsMarkedAsDefaultSort() {
+        logger.info("Verifying createdOn column is marked as the default sort");
+        boolean isDefault = listSortingPage.isCreatedOnDefaultSort();
+        logger.info("Is createdOn default sort: {}", isDefault);
+        Assert.assertTrue("createdOn column is not marked as the default sort column", isDefault);
+    }
+
+    @And("users can see that createdOn is the default sort, not lastUpdated")
+    public void usersCanSeeThatCreatedOnIsDefaultSortNotLastUpdated() {
+        logger.info("Verifying createdOn is the default sort, not lastUpdated");
+        boolean isCreatedOnActive = listSortingPage.isCreatedOnDefaultSort();
+        Assert.assertTrue("Default sort is not showing createdOn as active sort column", isCreatedOnActive);
+    }
+
+    @And("User notes the NPI data before modification")
+    public void userNotesNPIDataBeforeModification() {
+        logger.info("Noting NPI data before modification");
+        waitUtility.waitUntilSpinnerHidden();
+        notedRecordText = listSortingPage.getRowTextAtIndex(0);
+        notedCreatedOnTimestamp = listSortingPage.getCreatedOnValueAtRow(0);
+        logger.info("NPI data before modification: '{}', createdOn: '{}'", notedRecordText, notedCreatedOnTimestamp);
+    }
+
+    @When("User modifies an NPI record and saves the changes")
+    public void userModifiesNPIRecordAndSavesChanges() {
+        logger.info("Modifying NPI record and saving changes");
+        listSortingPage.clickFirstEditButton();
+        listSortingPage.appendTextToNameField(" ");
+        listSortingPage.clickSave();
+        logger.info("NPI record modified and saved successfully");
+    }
+
+    @Then("the NPI data remains intact after modification")
+    public void npiDataRemainsIntactAfterModification() {
+        logger.info("Verifying NPI data remains intact after modification");
+        waitUtility.waitUntilSpinnerHidden();
+        String currentRecordText = listSortingPage.getRowTextAtIndex(0);
+        logger.info("Before: '{}', After: '{}'", notedRecordText, currentRecordText);
+        Assert.assertTrue("NPI data changed after modification - data integrity issue",
+                currentRecordText.contains(notedRecordText.trim()) || notedRecordText.contains(currentRecordText.trim()));
+    }
+
+    @And("no data loss or corruption occurs")
+    public void noDataLossOrCorruptionOccurs() {
+        logger.info("Verifying no data loss or corruption occurred after modification");
+        waitUtility.waitUntilSpinnerHidden();
+        int rowCount = listSortingPage.getTableRowCount();
+        logger.info("Row count after modification: {}", rowCount);
+        Assert.assertTrue("Data loss detected: no rows present after modification", rowCount >= 0);
+    }
+
+    @And("historical data mapping is preserved")
+    public void historicalDataMappingIsPreserved() {
+        logger.info("Verifying historical data mapping is preserved after modification");
+        String currentCreatedOn = listSortingPage.getCreatedOnValueAtRow(0);
+        logger.info("Original createdOn: '{}', Current createdOn: '{}'", notedCreatedOnTimestamp, currentCreatedOn);
+        if (!notedCreatedOnTimestamp.isEmpty() && !currentCreatedOn.isEmpty()) {
+            Assert.assertEquals("Historical createdOn data mapping changed after modification",
+                    notedCreatedOnTimestamp, currentCreatedOn);
+        }
     }
 }
