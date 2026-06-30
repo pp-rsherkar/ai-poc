@@ -346,6 +346,68 @@ jobs:
           echo "Scenarios generated: $(echo "$CLEANED" | grep -cE '^\s*Scenario:|^\s*Scenario Outline:' || true)"
 
       # ---------------------------
+      # Validate mandatory Background env step is present per Feature block
+      # ---------------------------
+      - name: Validate environment step presence
+        run: |
+          set -euo pipefail
+ 
+          python3 - << 'PY'
+          import re, os, sys
+ 
+          DOMAIN_ENVIRONMENTS = {
+              "life":   "Demo",
+              "studio": "Pre-release",
+              "hcp":    "Demo",
+          }
+ 
+          domain = os.environ["DOMAIN"]
+          environment = DOMAIN_ENVIRONMENTS.get(domain)
+ 
+          if environment is None:
+              print(f"::warning::No environment mapping for domain '{domain}' — skipping environment step validation")
+              sys.exit(0)
+ 
+          expected = f'Given This scenario will be executed in the "{environment}" environment as a "User"'
+ 
+          with open("raw_output.gherkin", "r", encoding="utf-8") as f:
+              content = f.read()
+ 
+          # Split into per-Feature blocks (env step now lives in Background, once per Feature)
+          feature_blocks = re.split(r'(?=^Feature:)', content, flags=re.MULTILINE)
+          feature_blocks = [b for b in feature_blocks if b.strip().startswith("Feature:")]
+ 
+          if not feature_blocks:
+              print("::error::No Feature: blocks found — cannot validate Background step")
+              sys.exit(1)
+ 
+          missing = []
+          for b in feature_blocks:
+              title_match = re.search(r'^Feature:\s*(.+)', b, re.MULTILINE)
+              title = title_match.group(1).strip() if title_match else "<unknown>"
+ 
+              # Background must appear before the first Scenario/Scenario Outline
+              bg_match = re.search(r'^\s*Background:\s*\n(.*?)(?=^\s*(?:@\w+\s*\n\s*)?Scenario)', b, re.MULTILINE | re.DOTALL)
+              if not bg_match:
+                  missing.append((title, "no Background: block found"))
+                  continue
+ 
+              bg_lines = [l.strip() for l in bg_match.group(1).split("\n") if l.strip()]
+              if expected not in bg_lines:
+                  missing.append((title, f"Background present but missing expected line (found: {bg_lines})"))
+ 
+          if missing:
+              print(f"::error::{len(missing)} Feature block(s) missing mandatory Background step '{expected}':")
+              for title, reason in missing:
+                  print(f"::error::  - {title}: {reason}")
+              sys.exit(1)
+ 
+          print(f"All {len(feature_blocks)} Feature block(s) correctly declare Background: {expected}")
+          PY
+        env:
+          DOMAIN: ${{ inputs.domain }}
+
+      # ---------------------------
       # Split into feature files (1 file per Feature block)
       # ---------------------------
       - name: Split feature files

@@ -26,7 +26,25 @@ feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 MODEL       = os.environ.get("LLM_MODEL", "claude-sonnet-4-6")
 OAUTH_TOKEN = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN", "")
 
+# ── Domain → Environment mapping ────────────────────────────────────────────────
+# life   -> Demo
+# studio -> Pre-release
+# hcp    -> Demo (placeholder — confirm correct mapping when known)
+DOMAIN_ENVIRONMENTS = {
+    "life":   "Demo",
+    "studio": "Pre-release",
+    "hcp":    "Demo",
+}
+
+ENVIRONMENT = DOMAIN_ENVIRONMENTS.get(domain_text)
+if ENVIRONMENT is None:
+    print(f"::warning::No environment mapping for domain '{domain_text}' — environment Given step will be omitted from prompt")
+    ENVIRONMENT = ""
+elif domain_text == "hcp":
+    print("::warning::Domain 'hcp' has no confirmed environment mapping — defaulting to 'Demo'. Update DOMAIN_ENVIRONMENTS in write_prompt.py if this is wrong.")
+
 print(f"Model         : {MODEL}")
+print(f"Environment   : {ENVIRONMENT or '(not set)'}")
 
 IS_HAIKU = "haiku" in MODEL.lower()
 if IS_HAIKU:
@@ -234,9 +252,37 @@ if os.path.exists("scenario_dictionary.txt"):
     scenario_context = "\n".join(domain_scenarios[-30:])
     print(f"Scenario ctx  : {len(domain_scenarios)} titles, showing last 30")
 
+# ── Mandatory environment step ──────────────────────────────────────────────────
+# Implemented via a Background block (one Given per Feature block) instead of
+# repeating the line in every Scenario/Outline. This keeps the instruction
+# lightweight — it costs the model one line per Feature, not one line per
+# scenario — so it doesn't compete with the coverage/gap-check rules for
+# attention and doesn't eat into output token budget on large tickets.
+if ENVIRONMENT:
+    env_given_step = f'Given This scenario will be executed in the "{ENVIRONMENT}" environment as a "User"'
+    env_step_rule = f"""0. MANDATORY BACKGROUND STEP — ENVIRONMENT DECLARATION:
+   EVERY Feature block, with NO exceptions, MUST begin with a Background section
+   containing exactly this one Given step, placed immediately after the
+   "Feature:" line and before the first Scenario/Scenario Outline:
+
+   Background:
+     {env_given_step}
+
+   - Do NOT repeat this Given step inside individual Scenarios — it lives ONLY
+     in the Background, once per Feature block. It applies automatically to
+     every Scenario in that Feature.
+   - Do not reword, abbreviate, or change the environment name in this step.
+   - If the ticket produces 2 Feature blocks, EACH Feature block gets its own
+     Background with this same step.
+   - This is a single fixed line, not a Scenario Outline parameter.
+"""
+else:
+    env_given_step = ""
+    env_step_rule = ""
+
 # ── Build prompt ───────────────────────────────────────────────────────────────
 prompt = f"""HARD RULES:
-1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
+{env_step_rule}1. Return ONLY raw valid Gherkin. No markdown, no code fences, no explanations.
 2. Every Scenario/Scenario Outline must have exactly one @todo tag on its own line above it.
 3. NEVER place @todo on the same line as Scenario. NEVER emit two @todo tags before one Scenario.
 4. You are STRICTLY FORBIDDEN from inventing new steps unless absolutely necessary. Every step
@@ -360,7 +406,10 @@ STEP DICTIONARY (use verbatim - invent only if no match exists):
 
 OUTPUT FORMAT:
 Feature: <descriptive name — max 2 Feature blocks per ticket>
-
+{f"""
+  Background:
+    {env_given_step}
+""" if env_given_step else ""}
   @todo
   Scenario: <use ONLY when steps are unique and cannot be parameterised>
     Given ...
@@ -390,10 +439,14 @@ Feature: <descriptive name — max 2 Feature blocks per ticket>
       | Unexposed Rx Share |
       | Rx Index           |
 
-If the ticket covers exactly two distinct components, add a second Feature block:
+If the ticket covers exactly two distinct components, add a second Feature block (each
+with its own Background containing the same environment step, if applicable):
 
 Feature: <descriptive name for second component>
-
+{f"""
+  Background:
+    {env_given_step}
+""" if env_given_step else ""}
   @todo
   Scenario Outline: ...
 
@@ -404,7 +457,10 @@ FINAL REMINDER BEFORE YOU OUTPUT:
 - Scan every group of plain Scenarios: collapse any with identical structure into ONE Outline.
 - Every Scenario/Outline must be fully complete with at least one Given/When/Then.
 - If running low on output space, complete the current Scenario cleanly and stop.
-  Do NOT start a Scenario you cannot finish.
+  Do NOT start a Scenario you cannot finish.{f"""
+- VERIFY: every Feature block has exactly one Background containing only:
+  {env_given_step}
+  (Scenarios should NOT repeat this line — it lives in the Background only.)""" if env_given_step else ""}
 """
 
 with open("prompt.txt", "w", encoding="utf-8") as f:
@@ -417,3 +473,4 @@ print(f"Prompt size   : {size:,} bytes (~{input_toks:,} input tokens)")
 print(f"Window used   : {input_toks / token_window * 100:.1f}% of {MODEL} context window")
 print(f"Max output    : {output_toks:,} tokens for {MODEL}")
 print(f"Components    : {len(components)} detected — checklist {'injected' if components else 'skipped'}")
+print(f"Env step      : {'injected (' + ENVIRONMENT + ') via Background' if env_given_step else 'SKIPPED — no ENVIRONMENT set'}")
