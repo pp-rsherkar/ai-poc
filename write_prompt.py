@@ -25,10 +25,23 @@ domain_text = domain or "general"
 feature_dir = os.environ.get("FEATURE_DIR", "src/test/resources/features")
 MODEL       = os.environ.get("LLM_MODEL", "claude-sonnet-4-6")
 OAUTH_TOKEN = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN", "")
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "").strip()
  
-if not ENVIRONMENT:
-    print("::warning::ENVIRONMENT env var not set — environment Given step will be omitted from prompt")
+# ── Domain → Environment mapping ────────────────────────────────────────────────
+# life   -> Demo
+# studio -> Pre-release
+# hcp    -> Demo (placeholder — confirm correct mapping when known)
+DOMAIN_ENVIRONMENTS = {
+    "life":   "Demo",
+    "studio": "Pre-release",
+    "hcp":    "Demo",
+}
+ 
+ENVIRONMENT = DOMAIN_ENVIRONMENTS.get(domain_text)
+if ENVIRONMENT is None:
+    print(f"::warning::No environment mapping for domain '{domain_text}' — environment Given step will be omitted from prompt")
+    ENVIRONMENT = ""
+elif domain_text == "hcp":
+    print("::warning::Domain 'hcp' has no confirmed environment mapping — defaulting to 'Demo'. Update DOMAIN_ENVIRONMENTS in write_prompt.py if this is wrong.")
  
 print(f"Model         : {MODEL}")
 print(f"Environment   : {ENVIRONMENT or '(not set)'}")
@@ -451,3 +464,4 @@ print(f"Prompt size   : {size:,} bytes (~{input_toks:,} input tokens)")
 print(f"Window used   : {input_toks / token_window * 100:.1f}% of {MODEL} context window")
 print(f"Max output    : {output_toks:,} tokens for {MODEL}")
 print(f"Components    : {len(components)} detected — checklist {'injected' if components else 'skipped'}")
+print(f"Env step      : {'injected (' + ENVIRONMENT + ')' if env_given_step else 'SKIPPED — no ENVIRONMENT set'}")
