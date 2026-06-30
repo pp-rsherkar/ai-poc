@@ -1252,7 +1252,21 @@ public class StudioSteps {
     public void userSetsCustomDateRange(String startDate, String endDate) {
         logger.info("Setting custom date range: {} to {}", startDate, endDate);
         brandExplorerWorkspace.setCustomDateRange(startDate, endDate);
-        brandExplorerWorkspace.waitForDashboardLoad();
+        brandExplorerWorkspace.waitForStartDateInTable(startDate);
+    }
+
+    @When("User enters a start date {string} that is later than the end date {string}")
+    public void userEntersStartDateLaterThanEndDate(String startDate, String endDate) {
+        logger.info("Entering start date {} later than end date {}", startDate, endDate);
+        brandExplorerWorkspace.setCustomDateRange(startDate, endDate);
+    }
+
+    @Then("Verify an error message is displayed indicating the start date cannot be later than the end date")
+    public void verifyDateRangeErrorIsDisplayed() {
+        logger.info("Verifying error message is displayed for start date later than end date");
+        Assert.assertTrue(
+                "Error message for start date later than end date is not displayed",
+                brandExplorerWorkspace.isDateRangeErrorDisplayed());
     }
 
     @Then("Verify {string} is the first date row in the table")

@@ -80,3 +80,17 @@ Feature: Brand Explorer Workspace creation in Studio
       | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-07 |
       | TAMTESTING ACCOUNT | 2026-03-01 | 2026-05-07 |
       | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-01 |
+
+  @regression
+  Scenario Outline: Verify an error is shown when the custom start date is later than the end date
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    When User clicks the TimeFrame selector
+    And User selects the timeframe preset "Custom"
+    When User enters a start date "<START_DATE>" that is later than the end date "<END_DATE>"
+    Then Verify an error message is displayed indicating the start date cannot be later than the end date
+    Examples:
+      | ADVERTISER         | START_DATE | END_DATE   |
+      | TAMTESTING ACCOUNT | 2026-05-07 | 2026-05-01 |

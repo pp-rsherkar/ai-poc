@@ -3,6 +3,7 @@ package pages.studio;
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.TimeoutError;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,6 +23,7 @@ public class BrandExplorerWorkspace {
     private final Locator DATE_RANGE_PICKER;
     private final Locator START_DATE_INPUT;
     private final Locator END_DATE_INPUT;
+    private final Locator DATE_RANGE_ERROR;
     WaitUtility waitUtility;
 
     public BrandExplorerWorkspace(Page page) {
@@ -37,6 +39,8 @@ public class BrandExplorerWorkspace {
         this.DATE_RANGE_PICKER = WORKSPACE_FRAME.locator("[data-testid='date-range-picker']");
         this.START_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-from-text-input']");
         this.END_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-to-text-input']");
+        this.DATE_RANGE_ERROR =
+                WORKSPACE_FRAME.locator("//p[normalize-space()='Start date cannot be later than end date.']");
     }
 
     public void waitForDashboardLoad() {
@@ -157,10 +161,24 @@ public class BrandExplorerWorkspace {
         END_DATE_INPUT.click(new Locator.ClickOptions().setClickCount(3));
         END_DATE_INPUT.fill(endFormatted);
         page.keyboard().press("Tab");
+    }
+
+    public void waitForStartDateInTable(String startDate) {
         // Wait until the table actually reflects the new start date, not just that containers are visible
         Locator startDateCell = WORKSPACE_FRAME.locator(
                 String.format("//div[contains(@class,'Box')]//table//tbody//tr//td[1]//p[normalize-space()='%s']", startDate));
         waitUtility.waitForLocatorVisible(startDateCell);
+    }
+
+    public boolean isDateRangeErrorDisplayed() {
+        // in case the error message is not displayed, waitForLocatorVisible will throw a TimeoutError, which we catch and return false
+        // instead of timing out the test as that would be a regression failure. 
+        try {
+            waitUtility.waitForLocatorVisible(DATE_RANGE_ERROR);
+            return true;
+        } catch (TimeoutError e) {
+            return false;
+        }
     }
 
     public boolean isStartDateFirstInTable(String startDate) {
