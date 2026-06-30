@@ -60,3 +60,4 @@ Feature: Brand Explorer Workspace creation in Studio
       | ADVERTISER         | TIMEFRAME    | DAYS |
       | TAMTESTING ACCOUNT | Last 14 Days | 14   |
       | TAMTESTING ACCOUNT | Last 30 Days | 30   |
+      | TAMTESTING ACCOUNT | Yesterday    | 1    |
