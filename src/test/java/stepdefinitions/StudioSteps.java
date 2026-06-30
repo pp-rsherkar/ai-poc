@@ -1262,7 +1262,6 @@ public class StudioSteps {
     public void userCapturesTheCount(String countType) {
         String countText = dtcExplorerWorkspace.getUniqueConsumerCount().replaceAll("[^0-9]", "");
         uniqueConsumersCount = Long.parseLong(countText);
-        System.out.println(countType + " Count : " + uniqueConsumersCount);
     }
 
     @Then("Verify whether the {string} count is greater than or equals to {int}")
