@@ -3,6 +3,7 @@ package factory;
 import com.microsoft.playwright.*;
 import utils.ConfigReader;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 public class DriverFactory {
@@ -44,7 +45,13 @@ public class DriverFactory {
                 break;
             case "chrome":
                 browserType = playwright.chromium();
-                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chromium").setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay));
+                BrowserType.LaunchOptions chromeOptions = new BrowserType.LaunchOptions()
+                        .setHeadless(headless).setArgs(List.of("--start-maximized")).setSlowMo(delay);
+                java.nio.file.Path preinstalledChrome = Paths.get("/opt/pw-browsers/chromium-1194/chrome-linux/chrome");
+                if (preinstalledChrome.toFile().exists()) {
+                    chromeOptions.setExecutablePath(preinstalledChrome);
+                }
+                browser = browserType.launch(chromeOptions);
                 break;
             case "webkit":
                 browserType = playwright.webkit();
