@@ -1213,6 +1213,27 @@ public class StudioSteps {
         brandExplorerWorkspace.clickTimeFrameSelector();
     }
 
+    @When("User navigates back to the workspace list and reopens the saved Brand Explorer workspace")
+    public void userReopensTheSavedBrandExplorerWorkspace() {
+        logger.info("Reopening saved Brand Explorer workspace: {}", workspaceName);
+        workspace.goToWorkspaceList();
+        workspaceCreation.closeAIPanel();
+        workspaceCreation.verifyStudioWorkspaceFrame();
+        // A freshly saved Brand Explorer workspace is not yet returned by the name search, so filter by
+        // the Brand Explorer type and open it by name. Uses filterByWorkspaceTypeAndOpen() to avoid
+        // waiting on PAGINATION which may not render when results fit on a single page.
+        workspaceCreation.filterByWorkspaceTypeAndOpen("Brand Explorer", workspaceName);
+        brandExplorerWorkspace.waitForDashboardLoad();
+    }
+
+    @Then("Verify the Time Frame still shows {string} after reopening the workspace")
+    public void verifyTimeFramePersistsAfterReopen(String timeFrame) {
+        logger.info("Verifying Time Frame persists as {} after reopening the workspace", timeFrame);
+        String actualTimeFrame = brandExplorerWorkspace.getDefaultTimeFrame();
+        logger.info("Time Frame after reopen: {}", actualTimeFrame);
+        Assert.assertEquals("Time Frame did not persist after reopening the workspace", timeFrame, actualTimeFrame);
+    }
+
     @Then("All 9 preset timeframe options are visible in the dropdown with correct labels")
     public void allPresetOptionsAreVisibleInDropdownWithCorrectLabels(DataTable dataTable) {
         List<String> expected = dataTable.asList(String.class);
