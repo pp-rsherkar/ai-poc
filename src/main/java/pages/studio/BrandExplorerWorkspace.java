@@ -24,6 +24,7 @@ public class BrandExplorerWorkspace {
     private final Locator START_DATE_INPUT;
     private final Locator END_DATE_INPUT;
     private final Locator DATE_RANGE_ERROR;
+    private final Locator DATE_CELLS;
     WaitUtility waitUtility;
 
     public BrandExplorerWorkspace(Page page) {
@@ -41,6 +42,8 @@ public class BrandExplorerWorkspace {
         this.END_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-to-text-input']");
         this.DATE_RANGE_ERROR =
                 WORKSPACE_FRAME.locator("//p[normalize-space()='Start date cannot be later than end date.']");
+        this.DATE_CELLS = WORKSPACE_FRAME.locator(
+                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
     }
 
     public void waitForDashboardLoad() {
@@ -105,16 +108,14 @@ public class BrandExplorerWorkspace {
     }
 
     public List<String> getTableDates(int days) {
-        Locator dateCells = WORKSPACE_FRAME.locator(
-                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
-        waitUtility.waitForLocatorVisible(dateCells.first());
+        waitUtility.waitForLocatorVisible(DATE_CELLS.first());
         Set<String> seenDates = new LinkedHashSet<>();
         String previousLastDate = "";
         while (seenDates.size() < days) {
-            int visibleRowCount = dateCells.count();
+            int visibleRowCount = DATE_CELLS.count();
             // Capture all currently visible dates
             for (int i = 0; i < visibleRowCount; i++) {
-                String date = dateCells.nth(i).innerText().trim();
+                String date = DATE_CELLS.nth(i).innerText().trim();
                 if (!date.isEmpty()) {
                     seenDates.add(date);
                 }
@@ -122,14 +123,14 @@ public class BrandExplorerWorkspace {
             if (seenDates.size() >= days) {
                 break;
             }
-            String currentLastDate = dateCells.last().innerText().trim();
+            String currentLastDate = DATE_CELLS.last().innerText().trim();
             // Hover over table before scrolling
-            dateCells.last().hover();
+            DATE_CELLS.last().hover();
             // Scroll down
             page.mouse().wheel(0, 75);
             // Wait for virtualized rows to refresh
             page.waitForTimeout(1000);
-            String newLastDate = dateCells.last().innerText().trim();
+            String newLastDate = DATE_CELLS.last().innerText().trim();
             // No new data loaded
             if (currentLastDate.equals(newLastDate)
                     || currentLastDate.equals(previousLastDate)) {
@@ -182,28 +183,24 @@ public class BrandExplorerWorkspace {
     }
 
     public boolean isStartDateFirstInTable(String startDate) {
-        Locator dateCells = WORKSPACE_FRAME.locator(
-                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
-        waitUtility.waitForLocatorVisible(dateCells.first());
-        return dateCells.first().innerText().trim().equals(startDate);
+        waitUtility.waitForLocatorVisible(DATE_CELLS.first());
+        return DATE_CELLS.first().innerText().trim().equals(startDate);
     }
 
     public boolean isEndDateLastInTable(String endDate) {
-        Locator dateCells = WORKSPACE_FRAME.locator(
-                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
         // Scroll to the bottom to ensure all rows are rendered
         String previousLastDate = "";
         for (int i = 0; i < 30; i++) {
-            String currentLastDate = dateCells.last().innerText().trim();
+            String currentLastDate = DATE_CELLS.last().innerText().trim();
             if (currentLastDate.equals(previousLastDate)) {
                 break;
             }
-            dateCells.last().hover();
+            DATE_CELLS.last().hover();
             page.mouse().wheel(0, 75);
             page.waitForTimeout(500);
             previousLastDate = currentLastDate;
         }
-        return dateCells.last().innerText().trim().equals(endDate);
+        return DATE_CELLS.last().innerText().trim().equals(endDate);
     }
 
     // Converts YYYY-MM-DD to MM/DD/YYYY for the date input fields
