@@ -79,3 +79,4 @@ Feature: Brand Explorer Workspace creation in Studio
       | ADVERTISER         | START_DATE | END_DATE   |
       | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-07 |
       | TAMTESTING ACCOUNT | 2026-03-01 | 2026-05-07 |
+      | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-01 |
