@@ -2046,9 +2046,9 @@ public class LifeSteps {
         npiLists.openSearchedList(npiNameEdited);
     }
 
-    @When("User deletes the Attribute list")
-    public void userDeletesTheAttributeList() {
-        logger.info("Deleting the Attribute list: {}", npiNameEdited);
+    @When("User deletes the {string} list")
+    public void userDeletesTheAttributeList(String listType) {
+        logger.info("Deleting the {} type list: {}", listType, npiNameEdited);
         npiAttributesList.deleteList();
     }
 
