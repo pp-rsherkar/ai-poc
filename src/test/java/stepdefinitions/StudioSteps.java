@@ -1266,10 +1266,10 @@ public class StudioSteps {
     }
 
     @Then("Verify whether the {string} count is greater than or equals to {int}")
-    public void verifyWhetherTheCountIsGreaterThanOrEqualsTo(String countType) {
-        long expectedValue=100000;
+    public void verifyWhetherTheCountIsGreaterThanOrEqualsTo(String countType, int expectedValue) {
+        logger.info("Verifying {} count ({}) is >= {}", countType, uniqueConsumersCount, expectedValue);
         Assert.assertTrue(
-                countType + " count is less than " + expectedValue,
+                countType + " count (" + uniqueConsumersCount + ") is less than " + expectedValue,
                 uniqueConsumersCount >= expectedValue
         );
     }

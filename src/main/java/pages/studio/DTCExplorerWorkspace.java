@@ -4,51 +4,61 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import utils.WaitUtility;
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-
 
 public class DTCExplorerWorkspace {
 
     private final Page page;
     private final FrameLocator WORKSPACE_FRAME;
+    private final FrameLocator DASHBOARD_FRAME;
     private final Locator SAVE_WORKSPACE;
+    private final Locator UNIQUE_CONSUMER_TEXT;
     private final Locator UNIQUE_CONSUMER_COUNT;
     private final Locator SUBMIT_ICON;
     private final Locator SUBMIT_BUTTON;
     private final Locator AUDIENCE_SUBMIT_VERIFICATION;
     private final Locator WORKSPACE_SUBMIT_TOAST;
     private final Locator REQUEST_SUBMIT_TOAST;
-    WaitUtility waitUtility;
+    private final WaitUtility waitUtility;
 
     public DTCExplorerWorkspace(Page page) {
         this.page = page;
         this.waitUtility = new WaitUtility(page);
+
+        // WORKSPACE_FRAME: nested iframe (2 levels) - for buttons, toasts, dialogs, filters
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
-        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator(
-                "//button[contains(@data-tour-id,'save-workspace-button')]//div[contains(text(),'Save')]");
-        this.UNIQUE_CONSUMER_COUNT = WORKSPACE_FRAME.locator(
-                "div[class*='single-value-visualization']:has(h3:text-is('Unique Consumers')) span[class*='StyleSpan']");
-        this.SUBMIT_ICON = WORKSPACE_FRAME.locator("//div[contains(@class, 'sc-cXPBUD')]//div[contains(@class, 'Icon-sc')]");
+
+        // DASHBOARD_FRAME: The Looker dashboard is embedded within WORKSPACE_FRAME via #extension-root iframe
+        this.DASHBOARD_FRAME = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame();
+
+        // Save button - in the nested iframe structure
+        this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("[data-tour-id*='save-workspace-button']");
+
+        // Unique consumers metric - in the dashboard frame (Looker dashboard within #extension-root iframe)
+        this.UNIQUE_CONSUMER_TEXT = DASHBOARD_FRAME.locator("//h3[contains(text(), 'Unique Consumers')]");
+        this.UNIQUE_CONSUMER_COUNT = DASHBOARD_FRAME.locator(
+                "//h3[normalize-space()='Unique Consumers']/ancestor::div[contains(@class,'single-value-visualization')]//span");
+
+        // Submit button and dialogs - in the nested iframe
+        // Use .first() to avoid strict mode violation (multiple Icon-sc divs exist)
+        this.SUBMIT_ICON = WORKSPACE_FRAME.locator("//div[contains(@class, 'sc-cXPBUD')]//div[contains(@class, 'Icon-sc')]").first();
         this.SUBMIT_BUTTON = WORKSPACE_FRAME.locator("//button[.//div[text()='Submit request']]");
         this.AUDIENCE_SUBMIT_VERIFICATION = WORKSPACE_FRAME.locator("//p[text()='Your Audience is being processed']");
+
+        // Toast notifications - in the nested iframe
         this.WORKSPACE_SUBMIT_TOAST = WORKSPACE_FRAME.locator("//p[normalize-space(.)='Workspace saved successfully']");
         this.REQUEST_SUBMIT_TOAST = WORKSPACE_FRAME.locator("//p[normalize-space(.)='Request submitted successfully']");
-
-
     }
 
     public void waitForDashboardLoad() {
-
-        waitUtility.waitForLocatorVisible(UNIQUE_CONSUMER_COUNT);
+        waitUtility.waitForLocatorVisible(UNIQUE_CONSUMER_TEXT);
     }
 
     public void saveDTCExplorerWorkspace() {
         SAVE_WORKSPACE.click();
-        waitUtility.waitForLocatorVisible(UNIQUE_CONSUMER_COUNT);
     }
 
     public String getUniqueConsumerCount() {
-        waitUtility.waitForLocatorVisible(UNIQUE_CONSUMER_COUNT);
+        waitUtility.waitForLocatorVisible(UNIQUE_CONSUMER_TEXT);
         return UNIQUE_CONSUMER_COUNT.textContent().replace(",", "");
     }
 
@@ -63,9 +73,8 @@ public class DTCExplorerWorkspace {
         return AUDIENCE_SUBMIT_VERIFICATION.innerText().trim();
     }
 
-    public void verifyDTCExplorerWorkspaceConfirmationToast(){
-    waitUtility.waitForLocatorVisible(WORKSPACE_SUBMIT_TOAST);
-    waitUtility.waitForLocatorVisible(REQUEST_SUBMIT_TOAST);
+    public void verifyDTCExplorerWorkspaceConfirmationToast() {
+        waitUtility.waitForLocatorVisible(WORKSPACE_SUBMIT_TOAST);
+        waitUtility.waitForLocatorVisible(REQUEST_SUBMIT_TOAST);
     }
-
 }
