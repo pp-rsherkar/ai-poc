@@ -13,7 +13,7 @@ Feature: DTC Workspace creation in Studio
     #And User clicks PulsePoint icon to navigate back to Life
     And User navigates to Studio application
 
-  @regression @ps
+  @regression
   Scenario Outline: Create DTC workspace based on Unique Consumers
     When User clicks on Create New Workspace
     #Then User sees the types of workspaces they have permissions for

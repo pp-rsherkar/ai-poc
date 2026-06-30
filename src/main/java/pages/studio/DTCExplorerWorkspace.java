@@ -23,28 +23,15 @@ public class DTCExplorerWorkspace {
     public DTCExplorerWorkspace(Page page) {
         this.page = page;
         this.waitUtility = new WaitUtility(page);
-
-        // WORKSPACE_FRAME: nested iframe (2 levels) - for buttons, toasts, dialogs, filters
         this.WORKSPACE_FRAME = page.frameLocator("iframe").frameLocator("iframe");
-
-        // DASHBOARD_FRAME: The Looker dashboard is embedded within WORKSPACE_FRAME via #extension-root iframe
         this.DASHBOARD_FRAME = WORKSPACE_FRAME.locator("#extension-root iframe").contentFrame();
-
-        // Save button - in the nested iframe structure
         this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator("[data-tour-id*='save-workspace-button']");
-
-        // Unique consumers metric - in the dashboard frame (Looker dashboard within #extension-root iframe)
         this.UNIQUE_CONSUMER_TEXT = DASHBOARD_FRAME.locator("//h3[contains(text(), 'Unique Consumers')]");
         this.UNIQUE_CONSUMER_COUNT = DASHBOARD_FRAME.locator(
                 "//h3[normalize-space()='Unique Consumers']/ancestor::div[contains(@class,'single-value-visualization')]//span");
-
-        // Submit button and dialogs - in the nested iframe
-        // Use .first() to avoid strict mode violation (multiple Icon-sc divs exist)
         this.SUBMIT_ICON = WORKSPACE_FRAME.locator("//div[contains(@class, 'sc-cXPBUD')]//div[contains(@class, 'Icon-sc')]").first();
         this.SUBMIT_BUTTON = WORKSPACE_FRAME.locator("//button[.//div[text()='Submit request']]");
         this.AUDIENCE_SUBMIT_VERIFICATION = WORKSPACE_FRAME.locator("//p[text()='Your Audience is being processed']");
-
-        // Toast notifications - in the nested iframe
         this.WORKSPACE_SUBMIT_TOAST = WORKSPACE_FRAME.locator("//p[normalize-space(.)='Workspace saved successfully']");
         this.REQUEST_SUBMIT_TOAST = WORKSPACE_FRAME.locator("//p[normalize-space(.)='Request submitted successfully']");
     }
