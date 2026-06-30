@@ -21,16 +21,16 @@ Feature: Fetch data using MCP Tools by retrieving metadata, creating query and e
       | Accept       | application/json, text/event-stream |
     Then Verify the MCP server initialization response is successful
     And User calls the MCP tool to create a query for the user prompt using dimensions and metrics with headers:
-      | Content-Type    | application/json                    |
-      | Accept          | application/json, text/event-stream |
-      | X-Account-Id    | <ACCOUNT_ID>                        |
-      | X-Advertiser-Id | <ADVERTISER_ID>                     |
-      | X-User-Id       | <USER_ID>                           |
-      | Dimension       | <PROMPT_SPECIFIC_DIMENSIONS>        |
-      | FilterLabel     | <FILTER_LABEL>                      |
-      | FilterValue     | <FILTER_VALUE>                      |
-      | Sort            | <SORT_BY>                           |
-      | Limit           | <LIMIT>                             |
+      | Content-Type    | application/json                     |
+      | Accept          | application/json, text/event-stream  |
+      | X-Account-Id    | <ACCOUNT_ID>                         |
+      | X-Advertiser-Id | <ADVERTISER_ID>                      |
+      | X-User-Id       | <USER_ID>                            |
+      | Dimension       | <PROMPT_SPECIFIC_DIMENSIONS_METRICS> |
+      | FilterLabel     | <FILTER_LABEL>                       |
+      | FilterValue     | <FILTER_VALUE>                       |
+      | Sort            | <SORT_BY>                            |
+      | Limit           | <LIMIT>                              |
     Then Verify the query is created successfully and returns a query ID
     And User calls the MCP tool to execute the created query with headers:
       | Content-Type    | application/json                    |
@@ -38,9 +38,9 @@ Feature: Fetch data using MCP Tools by retrieving metadata, creating query and e
       | X-Account-Id    | <ACCOUNT_ID>                        |
       | X-Advertiser-Id | <ADVERTISER_ID>                     |
       | X-User-Id       | <USER_ID>                           |
-    Then Verify the query execution response contains the retrieved data "<PROMPT_SPECIFIC_DIMENSIONS>"
+    Then Verify the query execution response contains the retrieved data "<PROMPT_SPECIFIC_DIMENSIONS_METRICS>"
     Examples:
-      | ACCOUNT_ID | ADVERTISER_ID | USER_ID | USER_PROMPT                                                                                                                          | PROMPT_SPECIFIC_DIMENSIONS                                                                                                           | FILTER_LABEL                             | FILTER_VALUE              | SORT_BY                                   | LIMIT |
+      | ACCOUNT_ID | ADVERTISER_ID | USER_ID | USER_PROMPT                                                                                                                          | PROMPT_SPECIFIC_DIMENSIONS_METRICS                                                                                                   | FILTER_LABEL                             | FILTER_VALUE              | SORT_BY                                   | LIMIT |
       | 561973     | 5590          | 69431   | What is the trend of Identified NPIs and Total Active Users by Day for the last 8 weeks, including a 7-day moving average?           | resolved_measures.distinct_npis, custom_measures_ga4.active_user_count_, hcp365_core.day                                             | hcp365_core.day                          | 56 days ago for 56 days   | hcp365_core.day asc                       | 500   |
       | 561673     | 5586          | 69431   | Show NPI First Visits vs NPI Returning Visits by Week for the past quarter, with return rate percentages.                            | custom_measures_ga4.npi_first_visits, custom_measures_ga4.npi_returning_visits, hcp365_core.week                                     | hcp365_core.day                          | 90 days ago for 90 days   | hcp365_core.week asc                      | 13    |
       | 561973     | 5590          | 69431   | Show NPI Pageviews by Page URL grouped by Primary Specialty for the last 45 days to assess topic affinity.                           | hcp365_core.normalizedurl, npi_reference.primary_specialty,resolved_measures.npi_pageviews                                           | hcp365_core.day                          | last 45 days              | resolved_measures.npi_pageviews desc      | 500   |

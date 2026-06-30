@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import org.junit.Assert;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.CommonUtils;
@@ -29,12 +31,14 @@ public class ApiSteps {
     String bearerToken;
     String modifiedName;
     String query_id;
-    Path path = Paths.get("src/main/resources/apiRequest/request.json");
-    ApiActions apiActions = new ApiActions();
-    ObjectMapper mapper = new ObjectMapper();
     ArrayNode data;
     static String p2McpAgentApiKey;
+    private Scenario scenario;
+    ApiActions apiActions = new ApiActions();
+    ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(ApiSteps.class);
+    Path path = Paths.get("src/main/resources/apiRequest/request.json");
+
 
     static {
         try {
@@ -42,6 +46,11 @@ public class ApiSteps {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Before
+    public void setScenario(Scenario scenario) {
+        this.scenario = scenario;
     }
 
     @Given("I call the Token API for user {string} and password {string} for authentication")
@@ -235,15 +244,19 @@ public class ApiSteps {
         formData.put("client_id", config.get("client_id"));
         formData.put("client_secret", p2McpAgentApiKey);
         formData.put("audience", config.get("audience"));
+        long startTime = System.currentTimeMillis();
         response = apiActions.postFormURLEncodedRequest(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_OAUTH_TOKEN, headers, formData);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("Bearer Token API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the Token API response status and presence of a valid access token")
     public void verifyTokenAPIResponseStatusAndPresenceOfValidAccessToken() throws Exception {
         jsonNode = mapper.readTree(response.text());
         Assert.assertEquals(200, response.status());
-        String accessToken = jsonNode.get("access_token").asText();
         Assert.assertTrue(
                 "access_token is missing in response",
                 jsonNode.has("access_token") || !jsonNode.get("access_token").isEmpty());
@@ -259,8 +272,13 @@ public class ApiSteps {
         headers.put("Accept", headersConfig.get("Accept"));
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
+        long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("MCP Server Initialization API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the MCP server initialization response is successful")
@@ -280,8 +298,13 @@ public class ApiSteps {
         headers.put("Accept", headersConfig.get("Accept"));
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
+        long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("MCP Prompt List API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the MCP prompts list is fetched successfully")
@@ -303,8 +326,13 @@ public class ApiSteps {
         headers.put("Accept", headersConfig.get("Accept"));
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
+        long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("MCP Prompt Details API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the MCP prompt details are retrieved successfully")
@@ -327,8 +355,13 @@ public class ApiSteps {
         headers.put("X-User-Id", headersConfig.get("X-User-Id"));
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
+        long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("Looker Explore Metadata API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the Looker explore metadata response is successful")
@@ -377,8 +410,13 @@ public class ApiSteps {
         headers.put("Authorization", "Bearer " + bearerToken);
 
         String requestBody = templateNode.toString();
+        long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("Create Query API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the query is created successfully and returns a query ID")
@@ -405,8 +443,13 @@ public class ApiSteps {
         headers.put("X-User-Id", headersConfig.get("X-User-Id"));
         headers.put("Authorization", "Bearer " + bearerToken);
         String requestBody = templateNode.toString();
+        long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+        long responseTime = System.currentTimeMillis() - startTime;
+        scenario.attach(("Execute Query API Response Time: " + responseTime + " ms").getBytes(),
+                "text/plain",
+                "API Response Time");
     }
 
     @Then("Verify the query execution response contains the retrieved data {string}")
@@ -431,6 +474,7 @@ public class ApiSteps {
                     Assert.assertFalse("Missing expected field: " + fieldName, valueNode.isMissingNode());
                     String fetchedValue = valueNode.asText();
                     logger.info("  -> {} : {}", fieldName, fetchedValue);
+                    //scenario.log("  -> " + fieldName + " : " + fetchedValue);
                 }
                 logger.info("-----------------------------------");
             }
