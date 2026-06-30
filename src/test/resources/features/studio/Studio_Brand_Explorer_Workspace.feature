@@ -61,3 +61,21 @@ Feature: Brand Explorer Workspace creation in Studio
       | TAMTESTING ACCOUNT | Last 14 Days | 14   |
       | TAMTESTING ACCOUNT | Last 30 Days | 30   |
       | TAMTESTING ACCOUNT | Yesterday    | 1    |
+
+  @regression
+  Scenario Outline: Verify Custom date range picker and inclusive start and end dates in the returned dataset
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    When User clicks the TimeFrame selector
+    And User selects the timeframe preset "Custom"
+    Then Verify a date picker with separate start and end date fields is displayed
+    And Verify both start and end date fields are configurable
+    When User sets a custom date range with start date "<START_DATE>" and end date "<END_DATE>"
+    Then Verify "<START_DATE>" is the first date row in the table
+    And Verify "<END_DATE>" is the last date row in the table
+    Examples:
+      | ADVERTISER         | START_DATE | END_DATE   |
+      | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-07 |
+      | TAMTESTING ACCOUNT | 2026-03-01 | 2026-05-07 |
