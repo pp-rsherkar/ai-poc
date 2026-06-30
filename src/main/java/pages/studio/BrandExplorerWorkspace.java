@@ -19,6 +19,9 @@ public class BrandExplorerWorkspace {
     private final Locator BRAND_EXPLORER_TABLE;
     private final Locator SAVE_WORKSPACE;
     private final Locator DATE_RANGE_SELECTOR;
+    private final Locator DATE_RANGE_PICKER;
+    private final Locator START_DATE_INPUT;
+    private final Locator END_DATE_INPUT;
     WaitUtility waitUtility;
 
     public BrandExplorerWorkspace(Page page) {
@@ -31,6 +34,9 @@ public class BrandExplorerWorkspace {
                 "//button[contains(@data-tour-id,'save-workspace-button')]//div[contains(text(),'Save')]");
         this.DATE_RANGE_SELECTOR = WORKSPACE_FRAME.locator(
                 "//p[normalize-space()='Time Frame']/following-sibling::div//input[starts-with(@id,'listbox-input-')]");
+        this.DATE_RANGE_PICKER = WORKSPACE_FRAME.locator("[data-testid='date-range-picker']");
+        this.START_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-from-text-input']");
+        this.END_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-to-text-input']");
     }
 
     public void waitForDashboardLoad() {
@@ -130,5 +136,61 @@ public class BrandExplorerWorkspace {
         return seenDates.stream()
                 .limit(days)
                 .collect(Collectors.toList());
+    }
+
+    public boolean isDateRangePickerDisplayed() {
+        return DATE_RANGE_PICKER.isVisible()
+                && START_DATE_INPUT.isVisible()
+                && END_DATE_INPUT.isVisible();
+    }
+
+    public boolean areDateFieldsConfigurable() {
+        return START_DATE_INPUT.isEnabled() && END_DATE_INPUT.isEnabled();
+    }
+
+    public void setCustomDateRange(String startDate, String endDate) {
+        String startFormatted = toDisplayFormat(startDate);
+        String endFormatted = toDisplayFormat(endDate);
+        START_DATE_INPUT.click(new Locator.ClickOptions().setClickCount(3));
+        START_DATE_INPUT.fill(startFormatted);
+        page.keyboard().press("Tab");
+        END_DATE_INPUT.click(new Locator.ClickOptions().setClickCount(3));
+        END_DATE_INPUT.fill(endFormatted);
+        page.keyboard().press("Tab");
+        // Wait until the table actually reflects the new start date, not just that containers are visible
+        Locator startDateCell = WORKSPACE_FRAME.locator(
+                String.format("//div[contains(@class,'Box')]//table//tbody//tr//td[1]//p[normalize-space()='%s']", startDate));
+        waitUtility.waitForLocatorVisible(startDateCell);
+    }
+
+    public boolean isStartDateFirstInTable(String startDate) {
+        Locator dateCells = WORKSPACE_FRAME.locator(
+                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
+        waitUtility.waitForLocatorVisible(dateCells.first());
+        return dateCells.first().innerText().trim().equals(startDate);
+    }
+
+    public boolean isEndDateLastInTable(String endDate) {
+        Locator dateCells = WORKSPACE_FRAME.locator(
+                "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
+        // Scroll to the bottom to ensure all rows are rendered
+        String previousLastDate = "";
+        for (int i = 0; i < 30; i++) {
+            String currentLastDate = dateCells.last().innerText().trim();
+            if (currentLastDate.equals(previousLastDate)) {
+                break;
+            }
+            dateCells.last().hover();
+            page.mouse().wheel(0, 75);
+            page.waitForTimeout(500);
+            previousLastDate = currentLastDate;
+        }
+        return dateCells.last().innerText().trim().equals(endDate);
+    }
+
+    // Converts YYYY-MM-DD to MM/DD/YYYY for the date input fields
+    private String toDisplayFormat(String isoDate) {
+        String[] parts = isoDate.split("-");
+        return parts[1] + "/" + parts[2] + "/" + parts[0];
     }
 }
