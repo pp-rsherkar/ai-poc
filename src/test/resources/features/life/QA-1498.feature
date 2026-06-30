@@ -1,6 +1,6 @@
 Feature: List Sorting and Record Modification Behavior Across All List Types
 
-  @todo
+  @e2e
   Scenario Outline: Verify default sorting by createdOn for all list types
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -16,7 +16,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify record position remains unchanged after modification when sorted by createdOn
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -36,7 +36,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify lastUpdated column does not affect default list sorting
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -55,7 +55,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify rapid edits maintain relative order based on createdOn
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -76,7 +76,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify clearing optional fields does not change record position
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -96,7 +96,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify manual sort is respected after record modification
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -117,7 +117,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   | Email       |
       | Pixel List   | Pixel ID    |
 
-  @todo
+  @e2e
   Scenario Outline: Verify internal user can modify record and position is maintained
     Given "Life" application is logged in successfully with Account "automation@pulsepoint" as an internal user
     And User navigates to the "<LIST_TYPE>" list page
@@ -137,7 +137,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify internal user has permission to modify records
     Given "Life" application is logged in successfully with Account "automation@pulsepoint" as an internal user
     And User navigates to the "<LIST_TYPE>" list page
@@ -154,7 +154,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify external user is blocked from modifying records when not permitted
     Given "Life" application is logged in successfully with Account "automation@pulsepoint" as an external user without modify permission
     And User navigates to the "<LIST_TYPE>" list page
@@ -171,7 +171,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify external user can modify record when permitted and position is maintained
     Given "Life" application is logged in successfully with Account "automation@pulsepoint" as an external user with modify permission
     And User navigates to the "<LIST_TYPE>" list page
@@ -191,7 +191,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify record on page 2 does not jump to page 1 after modification
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -212,7 +212,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify record on page 3 does not jump unexpectedly after modification
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -233,7 +233,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify lastUpdated column exists and is visible in list UI
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -248,7 +248,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify clicking lastUpdated column header re-sorts the list
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -265,7 +265,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify modification is captured in Audit Log with correct timestamp
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -285,7 +285,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify list position updates immediately after saving without page refresh
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -305,7 +305,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify active manual lastUpdated sort is respected after record save
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -326,7 +326,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify all list types use consistent default sorting by createdOn
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     When User navigates to the "<LIST_TYPE_A>" list page
@@ -342,7 +342,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Keyword List | Email List   |
       | Domain/App   | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify loading indicator displays during list refresh after modification
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -360,7 +360,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify empty state message displays when no records exist
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -376,7 +376,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario Outline: Verify NPI data integrity is maintained during list updates
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the NPI List page
@@ -391,7 +391,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | placeholder |
       | value       |
 
-  @todo
+  @e2e
   Scenario Outline: Verify search and filter interaction with list sorting
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the "<LIST_TYPE>" list page
@@ -409,7 +409,7 @@ Feature: List Sorting and Record Modification Behavior Across All List Types
       | Email List   |
       | Pixel List   |
 
-  @todo
+  @e2e
   Scenario: Verify active sort column is clearly indicated in the UI
     Given "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the NPI List page
