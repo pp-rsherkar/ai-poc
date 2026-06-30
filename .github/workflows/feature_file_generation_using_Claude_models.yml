@@ -59,39 +59,6 @@ jobs:
           sudo apt-get install -y jq
 
       # ---------------------------
-      # Resolve environment for this domain
-      # life    -> Demo
-      # studio  -> Pre-release
-      # hcp     -> Demo (default until confirmed otherwise)
-      # ---------------------------
-      - name: Resolve domain environment
-        run: |
-          set -euo pipefail
- 
-          DOMAIN="${{ inputs.domain }}"
- 
-          case "$DOMAIN" in
-            life)
-              ENVIRONMENT="Demo"
-              ;;
-            studio)
-              ENVIRONMENT="Pre-release"
-              ;;
-            hcp)
-              ENVIRONMENT="Demo"
-              echo "::warning::No explicit environment mapping confirmed for 'hcp' domain — defaulting to Demo. Update this mapping if hcp should use a different environment."
-              ;;
-            *)
-              echo "::error::Unrecognized domain '$DOMAIN' — no environment mapping defined."
-              exit 1
-              ;;
-          esac
- 
-          echo "Domain      : $DOMAIN"
-          echo "Environment : $ENVIRONMENT"
-          echo "ENVIRONMENT=$ENVIRONMENT" >> "$GITHUB_ENV"    
-
-      # ---------------------------
       # Build context
       # ---------------------------
       - name: Build AI repository context
@@ -377,6 +344,62 @@ jobs:
           echo "$CLEANED" > raw_output.gherkin
           echo "Feature blocks     : $FEATURE_COUNT"
           echo "Scenarios generated: $(echo "$CLEANED" | grep -cE '^\s*Scenario:|^\s*Scenario Outline:' || true)"
+
+      # ---------------------------
+      # Validate mandatory first step is present in every scenario
+      # ---------------------------
+      - name: Validate environment step presence
+        run: |
+          set -euo pipefail
+ 
+          python3 - << 'PY'
+          import re, os, sys
+ 
+          DOMAIN_ENVIRONMENTS = {
+              "life":   "Demo",
+              "studio": "Pre-release",
+              "hcp":    "Demo",
+          }
+ 
+          domain = os.environ["DOMAIN"]
+          environment = DOMAIN_ENVIRONMENTS.get(domain)
+ 
+          if environment is None:
+              print(f"::warning::No environment mapping for domain '{domain}' — skipping environment step validation")
+              sys.exit(0)
+ 
+          expected = f'Given This scenario will be executed in the "{environment}" environment as a "User"'
+ 
+          with open("raw_output.gherkin", "r", encoding="utf-8") as f:
+              content = f.read()
+ 
+          blocks = re.split(r'(?=^\s*(?:@\w+\s*\n\s*)?Scenario(?: Outline)?:)', content, flags=re.MULTILINE)
+          scenario_blocks = [b for b in blocks if re.search(r'^\s*Scenario(?: Outline)?:', b, re.MULTILINE)]
+ 
+          missing = []
+          for b in scenario_blocks:
+              title_match = re.search(r'^\s*Scenario(?: Outline)?:\s*(.+)', b, re.MULTILINE)
+              title = title_match.group(1).strip() if title_match else "<unknown>"
+ 
+              first_given = None
+              for line in b.split("\n"):
+                  s = line.strip()
+                  if s.startswith("Given"):
+                      first_given = s
+                      break
+              if first_given != expected:
+                  missing.append(title)
+ 
+          if missing:
+              print(f"::error::{len(missing)} scenario(s) missing mandatory first step '{expected}':")
+              for t in missing:
+                  print(f"::error::  - {t}")
+              sys.exit(1)
+ 
+          print(f"All {len(scenario_blocks)} scenario(s) correctly begin with: {expected}")
+          PY
+        env:
+          DOMAIN: ${{ inputs.domain }}
 
       # ---------------------------
       # Split into feature files (1 file per Feature block)
