@@ -348,6 +348,7 @@ public class StudioSteps {
                 "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
+        workspace.waitTillWorkspaceSaveButtonIsDisabled();
     }
 
     @And("User clicks Edit button and updates workspace name to {string}")
@@ -1217,7 +1218,6 @@ public class StudioSteps {
     public void userReopensTheSavedBrandExplorerWorkspace() {
         logger.info("Reopening saved Brand Explorer workspace: {}", workspaceName);
         workspace.goToWorkspaceList();
-        workspaceCreation.closeAIPanel();
         workspaceCreation.verifyStudioWorkspaceFrame();
         // A freshly saved Brand Explorer workspace is not yet returned by the name search, so filter by
         // the Brand Explorer type and open it by name. Uses filterByWorkspaceTypeAndOpen() to avoid
