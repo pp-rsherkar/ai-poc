@@ -49,6 +49,7 @@ Feature: Deal Groups - Applied Only Tab Data Synchronization
     And User navigates to Supply, Deal Groups section
     And User opens the Deal modal for an existing Deal Group
     When User clicks All Deals tab and adds a new deal to the Deal Group
+    And User clicks on OK button
     And User clicks Applied Only tab without closing the modal
     Then Applied Only tab count should update immediately to reflect the newly added deal
     And Applied Only tab list should display the newly added deal without requiring a manual refresh
@@ -66,13 +67,15 @@ Feature: Deal Groups - Applied Only Tab Data Synchronization
   Scenario Outline: Verify Applied Only tab visibility and data based on user type and feature flag state
     Given "Life" application is logged in successfully with Account "automation@pulsepoint" as an "<USER_TYPE>"
     And User navigates to Supply, Deal Groups section
+    # NEW STEP
     When User opens the Deal modal for a Deal Group with applied deals with feature flag "<FEATURE_FLAG>"
+    # NEW STEP
     Then Verify the Applied Only tab behavior is "<EXPECTED_BEHAVIOR>"
     Examples:
       | USER_TYPE     | FEATURE_FLAG | EXPECTED_BEHAVIOR                                   |
-      | Internal User | ON           | tab is visible with correct count and deal list     |
-      | External User | ON           | tab is visible with correct count and deal list     |
-      | Internal User | OFF          | tab remains hidden per interim logic                |
+      | internal user | ON           | tab is visible with correct count and deal list     |
+      | external user | ON           | tab is visible with correct count and deal list     |
+      | internal user | OFF          | tab remains hidden per interim logic                |
 
   @todo
   Scenario: Verify Applied Only tab does not display an empty list or an indefinite loader when deals are present
