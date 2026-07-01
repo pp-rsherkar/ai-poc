@@ -147,7 +147,7 @@ jobs:
       - name: Parse Jira fields
         run: |
           set -euo pipefail
-          python3 parse_jira_fields.py
+          python3 \.github\testcase_scripts\parse_jira_fields.py
           cat jira_fields.env >> "$GITHUB_ENV"
           echo "=== Description file size ==="
           wc -c jira_description.txt
@@ -176,7 +176,7 @@ jobs:
             fi
           fi
 
-          python3 write_prompt.py \
+          python3 \.github\testcase_scripts\write_prompt.py \
             "${{ inputs.jira_id }}" \
             "${{ inputs.domain }}"
         env:
