@@ -2,7 +2,6 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -1231,6 +1230,59 @@ public class StudioSteps {
         Assert.assertTrue(
                 "Chart and table did not update for selected timeframe: " + timeFrame,
                 actual.equalsIgnoreCase(timeFrame));
+    }
+
+    @Then("Verify a date picker with separate start and end date fields is displayed")
+    public void verifyDatePickerWithStartAndEndFieldsIsDisplayed() {
+        logger.info("Verifying custom date picker with start and end date fields is displayed");
+        Assert.assertTrue(
+                "Date picker with start and end date fields is not displayed",
+                brandExplorerWorkspace.isDateRangePickerDisplayed());
+    }
+
+    @And("Verify both start and end date fields are configurable")
+    public void verifyBothDateFieldsAreConfigurable() {
+        logger.info("Verifying both start and end date fields are configurable");
+        Assert.assertTrue(
+                "Start and/or end date fields are not configurable",
+                brandExplorerWorkspace.areDateFieldsConfigurable());
+    }
+
+    @When("User sets a custom date range with start date {string} and end date {string}")
+    public void userSetsCustomDateRange(String startDate, String endDate) {
+        logger.info("Setting custom date range: {} to {}", startDate, endDate);
+        brandExplorerWorkspace.setCustomDateRange(startDate, endDate);
+        brandExplorerWorkspace.waitForStartDateInTable(startDate);
+    }
+
+    @When("User enters a start date {string} that is later than the end date {string}")
+    public void userEntersStartDateLaterThanEndDate(String startDate, String endDate) {
+        logger.info("Entering start date {} later than end date {}", startDate, endDate);
+        brandExplorerWorkspace.setCustomDateRange(startDate, endDate);
+    }
+
+    @Then("Verify an error message is displayed indicating the start date cannot be later than the end date")
+    public void verifyDateRangeErrorIsDisplayed() {
+        logger.info("Verifying error message is displayed for start date later than end date");
+        Assert.assertTrue(
+                "Error message for start date later than end date is not displayed",
+                brandExplorerWorkspace.isDateRangeErrorDisplayed());
+    }
+
+    @Then("Verify {string} is the first date row in the table")
+    public void verifyStartDateIsFirstRowInTable(String startDate) {
+        logger.info("Verifying start date {} is the first row in the table", startDate);
+        Assert.assertTrue(
+                "Start date " + startDate + " is not the first row in the table",
+                brandExplorerWorkspace.isStartDateFirstInTable(startDate));
+    }
+
+    @And("Verify {string} is the last date row in the table")
+    public void verifyEndDateIsLastRowInTable(String endDate) {
+        logger.info("Verifying end date {} is the last row in the table", endDate);
+        Assert.assertTrue(
+                "End date " + endDate + " is not the last row in the table",
+                brandExplorerWorkspace.isEndDateLastInTable(endDate));
     }
 
     @And("Verify the Day column shows {int} dates in ascending order")
