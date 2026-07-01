@@ -6,8 +6,10 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
+
 import java.util.Collections;
 import java.util.List;
+
 import utils.CommonUtils;
 import utils.ConfigReader;
 import utils.WaitUtility;
@@ -19,6 +21,7 @@ public class WorkspaceCreation {
     private final Locator HCP_EXPLORER;
     private final Locator HCP_EXPANSION;
     private final Locator BRAND_EXPLORER;
+    private final Locator DTC_EXPLORER;
     private final Locator BACK_TO_WORKSPACE_DASHBOARD;
     private final Locator WORKSPACE_CREATED_ALERT;
     private final Locator MENU_ICON;
@@ -51,10 +54,11 @@ public class WorkspaceCreation {
     private final Locator WORKSPACE_TYPE;
     private final Locator WORKSPACE_CREATED_BY_DROPDOWN;
     private final Locator DROPDOWN_LIST_ITEMS;
-    private final Locator FETCH_WORKSPACE_NAME_FROM_DASHBOARD;
+    private final Locator GET_WORKSPACE_NAME_FROM_DASHBOARD;
     private final Locator BACK_ARROW;
     private final Locator AI_PANEL;
     private final Locator AI_PANEL_CLOSE_BUTTON;
+    private final Locator ABSENT_WORKSPACE;
     WaitUtility waitUtility;
     int counter = 0;
 
@@ -67,6 +71,7 @@ public class WorkspaceCreation {
         this.HCP_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'HCP Explorer')]");
         this.HCP_EXPANSION = WORKSPACE_FRAME.locator("//label[contains(text(),'HCP Audience Expansion')]");
         this.BRAND_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'Brand Explorer')]");
+        this.DTC_EXPLORER = WORKSPACE_FRAME.locator("//p[contains(text(),'DTC Explorer')]");
         this.BACK_TO_WORKSPACE_DASHBOARD = WORKSPACE_FRAME.getByRole(AriaRole.BUTTON);
         this.WORKSPACE_CREATED_ALERT = WORKSPACE_FRAME.locator(
                 "//p[contains(text(),'Workspace created successfully') or contains(text(),'Workspace saved successfully')]");
@@ -113,12 +118,11 @@ public class WorkspaceCreation {
         this.WORKSPACE_CREATED_BY_DROPDOWN =
                 WORKSPACE_FRAME.locator("//div[@data-tour-id='workspaces-created-by-filter']//input");
         this.DROPDOWN_LIST_ITEMS = WORKSPACE_FRAME.locator("//div[@role='dialog']//li//span");
-        this.FETCH_WORKSPACE_NAME_FROM_DASHBOARD =
-                WORKSPACE_FRAME.locator("//td[@role='gridcell' and contains(@id,'workspace_name')]//span");
+        this.GET_WORKSPACE_NAME_FROM_DASHBOARD = WORKSPACE_FRAME.locator("//td[@role='gridcell' and contains(@id,'workspace_name')]//span");
         this.BACK_ARROW = WORKSPACE_FRAME.locator("//button[@color='textPrimary']");
         this.AI_PANEL = page.locator("//div[@class='ai-assistant-panel open']");
-        this.AI_PANEL_CLOSE_BUTTON =
-                page.locator("//button[@aria-label='Close AI Assistant' and @class='ai-icon-btn']");
+        this.AI_PANEL_CLOSE_BUTTON = page.locator("//button[@aria-label='Close AI Assistant' and @class='ai-icon-btn']");
+        this.ABSENT_WORKSPACE = WORKSPACE_FRAME.locator("//p[text()='Nothing Found...']");
     }
 
     public String studioDashboard() {
@@ -140,6 +144,11 @@ public class WorkspaceCreation {
         return BRAND_EXPLORER.innerText();
     }
 
+    public String verifyDTCExplorer() {
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        return DTC_EXPLORER.innerText();
+    }
+
     public String verifyHCPAudienceExpansion() {
         return HCP_EXPANSION.innerText();
     }
@@ -150,6 +159,10 @@ public class WorkspaceCreation {
 
     public void clickBrandExplorerWorkspace() {
         BRAND_EXPLORER.click();
+    }
+
+    public void clickDTCExplorerWorkspace() {
+        DTC_EXPLORER.click();
     }
 
     public String isWorkspaceCreationAlertDisplayed() {
@@ -356,15 +369,21 @@ public class WorkspaceCreation {
     }
 
     public String fetchWorkspaceNameFromDashboard() {
-        return FETCH_WORKSPACE_NAME_FROM_DASHBOARD.first().textContent().trim();
+        return GET_WORKSPACE_NAME_FROM_DASHBOARD.first().textContent().trim();
     }
 
     public void searchByWorkspaceName(String workspaceName) {
         SEARCH_WORKSPACE.fill(workspaceName);
         page.keyboard().press("Enter");
+    }
+
+    public void isWorkspacePresent(String workspaceName) {
         waitUtility.waitForLocatorVisible(PAGINATION.first());
-        waitUtility.waitForLocatorVisible(
-                WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
+        waitUtility.waitForLocatorVisible(WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)));
+    }
+
+    public void isWorkspaceAbsent() {
+        waitUtility.waitForLocatorVisible(ABSENT_WORKSPACE);
     }
 
     public void clickBackArrowFromCreateNewWorkspace() {
@@ -406,6 +425,14 @@ public class WorkspaceCreation {
         if (AI_PANEL.isVisible() && AI_PANEL_CLOSE_BUTTON.isVisible()) {
             AI_PANEL_CLOSE_BUTTON.click();
             waitUtility.waitForLocatorDetached(AI_PANEL);
+        }
+    }
+
+    public boolean isWorkspaceVisible(String workspaceName, String draftOption) {
+        if (draftOption.equalsIgnoreCase("Public")) {
+            return WORKSPACE_FRAME.locator(String.format("//span[contains(text(),'%s')]", workspaceName)).isVisible();
+        } else {
+            return ABSENT_WORKSPACE.isVisible();
         }
     }
 }

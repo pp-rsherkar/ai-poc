@@ -1,5 +1,7 @@
 package pages.studio;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -10,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import utils.CommonUtils;
 import utils.WaitUtility;
-
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class ExplorerWorkspace {
     private final Page page;
@@ -238,7 +238,7 @@ public class ExplorerWorkspace {
                     else locator.first().click();
                 }
                 break;
-            case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
+            case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender", "Gender":
                 for (String option : options) {
                     WORKSPACE_FRAME
                             .locator(String.format("//label[contains(text(),'%s')]", option.trim()))
@@ -475,5 +475,10 @@ public class ExplorerWorkspace {
         Locator recencyLocator = WORKSPACE_FRAME.locator(String.format(
                 "//p[normalize-space()='%s Recency']/parent::div//following-sibling::div//p", filterType));
         return recencyLocator.textContent().trim();
+    }
+
+    public void selectDraftOption(String DraftOption) {
+        Locator DRAFT_OPTION = WORKSPACE_FRAME.locator(String.format("//button/div[text()='%s']", DraftOption));
+        DRAFT_OPTION.click();
     }
 }

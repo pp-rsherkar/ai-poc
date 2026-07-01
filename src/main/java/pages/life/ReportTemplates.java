@@ -103,8 +103,10 @@ public class ReportTemplates {
         this.EDIT_TEMPLATE = page.locator("//div[text()='Edit Template']");
         this.DELETE_ICON = page.locator("//span[text()='Delete']/parent::div");
         this.ALERT_MESSAGE = page.locator("//div[@role='alert']");
-        this.FETCH_TEMPLATE_NAME_FROM_CONFIRMATION_POPUP = page.locator("//div[contains(text(),'Delete Report Template')]/following-sibling::div//div[contains(@style,'word-break:')]");
-        this.DELETE_BUTTON_FROM_CONFIRMATION_POPUP = page.locator("//div[contains(text(),'Delete Report Template')]/following-sibling::div//span[contains(text(),'Delete')]");
+        this.FETCH_TEMPLATE_NAME_FROM_CONFIRMATION_POPUP = page.locator(
+                "//div[contains(text(),'Delete Report Template')]/following-sibling::div//div[contains(@style,'word-break:')]");
+        this.DELETE_BUTTON_FROM_CONFIRMATION_POPUP = page.locator(
+                "//div[contains(text(),'Delete Report Template')]/following-sibling::div//span[contains(text(),'Delete')]");
         this.DELETE_ICON_FROM_TEMPLATE_LIST = page.locator("//span[@title='Delete']");
     }
 
@@ -196,7 +198,7 @@ public class ReportTemplates {
         }
         optionLocator.click();
         SELECT_TACTIC.fill(tactic);
-        page.locator(String.format("//div[contains(text(),'%s')]", tactic)).click();
+            page.locator(String.format("//div[@id='tacticLookup']//div[@data-text='%s']",tactic)).click();
         REPORT_PANEL.click();
         SELECT_LIFETIME.click();
     }
@@ -300,7 +302,9 @@ public class ReportTemplates {
     }
 
     public boolean checkActionIconsForTemplate(String templateName, String actionIcon) {
-        Locator actionIconLocator = page.locator(String.format("//div[contains(normalize-space(.),'%s')]/parent::span/following-sibling::span//span[@title='%s']", templateName, actionIcon));
+        Locator actionIconLocator = page.locator(String.format(
+                "//div[contains(normalize-space(.),'%s')]/parent::span/following-sibling::span//span[@title='%s']",
+                templateName, actionIcon));
         return actionIconLocator.first().isVisible();
     }
 
@@ -330,6 +334,8 @@ public class ReportTemplates {
     }
 
     public boolean isDefaultTemplateTypeSelected(String defaultTemplateType) {
-        return page.locator(String.format("//label[text()='%s']/parent::sui-radio-button", defaultTemplateType)).getAttribute("class").contains("checked");
+        return page.locator(String.format("//label[text()='%s']/parent::sui-radio-button", defaultTemplateType))
+                .getAttribute("class")
+                .contains("checked");
     }
 }

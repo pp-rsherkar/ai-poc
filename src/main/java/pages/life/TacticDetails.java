@@ -11,6 +11,8 @@ import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
 
+import java.util.function.Consumer;
+
 public class TacticDetails {
     public final Locator TARGETING_RULES_ICON;
     private final Page page;
@@ -724,5 +726,73 @@ public void fetchShowExpressionValues() {
     public boolean isCustomFieldAvailable(String customFieldName) {
         return page.locator(String.format("//label[contains(text(),'%s')]", customFieldName))
                 .isVisible();
+    }
+
+    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative, Consumer<Map<String, List<String>>> perTacticVerification) {
+        String currentLiName = null;
+
+        for (int i = 0; i < rows.size(); i++) {
+            Map<String, String> row = rows.get(i);
+            String liType    = row.get("LI_TYPE");
+            String liName    = row.get("LI_NAME");
+            String liBudget  = row.get("LI_BUDGET");
+            String tacticName = row.get("TACTIC_NAME");
+            String channel   = row.get("CHANNEL");
+
+            if (!liName.equals(currentLiName)) {
+                if (currentLiName != null) {
+                    lineItemDetails.selectNewLineItem();
+                }
+                lineItemDetails.enterLineItemName(liName);
+                lineItemDetails.selectLineItemType(liType);
+                lineItemDetails.clickAddFlightButton();
+                lineItemDetails.enterLineItemBudget(liBudget);
+                lineItemDetails.enableLineItem();
+                lineItemDetails.saveLineItem();
+                waitUtility.waitUntilSpinnerHidden();
+                lineItemDetails.lineItemSuccess();
+                currentLiName = liName;
+            }
+
+            createTactic(tacticName);
+            tacticSettings.selectChannel(channel);
+            navigation.clickOnIcon("Add Targeting Rule");
+
+            Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
+            for (int j = 1; row.containsKey("RULE_" + j); j++) {
+                String rule   = row.get("RULE_"   + j);
+                String values = row.get("VALUES_" + j);
+                if (rule != null && !rule.isEmpty()) {
+                    List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
+                    tacticSettings.selectMultipleRuleTypes(rule, parsedValues);
+                    perTacticRules.put(rule, parsedValues);
+                }
+            }
+
+            tacticSettings.closeRuleTypePanel();
+
+            if (perTacticVerification != null) {
+                perTacticVerification.accept(perTacticRules);
+            }
+
+            saveTacticDetails();
+            navigation.clickOnIcon("Assign Existing Creatives");
+            tacticCreatives.assignCreatives(creative);
+            tacticCreatives.enableCreative();
+            tacticCreatives.saveTacticCreatives();
+            waitUtility.waitUntilSpinnerHidden();
+
+            if (i + 1 < rows.size()) {
+                String nextLiName = rows.get(i + 1).get("LI_NAME");
+                if (nextLiName.equals(liName)) {
+                    addNewTactic();
+                }
+            }
+        }
+    }
+
+    public void addNewTactic() {
+        NEW_TACTIC_BUTTON.click();
+        waitUtility.waitForLocatorVisible(CUSTOM_FIELD);
     }
 }
