@@ -3,3 +3,4 @@ asterix_story_log.json
 .vscode/
 .playwright-mcp/
 .target/
+target/
