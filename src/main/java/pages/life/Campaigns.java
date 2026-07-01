@@ -458,7 +458,6 @@ public class Campaigns {
 
     public String fetchCustomFieldSuccessAlert() {
         String text = CUSTOM_FIELD_SUCCESS_ALERT.textContent().trim();
-        System.out.println("debugging" + text);
         waitUtility.waitForLocatorHidden(CUSTOM_FIELD_SUCCESS_ALERT);
         return text;
     }
