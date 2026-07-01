@@ -62,23 +62,6 @@ Feature: Brand Explorer Workspace creation in Studio
       | TAMTESTING ACCOUNT | Last 30 Days | 30   |
       | TAMTESTING ACCOUNT | Yesterday    | 1    |
 
-  @regression @persist
-  Scenario Outline: Verify a saved non-default timeframe persists when the workspace is closed and reopened
-    When User clicks on Create New Workspace
-    Then User sees the types of workspaces they have permissions for
-    And User clicks on "Brand Explorer" workspace
-    And User selects the advertiser "<ADVERTISER>"
-    And User edits the workspace name as "<WORKSPACE_NAME>"
-    When User clicks the TimeFrame selector
-    And User selects the timeframe preset "<TIMEFRAME>"
-    And User saves the "Brand Explorer" workspace
-    Then Verify the "Brand Explorer" Workspace is saved
-    When User navigates back to the workspace list and reopens the saved Brand Explorer workspace
-    Then Verify the Time Frame still shows "<TIMEFRAME>" after reopening the workspace
-    Examples:
-      | ADVERTISER         | WORKSPACE_NAME         | TIMEFRAME     |
-      | TAMTESTING ACCOUNT | Brand_Explorer_Persist | Last 365 Days |
-
   @regression
   Scenario Outline: Verify Custom date range picker and inclusive start and end dates in the returned dataset
     When User clicks on Create New Workspace
@@ -111,3 +94,20 @@ Feature: Brand Explorer Workspace creation in Studio
     Examples:
       | ADVERTISER         | START_DATE | END_DATE   |
       | TAMTESTING ACCOUNT | 2026-05-07 | 2026-05-01 |
+
+  @regression
+  Scenario Outline: Verify a saved non-default timeframe persists when the workspace is closed and reopened
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    And User edits the workspace name as "<WORKSPACE_NAME>"
+    When User clicks the TimeFrame selector
+    And User selects the timeframe preset "<TIMEFRAME>"
+    And User saves the "Brand Explorer" workspace
+    Then Verify the "Brand Explorer" Workspace is saved
+    When User navigates back to the workspace list and reopens the saved Brand Explorer workspace
+    Then Verify the Time Frame still shows "<TIMEFRAME>" after reopening the workspace
+    Examples:
+      | ADVERTISER         | WORKSPACE_NAME         | TIMEFRAME     |
+      | TAMTESTING ACCOUNT | Brand_Explorer_Persist | Last 365 Days |
