@@ -25,6 +25,7 @@ public class BrandExplorerWorkspace {
     private final Locator END_DATE_INPUT;
     private final Locator DATE_RANGE_ERROR;
     private final Locator DATE_CELLS;
+    private final Locator SPINNER;
     WaitUtility waitUtility;
 
     public BrandExplorerWorkspace(Page page) {
@@ -44,6 +45,7 @@ public class BrandExplorerWorkspace {
                 WORKSPACE_FRAME.locator("//p[normalize-space()='Start date cannot be later than end date.']");
         this.DATE_CELLS = WORKSPACE_FRAME.locator(
                 "//div[contains(@class,'Box')]//table//tbody//tr//td[1][@aria-colindex]");
+        this.SPINNER = WORKSPACE_FRAME.locator("//div[@data-testid='loading-spinner']");
     }
 
     public void waitForDashboardLoad() {
@@ -99,12 +101,16 @@ public class BrandExplorerWorkspace {
         waitUtility.waitForLocatorVisible(option);
         option.click();
         page.keyboard().press("Escape");
-        waitForDashboardLoad();
+        waitForSpinnerToDisappear();
     }
 
     public String getSelectedTimeFrameAfterUpdate() {
         waitForDashboardLoad();
         return getDefaultTimeFrame();
+    }
+
+    public void waitForSpinnerToDisappear() {
+        waitUtility.waitForLocatorHidden(SPINNER);
     }
 
     public List<String> getTableDates(int days) {

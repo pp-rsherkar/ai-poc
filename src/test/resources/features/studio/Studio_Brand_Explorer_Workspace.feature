@@ -108,6 +108,7 @@ Feature: Brand Explorer Workspace creation in Studio
     Then Verify the "Brand Explorer" Workspace is saved
     When User navigates back to the workspace list and reopens the saved Brand Explorer workspace
     Then Verify the Time Frame still shows "<TIMEFRAME>" after reopening the workspace
+    And Verify the Day column shows <DAYS> dates in ascending order
     Examples:
-      | ADVERTISER         | WORKSPACE_NAME         | TIMEFRAME     |
-      | TAMTESTING ACCOUNT | Brand_Explorer_Persist | Last 365 Days |
+      | ADVERTISER         | WORKSPACE_NAME     | TIMEFRAME    | DAYS |
+      | TAMTESTING ACCOUNT | Automation_Persist | Last 30 Days | 30   |

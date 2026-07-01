@@ -1248,6 +1248,7 @@ public class StudioSteps {
     public void userSelectsTimeframePreset(String timeFrame) {
         logger.info("Selecting timeframe preset: {}", timeFrame);
         brandExplorerWorkspace.selectTimeFramePreset(timeFrame);
+
     }
 
     @Then("Verify the chart and table update immediately to reflect {string} data")
