@@ -142,21 +142,18 @@ jobs:
       - name: Install Claude Code CLI globally
         run: npm install -g @anthropic-ai/claude-code
 
+      - name: Verify Claude Code Installation
+        run: |
+          echo "=== CLI Diagnostics ==="
+          claude --version
+          claude doctor || true
+
       - name: Run iAutomate
         env:
-          CLAUDE_CODE_TOKEN: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The modern CLI looks directly for the standard Anthropic variable name
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          # 1. Mock the local desktop login configuration directory to bypass the check
-          mkdir -p ~/.config/claude-code
-          cat << EOF > ~/.config/claude-code/config.json
-          {
-            "auth": {
-              "token": "${{ secrets.ANTHROPIC_API_KEY }}"
-            }
-          }
-          EOF
-
-          # 2. Create the temporary prompt file
+          # 1. Create a temporary prompt file to prevent bash escaping bugs
           cat << 'EOF' > claude_prompt.txt
           Run iAutomate for ${{ steps.resolve.outputs.jira_id }}.
 
@@ -174,8 +171,9 @@ jobs:
           Read src/test/resources/config/config.properties for the application URL and login credentials.
           EOF
 
-          # 3. Execute using standard automated flags
+          # 2. Execute using updated model aliases and permission modes
           claude --print \
                  --permission-mode dontAsk \
+                 --model sonnet \
                  --max-turns 100 \
                  "$(cat claude_prompt.txt)"
