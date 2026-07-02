@@ -6,8 +6,8 @@ on:
 
   workflow_dispatch:
     inputs:
-      pr_link:
-        description: "PR link (e.g., https://github.com/pp-rsherkar/ai-poc/pull/25)"
+      feature_file:
+        description: "Feature file name (e.g., QA-1557 or QA-1557.feature)"
         required: true
         type: string
 
@@ -22,7 +22,6 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
-       github.event.issue.pull_request &&
        contains(github.event.comment.body, '@claude') &&
        contains(github.event.comment.body, 'iAutomate'))
     runs-on: ubuntu-latest
@@ -35,52 +34,59 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Extract PR details
-        id: pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve feature file
+        id: resolve
         run: |
           set -euo pipefail
 
-          # Get PR number from link or issue_comment
+          # ── Get the raw input name ──
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            PR_NUMBER=$(echo "${{ inputs.pr_link }}" | grep -oP '\d+$')
+            RAW_INPUT="${{ inputs.feature_file }}"
           else
-            PR_NUMBER="${{ github.event.issue.number }}"
+            # Parse from comment: "@claude Run iAutomate for <name>"
+            RAW_INPUT=$(echo '${{ github.event.comment.body }}' \
+              | grep -oiP 'iAutomate\s+(?:for\s+)?\K\S+' || true)
           fi
 
-          if [ -z "$PR_NUMBER" ]; then
-            echo "::error::Could not extract PR number"
+          if [ -z "$RAW_INPUT" ]; then
+            echo "::error::Could not extract feature file name from input"
             exit 1
           fi
-          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
 
-          # Get the feature file from the PR's changed files
-          FEATURE_FILE=$(gh pr diff "$PR_NUMBER" --name-only | grep '\.feature$' | head -1)
+          # Strip .feature extension if provided — we search by base name
+          BASE_NAME=$(echo "$RAW_INPUT" | sed 's/\.feature$//')
+
+          echo "Looking for ${BASE_NAME}.feature …"
+
+          # ── Find the feature file anywhere under features/ ──
+          FEATURE_FILE=$(find src/test/resources/features -type f -name "${BASE_NAME}.feature" 2>/dev/null | head -1)
+
           if [ -z "$FEATURE_FILE" ]; then
-            echo "::error::No .feature file found in PR #${PR_NUMBER}"
+            echo "::error::Feature file '${BASE_NAME}.feature' not found under src/test/resources/features/"
+            find src/test/resources/features -type f -name '*.feature' | sort
             exit 1
           fi
-          echo "feature_file=${FEATURE_FILE}" >> "$GITHUB_OUTPUT"
 
-          # Extract domain from file path
+          # ── Derive domain from path ──
           DOMAIN=$(echo "$FEATURE_FILE" | sed -n 's|src/test/resources/features/\([^/]*\)/.*|\1|p')
-          echo "domain=${DOMAIN}" >> "$GITHUB_OUTPUT"
 
-          # Extract JIRA ticket from PR title or branch name
-          PR_TITLE=$(gh pr view "$PR_NUMBER" --json title -q '.title')
-          PR_BRANCH=$(gh pr view "$PR_NUMBER" --json headRefName -q '.headRefName')
-          JIRA_ID=$(echo "${PR_TITLE} ${PR_BRANCH}" | grep -oP '[A-Z]+-\d+' | head -1)
-          echo "jira_id=${JIRA_ID}" >> "$GITHUB_OUTPUT"
+          # ── Extract JIRA ticket ID from file name ──
+          JIRA_ID=$(echo "$BASE_NAME" | grep -oP '[A-Z]+-\d+' || echo "$BASE_NAME")
 
-          # Summary
-          echo "PR:            #${PR_NUMBER}"
+          # ── Count scenarios ──
+          SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' "$FEATURE_FILE" || true)
+
+          # ── Output ──
+          echo "feature_file=${FEATURE_FILE}" >> "$GITHUB_OUTPUT"
+          echo "domain=${DOMAIN}"             >> "$GITHUB_OUTPUT"
+          echo "jira_id=${JIRA_ID}"           >> "$GITHUB_OUTPUT"
+
+          echo "───────────────────────────────"
           echo "Feature file:  ${FEATURE_FILE}"
           echo "Domain:        ${DOMAIN}"
           echo "JIRA ID:       ${JIRA_ID}"
-
-          SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' "$FEATURE_FILE" || true)
           echo "Scenarios:     ${SCENARIO_COUNT}"
+          echo "───────────────────────────────"
 
           if [ "$SCENARIO_COUNT" -eq 0 ]; then
             echo "::error::No scenarios found in ${FEATURE_FILE}"
@@ -133,18 +139,17 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
           prompt: |
-            Run iAutomate for ${{ steps.pr.outputs.jira_id }}.
+            Run iAutomate for ${{ steps.resolve.outputs.jira_id }}.
 
-            Feature file: ${{ steps.pr.outputs.feature_file }}
-            Domain: ${{ steps.pr.outputs.domain }}
-            Source PR: #${{ steps.pr.outputs.pr_number }}
+            Feature file: ${{ steps.resolve.outputs.feature_file }}
+            Domain: ${{ steps.resolve.outputs.domain }}
 
             Follow the CLAUDE.md instructions exactly. Execute all 5 phases:
             1. Parse the feature file and catalog every step
             2. Scan the entire repository for reusable steps, page objects, and utilities
             3. Navigate the live application using Playwright to extract real DOM locators, then generate step definitions and page object classes
             4. Run the feature file with Maven and iterate until all scenarios pass with zero failures
-            5. Commit all new/modified files to a new branch (feature/${{ steps.pr.outputs.jira_id }}) and create a PR
+            5. Commit all new/modified files to a new branch (feature/${{ steps.resolve.outputs.jira_id }}) and create a PR
 
             The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
             Read src/test/resources/config/config.properties for the application URL and login credentials.
