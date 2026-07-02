@@ -140,7 +140,6 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-haiku-4-5-20251001
           show_full_output: true
           prompt: |
             Run iAutomate for ${{ steps.resolve.outputs.jira_id }}.
@@ -157,4 +156,4 @@ jobs:
 
             The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
             Read src/test/resources/config/config.properties for the application URL and login credentials.
-          claude_args: --max-turns 100
+          claude_args: --model claude-haiku-4-5-20251001 --max-turns 100
