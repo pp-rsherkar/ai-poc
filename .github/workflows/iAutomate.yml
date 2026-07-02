@@ -6,8 +6,8 @@ on:
 
   workflow_dispatch:
     inputs:
-      pr_number:
-        description: "PR number containing the feature file (e.g., 25)"
+      pr_link:
+        description: "PR link (e.g., https://github.com/pp-rsherkar/ai-poc/pull/25)"
         required: true
         type: string
 
@@ -41,11 +41,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Get PR number from workflow_dispatch or issue_comment
+          # Get PR number from link or issue_comment
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            PR_NUMBER="${{ inputs.pr_number }}"
+            PR_NUMBER=$(echo "${{ inputs.pr_link }}" | grep -oP '\d+$')
           else
             PR_NUMBER="${{ github.event.issue.number }}"
+          fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "::error::Could not extract PR number"
+            exit 1
           fi
           echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
 
