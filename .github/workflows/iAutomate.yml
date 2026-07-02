@@ -136,6 +136,8 @@ jobs:
 
       - name: Run iAutomate
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
@@ -154,4 +156,4 @@ jobs:
 
             The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
             Read src/test/resources/config/config.properties for the application URL and login credentials.
-          claude_args: "--max-turns 100"
+          claude_args: --max-turns 100
