@@ -1,0 +1,143 @@
+name: iAutomate — Test Automation Code Generator
+
+on:
+  issue_comment:
+    types: [created]
+
+  workflow_dispatch:
+    inputs:
+      jira_id:
+        description: "JIRA Ticket ID (e.g., QA-1557)"
+        required: true
+        type: string
+      feature_file:
+        description: "Feature file path (e.g., src/test/resources/features/life/QA-1557.feature)"
+        required: true
+        type: string
+      domain:
+        description: "Target domain"
+        required: true
+        type: choice
+        default: "life"
+        options: [life, studio, hcp]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  iAutomate:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude') &&
+       contains(github.event.comment.body, 'iAutomate'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Parse trigger inputs
+        id: parse
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "jira_id=${{ inputs.jira_id }}" >> "$GITHUB_OUTPUT"
+            echo "feature_file=${{ inputs.feature_file }}" >> "$GITHUB_OUTPUT"
+            echo "domain=${{ inputs.domain }}" >> "$GITHUB_OUTPUT"
+          else
+            COMMENT_BODY="${{ github.event.comment.body }}"
+            JIRA_ID=$(echo "$COMMENT_BODY" | grep -oP '[A-Z]+-\d+' | head -1)
+            echo "jira_id=${JIRA_ID}" >> "$GITHUB_OUTPUT"
+            FEATURE_FILE=$(echo "$COMMENT_BODY" | grep -oP 'src/test/resources/features/\S+\.feature' | head -1)
+            if [ -z "$FEATURE_FILE" ]; then
+              FEATURE_FILE=$(find src/test/resources/features -name "${JIRA_ID}.feature" 2>/dev/null | head -1)
+            fi
+            echo "feature_file=${FEATURE_FILE}" >> "$GITHUB_OUTPUT"
+            DOMAIN=$(echo "$FEATURE_FILE" | sed -n 's|src/test/resources/features/\([^/]*\)/.*|\1|p')
+            echo "domain=${DOMAIN}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate inputs
+        run: |
+          set -euo pipefail
+          JIRA_ID="${{ steps.parse.outputs.jira_id }}"
+          FEATURE_FILE="${{ steps.parse.outputs.feature_file }}"
+          DOMAIN="${{ steps.parse.outputs.domain }}"
+          echo "JIRA ID:       $JIRA_ID"
+          echo "Feature file:  $FEATURE_FILE"
+          echo "Domain:        $DOMAIN"
+          if [ -z "$JIRA_ID" ]; then echo "::error::Could not extract JIRA ticket ID"; exit 1; fi
+          if [ -z "$FEATURE_FILE" ] || [ ! -f "$FEATURE_FILE" ]; then echo "::error::Feature file not found: $FEATURE_FILE"; exit 1; fi
+          if [ -z "$DOMAIN" ]; then echo "::error::Could not determine domain"; exit 1; fi
+          SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' "$FEATURE_FILE" || true)
+          echo "Scenarios found: $SCENARIO_COUNT"
+          if [ "$SCENARIO_COUNT" -eq 0 ]; then echo "::error::No scenarios found in feature file"; exit 1; fi
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Install Maven dependencies
+        run: mvn dependency:resolve -q
+
+      - name: Install Playwright browsers
+        run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium" -q
+
+      - name: Configure application credentials
+        env:
+          DEMO_URL: ${{ secrets.DEMO_URL }}
+          DEMO_INTERNAL_USER: ${{ secrets.DEMO_INTERNAL_USER }}
+          DEMO_INTERNAL_PASS: ${{ secrets.DEMO_INTERNAL_PASS }}
+          DEMO_EXTERNAL_USER: ${{ secrets.DEMO_EXTERNAL_USER }}
+          DEMO_EXTERNAL_PASS: ${{ secrets.DEMO_EXTERNAL_PASS }}
+        run: |
+          set -euo pipefail
+          CONFIG="src/test/resources/config/config.properties"
+          if [ -n "${DEMO_URL:-}" ]; then sed -i "s|^demoURL=.*|demoURL=${DEMO_URL}|" "$CONFIG"; fi
+          if [ -n "${DEMO_INTERNAL_USER:-}" ]; then
+            sed -i "s|^demoInternalUser=.*|demoInternalUser=${DEMO_INTERNAL_USER}|" "$CONFIG"
+            sed -i "s|^demoInternalPassword=.*|demoInternalPassword=${DEMO_INTERNAL_PASS}|" "$CONFIG"
+          fi
+          if [ -n "${DEMO_EXTERNAL_USER:-}" ]; then
+            sed -i "s|^demoExternalUser=.*|demoExternalUser=${DEMO_EXTERNAL_USER}|" "$CONFIG"
+            sed -i "s|^demoExternalPassword=.*|demoExternalPassword=${DEMO_EXTERNAL_PASS}|" "$CONFIG"
+          fi
+          echo "Application credentials configured"
+
+      - name: Run iAutomate
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Run iAutomate for ${{ steps.parse.outputs.jira_id }}.
+
+            Feature file: ${{ steps.parse.outputs.feature_file }}
+            Domain: ${{ steps.parse.outputs.domain }}
+
+            Follow the CLAUDE.md instructions exactly. Execute all 5 phases:
+            1. Parse the feature file and catalog every step
+            2. Analyze the repository for reusable steps, page objects, and utilities
+            3. Navigate the live application using Playwright to extract real DOM locators, then generate step definitions and page object classes
+            4. Run the feature file with Maven and iterate until all scenarios pass with zero failures
+            5. Commit all new/modified files to a new branch (feature/${{ steps.parse.outputs.jira_id }}) and create a PR
+
+            The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
+            Read src/test/resources/config/config.properties for the application URL and login credentials.
+          claude_args: "--max-turns 100"
