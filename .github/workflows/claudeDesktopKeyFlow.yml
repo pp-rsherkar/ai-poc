@@ -1,4 +1,4 @@
-name: iAutomate — Test Automation Code Generator
+name: claudeDesktopKeyFlow
 
 on:
   issue_comment:
