@@ -3,10 +3,11 @@ name: claudeDesktopKeyFlow
 on:
   issue_comment:
     types: [created]
+
   workflow_dispatch:
     inputs:
       feature_file:
-        description: "Feature file name (e.g., QA-1557)"
+        description: "Feature file name (e.g., QA-1557 or QA-1557.feature)"
         required: true
         type: string
 
@@ -38,10 +39,13 @@ jobs:
         id: resolve
         run: |
           set -euo pipefail
+
+          # 1. Get raw string context input from event
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             RAW_INPUT="${{ inputs.feature_file }}"
           else
-            RAW_INPUT=$(echo '${{ github.event.comment.body }}' | grep -oiP 'iAutomate\s+(?:for\s+)?\K\S+' || true)
+            RAW_INPUT=$(echo '${{ github.event.comment.body }}' \
+              | grep -oiP 'iAutomate\s+(?:for\s+)?\K\S+' || true)
           fi
 
           if [ -z "$RAW_INPUT" ]; then
@@ -49,20 +53,32 @@ jobs:
             exit 1
           fi
 
+          # 2. Extract base file components
           BASE_NAME=$(echo "$RAW_INPUT" | sed 's/\.feature$//')
+          echo "Searching for target: ${BASE_NAME}.feature ..."
+
           FEATURE_FILE=$(find src/test/resources/features -type f -name "${BASE_NAME}.feature" 2>/dev/null | head -1)
 
           if [ -z "$FEATURE_FILE" ]; then
-            echo "::error::Feature file '${BASE_NAME}.feature' not found"
+            echo "::error::Feature file '${BASE_NAME}.feature' not found under features root directory."
             exit 1
           fi
 
           DOMAIN=$(echo "$FEATURE_FILE" | sed -n 's|src/test/resources/features/\([^/]*\)/.*|\1|p')
           JIRA_ID=$(echo "$BASE_NAME" | grep -oP '[A-Z]+-\d+' || echo "$BASE_NAME")
+          SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' "$FEATURE_FILE" || true)
 
+          # 3. Stream resolved variables to step outputs context
           echo "feature_file=${FEATURE_FILE}" >> "$GITHUB_OUTPUT"
           echo "domain=${DOMAIN}"             >> "$GITHUB_OUTPUT"
           echo "jira_id=${JIRA_ID}"           >> "$GITHUB_OUTPUT"
+
+          echo "───────────────────────────────"
+          echo "Target Feature File: ${FEATURE_FILE}"
+          echo "Automation Domain:   ${DOMAIN}"
+          echo "Target JIRA ID:      ${JIRA_ID}"
+          echo "Scenario Count:      ${SCENARIO_COUNT}"
+          echo "───────────────────────────────"
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -70,7 +86,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install Playwright browsers
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Install Maven dependencies
+        run: mvn dependency:resolve -q
+
+      - name: Install Playwright Chromium with dependencies
         run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium" -q
 
       - name: Configure application credentials
@@ -78,32 +104,63 @@ jobs:
           DEMO_URL: ${{ secrets.DEMO_URL }}
           DEMO_INTERNAL_USER: ${{ secrets.DEMO_INTERNAL_USER }}
           DEMO_INTERNAL_PASS: ${{ secrets.DEMO_INTERNAL_PASS }}
+          DEMO_EXTERNAL_USER: ${{ secrets.DEMO_EXTERNAL_USER }}
+          DEMO_EXTERNAL_PASS: ${{ secrets.DEMO_EXTERNAL_PASS }}
         run: |
+          set -euo pipefail
           CONFIG="src/test/resources/config/config.properties"
           if [ -n "${DEMO_URL:-}" ]; then sed -i "s|^demoURL=.*|demoURL=${DEMO_URL}|" "$CONFIG"; fi
           if [ -n "${DEMO_INTERNAL_USER:-}" ]; then
             sed -i "s|^demoInternalUser=.*|demoInternalUser=${DEMO_INTERNAL_USER}|" "$CONFIG"
             sed -i "s|^demoInternalPassword=.*|demoInternalPassword=${DEMO_INTERNAL_PASS}|" "$CONFIG"
           fi
+          if [ -n "${DEMO_EXTERNAL_USER:-}" ]; then
+            sed -i "s|^demoExternalUser=.*|demoExternalUser=${DEMO_EXTERNAL_USER}|" "$CONFIG"
+            sed -i "s|^demoExternalPassword=.*|demoExternalPassword=${DEMO_EXTERNAL_PASS}|" "$CONFIG"
+          fi
+          echo "Application configurations mapped successfully."
 
-      - name: Run iAutomate Loop
-        uses: anthropics/claude-code-action@v1
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          show_full_output: true
-          claude_args: --max-turns 100
-          prompt: |
-            Run iAutomate for ${{ steps.resolve.outputs.jira_id }}.
+          node-version: 22
 
-            Feature file: ${{ steps.resolve.outputs.feature_file }}
-            Domain: ${{ steps.resolve.outputs.domain }}
+      - name: Install Claude Code CLI globally
+        run: npm install -g @anthropic-ai/claude-code
 
-            Follow the CLAUDE.md instructions exactly. Execute all 5 phases:
-            1. Parse the feature file and catalog every step
-            2. Scan the entire repository for reusable steps, page objects, and utilities
-            3. Navigate the live application using Playwright to extract real DOM locators, then generate step definitions and page object classes
-            4. Run the feature file with Maven and iterate until all scenarios pass with zero failures
-            5. Commit all new/modified files to a new branch (feature/${{ steps.resolve.outputs.jira_id }}) and create a PR
+      - name: Run Headless iAutomate Loop
+        run: |
+          # 1. Initialize local configuration matrix to inject individual consumer token payload
+          mkdir -p ~/.config/claude-code
+          cat << EOF > ~/.config/claude-code/config.json
+          {
+            "auth": {
+              "accessToken": "${{ secrets.ANTHROPIC_API_KEY }}"
+            },
+            "api": {}
+          }
+          EOF
 
-            The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
-            Read src/test/resources/config/config.properties for the application URL and login credentials.
+          # 2. Write structural prompt context to disk file
+          cat << 'EOF' > claude_prompt.txt
+          Run iAutomate for ${{ steps.resolve.outputs.jira_id }}.
+
+          Feature file: ${{ steps.resolve.outputs.feature_file }}
+          Domain: ${{ steps.resolve.outputs.domain }}
+
+          Follow the CLAUDE.md instructions exactly. Execute all 5 phases:
+          1. Parse the feature file and catalog every step
+          2. Scan the entire repository for reusable steps, page objects, and utilities
+          3. Navigate the live application using Playwright to extract real DOM locators, then generate step definitions and page object classes
+          4. Run the feature file with Maven and iterate until all scenarios pass with zero failures
+          5. Commit all new/modified files to a new branch (feature/${{ steps.resolve.outputs.jira_id }}) and create a PR
+
+          The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
+          Read src/test/resources/config/config.properties for the application URL and login credentials.
+          EOF
+
+          # 3. Fire terminal execution matrix without global developer variable declarations
+          claude --print \
+                 --permission-mode dontAsk \
+                 --max-turns 100 \
+                 "$(cat claude_prompt.txt)"
