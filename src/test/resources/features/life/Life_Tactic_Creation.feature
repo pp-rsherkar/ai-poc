@@ -290,7 +290,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify campaign details are saved and user is navigated to the line item page
     When User enters the line item details as "<LINE_NAME>" "<LINE_BUDGET>", enables the line item and saves the changes
     Then Verify line item details are saved and user is navigated to the tactic page
-    When User enters the tactic details as "Dynamic_Tac" and saves the tactic
+    When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then User navigates to tactic setting tab
     Then User verifies that forecast data is unavailable when no targeting rules are applied
     When User clicks on Add Targeting Rule
@@ -305,5 +305,5 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And Verify show expression connector AND OR logic is correct
 
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET |
-      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         |  Dynamic_Tac |
