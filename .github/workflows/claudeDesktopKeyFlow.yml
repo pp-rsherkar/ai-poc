@@ -144,8 +144,8 @@ jobs:
 
       - name: Run iAutomate
         env:
-          # Bypasses developer gateway and maps your 1-year consumer subscription token
-          CLAUDE_CODE_TOKEN: ${{ secrets.ANTHROPIC_API_KEY }} 
+          # CRITICAL: Change CLAUDE_CODE_TOKEN to CLAUDE_TOKEN so the CLI automatically authenticated headlessly
+          CLAUDE_TOKEN: ${{ secrets.ANTHROPIC_API_KEY }} 
         run: |
           # Create a temporary prompt file to prevent bash escaping bugs
           cat << 'EOF' > claude_prompt.txt
@@ -165,11 +165,10 @@ jobs:
           Read src/test/resources/config/config.properties for the application URL and login credentials.
           EOF
 
-          # Corrected flags:
-          # -p (or --print) runs Claude Code headlessly
-          # --permission-mode dontAsk guarantees it won't pause the CI build to prompt for confirmation
+          # Corrected flags and model string:
+          # Updated --model from claude-3-7-sonnet to claude-4 to bypass the retirement wall
           claude --print \
                  --permission-mode dontAsk \
-                 --model claude-3-7-sonnet \
+                 --model claude-4 \
                  --max-turns 100 \
                  "$(cat claude_prompt.txt)"
