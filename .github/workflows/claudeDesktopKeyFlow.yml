@@ -165,8 +165,11 @@ jobs:
           Read src/test/resources/config/config.properties for the application URL and login credentials.
           EOF
 
-          # Execute using the manual terminal package using non-interactive mode
-          claude --non-interactive \
+          # Corrected flags:
+          # -p (or --print) runs Claude Code headlessly
+          # --permission-mode dontAsk guarantees it won't pause the CI build to prompt for confirmation
+          claude --print \
+                 --permission-mode dontAsk \
                  --model claude-3-7-sonnet \
                  --max-turns 100 \
                  "$(cat claude_prompt.txt)"
