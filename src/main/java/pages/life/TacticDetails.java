@@ -5,10 +5,8 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
