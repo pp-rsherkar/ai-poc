@@ -144,8 +144,8 @@ jobs:
 
       - name: Run iAutomate
         env:
-          # CRITICAL: Change CLAUDE_CODE_TOKEN to CLAUDE_TOKEN so the CLI automatically authenticated headlessly
-          CLAUDE_TOKEN: ${{ secrets.ANTHROPIC_API_KEY }} 
+          # Required for headless individual user validation
+          CLAUDE_CODE_TOKEN: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           # Create a temporary prompt file to prevent bash escaping bugs
           cat << 'EOF' > claude_prompt.txt
@@ -165,10 +165,9 @@ jobs:
           Read src/test/resources/config/config.properties for the application URL and login credentials.
           EOF
 
-          # Corrected flags and model string:
-          # Updated --model from claude-3-7-sonnet to claude-4 to bypass the retirement wall
+          # Corrected flags and valid model identifier
           claude --print \
                  --permission-mode dontAsk \
-                 --model claude-4 \
+                 --model claude-3-7-sonnet \
                  --max-turns 100 \
                  "$(cat claude_prompt.txt)"
