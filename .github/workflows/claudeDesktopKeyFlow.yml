@@ -146,7 +146,6 @@ jobs:
         run: |
           echo "=== CLI Diagnostics ==="
           claude --version
-          claude doctor || true
 
       - name: Run iAutomate
         env:
