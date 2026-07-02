@@ -125,7 +125,7 @@ public class TacticDetails {
         this.FIELD_CREATE_SUCCESS =
                 page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
         this.CUSTOM_FIELD_TEXT = page.locator("//input[contains(@class,'gaName')]");
-        this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]");
+        this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]").last();
         this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
@@ -171,8 +171,9 @@ public class TacticDetails {
     }
 
     public Locator customFieldValue(String customFieldName) {
-        return page.locator(
-                String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+        return page.locator("app-life-custom-field-setting > div > div")
+                .filter(new Locator.FilterOptions().setHas(page.locator("text=" + customFieldName)))
+                .locator("input");
     }
 
     public List<String> getAllTactics() {
@@ -192,8 +193,9 @@ public class TacticDetails {
     }
 
     public void clearCustomFieldText(String customFieldName) {
-        Locator FIELD_OPTIONS = page.locator(
-                String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+        Locator FIELD_OPTIONS = page.locator("app-life-custom-field-setting > div > div")
+                .filter(new Locator.FilterOptions().setHas(page.locator("text=" + customFieldName)))
+                .locator("input");
         FIELD_OPTIONS.clear();
         SAVE_TACTIC_DETAILS.click();
     }
@@ -262,7 +264,8 @@ public class TacticDetails {
     }
 
     public String verifyCustomField(String fieldName) {
-        Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
+        //  Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
+        Locator customField = page.locator(String.format("//label[contains(normalize-space(),'%s')]", fieldName));
         return customField.innerText().trim();
     }
 
@@ -278,8 +281,9 @@ public class TacticDetails {
         waitUtility.waitForLocatorVisible(
                 page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
                         .last());
-        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
-        FIELD_OPTIONS.click();
+        Locator FIELD_OPTIONS = page.locator("app-life-custom-field-setting > div > div")
+                .filter(new Locator.FilterOptions().setHas(page.locator("text=" + customFieldName)));
+        FIELD_OPTIONS.locator("label img").first().click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
         String text = DELETE_SUCCESS.innerText();
