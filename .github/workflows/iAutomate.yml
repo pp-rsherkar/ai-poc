@@ -6,20 +6,10 @@ on:
 
   workflow_dispatch:
     inputs:
-      jira_id:
-        description: "JIRA Ticket ID (e.g., QA-1557)"
+      pr_number:
+        description: "PR number containing the feature file (e.g., 25)"
         required: true
         type: string
-      feature_file:
-        description: "Feature file path (e.g., src/test/resources/features/life/QA-1557.feature)"
-        required: true
-        type: string
-      domain:
-        description: "Target domain"
-        required: true
-        type: choice
-        default: "life"
-        options: [life, studio, hcp]
 
 permissions:
   contents: write
@@ -44,42 +34,52 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Parse trigger inputs
-        id: parse
+      - name: Extract PR details
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "jira_id=${{ inputs.jira_id }}" >> "$GITHUB_OUTPUT"
-            echo "feature_file=${{ inputs.feature_file }}" >> "$GITHUB_OUTPUT"
-            echo "domain=${{ inputs.domain }}" >> "$GITHUB_OUTPUT"
-          else
-            COMMENT_BODY="${{ github.event.comment.body }}"
-            JIRA_ID=$(echo "$COMMENT_BODY" | grep -oP '[A-Z]+-\d+' | head -1)
-            echo "jira_id=${JIRA_ID}" >> "$GITHUB_OUTPUT"
-            FEATURE_FILE=$(echo "$COMMENT_BODY" | grep -oP 'src/test/resources/features/\S+\.feature' | head -1)
-            if [ -z "$FEATURE_FILE" ]; then
-              FEATURE_FILE=$(find src/test/resources/features -name "${JIRA_ID}.feature" 2>/dev/null | head -1)
-            fi
-            echo "feature_file=${FEATURE_FILE}" >> "$GITHUB_OUTPUT"
-            DOMAIN=$(echo "$FEATURE_FILE" | sed -n 's|src/test/resources/features/\([^/]*\)/.*|\1|p')
-            echo "domain=${DOMAIN}" >> "$GITHUB_OUTPUT"
-          fi
 
-      - name: Validate inputs
-        run: |
-          set -euo pipefail
-          JIRA_ID="${{ steps.parse.outputs.jira_id }}"
-          FEATURE_FILE="${{ steps.parse.outputs.feature_file }}"
-          DOMAIN="${{ steps.parse.outputs.domain }}"
-          echo "JIRA ID:       $JIRA_ID"
-          echo "Feature file:  $FEATURE_FILE"
-          echo "Domain:        $DOMAIN"
-          if [ -z "$JIRA_ID" ]; then echo "::error::Could not extract JIRA ticket ID"; exit 1; fi
-          if [ -z "$FEATURE_FILE" ] || [ ! -f "$FEATURE_FILE" ]; then echo "::error::Feature file not found: $FEATURE_FILE"; exit 1; fi
-          if [ -z "$DOMAIN" ]; then echo "::error::Could not determine domain"; exit 1; fi
+          # Get PR number from workflow_dispatch or issue_comment
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PR_NUMBER="${{ inputs.pr_number }}"
+          else
+            PR_NUMBER="${{ github.event.issue.number }}"
+          fi
+          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+
+          # Get the feature file from the PR's changed files
+          FEATURE_FILE=$(gh pr diff "$PR_NUMBER" --name-only | grep '\.feature$' | head -1)
+          if [ -z "$FEATURE_FILE" ]; then
+            echo "::error::No .feature file found in PR #${PR_NUMBER}"
+            exit 1
+          fi
+          echo "feature_file=${FEATURE_FILE}" >> "$GITHUB_OUTPUT"
+
+          # Extract domain from file path
+          DOMAIN=$(echo "$FEATURE_FILE" | sed -n 's|src/test/resources/features/\([^/]*\)/.*|\1|p')
+          echo "domain=${DOMAIN}" >> "$GITHUB_OUTPUT"
+
+          # Extract JIRA ticket from PR title or branch name
+          PR_TITLE=$(gh pr view "$PR_NUMBER" --json title -q '.title')
+          PR_BRANCH=$(gh pr view "$PR_NUMBER" --json headRefName -q '.headRefName')
+          JIRA_ID=$(echo "${PR_TITLE} ${PR_BRANCH}" | grep -oP '[A-Z]+-\d+' | head -1)
+          echo "jira_id=${JIRA_ID}" >> "$GITHUB_OUTPUT"
+
+          # Summary
+          echo "PR:            #${PR_NUMBER}"
+          echo "Feature file:  ${FEATURE_FILE}"
+          echo "Domain:        ${DOMAIN}"
+          echo "JIRA ID:       ${JIRA_ID}"
+
           SCENARIO_COUNT=$(grep -cE '^\s*(Scenario|Scenario Outline):' "$FEATURE_FILE" || true)
-          echo "Scenarios found: $SCENARIO_COUNT"
-          if [ "$SCENARIO_COUNT" -eq 0 ]; then echo "::error::No scenarios found in feature file"; exit 1; fi
+          echo "Scenarios:     ${SCENARIO_COUNT}"
+
+          if [ "$SCENARIO_COUNT" -eq 0 ]; then
+            echo "::error::No scenarios found in ${FEATURE_FILE}"
+            exit 1
+          fi
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -126,17 +126,18 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            Run iAutomate for ${{ steps.parse.outputs.jira_id }}.
+            Run iAutomate for ${{ steps.pr.outputs.jira_id }}.
 
-            Feature file: ${{ steps.parse.outputs.feature_file }}
-            Domain: ${{ steps.parse.outputs.domain }}
+            Feature file: ${{ steps.pr.outputs.feature_file }}
+            Domain: ${{ steps.pr.outputs.domain }}
+            Source PR: #${{ steps.pr.outputs.pr_number }}
 
             Follow the CLAUDE.md instructions exactly. Execute all 5 phases:
             1. Parse the feature file and catalog every step
-            2. Analyze the repository for reusable steps, page objects, and utilities
+            2. Scan the entire repository for reusable steps, page objects, and utilities
             3. Navigate the live application using Playwright to extract real DOM locators, then generate step definitions and page object classes
             4. Run the feature file with Maven and iterate until all scenarios pass with zero failures
-            5. Commit all new/modified files to a new branch (feature/${{ steps.parse.outputs.jira_id }}) and create a PR
+            5. Commit all new/modified files to a new branch (feature/${{ steps.pr.outputs.jira_id }}) and create a PR
 
             The environment is ready: Java 21, Maven, Playwright with Chromium, and application credentials are all configured.
             Read src/test/resources/config/config.properties for the application URL and login credentials.
