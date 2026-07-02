@@ -5,8 +5,10 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -84,8 +86,8 @@ public class TacticDetails {
     private final Locator SHOW_EXPRESSION_BUTTON;
     private final Locator CONNECTION_LOCATOR;
     private final Locator VALUE_LOCATOR;
-    public List<String> showExpressionRawValues;
-    List<String> showExpressionValues;
+    private List<String> showExpressionRawValues;
+    private List<String> showExpressionValues;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -220,6 +222,10 @@ public class TacticDetails {
         return actualComment;
     }
 
+    public List<String> getShowExpressionRawValues() {
+        return showExpressionRawValues;
+    }
+
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
         waitUtility.waitUntilSpinnerHidden();
@@ -230,28 +236,27 @@ public class TacticDetails {
         waitUtility.waitUntilPreLoaderHidden();
     }
 
-public void fetchShowExpressionValues() {
-    waitUtility.waitForLocatorVisible(VALUE_LOCATOR.first());
-    int valueCount = VALUE_LOCATOR.count();
-    int connectorCount = CONNECTION_LOCATOR.count();
-    List<String> values = new ArrayList<>(valueCount * 2);
+    public void fetchShowExpressionValues() {
+        waitUtility.waitForLocatorVisible(VALUE_LOCATOR.first());
+        int valueCount = VALUE_LOCATOR.count();
+        int connectorCount = CONNECTION_LOCATOR.count();
+        List<String> values = new ArrayList<>(valueCount * 2);
 
-    for (int i = 0; i < valueCount; i++) {
-        if (i < connectorCount) {
-            values.add(CONNECTION_LOCATOR.nth(i).innerText().trim());
-        } else {
-            values.add("");
+        for (int i = 0; i < valueCount; i++) {
+            if (i < connectorCount) {
+                values.add(CONNECTION_LOCATOR.nth(i).innerText().trim());
+            } else {
+                values.add("");
+            }
+            values.add(VALUE_LOCATOR.nth(i).innerText().trim());
         }
-        values.add(VALUE_LOCATOR.nth(i).innerText().trim());
+        showExpressionRawValues = new ArrayList<>(values); // preserve raw for connector assertion
+        // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
+        showExpressionValues = values.stream()
+                .filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR"))
+                .distinct()
+                .collect(Collectors.toList());
     }
-
-    showExpressionRawValues = new ArrayList<>(values); // preserve raw for connector assertion
-    // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
-    showExpressionValues = values.stream()
-            .filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR"))
-            .distinct()
-            .collect(Collectors.toList());
-}
 
     public boolean assertShowExpressionConnectorLogic(List<String> rawValues) {
         // Keywords are at odd indices (1, 3, 5, ...), connectors at even indices (2, 4, 6, ...)
@@ -295,7 +300,7 @@ public void fetchShowExpressionValues() {
     public boolean verifyShowExpressionValues(String ruleType) {
         waitUtility.waitUntilSpinnerHidden();
         SHOW_EXPRESSION_BUTTON.click();
-        waitUtility.waitForLocatorVisible(targetingTemplate.TARGETING_CONTAINER);
+        waitUtility.waitForLocatorVisible(targetingTemplate.getTargetingContainer());
         switch (ruleType) {
             case "Behavioral Segment":
                 ruleType = "Behavioral";
@@ -733,11 +738,11 @@ public void fetchShowExpressionValues() {
 
         for (int i = 0; i < rows.size(); i++) {
             Map<String, String> row = rows.get(i);
-            String liType    = row.get("LI_TYPE");
-            String liName    = row.get("LI_NAME");
-            String liBudget  = row.get("LI_BUDGET");
+            String liType = row.get("LI_TYPE");
+            String liName = row.get("LI_NAME");
+            String liBudget = row.get("LI_BUDGET");
             String tacticName = row.get("TACTIC_NAME");
-            String channel   = row.get("CHANNEL");
+            String channel = row.get("CHANNEL");
 
             if (!liName.equals(currentLiName)) {
                 if (currentLiName != null) {
@@ -760,7 +765,7 @@ public void fetchShowExpressionValues() {
 
             Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
             for (int j = 1; row.containsKey("RULE_" + j); j++) {
-                String rule   = row.get("RULE_"   + j);
+                String rule = row.get("RULE_" + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
                     List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);

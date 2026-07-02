@@ -12,6 +12,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6403,10 +6405,9 @@ public class LifeSteps {
     }
 
     @Then("The user clicks on show expression tab and fetch the values displayed")
-    public void The_user_clicks_on_show_expression_tab_and_fetch_the_values_displayed() {
+    public void the_user_clicks_on_show_expression_tab_and_fetch_the_values_displayed() {
         tacticDetails.clickShowExpressionButton();
         tacticDetails.fetchShowExpressionValues();
-
     }
 
     @Then("Verify that all the rule types added in targeting rules are displayed in show expression with correct values")
@@ -6419,7 +6420,7 @@ public class LifeSteps {
     @Then("Verify show expression connector AND OR logic is correct")
     public void verifyShowExpressionConnectorLogicIsCorrect() {
         tacticDetails.fetchShowExpressionValues();
-        Assert.assertTrue("Show expression connector logic is incorrect. Raw values: " + tacticDetails.showExpressionRawValues, tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.showExpressionRawValues)
+        Assert.assertTrue("Show expression connector logic is incorrect. Raw values: " + tacticDetails.getShowExpressionRawValues(), tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.getShowExpressionRawValues())
         );
     }
 
@@ -7211,7 +7212,7 @@ public class LifeSteps {
     @And(
             "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
     public void
-            verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
+    verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
         logger.info(
                 "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
         lineItemDetails.saveLineItem();
@@ -7328,7 +7329,7 @@ public class LifeSteps {
     }
 
     @Given("User configures Bid multiplier rules as below with {string}")
-    public void user_selects_the_Bid_multiplier_rules(String fillValue,DataTable bidRuleTypeAndOptions) {
+    public void user_selects_the_Bid_multiplier_rules(String fillValue, DataTable bidRuleTypeAndOptions) {
         logger.info("Configuring Bid multiplier rules from DataTable");
         Map<String, String> rawMap = bidRuleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
@@ -7337,7 +7338,7 @@ public class LifeSteps {
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             keyType.add(entry.getKey());
             keyValues.addAll(entry.getValue());
-            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(),fillValue);
+            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(), fillValue);
         }
         logger.info("Closing Bid Rule Type panel");
         tacticSettings.closeRuleTypePanel();
