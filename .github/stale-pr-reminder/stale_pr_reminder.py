@@ -12,6 +12,19 @@ import requests
 from github import Github
 from github.PullRequest import PullRequest
 
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+# This section defines the tunable behavior of the bot: how many days a PR
+# must sit in a given status before we nag about it, how many approvals are
+# required before a PR is considered mergeable, who the designated "merger"
+# is, and what action text is shown to whoever is responsible for the PR at
+# each status. Everything below is data, not logic — the actual decision
+# tree that assigns a status to a PR lives further down in determine_status().
+
+# Number of days a PR must remain in each status before the bot will post a
+# reminder comment about it. Each status is keyed by the exact string that
+# determine_status() returns for that state.
 STATUS_THRESHOLDS = {
     "No Reviewers Assigned":         3,
     "Waiting For Review":            2,
@@ -24,10 +37,18 @@ STATUS_THRESHOLDS = {
 #   <= 3 items → 3 days
 #    > 3 items → 5 days
 
+# Minimum number of distinct approving reviewers before a PR is treated as
+# ready to merge. Can be overridden per-repo via the REQUIRED_APPROVALS env
+# var; defaults to 2 if not set.
 REQUIRED_APPROVALS = int(os.getenv("REQUIRED_APPROVALS", "2"))
-MERGER = os.getenv("MERGER", "pp-pmitra")
 
-# Per-status guidance shown in the reminder comment.
+# GitHub login of the person who should be pinged to actually click "Merge"
+# once a PR is fully approved. Overridable via the MERGER env var.
+MERGER = os.getenv("MERGER", "pp-sdeodhar")
+
+# Per-status guidance shown in the reminder comment. Each entry is the
+# human-readable "Next Steps" text inserted into the comment body for PRs
+# currently in that status, telling the responsible party what to do next.
 STATUS_ACTIONS = {
     "Ready To Merge": "All required approvals are in. Please merge when ready.",
     "No Reviewers Assigned": "Please assign reviewers to get this moving.",
@@ -51,11 +72,23 @@ STATUS_ACTIONS = {
 }
 
 
+# ============================================================================
+# TIME / AGE HELPERS
+# ============================================================================
+# Small utility functions for computing how old a PR is and how long it's
+# been since a real (non-bot) human touched it. These are used both for
+# display in the reminder comment and, in some cases, as fallbacks when
+# computing how long a PR has sat in its current status.
+
 def get_now() -> datetime:
+    # Centralized "current time" so every age calculation in this file uses
+    # the exact same timestamp during a single run.
     return datetime.now(timezone.utc)
 
 
 def get_pr_age_minutes(pr: PullRequest) -> float:
+    # How long ago the PR was originally opened, in minutes. Used purely for
+    # the "PR Age" line in the reminder comment (not for status timing logic).
     return (get_now() - pr.created_at).total_seconds() / 60
 
 
@@ -79,7 +112,18 @@ def get_last_human_activity_days(pr: PullRequest) -> float:
     return (now - latest).total_seconds() / 86400
 
 
+# ============================================================================
+# REVIEWER / COMMENTER LOOKUPS
+# ============================================================================
+# Functions that pull the raw lists of people involved with a PR — who's
+# been requested as a reviewer, and who has left issue comments. These lists
+# feed into determine_status() to figure out who is currently "responsible"
+# for moving the PR forward.
+
 def get_requested_reviewers(pr: PullRequest) -> List[str]:
+    # GitHub logins of reviewers who have been requested but haven't yet
+    # submitted a review (i.e. still sitting in the "requested" state).
+    # Bots are excluded since they can't meaningfully "take action".
     try:
         users, _teams = pr.get_review_requests()
         return [user.login for user in users if user.type != "Bot"]
@@ -89,12 +133,23 @@ def get_requested_reviewers(pr: PullRequest) -> List[str]:
 
 
 def get_issue_commenters(pr: PullRequest) -> List[str]:
+    # Distinct, non-bot logins that have left a top-level issue comment
+    # (as opposed to an inline code review comment) on the PR.
     commenters = set()
     for comment in pr.get_issue_comments():
         if comment.user and comment.user.type != "Bot":
             commenters.add(comment.user.login)
     return list(commenters)
 
+
+# ============================================================================
+# REVIEW HISTORY ANALYSIS
+# ============================================================================
+# This section turns the PR's raw, chronological review history (which can
+# contain multiple reviews per person, e.g. "commented" then later
+# "approved") into a clean, deduplicated picture: who currently approves,
+# who currently requests changes, who only left comments, and what the
+# substance of that feedback was.
 
 def analyze_reviews(
     pr: PullRequest,
@@ -133,6 +188,11 @@ def analyze_reviews(
 
 
 def get_review_feedback(pr: PullRequest, approved_by: List[str]) -> List[str]:
+    # Collects the actual written feedback text from reviews left by people
+    # who have NOT approved the PR (their concerns are presumably still
+    # outstanding). Only CHANGES_REQUESTED and COMMENTED reviews with a
+    # non-empty body are included; this text is surfaced verbatim in the
+    # "Review Feedback" section of the reminder comment.
     approved = set(approved_by)
     feedback = []
     for review in pr.get_reviews():
@@ -151,6 +211,10 @@ def get_review_feedback(pr: PullRequest, approved_by: List[str]) -> List[str]:
 
 
 def get_discussion_comments(pr: PullRequest) -> List[str]:
+    # Collects the text of top-level (non-bot) issue comments on the PR, for
+    # display in the "Discussion Comments" section of the reminder. Unlike
+    # get_review_feedback, this is not filtered by approval status — it's
+    # general conversation, not a formal review verdict.
     comments = []
     for comment in pr.get_issue_comments():
         if not comment.user or comment.user.type == "Bot":
@@ -161,6 +225,15 @@ def get_discussion_comments(pr: PullRequest) -> List[str]:
         comments.append(f"- @{comment.user.login}\n  {body}")
     return comments
 
+
+# ============================================================================
+# UNRESOLVED CODE REVIEW THREADS (GitHub GraphQL API)
+# ============================================================================
+# GitHub's REST API (used everywhere else in this file via PyGithub) does
+# not expose whether an inline review comment thread has been "resolved" or
+# GitHub's official reviewDecision verdict for the PR. Both of those are
+# only available through the GraphQL API, so this section makes a direct
+# GraphQL query to fetch them.
 
 def get_unresolved_review_threads(
     repository_name: str,
@@ -179,6 +252,10 @@ def get_unresolved_review_threads(
     """
     owner, repo = repository_name.split("/")
 
+    # GraphQL query pulling: the PR's overall reviewDecision, plus every
+    # review thread (up to 100) and, within each thread, its first 20
+    # comments — we only need each thread's resolved flag and its opening
+    # comment (author/path/body/timestamp) to build our summary.
     query = """
     query($owner:String!, $repo:String!, $number:Int!) {
       repository(owner:$owner, name:$repo) {
@@ -205,6 +282,8 @@ def get_unresolved_review_threads(
     }
     """
 
+    # Fire the GraphQL request directly with `requests`, authenticating with
+    # the same GITHUB_TOKEN used elsewhere for the REST/PyGithub calls.
     response = requests.post(
         "https://api.github.com/graphql",
         headers={"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"},
@@ -233,6 +312,9 @@ def get_unresolved_review_threads(
     thread_reviewers: List[str] = []
     thread_timestamps: List[datetime] = []
 
+    # Walk every review thread and keep only the ones still unresolved,
+    # extracting the info needed from each thread's opening comment: who
+    # started it, on what file, what they said, and when.
     for thread in threads:
         if thread["isResolved"]:
             continue
@@ -264,6 +346,17 @@ def get_unresolved_review_threads(
 
     return list(unresolved_reviewers), summary_lines, thread_reviewers, thread_timestamps, review_decision
 
+
+# ============================================================================
+# STATUS DECISION TREE
+# ============================================================================
+# The heart of the bot: given everything we know about a PR (its reviews,
+# unresolved threads, requested reviewers, commenters, and GitHub's own
+# reviewDecision verdict), decide which single "status" bucket it falls
+# into (e.g. "Waiting For Review", "Changes Requested", "Ready To Merge")
+# and who is responsible for acting on it next. The returned status string
+# is later used to look up a threshold (STATUS_THRESHOLDS) and an action
+# message (STATUS_ACTIONS).
 
 def determine_status(
     pr: PullRequest,
@@ -318,6 +411,8 @@ def determine_status(
     # Use the full fine-grained V1 decision tree. This also ensures repos
     # without branch protection still get all statuses correctly.
 
+    # There's an unresolved inline thread not superseded by an approval —
+    # the author owes a response regardless of the overall review verdict.
     if active_unresolved:
         return "Changes Requested", author, approved_by
 
@@ -325,12 +420,17 @@ def determine_status(
     if approval_count >= REQUIRED_APPROVALS and not changes_requested_by:
         return "Ready To Merge", MERGER, approved_by
 
+    # Nobody has reviewed at all yet — split on whether reviewers were ever
+    # requested (waiting on named people) vs. nobody assigned (waiting on
+    # the author/team to assign someone).
     if review_count == 0:
         if requested_reviewers:
             responsible = ", ".join(f"@{r}" for r in requested_reviewers)
             return "Waiting For Review", responsible, approved_by
         return "No Reviewers Assigned", author, approved_by
 
+    # A reviewer's active CHANGES_REQUESTED verdict exists (but no unresolved
+    # thread caught it above) — ping everyone involved in the discussion.
     if changes_requested_by:
         participants = sorted(
             set([author] + changes_requested_by + commented_by
@@ -340,6 +440,8 @@ def determine_status(
         responsible = ", ".join(f"@{user}" for user in participants)
         return "Review Discussion In Progress", responsible, approved_by
 
+    # Only non-blocking COMMENTED reviews exist — softer nudge than a formal
+    # change request, but still needs eyes from author and reviewers alike.
     if commented_by:
         participants = sorted(
             set([author] + commented_by + requested_reviewers + issue_commenters)
@@ -348,6 +450,8 @@ def determine_status(
         responsible = ", ".join(f"@{user}" for user in participants)
         return "Comments Received", responsible, approved_by
 
+    # At least one approval exists but not enough to hit REQUIRED_APPROVALS —
+    # waiting on the remaining requested reviewers to weigh in.
     if approval_count > 0:
         pending = [r for r in requested_reviewers if r not in set(approved_by)]
         responsible = ", ".join(f"@{r}" for r in pending) if pending else "@reviewers"
@@ -360,8 +464,19 @@ def determine_status(
     return "No Reviewers Assigned", author, approved_by
 
 
+# ============================================================================
+# REMINDER THROTTLING
+# ============================================================================
+# Functions that determine how long the PR has been sitting in its current
+# status, and whether we've already nagged about it recently. Together
+# these prevent the bot from spamming the same PR every single run — a
+# reminder only goes out once the status has aged past its threshold AND
+# enough time has passed since the last reminder.
+
 def get_last_reminder_days(pr: PullRequest) -> Optional[float]:
     """Return days since the last bot reminder comment, or None if never reminded."""
+    # Scan comments newest-first (reversed) so we stop at the most recent
+    # bot reminder rather than the oldest one.
     comments = list(pr.get_issue_comments())
     for comment in reversed(comments):
         if (
@@ -386,6 +501,8 @@ def get_status_age_days(
     """
     now = get_now()
 
+    # No review activity has happened yet, so the clock naturally starts at
+    # PR creation — there's no more recent event to anchor to.
     if status in ("No Reviewers Assigned", "Waiting For Review"):
         return (now - pr.created_at).total_seconds() / 86400
 
@@ -396,6 +513,8 @@ def get_status_age_days(
         return 0.0
 
     # Review-verdict-based statuses: find the most recent matching review
+    # state and anchor the clock to when it was submitted (e.g. "Ready To
+    # Merge" is timed from the last APPROVED review, not from PR creation).
     verdict_map = {
         "Review Discussion In Progress": ("CHANGES_REQUESTED",),
         "Comments Received":            ("COMMENTED",),
@@ -418,6 +537,12 @@ def get_status_age_days(
     return (now - pr.created_at).total_seconds() / 86400
 
 
+# ============================================================================
+# COMMENT RENDERING
+# ============================================================================
+# Formats all the data gathered above into the Markdown comment that gets
+# posted to the PR. Purely presentational — no decision-making happens here.
+
 def build_comment(
     pr: PullRequest,
     status: str,
@@ -432,6 +557,9 @@ def build_comment(
 
     approvals = ", ".join(f"@{u}" for u in approved_by) if approved_by else "None"
 
+    # "responsible" may already be a comma-separated "@user, @user" string
+    # (multiple participants) or a bare login (single user) — only prefix
+    # with "@" if it isn't already formatted as a mention.
     responsible_display = responsible
     if not responsible.startswith("@"):
         responsible_display = f"@{responsible}"
@@ -475,6 +603,16 @@ _This is an automated reminder. Please take action to keep this PR moving._
 """
 
 
+# ============================================================================
+# ENTRY POINT
+# ============================================================================
+# Orchestrates the whole bot: iterate every open PR in the repo, work out
+# its status and how long it's been stuck there, and post a reminder
+# comment if it has exceeded that status's threshold and hasn't already
+# been reminded about recently. Each PR is processed independently and
+# wrapped in a try/except so one PR's failure (e.g. an API error) doesn't
+# abort the run for the rest of the repository.
+
 def main() -> None:
 
     github_client = Github(os.environ["GITHUB_TOKEN"])
@@ -484,15 +622,20 @@ def main() -> None:
 
     for pr in repository.get_pulls(state="open"):
         try:
+            # Draft PRs aren't ready for review yet, so skip them entirely.
             if pr.draft:
                 continue
 
+            # Step 1: fetch unresolved review threads + GitHub's official
+            # reviewDecision via the GraphQL API (not available over REST).
             unresolved_reviewers, summary_lines, thread_reviewers, thread_timestamps, review_decision = (
                 get_unresolved_review_threads(repository.full_name, pr.number)
             )
 
             issue_commenters = get_issue_commenters(pr)
 
+            # Step 2: run the decision tree to get this PR's current status
+            # bucket and who's responsible for the next action.
             status, responsible, approved_by = determine_status(
                 pr, unresolved_reviewers, issue_commenters, review_decision
             )
@@ -512,6 +655,8 @@ def main() -> None:
                 if reviewer not in approved_set
             ]
 
+            # Step 3: assemble the "PR Feedback" section of the comment out
+            # of whichever feedback types are actually present for this PR.
             feedback_sections = []
 
             if active_lines:
@@ -531,7 +676,10 @@ def main() -> None:
                 "\n\n".join(feedback_sections) if feedback_sections else "_No feedback found_"
             )
 
-            # Per-status threshold (days)
+            # Step 4: figure out how many days this status must persist
+            # before we're allowed to remind about it. "Comments Received"
+            # is special-cased — more feedback items means more time is
+            # given for the author/reviewers to work through them.
             if status == "Comments Received":
                 feedback_count = len(review_feedback) + len(discussion_comments)
                 threshold_days = 3 if feedback_count <= 3 else 5
@@ -549,6 +697,10 @@ def main() -> None:
                 f"LastReminder={last_reminder_days}"
             )
 
+            # Step 5: throttle — only post if the status has been sitting
+            # long enough AND we haven't already reminded within that same
+            # threshold window (prevents reminder spam on every run).
+
             # Skip if the PR hasn't been in this status long enough
             if status_age_days < threshold_days:
                 continue
@@ -557,6 +709,7 @@ def main() -> None:
             if last_reminder_days is not None and last_reminder_days < threshold_days:
                 continue
 
+            # Step 6: build and post the reminder comment.
             comment = build_comment(
                 pr=pr,
                 status=status,
@@ -571,6 +724,8 @@ def main() -> None:
             print(f"Reminder posted for PR #{pr.number}")
 
         except Exception as exc:
+            # Don't let one problematic PR (e.g. a transient API error)
+            # kill the whole scan — log it and move on to the next PR.
             print(f"PR #{pr.number}: skipping due to error — {exc}")
 
 
