@@ -96,6 +96,8 @@ public class LifeSteps {
     int totalListCount = 0;
     int flightStartDate = 0;
     int flightEndDate = 0;
+    int file1RecordCount = 0;
+    int file2RecordCount = 0;
     APIResponse response;
     boolean flag = false;
     String customFieldName;
@@ -2790,8 +2792,16 @@ public class LifeSteps {
         logger.info(
                 "Verify that if multiple {} are specified on a single line, a validation error is shown", domainName);
         List<String> domainNameList = CommonUtils.convertStringToList(domainName);
-        String errorMessage = sharedList.checkErrorOnSingleLineMultipleDomainsInput(domainNameList);
-        Assert.assertTrue("No Validation error is displayed", errorMessage.contains("validation error(s)"));
+        String validationErrorMessage = sharedList.checkErrorOnSingleLineMultipleDomainsInput(domainNameList);
+        Assert.assertTrue("No Validation error is displayed", validationErrorMessage.contains("validation error(s)"));
+    }
+
+    @And("Verify that if multiple {string} are specified across multiple lines, an error is shown")
+    public void verifyThatIfMultipleAreSpecifiedAcrossMultipleLinesAValidationErrorIsShown(String domainName) {
+        logger.info("Verify that if multiple {} are specified across multiple lines, a validation error is shown", domainName);
+        List<String> domainNameList = Arrays.stream(domainName.split("::")).map(String::trim).toList();
+        String gotToNextErrorMessage = sharedList.getGoToNextValidationError(domainNameList);
+        Assert.assertTrue("No Go To Next Error is displayed", gotToNextErrorMessage.contains("Go To Next Error"));
     }
 
     @And("Verify that when {string} names are specified manually, the option to upload a file disappears")
@@ -2800,12 +2810,19 @@ public class LifeSteps {
                 "Verify that when {} names are specified manually, the option to upload a file disappears", listType);
         keyValues.clear();
         keyValues = new ArrayList<>(CommonUtils.convertStringToList(listType));
+        sharedList.clearListTextArea();
         boolean isUploadVisibleBefore = sharedList.verifyUploadSectionIsVisibleBeforeListInput();
         Assert.assertTrue("Upload section is not available before list input", isUploadVisibleBefore);
         logger.info("Entering domain names manually");
         sharedList.enterDomainNames(keyValues);
         boolean isUploadVisibleAfter = sharedList.verifyUploadSectionIsVisibleAfterListInput();
         Assert.assertTrue("Upload section is available after list input", isUploadVisibleAfter);
+    }
+
+    @And("User retrieves all the entered data before saving the list details {string}")
+    public void userRetrievesAllTheEnteredDataBeforeSavingTheListDetails(String listName) {
+        logger.info("Retrieving all the entered data before saving the list details: {}", listName);
+        itemList = sharedList.fetchListDetailsFromNewPanel();
     }
 
     @And("Verify that the user is able to create a {string} list by specifying names manually")
@@ -2837,7 +2854,8 @@ public class LifeSteps {
             String pulsepointProvidedDomainList) {
         logger.info(
                 "Searching for PulsePoint provided list '{}' to verify purple P icon", pulsepointProvidedDomainList);
-        sharedList.searchAndOpenCreatedList(pulsepointProvidedDomainList);
+        sharedList.searchCreatedList(pulsepointProvidedDomainList);
+        sharedList.openSearchedList(pulsepointProvidedDomainList);
         boolean isIconPresent = sharedList.fetchPulsepointIcon(pulsepointProvidedDomainList);
         Assert.assertTrue("P icon is not present on the PulsePoint provided list", isIconPresent);
     }
@@ -2846,9 +2864,30 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueForEachListInTheNavigationPanel() {
         logger.info(
                 "Verify that the counter on the left displays the correct value for each list in the navigation panel");
-        sharedList.searchAndOpenCreatedList(metricName);
+        sharedList.searchCreatedList(metricName);
+        sharedList.openSearchedList(metricName);
         totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
         Assert.assertEquals(totalListCount, keyValues.size());
+    }
+
+    @And("User retrieves all the entered data after saving the list details {string}")
+    public void userRetrievesAllTheEnteredDataAfterSavingTheListDetails(String listName) {
+        logger.info("Retrieving all the entered data after saving the list details: {}", listName);
+        capturedDetails.clear();
+        capturedDetails = sharedList.fetchListDetailsFromEditPanel();
+        List<String> normalizedExpected = itemList.stream()
+                .flatMap(item -> Arrays.stream(item.split("\\R")))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .sorted()
+                .toList();
+        List<String> normalizedActual = capturedDetails.stream()
+                .flatMap(item -> Arrays.stream(item.split("\\R")))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .sorted()
+                .toList();
+        Assert.assertEquals("List Details are not matching", normalizedExpected, normalizedActual);
     }
 
     @And("Verify that the user is able to edit an existing {string} name list {string}")
@@ -2856,6 +2895,8 @@ public class LifeSteps {
         logger.info("Editing existing '{}' list with modified names: {}", listType, modifiedName);
         keyValues = new ArrayList<>(CommonUtils.convertStringToList(modifiedName));
         sharedList.editAnExistingList(keyValues);
+        itemList.clear();
+        itemList = sharedList.fetchListDetailsFromEditPanel();
         logger.info("Saving updated list");
         sharedList.saveList();
         String updateMessage = sharedList.isListCreatedOrDeleted();
@@ -2906,9 +2947,15 @@ public class LifeSteps {
         }
     }
 
-    /*Roshani Sherkar
-     * 11/08/2025
-     * Domain List Creation by File Upload*/
+    @And("Verify the deleted list is no longer displayed in the left panel")
+    public void verifyTheDeletedListIsNoLongerDisplayedInTheLeftPanel() {
+        logger.info("Verifying that the deleted list '{}' is no longer displayed in the left panel", metricName);
+        sharedList.searchCreatedList(metricName);
+        Assert.assertTrue(
+                "Deleted list is still displayed in the left panel (expected 'Nothing Found' after search)",
+                sharedList.isNothingFoundDisplayed());
+    }
+
     @And(
             "Verify that an error message is displayed when no list names is specified and user tries to upload a file {string}")
     public void verifyThatAnErrorMessageIsDisplayedWhenNoListNamesIsSpecifiedAndUserTriesToUploadAFile(
@@ -2984,7 +3031,8 @@ public class LifeSteps {
     @And("Verify that the counter on the left displays the correct value after file upload {string}")
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUpload(String fileName) {
         logger.info("Verify that the counter on the left displays the correct value after file upload {}", fileName);
-        sharedList.searchAndOpenCreatedList(metricName);
+        sharedList.searchCreatedList(metricName);
+        sharedList.openSearchedList(metricName);
         totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
         itemCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
         Assert.assertEquals(totalListCount, itemCount);
@@ -3041,21 +3089,40 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheUpdatedValueAfterNewFileUpload(String fileName) {
         logger.info(
                 "Verify that the counter on the left displays the updated value after new file upload {}", fileName);
-        sharedList.searchAndOpenCreatedList(metricName);
+        sharedList.searchCreatedList(metricName);
+        sharedList.openSearchedList(metricName);
         int domainCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
         int newUploadCount = sharedList.fetchDomainCountFromUploadedFilesSection(fileName);
         Assert.assertEquals(itemCount + newUploadCount, domainCount);
     }
 
-    @And("Verify that user is able to download the uploaded file {string}, {string}")
+    @And("Verify that user is able to download the uploaded file {string}, {string} and fetches the count of the downloaded files")
     public void verifyThatUserIsAbleToDownloadTheUploadedFile(String fileName1, String fileName2) throws IOException {
         logger.info("Verify that user is able to download the uploaded file {}, {}", fileName1, fileName2);
+        Path filePath1 = sharedList.downloadFile(fileName1);
         Assert.assertTrue(
                 "Downloaded file is not available",
-                CommonUtils.isDownloadedFileAvailable(sharedList.downloadFile(fileName1), "csv"));
+                CommonUtils.isDownloadedFileAvailable(filePath1, "csv"));
+        file1RecordCount = FileActions.fetchRowCountFromCSV(filePath1);
+
+        Path filePath2 = sharedList.downloadFile(fileName2);
         Assert.assertTrue(
                 "Downloaded file is not available",
-                CommonUtils.isDownloadedFileAvailable(sharedList.downloadFile(fileName2), "csv"));
+                CommonUtils.isDownloadedFileAvailable(filePath2, "csv"));
+        file2RecordCount = FileActions.fetchRowCountFromCSV(filePath2);
+    }
+
+    @And("Verify that the count of the downloaded files {string}, {string} matches with the count displayed in the Uploaded Files section and left side panel")
+    public void verifyThatTheCountOfTheDownloadedFilesMatchesWithTheCountDisplayedInTheUploadedFilesSectionAndLeftSidePanel(String fileName1, String fileName2) {
+        logger.info(
+                "Verifying that the count of the downloaded files matches with the count displayed in the Uploaded Files section and left side panel");
+        int uploadedFileCount1 = sharedList.fetchDomainCountFromUploadedFilesSection(fileName1);
+        int uploadedFileCount2 = sharedList.fetchDomainCountFromUploadedFilesSection(fileName2);
+        Assert.assertEquals(file1RecordCount, uploadedFileCount1);
+        Assert.assertEquals(file2RecordCount, uploadedFileCount2);
+
+        int leftPanelCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
+        Assert.assertEquals(file1RecordCount + file2RecordCount, leftPanelCount);
     }
 
     @And("Verify that the user is able to delete the uploaded file {string}")
@@ -6200,7 +6267,8 @@ public class LifeSteps {
     public void verifyThatTheCounterOnTheLeftDisplaysTheCorrectValueAfterFileUploadFor(String listType) {
         logger.info(
                 "Verify that the counter on the left displays the correct value after file upload for {}", listType);
-        sharedList.searchAndOpenCreatedList(metricName);
+        sharedList.searchCreatedList(metricName);
+        sharedList.openSearchedList(metricName);
         totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
         itemCount = sharedList.fetchEmailCount();
         Assert.assertEquals(totalListCount, itemCount);
