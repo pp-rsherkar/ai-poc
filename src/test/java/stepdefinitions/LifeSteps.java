@@ -1,8 +1,5 @@
 package stepdefinitions;
 
-import static utils.CommonUtils.normalize;
-import static utils.CommonUtils.normalizeObjectList;
-
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.PlaywrightException;
 import com.opencsv.exceptions.CsvValidationException;
@@ -12,6 +9,16 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pages.Navigation;
+import pages.admin.Accounts;
+import pages.admin.Setup;
+import pages.life.*;
+import pages.studio.WorkspaceCreation;
+import utils.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,15 +30,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pages.Navigation;
-import pages.admin.Accounts;
-import pages.admin.Setup;
-import pages.life.*;
-import pages.studio.WorkspaceCreation;
-import utils.*;
+
+import static utils.CommonUtils.normalize;
+import static utils.CommonUtils.normalizeObjectList;
 
 public class LifeSteps {
 
@@ -1188,8 +1189,8 @@ public class LifeSteps {
     @Then(
             "Verify comments, icon should display in bluish-green color {string} and comments should available on individual panel")
     public void
-            verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(
-                    String colour) {
+    verifyCommentsAreSavedSuccessfullyIconShouldDisplayInBLUISHGREENAndCommentsShouldAvailableOnIndividualPanel(
+            String colour) {
         logger.info("Verifying comment icon color: {} and comment text", colour);
         List<String> backgroundImage = campaignDashboard.verifyCommentIconColor();
         Assert.assertTrue("Image is matched", backgroundImage.contains(colour));
@@ -1242,8 +1243,8 @@ public class LifeSteps {
     @And(
             "User fetches the Line Items and Tactics enabled-disabled status from Campaign Dashboard using {string} and verifies the same status in the respective Line Item and Tactic pages")
     public void
-            userFetchesTheLineItemsAndTacticsEnabledDisabledStatusFromCampaignDashboardAndVerifiesTheSameStatusInTheRespectiveLineItemAndTacticPages(
-                    String campaignID) {
+    userFetchesTheLineItemsAndTacticsEnabledDisabledStatusFromCampaignDashboardAndVerifiesTheSameStatusInTheRespectiveLineItemAndTacticPages(
+            String campaignID) {
         List<String> expectedStatus = campaignDashboard.fetchLineAndTacticToggleStatus();
         List<String> actualStatus = new ArrayList<>();
         logger.info("Navigating to pages to verify status. Campaign ID: {}", campaignID);
@@ -1353,8 +1354,8 @@ public class LifeSteps {
     @And(
             "Filter icon should display in the column header to which filter is applied and a red bullet {string} on the filter icon present next to global search")
     public void
-            filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(
-                    String iconColor) {
+    filterIconShouldDisplayInTheColumnHeaderToWhichFilterIsAppliedAndARedBulletOnTheFilterIconPresentNextToGlobalSearch(
+            String iconColor) {
         logger.info("Verifying filter icon color: {}", iconColor);
         String filterIconColor = campaignDashboard.verifyFilterIcon();
         Assert.assertEquals(iconColor, filterIconColor);
@@ -2375,8 +2376,8 @@ public class LifeSteps {
     @And(
             "User performs Bulk approve action using {string} option on multiple creatives - {string} with status other than Approved and verifies the selected creatives are marked as {string}")
     public void
-            userPerformsBulkApproveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreRemovedFromTheCreativeLibraryPage(
-                    String bulkActionOption, String noOfCreatives, String statusLabel, DataTable dataTable) {
+    userPerformsBulkApproveActionOnMultipleCreativesAndVerifiesTheSelectedCreativesAreRemovedFromTheCreativeLibraryPage(
+            String bulkActionOption, String noOfCreatives, String statusLabel, DataTable dataTable) {
         logger.info(
                 "Performing bulk approval ({}) on {} creatives to set status: {}",
                 bulkActionOption,
@@ -2940,8 +2941,8 @@ public class LifeSteps {
     @And(
             "Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file {string} is uploaded")
     public void
-            verifyUploadedFilesSectionDisplaysEntriesIncludedInTheFileTimestampDownloadAndDeleteIconsOnceTheFileIsUploaded(
-                    String fileName) throws CsvValidationException, IOException {
+    verifyUploadedFilesSectionDisplaysEntriesIncludedInTheFileTimestampDownloadAndDeleteIconsOnceTheFileIsUploaded(
+            String fileName) throws CsvValidationException, IOException {
         logger.info(
                 "Verify the Uploaded Files section displays the entries count, includes download and delete icons after the file {} is uploaded",
                 fileName);
@@ -3332,7 +3333,8 @@ public class LifeSteps {
     }
 
     @And("Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account")
-    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {}
+    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {
+    }
 
     @When("User selects the {string} creative type")
     public void userSelectsTheCreativeType(String creativeType) {
@@ -3432,7 +3434,7 @@ public class LifeSteps {
     @And(
             "Verify the newly created creative is displayed in the Creative Library page and contains all the details entered during creation")
     public void
-            verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPageAndContainsAllTheDetailsEnteredDuringCreation() {
+    verifyTheNewlyCreatedCreativeIsDisplayedInTheCreativeLibraryPageAndContainsAllTheDetailsEnteredDuringCreation() {
         logger.info("User saves the creative");
 
         for (String name : nameList) {
@@ -3697,7 +3699,7 @@ public class LifeSteps {
     @And(
             "Verify that the Clickthrough URL and Landing Domain fields are validated as mandatory when all other required fields are filled")
     public void
-            verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
+    verifyThatTheClickthroughURLAndLandingDomainFieldsAreValidatedAsMandatoryWhenAllOtherRequiredFieldsIncludingAreFilled() {
         logger.info("Verifying mandatory validation for Clickthrough URL and Landing Domain");
         bulkCreativeUpload.clickPreviewButton();
         bulkCreativeUpload.clickOKButton();
@@ -4368,7 +4370,7 @@ public class LifeSteps {
     @And(
             "User verifies the custom destination fields - Destination Name, Destination Type, Host, Username, Password, Port textfields, Test Access, Create and Cancel buttons")
     public void
-            userVerifiesTheCustomDestinationFieldsDestinationNameDestinationTypeHostUsernamePasswordPortTextfieldsTestAccessCreateAndCancelButtons() {
+    userVerifiesTheCustomDestinationFieldsDestinationNameDestinationTypeHostUsernamePasswordPortTextfieldsTestAccessCreateAndCancelButtons() {
         logger.info("User clicks Edit button from Destination dropdown field");
         Assert.assertTrue("Destination Name field is not available", runReportPanel.isDestinationNameAvailable());
         Assert.assertTrue("Destination Type field is not available", runReportPanel.isDestinationTypeAvailable());
@@ -5900,8 +5902,8 @@ public class LifeSteps {
     @And(
             "Verify that if the account has a Client value set, the Client field is disabled and auto-populated; otherwise, it remains enabled for user selection {string}")
     public void
-            verifyThatIfTheAccountHasAClientValueSetTheClientFieldIsDisabledAndAutoPopulatedOtherwiseItRemainsEnabledForUserSelection(
-                    String clientName) {
+    verifyThatIfTheAccountHasAClientValueSetTheClientFieldIsDisabledAndAutoPopulatedOtherwiseItRemainsEnabledForUserSelection(
+            String clientName) {
         boolean isEnabled = metricName.equalsIgnoreCase("None");
         String actualState = campaigns.verifyClientFieldEnabledOrDisabledBasedOnAccount(clientName);
         if (isEnabled) {
@@ -6286,8 +6288,8 @@ public class LifeSteps {
 
     @And("Verify column selection icon is available and upon clicking it below columns should display")
     public void
-            verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(
-                    DataTable dataTable) {
+    verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(
+            DataTable dataTable) {
         List<String> expectedColumnNames = dataTable.asList(String.class);
         logger.info("Verifying column selection icon and expected available columns: {}", expectedColumnNames);
         createCreatives.clickColumnSelectionIcon();
@@ -7004,7 +7006,7 @@ public class LifeSteps {
     @Then(
             "Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template")
     public void
-            verifyTheImportedDealIsDisplayedInTheDealsTabOnAdminSCuratedMarketPageWithDetailsMatchingTheUploadedTemplate() {
+    verifyTheImportedDealIsDisplayedInTheDealsTabOnAdminSCuratedMarketPageWithDetailsMatchingTheUploadedTemplate() {
         logger.info(
                 "Verify the imported deal is displayed in the Deals Tab on Admin's Curated Market page with details matching the uploaded template");
         Assert.assertTrue(
@@ -7182,7 +7184,7 @@ public class LifeSteps {
     @And(
             "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page")
     public void
-            verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
+    verifyErrorMessageIfUserFailsToAddImpressionCapValueWhenTheCheckboxesAreSelectedAndTriesToSaveTheLineItemPage() {
         logger.info(
                 "Verify error message if user fails to add impression cap value when the checkboxes are selected and tries to save the line item page");
         lineItemDetails.saveLineItem();
@@ -7299,7 +7301,7 @@ public class LifeSteps {
     }
 
     @Given("User configures Bid multiplier rules as below with {string}")
-    public void user_selects_the_Bid_multiplier_rules(String fillValue,DataTable bidRuleTypeAndOptions) {
+    public void user_selects_the_Bid_multiplier_rules(String fillValue, DataTable bidRuleTypeAndOptions) {
         logger.info("Configuring Bid multiplier rules from DataTable");
         Map<String, String> rawMap = bidRuleTypeAndOptions.asMap(String.class, String.class);
         Map<String, List<String>> rulesMap = CommonUtils.processDataTable(rawMap);
@@ -7308,7 +7310,7 @@ public class LifeSteps {
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
             keyType.add(entry.getKey());
             keyValues.addAll(entry.getValue());
-            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(),fillValue);
+            tacticSettings.selectMultipleBidRuleTypes(entry.getKey(), entry.getValue(), fillValue);
         }
         logger.info("Closing Bid Rule Type panel");
         tacticSettings.closeRuleTypePanel();
