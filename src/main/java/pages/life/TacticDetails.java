@@ -5,7 +5,9 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
+
 import java.util.*;
+
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -171,9 +173,8 @@ public class TacticDetails {
     }
 
     public Locator customFieldValue(String customFieldName) {
-        return page.locator("app-life-custom-field-setting > div > div")
-                .filter(new Locator.FilterOptions().setHas(page.locator("text=" + customFieldName)))
-                .locator("input");
+        return page.locator(
+                String.format("//span[@class='cmp-form-label-text' and text()='%s']/parent::label/following-sibling::input", customFieldName));
     }
 
     public List<String> getAllTactics() {
@@ -193,9 +194,8 @@ public class TacticDetails {
     }
 
     public void clearCustomFieldText(String customFieldName) {
-        Locator FIELD_OPTIONS = page.locator("app-life-custom-field-setting > div > div")
-                .filter(new Locator.FilterOptions().setHas(page.locator("text=" + customFieldName)))
-                .locator("input");
+        Locator FIELD_OPTIONS = page.locator(
+                String.format("//span[@class='cmp-form-label-text' and text()='%s']/parent::label/following-sibling::input", customFieldName));
         FIELD_OPTIONS.clear();
         SAVE_TACTIC_DETAILS.click();
     }
@@ -264,8 +264,7 @@ public class TacticDetails {
     }
 
     public String verifyCustomField(String fieldName) {
-        //  Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
-        Locator customField = page.locator(String.format("//label[contains(normalize-space(),'%s')]", fieldName));
+        Locator customField = page.locator(String.format("//span[contains(text(),'%s')]", fieldName));
         return customField.innerText().trim();
     }
 
@@ -281,9 +280,9 @@ public class TacticDetails {
         waitUtility.waitForLocatorVisible(
                 page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
                         .last());
-        Locator FIELD_OPTIONS = page.locator("app-life-custom-field-setting > div > div")
-                .filter(new Locator.FilterOptions().setHas(page.locator("text=" + customFieldName)));
-        FIELD_OPTIONS.locator("label img").first().click();
+        Locator FIELD_OPTIONS = page.locator(
+                String.format("//span[@class='cmp-form-label-text' and text()='%s']/following-sibling::div//img[@class='three-dots']", customFieldName));
+        FIELD_OPTIONS.click();
         DELETE_BUTTON.click();
         CONFIRM_DELETE.click();
         String text = DELETE_SUCCESS.innerText();
@@ -637,11 +636,11 @@ public class TacticDetails {
 
         for (int i = 0; i < rows.size(); i++) {
             Map<String, String> row = rows.get(i);
-            String liType    = row.get("LI_TYPE");
-            String liName    = row.get("LI_NAME");
-            String liBudget  = row.get("LI_BUDGET");
+            String liType = row.get("LI_TYPE");
+            String liName = row.get("LI_NAME");
+            String liBudget = row.get("LI_BUDGET");
             String tacticName = row.get("TACTIC_NAME");
-            String channel   = row.get("CHANNEL");
+            String channel = row.get("CHANNEL");
 
             if (!liName.equals(currentLiName)) {
                 if (currentLiName != null) {
@@ -664,7 +663,7 @@ public class TacticDetails {
 
             Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
             for (int j = 1; row.containsKey("RULE_" + j); j++) {
-                String rule   = row.get("RULE_"   + j);
+                String rule = row.get("RULE_" + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
                     List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
