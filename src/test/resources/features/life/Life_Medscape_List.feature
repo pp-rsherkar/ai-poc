@@ -6,7 +6,7 @@ Feature: LIFE regression - Create NPI List of following types:
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
 
-  @todo @e2e
+  @regression
   Scenario Outline: Create and delete Medscape List by uploading file "<FILE_NAME>"
     And User navigates to NPI Lists page
     When User clicks on Create New List
