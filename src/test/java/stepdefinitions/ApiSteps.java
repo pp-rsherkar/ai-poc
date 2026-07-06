@@ -248,6 +248,7 @@ public class ApiSteps {
         response = apiActions.postFormURLEncodedRequest(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_OAUTH_TOKEN, headers, formData);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("Bearer Token API Response Time: " + responseTime + " ms");
         scenario.attach(("Bearer Token API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -276,6 +277,7 @@ public class ApiSteps {
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("MCP Server Initialization API Response Time: " + responseTime + " ms");
         scenario.attach(("MCP Server Initialization API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -302,6 +304,7 @@ public class ApiSteps {
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("MCP Prompt List API Response Time: " + responseTime + " ms");
         scenario.attach(("MCP Prompt List API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -330,6 +333,7 @@ public class ApiSteps {
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("MCP Prompt Details API Response Time: " + responseTime + " ms");
         scenario.attach(("MCP Prompt Details API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -359,6 +363,7 @@ public class ApiSteps {
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("Looker Explore Metadata API Response Time: " + responseTime + " ms");
         scenario.attach(("Looker Explore Metadata API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -414,6 +419,7 @@ public class ApiSteps {
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("Create Query API Response Time: " + responseTime + " ms");
         scenario.attach(("Create Query API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -447,6 +453,7 @@ public class ApiSteps {
         response = apiActions.postRequestWithBody(
                 ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
+        scenario.log("Execute Query API Response Time: " + responseTime + " ms");
         scenario.attach(("Execute Query API Response Time: " + responseTime + " ms").getBytes(),
                 "text/plain",
                 "API Response Time");
@@ -473,8 +480,7 @@ public class ApiSteps {
                     JsonNode valueNode = row.path(fieldName);
                     Assert.assertFalse("Missing expected field: " + fieldName, valueNode.isMissingNode());
                     String fetchedValue = valueNode.asText();
-                    logger.info("  -> {} : {}", fieldName, fetchedValue);
-                    //scenario.log("  -> " + fieldName + " : " + fetchedValue);
+                    scenario.log("  -> " + fieldName + " : " + fetchedValue);
                 }
                 logger.info("-----------------------------------");
             }
