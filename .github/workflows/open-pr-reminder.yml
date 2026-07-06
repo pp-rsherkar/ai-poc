@@ -6,9 +6,8 @@ on:
   # Lets you trigger a run by hand from the Actions tab.
   workflow_dispatch:
   
-  pull_request:
-    branches:
-      - main
+  schedule:
+    - cron: '30 3 * * *'
 
 # Allow the default GITHUB_TOKEN to comment on PRs.
 permissions:
