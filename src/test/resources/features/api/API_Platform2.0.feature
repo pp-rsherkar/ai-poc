@@ -1,12 +1,8 @@
 Feature: Fetch data using MCP Tools by retrieving metadata, creating query and executing query using dimensions and metrics
   1. STG Token
   2. MCP Initialize
-  3. MCP Tools List
-  4. MCP Prompts List
-  5. MCP Prompt Get
-  6. MCP Tool Call - Looker Get Explore Metadata
-  7. MCP Tool Call - Create Query
-  8. MCP Tool Call - Execute Query
+  3. MCP Tool Call - Create Query
+  4. MCP Tool Call - Execute Query
 
   @regression
   Scenario Outline: Validate AI-generated business analytics across diverse prompt inputs - "<USER_PROMPT>"
