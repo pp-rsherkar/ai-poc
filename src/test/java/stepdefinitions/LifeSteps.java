@@ -92,6 +92,7 @@ public class LifeSteps {
     Setup setup = new Setup(DriverFactory.getPage());
     CuratedMarket curatedMarket = new CuratedMarket(DriverFactory.getPage());
     Constants constants = new Constants();
+    NPIMedscapeList npiMedscapeList = new NPIMedscapeList(DriverFactory.getPage());
     int itemCount = 0;
     int totalListCount = 0;
     int flightStartDate = 0;
@@ -627,13 +628,6 @@ public class LifeSteps {
     @Given("User navigates to NPI Lists page")
     public void user_navigates_to_npi_lists_page() {
         logger.info("Navigating to NPI Lists page");
-        navigation.clickSubMenu();
-        npiLists.clickNPILists();
-    }
-
-    @And("User navigates to NPI Lists page in LIFE")
-    public void userNavigatesToNPIListsPageInLIFE() {
-        logger.info("Navigating to NPI Lists page in LIFE");
         navigation.clickSubMenu();
         npiLists.clickNPILists();
     }
@@ -2038,9 +2032,13 @@ public class LifeSteps {
         npiNameEdited = "Edited" + '_' + npiName;
         logger.info("Updating list name to: {}", npiNameEdited);
         npiAttributesList.editListName(npiNameEdited);
+    }
+
+    @And("User saves the list after making updates")
+    public void userSavesTheListAfterMakingUpdates() {
         npiAttributesList.saveList();
         String updateMessage = npiAttributesList.updateListSuccess();
-        Assert.assertTrue("NPI List failed to update", updateMessage.contains("NPI list updated"));
+        Assert.assertTrue("Failed to update list name", updateMessage.contains("NPI list updated") || updateMessage.contains("Medscape List updated"));
     }
 
     @Then("Verify the updates are applied successfully")
@@ -2051,9 +2049,9 @@ public class LifeSteps {
         npiLists.openSearchedList(npiNameEdited);
     }
 
-    @When("User deletes the Attribute list")
-    public void userDeletesTheAttributeList() {
-        logger.info("Deleting the Attribute list: {}", npiNameEdited);
+    @When("User deletes the {string} list")
+    public void userDeletesTheAttributeList(String listType) {
+        logger.info("Deleting the {} type list: {}", listType, npiNameEdited);
         npiAttributesList.deleteList();
     }
 
@@ -2061,13 +2059,9 @@ public class LifeSteps {
     public void verifyTheListIsDeletedSuccessfully() {
         String deleteMessage = npiAttributesList.deleteSuccess();
         logger.info("Delete message: '{}'", deleteMessage);
-        assert deleteMessage.contains("NPI List Deleted");
+        Assert.assertTrue("No Deletion message is shown", deleteMessage.contains("NPI List Deleted"));
     }
 
-    /* Roshani Sherkar
-     * 18-07-2025
-     * Targeting Template Creation from Tactic
-     * */
     @And(
             "Create a tactic with below targeting rules and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
     public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(
@@ -7473,5 +7467,59 @@ public class LifeSteps {
         logger.info("Searching for Campaign: {}", campaignNameRandom);
         campaignDashboard.searchCreatedCampaign(campaignNameRandom);
         Assert.assertEquals(campaignNameRandom, campaignDashboard.verifyCreatedCampaign(campaignNameRandom));
+    }
+
+    @And("User selects Medscape List")
+    public void userSelectsMedscapeList() {
+        logger.info("Selecting Medscape List");
+        npiLists.clickMedscapeList();
+    }
+
+    @And("Verify Advertiser is auto selected as {string}")
+    public void verifyAdvertiserIsAutoSelectedAs(String advertiserName) {
+        logger.info("Verifying Advertiser is auto selected as: {}", advertiserName);
+        String actualAdvertiser = npiMedscapeList.fetchDefaultAdvertiser();
+        Assert.assertEquals("Advertiser is not auto selected correctly", advertiserName, actualAdvertiser);
+    }
+
+    @And("User enters the Medscape NPI list name as {string} and saves the list")
+    public void userEntersTheMedscapeNPIListNameAs(String listName) {
+        npiName = listName + "_" + CommonUtils.timeStampCalculation();
+        logger.info("Entering Medscape NPI list name: {}", npiName);
+        npiMedscapeList.enterListName(npiName);
+        npiMedscapeList.clickNextButton();
+    }
+
+    @And("Verify Upload File section is displayed on the Medscape List details page")
+    public void verifyUploadFileSectionIsDisplayedOnTheMedscapeListDetailsPage() {
+        logger.info("Verifying Upload File section is displayed on the Medscape List details page");
+        Assert.assertTrue("Upload File section is not displayed", npiMedscapeList.isUploadFileSectionDisplayed());
+    }
+
+    @And("User maps row headers from the uploaded spreadsheet to predefined labels as below")
+    public void userMapsRequiredFieldsAs(DataTable dataTable) {
+        logger.info("Mapping row headers from the uploaded spreadsheet to predefined labels");
+        List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
+        for (Map<String, String> mapping : data) {
+            String labelName = mapping.get("LABEL");
+            String columnValue = mapping.get("COLUMN_VALUE");
+            npiMedscapeList.mapRowHeadersToLabels(labelName, columnValue);
+        }
+    }
+
+    @And("User saves the Medscape List and verify that the list is uploaded successfully with message {string} and {string}")
+    public void userSavesTheMedscapeListNavigatesToLoadingPageWithContent(String messageContent, String waitText) {
+        logger.info("Saving the Medscape List and navigating to loading page with content: {}", messageContent);
+        npiMedscapeList.clickSaveButton();
+        String softMatchMessage = npiMedscapeList.getSoftMatchProgressText();
+        String waitTextContent = npiMedscapeList.getWaitText();
+        Assert.assertEquals("Soft match progress message is not displayed correctly", messageContent, softMatchMessage);
+        Assert.assertEquals("Soft match progress message is not displayed correctly", waitText, waitTextContent);
+    }
+
+    @And("Verify file details are displayed correctly in the list details page")
+    public void verifyFileDetailsAreDisplayedInListDetailsPage() {
+        logger.info("Verifying file details are displayed correctly in the list details page");
+        Assert.assertTrue("File details are not displayed", npiMedscapeList.isMedscapeListContainerDisplayed());
     }
 }
