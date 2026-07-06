@@ -1,13 +1,12 @@
 name: Stale PR Reminder
 
 on:
-  # Smallest interval GitHub allows is 5 minutes (runs are best-effort and may
-  # be delayed under load). Good enough for the 10m/5m testing windows.
   # Lets you trigger a run by hand from the Actions tab.
   workflow_dispatch:
   
-  schedule:
-    - cron: '30 3 * * *'
+  pull_request:
+    branches:
+      - main
 
 # Allow the default GITHUB_TOKEN to comment on PRs.
 permissions:
@@ -39,9 +38,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          # Testing windows. For production use e.g. 4320 (3 days) / 1440 (1 day).
-          STALE_MINUTES: "7200"
-          SPAM_PREVENTION_MINUTES: "2880"
           REQUIRED_APPROVALS: "2"
           MERGER: "pp-sdeodhar"
         run: python stale_pr_reminder.py

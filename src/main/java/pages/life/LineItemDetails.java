@@ -71,6 +71,12 @@ public class LineItemDetails {
     private final Locator PLACEMENT_ID;
     private final Locator MANAGEMENT_FEE_LABEL_VALUE;
     private final Locator MANAGEMENT_FEE_OVERRIDE;
+    private final Locator IMPRESSION_ERROR_MESSAGE;
+    private final Locator ADD_CUSTOM_FIELD;
+    private final Locator ADD_CUSTOM_FIELD_INPUT;
+    private final Locator SAVE_CUSTOM_FIELD_BUTTON;
+    private final Locator FIELD_CREATE_SUCCESS;
+    private final Locator FETCH_LINE_ITEM_NAME;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
     Calendar calendar = Calendar.getInstance();
     LocalDateTime currentDateTime = LocalDateTime.now();
@@ -103,7 +109,7 @@ public class LineItemDetails {
         this.LINE_ITEM_STATUS = page.locator("//span[contains(@class,'status-label')]/span");
         this.TOOL_TIP = page.locator("//div[contains(@class,'ng-tooltip-show')]");
         this.ERROR_ALERT = page.locator(
-                "//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.')]");
+                "//div[contains(@aria-label, 'The total flight budget could not exceed') or contains(@aria-label, 'LineItem Flight is required.') or contains(@aria-label, 'LineItem flights overlap.') or contains(@aria-label, 'Invalid budget')]");
         this.UNACCOUNTED_BUDGET = page.locator("//span[contains(text(), 'Use Unaccounted Budget')]");
         this.FLIGHT_CONTAINER = page.locator("//div[contains(@class,'flight-container')]");
         this.FLIGHT_START_DATE = page.locator("//input[contains(@class,'gaFlightStartDate')]");
@@ -157,6 +163,13 @@ public class LineItemDetails {
         this.MANAGEMENT_FEE_LABEL_VALUE = page.locator("//span[contains(@class, 'fee-value')]");
         this.MANAGEMENT_FEE_OVERRIDE = page.locator(
                 "//div[contains(@class,'management-fee')]//span/following-sibling::span//label[contains(text(),'Override')]");
+        this.IMPRESSION_ERROR_MESSAGE = page.locator("//p[contains(text(),'Invalid Impression Cap')]");
+        this.ADD_CUSTOM_FIELD = page.locator("//span[contains(text(),'Add Custom Field')]");
+        this.ADD_CUSTOM_FIELD_INPUT = page.locator("//input[@placeholder='Field Name']");
+        this.SAVE_CUSTOM_FIELD_BUTTON = page.locator("//button[normalize-space()='Save']");
+        this.FIELD_CREATE_SUCCESS =
+                page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
+        this.FETCH_LINE_ITEM_NAME = page.locator("//div[contains(@class,'item-detials')]/div[@class='main-details']");
     }
 
     public String verifyLineItemText() {
@@ -178,6 +191,7 @@ public class LineItemDetails {
 
     public void saveLineItem() {
         SAVE_LINE_ITEM.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public String lineItemSuccess() {
@@ -345,7 +359,10 @@ public class LineItemDetails {
     public void navigateToLineItemDetails(String lineItemName) {
         page.locator(String.format("//div[@class='main-details' and text()='%s']", lineItemName))
                 .click();
-        waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+        page.locator("//div[contains(@class, 'data-rangeSlider-container')]")
+                .or(ADD_FLIGHT_BUTTON)
+                .first()
+                .waitFor();
     }
 
     public void clickDetailsTab() {
@@ -362,13 +379,8 @@ public class LineItemDetails {
         DELETE_FLIGHT.first().click();
     }
 
-    public List<String> generateSequentialFlights(String budget, String numberOfMonths) {
-        List<String> sequentialFlights = new ArrayList<>();
-        int initialFlightCount = FLIGHT_CONTAINER.count();
+    public void generateSequentialFlights(String budget, String numberOfMonths) {
         GENERATE_SEQUENTIAL_FLIGHT.click();
-        String startMonthValue =
-                SEQUENTIAL_START_MONTH.evaluate("el => el.value").toString();
-        sequentialFlights.add(startMonthValue);
         NUMBER_OF_MONTHS.click();
         page.locator(String.format(
                         "//label[text()='Number of Months']/following-sibling::div//sui-select//div[@class='menu transition visible']/sui-select-option[@title='%s']",
@@ -376,14 +388,32 @@ public class LineItemDetails {
                 .click();
         enterLineItemBudget(budget);
         GENERATE_FLIGHTS.click();
+    }
+
+    public List<String> fetchSequentialFlightStartDates() {
+        List<String> sequentialFlights = new ArrayList<>();
         int totalFlightCount = FLIGHT_CONTAINER.count();
-        for (int i = initialFlightCount + 1; i <= totalFlightCount; i++) {
+        for (int i = 1; i <= totalFlightCount; i++) {
             String flightStartDate = page.locator(String.format(
                             "//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightStartDate')]",
                             i))
                     .evaluate("el => el.value")
                     .toString();
             sequentialFlights.add(flightStartDate);
+        }
+        return sequentialFlights;
+    }
+
+    public List<String> fetchSequentialFlightEndDates() {
+        List<String> sequentialFlights = new ArrayList<>();
+        int totalFlightCount = FLIGHT_CONTAINER.count();
+        for (int i = 1; i <= totalFlightCount; i++) {
+            String flightEndDate = page.locator(String.format(
+                            "//div[@class='flight-number' and contains(text(),'%d')]/following-sibling::div//input[contains(@class,'gaFlightEndDate')]",
+                            i))
+                    .evaluate("el => el.value")
+                    .toString();
+            sequentialFlights.add(flightEndDate);
         }
         return sequentialFlights;
     }
@@ -465,7 +495,8 @@ public class LineItemDetails {
     }
 
     public List<String> fetchLineItemName() {
-        return MAIN_DETAILS_LABEL.allInnerTexts();
+        waitUtility.waitForLocatorVisible(FETCH_LINE_ITEM_NAME.last());
+        return FETCH_LINE_ITEM_NAME.allTextContents();
     }
 
     public void exitBulkEditMode() {
@@ -488,7 +519,7 @@ public class LineItemDetails {
         originalLineItemDetails.add(COST_MODEL
                 .locator("xpath=./descendant::div[contains(@class, 'text')]")
                 .textContent());
-        if (FLAT_CPM.isVisible()) originalLineItemDetails.add(FLAT_CPM.innerText());
+        if (FLAT_CPM.isVisible()) originalLineItemDetails.add(FLAT_CPM.inputValue());
         Locator budgetXpath = BUDGET_DISTRIBUTION.locator("xpath=//button");
         for (int i = 0; i < budgetXpath.count(); i++) {
             if (budgetXpath.nth(i).getAttribute("class").contains("active")) {
@@ -499,11 +530,12 @@ public class LineItemDetails {
         }
         originalLineItemDetails.add(FLIGHT_START_DATE.inputValue());
         originalLineItemDetails.add(FLIGHT_END_DATE.inputValue());
+        if (LINE_ITEM_BUDGET.isVisible()) originalLineItemDetails.add(LINE_ITEM_BUDGET.inputValue());
         originalLineItemDetails.add(PACING_MODE
                 .locator("xpath=./descendant::div[contains(@class, 'text')]/span[2]")
                 .textContent()
                 .trim());
-        if (PACING_MODE_INPUT.isVisible()) originalLineItemDetails.add(PACING_MODE_INPUT.innerText());
+        if (PACING_MODE_INPUT.isVisible()) originalLineItemDetails.add(PACING_MODE_INPUT.inputValue());
         return originalLineItemDetails;
     }
 
@@ -516,8 +548,6 @@ public class LineItemDetails {
         enterLineItemBudget(attributeMap.get("LineBudget"));
         selectPacingMode(attributeMap.get("PacingMode"), attributeMap.get("PacingPercentage"));
         enableLineItem();
-        saveLineItem();
-        waitUtility.waitUntilSpinnerHidden();
     }
 
     public void selectCostModel(String costModel, String cpm) {
@@ -555,5 +585,52 @@ public class LineItemDetails {
         String xpath = String.format("//div[text()='%s']", name);
         page.locator(xpath).click();
         waitUtility.waitForElementVisible("//div[contains(@class, 'data-rangeSlider-container')]");
+    }
+
+    public boolean isImpressionCapCheckboxAvailable(String impressionCap) {
+        Locator impressionCapLocator = page.locator(String.format("//label[contains(text(),'%s')]", impressionCap));
+        return impressionCapLocator.count() > 0;
+    }
+
+    public void clickImpressionCapCheckbox(String impressionCap) {
+        Locator impressionCapLocator = page.locator(String.format("//label[contains(text(),'%s')]", impressionCap));
+        for (int i = 0; i < impressionCapLocator.count(); i++) {
+            if (impressionCapLocator.nth(i).isVisible()) {
+                impressionCapLocator.nth(i).click();
+                break;
+            }
+        }
+    }
+
+    public boolean isImpressionCapCheckboxChecked(String impressionCap) {
+        Locator impressionCapLocator =
+                page.locator(String.format("//label[contains(text(),'%s')]/parent::sui-checkbox", impressionCap));
+        for (int i = 0; i < impressionCapLocator.count(); i++) {
+            if (impressionCapLocator.nth(i).isVisible()) {
+                return impressionCapLocator.nth(i).getAttribute("class").contains("checked");
+            }
+        }
+        return false;
+    }
+
+    public boolean isImpressionCapErrorMessageVisible() {
+        return IMPRESSION_ERROR_MESSAGE.count() > 0;
+    }
+
+    public void addCustomField(String customFieldName) {
+        ADD_CUSTOM_FIELD.click();
+        ADD_CUSTOM_FIELD_INPUT.fill(customFieldName);
+        SAVE_CUSTOM_FIELD_BUTTON.click();
+        waitUtility.waitForLocatorVisible(FIELD_CREATE_SUCCESS);
+    }
+
+    public boolean isCustomFieldAvailable(String fieldName) {
+        waitUtility.waitUntilPreLoaderHidden();
+        waitUtility.waitForLocatorVisible(
+                page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
+                        .last());
+        return page.locator(
+                        String.format("//label[contains(@class,'form-label') and contains(text(),'%s')]", fieldName))
+                .isVisible();
     }
 }

@@ -68,8 +68,9 @@ Feature: LIFE regression - Create NPI List of following types:
     Then Verify the Attributes list is saved successfully
     And Verify the NPI Numbers from the uploaded file "<FILE_NAME>" are displayed correctly in the list details page
     When User edits the saved list
+    And User saves the list after making updates
     Then Verify the updates are applied successfully
-    When User deletes the Attribute list
+    When User deletes the "Attribute" list
     Then Verify the list is deleted successfully
     Examples:
       | LIST_NAME | ADVERTISER     | FILE_NAME                 | COLUMN_NAME |

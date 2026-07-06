@@ -1,6 +1,7 @@
 package factory;
 
 import com.microsoft.playwright.*;
+import java.nio.file.Paths;
 import java.util.List;
 import utils.ConfigReader;
 
@@ -58,7 +59,14 @@ public class DriverFactory {
         }
         if (null == browserType) throw new IllegalArgumentException("Could not Launch Browser for type" + browserName);
         threadLocalBrowser.set(browser);
-        BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
+        boolean videoEnabled = Boolean.parseBoolean(ConfigReader.getProperty("recordVideo"));
+        int width = Integer.parseInt(ConfigReader.getProperty("videoWidth"));
+        int height = Integer.parseInt(ConfigReader.getProperty("videoHeight"));
+        Browser.NewContextOptions contextOptions = new Browser.NewContextOptions().setViewportSize(null);
+        if (videoEnabled) {
+            contextOptions.setRecordVideoDir(Paths.get("target/videos")).setRecordVideoSize(width, height);
+        }
+        BrowserContext context = browser.newContext(contextOptions);
         // Below line is used to start the trace file
         context.tracing()
                 .start(new Tracing.StartOptions()

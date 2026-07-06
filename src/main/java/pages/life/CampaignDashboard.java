@@ -70,6 +70,7 @@ public class CampaignDashboard {
     private final Locator FLIGHT_START_END_DATE;
     private final Locator INACTIVE_FLIGHT_LIST;
     private final Locator NO_CAMPAIGN_AVAILABLE_TEXT;
+    private final Locator CAMPAIGN_FROM_DASHBOARD;
     WaitUtility waitUtility;
     String lineItemClassBeforeClick, lineItemClassAfterClick, tacticClassBeforeClick, tacticClassAfterClick;
 
@@ -148,6 +149,7 @@ public class CampaignDashboard {
                 page.locator("//div[contains(@class, 'active-flight-col') and (contains(text(), 'inactive flight'))]");
         this.NO_CAMPAIGN_AVAILABLE_TEXT =
                 page.locator("//p[contains(text(), 'No campaigns matching filtering criteria found')]");
+        this.CAMPAIGN_FROM_DASHBOARD = page.locator("//span[contains(@class,'adv-camp-name')]//span");
     }
 
     public String isCampaignDashboardVisibleWithTitle(String text) {
@@ -601,5 +603,11 @@ public class CampaignDashboard {
 
     public boolean isCampaignDataAvailableInCustomDateRange() {
         return NO_CAMPAIGN_AVAILABLE_TEXT.isVisible();
+    }
+
+    public void clickCampaignFromDashboard() {
+        waitUtility.waitForLocatorVisible(CAMPAIGN_ENTRIES.last());
+        CAMPAIGN_FROM_DASHBOARD.first().click();
+        waitUtility.waitForLocatorVisible(CAMPAIGN_PAGE_TITLE);
     }
 }

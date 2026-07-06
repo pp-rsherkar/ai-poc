@@ -1,5 +1,7 @@
 package pages.studio;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -162,6 +164,8 @@ public class ExplorerWorkspace {
     public void selectAdvertiser(String advertiser) {
         waitUtility.waitForLocatorVisible(ADVERTISER_LIST);
         SEARCH_ADVERTISER.fill(advertiser);
+        assertThat(ADVERTISER_BUTTON).hasCount(1);
+
         for (int i = 0; i < ADVERTISER_BUTTON.count(); i++) {
             if (ADVERTISER_BUTTON.nth(i).getAttribute("data-tour-id").contains(advertiser)) {
                 ADVERTISER_BUTTON.nth(i).click();
@@ -234,7 +238,7 @@ public class ExplorerWorkspace {
                     else locator.first().click();
                 }
                 break;
-            case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender":
+            case "NPI Gender", "NPI Age", "Years Practiced", "Number of Patients", "Patient Age", "Patient Gender", "Gender":
                 for (String option : options) {
                     WORKSPACE_FRAME
                             .locator(String.format("//label[contains(text(),'%s')]", option.trim()))
@@ -471,5 +475,10 @@ public class ExplorerWorkspace {
         Locator recencyLocator = WORKSPACE_FRAME.locator(String.format(
                 "//p[normalize-space()='%s Recency']/parent::div//following-sibling::div//p", filterType));
         return recencyLocator.textContent().trim();
+    }
+
+    public void selectDraftOption(String DraftOption) {
+        Locator DRAFT_OPTION = WORKSPACE_FRAME.locator(String.format("//button/div[text()='%s']", DraftOption));
+        DRAFT_OPTION.click();
     }
 }
