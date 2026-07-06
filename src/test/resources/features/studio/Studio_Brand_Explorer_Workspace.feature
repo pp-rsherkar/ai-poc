@@ -60,3 +60,55 @@ Feature: Brand Explorer Workspace creation in Studio
       | ADVERTISER         | TIMEFRAME    | DAYS |
       | TAMTESTING ACCOUNT | Last 14 Days | 14   |
       | TAMTESTING ACCOUNT | Last 30 Days | 30   |
+      | TAMTESTING ACCOUNT | Yesterday    | 1    |
+
+  @regression
+  Scenario Outline: Verify Custom date range picker and inclusive start and end dates in the returned dataset
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    When User clicks the TimeFrame selector
+    And User selects the timeframe preset "Custom"
+    Then Verify a date picker with separate start and end date fields is displayed
+    And Verify both start and end date fields are configurable
+    When User sets a custom date range with start date "<START_DATE>" and end date "<END_DATE>"
+    Then Verify "<START_DATE>" is the first date row in the table
+    And Verify "<END_DATE>" is the last date row in the table
+    Examples:
+      | ADVERTISER         | START_DATE | END_DATE   |
+      | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-07 |
+      | TAMTESTING ACCOUNT | 2026-03-01 | 2026-05-07 |
+      | TAMTESTING ACCOUNT | 2026-05-01 | 2026-05-01 |
+
+  @regression
+  Scenario Outline: Verify an error is shown when the custom start date is later than the end date
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    When User clicks the TimeFrame selector
+    And User selects the timeframe preset "Custom"
+    When User enters a start date "<START_DATE>" that is later than the end date "<END_DATE>"
+    Then Verify an error message is displayed indicating the start date cannot be later than the end date
+    Examples:
+      | ADVERTISER         | START_DATE | END_DATE   |
+      | TAMTESTING ACCOUNT | 2026-05-07 | 2026-05-01 |
+
+  @regression
+  Scenario Outline: Verify a saved non-default timeframe persists when the workspace is closed and reopened
+    When User clicks on Create New Workspace
+    Then User sees the types of workspaces they have permissions for
+    And User clicks on "Brand Explorer" workspace
+    And User selects the advertiser "<ADVERTISER>"
+    And User edits the workspace name as "<WORKSPACE_NAME>"
+    When User clicks the TimeFrame selector
+    And User selects the timeframe preset "<TIMEFRAME>"
+    And User saves the "Brand Explorer" workspace
+    Then Verify the "Brand Explorer" Workspace is saved
+    When User navigates back to the workspace list and reopens the saved Brand Explorer workspace
+    Then Verify the Time Frame still shows "<TIMEFRAME>" after reopening the workspace
+    And Verify the Day column shows <DAYS> dates in ascending order
+    Examples:
+      | ADVERTISER         | WORKSPACE_NAME     | TIMEFRAME    | DAYS |
+      | TAMTESTING ACCOUNT | Automation_Persist | Last 30 Days | 30   |

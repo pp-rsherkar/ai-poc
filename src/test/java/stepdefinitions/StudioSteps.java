@@ -2,7 +2,6 @@ package stepdefinitions;
 
 import factory.DriverFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -42,6 +41,7 @@ public class StudioSteps {
     ExplorerWorkspace explorerWorkspace = new ExplorerWorkspace(DriverFactory.getPage());
     Workspace workspace = new Workspace(DriverFactory.getPage());
     BrandExplorerWorkspace brandExplorerWorkspace = new BrandExplorerWorkspace(DriverFactory.getPage());
+    DTCExplorerWorkspace dtcExplorerWorkspace = new DTCExplorerWorkspace(DriverFactory.getPage());
     List<String> appliedFilterEntries = new ArrayList<>();
     List<String> appliedFilterValues = new ArrayList<>();
     List<String> previousNpiDetails = null;
@@ -49,6 +49,7 @@ public class StudioSteps {
     List<String> fetchedMetricNames = new ArrayList<>();
     String npiCount;
     Path targetFilePath;
+    long uniqueConsumersCount;
 
     @When("the user clicks on Create New Workspace")
     public void the_user_clicks_on_create_new_workspace() {
@@ -214,6 +215,7 @@ public class StudioSteps {
                     switch (workspaceType) {
                         case "HCP Explorer" -> workspaceCreation.verifyHCPExplorer();
                         case "Brand Explorer" -> workspaceCreation.verifyBrandExplorer();
+                        case "DTC Explorer" -> workspaceCreation.verifyDTCExplorer();
                         default -> throw new IllegalArgumentException(
                                 "Unsupported workspace verification: " + workspaceType);
                     };
@@ -225,6 +227,7 @@ public class StudioSteps {
         switch (workspaceType) {
             case "HCP Explorer" -> workspaceCreation.clickHCPExplorerWorkspace();
             case "Brand Explorer" -> workspaceCreation.clickBrandExplorerWorkspace();
+            case "DTC Explorer" -> workspaceCreation.clickDTCExplorerWorkspace();
             default -> throw new IllegalArgumentException("Unsupported workspace click: " + workspaceType);
         }
     }
@@ -329,6 +332,9 @@ public class StudioSteps {
             case "Brand Explorer":
                 brandExplorerWorkspace.saveBrandExplorerWorkspace();
                 break;
+            case "DTC Explorer":
+                dtcExplorerWorkspace.saveDTCExplorerWorkspace();
+                break;
         }
     }
 
@@ -342,6 +348,7 @@ public class StudioSteps {
                 "Sent for asynchronous processing, forced by upstream dependencies - need to refresh upstream workspaces first");
         Assert.assertTrue("Unexpected message for " + workspaceType + " workspace: " + actualMessage, isValid);
         workspace.waitTillWorkspaceAlertHide();
+        workspace.waitTillWorkspaceSaveButtonIsDisabled();
     }
 
     @And("User clicks Edit button and updates workspace name to {string}")
@@ -1207,6 +1214,26 @@ public class StudioSteps {
         brandExplorerWorkspace.clickTimeFrameSelector();
     }
 
+    @When("User navigates back to the workspace list and reopens the saved Brand Explorer workspace")
+    public void userReopensTheSavedBrandExplorerWorkspace() {
+        logger.info("Reopening saved Brand Explorer workspace: {}", workspaceName);
+        workspace.goToWorkspaceList();
+        workspaceCreation.verifyStudioWorkspaceFrame();
+        // A freshly saved Brand Explorer workspace is not yet returned by the name search, so filter by
+        // the Brand Explorer type and open it by name. Uses filterByWorkspaceTypeAndOpen() to avoid
+        // waiting on PAGINATION which may not render when results fit on a single page.
+        workspaceCreation.filterByWorkspaceTypeAndOpen("Brand Explorer", workspaceName);
+        brandExplorerWorkspace.waitForDashboardLoad();
+    }
+
+    @Then("Verify the Time Frame still shows {string} after reopening the workspace")
+    public void verifyTimeFramePersistsAfterReopen(String timeFrame) {
+        logger.info("Verifying Time Frame persists as {} after reopening the workspace", timeFrame);
+        String actualTimeFrame = brandExplorerWorkspace.getDefaultTimeFrame();
+        logger.info("Time Frame after reopen: {}", actualTimeFrame);
+        Assert.assertEquals("Time Frame did not persist after reopening the workspace", timeFrame, actualTimeFrame);
+    }
+
     @Then("All 9 preset timeframe options are visible in the dropdown with correct labels")
     public void allPresetOptionsAreVisibleInDropdownWithCorrectLabels(DataTable dataTable) {
         List<String> expected = dataTable.asList(String.class);
@@ -1221,6 +1248,7 @@ public class StudioSteps {
     public void userSelectsTimeframePreset(String timeFrame) {
         logger.info("Selecting timeframe preset: {}", timeFrame);
         brandExplorerWorkspace.selectTimeFramePreset(timeFrame);
+
     }
 
     @Then("Verify the chart and table update immediately to reflect {string} data")
@@ -1231,6 +1259,59 @@ public class StudioSteps {
         Assert.assertTrue(
                 "Chart and table did not update for selected timeframe: " + timeFrame,
                 actual.equalsIgnoreCase(timeFrame));
+    }
+
+    @Then("Verify a date picker with separate start and end date fields is displayed")
+    public void verifyDatePickerWithStartAndEndFieldsIsDisplayed() {
+        logger.info("Verifying custom date picker with start and end date fields is displayed");
+        Assert.assertTrue(
+                "Date picker with start and end date fields is not displayed",
+                brandExplorerWorkspace.isDateRangePickerDisplayed());
+    }
+
+    @And("Verify both start and end date fields are configurable")
+    public void verifyBothDateFieldsAreConfigurable() {
+        logger.info("Verifying both start and end date fields are configurable");
+        Assert.assertTrue(
+                "Start and/or end date fields are not configurable",
+                brandExplorerWorkspace.areDateFieldsConfigurable());
+    }
+
+    @When("User sets a custom date range with start date {string} and end date {string}")
+    public void userSetsCustomDateRange(String startDate, String endDate) {
+        logger.info("Setting custom date range: {} to {}", startDate, endDate);
+        brandExplorerWorkspace.setCustomDateRange(startDate, endDate);
+        brandExplorerWorkspace.waitForStartDateInTable(startDate);
+    }
+
+    @When("User enters a start date {string} that is later than the end date {string}")
+    public void userEntersStartDateLaterThanEndDate(String startDate, String endDate) {
+        logger.info("Entering start date {} later than end date {}", startDate, endDate);
+        brandExplorerWorkspace.setCustomDateRange(startDate, endDate);
+    }
+
+    @Then("Verify an error message is displayed indicating the start date cannot be later than the end date")
+    public void verifyDateRangeErrorIsDisplayed() {
+        logger.info("Verifying error message is displayed for start date later than end date");
+        Assert.assertTrue(
+                "Error message for start date later than end date is not displayed",
+                brandExplorerWorkspace.isDateRangeErrorDisplayed());
+    }
+
+    @Then("Verify {string} is the first date row in the table")
+    public void verifyStartDateIsFirstRowInTable(String startDate) {
+        logger.info("Verifying start date {} is the first row in the table", startDate);
+        Assert.assertTrue(
+                "Start date " + startDate + " is not the first row in the table",
+                brandExplorerWorkspace.isStartDateFirstInTable(startDate));
+    }
+
+    @And("Verify {string} is the last date row in the table")
+    public void verifyEndDateIsLastRowInTable(String endDate) {
+        logger.info("Verifying end date {} is the last row in the table", endDate);
+        Assert.assertTrue(
+                "End date " + endDate + " is not the last row in the table",
+                brandExplorerWorkspace.isEndDateLastInTable(endDate));
     }
 
     @And("Verify the Day column shows {int} dates in ascending order")
@@ -1250,4 +1331,39 @@ public class StudioSteps {
         Assert.assertEquals("Last date in table does not match yesterday", expectedEnd, dates.get(dates.size() - 1));
         Assert.assertEquals("First date in table does not match expected start", expectedStart, dates.get(0));
     }
+
+    @Then("User captures the {string} count")
+    public void userCapturesTheCount(String countType) {
+        String countText = dtcExplorerWorkspace.getUniqueConsumerCount().replaceAll("[^0-9]", "");
+        uniqueConsumersCount = Long.parseLong(countText);
+    }
+
+    @Then("Verify whether the {string} count is greater than or equals to {int}")
+    public void verifyWhetherTheCountIsGreaterThanOrEqualsTo(String countType, int expectedValue) {
+        logger.info("Verifying {} count ({}) is >= {}", countType, uniqueConsumersCount, expectedValue);
+        Assert.assertTrue(
+                countType + " count (" + uniqueConsumersCount + ") is less than " + expectedValue,
+                uniqueConsumersCount >= expectedValue
+        );
+    }
+
+    @And("User clicks on Submit button")
+    public void userClicksOnSubmitButton() {
+        dtcExplorerWorkspace.clickSubmitButton();
+    }
+
+    @And("User verifies if workspace is saved successfully and the submission is successful")
+    public void userVerifiesIfWorkspaceIsSavedSuccessfullyAndTheSubmissionIsSuccessful() {
+        logger.info("Verifying workspace save and submission confirmation toasts");
+        dtcExplorerWorkspace.verifyDTCExplorerWorkspaceConfirmationToast();
+    }
+
+    @Then("User verifies the dialog message as {string}")
+    public void userVerifiesTheDialogMessageAs(String expectedMessage) {
+        logger.info("Verifying dialog message: {}", expectedMessage);
+        String actualMessage = dtcExplorerWorkspace.getDialogMessage();
+        logger.info("Actual dialog message: {}", actualMessage);
+        Assert.assertEquals("Dialog message does not match", expectedMessage, actualMessage);
+    }
+
 }
