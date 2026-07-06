@@ -5,9 +5,7 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
-
 import java.util.*;
-
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -636,11 +634,11 @@ public class TacticDetails {
 
         for (int i = 0; i < rows.size(); i++) {
             Map<String, String> row = rows.get(i);
-            String liType = row.get("LI_TYPE");
-            String liName = row.get("LI_NAME");
-            String liBudget = row.get("LI_BUDGET");
+            String liType    = row.get("LI_TYPE");
+            String liName    = row.get("LI_NAME");
+            String liBudget  = row.get("LI_BUDGET");
             String tacticName = row.get("TACTIC_NAME");
-            String channel = row.get("CHANNEL");
+            String channel   = row.get("CHANNEL");
 
             if (!liName.equals(currentLiName)) {
                 if (currentLiName != null) {
@@ -663,7 +661,7 @@ public class TacticDetails {
 
             Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
             for (int j = 1; row.containsKey("RULE_" + j); j++) {
-                String rule = row.get("RULE_" + j);
+                String rule   = row.get("RULE_"   + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
                     List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
