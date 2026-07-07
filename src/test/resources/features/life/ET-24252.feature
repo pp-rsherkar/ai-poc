@@ -2,7 +2,7 @@ Feature: RTS AdSetup HTTPS Default and Life-Only Endpoint Toggle
   1. All RTS AdSetup endpoints (US East Coast, US West Coast, Europe) render as HTTPS by default, for both existing and newly created accounts, with no manual edit required.
   2. When an RTS account's Life-Only toggle is set to OFF (RTB bidding disabled / Life-Only mode active), AdSetup auto-populates the Life-Only MPC bid URLs for all three regions; switching back to ON reverts the endpoints to the standard exchange URLs.
   3. Assumption (Ambiguity Detected #1, ET-24252): "Life-Only toggle set to OFF" is read as Interpretation A - OFF means RTB is disabled and the account operates in Life-Only/MPC mode - matching the QA-1013 verification screenshots. See PR body for the open clarification question.
-  4. Assumption (Contradicting Requirement Detected, ET-24252): the US East Coast hostname and URL placeholder use ET-24252's own values (ma2-mpc.contextweb.com, #URL_ALIAS#) as source of truth, not QA-1013's stale lga-mpc/#PUBNAME# values. See PR body.
+  4. Assumption (Contradicting Requirement Detected, ET-24252): the US East Coast hostname and URL placeholder use ET-24252's own values (ma2-mpc.contextweb.com, URL_ALIAS) as source of truth, not QA-1013's stale lga-mpc/PUBNAME values. See PR body.
   5. No backend routing, bidding, or Settings-page toggle logic changes are in scope - this covers the AdSetup FE display only.
 
   @todo
