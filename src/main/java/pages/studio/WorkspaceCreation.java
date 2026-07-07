@@ -352,6 +352,16 @@ public class WorkspaceCreation {
         waitUtility.waitForLocatorVisible(PAGINATION.first());
     }
 
+    public void filterByWorkspaceTypeAndOpen(String workspaceType, String workspaceName) {
+        waitForStudioWorkspacePage(WORKSPACE_TYPE);
+        waitUtility.waitForLocatorVisible(WORKSPACE_TYPE.last());
+        CommonUtils.selectAndClickElement(WORKSPACE_TYPE, Collections.singletonList(workspaceType));
+        Locator workspaceRow = WORKSPACE_FRAME.locator(
+                String.format("//span[contains(text(),'%s')]", workspaceName));
+        waitUtility.waitForLocatorVisible(workspaceRow);
+        workspaceRow.click();
+    }
+
     public void selectWorkspaceAdvertiser(String advertiser) {
         WORKSPACE_ADVERTISER_DROPDOWN.click();
         waitUtility.waitForLocatorVisible(DROPDOWN_LIST_ITEMS.locator("text = " + advertiser));
