@@ -125,7 +125,7 @@ public class TacticDetails {
         this.FIELD_CREATE_SUCCESS =
                 page.locator("//div[@role='alert' and contains(text(),'Successfully created custom Field')]");
         this.CUSTOM_FIELD_TEXT = page.locator("//input[contains(@class,'gaName')]");
-        this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]").last();
+        this.DELETE_BUTTON = page.locator("//app-icon-lable-link[contains(@class,'delete-field')]");
         this.CONFIRM_DELETE = page.locator("//span[contains(text(),'Delete Field')]");
         this.DELETE_SUCCESS = page.locator("//div[contains(text(),'Successfully deleted the Field')]");
         this.CUSTOM_FIELD = page.locator("(//label[contains(@class,'cmp-form-label')])[1]");
@@ -281,7 +281,7 @@ public class TacticDetails {
         Locator FIELD_OPTIONS = page.locator(
                 String.format("//span[@class='cmp-form-label-text' and text()='%s']/following-sibling::div//img[@class='three-dots']", customFieldName));
         FIELD_OPTIONS.click();
-        DELETE_BUTTON.click();
+        DELETE_BUTTON.last().click();
         CONFIRM_DELETE.click();
         String text = DELETE_SUCCESS.innerText();
         waitUtility.waitForLocatorVisible(DELETE_SUCCESS);
