@@ -30,9 +30,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static utils.CommonUtils.normalize;
 import static utils.CommonUtils.normalizeObjectList;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pages.Navigation;
+import pages.admin.Accounts;
+import pages.admin.Setup;
+import pages.life.*;
+import pages.studio.WorkspaceCreation;
+import utils.*;
 
 public class LifeSteps {
 
@@ -3393,10 +3401,6 @@ public class LifeSteps {
                 bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
     }
 
-    @And("Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account")
-    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {
-    }
-
     @When("User selects the {string} creative type")
     public void userSelectsTheCreativeType(String creativeType) {
         logger.info("Selecting Creative type: {}", creativeType);
@@ -6350,8 +6354,7 @@ public class LifeSteps {
 
     @And("Verify column selection icon is available and upon clicking it below columns should display")
     public void
-    verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(
-            DataTable dataTable) {
+    verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(DataTable dataTable) {
         List<String> expectedColumnNames = dataTable.asList(String.class);
         logger.info("Verifying column selection icon and expected available columns: {}", expectedColumnNames);
         createCreatives.clickColumnSelectionIcon();
@@ -6463,6 +6466,32 @@ public class LifeSteps {
     public void userNavigatesToTacticSettingTab() {
         logger.info("User navigates to Line item from Association Tab");
         tacticDetails.clickSettingsTab();
+    }
+
+    @Then("The user clicks on show expression tab and fetch the values displayed")
+    public void the_user_clicks_on_show_expression_tab_and_fetch_the_values_displayed() {
+        tacticDetails.clickShowExpressionButton();
+        tacticDetails.fetchShowExpressionValues();
+    }
+
+    @Then("Verify that all the rule types added in targeting rules are displayed in show expression with correct values along with {string}")
+    public void verify_all_rule_types_added_in_targeting_rules_are_displayed_in_show_expression_with_correct_values_along_with_default_expression(String defaultExpression) {
+        boolean result = tacticDetails.ruleMappingWithShowExpressionValues(rulesMap,defaultExpression);
+        Assert.assertTrue("Targeting rules added is not matching with the ones in show expression", result);
+    }
+
+    @Then("Verify show expression connector AND OR logic is correct")
+    public void verifyShowExpressionConnectorLogicIsCorrect() {
+        tacticDetails.fetchShowExpressionValues();
+        Assert.assertTrue("Show expression connector logic is incorrect. Raw values: " + tacticDetails.getShowExpressionRawValues(), tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.getShowExpressionRawValues())
+        );
+    }
+
+    @Then("User removes the targeting {string} and saves the settings")
+    public void userRemovesTheTargetingAndSavesTheSettings(String ruleType) {
+        logger.info("Removing targeting rule type: {}", ruleType);
+        tacticDetails.removeTargetingRule(ruleType);
+        tacticSettings.saveTacticSettings();
     }
 
     @Then("User verifies that forecast data is unavailable when no targeting rules are applied")

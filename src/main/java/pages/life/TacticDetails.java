@@ -6,6 +6,7 @@ import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import factory.DriverFactory;
 import java.util.*;
+import java.util.stream.Collectors;
 import pages.Navigation;
 import utils.CommonUtils;
 import utils.WaitUtility;
@@ -80,7 +81,11 @@ public class TacticDetails {
     private final Locator CLICK_REFRESH_BUTTON;
     private final Locator NO_TARGETING_RULES;
     private final Locator FORECAST_AVAILS_NUMBER;
-
+    private final Locator SHOW_EXPRESSION_BUTTON;
+    private final Locator CONNECTION_LOCATOR;
+    private final Locator VALUE_LOCATOR;
+    private List<String> showExpressionRawValues;
+    private List<String> showExpressionValues;
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
     NPISmartList npiSmartList = new NPISmartList(DriverFactory.getPage());
@@ -164,6 +169,9 @@ public class TacticDetails {
         this.CLICK_REFRESH_BUTTON = page.locator("//button[contains(@class,'refresh')]");
         this.NO_TARGETING_RULES = page.locator("//div[contains(text(),'No Targeting Rules set yet')]");
         this.FORECAST_AVAILS_NUMBER = page.locator("//div[@class='forecast-metrics']//div[@class='availsNumber']");
+        this.SHOW_EXPRESSION_BUTTON = page.locator("//span[contains(text(),'Show Expression')]");
+        this.VALUE_LOCATOR = page.locator("//span[@class='targetGreen keyword text-target']");
+        this.CONNECTION_LOCATOR = page.locator("//span[@class='inlineDiv connector']");
     }
 
     public void clickNewTactic() {
@@ -212,8 +220,86 @@ public class TacticDetails {
         return actualComment;
     }
 
+    public List<String> getShowExpressionRawValues() {
+        return showExpressionRawValues;
+    }
+
     public void clickSettingsTab() {
         TACTIC_SETTINGS_TAB.click();
+        waitUtility.waitUntilSpinnerHidden();
+    }
+
+    public void clickShowExpressionButton() {
+        SHOW_EXPRESSION_BUTTON.click();
+        waitUtility.waitUntilPreLoaderHidden();
+    }
+
+    public void fetchShowExpressionValues() {
+        waitUtility.waitForLocatorVisible(VALUE_LOCATOR.first());
+        int valueCount = VALUE_LOCATOR.count();
+        int connectorCount = CONNECTION_LOCATOR.count();
+        List<String> values = new ArrayList<>(valueCount * 2);
+
+        for (int i = 0; i < valueCount; i++) {
+            if (i < connectorCount) {
+                values.add(CONNECTION_LOCATOR.nth(i).innerText().trim());
+            } else {
+                values.add("");
+            }
+            values.add(VALUE_LOCATOR.nth(i).innerText().trim());
+        }
+        showExpressionRawValues = new ArrayList<>(values); // preserve raw for connector assertion
+        // Keep first occurrence order, remove duplicates, blanks, and logical connectors.
+        showExpressionValues = values.stream()
+                .filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR"))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public boolean assertShowExpressionConnectorLogic(List<String> rawValues) {
+        // Keywords are at odd indices (1, 3, 5, ...), connectors at even indices (2, 4, 6, ...)
+        boolean allValid = true;
+        for (int i = 1; i + 2 < rawValues.size(); i += 2) {
+            String leftKeyword = rawValues.get(i);
+            String connector = rawValues.get(i + 1);
+            String rightKeyword = rawValues.get(i + 2);
+            String expectedConnector = leftKeyword.equals(rightKeyword) ? "OR" : "AND";
+            if (!connector.equals(expectedConnector)) {
+                allValid = false;
+                break;
+            }
+        }
+        return allValid;
+    }
+
+    public boolean ruleMappingWithShowExpressionValues(Map<String, List<String>> ruleMap, String defaultExpression) {
+        List<String> ruleTypes = new ArrayList<>(ruleMap.keySet());
+        List<String> ruleTypeExpressions = new ArrayList<>(ruleTypes.size());
+        ruleTypeExpressions.add(defaultExpression);
+        for (String ruleType : ruleTypes) {
+            switch (ruleType) {
+                case "Behavioral Segment":
+                    ruleTypeExpressions.add("Behavioral");
+                    break;
+                case "Health Populations":
+                    ruleTypeExpressions.add("CONDITION");
+                    break;
+                case "Age":
+                    ruleTypeExpressions.add("AGE");
+                    break;
+                default:
+                    ruleTypeExpressions.add(ruleType);
+                    break;
+            }
+        }
+        return showExpressionValues.equals(ruleTypeExpressions);
+    }
+
+    public void removeTargetingRule(String ruleType) {
+        waitUtility.waitUntilSpinnerHidden();
+        String ruleLocator = String.format("//span[text()='%s']/parent::label//following-sibling::div//div[contains(@title,'delete')]", ruleType);
+        page.locator(ruleLocator).click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 
     public boolean isForecastDataAvailable() {
@@ -633,11 +719,11 @@ public class TacticDetails {
 
         for (int i = 0; i < rows.size(); i++) {
             Map<String, String> row = rows.get(i);
-            String liType    = row.get("LI_TYPE");
-            String liName    = row.get("LI_NAME");
-            String liBudget  = row.get("LI_BUDGET");
+            String liType = row.get("LI_TYPE");
+            String liName = row.get("LI_NAME");
+            String liBudget = row.get("LI_BUDGET");
             String tacticName = row.get("TACTIC_NAME");
-            String channel   = row.get("CHANNEL");
+            String channel = row.get("CHANNEL");
 
             if (!liName.equals(currentLiName)) {
                 if (currentLiName != null) {
@@ -660,7 +746,7 @@ public class TacticDetails {
 
             Map<String, List<String>> perTacticRules = new LinkedHashMap<>();
             for (int j = 1; row.containsKey("RULE_" + j); j++) {
-                String rule   = row.get("RULE_"   + j);
+                String rule = row.get("RULE_" + j);
                 String values = row.get("VALUES_" + j);
                 if (rule != null && !rule.isEmpty()) {
                     List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
