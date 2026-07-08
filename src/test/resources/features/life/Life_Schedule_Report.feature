@@ -244,3 +244,17 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
     Examples:
       | REPORT_NAME    | TEMPLATE       | TACTIC_INITIALS | FREQUENCY_VALUE | TIME_ZONE                       | REPORTING_PERIOD | DESTINATION_NAME | DESTINATION_TYPE | HOST                | PORT | SERVER_PATH                    |
       | ScheduleReport | AutoTemplate20 | CreativeTactic  | Monthly         | (GMT+05:30) India Standard Time | Month to Date    | Run_Destination_ | SFTP             | ma2-qa-automation01 | 22   | /home/NPIAutoImport/Automation |
+
+  @todo
+  Scenario Outline: Verify status indicator dot and tooltip display for Campaign, Line Item, and Tactic filters in Schedule Report
+    When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+    Then a status indicator dot should be displayed next to each campaign name in the dropdown
+    And hovering the status indicator should display a tooltip identifying the current status "<STATUS>"
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+    Then a status indicator dot should be displayed next to each line item name in the dropdown
+    When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+    Then a status indicator dot should be displayed next to each tactic name in the dropdown
+    Examples:
+      | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | STATUS  |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Running |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Ready   |
