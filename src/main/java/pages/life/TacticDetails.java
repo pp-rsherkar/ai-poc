@@ -180,7 +180,7 @@ public class TacticDetails {
 
     public Locator customFieldValue(String customFieldName) {
         return page.locator(
-                String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+                String.format("//span[@class='cmp-form-label-text' and text()='%s']/parent::label/following-sibling::input", customFieldName));
     }
 
     public List<String> getAllTactics() {
@@ -201,7 +201,7 @@ public class TacticDetails {
 
     public void clearCustomFieldText(String customFieldName) {
         Locator FIELD_OPTIONS = page.locator(
-                String.format("//label[contains(text(),'%s')]/div/span//following::input[1]", customFieldName));
+                String.format("//span[@class='cmp-form-label-text' and text()='%s']/parent::label/following-sibling::input", customFieldName));
         FIELD_OPTIONS.clear();
         SAVE_TACTIC_DETAILS.click();
     }
@@ -348,7 +348,7 @@ public class TacticDetails {
     }
 
     public String verifyCustomField(String fieldName) {
-        Locator customField = page.locator(String.format("//label[contains(text(),'%s')]", fieldName));
+        Locator customField = page.locator(String.format("//span[contains(text(),'%s')]", fieldName));
         return customField.innerText().trim();
     }
 
@@ -364,9 +364,10 @@ public class TacticDetails {
         waitUtility.waitForLocatorVisible(
                 page.locator("//app-life-custom-field-setting//label[contains(@class,'form-label')]")
                         .last());
-        Locator FIELD_OPTIONS = page.locator(String.format("//label[contains(text(),'%s')]/div/span", customFieldName));
+        Locator FIELD_OPTIONS = page.locator(
+                String.format("//span[@class='cmp-form-label-text' and text()='%s']/following-sibling::div//img[@class='three-dots']", customFieldName));
         FIELD_OPTIONS.click();
-        DELETE_BUTTON.click();
+        DELETE_BUTTON.last().click();
         CONFIRM_DELETE.click();
         String text = DELETE_SUCCESS.innerText();
         waitUtility.waitForLocatorVisible(DELETE_SUCCESS);
