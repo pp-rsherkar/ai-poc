@@ -269,3 +269,73 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | DESTINATION_NAME | DESTINATION_TYPE | HOST                | PORT | SERVER_PATH                    |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | Run_Destination_ | SFTP             | ma2-qa-automation01 | 22   | /home/NPIAutoImport/Automation |
+
+  @todo
+  Scenario Outline: Verify status indicator dot and tooltip display for Campaign, Line Item, and Tactic filters in Run Report
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+    Then a status indicator dot should be displayed next to each campaign name in the dropdown
+    And hovering the status indicator should display a tooltip identifying the current status "<STATUS>"
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+    Then a status indicator dot should be displayed next to each line item name in the dropdown
+    When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+    Then a status indicator dot should be displayed next to each tactic name in the dropdown
+    Examples:
+      | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | STATUS    |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Running   |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Ready     |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Finished  |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Denied    |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  | Incomplete |
+
+  @todo
+  Scenario: Verify cloned entities with near-identical names display distinct status indicators in the Run Report filters
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    Given two campaigns with near-identical names but different statuses exist
+    When Campaign should load for selection when user types campaign initials in "Campaign" field
+    Then each campaign's status indicator dot should correctly reflect its own status, not the other's
+
+  @todo
+  Scenario: Verify Denied and Incomplete statuses are visually and textually distinguishable in the Run Report filters
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    Then an entity with status "Denied" and an entity with status "Incomplete" should display visually distinct status indicators
+    And their tooltips should display distinct status text
+
+  @todo
+  Scenario: Verify an entity with an unresolved status shows a graceful default indicator in the Run Report filters
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    Given an entity exists whose status cannot be resolved
+    Then the entity should display a graceful default status indicator with no broken icon and no error
+
+  @todo
+  Scenario: Verify status indicators remain performant and aligned with a large number of entities in the Run Report filters
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    Given the account has a large number of campaigns, line items, and tactics
+    Then status indicator dots should remain aligned with their entity names without rendering or performance degradation
+
+  @todo
+  Scenario: Verify the status indicator and tooltip are keyboard-accessible and not reliant on color alone in the Run Report filters
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User tabs to an entity's status indicator using the keyboard
+    Then the tooltip should be reachable and readable via keyboard
+    And the status should be distinguishable by more than color alone
+
+  @todo
+  Scenario: Regression - verify status-driven dropdown filtering in Run Report does not throw a query error
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User filters the Campaign, Line Item, or Tactic dropdown by status
+    Then the filter should return results without a backend query failure
+
+  @todo
+  Scenario: Regression - verify the Running status indicator reflects true entity state, not a stuck reporting pipeline state
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    Given a report is stuck in a "Running" pipeline state due to a reporting pipeline issue
+    Then the entity's "Running" status indicator should reflect genuine entity delivery state, not the stuck pipeline artifact
