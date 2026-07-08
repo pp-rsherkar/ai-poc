@@ -30,7 +30,7 @@ public class ApiSteps {
     JsonNode jsonNode;
     String bearerToken;
     String modifiedName;
-    String query_id;
+    String queryId;
     ArrayNode data;
     static String p2McpAgentApiKey;
     private Scenario scenario;
@@ -38,7 +38,6 @@ public class ApiSteps {
     ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(ApiSteps.class);
     Path path = Paths.get("src/main/resources/apiRequest/request.json");
-
 
     static {
         try {
@@ -275,7 +274,7 @@ public class ApiSteps {
         String requestBody = templateNode.toString();
         long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
-                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_ENDPOINT, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
         scenario.log("MCP Server Initialization API Response Time: " + responseTime + " ms");
         scenario.attach(("MCP Server Initialization API Response Time: " + responseTime + " ms").getBytes(),
@@ -302,7 +301,7 @@ public class ApiSteps {
         String requestBody = templateNode.toString();
         long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
-                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_ENDPOINT, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
         scenario.log("MCP Prompt List API Response Time: " + responseTime + " ms");
         scenario.attach(("MCP Prompt List API Response Time: " + responseTime + " ms").getBytes(),
@@ -331,7 +330,7 @@ public class ApiSteps {
         String requestBody = templateNode.toString();
         long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
-                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_ENDPOINT, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
         scenario.log("MCP Prompt Details API Response Time: " + responseTime + " ms");
         scenario.attach(("MCP Prompt Details API Response Time: " + responseTime + " ms").getBytes(),
@@ -361,7 +360,7 @@ public class ApiSteps {
         String requestBody = templateNode.toString();
         long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
-                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_ENDPOINT, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
         scenario.log("Looker Explore Metadata API Response Time: " + responseTime + " ms");
         scenario.attach(("Looker Explore Metadata API Response Time: " + responseTime + " ms").getBytes(),
@@ -417,7 +416,7 @@ public class ApiSteps {
         String requestBody = templateNode.toString();
         long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
-                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_ENDPOINT, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
         scenario.log("Create Query API Response Time: " + responseTime + " ms");
         scenario.attach(("Create Query API Response Time: " + responseTime + " ms").getBytes(),
@@ -429,8 +428,8 @@ public class ApiSteps {
     public void verifyTheQueryIsCreatedSuccessfullyAndReturnsAQueryId() throws Exception {
         jsonNode = mapper.readTree(apiActions.getCleanJson(response));
         Assert.assertEquals(200, response.status());
-        query_id = jsonNode.path("result").path("structuredContent").path("query_id").asText();
-        Assert.assertFalse( "Slug should not be empty", query_id.isEmpty());
+        queryId = jsonNode.path("result").path("structuredContent").path("query_id").asText();
+        Assert.assertFalse( "Slug should not be empty", queryId.isEmpty());
     }
 
     @And("User calls the MCP tool to execute the created query with headers:")
@@ -439,7 +438,7 @@ public class ApiSteps {
         JsonNode templateNode = fullPayload.path("executeQuery");
         ObjectNode arguments =
                 (ObjectNode) templateNode.path("params").path("arguments");
-        arguments.put("query_slug", query_id);
+        arguments.put("query_slug", queryId);
         //Headers
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", headersConfig.get("Content-Type"));
@@ -451,7 +450,7 @@ public class ApiSteps {
         String requestBody = templateNode.toString();
         long startTime = System.currentTimeMillis();
         response = apiActions.postRequestWithBody(
-                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_INITIALIZE, headers, requestBody);
+                ConfigReader.getProperty("p2BaseURL"), ApiEndpoints.P2_MCP_ENDPOINT, headers, requestBody);
         long responseTime = System.currentTimeMillis() - startTime;
         scenario.log("Execute Query API Response Time: " + responseTime + " ms");
         scenario.attach(("Execute Query API Response Time: " + responseTime + " ms").getBytes(),
@@ -482,7 +481,6 @@ public class ApiSteps {
                     String fetchedValue = valueNode.asText();
                     scenario.log("  -> " + fieldName + " : " + fetchedValue);
                 }
-                logger.info("-----------------------------------");
             }
         }
     }
