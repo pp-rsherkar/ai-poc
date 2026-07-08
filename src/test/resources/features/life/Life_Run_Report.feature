@@ -269,3 +269,58 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Examples:
       | TEMPLATE       | ADVERTISER     | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS | CREATIVE_INITIALS | TIME_ZONE                       | DESTINATION_NAME | DESTINATION_TYPE | HOST                | PORT | SERVER_PATH                    |
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | Run_Destination_ | SFTP             | ma2-qa-automation01 | 22   | /home/NPIAutoImport/Automation |
+
+  @todo
+  Scenario Outline: Status indicator dot and tooltip identify each entity's status in the Campaign, Line Item, and Tactic filter dropdowns
+    When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+    Then each listed campaign displays a status indicator dot for one of Incomplete, Denied, Ready, Running, Finished
+    When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
+    Then each listed line item displays its own status indicator dot, independent of the campaign's status
+    When Tactic of selected line items should load when user types tactic names initials "<TACTIC_INITIALS>" in "Tactic" field
+    Then each listed tactic displays its own status indicator dot, independent of the campaign's and line item's status
+    And hovering a status dot displays a tooltip identifying the current status per the Design System
+    Examples:
+      | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
+      | CreativeCampaign   | CreativeLine        | CreativeTactic  |
+
+  @todo
+  Scenario: Cloned campaigns with identical names show distinct status dots
+    Given two campaigns in the Campaign filter dropdown share the same name but have different statuses
+    When User views the Campaign filter dropdown
+    Then each of the two identically named campaigns displays its own correct, distinct status dot
+
+  @todo
+  Scenario: Denied and Incomplete statuses are visually and textually distinguishable
+    When User views the Campaign, Line Item, or Tactic filter dropdown
+    Then entities in the Denied status and entities in the Incomplete status display visually distinct dots and distinct tooltip text
+
+  @todo
+  Scenario: An entity with an unresolvable status renders a graceful default
+    Given an entity's status cannot be determined
+    When User views its status indicator in the filter dropdown
+    Then a graceful default is displayed with no broken icon and no JavaScript error
+
+  @todo
+  Scenario: Status indicators remain aligned and performant in large filter dropdowns
+    Given the Campaign, Line Item, or Tactic filter dropdown contains a large number of entities
+    When User opens the dropdown
+    Then status dots remain aligned with their entity names with no rendering or performance degradation
+
+  @todo
+  Scenario: Status indicators are keyboard accessible and not color-only
+    When User tabs to a status indicator using the keyboard
+    Then the status is reachable via keyboard focus and its tooltip is announced
+    And the status is distinguishable by more than color alone, for color-blind accessibility
+
+  @todo
+  Scenario: Filtering by status-driven dropdown does not throw a query error
+    When User filters the Campaign, Line Item, or Tactic dropdown while status indicators are displayed
+    Then the filter completes without a backend query error
+    # Regression anchor: ET-23999/ET-24000 - filtering entities by status previously threw a RuntimeException / failed COUNT query
+
+  @todo
+  Scenario: The Running status indicator reflects true delivery state, not a stuck reporting pipeline
+    Given an entity's underlying report is stuck in a started/Running pipeline state
+    When User views its status indicator
+    Then the Running indicator reflects the entity's genuine delivery state, not merely the stuck pipeline artifact
+    # Regression anchor: DPD-1905 - reports can get stuck in a Running pipeline state
