@@ -150,36 +150,3 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Approved     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
-
-#  Scenario: Verify Campaign Dashboard displays correct data based on Filters selection
-#    Given This scenario will be executed in the "Demo" environment as a "User"
-#    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-#    And Verify Campaign Dashboard is displayed with title "Campaigns"
-#
-#  # Reset state
-#    When User removes all the filters applied on the Dashboard
-#
-#  # 1. Lifetime Filter Verification
-#    And User clicks Lifetime filter
-#    Then User verifies that the campaigns displayed on the Dashboard include all past and current flights
-#
-#  # 2. Today Filter Verification
-#    When User clicks "Today" filter
-#    And User waits for the dashboard data grid to refresh
-#    Then Verify only flights active on today's calendar date should render on the Dashboard
-#
-#  # 3. Yesterday Filter Verification
-#    When User clicks "Yesterday" filter
-#    And User waits for the dashboard data grid to refresh
-#    Then Verify only flights active on yesterday's calendar date should render on the Dashboard
-#
-#  # 4. Active Flight Filter Verification
-#    When User clicks "Active Flight" filter
-#    And User waits for the dashboard data grid to refresh
-#    Then Verify only currently operating flights should render on the Dashboard
-#
-#  # 5. Dynamic Custom Date Range Filter Verification
-#    When User clicks "Custom" filter
-#    And User enters a custom date range from "minus 30 days" to "today" and applies the filter
-#    And User waits for the dashboard data grid to refresh
-#    Then Verify only flights overlapping the calculated custom range from "minus 30 days" to "today" should render on the Dashboard
