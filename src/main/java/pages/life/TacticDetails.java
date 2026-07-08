@@ -272,10 +272,10 @@ public class TacticDetails {
         return allValid;
     }
 
-    public boolean ruleMappingWithShowExpressionValues(Map<String, List<String>> ruleMap) {
+    public boolean ruleMappingWithShowExpressionValues(Map<String, List<String>> ruleMap, String defaultExpression) {
         List<String> ruleTypes = new ArrayList<>(ruleMap.keySet());
         List<String> ruleTypeExpressions = new ArrayList<>(ruleTypes.size());
-        ruleTypeExpressions.add("COUNTRY");
+        ruleTypeExpressions.add(defaultExpression);
         for (String ruleType : ruleTypes) {
             switch (ruleType) {
                 case "Behavioral Segment":
@@ -293,23 +293,6 @@ public class TacticDetails {
             }
         }
         return showExpressionValues.equals(ruleTypeExpressions);
-    }
-
-    public boolean verifyShowExpressionValues(String ruleType) {
-        waitUtility.waitUntilSpinnerHidden();
-        SHOW_EXPRESSION_BUTTON.click();
-        waitUtility.waitForLocatorVisible(targetingTemplate.getTargetingContainer());
-        switch (ruleType) {
-            case "Behavioral Segment":
-                ruleType = "Behavioral";
-                break;
-            case "Health Populations":
-                ruleType = "CONDITION";
-                break;
-            default:
-                break;
-        }
-        return page.locator(String.format("//span[text()='%s']", ruleType)).isVisible();
     }
 
     public void removeTargetingRule(String ruleType) {

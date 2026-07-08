@@ -3401,10 +3401,6 @@ public class LifeSteps {
                 bulkCreativeUpload.checkDefaultCreativeType(defaultOption));
     }
 
-    @And("Verify the Advertiser dropdown is displaying all Advertisers mapped to the logged in account")
-    public void verifyTheAdvertiserDropdownIsDisplayingAllAdvertisersMappedToTheLoggedInAccount() {
-    }
-
     @When("User selects the {string} creative type")
     public void userSelectsTheCreativeType(String creativeType) {
         logger.info("Selecting Creative type: {}", creativeType);
@@ -6358,8 +6354,7 @@ public class LifeSteps {
 
     @And("Verify column selection icon is available and upon clicking it below columns should display")
     public void
-    verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(
-            DataTable dataTable) {
+    verifyColumnSelectionIconIsAvailableAndUponClickingItLineItemNameIDStatusCampaignNameStartDateAndEndDateShouldBeDisplayed(DataTable dataTable) {
         List<String> expectedColumnNames = dataTable.asList(String.class);
         logger.info("Verifying column selection icon and expected available columns: {}", expectedColumnNames);
         createCreatives.clickColumnSelectionIcon();
@@ -6479,11 +6474,10 @@ public class LifeSteps {
         tacticDetails.fetchShowExpressionValues();
     }
 
-    @Then("Verify that all the rule types added in targeting rules are displayed in show expression with correct values")
-    public void verify_all_rule_types_added_in_targeting_rules_are_displayed_in_show_expression_with_correct_values() {
-        boolean result = tacticDetails.ruleMappingWithShowExpressionValues(rulesMap);
+    @Then("Verify that all the rule types added in targeting rules are displayed in show expression with correct values along with {string}")
+    public void verify_all_rule_types_added_in_targeting_rules_are_displayed_in_show_expression_with_correct_values_along_with_default_expression(String defaultExpression) {
+        boolean result = tacticDetails.ruleMappingWithShowExpressionValues(rulesMap,defaultExpression);
         Assert.assertTrue("Targeting rules added is not matching with the ones in show expression", result);
-
     }
 
     @Then("Verify show expression connector AND OR logic is correct")

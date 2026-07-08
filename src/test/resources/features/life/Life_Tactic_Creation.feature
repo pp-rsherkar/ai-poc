@@ -196,10 +196,10 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
     When User duplicates tactic, verify data on the duplicated tactic using "Duplicate" option
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE          | CREATIVE      |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
+
   @regression
   Scenario Outline: Verify all Bid Multipliers Rules under categories and Create a tactic by adding all Bid multipliers Rules
     And User clicks on create new Campaign
@@ -234,8 +234,8 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then Verify the newly created campaign is in running state
     Then Verify the newly created campaign details in the campaign list: Campaign name, Line item name and Tactic name
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT |BID_VALUE|
-      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     |2        |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL | CREATIVE      | COUNT | BID_VALUE |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      | Email   | Auto_Creative | 1     | 2         |
 
   @regression
   Scenario Outline: Verify campaign management fee is reflected in line item and line item override is reflected in tactic
@@ -278,7 +278,6 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And User saves the settings
     And User navigates to tactic setting tab
     Then User verifies the forecast data refreshes and displays values after adding targeting rule
-
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
       | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Tactic      |
@@ -301,9 +300,8 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     And User saves the settings
     And User navigates to tactic setting tab
     Then The user clicks on show expression tab and fetch the values displayed
-    Then Verify that all the rule types added in targeting rules are displayed in show expression with correct values
+    Then Verify that all the rule types added in targeting rules are displayed in show expression with correct values along with "<Default_Expression>"
     And Verify show expression connector AND OR logic is correct
-
     Examples:
-      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME |
-      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         |  Dynamic_Tac |
+      | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | Default_Expression |
+      | 01- Advertiser | Test    | Regular | 10000     | Line      | 120         | Dynamic_Tac |  COUNTRY           |
