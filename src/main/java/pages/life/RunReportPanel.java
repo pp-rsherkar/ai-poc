@@ -88,6 +88,7 @@ public class RunReportPanel {
     private final Locator DESTINATION_DROPDOWN;
     private final Locator FILE_NAME_HELP_TEXT;
     private final Locator RE_RUN_ACCESS_BUTTON;
+    private final Locator OPEN_DROPDOWN_STATUS_DOTS;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public RunReportPanel(Page page) {
@@ -190,6 +191,8 @@ public class RunReportPanel {
         this.DESTINATION_DROPDOWN = page.locator("//div[contains(text(),'Destination')]/following-sibling::sui-select");
         this.FILE_NAME_HELP_TEXT = page.locator("//span[@class='custom-destination-example-texr']//span");
         this.RE_RUN_ACCESS_BUTTON = page.locator("//span[contains(text(),'Re-run Access')]");
+        this.OPEN_DROPDOWN_STATUS_DOTS = page.locator(
+                "//div[contains(@class,'menu transition visible')]//span[contains(@class,'gr-status-dot')]");
     }
 
     public boolean isRunReportPanelOpened() {
@@ -830,6 +833,25 @@ public class RunReportPanel {
 
     public boolean isTestAccessButtonAvailable() {
         return TEST_ACCESS_BUTTON.isVisible();
+    }
+
+    public List<String> getStatusDotsFromOpenDropdown() {
+        List<String> statuses = new ArrayList<>();
+        int count = OPEN_DROPDOWN_STATUS_DOTS.count();
+        for (int i = 0; i < count; i++) {
+            String status = OPEN_DROPDOWN_STATUS_DOTS.nth(i).getAttribute("data-status");
+            if (status != null && !status.isEmpty()) statuses.add(status);
+        }
+        return statuses;
+    }
+
+    public String getFirstStatusDotDataStatus() {
+        return OPEN_DROPDOWN_STATUS_DOTS.first().getAttribute("data-status");
+    }
+
+    public void hoverFirstStatusDot() {
+        OPEN_DROPDOWN_STATUS_DOTS.first().hover();
+        page.waitForTimeout(2000);
     }
 
     public boolean isReRunAccessButtonAvailable() {
