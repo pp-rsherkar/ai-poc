@@ -9,7 +9,6 @@ Feature: Life Deal Groups - Verify Applied Deals Tab Count and List Accuracy in 
     And User navigates to Deal Groups page
 
   @todo
-  @regression
   Scenario Outline: Verify Applied Deals tab count and list accuracy for Deal Group "<DEAL_GROUP>" with "<APPLIED_DEALS_COUNT>" applied deals
     When User opens the Deal (PMP) modal for Deal Group "<DEAL_GROUP>"
     And User clicks Applied Deals tab
@@ -23,7 +22,6 @@ Feature: Life Deal Groups - Verify Applied Deals Tab Count and List Accuracy in 
       | Large_Deal_Group | 50                  |
 
   @todo
-  @regression
   Scenario Outline: Verify Applied Deals tab reflects deals "<ACTION>" to Deal Group "<DEAL_GROUP>" after the Deal (PMP) modal is opened
     Given User opens the Deal (PMP) modal for Deal Group "<DEAL_GROUP>"
     And User clicks Applied Deals tab
@@ -38,7 +36,6 @@ Feature: Life Deal Groups - Verify Applied Deals Tab Count and List Accuracy in 
       | Small_Deal_Group | removed | 3            | 2           |
 
   @todo
-  @regression
   Scenario: Verify Applied Deals tab does not retain previous Deal Group data when switching between Deal Groups
     Given User opens the Deal (PMP) modal for Deal Group "Small_Deal_Group"
     And User clicks Applied Deals tab
