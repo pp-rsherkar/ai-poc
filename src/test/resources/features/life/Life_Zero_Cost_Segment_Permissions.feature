@@ -12,13 +12,11 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
     And User navigates to Users page
 
   @todo
-  @regression
   Scenario: Verify four dollar zero Cost Segment permissions are displayed on Admin Users page
     When User selects a user to edit permissions
     Then Global View, Global Edit, Account View, and Account Edit permissions should be visible in the permissions list
 
   @todo
-  @regression
   Scenario Outline: Verify Global Fees and Account Life Settings Fees visibility for permission combination Global View "<GLOBAL_VIEW>", Global Edit "<GLOBAL_EDIT>", Account View "<ACCOUNT_VIEW>", Account Edit "<ACCOUNT_EDIT>"
     When User selects a user to edit permissions
     And User sets permissions for the user as Global View "<GLOBAL_VIEW>", Global Edit "<GLOBAL_EDIT>", Account View "<ACCOUNT_VIEW>", Account Edit "<ACCOUNT_EDIT>"
@@ -36,7 +34,6 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
       | 100Plus      | Yes         | Yes         | Yes          | Yes          | Editable          | Editable           |
 
   @todo
-  @regression
   Scenario Outline: Verify Global Edit permission grant and revoke is restricted to the named user Jifei when admin "<ADMIN_USER>" attempts the action
     When "<ADMIN_USER>" attempts to grant Global Edit permission to a user via the Admin UI
     Then the grant action should "<RESULT>"
@@ -49,7 +46,6 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
       | Andrew Stark | be blocked |
 
   @todo
-  @regression
   Scenario Outline: Verify "<ENTRY_POINT>" behavior remains ungated by the new dollar zero Cost Segment permissions
     Given No dollar zero Cost Segment permissions are granted to the user
     When User navigates to "<ENTRY_POINT>"
@@ -61,7 +57,6 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
       | Reporting                                   | configured fee values shown in reports           | always reflects configured fees ungated by permission |
 
   @todo
-  @regression
   Scenario Outline: Verify legacy permission mapping migrates users who previously held "<LEGACY_PERMISSION>" to the correct consolidated permissions
     Given A user previously held the legacy "<LEGACY_PERMISSION>" permission under the pre-migration model
     When User reviews that user permissions after migration
