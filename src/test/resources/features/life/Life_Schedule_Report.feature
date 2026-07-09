@@ -245,8 +245,12 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | REPORT_NAME    | TEMPLATE       | TACTIC_INITIALS | FREQUENCY_VALUE | TIME_ZONE                       | REPORTING_PERIOD | DESTINATION_NAME | DESTINATION_TYPE | HOST                | PORT | SERVER_PATH                    |
       | ScheduleReport | AutoTemplate20 | CreativeTactic  | Monthly         | (GMT+05:30) India Standard Time | Month to Date    | Run_Destination_ | SFTP             | ma2-qa-automation01 | 22   | /home/NPIAutoImport/Automation |
 
-  @todo
+  @todo @ps
   Scenario Outline: Status indicator dot and tooltip identify each entity's status in the Schedule Report's Campaign, Line Item, and Tactic filter dropdowns
+    # "Auto" campaigns return a mix of Ready, Running, and Incomplete statuses (verified live)
+    # "Auto" line items return Finished status entities (AutoDisplayLI, AutoVideoLI, etc.)
+    # "AutoTactic" returns Incomplete status entities
+    # Together these cover 4 of the 5 valid statuses in a single run
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
     Then each listed campaign displays a status indicator dot for one of Incomplete, Denied, Ready, Running, Finished
     When Line Items of selected campaigns should load when user types line items initials "<LINE_ITEM_INITIALS>" in "Line Item" field
@@ -256,4 +260,4 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
     And hovering a status dot displays a tooltip identifying the current status per the Design System
     Examples:
       | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
-      | CreativeCampaign   | CreativeLine        | CreativeTactic  |
+      | Auto              | Auto               | AutoTactic      |
