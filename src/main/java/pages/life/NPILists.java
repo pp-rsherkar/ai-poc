@@ -4,9 +4,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
-import utils.WaitUtility;
-
 import java.util.List;
+import utils.WaitUtility;
 
 public class NPILists {
     private final Page page;
@@ -23,16 +22,19 @@ public class NPILists {
     private final Locator SMART_LIST;
     private final Locator AUTO_IMPORTED_LIST;
     private final Locator EDIT_ICON;
+    private final Locator MEDSCAPE_LIST;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public NPILists(Page page) {
         this.page = page;
         this.NPI_LISTS = page.locator("//div[contains(@class, 'menu') and contains(text(),'NPI Lists')]");
-        this.NPI_LISTS_HEADER = page.locator("//span[contains(@class,'header-title') and contains(text(),'NPI Lists')]");
+        this.NPI_LISTS_HEADER =
+                page.locator("//span[contains(@class,'header-title') and contains(text(),'NPI Lists')]");
         this.CREATE_NPI_LIST = page.getByText("Create New NPI List");
         this.STATIC_LIST = page.getByText("Plain static list of NPI");
         this.SEARCH_NPI_LISTS = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Search"));
-        this.AVAILABLE_IN_CHECKBOX = page.locator("//input[contains(@class,'mat-checkbox-input') and @aria-checked='true']/ancestor::div/following-sibling::span");
+        this.AVAILABLE_IN_CHECKBOX = page.locator(
+                "//input[contains(@class,'mat-checkbox-input') and @aria-checked='true']/ancestor::div/following-sibling::span");
         this.AVAILABLE_IN_CONTAINER = page.locator("//div[contains(@class,'npiGroupAvailableSettingContainer')]");
         this.PARENT_LIST_LABEL = page.locator("//span[contains(@class,'parentListLabel')]");
         this.CREATE_NEW_LIST = page.locator("//span[normalize-space(text())='Create New List']");
@@ -40,6 +42,7 @@ public class NPILists {
         this.SMART_LIST = page.getByText("Dynamic list of NPI");
         this.AUTO_IMPORTED_LIST = page.locator("//app-npilisttype[@listtypename='Auto-Imported List']");
         this.EDIT_ICON = page.locator("//img[@alt='edit' and contains(@src,'edit-inline.svg')]");
+        this.MEDSCAPE_LIST = page.locator("//app-npilisttype[@listtypename='Medscape List']");
     }
 
     public void clickNPILists() {
@@ -118,5 +121,10 @@ public class NPILists {
 
     public void clickAutoImportedList() {
         AUTO_IMPORTED_LIST.click();
+    }
+
+    public void clickMedscapeList() {
+        MEDSCAPE_LIST.click();
+        waitUtility.waitUntilSpinnerHidden();
     }
 }

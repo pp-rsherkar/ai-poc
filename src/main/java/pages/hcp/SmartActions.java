@@ -4,9 +4,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import utils.CommonUtils;
-
 import java.util.Collections;
+import utils.CommonUtils;
 
 public class SmartActions {
 
@@ -39,25 +38,32 @@ public class SmartActions {
         this.page = page;
         this.SMART_ACTIONS = page.locator("#megamenu").getByText("Smart Actions");
         this.ADD_SMART_ACTION = page.getByText("Add Smart Action");
-        this.VERIFY_SMART_ACTION = page.locator("//div[contains(@class,'trigger-header') and (contains(text(),'New Smart Action'))]");
-        this.SMART_ACTION_NAME = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Smart Action Name"));
+        this.VERIFY_SMART_ACTION =
+                page.locator("//div[contains(@class,'trigger-header') and (contains(text(),'New Smart Action'))]");
+        this.SMART_ACTION_NAME =
+                page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Smart Action Name"));
         this.ADVERTISER = page.locator("//ng-select[contains(@placeholder,'Select Advertiser')]");
-        this.SELECT_ADVERTISER = page.locator("//ng-select[contains(@placeholder,'Select Advertiser')]//ng-dropdown-panel//div[@role='option']");
+        this.SELECT_ADVERTISER = page.locator(
+                "//ng-select[contains(@placeholder,'Select Advertiser')]//ng-dropdown-panel//div[@role='option']");
         this.SAVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
         this.SMART_ACTION_SUCCESS = page.getByText("new Smart Action created successfully");
         this.AUDIENCE_TAB = page.locator("//div[@class='col-sm nav-tab selected']");
         this.AUDIENCE_NPI_LISTS_OPTION = page.getByText("NPI Lists");
         this.NPI_LIST_SEARCH = page.locator("//input[@id='search-input']");
-        this.NPI_LIST_TARGET = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@title='Target']");
-        this.VERIFY_NPI_LIST_NAME = page.locator("//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@customclass='primary-tooltip']");
+        this.NPI_LIST_TARGET = page.locator(
+                "//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@title='Target']");
+        this.VERIFY_NPI_LIST_NAME = page.locator(
+                "//div[@class='treeviewNode clearfix ng-star-inserted' and not(@hidden)]//div[@customclass='primary-tooltip']");
         this.OK_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ok"));
         this.SAVED_SUCCESS_MESSAGE = page.getByText("Data saved successfully");
         this.ACTION_TAB = page.locator("//div[@class='col-sm nav-tab']").first();
         this.ACTION_VISITS_BRAND_PAGE_OPTION = page.getByText("Visits Brand Page");
-        this.COLLECTION_COMBO_BOX = page.locator("//div[text()='Collections']/parent::div/following-sibling::ng-select//input[@role='combobox']");
+        this.COLLECTION_COMBO_BOX = page.locator(
+                "//div[text()='Collections']/parent::div/following-sibling::ng-select//input[@role='combobox']");
         this.COLLECTION_OPTION = page.locator("//div[@role='option']").first();
         this.RESPONSE_TAB = page.locator("//div[@class='col-sm nav-tab']").nth(1);
-        this.RESPONSE_ADD_NPI_TO_SMART_LIST_OPTION = page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Add NPI to the Smart List"));
+        this.RESPONSE_ADD_NPI_TO_SMART_LIST_OPTION =
+                page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Add NPI to the Smart List"));
         this.SMART_LIST_NAME = page.locator("//input[@formcontrolname='smartListName']");
         this.DAYS = page.locator("//input[@formcontrolname='noOfDays']");
     }

@@ -34,17 +34,23 @@ public class CuratedMarket {
     }
 
     public String fetchMediaTypeForCuratedMarket(String marketName) {
-        Locator mediaTypeLocator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//span[contains(text(),'Media Type:')]/following-sibling::span//span", marketName));
+        Locator mediaTypeLocator = page.locator(String.format(
+                "//div[contains(text(),'%s')]/following-sibling::div//span[contains(text(),'Media Type:')]/following-sibling::span//span",
+                marketName));
         return mediaTypeLocator.textContent().trim();
     }
 
     public String fetchMarketIdForCuratedMarket(String marketName) {
-        Locator marketIdLocator = page.locator(String.format("//div[contains(text(),'%s')]/following-sibling::div//span[contains(text(), 'ID:')]/following-sibling::span[1]", marketName));
+        Locator marketIdLocator = page.locator(String.format(
+                "//div[contains(text(),'%s')]/following-sibling::div//span[contains(text(), 'ID:')]/following-sibling::span[1]",
+                marketName));
         return marketIdLocator.textContent().trim();
     }
 
     public String fetchFloorPriceForCuratedMarket(String marketName) {
-        Locator floorPriceLocator = page.locator(String.format("//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[text()='Floor Price']/preceding-sibling::div", marketName));
+        Locator floorPriceLocator = page.locator(String.format(
+                "//div[contains(text(),'%s')]/parent::div/following-sibling::div//div[text()='Floor Price']/preceding-sibling::div",
+                marketName));
         return floorPriceLocator.textContent().replace("$", "").replace(",", "").trim();
     }
 }

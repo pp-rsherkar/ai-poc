@@ -3,7 +3,6 @@ package utils;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,7 @@ public class CommonUtils {
 
     public static String randomFourDigitNumber() {
         int number = (int) (Math.random() * 10000); // generates 0 to 9999
-        return String.format("%04d", number);      // pads with leading zeros
+        return String.format("%04d", number); // pads with leading zeros
     }
 
     public static String generateRandomNumber() {
@@ -46,19 +45,28 @@ public class CommonUtils {
     }
 
     public static List<String> normalize(List<String> list) {
-        return list.stream().map(s -> s.replaceAll("\\s+", " ").trim()) // replaces multiple spaces and trims
+        return list.stream()
+                .map(s -> s.replaceAll("\\s+", " ").trim()) // replaces multiple spaces and trims
                 .collect(Collectors.toList());
     }
 
     public static List<String> normalizeObjectList(List<Object> list) {
-        return list.stream().map(Object::toString).flatMap(s -> Arrays.stream(s.split("::"))).flatMap(s -> Arrays.stream(s.split(","))).map(s -> s.replaceAll("\\s+", " ").trim()).collect(Collectors.toList());
+        return list.stream()
+                .map(Object::toString)
+                .flatMap(s -> Arrays.stream(s.split("::")))
+                .flatMap(s -> Arrays.stream(s.split(",")))
+                .map(s -> s.replaceAll("\\s+", " ").trim())
+                .collect(Collectors.toList());
     }
 
     public static List<String> parseCommaSeparatedString(String input) {
         if (input == null || input.isBlank()) {
             return List.of();
         }
-        return Arrays.stream(input.split(",")).map(String::trim).filter(opt -> !opt.isEmpty()).collect(Collectors.toList());
+        return Arrays.stream(input.split(","))
+                .map(String::trim)
+                .filter(opt -> !opt.isEmpty())
+                .collect(Collectors.toList());
     }
 
     public static Map<String, List<String>> processDataTable(Map<String, String> map) {
@@ -67,7 +75,9 @@ public class CommonUtils {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey().trim();
             String keyValue = entry.getValue().trim();
-            List<String> values = keyValue.contains(",") ? Arrays.stream(keyValue.split(",")).map(String::trim).collect(Collectors.toList()) : Collections.singletonList(keyValue);
+            List<String> values = keyValue.contains(",")
+                    ? Arrays.stream(keyValue.split(",")).map(String::trim).collect(Collectors.toList())
+                    : Collections.singletonList(keyValue);
             result.put(key, values);
         }
         return result;
@@ -130,9 +140,12 @@ public class CommonUtils {
         targetInput.setInputFiles(basePath);
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
         if (locatorValue.contains("%s")) {
-            page.waitForSelector(String.format(locatorValue, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            page.waitForSelector(
+                    String.format(locatorValue, fileName),
+                    new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         } else {
-            page.waitForSelector(locatorValue, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            page.waitForSelector(
+                    locatorValue, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         }
     }
 
@@ -150,21 +163,27 @@ public class CommonUtils {
         targetInput.setInputFiles(basePath);
         page.evaluate("element => element.dispatchEvent(new Event('change', { bubbles: true }))", fileInputHandle);
         if (locatorValue.contains("%s")) {
-            page.waitForSelector(String.format(locatorValue, fileName), new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            page.waitForSelector(
+                    String.format(locatorValue, fileName),
+                    new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         } else {
-            page.waitForSelector(locatorValue, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            page.waitForSelector(
+                    locatorValue, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         }
     }
 
     public static boolean isDownloadedFileAvailable(Path filePath, String expectedExtension) {
         File file = filePath.toFile();
-        return file.exists() && file.isFile() && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
+        return file.exists()
+                && file.isFile()
+                && file.getName().toLowerCase().endsWith("." + expectedExtension.toLowerCase());
     }
 
     public static Path getMostRecentFileFromDownloads() throws IOException {
         Path downloadsDir = Paths.get(System.getProperty("user.home"), "Downloads");
         try (Stream<Path> files = Files.list(downloadsDir)) {
-            Optional<Path> latestFile = files.filter(Files::isRegularFile).max(Comparator.comparingLong(p -> p.toFile().lastModified()));
+            Optional<Path> latestFile = files.filter(Files::isRegularFile)
+                    .max(Comparator.comparingLong(p -> p.toFile().lastModified()));
             return latestFile.orElse(null);
         }
     }
@@ -204,7 +223,8 @@ public class CommonUtils {
         }
     }
 
-    public static boolean scrollElementIntoView(Locator container, Locator targetList, int maxScrolls, int scrollStep, Page page) {
+    public static boolean scrollElementIntoView(
+            Locator container, Locator targetList, int maxScrolls, int scrollStep, Page page) {
         container.evaluate("el => el.scrollTop = 0");
 
         for (int j = 0; j < maxScrolls; j++) {
@@ -212,9 +232,15 @@ public class CommonUtils {
                 BoundingBox targetBox = targetList.nth(i).boundingBox();
                 BoundingBox containerBox = container.boundingBox();
 
-                if (targetBox != null && containerBox != null && targetBox.y >= containerBox.y && targetBox.y <= (containerBox.y + containerBox.height)) {
+                if (targetBox != null
+                        && containerBox != null
+                        && targetBox.y >= containerBox.y
+                        && targetBox.y <= (containerBox.y + containerBox.height)) {
                     return true;
-                } else if (targetBox != null && containerBox != null && targetBox.y < containerBox.y + containerBox.height && targetBox.y + targetBox.height > containerBox.y) {
+                } else if (targetBox != null
+                        && containerBox != null
+                        && targetBox.y < containerBox.y + containerBox.height
+                        && targetBox.y + targetBox.height > containerBox.y) {
                     return true;
                 } else {
                     container.evaluate("el => el.scrollBy(0, " + scrollStep + ")");
@@ -261,7 +287,7 @@ public class CommonUtils {
         LocalDate startDate = currentMonth.atDay(startDay);
         LocalDate endDate = currentMonth.atDay(endDay);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMM-yyyy");
-        return new String[]{startDate.format(formatter), endDate.format(formatter)};
+        return new String[] {startDate.format(formatter), endDate.format(formatter)};
     }
 
     public static void selectCalendarData(Locator locator, String data) {
@@ -279,7 +305,9 @@ public class CommonUtils {
 
         targetValue = Math.max(min, Math.min(targetValue, max));
         Locator sliderRoot = sliderHandle.locator("xpath=ancestor::ngx-slider[1]");
-        Locator sliderTrack = sliderRoot.locator("span.ngx-slider-bar-wrapper, span.ngx-slider-bar").first();
+        Locator sliderTrack = sliderRoot
+                .locator("span.ngx-slider-bar-wrapper, span.ngx-slider-bar")
+                .first();
 
         BoundingBox trackBox = sliderTrack.boundingBox();
         BoundingBox handleBox = sliderHandle.boundingBox();
