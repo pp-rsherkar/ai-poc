@@ -28,12 +28,12 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
     Then Account Fees section visibility should be "<ACCOUNT_FEES_STATE>"
     Examples:
       | ACCOUNT_NAME | GLOBAL_VIEW | GLOBAL_EDIT | ACCOUNT_VIEW | ACCOUNT_EDIT | GLOBAL_FEES_STATE | ACCOUNT_FEES_STATE |
-      | 100Plus      | No          | No          | No           | No           | Hidden             | Hidden              |
-      | 100Plus      | Yes         | No          | No           | No           | Visible-ReadOnly   | Visible-ReadOnly    |
-      | 100Plus      | Yes         | Yes         | No           | No           | Editable           | Visible-ReadOnly    |
-      | 100Plus      | No          | No          | Yes          | No           | Hidden             | Visible-ReadOnly    |
-      | 100Plus      | No          | No          | Yes          | Yes          | Hidden             | Editable            |
-      | 100Plus      | Yes         | Yes         | Yes          | Yes          | Editable           | Editable            |
+      | 100Plus      | No          | No          | No           | No           | Hidden            | Hidden             |
+      | 100Plus      | Yes         | No          | No           | No           | Visible-ReadOnly  | Visible-ReadOnly   |
+      | 100Plus      | Yes         | Yes         | No           | No           | Editable          | Visible-ReadOnly   |
+      | 100Plus      | No          | No          | Yes          | No           | Hidden            | Visible-ReadOnly   |
+      | 100Plus      | No          | No          | Yes          | Yes          | Hidden            | Editable           |
+      | 100Plus      | Yes         | Yes         | Yes          | Yes          | Editable          | Editable           |
 
   @todo
   @regression
@@ -55,10 +55,10 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
     When User navigates to "<ENTRY_POINT>"
     Then "<BEHAVIOR>" should remain unaffected and continue to follow "<GOVERNING_RULE>"
     Examples:
-      | ENTRY_POINT                                  | BEHAVIOR                                          | GOVERNING_RULE                                        |
-      | Data Segments Zero Dollar Flat Fee dropdown  | segment classification editing                    | existing Segment Administration edit permissions     |
-      | Tactic Editor Data Cost CPM field             | field visibility for internal and external users  | always visible regardless of permission               |
-      | Reporting                                     | configured fee values shown in reports             | always reflects configured fees ungated by permission |
+      | ENTRY_POINT                                 | BEHAVIOR                                         | GOVERNING_RULE                                        |
+      | Data Segments Zero Dollar Flat Fee dropdown | segment classification editing                   | existing Segment Administration edit permissions      |
+      | Tactic Editor Data Cost CPM field           | field visibility for internal and external users | always visible regardless of permission               |
+      | Reporting                                   | configured fee values shown in reports           | always reflects configured fees ungated by permission |
 
   @todo
   @regression
@@ -67,9 +67,9 @@ Feature: Life Zero Cost Segment Permissions - Verify Global and Account Scope Vi
     When User reviews that user permissions after migration
     Then the user should now effectively hold "<NEW_PERMISSIONS>" under the consolidated permission model
     Examples:
-      | LEGACY_PERMISSION                | NEW_PERMISSIONS                                              |
-      | Direct 1st-party segment View    | Global View, Account View                                    |
-      | Direct 1st-party segment Edit    | Global Edit, Account Edit                                     |
-      | dollar zero 3rd-party segment View | Global View, Account View                                  |
-      | dollar zero 3rd-party segment Edit | Global Edit, Account Edit                                   |
-      | dollar zero Flat Fee              | Global View, Global Edit, Account View, Account Edit          |
+      | LEGACY_PERMISSION                  | NEW_PERMISSIONS                                      |
+      | Direct 1st-party segment View      | Global View, Account View                            |
+      | Direct 1st-party segment Edit      | Global Edit, Account Edit                            |
+      | dollar zero 3rd-party segment View | Global View, Account View                            |
+      | dollar zero 3rd-party segment Edit | Global Edit, Account Edit                            |
+      | dollar zero Flat Fee               | Global View, Global Edit, Account View, Account Edit |
