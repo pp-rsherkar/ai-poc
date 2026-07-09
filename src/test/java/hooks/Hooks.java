@@ -24,7 +24,7 @@ public class Hooks {
     public DriverFactory driverFactory;
     public Page page;
 
-    @Before(value = "@e2e or @regression")
+    @Before(value = "@e2e or @regression or @todo")
     public void launchBrowser(Scenario scenario) {
         try {
             // Clean old traces before starting new scenario
@@ -42,7 +42,7 @@ public class Hooks {
     }
 
     // After runs in reverse order so order = 1 runs FIRST and order = -1 runs LAST.
-    @After(value = "@e2e or @regression", order = -1)
+    @After(value = "@e2e or @regression or @todo", order = -1)
     public void renameAndAttachVideo(Scenario scenario) {
         boolean videoEnabled = Boolean.parseBoolean(ConfigReader.getProperty("recordVideo"));
         if (!videoEnabled || page == null || page.video() == null) {
@@ -80,7 +80,7 @@ public class Hooks {
         }
     }
 
-    @After(value = "@e2e or @regression", order = 0)
+    @After(value = "@e2e or @regression or @todo", order = 0)
     public void quitBrowser(Scenario scenario) {
         try {
             logger.info("Quitting browser after scenario: {}", scenario.getName());
@@ -93,7 +93,7 @@ public class Hooks {
         }
     }
 
-    @After(value = "@e2e or @regression", order = 1)
+    @After(value = "@e2e or @regression or @todo", order = 1)
     public void takeScreenshotAndTrace(Scenario scenario) {
         if (scenario.isFailed()) {
             try {

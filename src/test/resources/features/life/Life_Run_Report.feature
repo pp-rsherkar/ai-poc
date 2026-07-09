@@ -272,6 +272,10 @@ Feature: LIFE Regression - Run Report fields verification and report generation
 
   @todo
   Scenario Outline: Verify the status-indicator workflow in the Campaign, Line Item, and Tactic filter dropdowns
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    And User should be able to select template "AutoTemplate20" from the dropdown
+    And User should be able to select advertiser as "01- Advertiser"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
     Then each listed campaign displays a status indicator dot for one of Incomplete, Denied, Ready, Running, Finished
     And hovering a status dot displays a tooltip identifying the current status per the Design System

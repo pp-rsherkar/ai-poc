@@ -286,6 +286,67 @@ public class RunReportPanel {
         return locator.locator("xpath=./following-sibling::div/div").count() > 0;
     }
 
+    public List<String> getStatusDotsFromOpenDropdown() {
+        Locator dots = page.locator(
+                "//div[contains(@class,'menu transition visible')]//span[contains(@class,'gr-status-dot')]");
+        List<String> statuses = new ArrayList<>();
+        int count = dots.count();
+        for (int i = 0; i < count; i++) {
+            String status = dots.nth(i).getAttribute("data-status");
+            if (status != null && !status.isEmpty()) statuses.add(status);
+        }
+        return statuses;
+    }
+
+    public String getFirstStatusDotDataStatus() {
+        return page.locator("//div[contains(@class,'menu transition visible')]//span[contains(@class,'gr-status-dot')]")
+                .first()
+                .getAttribute("data-status");
+    }
+
+    public void hoverFirstStatusDot() {
+        page.locator("//div[contains(@class,'menu transition visible')]//span[contains(@class,'gr-status-dot')]")
+                .first()
+                .hover();
+        page.waitForTimeout(2000);
+    }
+
+    public boolean isStatusIndicatorPresentInOpenDropdown() {
+        return page.locator("//div[contains(@class,'menu transition visible')]//span[contains(@class,'gr-status-dot')]")
+                        .count()
+                > 0;
+    }
+
+    public int getOpenDropdownItemCount() {
+        return page.locator(
+                        "//div[contains(@class,'menu transition visible')]//div[contains(@class,'gr-status-dot-item')]")
+                .count();
+    }
+
+    public List<String> getStatusDotStylesFromOpenDropdown() {
+        Locator dots = page.locator(
+                "//div[contains(@class,'menu transition visible')]//span[contains(@class,'gr-status-dot')]");
+        List<String> styles = new ArrayList<>();
+        int count = dots.count();
+        for (int i = 0; i < count; i++) {
+            String style = dots.nth(i).getAttribute("style");
+            if (style != null) styles.add(style);
+        }
+        return styles;
+    }
+
+    public void openDropdownField(String fieldName) {
+        page.locator(String.format(
+                        "//label[text()='%s']/following-sibling::div//input[contains(@placeholder,'%s')]",
+                        fieldName, fieldName))
+                .click();
+        page.waitForTimeout(1000);
+    }
+
+    public boolean isPageErrorAlertVisible() {
+        return page.locator("//div[@role='alert' and contains(@class,'error')]").isVisible();
+    }
+
     public List<String> selectMultipleValueFromDropdown() {
         int count = DROPDOWN_LIST.count();
         int randomIndex = (int) (Math.random() * count);
