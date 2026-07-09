@@ -7,3 +7,9 @@ Follow CLAUDE.md for the full workflow — all 5 phases:
 3. Navigate the live application for real locators, then generate step definitions and page object classes (only for steps needed by @todo scenarios)
 4. Run the @todo scenarios with Maven (use `-Dcucumber.filter.tags="@todo"`) and iterate until all pass with zero failures
 5. Create a new branch, commit all changes, and push
+
+Code-style rules (mandatory — match existing repo conventions):
+- All page-class locators must be declared as fields and initialized inside the constructor (follow the existing locator strategy in the repo — do not use inline `page.locator()` calls in methods)
+- Step definition class structure (method signatures, hook usage, dependency injection) must match the patterns already present in the repo's step definition classes
+- Page class method structure (naming, return types, visibility, how they call locators) must match the patterns already present in the repo's page object classes
+- Before writing any new code, study at least ten existing step definition files and ten existing page object files to extract the house style, then follow it exactly
