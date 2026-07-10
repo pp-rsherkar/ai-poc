@@ -150,3 +150,25 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Approved     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
+
+  @todo
+  Scenario Outline: Weekly granularity trend chart x-axis displays calendar dates instead of week numbers
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User navigates to a Campaign's trend chart with reporting granularity set to "<GRANULARITY>"
+    When User views the x-axis labels
+    Then each label shows the week's start date in MM/DD/YY format instead of "Week N-YYYY"
+    And the week start day aligns with the system-wide Sunday week-start definition
+    Given the campaign's date range starts or ends mid-week
+    Then the partial week's label still shows the actual Sunday week-start date, not the campaign's actual start or end date
+    Given a week spans a year boundary, such as December 29 to January 4
+    Then the label shows the correct calendar date, not a week-number rollover artifact
+    Given a long date range producing many weekly labels
+    Then labels do not overlap or collide on the chart
+    Given granularity is switched from Weekly to Daily or Monthly and back to Weekly
+    Then the x-axis reformats correctly each time with no stale labels left over
+    Examples:
+      | GRANULARITY |
+      | Weekly      |
+    # Regression anchor: this ticket slipped one release cycle (June to July 2026) due to FE sprint capacity; verify the QA cycle was not compressed by the slip
