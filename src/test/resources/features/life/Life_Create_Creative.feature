@@ -91,7 +91,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify user is able to close the Creative Preview tab
     And User searches the creative and clicks the creative details from Creative Library page
     And User clicks on Preview link from Creative Details page
-    And Verify Creative Preview tab is displayed with correct creative name
+    Then Verify Creative Preview tab is displayed with correct creative name
     And Verify user is able to close the Creative Preview tab
 
   @regression
@@ -319,3 +319,48 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Campaign Name   |
       | Line Item Dates |
     And User navigates to Line item from Association Tab
+
+  @todo
+  Scenario Outline: Bulk Creative Upload auto-populates Clickthrough URL and Domain Landing from the upload sheet or embedded tags
+    Given User has the "EXTRACT CLICKTHRU AND DOMAIN LANDING" permission enabled
+    And User clicks Bulk Upload button on Creative Library page and selects the "<CREATIVE_TYPE>" creative type
+    When User uploads a bulk sheet "<SHEET_CONDITION>"
+    Then "<RESULT>"
+    Examples:
+      | CREATIVE_TYPE | SHEET_CONDITION                                                              | RESULT                                                                                                |
+      | Video         | with a Clickthrough URL column, first row differing from other rows         | Domain Landing is populated by stripping the path from the FIRST row's Clickthrough URL only         |
+      | Audio         | with no Clickthrough URL column, but a clickthrough URL embedded in the tags | the Clickthrough URL field is populated from the embedded tag, and Domain Landing is derived from it |
+      | HTML          | with no Clickthrough URL column and no embedded clickthrough URL found      | both fields are left blank rather than raising an error                                              |
+      | Native        | with a Clickthrough URL column                                              | Domain Landing is populated by stripping the path from the first row's Clickthrough URL              |
+
+  @todo
+  Scenario: Auto-population is fully inactive for users without the gating permission, and does not slow large uploads
+    Given User does not have the "EXTRACT CLICKTHRU AND DOMAIN LANDING" permission
+    When User bulk uploads creatives with a Clickthrough URL column present
+    Then Clickthrough URL and Domain Landing behave exactly as they did before this feature, with no auto-population
+    Given a very large bulk upload file with no Clickthrough URL column
+    When User uploads the file
+    Then the tag-scanning step completes within a few seconds and does not materially slow the upload flow
+    # Regression anchor: QA-1533 - BLOCKER - Landing Domain field was not auto-populated when the file had a Clickthrough URL column; verify this fix holds
+    # Note: Audio Bulk Uploads GA is explicitly blocked on this ticket per source analysis; treat Audio coverage above as release-gating
+
+  @todo
+  Scenario Outline: Duration column replaces Size column for Video creatives in the Tactic Creative Table and Creative Library, per row
+    Given a table or library listing contains creatives of mixed types, including "<CREATIVE_TYPE>"
+    When User views the "<LOCATION>"
+    Then rows where creative type is Video show a "Duration" column showing the video's runtime instead of "Size"
+    And rows for non-Video creative types, such as "<CREATIVE_TYPE>", continue to show "Size", not "Duration"
+    Examples:
+      | LOCATION              | CREATIVE_TYPE |
+      | Tactic Creative Table | Image         |
+      | Creative Library      | HTML          |
+
+  @todo
+  Scenario: Duration values render correctly at extreme lengths and while metadata is still processing
+    Given a Video creative with duration metadata still transcoding or unprocessed
+    When User views its row in the Tactic Creative Table or Creative Library
+    Then a graceful placeholder is shown rather than a blank or error value
+    Given Video creatives with a very short, under 1 second, and a very long, multi-hour, duration
+    Then the Duration column formatting does not truncate or overflow in either case
+    Given the Duration column supports sorting
+    Then it sorts numerically by time, not as a string
