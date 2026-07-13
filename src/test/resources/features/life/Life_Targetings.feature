@@ -308,6 +308,7 @@ Feature: LIFE Regression - Targetings
       | ADVERTISER     | CP_NAME        | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | Campaign_Audio | Regular | 10000     | Line      | 500         | Audio      | Tactic      | Auto_Creative |
 
+  # Source: ET-24248
   @todo
   Scenario: WebMD Health Markets targeting is fully removed from the UI, API, and feature flag configuration
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -319,9 +320,8 @@ Feature: LIFE Regression - Targetings
     Then the request is rejected, confirming the backend also blocks it and not merely the UI hiding it
     And the WebMDPremiumPublisher feature flag no longer exists in feature-flag configuration
     And the remaining Health Markets targeting options, such as Medscape, are unaffected by this removal
-    # Regression anchor: PROD-6844 - originating ticket that first introduced WebMD health-market targeting
-    # Note: source requirement asserts only one test deal used WebMD targeting but does not include a stated pre-removal audit step; independently verify zero live production usage beyond that one deal before treating removal as safe
 
+  # Source: ET-24695
   @todo
   Scenario Outline: IAS Quality Sync ID field on the Brand Safety Profile form accepts only a 7-digit numeric ID within a fixed range and enforces uniqueness
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -329,16 +329,17 @@ Feature: LIFE Regression - Targetings
     When User enters "<IAS_SYNC_ID>" in the IAS Quality Sync ID field on a Brand Safety Profile and saves
     Then the outcome is "<RESULT>"
     Examples:
-      | IAS_SYNC_ID | RESULT                                     |
-      |             | inline validation error - empty field       |
-      | 40A0000     | inline validation error - non-numeric       |
+      | IAS_SYNC_ID | RESULT                                        |
+      |             | inline validation error - empty field         |
+      | 40A0000     | inline validation error - non-numeric         |
       | 400000      | inline validation error - fewer than 7 digits |
-      | 40000000    | inline validation error - more than 7 digits |
-      | 3999999     | inline validation error - below range        |
-      | 5000000     | inline validation error - above range        |
-      | 4000000     | accepted - lower boundary                    |
-      | 4999999     | accepted - upper boundary                    |
+      | 40000000    | inline validation error - more than 7 digits  |
+      | 3999999     | inline validation error - below range         |
+      | 5000000     | inline validation error - above range         |
+      | 4000000     | accepted - lower boundary                     |
+      | 4999999     | accepted - upper boundary                     |
 
+  # Source: ET-24695
   @todo
   Scenario: A duplicate IAS Quality Sync ID is rejected with an inline message naming the conflicting entity at the Media Planner level
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -346,10 +347,10 @@ Feature: LIFE Regression - Targetings
     Given an IAS Quality Sync ID is already assigned to a Media Planner
     When an internal user enters that same ID on a different Media Planner
     Then an inline message identifies the Media Planner where the ID is already in use
-    # Ambiguity resolved per Interpretation B: linked bug QA-1539 (Done/fixed) confirmed the real duplicate-check scope is the Media Planner level, not the Tactic level as the epic's own written text loosely suggested; retest specifically at Media Planner scope
     Given a previously-saved valid ID outside the current validation range from before this change shipped
     Then it is not force-invalidated on an unrelated re-save
 
+  # Source: ET-24234
   @todo
   Scenario: A new "WebMD Brand's Bundled Deals" AO factor builds a lookalike-modeled seed audience from first-party WebMD page-visitation URL patterns
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -359,11 +360,11 @@ Feature: LIFE Regression - Targetings
     And clicking "Add URL" adds a new row with a remove icon
     When User enters an invalid URL in the pattern picker
     Then the invalid URL is rejected, not silently accepted
-    # Regression anchor: QA-1540 (Done/fixed) - invalid URL was previously accepted in this exact picker; retest with a range of malformed URLs, not just the one originally reported
     Given URL patterns spanning two different domains, for example webmd.com and rxlist.com
     Then visitors matching either domain's pattern are correctly included in the seed audience
     And the seed audience is scored against the full US population via lookalike modeling to produce the final factor output
 
+  # Source: ET-24233
   @todo
   Scenario: A new "Medscape Custom URL" AO factor (titled "Medscape Brand's Bundled Deals") builds a seed audience from SQL-LIKE-wrapped URL patterns
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -375,13 +376,12 @@ Feature: LIFE Regression - Targetings
     Then users are not double-counted in the seed audience
     Given a pattern contains a literal "%" or "_" character intended as match text
     Then the character is escaped/handled rather than breaking the pattern match
-    # Title mismatch: the epic's own requirements text names the product-facing factor "Medscape Custom URL," distinct from the ticket/epic title "Medscape Brand's Bundled Deals" - confirm which name actually ships and flag the same pattern likely applies to the WebMD sibling factor
 
+  # Source: ET-24232
   @todo
   Scenario: Medscape Top-Level Condition AO factor gains a permission-gated Specific Concept Id selector for granular targeting, without altering its existing coarse behavior
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    # Note: this is an enhancement to the existing Medscape Top-Level Condition factor, not a new factor, despite sharing the batch's "New factors" naming convention
     Given only the single named account rkuzmych@pulsepoint.com has this feature enabled
     When any other internal or external user views the Medscape Top-Level Condition factor
     Then the "Specific Concept Id" field is not visible to them at all
@@ -392,6 +392,7 @@ Feature: LIFE Regression - Targetings
     Given a top-level condition is selected without any specific concept ID
     Then the existing coarse-grained behavior still works unchanged as a baseline regression check
 
+  # Source: ET-24231
   @todo
   Scenario: An internal-only "Medscape Drug Monograph Specific" AO factor targets engagement with individually selected drug monograph pages
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -403,4 +404,3 @@ Feature: LIFE Regression - Targetings
     Then the seed audience correctly unions engagement across all selected drugs
     Given the drug name/value shown in the factor picker screen
     Then it must match the drug name/value shown in the Tactic's AO section after selection
-    # CRITICAL - QA-1527 (Open, unresolved at analysis time): the drug name shown in the picker and in the Tactic AO section were found not matching; do not sign off this factor as release-ready until explicitly resolved or knowingly deferred by product, since a mismatch could mean the wrong drug's audience is targeted
