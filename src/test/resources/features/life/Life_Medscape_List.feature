@@ -33,3 +33,21 @@ Feature: LIFE regression - Create NPI List of following types:
     Examples:
       | LIST_NAME     | FILE_NAME            | MESSAGE                      | WAIT_TEXT                           |
       | Medscape_List | NPI_MedscapeList.csv | Soft Matching in Progress... | This process may take a few minutes |
+
+  @todo
+  Scenario: Every DPD record for a Medscape list upload includes FILE_HEADER_ROW, MAPPED_TARGET_FIELDS, and FILE_DETAILED_ROW, positionally aligned and colon-joined
+    Given User uploads a Medscape list-type file and maps its columns, leaving some columns unmapped
+    When the file is processed and sent to the downstream DPD data pipeline
+    Then every record includes FILE_HEADER_ROW as the original uploaded column names joined by ":" in original file order, identical on every row
+    And every record includes MAPPED_TARGET_FIELDS as the mapped Standard Medscape target field names joined by ":", positionally aligned to FILE_HEADER_ROW, with empty slots for unmapped columns
+    And every record includes FILE_DETAILED_ROW as the raw values of that row joined by ":", positionally aligned, with empty slots for empty cells, varying per row
+    And positional order is strictly preserved and never reordered across all three columns
+    Given a column name or cell value itself contains a ":"
+    Then the ":" is replaced with a space uniformly across all three columns
+    Given the File Preview screen is opened after processing completes
+    Then all three columns are surfaced in the File Preview UI
+    Given a non-Medscape list-type upload flow
+    Then that flow is completely unaffected by this change
+    Given a file uploaded before this change ships
+    Then it is not backfilled with the three new columns
+    # Note: column data type/size and whether Preview Mode truncates long values were open recommendations pending explicit sign-off at analysis time; confirm finalized before treating as locked acceptance criteria
