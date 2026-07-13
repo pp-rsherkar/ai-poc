@@ -258,30 +258,29 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
       | CreativeCampaign   | CreativeLine        | CreativeTactic  |
 
+  # Source: ET-24246
   @todo
   Scenario Outline: Report Period supports a Completed Period option that resolves to the most recently fully completed week at execution time
     Given User selects "Completed Period" as Report Period, with only the "Weekly" sub-option enabled
     When User opens the week-definition dropdown
     Then all seven week-start/end combinations are available
-      | Monday-Sunday    |
-      | Tuesday-Monday   |
-      | Wednesday-Tuesday |
+      | Monday-Sunday      |
+      | Tuesday-Monday     |
+      | Wednesday-Tuesday  |
       | Thursday-Wednesday |
-      | Friday-Thursday  |
-      | Saturday-Friday  |
-      | Sunday-Saturday  |
+      | Friday-Thursday    |
+      | Saturday-Friday    |
+      | Sunday-Saturday    |
     Given the report executes on "<EXECUTION_DAY>" for the "<WEEK_COMBINATION>" combination
     Then the resolved date range is "<RESOLVED_RANGE>"
     And a full calendar day must have passed since the week's end day before that week counts as completed, otherwise it resolves to the prior week
     Examples:
-      | EXECUTION_DAY | WEEK_COMBINATION | RESOLVED_RANGE                |
-      | Tue Jan 7      | Monday-Sunday     | Mon Dec 30 - Sun Jan 5         |
-      | Mon Jan 6      | Monday-Sunday     | Mon Dec 30 - Sun Jan 5         |
-      | Sun Jan 5      | Monday-Sunday     | Mon Dec 23 - Sun Dec 29        |
-    # CRITICAL - QA-1571 (Open, unresolved at analysis time): HCP365 weekly extraction was reported generating an 8-day report instead of 7; do not sign off as release-ready until explicitly resolved or knowingly deferred by product
-    # Regression anchor: QA-1538 (Done/fixed) - week-combination selector previously ignored the user's choice and always defaulted to Monday-Sunday; retest all 7 combinations individually to confirm the fix generalizes
-    # Note: timezone governing the "execution timestamp" boundary (user's, account's, or server's) is not specified in the source requirement; confirm before treating a specific timezone as locked
+      | EXECUTION_DAY | WEEK_COMBINATION | RESOLVED_RANGE          |
+      | Tue Jan 7     | Monday-Sunday    | Mon Dec 30 - Sun Jan 5  |
+      | Mon Jan 6     | Monday-Sunday    | Mon Dec 30 - Sun Jan 5  |
+      | Sun Jan 5     | Monday-Sunday    | Mon Dec 23 - Sun Dec 29 |
 
+  # Source: ET-24250
   @todo
   Scenario: Azure Blob Storage is available as a custom report destination with SAS URL or SAS Connection String authentication and a Test Access validation flow
     When User adds a new destination and selects "Azure Blob Storage" as the destination/storage type
@@ -299,14 +298,14 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
     When User edits a SAS field after a Success result
     Then the success message clears and Test Access reappears
     Given the Azure Blob Storage destination is available in all 5 configuration locations
-      | Life Portal - Account Report |
-      | Life Portal - Reporting      |
+      | Life Portal - Account Report    |
+      | Life Portal - Reporting         |
       | HCP portal - Custom destination |
-      | HCP portal - Run Report      |
-      | HCP portal - Schedule Report |
+      | HCP portal - Run Report         |
+      | HCP portal - Schedule Report    |
     Then each location shows the correct, final Azure Blob icon, not a placeholder S3 icon
-    # Regression anchor: source requirement's own comment thread confirms only 2 of these 5 locations were in the original written description; the other 3 (HCP portal) were added by later verbal agreement - all 5 must be tested, not just 2
 
+  # Source: ET-24236
   @todo
   Scenario: SFTP key upload auto-detects a PuTTY (.ppk) key and converts it to OpenSSH format before submission, prompting for a password when the key is encrypted
     When User uploads an OpenSSH/PEM-format SFTP key file
@@ -314,7 +313,6 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
     When User uploads a PuTTY (.ppk) format SFTP key file
     Then it is auto-converted to OpenSSH format client-side before submission to the API
     And a Password field appears specifically for the PuTTY key, allowing the user to enter the password required to decrypt it
-    # Contradiction: the ticket's own acceptance criteria state the upload flow is "identical for the user regardless of key format" with "no extra steps," but the approved design implementation note explicitly adds a visible Password field only for PuTTY uploads - by definition an extra, format-aware step; treat the design note as the operative source of truth and flag the mismatch with product
     Given a corrupted or malformed .ppk file
     Then a clear format error is shown rather than a silent conversion failure
     Given a .ppk file using an unsupported or deprecated key algorithm
