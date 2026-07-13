@@ -72,6 +72,7 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
 
+  # Source: ET-24245
   @todo
   Scenario Outline: HCP365 Report Builder's Report Format dropdown supports all six delimiter formats, mirroring Life's layout
     Given Life application is logged in as "<USER>"

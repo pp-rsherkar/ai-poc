@@ -8,22 +8,27 @@ Feature: Life Platform Meta Endpoints - IAB Categories, Media Optimization Types
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24244
   @todo
   Scenario Outline: GET /api/v2/meta/iabCategories returns hierarchical categories filtered per query parameters, with leafOnly=false returning all levels
     When User calls GET /api/v2/meta/iabCategories with "<PARAMS>"
     Then the response returns "<EXPECTED_RESULT>"
     Examples:
-      | PARAMS                                     | EXPECTED_RESULT                                                                 |
+      | PARAMS                                         | EXPECTED_RESULT                                                                              |
       | includeChildren=true, limit=10, no tier filter | exactly 10 tier-1 parents, though total objects in data may exceed 10 due to nested children |
-      | leafOnly=true                               | only leaf (isLeaf=true) categories                                              |
-      | leafOnly=false                               | all levels, leaf and non-leaf together, not "non-leaf only"                      |
-      | limit=-1                                     | the full bounded taxonomy (450 total per spec) with no truncation or timeout     |
-    # CRITICAL - Ambiguity with confirmed real-world impact: QA/UAT previously filed bugs assuming leafOnly=false means "non-leaf only"; engineering confirmed leafOnly=false means "return all levels" and the fix was documentation-only, not a parameter rename. Confirm the ReadMe documentation update is actually published, and explicitly retest leafOnly=false against the "return all levels" definition before sign-off.
+      | leafOnly=true                                  | only leaf (isLeaf=true) categories                                                           |
+      | leafOnly=false                                 | all levels, leaf and non-leaf together, not "non-leaf only"                                  |
+      | limit=-1                                       | the full bounded taxonomy (450 total per spec) with no truncation or timeout                 |
+
+  # Source: ET-24244
+  @todo
+  Scenario: GET /api/v2/meta/iabCategories rejects or resolves conflicting parent-filter parameters with a structured error
     Given parentCategoryCode (string) and parentId (numeric) are both supplied in the same request
     Then confirm whether this is rejected with 422 or resolved by a defined precedence rule, since the two parameters' relationship is not reconciled in the source requirement
     Given an invalid parameter combination
     Then the response is 422 with a structured error body, and a wholly invalid parameter is 400
 
+  # Source: ET-24242
   @todo
   Scenario: GET /v2/meta/mediaOptimizationTypes returns restriction and deprecation metadata that matches actual tactic create/update validation
     When User calls GET /v2/meta/mediaOptimizationTypes
@@ -34,13 +39,12 @@ Feature: Life Platform Meta Endpoints - IAB Categories, Media Optimization Types
     Given a deprecated optimization type
     When User attempts to create or update a tactic using it via a direct API call
     Then the request is rejected, not merely flagged, confirming deprecation blocks input at the API level
-    # CRITICAL - Contradiction unresolved at analysis time: product stated CPVI and CPV are deprecated, but engineering later found a live tactic on a demo URL still actively using CPVI, and it was unconfirmed whether this was demo-only or also present in production. Confirm the final deprecation status of CPVI and CPV before signing off, since shipping the wrong deprecated flag misrepresents their real availability.
-    # Missing requirement: a releaseStatus field (generallyAvailable/betaTesting/internalTesting or a reduced 2-value set) was requested but its final enum values were not finalized as of analysis time; confirm the actual shipped schema and check companion ticket ET-25010 for the final decision
     Given each restriction in the documented Restriction List, for example CTV blocking CPC/CTR
     Then the metadata matches the validation actually enforced by the tactic creation/update endpoints for that restriction
 
+  # Source: ET-24241
   @todo
-  Scenario: Creative name-uniqueness validation is removed from the create and update endpoints for all three creative types
+  Scenario Outline: Creative name-uniqueness validation is removed from the create and update endpoints for all three creative types
     Given a creative name that duplicates an existing creative's name
     When User creates a new creative via POST for "<CREATIVE_TYPE>"
     Then the request succeeds with no uniqueness error
@@ -52,4 +56,3 @@ Feature: Life Platform Meta Endpoints - IAB Categories, Media Optimization Types
       | Display       |
       | Video         |
       | Native        |
-    # Note: source requirement asserts the system does not key off creative name for anything functional; independently verify no downstream feature (search/lookup by name, name-grouped reporting) silently assumed uniqueness, rather than taking this on faith
