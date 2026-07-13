@@ -139,3 +139,24 @@ Feature: LIFE Regression - Line Item Management
     Examples:
       | LINE_ITEM  | CUSTOM_NAME     | LINE_BUDGET |
       | Line_Item_ | Custom_Field_ID | 50          |
+
+  @todo
+  Scenario: Percentage-budgeted tactics show a read-only dollar value next to the percentage, computed against the current or upcoming flight's budget
+    Given a Line Item's Allocation setting is Percentage
+    When User views the Tactic Allocation field
+    Then a read-only dollar value displays next to the percentage
+    And the Tactic table at the line item level shows the same read-only dollar value next to each tactic's percentage
+    And the Tactic sidebar shows the combined format, for example "Budget: 50% ($50.00)"
+    Given a current flight exists for the line item
+    Then the dollar value is computed against the current flight's budget
+    Given no current flight exists but an upcoming flight exists
+    Then the dollar value is computed against the upcoming flight's budget
+    # Ambiguity: when multiple future flights exist, which one is "the upcoming flight" is not specified in the source requirement; confirm with product before treating a specific selection rule as locked
+    Given neither a current nor a future flight exists
+    Then no dollar value is shown, only the percentage
+    Given a flight's budget changes after a percentage is already set
+    Then the displayed dollar value recalculates against the new budget rather than showing a stale amount
+    Given percentage allocations across tactics do not sum to 100%
+    Then each tactic's dollar value is still computed independently and correctly per its own percentage
+    Given a line item is switched from Percentage back to Dollar budgeting and back to Percentage again
+    Then the computed dollar value redisplays correctly rather than retaining a stale cached figure
