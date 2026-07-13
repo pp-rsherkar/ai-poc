@@ -34,6 +34,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | LIST_NAME     | FILE_NAME            | MESSAGE                      | WAIT_TEXT                           |
       | Medscape_List | NPI_MedscapeList.csv | Soft Matching in Progress... | This process may take a few minutes |
 
+  # Source: ET-24692
   @todo
   Scenario: Every DPD record for a Medscape list upload includes FILE_HEADER_ROW, MAPPED_TARGET_FIELDS, and FILE_DETAILED_ROW, positionally aligned and colon-joined
     Given User uploads a Medscape list-type file and maps its columns, leaving some columns unmapped
@@ -50,4 +51,3 @@ Feature: LIFE regression - Create NPI List of following types:
     Then that flow is completely unaffected by this change
     Given a file uploaded before this change ships
     Then it is not backfilled with the three new columns
-    # Note: column data type/size and whether Preview Mode truncates long values were open recommendations pending explicit sign-off at analysis time; confirm finalized before treating as locked acceptance criteria

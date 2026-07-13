@@ -70,6 +70,7 @@ Feature: Curated Markets - Verify Deal Import, Validation, and Tactic Assignment
       | MARKET_NAME    | ACCOUNTS              | DESCRIPTION                | MARKET_KPI_BENCHMARK |
       | Curated_Market | automation@pulsepoint | Curated Market Description | 0.5                  |
 
+  # Source: ET-24235
   @todo
   Scenario Outline: Curated Market margin is percentage-based with an optional dollar cap, and the dollar margin field is no longer editable
     When User creates or edits a Curated Market
@@ -80,16 +81,15 @@ Feature: Curated Markets - Verify Deal Import, Validation, and Tactic Assignment
     And the Market > Deals view displays the deal floor using the same formula
     Examples:
       | MARGIN_PERCENT | CAP  |
-      | 100%            | $300 |
-      | 50%             | none |
-      | 10%             | $0   |
+      | 100%           | $300 |
+      | 50%            | none |
+      | 10%            | $0   |
 
+  # Source: ET-24235
   @todo
   Scenario: Migrated Curated Market ID 48 shows the documented post-migration margin and cap values
     Given the Health System Curated Market, ID 48, was migrated from a $ margin
     When User views its margin configuration
     Then it shows 100% margin with a $300 cap
-    # Regression anchor: PROD-14695 - March 2026 predecessor migrated Life Marketplace deals to % margin; this ticket extends the same model to Curated Markets
     Given any other existing Curated Market that previously had a $ margin besides ID 48
     Then it was migrated to a sensible, correct equivalent % and cap
-    # Note: PROD-15840/PROD-15842 (status Needs Grooming at analysis time) will later remove the legacy $-margin code; this release is a UI-visibility change only, not a full code removal

@@ -9,6 +9,7 @@ Feature: Deal Debugger - Data Source Corrections and Scope Expansion
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the Tactic Debugger for an existing tactic
 
+  # Source: ET-24480
   @todo
   Scenario Outline: Post Targeting Eligible Requests uses day-bounded Today/Yesterday data instead of a rolling 24-hour window
     Given User selects "<TIMEFRAME>" as the Debugger timeframe
@@ -23,17 +24,17 @@ Feature: Deal Debugger - Data Source Corrections and Scope Expansion
       | Today     |
       | Yesterday |
 
+  # Source: ET-24243
   @todo
   Scenario: Bids in the Tactic Debugger is sourced from the same DPD Adv Stats endpoint as Impressions, resolving the Win Rate mismatch
     Given User views the Tactic Debugger metrics header
     Then Bids is sourced from the DPD Adv Stats endpoint, the same source already used for Impressions, Clicks, Win Rate, and CTR
     When User manually recomputes Win Rate as Impressions divided by Bids using the displayed values
     Then the recomputed value matches the displayed Win Rate
-    # Regression anchor: BRAIN-2339 - root-cause ticket for the Win Rate mismatch; confirm the exact originally reported discrepancy is closed, not just the general metric source
-    # Regression anchor: HT-5259 - root-cause ticket for "more impressions than bids"; cross-check the exact originally reported scenario now shows correct behavior
     Given any filter/breakdown view within the Debugger beyond the top-level metrics header
     Then the Bids source change applies consistently across all such breakdowns
 
+  # Source: ET-24239
   @todo
   Scenario: Deal View is accessible for tactics targeting Deals and the Open Exchange together, showing only explicitly targeted deals
     Given a tactic has "Selected + Open Exchange" selected in the Curated Markets and Deals section

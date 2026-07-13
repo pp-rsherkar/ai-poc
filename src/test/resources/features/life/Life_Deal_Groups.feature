@@ -7,6 +7,7 @@ Feature: Deal Groups - Yesterday's Available Impressions Column
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User navigates to the Deal Group view
 
+  # Source: ET-24249
   @todo
   Scenario: Est. Avails Yst column shows yesterday's available impressions, reusing the Est. Avails 30d data source and null-handling convention
     Then a new column "Est. Avails Yst" appears immediately to the right of the existing "Est. Avails 30d" column

@@ -151,6 +151,7 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
 
+  # Source: ET-24260
   @todo
   Scenario Outline: Weekly granularity trend chart x-axis displays calendar dates instead of week numbers
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -171,4 +172,3 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
     Examples:
       | GRANULARITY |
       | Weekly      |
-    # Regression anchor: this ticket slipped one release cycle (June to July 2026) due to FE sprint capacity; verify the QA cycle was not compressed by the slip
