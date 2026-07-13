@@ -71,3 +71,28 @@ Feature: HCP365 Regression - Dashboard data Validation and Permission
     Examples:
       | USER    | ADVERTISER | TYPE    | CLIENT | ExpectedOutput | User Type |
       | admin11 |            | Regular |        | XYZ            | Internal  |
+
+  @todo
+  Scenario Outline: HCP365 Report Builder's Report Format dropdown supports all six delimiter formats, mirroring Life's layout
+    Given Life application is logged in as "<USER>"
+    And User clicks on HCP 365 module from main menu
+    And User navigates to Report Builder
+    When User opens the Report Format dropdown
+    Then all six formats are available, matching Life's Report Format UI layout
+      | CSV (Comma-delimited) |
+      | Tab Delimited (TSV)   |
+      | Pipe Delimited CSV    |
+      | Pipe Delimited TXT    |
+      | Tab Delimited TXT     |
+      | Excel                 |
+    When User selects "<FORMAT>" and generates a scheduled or on-demand report containing a value with the delimiter character itself, with Text Qualifier enabled
+    Then the delimiter is correctly applied and Text Qualifier/escaping prevents column misalignment for that value
+    Given a report scheduled before this change shipped with a legacy format setting
+    Then it continues to generate correctly post-deployment with no forced-migration break
+    Examples:
+      | USER    | FORMAT                |
+      | admin11 | CSV (Comma-delimited) |
+      | admin11 | Tab Delimited (TSV)   |
+      | admin11 | Pipe Delimited CSV    |
+      | admin11 | Pipe Delimited TXT    |
+      | admin11 | Tab Delimited TXT     |
