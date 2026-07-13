@@ -139,12 +139,24 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     When User searches the deal and assign it from the deal list
     And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
     And Verify Archive option is available based on the campaign state
+    And Verify the Tactic Link is available in the confirmation pop-up
+    And Verify the Tactic Link is clickable and navigates to the respective tactic page
+    When User searches the deal and assign it from the deal list
+    And User unassigns active deal from the applied deals section of All Deals tab
+    When User clicks on OK button
+    And User saves the settings
+    When User add new targeting rule for Rule Type "Deals"
+    Then user should navigate to PMP Deals Panel
+    When User searches the deal and assign it from the deal list
+    And User clicks 3 dot menu and selects Archive button for the active deal from the deal listing
+    And Verify Archive option is available based on the campaign state
     And User clicks "Archived" button from the search section of deal listing page
     Then Verify that the deal is moved to archived deal section
     Examples:
       | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | ADVERTISER     | CURATOR                          | CREATIVE      |
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 01- Advertiser | PulsePoint (Direct Integrations) | Auto_Creative |
 
+  # Source: ET-24733
   @todo
   Scenario: PG Tactic auto-derives Base/Max Bid Price and Media Optimization from targeted PG deal terms, and PG Line Item flight pacing always shows ASAP
     Given User adds multiple PG deals priced "$2", "$5", "$6" as targeting on a PG Tactic
@@ -166,15 +178,12 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then the Bid Price and Media Optimization fields re-lock and re-populate correctly rather than retaining stale disabled values
     Given a targeted PG deal's price exceeds the account-level Max Bid Price cap
     Then the account cap is honored and the Tactic saves without error, with no warning UI shown in this release
-    # Regression anchor: PROD-15977 - warning UI for this case is explicitly deferred to a follow-up ticket
-    # Regression anchor: ET-24697 - Deal Incompatibility warning/tooltip changes on the same tactic-deal-compatibility UI surface, same parent epic; regression-test together
 
+  # Source: ET-24238
   @todo
   Scenario: Media Spend column on Deal > Associated Tactics view is visible only to users with the permission-gated soft launch enabled
     Given a user without the Media Spend gating permission views the Deal > Associated Tactics view
     Then the Media Spend column is fully absent from the view, not merely disabled
     Given a user with the Media Spend gating permission enabled views the same Deal > Associated Tactics view
     Then the Media Spend column is visible and its values match the underlying DPD-sourced data
-    # Regression anchor: DPD-2698 - backing data-pipeline ticket was still in Prod Release status, not a terminal Done state, at analysis time; confirm data completeness before relying on displayed values
     And toggling the gating permission on and off for a test account correctly shows and hides the column
-    # Note: this release ships as a permission-gated soft launch ahead of a planned August GA per product's own stated rollout plan; this scenario intentionally does not assert full GA-scope behavior
