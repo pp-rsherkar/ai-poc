@@ -91,7 +91,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify user is able to close the Creative Preview tab
     And User searches the creative and clicks the creative details from Creative Library page
     And User clicks on Preview link from Creative Details page
-    Then Verify Creative Preview tab is displayed with correct creative name
+    And Verify Creative Preview tab is displayed with correct creative name
     And Verify user is able to close the Creative Preview tab
 
   @regression
@@ -320,6 +320,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Line Item Dates |
     And User navigates to Line item from Association Tab
 
+  # Source: ET-24229
   @todo
   Scenario Outline: Bulk Creative Upload auto-populates Clickthrough URL and Domain Landing from the upload sheet or embedded tags
     Given User has the "EXTRACT CLICKTHRU AND DOMAIN LANDING" permission enabled
@@ -333,6 +334,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | HTML          | with no Clickthrough URL column and no embedded clickthrough URL found      | both fields are left blank rather than raising an error                                              |
       | Native        | with a Clickthrough URL column                                              | Domain Landing is populated by stripping the path from the first row's Clickthrough URL              |
 
+  # Source: ET-24229
   @todo
   Scenario: Auto-population is fully inactive for users without the gating permission, and does not slow large uploads
     Given User does not have the "EXTRACT CLICKTHRU AND DOMAIN LANDING" permission
@@ -341,9 +343,8 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     Given a very large bulk upload file with no Clickthrough URL column
     When User uploads the file
     Then the tag-scanning step completes within a few seconds and does not materially slow the upload flow
-    # Regression anchor: QA-1533 - BLOCKER - Landing Domain field was not auto-populated when the file had a Clickthrough URL column; verify this fix holds
-    # Note: Audio Bulk Uploads GA is explicitly blocked on this ticket per source analysis; treat Audio coverage above as release-gating
 
+  # Source: ET-24268
   @todo
   Scenario Outline: Duration column replaces Size column for Video creatives in the Tactic Creative Table and Creative Library, per row
     Given a table or library listing contains creatives of mixed types, including "<CREATIVE_TYPE>"
@@ -355,6 +356,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Tactic Creative Table | Image         |
       | Creative Library      | HTML          |
 
+  # Source: ET-24268
   @todo
   Scenario: Duration values render correctly at extreme lengths and while metadata is still processing
     Given a Video creative with duration metadata still transcoding or unprocessed
