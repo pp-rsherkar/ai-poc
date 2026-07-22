@@ -1,8 +1,15 @@
 Read the feature file $ARGUMENTS from the repository and generate the complete test automation for it.
+Only work on scenarios tagged with @todo — skip all other scenarios in the feature file.
 
 Follow CLAUDE.md for the full workflow — all 5 phases:
-1. Locate and parse the feature file, catalog every step, identify the domain
+1. Locate and parse the feature file, catalog every step but only for @todo-tagged scenarios, identify the domain
 2. Scan existing step definitions, page objects, and utilities — reuse first, never duplicate
-3. Navigate the live application for real locators, then generate step definitions and page object classes
-4. Run the feature file with Maven and iterate until all scenarios pass with zero failures
+3. Navigate the live application for real locators, then generate step definitions and page object classes (only for steps needed by @todo scenarios)
+4. Run the @todo scenarios with Maven (use `-Dcucumber.filter.tags="@todo"`) and iterate until all pass with zero failures
 5. Create a new branch, commit all changes, and push
+
+Code-style rules (mandatory — match existing repo conventions):
+- All page-class locators must be declared as fields and initialized inside the constructor (follow the existing locator strategy in the repo — do not use inline `page.locator()` calls in methods)
+- Step definition class structure (method signatures, hook usage, dependency injection) must match the patterns already present in the repo's step definition classes
+- Page class method structure (naming, return types, visibility, how they call locators) must match the patterns already present in the repo's page object classes
+- Before writing any new code, study at least ten existing step definition files and ten existing page object files to extract the house style, then follow it exactly
