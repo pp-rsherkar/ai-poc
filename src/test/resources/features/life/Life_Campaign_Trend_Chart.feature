@@ -1,6 +1,6 @@
 Feature: LIFE Campaign Trend Chart - Verify Weekly x-axis label displays calendar start-of-week dates
   1. Weekly granularity x-axis labels show calendar start-of-week dates (MM/DD/YY) instead of ISO week numbers
-  2. Weekly label behavior across partial-week and long/yearly date ranges, with underlying chart data unchanged
+  2. Weekly label behavior across partial-week, single-week, year-boundary, and long/yearly date ranges, with underlying chart data unchanged
   3. Daily, Monthly, and Hourly granularities remain unaffected, including under rapid granularity switching
 
   Background:
@@ -18,11 +18,13 @@ Feature: LIFE Campaign Trend Chart - Verify Weekly x-axis label displays calenda
     And The week-start label behavior for that range matches "<EXPECTED_BEHAVIOR>"
     And The underlying chart data points and shape remain unchanged from before the label format update
     Examples:
-      | DATE_RANGE_TYPE      | START_DATE | END_DATE   | EXPECTED_BEHAVIOR                                                                            |
-      | Multi-week range     | 03/01/2026 | 03/29/2026 | the first label displays as 03/01/26 for the week that begins on that date                   |
-      | Mid-week start range | 03/04/2026 | 03/29/2026 | the first label reflects the true week-start Sunday date rather than the mid-week start date |
-      | Mid-week end range   | 03/01/2026 | 03/25/2026 | the final label reflects the correct week-start date for the trailing partial week           |
-      | Yearly range         | 11/17/2025 | 06/29/2026 | all weekly labels remain legible with no overlapping text                                    |
+      | DATE_RANGE_TYPE      | START_DATE | END_DATE   | EXPECTED_BEHAVIOR                                                                                              |
+      | Multi-week range     | 03/01/2026 | 03/29/2026 | the first label displays as 03/01/26 for the week that begins on that date                                    |
+      | Mid-week start range | 03/04/2026 | 03/29/2026 | the first label reflects the true week-start Sunday date rather than the mid-week start date                  |
+      | Mid-week end range   | 03/01/2026 | 03/25/2026 | the final label reflects the correct week-start date for the trailing partial week                            |
+      | Single-week range    | 03/01/2026 | 03/07/2026 | the single visible week label renders correctly as 03/01/26, using the same format as multi-week ranges       |
+      | Year-boundary range  | 12/28/2025 | 01/04/2026 | the week spanning Dec 31/Jan 1 renders as 12/28/25 with correct year rollover and no mis-rendered label       |
+      | Yearly range         | 11/17/2025 | 06/29/2026 | all weekly labels remain legible with no overlapping text                                                     |
 
   # Source: ET-24260
   @todo
