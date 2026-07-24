@@ -9,8 +9,10 @@ Feature: Life Keyword Targeting - Align Search Behaviour with Media Planner
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24719, GAP-1, AMB-1
   @todo
   Scenario: Verify the filter-and-highlight search workflow for Keyword and Keyword Population targeting
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User creates a new tactic and opens Keyword targeting
     When User types "hypertension" in the search field
     Then the list filters to show only items containing "hypertension" and hides non-matching items
@@ -30,8 +32,10 @@ Feature: Life Keyword Targeting - Align Search Behaviour with Media Planner
     When User runs the same search term in Life DSP and in Media Planner
     Then both surfaces filter with the same matching logic and the same result count
 
+  # Source: ET-24719, GAP-2, HT-4185
   @todo
   Scenario: Verify selection persistence and adjacent-targeting regression after search-driven selection
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User creates a new tactic and opens Keyword targeting
     When User filters the list by "diabetes", selects 5 items from the filtered results, and saves the tactic
     And User reopens the tactic

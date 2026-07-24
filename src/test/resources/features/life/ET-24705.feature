@@ -9,8 +9,10 @@ Feature: Admin AM Settings - Decouple Login/Logout Section from VIEW PINTEREST S
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24705
   @todo
   Scenario: Verify the Login/Logout section visibility and per-button gating workflow after the permission decoupling
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account without the VIEW PINTEREST SIGNIN permission
     When User navigates to Admin > AM Settings
     Then the Login/Logout section is visible and the Pinterest Sign-in button within it is not visible
@@ -27,8 +29,10 @@ Feature: Admin AM Settings - Decouple Login/Logout Section from VIEW PINTEREST S
     Given any user account
     Then the TikTok sign-in option is visible in the Login/Logout section with no permission gate
 
+  # Source: ET-24705, GAP-2, AMB-1, ET-24726
   @todo
   Scenario: Verify the section is not over-gated and the Pinterest OAuth flow and adjacent permissions still work
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account with no special permissions
     When User navigates to Admin > AM Settings
     Then the Login/Logout section is visible with no remaining permission gate on the section container

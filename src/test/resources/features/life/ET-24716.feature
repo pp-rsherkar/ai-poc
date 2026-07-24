@@ -9,8 +9,10 @@ Feature: Admin - Milkshake Animation Upload UI
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24716, GAP-1, GAP-2, AMB-1, AMB-3
   @todo
   Scenario: Verify the upload, validation, preview, and scheduling workflow in the Admin Animation Upload UI
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User navigates to the Animation Upload section in the Admin panel
     Then the Animation Upload section and its upload interface are displayed
     # GAP-4: the specific permission gating Admin access is not defined
@@ -32,8 +34,10 @@ Feature: Admin - Milkshake Animation Upload UI
     When User enters a past date in the scheduler
     Then the past date is rejected with a validation error or a warning that the animation will activate immediately
 
+  # Source: ET-24716, GAP-3, AMB-2
   @todo
   Scenario: Verify animation management, activation, and Life DSP loader delivery with fallback
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given a valid animation is scheduled in the Admin Animation Upload UI
     When User edits the scheduled date of an existing entry and deletes a different entry
     Then the edit saves with the new date, the deleted entry is removed, and the changes persist on reload

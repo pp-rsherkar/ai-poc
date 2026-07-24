@@ -9,8 +9,10 @@ Feature: Admin - Omnichannel Audiences Minimum Size View and Edit Permissions
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24726, GAP-1, GAP-2
   @todo
   Scenario: Verify the VIEW and EDIT permission workflow for global and account-level omnichannel minimum sizes
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is an internal admin with the VIEW minimum size permission
     When User navigates to the global omnichannel minimum size settings
     Then the minimum size value for each configured platform is visible and read-only
@@ -28,8 +30,10 @@ Feature: Admin - Omnichannel Audiences Minimum Size View and Edit Permissions
     When User sets a platform minimum size to 10000000
     Then the value saves and displays without truncation or error
 
+  # Source: ET-24726, AMB-1, ET-24705
   @todo
   Scenario: Verify the permission gates hide the minimum size settings without leaking access across permissions
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is an internal admin without the VIEW minimum size permission
     When User navigates to the global omnichannel minimum size settings
     Then the minimum size settings section is not visible and no access or permission error is shown

@@ -9,8 +9,10 @@ Feature: Life Health Pages Targeting - Migrate to MeSH 2025 13k Taxonomy
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24730, AMB-1
   @todo
   Scenario: Verify the MeSH 2025 taxonomy rendering, deep-nesting margins, and search highlighting workflow in Health Pages targeting
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User creates a new tactic and opens Health Pages targeting
     Then the Health Pages taxonomy tree loads and displays the MeSH 2025 descriptors (~13k unique entries, not the legacy ~7.5k)
     When User expands a tree branch to 5 or more levels deep
@@ -29,8 +31,10 @@ Feature: Life Health Pages Targeting - Migrate to MeSH 2025 13k Taxonomy
     When User rapidly expands and collapses multiple branches
     Then the tree stays stable with no blank nodes, UI freeze, or console errors
 
+  # Source: ET-24730, GAP-2, AMB-2, HT-4185, HT-5112
   @todo
   Scenario: Verify MeSH 2025 selection persistence, cascade behaviour, and cross-targeting regression on tactic save
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User creates a new tactic and opens Health Pages targeting
     When User selects 50 MeSH 2025 descriptors across multiple tree levels and saves the tactic
     And User reopens the tactic

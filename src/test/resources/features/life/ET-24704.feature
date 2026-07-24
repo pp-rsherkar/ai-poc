@@ -9,8 +9,10 @@ Feature: Admin - Updates to Health Markets
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24704, GAP-1, GAP-2, AMB-2
   @todo
   Scenario: Verify the Admin Health Markets SSP deal management and search-by-typing workflow
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is an Admin user
     When User navigates to Admin > Health Markets
     Then the Health Markets section loads without error and reflects the post-July-2025 state (curated deals under Premium Publishers / Medscape)
@@ -25,8 +27,10 @@ Feature: Admin - Updates to Health Markets
     When User removes an existing deal from the Health Markets deal list
     Then the deal is removed and Life DSP targeting for Health Markets no longer shows that deal for new tactics
 
+  # Source: ET-24704, ET-25045
   @todo
   Scenario: Verify Admin Health Markets changes stay within scope and do not affect targeting UI or other Admin sections
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is an Admin user on the Health Markets section
     Then legacy targeting options now consolidated (Haymarket, Everyday Health, Conde Nast, Vice Media, AMC) are absent or clearly marked deprecated
     When User checks Life DSP tactic targeting for Health Markets legacy options

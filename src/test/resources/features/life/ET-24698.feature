@@ -9,8 +9,10 @@ Feature: Deal Platform - Additional Metrics in Deal Groups Associated Tactics (I
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24698, GAP-1, GAP-3, AMB-1
   @todo
   Scenario: Verify the permission-gated metrics, date range, sort, filter, and CSV export workflow in Associated Tactics
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account with all new metrics permissions enabled
     When User opens a Deal Group and navigates to the Associated Tactics view
     Then the new metric columns appear in the Associated Tactics table
@@ -27,8 +29,10 @@ Feature: Deal Platform - Additional Metrics in Deal Groups Associated Tactics (I
     Then no "Show Tactics From Other Accounts" checkbox is present anywhere in the view
     # AMB-1: the checkbox is descoped (Pavan Dasari) - verify it is fully absent, not merely disabled
 
+  # Source: ET-24698, HT-5419, HT-5521, HT-6125, HT-5666
   @todo
   Scenario: Verify permission gating, data accuracy, and Deal Groups regression guards in Associated Tactics
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account without the new metrics permissions
     When User opens Deal Group > Associated Tactics
     Then the new metric columns and the date-range selector are not visible and only baseline columns appear

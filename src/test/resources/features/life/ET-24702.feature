@@ -9,8 +9,10 @@ Feature: Creative Bulk Upload - Accept DCM Tags Starting with <script
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24702, HT-5114
   @todo
   Scenario: Verify valid <script DCM tags upload successfully with correct click-macro substitution
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User has a DCM tag sheet containing JavaScript tags that start with "<script" in the Klick Agency format
     When User uploads the tag sheet via the DCM bulk-upload UI
     Then the upload completes successfully with no error message (no click-macro error and no "many empty rows" error)
@@ -24,8 +26,10 @@ Feature: Creative Bulk Upload - Accept DCM Tags Starting with <script
     When User uploads a <script tag with an unusually long URL or script body
     Then the upload succeeds, the click macro populates, and the tag content is not truncated
 
+  # Source: ET-24702, GAP-2, HT-4137
   @todo
   Scenario: Verify the validation change keeps rejecting invalid content and does not regress DCM accuracy
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is on the DCM bulk-upload UI
     When User uploads a file that is not a valid DCM tag sheet
     Then the upload is rejected with a clear error and the validator does not become too permissive

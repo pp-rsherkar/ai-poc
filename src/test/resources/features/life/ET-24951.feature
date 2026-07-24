@@ -9,8 +9,10 @@ Feature: Life Report Builder - Health System EHR Dimension
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24951, GAP-2, HT-5466
   @todo
   Scenario: Verify the Health System EHR dimension workflow in Life Report Builder for a Flora EHR deal account
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User opens Life Report Builder for an account with active Flora EHR deals
     Then the "Health System EHR" dimension is visible in the dimension picker under its category grouping
     And the dimension label reads exactly "Health System EHR"
@@ -28,8 +30,10 @@ Feature: Life Report Builder - Health System EHR Dimension
     # GAP-2: exact fallback for the missing Veradigm reporting_value is undefined - document actual result and confirm with team
     # Regression anchor: HT-5466 - Flora deal values correct in backend but rendered incorrectly in the FE
 
+  # Source: ET-24951, GAP-3, HT-5466
   @todo
   Scenario: Verify the Health System EHR dimension degrades gracefully for non-Flora accounts and preserves existing reports
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User opens Life Report Builder for an account with no Flora EHR deals
     When User selects the "Health System EHR" dimension and runs the report
     Then the report generates with empty/null values for the dimension and no error or 403 is thrown

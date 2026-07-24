@@ -9,8 +9,10 @@ Feature: Admin - Deprecate Line Item Creative Separation Permission
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24713
   @todo
   Scenario: Verify the Line Item Creative Separation permission removal and Life Features table integrity workflow
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is an Admin user viewing the Life Features table
     Then the "Line Item Creative Separation" row is absent and all other rows are present and intact
     When User toggles a permission row adjacent to where Line Item Creative Separation was
@@ -18,8 +20,10 @@ Feature: Admin - Deprecate Line Item Creative Separation Permission
     When User opens an Admin audit log after deployment, if audit logging covers table changes
     Then the log shows the removal of the Line Item Creative Separation permission with no erroneous entries
 
+  # Source: ET-24713, GAP-2, AMB-1, ET-24715
   @todo
   Scenario: Verify the deprecation preserves existing line items and stays isolated from ET-24715
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account that previously had the Line Item Creative Separation permission enabled
     When User creates or edits a line item with that account
     Then the line item configuration works normally with no permission-related error

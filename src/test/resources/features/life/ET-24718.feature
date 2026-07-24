@@ -9,8 +9,10 @@ Feature: Tag Manager v1.0 - UI Polish and Navigation Refinements
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24718, GAP-1, GAP-3
   @todo
   Scenario: Verify the channel-order, sorting, and hidden-Social workflow across Tag Manager views
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User opens Tag Manager v1.0
     Then the channel navigation renders in the order Site, Search, Email, Media
     And the Social channel is not visible anywhere in the navigation and no Social toggle is shown
@@ -25,8 +27,10 @@ Feature: Tag Manager v1.0 - UI Polish and Navigation Refinements
     When User switches between Site, Email, Search, and Media in the navigation
     Then each channel section loads correctly with its configuration data intact and unchanged
 
+  # Source: ET-24718, AMB-2
   @todo
   Scenario: Verify hidden Social data preservation and per-channel functionality after the order change
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an existing saved Tag Manager that contains Social channel data
     When User opens it after the channel-order deployment
     Then the existing data is intact and the Social channel data is not deleted even though the Social toggle is hidden

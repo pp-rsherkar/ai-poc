@@ -9,8 +9,10 @@ Feature: Deal Platform - Remove Deal Incompatibility Warning for PG Deals on non
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24697, GAP-1, AMB-2
   @todo
   Scenario: Verify the incompatibility warning and tooltip are removed for the PG-on-non-PG workflow
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account with the PG Workaround permission
     When User creates a non-PG tactic and adds a PG deal to it
     Then the deal is added with no Deal Incompatibility warning, modal, toast, or inline message
@@ -26,8 +28,10 @@ Feature: Deal Platform - Remove Deal Incompatibility Warning for PG Deals on non
     Then the actual behaviour is documented (warning still shown, action blocked, or silent)
     # GAP-1: behaviour for non-PG-Workaround users is unspecified - document actual behaviour
 
+  # Source: ET-24697, HT-5466, HT-3601, HT-5051
   @todo
   Scenario: Verify the warning removal is targeted and PG delivery, pricing, fees, and bidding are not regressed
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account with a PG tactic setup
     When User adds a PG deal to a PG tactic
     Then the deal is added with no incompatibility message (the correct PG-on-PG scenario is unaffected)

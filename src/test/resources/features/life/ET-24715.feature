@@ -9,8 +9,10 @@ Feature: Admin - Deprecate Creative Name Bid Multiplier Permission
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24715, GAP-1
   @todo
   Scenario: Verify the Creative Name BM permission removal and Life Features table integrity workflow
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is an Admin user viewing the Life Features table
     Then the "Creative Name BM" row is absent and all other permission rows are present and intact
     # GAP-1: whether the underlying feature code is also deleted (vs. only the permission row) is an unresolved open question
@@ -21,8 +23,10 @@ Feature: Admin - Deprecate Creative Name Bid Multiplier Permission
     When User searches or filters the Life Features table for "Creative Name"
     Then no results are returned and the search does not error or return stale cached results
 
+  # Source: ET-24715, AMB-1, ET-24713
   @todo
   Scenario: Verify the deprecation does not break existing workflows and stays isolated from ET-24713
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account that previously had the Creative Name BM permission enabled
     When User creates and saves a tactic with that account
     Then the tactic saves normally with no permission-related error tied to Creative Name BM

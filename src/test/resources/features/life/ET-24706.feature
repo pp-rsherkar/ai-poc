@@ -9,8 +9,10 @@ Feature: Audience Manager - Deprecate Meta Web (Pixel) Audience Creation
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24706
   @todo
   Scenario: Verify the Meta audience push workflow creates only the Customer File Custom Audience and no pixel audience
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account configured for Meta audience push with an active Meta Pixel
     When User creates and pushes an AM audience to Meta
     Then the push completes successfully with a confirmation and no pixel-audience API error in the AM UI
@@ -21,8 +23,10 @@ Feature: Audience Manager - Deprecate Meta Web (Pixel) Audience Creation
     Given a client Meta account with pre-existing Website Custom Audiences created before the deprecation
     Then those pre-existing pixel audiences remain unchanged after the push (forward-only change, no backfill deletion)
 
+  # Source: ET-24706, GAP-1, GAP-2
   @todo
   Scenario: Verify push resilience, non-Meta isolation, and error handling after the pixel signal removal
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account with Meta integration but no Meta Pixel configured
     When User pushes an AM audience to Meta
     Then the push completes successfully with no missing-Pixel error and the Customer File CA is created

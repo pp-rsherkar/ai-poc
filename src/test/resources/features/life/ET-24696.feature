@@ -9,8 +9,10 @@ Feature: Deal Platform - Hidden Deal Handling in Deal Groups
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24696, GAP-1, GAP-3
   @todo
   Scenario: Verify hidden deal filtering, in-group persistence, and user messaging workflow in Deal Groups
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given an account with at least one deal marked as hidden
     When User opens the Deal Group > Add Deals picker
     Then the hidden deal is not shown while all non-hidden deals appear normally
@@ -27,8 +29,10 @@ Feature: Deal Platform - Hidden Deal Handling in Deal Groups
     When User opens the group
     Then a clear message explains that all deals are hidden with no crash or unexplained empty state
 
+  # Source: ET-24696, GAP-2, HT-5167, HT-5666, HT-6125
   @todo
   Scenario: Verify duplicate-name validation and Deal Groups regression guards
+    # Framework Gap: new step definitions required in stepdefinitions/LifeSteps.java (Background steps reused verbatim)
     Given User is creating a deal group
     When User creates a deal group with a name that already exists in the account
     Then the specific duplicate-name error message is shown and the deal group is not created

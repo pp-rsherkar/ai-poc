@@ -9,8 +9,10 @@ Feature: HCP365 Report Builder - Support 'in' and 'not in' Filter Operators
     Given This scenario will be executed in the "Pre-release" environment as a "User"
     And "HCP" application is logged in successfully with Account "automation@pulsepoint"
 
+  # Source: ET-24701, GAP-1, GAP-2, AMB-1
   @todo
   Scenario: Verify the 'in' and 'not in' multi-value filter workflow in HCP365 Report Builder
+    # Framework Gap: new step definitions required in stepdefinitions/HcpSteps.java (Background steps reused verbatim)
     Given User opens HCP365 Report Builder and creates a new filter on a supported dimension
     Then the operator dropdown shows both "in" and "not in" as options
     # GAP-1: the set of supported dimensions is defined in Lisa Choo's Google Sheet and must be obtained
@@ -29,8 +31,10 @@ Feature: HCP365 Report Builder - Support 'in' and 'not in' Filter Operators
     Then the report applies the filters with AND logic and returns the correctly intersected rows
     # AMB-1: multi-filter combination behaviour
 
+  # Source: ET-24701, AMB-2, HT-5720, HT-6148, HT-3962
   @todo
   Scenario: Verify input validation and backward-compatibility for existing HCP365 reporting artifacts
+    # Framework Gap: new step definitions required in stepdefinitions/HcpSteps.java (Background steps reused verbatim)
     Given User opens HCP365 Report Builder
     When User adds an "in" filter with an empty value list and runs the report
     Then a validation error states the value list cannot be empty and the report does not run
