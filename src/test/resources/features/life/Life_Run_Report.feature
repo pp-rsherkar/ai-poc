@@ -298,3 +298,113 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Examples:
       | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
       | CreativeCampaign   | CreativeLine        | CreativeTactic  |
+
+  # Source: ET-24951
+  @todo
+  Scenario Outline: Group Life Report Builder impression delivery by the Health System EHR dimension
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    # Framework Gap: Requires step definitions for verifying the Health System EHR dimension in the picker in LifeSteps.java
+    Then The "Health System EHR" dimension is displayed in the dimension picker under its category grouping
+    # Framework Gap: Requires step definitions for Flora EHR permission-free dimension access in LifeSteps.java
+    And The "Health System EHR" dimension is available to Flora EHR clients without a special permission grant
+    # Framework Gap: Requires step definitions for adding a dimension as a row grouping in LifeSteps.java
+    When User adds the "Health System EHR" dimension as a row grouping
+    # Framework Gap: Requires step definitions for filtering the report to a Flora EHR deal in LifeSteps.java
+    And User filters the report to the Flora EHR deal "<DEAL>"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for verifying one row per EHR platform in LifeSteps.java
+    Then The report displays one row per EHR platform with an impression count for each platform
+    # Framework Gap: Requires step definitions for verifying the flora_ehr flat-file source label in LifeSteps.java
+    And The "<EHR_PLATFORM>" row label matches its flora_ehr flat-file source platform
+    # Framework Gap: Requires step definitions for verifying distinct per-platform impression counts in LifeSteps.java
+    And The "<EHR_PLATFORM>" row displays a distinct impression count
+    And Confirms that the report panel retains the entered data
+    Examples:
+      | EHR_PLATFORM | DEAL                      |
+      | Epic         | PP_HealthSystemEHR_CBR001 |
+      | Cerner       | PP_HealthSystemEHR_CBR001 |
+
+  # Source: ET-24951
+  @todo
+  Scenario: Resolve a defined label or fallback for Veradigm impressions from publisher 562529
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    # Framework Gap: Requires step definitions for adding a dimension as a row grouping in LifeSteps.java
+    When User adds the "Health System EHR" dimension as a row grouping
+    # Framework Gap: Requires step definitions for filtering the report to a Flora EHR deal in LifeSteps.java
+    And User filters the report to the Flora EHR deal "PP_HealthSystemEHR_CBR001"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for verifying the Veradigm reporting_value fallback for publisher 562529 in LifeSteps.java
+    Then The Veradigm impressions from publisher "562529" display a valid label or the defined fallback "Veradigm"
+    # Framework Gap: Requires step definitions for verifying the Health System EHR row never errors or blanks in LifeSteps.java
+    And The Health System EHR row never displays an error or a blank value
+
+  # Source: ET-24951
+  @todo
+  Scenario: Return empty Health System EHR values for a non-Flora account without error
+    # Framework Gap: Requires step definitions for logging in with a standard non-Flora account in LifeSteps.java
+    Given User is logged in with a standard account that has no Flora EHR deals
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    # Framework Gap: Requires step definitions for adding a dimension as a row grouping in LifeSteps.java
+    When User adds the "Health System EHR" dimension as a row grouping
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for verifying empty or null Health System EHR values in LifeSteps.java
+    Then The Health System EHR column displays empty or null values with no error
+
+  # Source: ET-24951
+  @todo
+  Scenario: Reconcile, combine and filter the Health System EHR dimension in a single report journey
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    # Framework Gap: Requires step definitions for adding a dimension as a row grouping in LifeSteps.java
+    When User adds the "Health System EHR" dimension as a row grouping
+    # Framework Gap: Requires step definitions for filtering the report to a Flora EHR deal in LifeSteps.java
+    And User filters the report to the Flora EHR deal "PP_HealthSystemEHR_CBR001"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for reconciling Health System EHR values against the SSP backend in LifeSteps.java
+    Then The Health System EHR values match the SSP backend exactly with no stale labels
+    # Framework Gap: Requires step definitions for adding the Date dimension as a row grouping in LifeSteps.java
+    When User adds the "Date" dimension as a row grouping
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for verifying the hierarchical Date over Health System EHR grouping in LifeSteps.java
+    Then The report displays a hierarchical Date over Health System EHR grouping without error
+    # Framework Gap: Requires step definitions for filtering by a Health System EHR platform value in LifeSteps.java
+    When User filters the report to Health System EHR platform "Epic"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for verifying only the filtered Health System EHR platform rows in LifeSteps.java
+    Then Only Epic Health System EHR rows are displayed
+
+  # Source: ET-24951
+  @todo
+  Scenario: Preserve backward compatibility and empty-delivery resilience for the Health System EHR dimension
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    And User should be able to select template "AutoTemplate20" from the dropdown
+    # Framework Gap: Requires step definitions for loading a saved template without the Health System EHR dimension in LifeSteps.java
+    Then The saved report template without the Health System EHR dimension loads with no unknown-dimension error
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for running a report over a zero Health System EHR delivery date range in LifeSteps.java
+    When User runs the report for a date range with zero Health System EHR delivery
+    # Framework Gap: Requires step definitions for verifying a well-formed empty Report Builder response in LifeSteps.java
+    Then The Report Builder returns a well-formed response with empty rows and no 500 or 400 error
+
+  # Source: ET-24951, HT-5466
+  @todo
+  Scenario: Display Flora deal pricing as Fixed and not Floor in the report
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    # Framework Gap: Requires step definitions for filtering the report to a Flora EHR deal in LifeSteps.java
+    And User filters the report to the Flora EHR deal "PP_HealthSystemEHR_CBR004"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definitions for verifying the Flora deal pricing state display in LifeSteps.java
+    Then The Flora deal pricing state displays "Fixed" and not "Floor"
