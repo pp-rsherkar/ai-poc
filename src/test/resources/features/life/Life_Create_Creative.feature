@@ -319,3 +319,80 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Campaign Name   |
       | Line Item Dates |
     And User navigates to Line item from Association Tab
+
+  # Source: ET-24702
+  @todo
+  Scenario Outline: Bulk upload validates DCM tag formats and accepts tags beginning with "<script" as valid DCM tags
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "Display" creative type
+    And User enters "Auto_DSA", "Auto_Financer" mandatory fields data for Display creative
+    # Framework Gap: Requires step definitions for uploading a Display sheet with a specific DCM tag format in LifeSteps.java
+    And User uploads a Display bulk upload sheet "<FILE_NAME>" containing "<TAG_FORMAT>" tags
+    # Framework Gap: Requires step definitions for asserting the bulk upload acceptance or rejection outcome in LifeSteps.java
+    Then The bulk upload outcome is "<EXPECTED_OUTCOME>" with message "<EXPECTED_MESSAGE>"
+    Examples:
+      | TAG_FORMAT                  | FILE_NAME                    | EXPECTED_OUTCOME | EXPECTED_MESSAGE                 |
+      | standard DCM                | Display_DCM_Standard.xlsx    | accepted         | BulkUpload created successfully. |
+      | <script DCM                 | Display_DCM_Script.xlsx      | accepted         | BulkUpload created successfully. |
+      | mixed standard and <script  | Display_DCM_Mixed.xlsx       | accepted         | BulkUpload created successfully. |
+      | empty <script></script>     | Display_DCM_EmptyScript.xlsx | rejected         | Invalid or empty tag in row      |
+      | non-DCM <script JS          | Display_NonDCM_Script.xlsx   | rejected         | Not a valid DCM tag              |
+      | invalid file                | Display_Invalid.txt          | rejected         | Invalid file format              |
+
+  # Source: ET-24702
+  @todo
+  Scenario: Click macro %%CLICK_URL_ESC%% populates correctly in "<script" DCM tags with no raw placeholder or error
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "Display" creative type
+    And User enters "Auto_DSA", "Auto_Financer" mandatory fields data for Display creative
+    And User uploads a valid file "Display_DCM_Script.xlsx" for "Display" creative and previews the creative details
+    # Framework Gap: Requires step definitions for verifying click macro substitution in the previewed DCM tag markup in LifeSteps.java
+    Then The previewed creative tag has the click macro "%%CLICK_URL_ESC%%" substituted with no raw placeholder remaining
+    And User saves the creative
+    And Verify the newly created creative is displayed in the Creative Library page
+
+  # Source: ET-24702
+  @todo
+  Scenario: Valid "<script" DCM sheet does not trigger the "This file has many empty rows" error
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "Display" creative type
+    And User enters "Auto_DSA", "Auto_Financer" mandatory fields data for Display creative
+    And User uploads a valid file "Display_DCM_Script.xlsx" for "Display" creative
+    # Framework Gap: Requires step definitions for asserting that a specific error message is absent after upload in LifeSteps.java
+    Then No error message "This file has many empty rows" is displayed for the valid sheet
+    And User saves the creative
+
+  # Source: ET-24702, HT-5114
+  @todo
+  Scenario: Regression - Klick Agency "<script" DCM upload no longer shows the click macro error
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "Display" creative type
+    And User enters "Auto_DSA", "Auto_Financer" mandatory fields data for Display creative
+    And User uploads a valid file "Klick_Agency_DCM_Script.xlsx" for "Display" creative
+    # Framework Gap: Requires step definitions for asserting the click macro validation error is absent after upload in LifeSteps.java
+    Then No "click macro error" is displayed for the Klick Agency sheet
+    And User saves the creative
+    And Verify the newly created creative is displayed in the Creative Library page
+
+  # Source: ET-24702, HT-4137
+  @todo
+  Scenario: Regression - DCM click discrepancy stays under the 10% baseline after the "<script" validation change
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "Display" creative type
+    And User enters "Auto_DSA", "Auto_Financer" mandatory fields data for Display creative
+    And User uploads a valid file "Display_DCM_Script.xlsx" for "Display" creative and previews the creative details
+    And User saves the creative
+    # Framework Gap: Requires step definitions for measuring DCM click discrepancy against a baseline in LifeSteps.java
+    Then The DCM click discrepancy is below "10" percent against the baseline
+
+  # Source: ET-24702
+  @todo
+  Scenario: Edge - Very long "<script" DCM tag with a long JS redirect is handled without truncation
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "Display" creative type
+    And User enters "Auto_DSA", "Auto_Financer" mandatory fields data for Display creative
+    And User uploads a valid file "Display_DCM_LongScript.xlsx" for "Display" creative and previews the creative details
+    # Framework Gap: Requires step definitions for verifying the full DCM tag is stored without truncation in LifeSteps.java
+    Then The previewed creative tag retains the full "<script" tag content without truncation
+    And User saves the creative
+    And Verify the newly created creative is displayed in the Creative Library page
