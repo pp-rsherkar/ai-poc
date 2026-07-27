@@ -22,11 +22,11 @@ Feature: LIFE Regression - Audience Manager Meta push scope and AM Settings perm
     When "<REGRESSION_CHECK>"
     Then "<EXPECTED_RESULT>"
     Examples:
-      | REGRESSION_CHECK                                    | EXPECTED_RESULT                                                                                   |
-      | Re-push a previously created Meta audience          | All statuses remain accurate with no errors or regressions in push state                          |
-      | Compare match counts before and after the change    | Match counts are consistent with the pre-deploy baseline                                          |
-      | Force a push failure using an expired Meta token    | The failure is reported with an appropriate status/error; the push is not reported as successful |
-      | Push to a non-Meta platform after the change        | Non-Meta pushes behave exactly as before the removed signal                                       |
+      | REGRESSION_CHECK                                 | EXPECTED_RESULT                                                                                  |
+      | Re-push a previously created Meta audience       | All statuses remain accurate with no errors or regressions in push state                         |
+      | Compare match counts before and after the change | Match counts are consistent with the pre-deploy baseline                                         |
+      | Force a push failure using an expired Meta token | The failure is reported with an appropriate status/error; the push is not reported as successful |
+      | Push to a non-Meta platform after the change     | Non-Meta pushes behave exactly as before the removed signal                                      |
 
   @todo
   # Source: ET-24706, GAP-1, GAP-2
@@ -46,11 +46,11 @@ Feature: LIFE Regression - Audience Manager Meta push scope and AM Settings perm
     When User views the "<CARD>" AM Settings card
     Then "<EXPECTED_RESULT>"
     Examples:
-      | CARD      | PERMISSION_STATE                                       | EXPECTED_RESULT                                                                                    |
-      | Pinterest | Internal user lacking VIEW PINTEREST SIGNIN            | Login, Logout and Audit Log controls are visible on the Pinterest card                             |
-      | Pinterest | Internal user WITH VIEW PINTEREST SIGNIN               | Login/Logout/Audit Log remain visible; card visibility is decoupled from the permission            |
-      | LinkedIn  | Internal user lacking the LinkedIn sign-in permission  | Login, Logout and Audit Log are visible on the LinkedIn card                                       |
-      | TikTok    | Internal user (any)                                    | Login, Logout and Audit Log are visible on the TikTok card with no permission gate applied         |
+      | CARD      | PERMISSION_STATE                                      | EXPECTED_RESULT                                                                            |
+      | Pinterest | Internal user lacking VIEW PINTEREST SIGNIN           | Login, Logout and Audit Log controls are visible on the Pinterest card                     |
+      | Pinterest | Internal user WITH VIEW PINTEREST SIGNIN              | Login/Logout/Audit Log remain visible; card visibility is decoupled from the permission    |
+      | LinkedIn  | Internal user lacking the LinkedIn sign-in permission | Login, Logout and Audit Log are visible on the LinkedIn card                               |
+      | TikTok    | Internal user (any)                                   | Login, Logout and Audit Log are visible on the TikTok card with no permission gate applied |
 
   @todo
   # Source: ET-24705, AMB-1
@@ -59,11 +59,11 @@ Feature: LIFE Regression - Audience Manager Meta push scope and AM Settings perm
     Given "<PANEL_PERMISSION_STATE>"
     Then "<EXPECTED_SIGNIN_BUTTON_STATE>"
     Examples:
-      | PANEL_PERMISSION_STATE                     | EXPECTED_SIGNIN_BUTTON_STATE                                                        |
-      | User WITH VIEW PINTEREST SIGNIN            | The Pinterest Sign-in button is visible in the Audience create/edit panel           |
-      | User WITHOUT VIEW PINTEREST SIGNIN         | The Pinterest Sign-in button is not shown in the Audience create/edit panel         |
-      | User WITH the LinkedIn sign-in permission  | The LinkedIn Sign-in button is visible in the Audience create/edit panel            |
-      | User WITHOUT the LinkedIn sign-in permission | The LinkedIn Sign-in button is not shown in the Audience create/edit panel        |
+      | PANEL_PERMISSION_STATE                       | EXPECTED_SIGNIN_BUTTON_STATE                                                |
+      | User WITH VIEW PINTEREST SIGNIN              | The Pinterest Sign-in button is visible in the Audience create/edit panel   |
+      | User WITHOUT VIEW PINTEREST SIGNIN           | The Pinterest Sign-in button is not shown in the Audience create/edit panel |
+      | User WITH the LinkedIn sign-in permission    | The LinkedIn Sign-in button is visible in the Audience create/edit panel    |
+      | User WITHOUT the LinkedIn sign-in permission | The LinkedIn Sign-in button is not shown in the Audience create/edit panel  |
 
   @todo
   # Source: ET-24705, AMB-2, GAP-2
