@@ -298,3 +298,117 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Examples:
       | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
       | CreativeCampaign   | CreativeLine        | CreativeTactic  |
+
+  # Source: ET-24951
+  @todo
+  Scenario Outline: Health System EHR dimension is available under Content, renders on run and drops on removal
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    # Framework Gap: Requires step definition to assert a dimension is listed under a named picker group in LifeSteps.java
+    Then The "Health System EHR" dimension is listed under the "Content" group and is selectable
+    And User should be able to select "<DIMENSIONS>" and "<METRICS>"
+    And User should be able to select advertiser as "<ADVERTISER>"
+    When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
+    Then User should be able to select value from dropdown
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition to assert a named column is present in the generated report in LifeSteps.java
+    Then The generated report renders a "Health System EHR" column
+    # Framework Gap: Requires step definition to remove a selected dimension and regenerate the report in LifeSteps.java
+    When User removes the "Health System EHR" dimension and regenerates the report
+    # Framework Gap: Requires step definition to assert a named column is absent with no residual values in LifeSteps.java
+    Then The "Health System EHR" column is not present and no residual EHR values remain
+    Examples:
+      | DIMENSIONS                                        | METRICS     | ADVERTISER     | CAMPAIGN_INITIALS |
+      | Advertiser Name, Campaign Name, Health System EHR | Impressions | 01- Advertiser | CreativeCampaign  |
+
+  # Source: ET-24951
+  @todo
+  Scenario Outline: Health System EHR resolves the correct value per impression type
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "<DIMENSIONS>" and "<METRICS>"
+    And User should be able to select advertiser as "<ADVERTISER>"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition to assert the Health System EHR cell value for a given impression type in LifeSteps.java
+    Then The "Health System EHR" value for a "<IMPRESSION_TYPE>" impression with NPI match "<NPI_MATCH>" is "<EXPECTED_VALUE>"
+    Examples:
+      | IMPRESSION_TYPE     | NPI_MATCH | EXPECTED_VALUE               | DIMENSIONS                        | METRICS     | ADVERTISER     |
+      | Flora EHR           | matched   | Epic                         | Health System EHR, Publisher Name | Impressions | 01- Advertiser |
+      | Flora EHR           | unmatched | blank                        | Health System EHR, Publisher Name | Impressions | 01- Advertiser |
+      | Non-Flora EHR       | n/a       | Publisher Report Name        | Health System EHR, Publisher Name | Impressions | 01- Advertiser |
+      | Non-EHR inventory   | n/a       | N/A                          | Health System EHR, Publisher Name | Impressions | 01- Advertiser |
+      | EHR no report value | n/a       | recorded for publisher 562529 | Health System EHR, Publisher Name | Impressions | 01- Advertiser |
+
+  # Source: ET-24951
+  @todo
+  Scenario: Flora no-NPI-match and non-EHR impressions render as visibly distinct outcomes
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Health System EHR, Publisher Name" and "Impressions"
+    And User should be able to select advertiser as "01- Advertiser"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition to assert a Flora-no-NPI row renders blank in LifeSteps.java
+    Then A Flora EHR impression without an NPI match renders blank in the Health System EHR column
+    # Framework Gap: Requires step definition to assert a non-EHR row renders N/A in LifeSteps.java
+    And A non-EHR impression renders "N/A" in the Health System EHR column
+    # Framework Gap: Requires step definition to assert two column outcomes are visibly distinct in LifeSteps.java
+    And The blank Flora-no-NPI outcome and the "N/A" non-EHR outcome are visibly distinct
+
+  # Source: ET-24951
+  @todo
+  Scenario: Health System EHR grouped with Date and Deal reconciles to the ungrouped impression count
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Date, Deal, Health System EHR" and "Impressions"
+    And User should be able to select advertiser as "01- Advertiser"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition to assert a per-dimension breakdown reconciles to the ungrouped total in LifeSteps.java
+    Then The report breaks impressions down by Health System EHR per deal and date
+    And The per-EHR impression totals reconcile to the ungrouped impression count
+
+  # Source: ET-24951
+  @todo
+  Scenario: A totals row spanning EHR and non-EHR impressions follows the defined roll-up rule
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Health System EHR" and "Impressions"
+    And User should be able to select advertiser as "01- Advertiser"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition to assert the totals-row roll-up value across mixed EHR and non-EHR rows in LifeSteps.java
+    Then A totals row spanning EHR and non-EHR impressions follows the defined roll-up rule and does not display a single misleading EHR value
+
+  # Source: ET-24951
+  @todo
+  Scenario: A user without the required FE reporting permission cannot run the Health System EHR dimension
+    # Framework Gap: Requires step definition to log in as a user lacking the FE reporting permission in LifeSteps.java
+    Given A user without the required FE reporting permission is logged in
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    # Framework Gap: Requires step definition to assert a dimension is not selectable or the run is blocked in LifeSteps.java
+    Then The "Health System EHR" dimension is not selectable or the report is blocked with an access message and no EHR data is returned
+
+  # Source: HT-6056
+  @todo
+  Scenario: A LIFE tactic delivering on empty targeting values does not mis-populate Health System EHR
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Health System EHR, Tactic Name" and "Impressions"
+    And User should be able to select advertiser as "01- Advertiser"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition to reproduce the HT-6056 empty-targeting condition on a LIFE tactic in LifeSteps.java
+    Then Impressions from a LIFE tactic delivering on empty targeting values do not produce spurious Health System EHR values
+    And Health System EHR resolves only via the Flora NPI join, the non-Flora report name, or "N/A"
