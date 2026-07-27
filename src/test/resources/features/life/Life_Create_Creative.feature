@@ -91,7 +91,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify user is able to close the Creative Preview tab
     And User searches the creative and clicks the creative details from Creative Library page
     And User clicks on Preview link from Creative Details page
-    And Verify Creative Preview tab is displayed with correct creative name
+    Then Verify Creative Preview tab is displayed with correct creative name
     And Verify user is able to close the Creative Preview tab
 
   @regression
@@ -319,3 +319,26 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Campaign Name   |
       | Line Item Dates |
     And User navigates to Line item from Association Tab
+
+  @todo
+  # Source: ET-24702, GAP-1
+  Scenario Outline: DCM tag upload suppresses the click-macro warning only for <ins and <script prefixes
+    When User uploads a DCM creative tag beginning with "<TAG_PREFIX>"
+    Then "<EXPECTED_RESULT>"
+    Examples:
+      | TAG_PREFIX                     | EXPECTED_RESULT                                                               |
+      | <ins (standard DCM tag)        | No click-macro warning is surfaced and the tag is accepted                    |
+      | <script (JavaScript DCM tag)   | No click-macro warning is surfaced (new suppression) and the tag is accepted  |
+      | <SCRIPT (uppercase)            | Suppression behaves consistently with the lowercase case per the defined rule |
+      |  <script (leading whitespace)  | Suppression behaves consistently with the defined whitespace rule             |
+      | <div (malformed/other content) | The click-macro/file-type warning is still surfaced                           |
+
+  @todo
+  # Source: ET-24702, GAP-2
+  # Regression anchor: HT-5784 - Klick Agency bulk-uploaded <script tags falsely hit the click-macro warning
+  Scenario: Bulk DCM tag-sheet upload suppresses the warning per row for <script tags and the click macro still populates
+    When User uploads a bulk DCM tag sheet containing multiple tags beginning with "<script"
+    Then Each row uploads without the false click-macro warning, matching single-upload behavior
+    And The click macro is correctly populated in the served tag for each row, matching pre-change behavior
+    When User uploads a bulk DCM tag sheet containing a standard "<ins" tag
+    Then The "<ins" tag uploads, serves and populates the click macro exactly as before
