@@ -150,3 +150,23 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Approved     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
+
+  # Source: ET-24263
+  @todo
+  Scenario Outline: Verify deferred dynamic metric loading and active flight future tactics on the campaign landing page
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    # Framework Gap: Requires step definitions for viewport-triggered dynamic metric loading in LifeSteps.java
+    When User opens the campaign landing page for campaign "<Campaign ID>" with many tactics
+    Then No dynamic metric API calls fire on initial load and metric columns show a skeleton loading state
+    And Scrolling to reveal the first metric column triggers the metric load and skeleton states are replaced by real values within 10 seconds
+    And Lazy-loaded metric values match the eager-load reference report within acceptable rounding
+    And Initial page content renders within 5 seconds with no blocking on metric APIs
+    And A user who scrolls to the metrics area before initialization and a user with a metric column already visible both trigger the load correctly
+    And An API failure during the lazy load shows an error state instead of a perpetual skeleton
+    And Metrics load only once and repeated scrolling does not fire duplicate metric API calls
+    And The campaign landing page in active flight mode shows future tactics and existing name, status and date filtering is unaffected
+    Examples:
+      | Campaign ID          |
+      | Auto_20260519_183446 |
