@@ -23,9 +23,9 @@ Feature: LIFE Regression - Tag Manager v1.0 channel navigation, sorting, and plu
     When User views the Tag Manager collections list
     Then "<EXPECTED_ORDER_CHECK>"
     Examples:
-      | TIMESTAMP_CASE                                                | EXPECTED_ORDER_CHECK                                                                        |
-      | Multiple tag collections with distinct created timestamps    | List orders collections newest-to-oldest by timestamp                                       |
-      | Two tag collections with identical timestamps                 | A consistent, repeatable tie-break is applied so ordering is not random across reloads      |
+      | TIMESTAMP_CASE                                            | EXPECTED_ORDER_CHECK                                                                   |
+      | Multiple tag collections with distinct created timestamps | List orders collections newest-to-oldest by timestamp                                  |
+      | Two tag collections with identical timestamps             | A consistent, repeatable tie-break is applied so ordering is not random across reloads |
 
   @todo
   # Source: ET-24718
