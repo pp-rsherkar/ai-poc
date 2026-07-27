@@ -298,3 +298,78 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Examples:
       | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
       | CreativeCampaign   | CreativeLine        | CreativeTactic  |
+
+  @todo
+  # Source: ET-24951
+  Scenario: Health System EHR dimension is available under Content and drives the report column
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Health System EHR" and "Impressions"
+    # Framework Gap: Requires step definition asserting the dimension list under Content in LifeSteps.java
+    Then The "Health System EHR" dimension is listed under the Content group
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition asserting the rendered report column set in LifeSteps.java
+    Then A "Health System EHR" column renders in the generated report
+    When User removes the "Health System EHR" dimension and regenerates the report
+    Then No "Health System EHR" column is present and no residual values remain
+
+  @todo
+  # Source: ET-24951, GAP-1, GAP-2, AMB-1
+  Scenario Outline: Health System EHR resolves the correct display value per impression type
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Health System EHR" and "Impressions"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition resolving the Health System EHR value for a given NPI/publisher in LifeSteps.java
+    Then The Health System EHR column shows "<EXPECTED_VALUE>" for the "<IMPRESSION_TYPE>" impression with NPI "<NPI>"
+    And The Flora-no-NPI-match value and the non-EHR "N/A" value remain visibly distinct outcomes
+    Examples:
+      | IMPRESSION_TYPE                                                         | NPI        | EXPECTED_VALUE             |
+      | Flora EHR, NPI matched to Epic                                          | 1447230388 | Epic                       |
+      | Flora EHR, NPI not matched to reference table                           | 9990001112 | (blank/null)               |
+      | Non-Flora EHR publisher with configured channel name                    | 1023456780 | PublisherChannelReportName |
+      | Non-EHR inventory                                                       | 1023456781 | N/A                        |
+      | Flora EHR on publisher 562529 (Veradigm), no reporting value configured | 1122334455 | (recorded per GAP-2)       |
+
+  @todo
+  # Source: ET-24951, GAP-3
+  Scenario Outline: Health System EHR reconciles correctly when grouped with other dimensions
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "<GROUPING>" and "Impressions"
+    And User should be able to generate the report
+    # Framework Gap: Requires step definition validating grouped/roll-up Health System EHR totals in LifeSteps.java
+    Then "<METRIC_CHECK>"
+    Examples:
+      | GROUPING                                        | METRIC_CHECK                                                                             |
+      | Date, Deal, Health System EHR                   | Per-EHR breakdown totals reconcile to the ungrouped impression count                     |
+      | Totals row spanning EHR and non-EHR impressions | Roll-up follows the defined blank/Multiple rule and shows no single misleading EHR value |
+
+  @todo
+  # Source: ET-24951
+  Scenario: A user without the required FE reporting permission cannot run the Health System EHR dimension
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    # Framework Gap: Requires step definition for a user lacking the Health System EHR FE permission in LifeSteps.java
+    And "Life" application is logged in successfully with Account "automation@pulsepoint" lacking the Health System EHR permission
+    When User navigates to run report from mega menu of the life application
+    And User clicks on "Pick Dimensions/Metrics" link
+    Then The "Health System EHR" dimension is not selectable or the report is blocked with an access message
+    And No EHR data is returned
+
+  @todo
+  # Source: ET-24951
+  # Regression anchor: HT-6056 - LIFE tactics delivered on empty targeting values
+  Scenario: A LIFE tactic delivering on empty targeting values does not mis-populate Health System EHR
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And User should be able to select "Health System EHR" and "Impressions"
+    And User should be able to generate the report for the "HT-6056" reproduction tactic
+    Then Health System EHR resolves via the defined branches only and no spurious value is produced for empty-targeting impressions
