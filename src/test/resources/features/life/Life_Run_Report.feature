@@ -298,3 +298,26 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     Examples:
       | CAMPAIGN_INITIALS | LINE_ITEM_INITIALS | TACTIC_INITIALS |
       | CreativeCampaign   | CreativeLine        | CreativeTactic  |
+
+  # Source: ET-24951
+  @todo
+  Scenario Outline: Verify the Health System EHR dimension in Life Report Builder for Flora EHR deals
+    # Framework Gap: Requires step definitions for the Health System EHR dimension in the Report Builder dimension picker in LifeSteps.java
+    When User navigates to run report from mega menu of the life application
+    And Verify Run Report panel should be opened
+    When User clicks on "Pick Dimensions/Metrics" link
+    Then Dimensions and Metrics fields should be displayed
+    And The Health System EHR dimension is visible in the dimension picker under its category grouping
+    And User adds the Health System EHR dimension as a row grouping for advertiser "<ADVERTISER>"
+    And User should be able to generate the report
+    And The report shows one row per EHR platform with distinct impression counts that match the flora_ehr backend source
+    And A Flora EHR deal client accesses the dimension with no special permission and a non-Flora account returns empty values with no error
+    And Impressions from publisher "<VERADIGM_PUB>" display a valid fallback value instead of a blank or error
+    And The Health System EHR dimension combines with the Date dimension and with a "Health System EHR = <EHR_PLATFORM>" filter and returns correctly filtered rows
+    And An existing saved report without the Health System EHR dimension continues to load without error
+    And A date range with zero EHR delivery returns empty rows with no 500 or 400 server error
+    # Regression anchor: HT-5466 - Flora CBR PG deals previously showed 'Floor' pricing instead of 'Fixed'
+    And Flora EHR CBR deals show the correct "Fixed" pricing and not "Floor" in the deal list view
+    Examples:
+      | ADVERTISER     | VERADIGM_PUB | EHR_PLATFORM |
+      | 01- Advertiser | 562529       | Epic         |
