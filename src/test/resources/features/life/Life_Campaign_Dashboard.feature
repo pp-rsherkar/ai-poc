@@ -150,3 +150,65 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Approved     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
+
+  @todo
+  # Source: ET-24263
+  Scenario: Static columns render immediately while dynamic metrics defer until scrolled into view
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    When User opens the campaign landing page fresh
+    Then ID, advertiser, enabled, status, and budget columns display immediately without waiting on metrics
+    And No metric fetch occurs on load
+    When The first dynamic-metric column becomes partially visible on scroll
+    Then All dynamic metrics begin loading and cells show the preloader, then render values on completion
+    When User reorders columns so a dynamic metric is visible and reloads the page
+    Then Metric loading initiates immediately without requiring a scroll
+
+  @todo
+  # Source: ET-24263
+  Scenario Outline: Active Flight surfaces future-flight entities with the Starts-on text and m-dash metrics
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    When User switches to Active Flight mode
+    Then "<ENTITY_STATE>": "<EXPECTED_RESULT>"
+    Examples:
+      | ENTITY_STATE                                                             | EXPECTED_RESULT                                              |
+      | Line item with a future flight start (e.g. Native Health Pages Keywords) | The entity is shown in Active Flight and is no longer hidden |
+      | Future-flight row's Flight column                                        | Reads 'Starts on [month]/[date]' instead of a flight number  |
+      | Future-flight row's non-calculable metric columns                        | Display an m-dash instead of a value                         |
+
+  @todo
+  # Source: ET-24263
+  Scenario: No Grouping is removed while Campaigns and Advertisers grouping remain, and Lifetime is no longer a sticky default
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    When User opens the grouping selector
+    Then "No Grouping" is absent from the grouping options
+    And Both the Campaigns and Advertisers grouping options are present and functional
+    When User sets the date mode to Lifetime, leaves, and returns to the landing page
+    Then The page does not default back to Lifetime
+
+  @todo
+  # Source: ET-24263
+  Scenario: Pagination replaces Show more and bulk operations apply only to the current page
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    Given A landing page with more entities than one page
+    Then Pagination controls are shown and navigate pages, and the "Show more" control is no longer used
+    # Framework Gap: Requires step definition for the select-all scope under pagination in LifeSteps.java
+    When User selects items and runs a bulk operation while paginated
+    Then The operation affects only the items displayed on the current page, not the full result set
+
+  @todo
+  # Source: ET-24263
+  # Regression anchor: HT-6073 - monthly PLD report failure (data-load reliability)
+  Scenario: The landing page load performance does not regress to loading all heavy metrics up front
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    When User loads the landing page and observes network/metric fetches
+    Then Only static columns load initially, heavy metrics defer, and overall load performance is not regressed

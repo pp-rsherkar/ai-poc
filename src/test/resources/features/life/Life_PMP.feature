@@ -155,3 +155,123 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Examples:
       | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | ADVERTISER     | CURATOR                          | CREATIVE      |
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           | 230   | 01- Advertiser | PulsePoint (Direct Integrations) | Auto_Creative |
+
+  @todo
+  # Source: ET-24698
+  Scenario: Associated Tactics displays new metric columns and an Impressions tooltip
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    When User navigates to Deal Groups > Associated Tactics for a delivering deal
+    Then Columns Impressions, Win Rate, Clearing Price, Total Spend, and Media Spend are present and the Impressions column shows an explanatory tooltip
+
+  @todo
+  # Source: ET-24698, GAP-1
+  Scenario Outline: The Associated Tactics date range selector recomputes metrics and enforces the 60-day cap
+    When User navigates to Deal Groups > Associated Tactics for a delivering deal
+    # Framework Gap: Requires step definition for the Custom date-range 60-day boundary in LifeSteps.java
+    And User selects date range "<DATE_RANGE>"
+    Then "<EXPECTED_RESULT>"
+    Examples:
+      | DATE_RANGE                      | EXPECTED_RESULT                                                                          |
+      | Yesterday                       | Metrics filter to Yesterday and recompute for that window                               |
+      | Last 7 Days                     | Metrics filter to Last 7 Days and recompute for that window                             |
+      | Last 30 Days                    | Metrics filter to Last 30 Days and recompute for that window                            |
+      | Custom range of exactly 60 days | The 60-day range is accepted and metrics recompute for that window                      |
+      | Custom range of 75 days         | The range is rejected or clamped to 60 days per the defined rule with a clear indication |
+
+  @todo
+  # Source: ET-24698, GAP-2
+  Scenario: Associated Tactics supports filter/sort by ID and CSV export scoped per the defined rule
+    When User navigates to Deal Groups > Associated Tactics for a delivering deal
+    And User enters a Tactic ID, then a Campaign ID, then a Line Item ID
+    Then Each filter narrows the Associated Tactics rows to matches
+    When User clicks the Impressions sort control
+    Then Rows sort by Impressions ascending then descending on toggle
+    When User applies a filter and sort, then clicks Export to CSV
+    # Framework Gap: Requires step definition for CSV export scope (filtered/sorted view vs full set) in LifeSteps.java
+    Then A CSV downloads containing the Associated Tactics rows and the metric columns per the defined export-scope rule
+
+  @todo
+  # Source: ET-24698, GAP-3
+  # Regression anchor: HT-6125, HT-6049 - unable to access Deal Groups in Tactic UI / deal visibility regressions
+  Scenario Outline: Associated Tactics metrics are gated by the Deal-Group-metrics permission and the view remains accessible
+    When User navigates to Deal Groups > Associated Tactics as an internal user
+    Then The view loads and is accessible
+    Given "<PERMISSION_STATE>"
+    Then "<EXPECTED_RESULT>"
+    Examples:
+      | PERMISSION_STATE                               | EXPECTED_RESULT                                                               |
+      | User granted the Deal-Group-metrics permission | Columns, date range, filter/sort, and export are all available and functional |
+      | User without the Deal-Group-metrics permission | The new columns, date range, filter/sort, and export are not available        |
+
+  @todo
+  # Source: ET-24698, AMB-1
+  Scenario: The Show Tactics From Other Accounts checkbox is absent, consistent with the descope
+    When User navigates to Deal Groups > Associated Tactics for a delivering deal
+    Then No "Show Tactics From Other Accounts" checkbox is present
+
+  @todo
+  # Source: ET-24697
+  Scenario: A PG Workarounds user attaches a PG deal to a non-PG Tactic with no incompatibility warning
+    Given User holds the PG Workarounds/PG Deal Management permission
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    And User attaches a PG deal to a non-PG Tactic
+    Then No inline Deal Incompatibility warning or tooltip is displayed for this combination
+    When User saves the tactic
+    Then The PG deal attaches and the tactic saves successfully with no blocking warning
+
+  @todo
+  # Source: ET-24697, GAP-1, GAP-2, AMB-1
+  Scenario: Other deal incompatibility warnings and permission-gated access remain unaffected
+    Given User holds the PG Workarounds/PG Deal Management permission
+    When User creates a non-PG incompatible deal/tactic combination
+    Then The relevant incompatibility warning and tooltip are still shown for non-PG combinations
+    When User attaches a PG deal to a PG-compatible Tactic
+    Then No incompatibility warning appears and attachment works normally
+    # Framework Gap: Requires step definition for the permission-gated upstream block in LifeSteps.java
+    Given User lacks the PG Workarounds/PG Deal Management permission
+    Then The PG-deal-on-non-PG-Tactic path is prevented upstream for that user
+
+  @todo
+  # Source: ET-24697
+  # Regression anchor: HT-6125, HT-6091 - deal-group access and deal spend/visibility regressions
+  Scenario: Normal PG deal attachment and deal access are unaffected by the warning removal
+    Given User holds the PG Workarounds/PG Deal Management permission
+    When User attaches a PG deal to a PG Tactic using the standard flow
+    Then PG deals attach and remain accessible with no regression to deal-group/deal access
+
+  @todo
+  # Source: ET-24696
+  Scenario: A hidden deal is excluded from Deal Group Add Deals but a visible deal remains selectable
+    When User opens Deal Group > Add Deals
+    Then A deal set to hidden does not appear in the Add Deals selectable list
+    And A visible, enabled deal appears and can be added to the deal group
+
+  @todo
+  # Source: ET-24696, AMB-1
+  # Regression anchor: HT-6071 - hidden deal not spending
+  Scenario: A hidden deal already assigned to a group keeps serving and stays visible in the group's management view
+    Given A deal group contains a now-hidden deal targeted by a tactic
+    Then The tactic continues to serve/spend on the hidden deal
+    When User opens the deal group's own management/edit view
+    Then The hidden deal is visible there for context, while remaining absent from the Add Deals picker
+
+  @todo
+  # Source: ET-24696, GAP-1
+  Scenario: Copying a deal group with hidden deals warns and excludes them from the duplicate
+    When User copies a deal group containing at least one hidden deal
+    Then A warning is displayed stating the hidden deal(s) will not be carried over to the duplicate
+    # Framework Gap: Requires step definition for the copy-flow proceed/confirm outcome in LifeSteps.java
+    When User completes the copy
+    Then The duplicate contains only the visible deals and hidden deals are omitted
+
+  @todo
+  # Source: ET-24696, GAP-3
+  Scenario Outline: Deal-group name uniqueness is validated on create and copy
+    When User attempts to save a deal group with name "<GROUP_NAME>"
+    Then "<EXPECTED_RESULT>"
+    Examples:
+      | GROUP_NAME               | EXPECTED_RESULT                                                             |
+      | Existing_Deal_Group_2026 | A validation message indicates the name already exists and save is blocked |
+      | New_Unique_Deal_Group    | No duplicate-name message appears and the group saves                      |

@@ -307,3 +307,191 @@ Feature: LIFE Regression - Targetings
     Examples:
       | ADVERTISER     | CP_NAME        | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | Campaign_Audio | Regular | 10000     | Line      | 500         | Audio      | Tactic      | Auto_Creative |
+
+  @todo
+  # Source: ET-24730
+  Scenario: Health Pages targeting lists the seven productized branches and supports full tier navigation
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "10000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "Line" "500", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "Tactic" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "Display Advanced" as channel
+    And User clicks on Add Targeting Rule
+    # Framework Gap: Requires step definition for the MeSH 2025 Health Pages branch picker in LifeSteps.java
+    Then Health Pages targeting lists exactly the seven branches "Diseases & Conditions, Drugs & Substances, Diagnostics & Treatments, Mental Health & Behavior, Biological Processes, Healthcare Professions, Health Care System" with no legacy groupings or duplicate nodes
+    # Framework Gap: Requires step definition for tree drill-down/expand-to-leaf in LifeSteps.java
+    When User drills from branch "Diseases & Conditions" down to a leaf descriptor at tier depth "13"
+    Then Every tier through the deepest level expands and the level-13 descriptor is selectable with no cap truncating the path at 10
+    When User selects a mid-tier branch node at tier depth "3" instead of a leaf
+    Then The rule targets the branch subtree consistently with the taxonomy's descendant-inclusion definition
+
+  @todo
+  # Source: ET-24730, AMB-2
+  Scenario Outline: Searching the Health Pages tree unwraps or folds results per the resolved depth thresholds
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "10000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "Line" "500", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "Tactic" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "Display Advanced" as channel
+    And User clicks on Add Targeting Rule
+    # Framework Gap: Requires step definitions for search unwrap-depth and fold-collapse behavior in LifeSteps.java
+    When User searches the Health Pages tree for a descriptor at "<SEARCH_DEPTH>"
+    Then "<EXPECTED_UNWRAP_FOLD_BEHAVIOR>"
+    Examples:
+      | SEARCH_DEPTH                   | EXPECTED_UNWRAP_FOLD_BEHAVIOR                                                                                |
+      | level 6 match                  | Tree auto-expands the ancestor path down to the match and highlights the matched node                        |
+      | level 8 match                  | Levels beyond the fold boundary collapse into a single fold marker reachable via hover underline and pointer |
+      | fold click on a level 8 result | Clicking the collapsed fold expands every nested level beneath it to reveal the match and its ancestors      |
+      | no matching descriptor         | No nodes are expanded, no fold marker appears, and an empty/no-results state is shown                        |
+
+  @todo
+  # Source: ET-24730, GAP-1
+  Scenario Outline: Live legacy-targeting rules remap onto the new MeSH 2025 taxonomy without silent targeting loss
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definition for legacy-to-new-descriptor remap resolution in LifeSteps.java
+    When A live tactic targeting rule reproduces the "<LEGACY_RULE_CASE>" condition post-cutover
+    Then "<EXPECTED_REMAP_OUTCOME>"
+    Examples:
+      | LEGACY_RULE_CASE                                | EXPECTED_REMAP_OUTCOME                                                                                          |
+      | Legacy code with a defined 1:1 mapping          | Rule references the new descriptor and evaluates the same intended pages; targeting is not lost                 |
+      | Legacy code with no automatic mapping           | Rule appears in the remap review queue and retains a resolvable state; targeting does not silently go empty     |
+      | Legacy code mapping to multiple new descriptors | Remap applies the defined selection rule deterministically and the outcome is recorded for product confirmation |
+
+  @todo
+  # Source: ET-24730
+  Scenario: The MeSH 2025 taxonomy cutover is fully reversible with no downtime during the bake period
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definition toggling the MeSH 2025 feature flag in LifeSteps.java
+    When The MeSH 2025 feature flag is set to "100%"
+    Then Picker, bid-time matching, and reporting all reference the new MeSH-2025 taxonomy
+    When The MeSH 2025 feature flag is set to "OFF" during the bake period
+    Then The legacy taxonomy path still resolves and campaigns keep targeting with no downtime on toggle
+
+  @todo
+  # Source: ET-24730
+  Scenario: New-taxonomy descriptors resolve consistently across AI search, Media Planner, and Ad Manager
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definitions for AI search / Media Planner / Ad Manager MeSH 2025 parity checks in LifeSteps.java
+    When User runs an AI search query for a new-taxonomy category "Mental Health & Behavior"
+    Then AI search surfaces the correct new-taxonomy descriptor and it is selectable for targeting
+    And Media Planner lists the same seven productized branches and resolves the same new descriptors as Portal
+    And Ad Manager targeting on a Health Pages rule resolves and serves against the new-taxonomy descriptors consistently with Portal
+    When A sample page categorized to the targeted descriptor is evaluated at bid time on a staging tactic
+    Then Bid-time evaluation produces a match on the sampled live tactic in staging
+
+  @todo
+  # Source: ET-24730
+  # Regression anchor: HT-6056, HT-6100 - LIFE tactics delivering on empty/mismatched targeting values
+  Scenario: A migrated tactic does not begin delivering on empty or mismatched targeting after cutover
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definition reproducing the HT-6056/HT-6100 migrated-tactic condition in LifeSteps.java
+    When A migrated tactic reproduces the HT-6056/HT-6100 empty-targeting condition post-cutover
+    Then Delivery occurs only against pages matching the remapped descriptor and no impressions serve on empty or mismatched targeting
+
+  @todo
+  # Source: ET-24719, GAP-1, GAP-2, GAP-3
+  Scenario Outline: Keyword and Keyword Population search filters the list and highlights matches like Media Planner
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "10000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "Line" "500", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "Tactic" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "Display Advanced" as channel
+    And User clicks on Add Targeting Rule for "<TARGETING_TYPE>"
+    # Framework Gap: Requires step definitions for Condition Keyword Search match/highlight/removal behavior in LifeSteps.java
+    When User searches "<SEARCH_TERM>" in the "<TARGETING_TYPE>" targeting search box
+    Then "<MATCH_RULE_CHECK>" and non-matching records are removed from the list
+    Examples:
+      | TARGETING_TYPE     | SEARCH_TERM                              | MATCH_RULE_CHECK                                                           |
+      | Keyword            | asthma                                   | Only matching records remain and the matched text is highlighted           |
+      | Keyword Population | diabetes                                 | Only matching records remain and the matched text is highlighted           |
+      | Keyword            | diab                                     | Substring match is applied consistently with Media Planner                 |
+      | Keyword            | ASTHMA                                   | Search is case-insensitive and returns the same records as "asthma"        |
+      | Keyword            | a term matching only a nested child node | The matched child is shown with enough parent context to remain selectable |
+
+  @todo
+  # Source: ET-24719
+  Scenario: Clearing the Keyword search restores the full list and a no-match search shows an empty state
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "10000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "Line" "500", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "Tactic" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "Display Advanced" as channel
+    And User clicks on Add Targeting Rule for "Keyword"
+    When User searches "asthma" in the Keyword targeting search box
+    And User clears the search box
+    Then All previously removed records return and highlighting is cleared
+    When User searches "zzzznotarealterm" in the Keyword targeting search box
+    Then The list shows no records instead of the full unfiltered list
+    When User searches a punctuation-only string in the Keyword targeting search box
+    Then No crash occurs and the list stays consistent per the defined punctuation-handling rule
+
+  @todo
+  # Source: ET-24719, AMB-2
+  Scenario: A keyword selected before searching remains selected after the search that excludes it is cleared
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "10000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "Line" "500", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "Tactic" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "Display Advanced" as channel
+    And User clicks on Add Targeting Rule for "Keyword"
+    And User selects the keyword "Custom_Keyword"
+    When User searches "TestingKeyword" in the Keyword targeting search box, excluding the selected keyword
+    And User clears the search box
+    Then The keyword "Custom_Keyword" remains selected after clearing
+
+  @todo
+  # Source: ET-24719
+  Scenario: Life keyword search returns the same result set as Media Planner for an identical query
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definition comparing Life and Media Planner keyword-search result sets in LifeSteps.java
+    When The same keyword search query is run in Life Keyword targeting and in Media Planner
+    Then The filtered record sets match between Life and Media Planner
+
+  @todo
+  # Source: ET-24719
+  Scenario: Keywords selected while a search filter is active save correctly to the tactic targeting
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And User clicks on Create Campaign
+    When User enters the campaign details as "01- Advertiser" "Auto" "Regular" "10000" and saves the campaign
+    Then Verify campaign details are saved and user is navigated to the line item page
+    When User enters the line item details as "Line" "500", enables the line item and saves the changes
+    Then Verify line item details are saved and user is navigated to the tactic page
+    When User enters the tactic details as "Tactic" and saves the tactic
+    Then Verify tactic details are saved and user is navigated to the settings tab
+    When User selects the "Display Advanced" as channel
+    And User clicks on Add Targeting Rule for "Keyword"
+    When User searches "Custom_Keyword" in the Keyword targeting search box
+    And User selects two matching keywords from the filtered list
+    And User saves the settings
+    Then Both selected keywords persist on the tactic targeting regardless of the active filter at save time
