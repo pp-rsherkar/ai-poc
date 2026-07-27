@@ -319,3 +319,24 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Campaign Name   |
       | Line Item Dates |
     And User navigates to Line item from Association Tab
+
+  # Source: ET-24702
+  @todo
+  Scenario Outline: Verify DCM bulk upload accepts tags that start with "<script" and preserves click macro substitution
+    # Framework Gap: Requires step definitions for DCM bulk upload validation of <script tags in LifeSteps.java
+    Given User clicks Bulk Upload button on Creative Library page
+    When User selects the "HTML" creative type and uploads the DCM tag sheet "<FILE>"
+    Then The upload result is "<RESULT>" with no click macro error and no "This file has many empty rows" error for a valid file
+    And The click macro is correctly substituted in the "<script" DCM tags with no raw placeholder visible
+    And A standard non-script DCM tag sheet still uploads and validates correctly after the change
+    And A mixed sheet of standard and "<script" DCM tags uploads successfully with correct click macros in both types
+    And Non-DCM content, generic JavaScript and an empty "<script></script>" tag are still rejected with a clear error
+    And A very long "<script" redirect tag uploads with no truncation of the tag content
+    # Regression anchor: HT-5114 - Klick Agency DCM <script tag upload previously showed a false click macro error
+    And The exact HT-5114 Klick Agency repro sheet uploads with no click macro error
+    # Regression anchor: HT-4137 - DCM click/impression discrepancy must not increase
+    And The click and impression discrepancy stays within the historical baseline for all tag types
+    Examples:
+      | FILE                       | RESULT   |
+      | DCM_Script_Tags_Klick.xls  | accepted |
+      | DCM_Generic_Javascript.xls | rejected |

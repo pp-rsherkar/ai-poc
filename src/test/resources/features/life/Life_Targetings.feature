@@ -307,3 +307,45 @@ Feature: LIFE Regression - Targetings
     Examples:
       | ADVERTISER     | CP_NAME        | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | LINE_ITEMS | TACTIC_NAME | CREATIVE      |
       | 01- Advertiser | Campaign_Audio | Regular | 10000     | Line      | 500         | Audio      | Tactic      | Auto_Creative |
+
+  # Source: ET-24730
+  @todo
+  Scenario Outline: Verify Health Pages targeting on the MeSH 2025 13k taxonomy tree
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definitions for the MeSH 2025 Health Pages taxonomy tree in LifeSteps.java
+    When User opens Health Pages targeting in a new tactic
+    Then The MeSH 2025 taxonomy loads with descriptors expandable to 10 or more tier levels and legacy-only descriptors are absent
+    And Expanding beyond 4 levels reduces the left margin increments dynamically with no horizontal overflow or text clipping
+    And Searching "<SEARCH_TERM>" highlights matches across expansion states and changing the term to "<SECOND_TERM>" clears the previous highlights
+    And Searching a known descriptor "<KNOWN>" returns results within 2 seconds and gibberish "<GIBBERISH>" returns an empty state with no error
+    And Selecting "<SELECT_COUNT>" descriptors across multiple levels, saving and reloading persists exactly "<SELECT_COUNT>" descriptors with no items dropped
+    And Selecting a parent node includes all child descriptors in the count and deselecting the parent removes all child selections
+    # Regression anchor: HT-5112 - Health Pops/Health Pops+/Health Pages previously failed to load together (Milkshake-only state)
+    And Health Pages, Health Pops and Health Pops+ all load successfully with no Milkshake-only state
+    # Regression anchor: HT-4185 - Keyword Populations previously dropped items after tactic save
+    And Keyword Population targeting remains unaffected and a legacy descriptor absent from MeSH 2025 loads without error
+    And Rapid expand and collapse of tree branches produces no blank nodes, UI freeze or console errors
+    Examples:
+      | SEARCH_TERM    | SECOND_TERM | KNOWN        | GIBBERISH | SELECT_COUNT |
+      | cardiovascular | oncology    | Hypertension | xyzabc123 | 10           |
+
+  # Source: ET-24719
+  @todo
+  Scenario Outline: Verify "<TARGETING_TYPE>" targeting search filters the list in line with Media Planner
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    # Framework Gap: Requires step definitions for Keyword and Keyword Population search filtering in LifeSteps.java
+    When User opens "<TARGETING_TYPE>" targeting and types "<SEARCH_TERM>" in the search field
+    Then The list filters to show only items containing "<SEARCH_TERM>" and non-matching items are hidden
+    And The search term is highlighted within the filtered results and matches the Media Planner filtering behaviour exactly
+    And Clearing the search term restores the full unfiltered list with no stale filter state
+    And A partial term "<PARTIAL>" returns all items containing it and the search is case-insensitive
+    And A term with no matches "<NO_MATCH>" shows an empty state and the list does not fall back to showing all items
+    And Selecting "<SELECT_COUNT>" items from the filtered results and saving the tactic persists exactly "<SELECT_COUNT>" items after reload
+    # Regression anchor: HT-4185 - Keyword Populations previously dropped items after tactic save
+    And Keyword Population selection count does not decrease after save and Health Pages targeting search is unaffected
+    Examples:
+      | TARGETING_TYPE      | SEARCH_TERM    | PARTIAL | NO_MATCH   | SELECT_COUNT |
+      | Keyword             | hypertension   | card    | xyzqrstabc | 5            |
+      | Keyword Populations | cardiovascular | card    | xyzqrstabc | 50           |
