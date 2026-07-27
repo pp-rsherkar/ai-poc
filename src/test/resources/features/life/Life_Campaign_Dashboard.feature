@@ -150,3 +150,101 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Approved     |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Pending Appr |
       | 01- Advertiser | Auto    | Regular | 20000     | Line      | 500         | Tactic      | Display Advanced | Behavioral Segment | Denied       |
+
+  # Source: ET-24263
+  @todo
+  Scenario: Campaign landing page loads static columns immediately and defers dynamic metrics until scrolled into view
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    # Framework Gap: Requires step definition to assert immediate static-column render in LifeSteps.java (CampaignDashboardPage)
+    Then The static columns "ID, Advertiser, Enabled, Status, Budget" render immediately without waiting on metrics
+    # Framework Gap: Requires step definition to assert no metric request fires on initial load in LifeSteps.java
+    And No dynamic metric request is issued while the first metric column is outside the viewport
+    # Framework Gap: Requires step definition to scroll the first dynamic metric column into view in LifeSteps.java
+    When User scrolls the first dynamic metric column into the viewport
+    # Framework Gap: Requires step definition to assert the in-cell preloader then rendered values in LifeSteps.java
+    Then The metric cells display the preloader and then render the "Spend, Impressions, Clicks, Conversion Rate" values
+    # Framework Gap: Requires step definition to scroll a metric column out of and back into view in LifeSteps.java
+    When User scrolls the metric column out of the viewport and back into view
+    # Framework Gap: Requires step definition to assert the metric caching / re-fetch rule in LifeSteps.java
+    Then The metrics render per the defined caching rule with no error and no duplicate fetch
+
+  # Source: ET-24263
+  @todo
+  Scenario: Reordering a dynamic metric column into view triggers immediate metric loading on reload
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    # Framework Gap: Requires step definition to reorder columns so a dynamic metric is visible and reload in LifeSteps.java
+    When User reorders the columns so a dynamic metric column is visible and reloads the page
+    # Framework Gap: Requires step definition to assert immediate metric load without a scroll in LifeSteps.java
+    Then The dynamic metric loading initiates immediately on load without requiring a scroll
+
+  # Source: ET-24263
+  @todo
+  Scenario: Active Flight surfaces future-dated entities with Starts-on text and m-dash metrics
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User removes all the filters applied on the Dashboard
+    And User clicks "Active Flight" filter
+    # Framework Gap: Requires step definition to assert a future-flight entity is listed in Active Flight in LifeSteps.java
+    Then The line item "Native Health Pages Keywords" with a future flight start is listed in Active Flight
+    # Framework Gap: Requires step definition to assert the Flight column Starts-on text in LifeSteps.java
+    And Its Flight column reads "Starts on [month]/[date]" instead of a flight number
+    # Framework Gap: Requires step definition to assert the m-dash on non-calculable metric cells in LifeSteps.java
+    And Its non-calculable metric columns display an m-dash
+
+  # Source: ET-24263
+  @todo
+  Scenario: No Grouping option is removed while Campaign and Advertiser grouping remain available
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    # Framework Gap: Requires step definition to open the grouping selector and read available options in LifeSteps.java
+    When User opens the grouping selector from the Settings icon
+    Then The grouping selector offers the "Group By Campaign" and "Group By Advertiser" options
+    And The "No Grouping" option is not available in the grouping selector
+
+  # Source: ET-24263
+  @todo
+  Scenario: Lifetime is not persisted as the default date mode across sessions
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    # Framework Gap: Requires step definition to reload the landing page and read the active date mode in LifeSteps.java
+    When User reloads the campaign landing page
+    # Framework Gap: Requires step definition to assert the active date mode after reload in LifeSteps.java
+    Then The page does not default back to Lifetime and the Active Flight date mode is applied
+
+  # Source: ET-24263
+  @todo
+  Scenario: Pagination replaces Show more and scopes bulk operations to the current page
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    # Framework Gap: Requires step definition to assert pagination controls present and Show more absent in LifeSteps.java
+    Then The pagination controls are displayed and the "Show more" control is no longer used
+    # Framework Gap: Requires step definition to navigate pages via pagination in LifeSteps.java
+    When User navigates to the next page using the pagination controls
+    Then The next page of campaigns is displayed
+    # Framework Gap: Requires step definition to Select all and run a bulk operation while paginated in LifeSteps.java
+    When User uses "Select all" and runs a bulk operation while paginated
+    Then The bulk operation applies only to the items on the current page
+    And The "Select all" selection scope follows the defined rule of the current page
+
+  # Source: HT-6073
+  @todo
+  Scenario: Campaign landing page loads without regressing to loading all heavy metrics up front
+    Given This scenario will be executed in the "Demo" environment as a "User"
+    And "Life" application is logged in successfully with Account "automation@pulsepoint"
+    And Verify Campaign Dashboard is displayed with title "Campaigns"
+    And User clicks Lifetime filter
+    # Framework Gap: Requires step definition to observe the metric network fetches on load in LifeSteps.java
+    Then Only the static columns load initially and the heavy metrics are deferred
+    And The overall landing-page load performance is not regressed
