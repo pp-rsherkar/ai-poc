@@ -95,7 +95,7 @@ jobs:
           JIRA_URL: ${{ secrets.JIRA_URL }}
           JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-        run: timeout 15 uvx mcp-atlassian@2.0.0 || true
+        run: timeout 15 uvx mcp-atlassian || true
 
       - name: Render MCP server config
         env:
@@ -118,7 +118,7 @@ jobs:
               },
               "atlassian": {
                 "command": "uvx",
-                "args": ["mcp-atlassian@2.0.0"],
+                "args": ["mcp-atlassian"],
                 "env": {
                   "JIRA_URL": "${JIRA_URL}",
                   "JIRA_USERNAME": "${JIRA_USERNAME}",
