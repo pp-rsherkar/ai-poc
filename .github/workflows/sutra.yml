@@ -26,6 +26,10 @@ on:
         description: "Jira key (QA-1498), Sheet name/URL, or Doc name/URL — space-separate for sheet_and_doc"
         required: false
         type: string
+      restrict_to:
+        description: "Optional: restrict to a single ticket/tab (e.g. ET-24713) instead of the whole sheet/doc"
+        required: false
+        type: string
 
 
 permissions:
@@ -167,7 +171,7 @@ jobs:
             --mcp-config mcp-config.json \
             --allowedTools "Bash,Read,Write,Edit,Glob,Grep,mcp__google-drive__*,mcp__atlassian__*" \
             --permission-mode bypassPermissions \
-            --model claude-opus-5-5 \
+            --model opus \
             --output-format text \
             2>&1 | tee sutra-run.log
 
