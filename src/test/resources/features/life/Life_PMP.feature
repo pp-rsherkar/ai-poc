@@ -438,3 +438,44 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Given A hidden or inaccessible deal is applied to a tactic
     Then No false no-avails warning appears for it beyond what the unshared-deal handling already covers
     And No false no-avails warning appears on a tactic whose deals all have healthy avails
+
+  # Source: ET-25054
+  @todo
+  Scenario Outline: The no-avails warning in the "<SECTION>" section states the count of flagged deals
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    # Framework Gap: Requires an avails-history fixture that applies "<APPLIED>" deals to the "<SECTION>" section with "<FLAGGED>" of them having no avails for yesterday or the past 7 days
+    And User applies "<APPLIED>" deals to the "<SECTION>" section of which "<FLAGGED>" have no recent avails
+    # Framework Gap: Requires a no-avails warning label locator for the Deals and Deal Group sections in LifeSteps.java
+    Then Verify the "<SECTION>" section shows the warning "<WARNING>"
+    # Framework Gap: Requires an orange box warning locator on the Tactic Settings tab in LifeSteps.java
+    And Verify the orange box warning is not displayed
+    Examples:
+      | SECTION    | APPLIED | FLAGGED | WARNING                  |
+      | Deals      | 3       | 1       | 1 Deal(s) With No Avails |
+      | Deals      | 3       | 2       | 2 Deal(s) With No Avails |
+      | Deal Group | 4       | 1       | 1 Deal(s) With No Avails |
+      | Deal Group | 4       | 3       | 3 Deal(s) With No Avails |
+
+  # Source: ET-25054
+  @todo
+  Scenario: The orange box warning states how many deals have no estimated avails when every applied deal is unavailable
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    # Framework Gap: Requires an avails-history fixture where all 3 applied deals have no avails for yesterday or the past 7 days
+    And User applies "3" deals to the "Deals" section of which "3" have no recent avails
+    # Framework Gap: Requires an orange box warning locator on the Tactic Settings tab in LifeSteps.java
+    Then Verify the orange box warning is displayed above the applied deals
+    And Verify the orange box warning reads "3 deals have no estimated avails for yesterday or the past 7 days"
+
+  # Source: ET-25054
+  @todo
+  Scenario: The no-avails warning is shown alongside the existing Different Advertisers warning
+    When User clicks Tactic Setting tab
+    Then User should navigate to respective Tactic Setting tab
+    # Framework Gap: Requires a fixture applying 2 deals linked to different advertisers, 1 of which has no recent avails
+    And User applies "2" deals linked to different advertisers to the "Deals" section of which "1" have no recent avails
+    # Framework Gap: Requires a warning label locator for the Deals section in LifeSteps.java
+    Then Verify the "Deals" section shows the warning "Different Advertisers"
+    And Verify the "Deals" section shows the warning "1 Deal(s) With No Avails"
+    And Verify the "Deals" section does not show the warning "Deals linked to different advertisers"
