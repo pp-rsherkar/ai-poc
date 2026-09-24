@@ -153,3 +153,113 @@ Feature: LIFE Regression - Line Item Management
     Then The line item is saved with type Open AI and reloads showing type Open AI after the page is refreshed
   # Framework Gap: Requires a non-Open-AI line item regression check confirming Even is unaffected outside this line item type
     Then Verify a non-Open-AI line item is unaffected by the new Even budget distribution option
+
+  # Source: ET-25040, TC_ET-25040_33, TC_ET-25040_34, TC_ET-25040_36, TC_ET-25040_37, QA-2102
+  @todo
+  Scenario: Line Item Conversion tab shows the no-pixel message until a pixel created from the line item is associated with it
+    And User searches and selects the campaign "C1"
+    # Framework Gap: Requires a step definition to open a named line item from the campaign details page in LifeSteps.java / pages/life/Campaigns.java
+    When User opens the "LI-N" Line Item from the campaign details page
+    # Framework Gap: Requires page-object hooks for the Line Item Conversion tab in pages/life/LineItemConversions.java
+    And User opens the Conversion tab of the line item
+    # Framework Gap: Requires page-object hooks for the Line Item Conversion tab empty state in pages/life/LineItemConversions.java
+    Then Verify the message "To enable tracking for Line Item's Tactics, you must associate the pixel with that Line Item." is displayed on the Conversion tab
+    And Verify the empty-state illustration is displayed on the Conversion tab
+    # Framework Gap: Requires a step definition for the Add New Pixel action on the Line Item Conversion tab in LifeSteps.java
+    When User clicks Add New Pixel on the Conversion tab
+    And User enters the pixel details as "QA LI-Create" "100Advertiser" "Person" "Submit Application"
+    # Framework Gap: Requires a step definition and page-object hook for the "Associate this pixel with line item" footer checkbox in pages/life/ConversionPixel.java
+    And User ticks the "Associate this pixel with line item" checkbox
+    And User saves the pixel
+    # Framework Gap: Requires page-object hooks for the pixel list on the Line Item Conversion tab in pages/life/LineItemConversions.java
+    Then Verify the created pixel is ticked on the Conversion tab
+    And Verify the message "To enable tracking for Line Item's Tactics, you must associate the pixel with that Line Item." is not displayed on the Conversion tab
+    And Verify the empty-state illustration is not displayed on the Conversion tab
+    When User clicks Add New Pixel on the Conversion tab
+    And User enters the pixel details as "QA LI-Create-2" "100Advertiser" "Person" "Submit Application"
+    And User saves the pixel
+    Then Verify the created pixel is not ticked on the Conversion tab
+    And User navigates to Pixels page
+    # Framework Gap: Requires a step definition to open a created Conversion Pixel detail page in LifeSteps.java / pages/life/Pixels.java
+    When User opens the created Conversion Pixel from the pixel list
+    # Framework Gap: Requires page-object hooks for the Associated Line Items section in pages/life/ConversionPixel.java
+    Then Verify the Associated Line Items section title counter shows "0"
+    And Verify the warning "LI must be associated for pixel to work" is displayed in the Associated Line Items section
+    And User navigates to Pixels page
+    # Framework Gap: Requires a step definition to open a Conversion Pixel by name from the pixel list in LifeSteps.java
+    When User opens the Conversion Pixel "QA LI-Create" from the pixel list
+    # Framework Gap: Requires page-object hooks for the Associated Line Items list in pages/life/ConversionPixel.java
+    Then Verify the Associated Line Items section lists exactly the below line items
+      | LI-N |
+    And Verify the Associated Line Items section title counter shows "1"
+
+  # Source: ET-25040, TC_ET-25040_01, TC_ET-25040_02, TC_ET-25040_39, TC_ET-25040_40, HT-5380
+  @todo
+  Scenario: Associations made on the pixel page and on the Line Item Conversion tab stay in sync
+    And User navigates to Pixels page
+    # Framework Gap: Requires a step definition to open a Conversion Pixel by name from the pixel list in LifeSteps.java
+    When User opens the Conversion Pixel "4221" from the pixel list
+    # Framework Gap: Requires page-object hooks for the Associated Line Items list in pages/life/ConversionPixel.java
+    Then Verify the Associated Line Items section lists exactly the below line items
+      | LI-A |
+      | LI-B |
+    And Verify the Associated Line Items section title counter shows "2"
+    # Framework Gap: Requires step definitions for the Add Line Items panel in LifeSteps.java
+    When User clicks Add in the Associated Line Items section
+    And User expands campaign "C2" in the Add Line Items panel
+    And User ticks line item "LI-C" in the Add Line Items panel
+    And User confirms the Add Line Items panel selection
+    # Framework Gap: Requires a generic page reload step in LifeSteps.java
+    And User reloads the pixel page
+    Then Verify the Associated Line Items section title counter shows "3"
+    And User navigates to Campaign Dashboard
+    And User searches and selects the campaign "C2"
+    # Framework Gap: Requires a step definition to open a named line item from the campaign details page in LifeSteps.java / pages/life/Campaigns.java
+    When User opens the "LI-C" Line Item from the campaign details page
+    # Framework Gap: Requires page-object hooks for the Line Item Conversion tab in pages/life/LineItemConversions.java
+    And User opens the Conversion tab of the line item
+    # Framework Gap: Requires page-object hooks for the pixel list on the Line Item Conversion tab in pages/life/LineItemConversions.java
+    Then Verify pixel "4221" is ticked on the Conversion tab
+    And Verify the message "To enable tracking for Line Item's Tactics, you must associate the pixel with that Line Item." is not displayed on the Conversion tab
+    # Framework Gap: Requires a step definition to untick a pixel on the Line Item Conversion tab in LifeSteps.java
+    When User unticks pixel "4221" on the Conversion tab
+    # Framework Gap: Requires a step definition to save the Line Item Conversion tab in LifeSteps.java
+    And User saves the Conversion tab of the line item
+    And User navigates to Pixels page
+    And User opens the Conversion Pixel "4221" from the pixel list
+    Then Verify the Associated Line Items section lists exactly the below line items
+      | LI-A |
+      | LI-B |
+    And Verify the Associated Line Items section title counter shows "2"
+
+  # Source: ET-25040, TC_ET-25040_41, TC_ET-25040_42, PROD-15912
+  @todo
+  Scenario: A duplicated line item keeps its pixel associations and removing the copy leaves the original associated
+    And User searches and selects the campaign "C1"
+    # Framework Gap: Requires a step definition to open a named line item from the campaign details page in LifeSteps.java / pages/life/Campaigns.java
+    When User opens the "LI-A" Line Item from the campaign details page
+    # Framework Gap: Requires a step definition to duplicate a single named line item in LifeSteps.java / pages/life/LineItemDetails.java
+    And User duplicates the line item as "LI-A-copy"
+    # Framework Gap: Requires page-object hooks for the Line Item Conversion tab in pages/life/LineItemConversions.java
+    And User opens the Conversion tab of the line item
+    # Framework Gap: Requires page-object hooks for the pixel list on the Line Item Conversion tab in pages/life/LineItemConversions.java
+    Then Verify pixel "4221" is ticked on the Conversion tab
+    And User navigates to Pixels page
+    # Framework Gap: Requires a step definition to open a Conversion Pixel by name from the pixel list in LifeSteps.java
+    When User opens the Conversion Pixel "4221" from the pixel list
+    # Framework Gap: Requires page-object hooks for the Associated Line Items list in pages/life/ConversionPixel.java
+    Then Verify the Associated Line Items section lists the line item "LI-A"
+    And Verify the Associated Line Items section lists the line item "LI-A-copy" with its new line item ID
+    And Verify the Associated Line Items section title counter increased by "1"
+    # Framework Gap: Requires step definitions for removing a line item from the Associated Line Items section in LifeSteps.java
+    When User removes line item "LI-A-copy" from the Associated Line Items section
+    And User saves the pixel
+    # Framework Gap: Requires a generic page reload step in LifeSteps.java
+    And User reloads the pixel page
+    Then Verify the Associated Line Items section does not list the line item "LI-A-copy"
+    And Verify the Associated Line Items section lists the line item "LI-A"
+    And User navigates to Campaign Dashboard
+    And User searches and selects the campaign "C1"
+    When User opens the "LI-A" Line Item from the campaign details page
+    And User opens the Conversion tab of the line item
+    Then Verify pixel "4221" is ticked on the Conversion tab
