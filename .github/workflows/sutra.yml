@@ -19,17 +19,14 @@ on:
         type: string
       source_type:
         description: "Input source"
-        required: true
+        required: false
         type: choice
         options: [jira, sheet, doc, sheet_and_doc]
       source_ref:
         description: "Jira key (QA-1498), Sheet name/URL, or Doc name/URL — space-separate for sheet_and_doc"
-        required: true
-        type: string
-      restrict_to:
-        description: "Optional: restrict to a single ticket/tab (e.g. ET-24713) instead of the whole sheet/doc"
         required: false
         type: string
+
 
 permissions:
   contents: write
