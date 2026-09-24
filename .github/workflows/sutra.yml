@@ -155,15 +155,33 @@ jobs:
           }
           EOF
 
+      - name: Install Office-file parsing libraries
+        run: pip install python-docx openpyxl
+
       - name: Run Sutra
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ env.REPO_TOKEN }}
+          USE_NETRA_ARTIFACT: ${{ inputs.use_netra_artifact }}
           SOURCE_TYPE: ${{ inputs.source_type }}
           SOURCE_REF: ${{ inputs.source_ref }}
           RESTRICT_TO: ${{ inputs.restrict_to }}
         run: |
-          PROMPT="/sutra ${SOURCE_TYPE}: ${SOURCE_REF}"
+          if [ "$USE_NETRA_ARTIFACT" = "true" ]; then
+            XLSX_FILE=$(ls ./inputs/netra-deliverables/*.xlsx 2>/dev/null | head -n1)
+            DOCX_FILE=$(ls ./inputs/netra-deliverables/*.docx 2>/dev/null | head -n1)
+            if [ -z "$XLSX_FILE" ] || [ -z "$DOCX_FILE" ]; then
+              echo "::error::use_netra_artifact was true but a .xlsx or .docx file was not found in ./inputs/netra-deliverables"
+              exit 1
+            fi
+            PROMPT="/sutra sheet_and_doc: ${XLSX_FILE} ${DOCX_FILE}"
+          else
+            if [ -z "$SOURCE_TYPE" ] || [ -z "$SOURCE_REF" ]; then
+              echo "::error::source_type and source_ref are required when use_netra_artifact is false"
+              exit 1
+            fi
+            PROMPT="/sutra ${SOURCE_TYPE}: ${SOURCE_REF}"
+          fi
           if [ -n "$RESTRICT_TO" ]; then
             PROMPT="$PROMPT (restrict to ${RESTRICT_TO} only)"
           fi

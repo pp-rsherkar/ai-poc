@@ -41,6 +41,8 @@ Every external fetch in this skill must resolve to a specific, fully-qualified t
 
 **Known duplicate to watch for — Sheets:** this org's config also runs a dedicated `mcp-gsheets` server (range/value-oriented tools like `sheets_get_values`, `sheets_batch_get_values`) alongside `google-drive`. Default to `google-drive`'s `getGoogleSheetContent` for Sheet fetches — it returns tab-level content directly (matching this skill's row-extraction assumptions in STEP 0) and is the same server used for the paired Google Doc fetch, so one connector family covers both halves of a Sheet+Doc run. Fall back to `mcp-gsheets` only if `google-drive` is not loaded in a given session, and never call both for the same fetch.
 
+**Local File input (no connector call):** if `source_ref` is a plain filesystem path that already exists on disk — not a `docs.google.com`/`sheets.google.com`/`drive.google.com` URL, not a bare Jira key — treat it as a Local File input, not a connector fetch. This covers files staged by an upstream process, e.g. a `.docx`/`.xlsx` downloaded from another workflow's artifact before this run started. Skip Google Drive/Docs/Sheets/Jira connector resolution entirely for it; there is no live call to make. Read it directly via Bash using the appropriate local extraction method: `python-docx` for `.docx`, `openpyxl`/`pandas` for `.xlsx`. Verify the path exists and is non-empty before parsing — treat a missing/empty file as the Local File equivalent of a fetch failure (see Halting Conditions).
+
 **Disambiguation rule (deterministic, not a guess):**
 - Inspect the session's actual available tool list before the first fetch — do not assume the tools above exist under those exact names.
 - Match by resource host/type, not by tool popularity: a `docs.google.com`/`sheets.google.com`/`drive.google.com` URL (or a bare name reachable only via a Google Drive-family connector) routes to the Google Drive-family tools above. A `sharepoint.com`/`onedrive.live.com`/`graph.microsoft.com` URL is a Microsoft 365 document, not a Google Sheet/Doc — this skill does not support it; treat it as out of scope and halt with that explanation rather than routing it to any connector.
@@ -201,10 +203,11 @@ Emit an internal note per target page: `<TargetNode> | module=<module> | path=<S
 | Google Sheet | Name or URL | Test matrix grid — sole source for scenario count when present |
 | Google Doc | Name or URL, Deep Analysis §1–§8 | Background/Intent/Impact/Gaps/Ambiguities/Dependencies/History/References |
 | Jira ticket | `QA-1498`, a bare `PROJECT-NUMBER`, or "Generate feature file for X" | Summary, Description, AC, Attachments/Comments |
+| Local file (CI artifact) | A filesystem path already present on disk (e.g. downloaded from an upstream workflow's artifact, such as a Netra deliverable) | Same content role as Doc/Sheet — Deep Analysis doc (.docx) or test-matrix sheet (.xlsx) — but read directly from disk, no live Drive fetch |
 
 Rules: at least one of the above required — none provided halts (see Halting Conditions). Multiple valid combinations are additive (Sheet + Doc = Full Context Run); the connector is called for whichever is actually supplied. An explicit chat restriction to a single ticket/tab (e.g. "ET-24713 only") is honored instead of the default full-file scope.
 
-**Ingestion Mode** (set at the end of STEP 0, logged to chat): Full Context Run (Sheet + Doc) · Sheet-Only Run · Doc-Only Run · Jira-Only Run.
+**Ingestion Mode** (set at the end of STEP 0, logged to chat): Full Context Run (Sheet + Doc) · Sheet-Only Run · Doc-Only Run · Jira-Only Run · Local CI Artifact Run (Local File sheet and/or doc, e.g. staged by an upstream workflow's artifact).
 
 ### Fixed configuration
 
@@ -225,7 +228,11 @@ Rules: at least one of the above required — none provided halts (see Halting C
 2. **Google Doc (multi-ticket Deep Analysis):** call the resolved Docs tool (default `mcp__google-drive__readGoogleDoc`), read the complete document. Parse each ticket section (§1 Background … §8 References). Never hallucinate document content.
 3. **Jira ticket ID:** call the resolved Jira tool (default `mcp__atlassian__read_jira_issue` / `search_jira_issues`) for Summary, Description, Acceptance Criteria, Attachments/Comments.
 
-**Office-file detection (STRICT — check before calling any Docs/Sheets-specific tool):** check `mimeType` first. `.docx`/`.xlsx` mimeTypes are uploaded Office files, NOT native Google Docs/Sheets — the native tools will reject them. Route to the Office-file fallback tool named in Connector Resolution above, and log in the final PR: *"Ingested as uploaded Office file (.docx/.xlsx), not a native Google Doc/Sheet."* If no available tool can extract it, treat as a genuine fetch failure → Halting Condition. Never silently skip or proceed on a partial read.
+**Office-file detection (STRICT — check before calling any Docs/Sheets-specific tool):** an Office-formatted (`.docx`/`.xlsx`) source can arrive two ways, and both skip the native Docs/Sheets tools:
+- **Uploaded into Google Drive:** check `mimeType` first via the Drive connector. `.docx`/`.xlsx` mimeTypes are uploaded Office files, NOT native Google Docs/Sheets — the native tools will reject them. Route to the Office-file fallback tool named in Connector Resolution above (`readTextFile`/`downloadFile`), and log in the final PR: *"Ingested as uploaded Office file (.docx/.xlsx) via Google Drive, not a native Google Doc/Sheet."*
+- **Already local (Local File input, see Connector Resolution):** no Drive call at all — parse directly from disk via `python-docx`/`openpyxl`, and log: *"Ingested as a local Office file (.docx/.xlsx) staged on disk by an upstream process, not fetched from Google Drive."*
+
+If no available method can extract either case, treat as a genuine fetch/read failure → Halting Condition. Never silently skip or proceed on a partial read.
 
 **Batch Sizing (STRICT, deterministic — effort-budgeted, not fixed-size):**
 1. Run STEP 1 (ingestion + cross-referencing) and STEP 1.5 (duplicate check) for **every** ticket/tab, regardless of count. Always complete.
@@ -425,6 +432,7 @@ Every ticket not reached gets a Traceability row (ticket ID, test-case count, be
 - STEP 5.5's Gherkin parse (or, on the Local-Checkout Path, `mvn test-compile`) fails against the generated/updated file — reported with the tool's raw error output, never self-corrected past silently.
 - Neither Git & PR Mechanism path is viable (no local checkout AND no `mcp__github__*` tools present in this session), or the resolved path fails outright once chosen (push rejected, `gh pr create` errors, or a `mcp__github__*` call errors or returns an auth/permission failure) — or the resolved Google Sheets/Docs/Jira tool's API fails outright.
 - A named connector tool (per Connector Resolution) isn't present under any prefix in this session's tool list.
+- A Local File input is named, but the path does not exist on disk, is empty, or cannot be parsed by the available extraction method (`python-docx`/`openpyxl`).
 
 ## Non-negotiables
 
