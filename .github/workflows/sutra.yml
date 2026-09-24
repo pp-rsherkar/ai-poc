@@ -8,6 +8,15 @@ on:
         required: true
         default: "pulsepointinc/qa-automation"
         type: string
+      use_netra_artifact:
+        description: "Set to true to use downloaded Netra artifacts as input"
+        required: false
+        default: false
+        type: boolean
+      netra_run_id:
+        description: "Optional: Specific Run ID of Netra workflow (leave blank for latest)"
+        required: false
+        type: string
       source_type:
         description: "Input source"
         required: true
@@ -51,7 +60,7 @@ jobs:
       - name: Set up Python (for mcp-atlassian via uvx, and STEP 5's column-width script)
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+         python-version: "3.12"
 
       - name: Install uv
         run: pip install uv
@@ -89,6 +98,22 @@ jobs:
               exit 1
             fi
           done
+          
+      - name: Download Netra Deliverables Artifact
+        if: ${{ inputs.use_netra_artifact }}
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ env.REPO_TOKEN }}
+          workflow: netra.yml # Update this to the exact YAML filename of your Netra workflow
+          name: netra-deliverables
+          run_id: ${{ inputs.netra_run_id }} # If empty, it automatically fetches the latest run
+          path: ./inputs/netra-deliverables
+
+      - name: Inspect Downloaded Netra Artifacts
+        if: ${{ inputs.use_netra_artifact }}
+        run: |
+          echo "Downloaded files from Netra:"
+          ls -la ./inputs/netra-deliverables          
 
       - name: Debug mcp-atlassian startup
         env:
