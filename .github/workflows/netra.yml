@@ -55,6 +55,13 @@ jobs:
           claude update || true
           claude --version
 
+      - name: Debug mcp-atlassian startup
+        env:
+          JIRA_URL: ${{ secrets.JIRA_URL }}
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: timeout 15 uvx mcp-atlassian || true
+
       - name: Render MCP server config (Jira/Confluence via mcp-atlassian)
         env:
           JIRA_URL: ${{ secrets.JIRA_URL }}
@@ -66,7 +73,7 @@ jobs:
             "mcpServers": {
               "atlassian": {
                 "command": "uvx",
-                "args": ["mcp-atlassian@2.0.0"],
+                "args": ["mcp-atlassian"],
                 "env": {
                   "JIRA_URL": "${JIRA_URL}",
                   "JIRA_USERNAME": "${JIRA_USERNAME}",
