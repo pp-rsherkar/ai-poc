@@ -90,6 +90,13 @@ jobs:
             fi
           done
 
+      - name: Debug mcp-atlassian startup
+        env:
+          JIRA_URL: ${{ secrets.JIRA_URL }}
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: timeout 15 uvx mcp-atlassian@2.0.0 || true
+
       - name: Render MCP server config
         env:
           JIRA_URL: ${{ secrets.JIRA_URL }}
