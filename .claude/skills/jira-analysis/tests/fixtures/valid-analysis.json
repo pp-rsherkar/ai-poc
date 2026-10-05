@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "netra-demo-run",
+  "artifactId": "netra-demo-analysis",
+  "artifactType": "qa_analysis",
+  "producer": "netra",
+  "createdAt": "2026-09-24T08:00:00Z",
+  "status": "ready",
+  "sourceRefs": [
+    { "type": "jira", "id": "QA-100" }
+  ],
+  "blockers": [],
+  "assumptions": [],
+  "input": {
+    "type": "ticket",
+    "value": "QA-100",
+    "detailMode": "full",
+    "productionProjectKey": "HT",
+    "confluenceDetailMode": "disabled"
+  },
+  "tickets": [
+    {
+      "key": "QA-100",
+      "summary": "Validate a sample business rule",
+      "metadata": {
+        "issueType": "Story",
+        "status": "In Progress",
+        "priority": "High",
+        "assignee": "QA Engineer",
+        "components": ["Requests"],
+        "fixVersions": ["September 2026"]
+      },
+      "platforms": ["web"],
+      "background": "The request workflow accepts structured business data.",
+      "intent": "Save valid requests and reject incomplete requests.",
+      "crossFunctionalImpact": ["Request persistence", "Validation service"],
+      "contextNote": null,
+      "readiness": { "verdict": "ready", "flags": [] },
+      "requirements": [
+        {
+          "id": "QA-100-R01",
+          "text": "A valid request is saved.",
+          "sourceRefs": [{ "type": "jira", "id": "QA-100" }],
+          "confidence": "high"
+        }
+      ],
+      "gaps": [],
+      "ambiguities": [],
+      "dependencies": [],
+      "productionRisks": [
+        {
+          "issueKey": "HT-100",
+          "summary": "Request validation accepted incomplete data",
+          "rating": "HIGH",
+          "reason": "The same validation boundary failed previously.",
+          "sourceRefs": [{ "type": "production_issue", "id": "HT-100" }]
+        }
+      ],
+      "confluenceDocs": [],
+      "navigationContext": {
+        "node": "Request Page",
+        "module": "Requests",
+        "frameworkGap": true
+      },
+      "sourceManifest": [
+        {
+          "type": "ticket",
+          "id": "QA-100",
+          "disposition": "fetched"
+        },
+        {
+          "type": "production_issue",
+          "id": "HT-100",
+          "disposition": "fetched"
+        }
+      ],
+      "testCoverage": {
+        "requirementCount": 1,
+        "dimensions": ["happy path", "validation"],
+        "regressionAnchors": [],
+        "minimumTestCases": 2,
+        "testCases": [
+          {
+            "id": "TC_QA-100_01",
+            "requirementIds": ["QA-100-R01"],
+            "type": "positive",
+            "description": "Save a request using valid data.",
+            "testData": "Valid request values",
+            "expectedResult": "The request is persisted with an active status.",
+            "actualResult": "",
+            "status": "not_executed",
+            "owner": "",
+            "comments": "Src: QA-100-R01",
+            "variationGroup": "valid-request-status",
+            "variationKey": "active"
+          },
+          {
+            "id": "TC_QA-100_02",
+            "requirementIds": ["QA-100-R01"],
+            "type": "negative",
+            "description": "Reject a request with missing required data.",
+            "testData": "Required value omitted",
+            "expectedResult": "The request is rejected and is not persisted.",
+            "actualResult": "",
+            "status": "not_executed",
+            "owner": "",
+            "comments": "Src: QA-100-R01"
+          },
+          {
+            "id": "TC_QA-100_03",
+            "requirementIds": ["QA-100-R01"],
+            "type": "positive",
+            "description": "Save an approved request using valid data.",
+            "testData": "Valid approved request values",
+            "expectedResult": "The approved request is persisted with an active status.",
+            "actualResult": "",
+            "status": "not_executed",
+            "owner": "",
+            "comments": "Src: QA-100-R01",
+            "variationGroup": "valid-request-status",
+            "variationKey": "approved"
+          }
+        ]
+      },
+      "sourceRefs": [
+        { "type": "jira", "id": "QA-100" }
+      ]
+    }
+  ],
+  "releaseSummary": {
+    "totalTickets": 1,
+    "ready": 1,
+    "warnings": 0,
+    "blocked": 0,
+    "totalTestCases": 3,
+    "averageTestCasesPerTicket": 3,
+    "highestCoverageTicket": "QA-100",
+    "liveDependencies": [],
+    "productionRiskThemes": [],
+    "openAmbiguities": []
+  },
+  "compatibilityArtifacts": {
+    "deepAnalysisDocx": null,
+    "testDesignXlsx": null,
+    "readinessDashboardHtml": null,
+    "legacyCacheJson": null
+  }
+}

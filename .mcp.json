@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "atlassian-rovo": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v2/mcp",
+      "oauth": {
+        "scopes": "read:me read:account email offline_access read:jira:agent-interface search:jira:agent-interface read:confluence:agent-interface search:confluence:agent-interface search:rovo:agent-interface"
+      }
+    }
+  }
+}

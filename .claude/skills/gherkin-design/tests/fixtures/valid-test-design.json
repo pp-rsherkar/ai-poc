@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "sutra-demo-run",
+  "artifactId": "sutra-demo-design",
+  "artifactType": "test_design",
+  "producer": "sutra",
+  "createdAt": "2026-09-24T09:00:00Z",
+  "status": "ready",
+  "sourceAnalysis": {
+    "path": ".claude/skills/jira-analysis/tests/fixtures/valid-analysis.json",
+    "artifactId": "netra-demo-analysis",
+    "schemaVersion": "1.0.0"
+  },
+  "blockers": [],
+  "assumptions": [],
+  "featureFiles": [
+    {
+      "artifactPath": ".claude/skills/gherkin-design/tests/fixtures/Sample.feature",
+      "targetPath": "src/test/resources/features/e2e/Sample_Requests.feature",
+      "action": "create",
+      "ticketKeys": ["QA-100"],
+      "scenarioIds": ["SC_QA-100_01", "SC_QA-100_02"]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SC_QA-100_01",
+      "name": "Save a valid request",
+      "kind": "scenario_outline",
+      "ticketKey": "QA-100",
+      "requirementIds": ["QA-100-R01"],
+      "testCaseIds": ["TC_QA-100_01", "TC_QA-100_03"],
+      "featurePath": ".claude/skills/gherkin-design/tests/fixtures/Sample.feature"
+    },
+    {
+      "id": "SC_QA-100_02",
+      "name": "Reject an incomplete request",
+      "kind": "scenario",
+      "ticketKey": "QA-100",
+      "requirementIds": ["QA-100-R01"],
+      "testCaseIds": ["TC_QA-100_02"],
+      "featurePath": ".claude/skills/gherkin-design/tests/fixtures/Sample.feature"
+    }
+  ],
+  "triage": [
+    {
+      "testCaseId": "TC_QA-100_01",
+      "ticketKey": "QA-100",
+      "requirementIds": ["QA-100-R01"],
+      "automationCandidate": "yes",
+      "priority": "high",
+      "frameworkReadiness": "gap",
+      "disposition": "authored",
+      "rationale": "The behavior is deterministic and directly verifies QA-100-R01.",
+      "scenarioIds": ["SC_QA-100_01"]
+    },
+    {
+      "testCaseId": "TC_QA-100_02",
+      "ticketKey": "QA-100",
+      "requirementIds": ["QA-100-R01"],
+      "automationCandidate": "yes",
+      "priority": "high",
+      "frameworkReadiness": "gap",
+      "disposition": "authored",
+      "rationale": "The validation result is deterministic and protects the same requirement.",
+      "scenarioIds": ["SC_QA-100_02"]
+    },
+    {
+      "testCaseId": "TC_QA-100_03",
+      "ticketKey": "QA-100",
+      "requirementIds": ["QA-100-R01"],
+      "automationCandidate": "yes",
+      "priority": "high",
+      "frameworkReadiness": "gap",
+      "disposition": "authored",
+      "rationale": "The second source-backed status is a parallel request variation.",
+      "scenarioIds": ["SC_QA-100_01"]
+    }
+  ],
+  "queuedTickets": [],
+  "frameworkGaps": [
+    {
+      "ticketKey": "QA-100",
+      "description": "Sample request steps require Java implementation.",
+      "affectedScenarioIds": ["SC_QA-100_01", "SC_QA-100_02"]
+    }
+  ]
+}

@@ -1,0 +1,470 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulsepoint.example/schemas/analysis-output.schema.json",
+  "title": "Netra QA Analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "artifactId",
+    "artifactType",
+    "producer",
+    "createdAt",
+    "status",
+    "sourceRefs",
+    "blockers",
+    "assumptions",
+    "input",
+    "tickets",
+    "releaseSummary",
+    "compatibilityArtifacts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "runId": { "type": "string", "minLength": 1 },
+    "artifactId": { "type": "string", "minLength": 1 },
+    "artifactType": { "const": "qa_analysis" },
+    "producer": { "const": "netra" },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "status": {
+      "enum": ["ready", "needs_input", "blocked", "failed"]
+    },
+    "sourceRefs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sourceRef" }
+    },
+    "blockers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "input": { "$ref": "#/$defs/input" },
+    "tickets": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/ticket" }
+    },
+    "releaseSummary": { "$ref": "#/$defs/releaseSummary" },
+    "compatibilityArtifacts": { "$ref": "#/$defs/compatibilityArtifacts" }
+  },
+  "$defs": {
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["jira", "confluence", "production_issue", "repository"]
+        },
+        "id": { "type": "string", "minLength": 1 },
+        "url": { "type": ["string", "null"] }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "value",
+        "detailMode",
+        "productionProjectKey",
+        "confluenceDetailMode"
+      ],
+      "properties": {
+        "type": {
+          "enum": ["fix_version", "ticket", "ticket_list", "jira_url"]
+        },
+        "value": { "type": "string", "minLength": 1 },
+        "detailMode": { "enum": ["full", "fast"] },
+        "productionProjectKey": { "type": "string", "minLength": 1 },
+        "confluenceDetailMode": {
+          "enum": ["disabled", "shallow", "full"]
+        }
+      }
+    },
+    "ticket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "summary",
+        "platforms",
+        "background",
+        "intent",
+        "crossFunctionalImpact",
+        "readiness",
+        "requirements",
+        "gaps",
+        "ambiguities",
+        "dependencies",
+        "productionRisks",
+        "confluenceDocs",
+        "navigationContext",
+        "testCoverage",
+        "sourceManifest",
+        "sourceRefs"
+      ],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "metadata": { "$ref": "#/$defs/ticketMetadata" },
+        "platforms": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "background": { "type": "string", "minLength": 1 },
+        "intent": { "type": "string", "minLength": 1 },
+        "crossFunctionalImpact": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "contextNote": { "type": ["string", "null"] },
+        "readiness": { "$ref": "#/$defs/readiness" },
+        "requirements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/requirement" }
+        },
+        "gaps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        },
+        "ambiguities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dependency" }
+        },
+        "productionRisks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/productionRisk" }
+        },
+        "confluenceDocs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confluenceDoc" }
+        },
+        "navigationContext": { "$ref": "#/$defs/navigationContext" },
+        "testCoverage": { "$ref": "#/$defs/testCoverage" },
+        "sourceManifest": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceManifestEntry" }
+        },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceRef" }
+        }
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "flags"],
+      "properties": {
+        "verdict": { "enum": ["ready", "warning", "blocked"] },
+        "flags": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "MISSING_COMPONENTS",
+              "MISSING_ASSIGNEE",
+              "UNEXPECTED_STATE",
+              "UNREADY_DPD_DEPENDENCY",
+              "NO_LINKED_CONTEXT"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sourceManifestEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "disposition"],
+      "properties": {
+        "type": {
+          "enum": [
+            "ticket",
+            "parent",
+            "linked_issue",
+            "subtask",
+            "attachment",
+            "comment",
+            "confluence",
+            "production_issue",
+            "repository"
+          ]
+        },
+        "id": { "type": "string", "minLength": 1 },
+        "disposition": { "enum": ["fetched", "excluded"] },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "disposition": { "const": "excluded" } },
+            "required": ["disposition"]
+          },
+          "then": { "required": ["reason"] }
+        },
+        {
+          "if": {
+            "properties": { "disposition": { "const": "fetched" } },
+            "required": ["disposition"]
+          },
+          "then": { "not": { "required": ["reason"] } }
+        }
+      ]
+    },
+    "ticketMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "issueType": { "type": ["string", "null"] },
+        "status": { "type": ["string", "null"] },
+        "priority": { "type": ["string", "null"] },
+        "assignee": { "type": ["string", "null"] },
+        "components": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "fixVersions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "sourceRefs", "confidence"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9]+-[0-9]+-R[0-9]{2,}$" },
+        "text": { "type": "string", "minLength": 1 },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceRef" }
+        },
+        "confidence": { "enum": ["high", "medium", "low"] }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "sourceRefs"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "sourceRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRef" }
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "blocking", "sourceRefs"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 },
+        "blocking": { "type": "boolean" },
+        "sourceRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRef" }
+        }
+      }
+    },
+    "productionRisk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issueKey", "rating", "reason", "sourceRefs"],
+      "properties": {
+        "issueKey": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "rating": { "enum": ["LOW", "MEDIUM", "ELEVATED", "HIGH"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceRef" }
+        }
+      }
+    },
+    "confluenceDoc": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "detail", "rank", "sourceRefs"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "detail": { "enum": ["shallow", "full"] },
+        "rank": { "type": "integer", "minimum": 1 },
+        "excerpt": { "type": "string" },
+        "body": { "type": "string" },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceRef" }
+        }
+      }
+    },
+    "navigationContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "module", "frameworkGap"],
+      "properties": {
+        "node": { "type": ["string", "null"] },
+        "module": { "type": ["string", "null"] },
+        "frameworkGap": { "type": "boolean" }
+      }
+    },
+    "testCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirementCount",
+        "dimensions",
+        "regressionAnchors",
+        "minimumTestCases",
+        "testCases"
+      ],
+      "properties": {
+        "requirementCount": { "type": "integer", "minimum": 0 },
+        "dimensions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "regressionAnchors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "minimumTestCases": { "type": "integer", "minimum": 1 },
+        "testCases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/testCase" }
+        }
+      }
+    },
+    "testCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "requirementIds",
+        "type",
+        "description",
+        "testData",
+        "expectedResult",
+        "actualResult",
+        "status",
+        "owner",
+        "comments"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^TC_[A-Z][A-Z0-9]+-[0-9]+_[0-9]{2,}$" },
+        "requirementIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "type": {
+          "enum": ["positive", "negative", "edge", "regression", "blocked"]
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "testData": { "type": "string" },
+        "expectedResult": { "type": "string", "minLength": 1 },
+        "actualResult": { "type": "string" },
+        "status": { "enum": ["not_executed", "blocked", "pass", "fail"] },
+        "owner": { "type": "string" },
+        "comments": { "type": "string" },
+        "variationGroup": { "type": "string", "minLength": 1 },
+        "variationKey": { "type": "string", "minLength": 1 }
+      },
+      "dependentRequired": {
+        "variationGroup": ["variationKey"],
+        "variationKey": ["variationGroup"]
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "blocked" } },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": { "status": { "const": "blocked" } }
+          },
+          "else": {
+            "properties": { "status": { "not": { "const": "blocked" } } }
+          }
+        }
+      ]
+    },
+    "releaseSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalTickets",
+        "ready",
+        "warnings",
+        "blocked",
+        "totalTestCases",
+        "averageTestCasesPerTicket",
+        "highestCoverageTicket",
+        "liveDependencies",
+        "productionRiskThemes",
+        "openAmbiguities"
+      ],
+      "properties": {
+        "totalTickets": { "type": "integer", "minimum": 1 },
+        "ready": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 },
+        "totalTestCases": { "type": "integer", "minimum": 1 },
+        "averageTestCasesPerTicket": { "type": "number", "minimum": 0 },
+        "highestCoverageTicket": { "type": "string", "minLength": 1 },
+        "liveDependencies": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "productionRiskThemes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "openAmbiguities": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "compatibilityArtifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deepAnalysisDocx",
+        "testDesignXlsx",
+        "readinessDashboardHtml",
+        "legacyCacheJson"
+      ],
+      "properties": {
+        "deepAnalysisDocx": { "type": ["string", "null"] },
+        "testDesignXlsx": { "type": ["string", "null"] },
+        "readinessDashboardHtml": { "type": ["string", "null"] },
+        "legacyCacheJson": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
