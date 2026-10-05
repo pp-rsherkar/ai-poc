@@ -1,12 +1,14 @@
 Feature: LIFE Regression - Create a Report Template
 
-  @regression
-  Scenario Outline: Create a Report Template
+  Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
     And User navigates to Report Templates page
     Then Verify the tabs displayed on the Report Templates page
+
+  @regression
+  Scenario Outline: Verify UI default states, error validations, and successful creation of a Regular report template
     And Verify Template tab is selected by default on the Report Templates page
     When User clicks on New Template
     Then Verify the tabs displayed on the Create New Template panel
@@ -28,12 +30,7 @@ Feature: LIFE Regression - Create a Report Template
       | AutoTemplate  | Advertiser Name | Impressions |
 
   @regression
-  Scenario Outline: Add multiple dimensions and metrics from multiple categories during template creation
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And Verify Campaign Dashboard is displayed with title "Campaigns"
-    And User navigates to Report Templates page
-    Then Verify the tabs displayed on the Report Templates page
+  Scenario Outline: Add and delete multiple dimensions and metrics from multiple categories during template creation
     And Verify Template tab is selected by default on the Report Templates page
     When User clicks on New Template
     Then Verify the tabs displayed on the Create New Template panel
@@ -57,11 +54,6 @@ Feature: LIFE Regression - Create a Report Template
 
   @regression
   Scenario Outline: Verify that user is able to delete the existing report template
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And Verify Campaign Dashboard is displayed with title "Campaigns"
-    And User navigates to Report Templates page
-    Then Verify the tabs displayed on the Report Templates page
     When User clicks on New Template
     Then Verify the tabs displayed on the Create New Template panel
     When User enters the template details as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
@@ -77,11 +69,6 @@ Feature: LIFE Regression - Create a Report Template
 
   @regression
   Scenario Outline: Verify that user is able to copy the existing report template
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And Verify Campaign Dashboard is displayed with title "Campaigns"
-    And User navigates to Report Templates page
-    Then Verify the tabs displayed on the Report Templates page
     When User clicks on New Template
     Then Verify the tabs displayed on the Create New Template panel
     When User enters the template details as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"
@@ -101,11 +88,6 @@ Feature: LIFE Regression - Create a Report Template
 
   @regression
   Scenario Outline: Verify that user is able to run the report using 'Run report' icon from the Templates List View
-    Given This scenario will be executed in the "Demo" environment as a "User"
-    And "Life" application is logged in successfully with Account "automation@pulsepoint"
-    And Verify Campaign Dashboard is displayed with title "Campaigns"
-    And User navigates to Report Templates page
-    Then Verify the tabs displayed on the Report Templates page
     When User clicks on New Template
     Then Verify the tabs displayed on the Create New Template panel
     When User enters the template details as "<TEMPLATE NAME>" "<DIMENSIONS>" "<METRICS>"

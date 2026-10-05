@@ -258,45 +258,6 @@ public class TacticDetails {
         showExpressionValues = values.stream().filter(v -> !v.isBlank() && !v.equalsIgnoreCase("AND") && !v.equalsIgnoreCase("OR")).distinct().collect(Collectors.toList());
     }
 
-    public boolean assertShowExpressionConnectorLogic(List<String> rawValues) {
-        // Keywords are at odd indices (1, 3, 5, ...), connectors at even indices (2, 4, 6, ...)
-        boolean allValid = true;
-        for (int i = 1; i + 2 < rawValues.size(); i += 2) {
-            String leftKeyword = rawValues.get(i);
-            String connector = rawValues.get(i + 1);
-            String rightKeyword = rawValues.get(i + 2);
-            String expectedConnector = leftKeyword.equals(rightKeyword) ? "OR" : "AND";
-            if (!connector.equals(expectedConnector)) {
-                allValid = false;
-                break;
-            }
-        }
-        return allValid;
-    }
-
-    public boolean ruleMappingWithShowExpressionValues(Map<String, List<String>> ruleMap, String defaultExpression) {
-        List<String> ruleTypes = new ArrayList<>(ruleMap.keySet());
-        List<String> ruleTypeExpressions = new ArrayList<>(ruleTypes.size());
-        ruleTypeExpressions.add(defaultExpression);
-        for (String ruleType : ruleTypes) {
-            switch (ruleType) {
-                case "Behavioral Segment":
-                    ruleTypeExpressions.add("Behavioral");
-                    break;
-                case "Health Populations":
-                    ruleTypeExpressions.add("CONDITION");
-                    break;
-                case "Age":
-                    ruleTypeExpressions.add("AGE");
-                    break;
-                default:
-                    ruleTypeExpressions.add(ruleType);
-                    break;
-            }
-        }
-        return showExpressionValues.equals(ruleTypeExpressions);
-    }
-
     public void removeTargetingRule(String ruleType) {
         waitUtility.waitUntilSpinnerHidden();
         String ruleLocator = String.format("//span[text()='%s']/parent::label//following-sibling::div//div[contains(@title,'delete')]", ruleType);
@@ -420,7 +381,7 @@ public class TacticDetails {
         return ruleCountAndValueList.equals(labelCountMapList);
     }
 
-    public List<String> createTacticWithLineItemsAndTargetingRules(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, Map<String, List<String>> rulesMap) {
+    public List<String> createTacticWithLineItemsAndTargetingRules(List<String> lineItemTypeList, String advertiser, String campaignName, String campaignType, String budget, String lineItemName, String lineBudget, String tacticName, Map<String, List<String>> rulesMap, String targetType) {
         List<String> templateNameList = new ArrayList<>();
         for (String lineItemType : lineItemTypeList) {
             navigation.clickSubMenu();
@@ -431,7 +392,7 @@ public class TacticDetails {
             createLineItem(lineItemName + "_" + CommonUtils.timeStampCalculation(), lineItemType.trim(), lineBudget);
             createTactic(tacticName + "_" + CommonUtils.timeStampCalculation());
 
-            targetingTemplate.addTargetingRules(rulesMap);
+            targetingTemplate.addTargetingRules(rulesMap, targetType);
             saveTacticDetails();
             waitUtility.waitUntilSpinnerHidden();
             templateNameList.add(saveTargetingTemplate(lineItemType.trim()));
@@ -663,7 +624,12 @@ public class TacticDetails {
         return page.locator(String.format("//label[contains(text(),'%s')]", customFieldName)).isVisible();
     }
 
-    public void createLineItemsWithTacticsAndTargetingRules(List<Map<String, String>> rows, String creative, Consumer<Map<String, List<String>>> perTacticVerification) {
+    public void createLineItemsWithTacticsAndTargetingRules(
+            List<Map<String, String>> rows,
+            String targetType,
+            String creative,
+            Consumer<Map<String, List<String>>> perTacticVerification) {
+
         String currentLiName = null;
 
         for (int i = 0; i < rows.size(); i++) {
@@ -697,9 +663,13 @@ public class TacticDetails {
             for (int j = 1; row.containsKey("RULE_" + j); j++) {
                 String rule = row.get("RULE_" + j);
                 String values = row.get("VALUES_" + j);
-                if (rule != null && !rule.isEmpty()) {
-                    List<String> parsedValues = CommonUtils.parseCommaSeparatedString(values);
-                    tacticSettings.selectMultipleRuleTypes(rule, parsedValues);
+
+                if (rule != null && !rule.trim().isEmpty()) {
+                    List<String> parsedValues = (values != null && !values.trim().isEmpty())
+                            ? CommonUtils.parseCommaSeparatedString(values)
+                            : Collections.emptyList();
+
+                    tacticSettings.selectMultipleRuleTypes(rule, parsedValues, targetType);
                     perTacticRules.put(rule, parsedValues);
                 }
             }
@@ -754,5 +724,72 @@ public class TacticDetails {
                 }
             }
         }
+    }
+
+    public List<String> getOperatorsForRuleGroup(String ruleType, String targetType) {
+        // 1. Ensure raw values are fetched using your exact existing method
+        fetchShowExpressionValues();
+        List<String> operators = new ArrayList<>();
+        String formattedRuleType = formatRuleTypeForUI(ruleType);
+        String uiCondition = "Target".equalsIgnoreCase(targetType) ? "Equals" : "Not Equal To";
+        boolean insideGroup = false;
+        // 2. Iterate over showExpressionRawValues generated by your method
+        for (String token : showExpressionRawValues) {
+            if (token.isBlank()) {
+                continue;
+            }
+            // Detect entry into the rule group (e.g. token contains "LEGAL_POPULATION" and "Equals")
+            if (token.contains(formattedRuleType) && token.contains(uiCondition)) {
+                insideGroup = true;
+                continue;
+            }
+            // If we encounter a new rule field while inside a group, we have exited the current group
+            if (insideGroup && isAnotherRuleType(token, formattedRuleType)) {
+                insideGroup = false;
+            }
+            // Collect AND / OR connectors belonging to this group
+            if (insideGroup && (token.equalsIgnoreCase("AND") || token.equalsIgnoreCase("OR"))) {
+                operators.add(token.toUpperCase());
+            }
+        }
+        return operators;
+    }
+
+    private boolean isAnotherRuleType(String token, String currentRuleType) {
+        return (token.contains("LEGAL_POPULATION") || token.contains("IN_CONDITION")
+                || token.contains("DEVICE") || token.contains("AGE"))
+                && !token.contains(currentRuleType);
+    }
+
+    private String formatRuleTypeForUI(String ruleType) {
+        return switch (ruleType.toUpperCase()) {
+            case "LEGAL POPULATION", "LEGAL POPULATIONS" -> "LEGAL_POPULATION";
+            case "IN CONDITION" -> "IN_CONDITION_POPULATION";
+            default -> ruleType.toUpperCase();
+        };
+    }
+
+    public List<String> getValuesForRuleType(String ruleType) {
+        List<String> foundValues = new ArrayList<>();
+        boolean insideRule = false;
+
+        for (String token : showExpressionRawValues) {
+            if (token.contains(ruleType.toUpperCase())) {
+                insideRule = true;
+                continue;
+            }
+            if (insideRule) {
+                // Stop if we hit a closing bracket or next rule block
+                if (token.contains(")") || isAnotherRuleType(token, ruleType)) {
+                    break;
+                }
+                // Skip operators and conditions, capture actual values
+                if (!token.isBlank() && !token.equalsIgnoreCase("AND") && !token.equalsIgnoreCase("OR")
+                        && !token.equalsIgnoreCase("Equals") && !token.equalsIgnoreCase("Not Equal To")) {
+                    foundValues.add(token.replace("'", "").trim());
+                }
+            }
+        }
+        return foundValues;
     }
 }

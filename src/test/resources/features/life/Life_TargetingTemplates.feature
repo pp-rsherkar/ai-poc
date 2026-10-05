@@ -19,7 +19,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     Then Verify New Template button is present above the Search option
     And Verify Targeting template section opens by clicking New Template button
     #2
-    When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
+    When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules with target Type as "Target"
       | Behavioral Segment | AutoSegment |
       | Age                |       25-29 |
       | IP                 | AutoIP      |
@@ -39,7 +39,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
     Then Verify New Template button is present above the Search option
     And Verify Targeting template section opens by clicking New Template button
     #2
-    When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules
+    When User creates Targeting template "<TEMPLATE_NAME>" for the line items "<LINE_ITEMS>" with channel "<CHANNEL>" and Targeting Rules with target Type as "Target"
       | Behavioral Segment | AutoSegment |
       | Age                |       25-29 |
       | IP                 | AutoIP      |
@@ -62,7 +62,7 @@ Feature: LIFE Regression - Create a Targeting Template for below Line Item Type 
   @e2e @regression
   Scenario Outline: Create a Targeting Template from Tactic and its availability under Targeting templates page
     #1
-    And Create a tactic with below targeting rules and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
+    And Create a tactic with below targeting rules with target type as "Target" and "<LINE_ITEMS>" line items and other details "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" "<LINE_NAME>" "<LINE_BUDGET>" "<TACTIC_NAME>"
       | Behavioral Segment | AutoSegment |
       | Age                |       25-29 |
       | IP                 | AutoIP      |

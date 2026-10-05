@@ -1,4 +1,4 @@
-Feature: LIFE Regression - Create a Campaign
+Feature: LIFE Regression - Campaign Creation
   It ensures creation of a campaign with a line item and a tactic, including:
   1. Create a campaign with a tactic and a line item
   2. Create a campaign with multiple targeting rules added to a tactic
@@ -8,7 +8,7 @@ Feature: LIFE Regression - Create a Campaign
   6. Create a campaign for an external user
 
   @regression
-  Scenario Outline: Create a Campaign with a Tactic & a Line Item
+  Scenario Outline: Verify Campaign creation with a Line Item and a Tactic
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -34,7 +34,7 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | QA_Regression | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
 
   @regression
-  Scenario Outline: Create a Campaign with multiple Targeting Rules added to a Tactic
+  Scenario Outline: Verify Campaign creation with multiple Targeting Rules in a Tactic
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -45,7 +45,7 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" as channel
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
       | In Condition       | Digestive System Diseases                                          |
       | Age                |                                                       25-29, 35-39 |
@@ -67,7 +67,7 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | Multiple_Targetings | Regular |     10000 | Line      |         120 | Tactic      | Display Advanced | Please_Dont_Delete |
 
   @regression
-  Scenario Outline: Create a Campaign and add and verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings
+  Scenario Outline: Verify all Targetings under categories :: Audience Attribute, Health Journey,  Demographics, Contextual, Geography, Media Supply, Legal Targetings on Campaign creation
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -86,7 +86,7 @@ Feature: LIFE Regression - Create a Campaign
       | GEOGRAPHY          |
       | MEDIA SUPPLY       |
       | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Email,Sensitive Areas,Lookalike Audience |
       | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                                  |
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
@@ -130,7 +130,7 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | QA_Campaign | Regular |     50000 | % + CPM        | Glynase   | Test              | Automation test |      35 |    300 | PHM Chicago |
 
   @regression
-  Scenario Outline: Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence
+  Scenario Outline: Verify Custom field addition, modification, and deletion on the Campaign creation page, and verification of its persistence
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -179,7 +179,7 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | Campaign | Regular |     50000 |            5 |
 
   @regression
-  Scenario Outline: Create a Campaign with a Tactic & a Line Item for an External user
+  Scenario Outline: Verify Campaign creation with a Line Item and a Tactic for an External user
     Given This scenario will be executed in the "Demo" environment as a "External User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -192,7 +192,7 @@ Feature: LIFE Regression - Create a Campaign
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    When User clicks on Add Targeting Rule
+    When User clicks on "Add Targeting Rule"
     And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes
@@ -208,13 +208,13 @@ Feature: LIFE Regression - Create a Campaign
       | 1Demo Advertiser | External_Auto | Regular |     10000 | External_Line |         500 | External_Tactic | Behavioral Segment | External_Creative |
 
   @regression
-  Scenario Outline: Create a campaign with multiple line items, multiple tactics per line item and multiple targeting rules with multiple values per rule
+  Scenario Outline: Verify Campaign creation for multiple Line Items, multiple tactics per line item and multiple targeting rules with multiple values per rule
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "Multi_LI_Tactic" "Regular" "50000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
-    When User creates line items with tactics and targeting rules as below and assigns existing creative named "<CREATIVE>"
+    When User creates line items with tactics and targeting rules as below with target type as "Target" and assigns existing creative named "<CREATIVE>"
       | LI_TYPE        | LI_NAME    | LI_BUDGET | TACTIC_NAME        | CHANNEL          | RULE_1             | VALUES_1                                                                                                                                            | RULE_2             | VALUES_2                                                                                                                                                                            | RULE_3                   | VALUES_3                                                                                                                        | RULE_4               | VALUES_4                                                                                                  | RULE_5              | VALUES_5                                                                                       | RULE_6          | VALUES_6                                                                                    |
       | Audio          | Audio_Line |      5000 | Audio_DA_Tactic    | Display Advanced | Behavioral Segment | AutoSegment18577650, 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors, AutoSegment414137, AutoSegment747695, AutoSegment772910999 | Geo Targets        | New York, California, Texas, Florida, Illinois, Ohio, Georgia                                                                                                                       | Age                      |                                                                                 18-24, 25-29, 30-34, 35-39, 40-44, 50-54, 60-64 | HCP by Specialty     | Radiology, Aerospace Medicine, Neurology, Pediatrics                                                      | Device              | Mobile, Tablet, Connected Device, Desktop, OOH Device                                          | Browser         | Chrome, EDGE, Opera, Safari, FireFox                                                        |
       | Audio          | Audio_Line |      5000 | Audio_Email_Tactic | Email            | IP                 | AutoIP148406156, AutoIP193700567199550498, TestIP, NPIAuto777559789, IPAddress_FileUpload_20260109_155851, IP_Address_20250911_024138               | Health Populations | Electronarcosis, Conscious Sedation, Clinical Enzyme Tests, Microvascular Decompression Surgery                                                                                     | In Condition             | Irritable Bowel Syndrome, Liver Diseases                                                                                        | Legal Populations    | Adoption, Emancipation, Divorce, Separation, Child Custody, Child Support, Considering Divorce            | Keyword Populations | CustomTextForKeywordPopulations, KeywordPopulationsTest, KeywordTestAutomation, Automation123  | Gender          | Male, Female                                                                                |
@@ -233,7 +233,7 @@ Feature: LIFE Regression - Create a Campaign
       | Auto_Creative |
 
   @regression
-  Scenario Outline: Create a Campaign and verify Targeting Rules are preserved when navigating between Settings and Creatives tabs
+  Scenario Outline: Verify Targeting Rules are preserved when navigating between Settings and Creatives tabs on Campaign creation
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"
@@ -245,7 +245,7 @@ Feature: LIFE Regression - Create a Campaign
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
     When User selects the "<CHANNEL>" as channel
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Keywords          | Custom_Keyword, TestingKeyword, Qwerty123, MedKeyword1, MedKeyword2, HealthKeyword1, PharmaKeyword1                                   |
       | Geo Targets       | New York, California, Texas, Florida, Illinois, Ohio, Georgia                                                                         |
       | Age               |                                                                                       18-24, 25-29, 30-34, 35-39, 40-44, 50-54, 60-64 |
@@ -274,7 +274,7 @@ Feature: LIFE Regression - Create a Campaign
       | 01- Advertiser | Persisted | Regular |     10000 | Line      |         120 | Tactic      | Display Advanced | Please_Dont_Delete |
 
   @regression
-  Scenario: Deletion of Custom Fields from the Admin Account for Campaign, Line Items and Tactics
+  Scenario: Deletion of Custom Fields from the Admin Account for Campaigns, Line Items, and Tactics
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And Verify Campaign Dashboard is displayed with title "Campaigns"

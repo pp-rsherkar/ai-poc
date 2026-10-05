@@ -3,6 +3,7 @@ package pages.life;
 import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import factory.DriverFactory;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,12 +40,13 @@ public class SharedList {
     private final Locator LIST_HEADER;
     private final Locator NOTHING_FOUND_TEXT;
     private final Locator GO_TO_NEXT_ERROR_TEXT;
+    private final Locator CLEAR_SEARCH_BOX;
     WaitUtility waitUtility = new WaitUtility(DriverFactory.getPage());
 
     public SharedList(Page page) {
         this.page = page;
         this.SEARCH_KEYWORD = page.locator("//div[@id='searchKeyowrd']/input");
-        this.SUB_TABS_BUTTON = page.locator("//div[contains(@class,'lookupGroups')]/button");
+        this.SUB_TABS_BUTTON = page.locator("//app-ds-tab-switch-wrapper").locator("button[role='tab']");
         this.LIST_CREATION_PAGE_TITLE = page.locator("//div[normalize-space(text())='List Name']");
         this.LIST_NAME = page.locator("//input[@placeholder='List Name']");
         this.LIST_TEXTAREA = page.locator(
@@ -70,13 +72,13 @@ public class SharedList {
         this.LIST_DELETE_ICON =
                 page.locator("//div[@tooltip='Delete'] | //span[@tooltip='Delete']//img[contains(@src,'delete.svg')]");
         this.REMOVAL_CONFIRMATION_DIALOG = page.locator("//div[contains(text(),'Removal Confirmation')]");
-        this.REMOVE_BUTTON = page.locator("//span[contains(text(),'Remove')]");
+        this.REMOVE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Remove"));
         this.DOMAIN_NAME_FROM_REMOVAL_CONFIRMATION_DIALOG =
                 page.locator("//div[contains(@class,'confirm-modal')]//span");
         this.DUPLICATE_FILE_DIALOG = page.locator(" //div[contains(text(),'Duplicating File Names')]");
         this.DUPLICATE_FILE_DIALOG_TEXT = page.locator(
                 " //div[contains(text(),'Duplicating File Names')]/following-sibling::div[contains(@class,'confirm-modal')]/div");
-        this.REPLACE_BUTTON = page.locator("//span[contains(text(),'Replace')]");
+        this.REPLACE_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Replace"));
         this.DOWNLOAD_ICON = page.locator("//img[contains(@src,'export.svg')]");
         this.ITEM_COUNT_UI = page.locator("//div[contains(@class,'fileDetails')]/div");
         this.EMAIL_LIST_COUNT = page.locator("//span[contains(@class,'total-emails')]");
@@ -84,6 +86,7 @@ public class SharedList {
         this.LIST_HEADER = page.locator("//div[@class='lists-header']//span[contains(@class, 'header')]");
         this.NOTHING_FOUND_TEXT = page.locator("//div[contains(text(),'Nothing Found')]");
         this.GO_TO_NEXT_ERROR_TEXT = page.locator("//span[contains(text(),'Go To Next Error')]");
+        this.CLEAR_SEARCH_BOX = page.locator("//div[contains(@class,'clear-search-close')]");
     }
 
     public void clickDomainListFromMenu(String pageName) {
@@ -216,14 +219,19 @@ public class SharedList {
 
     public String fetchCountFromLeftPanel(String listName) {
         Locator locator = page.locator(String.format(
-                "(//div[contains(text(), '%s')]/parent::div/following-sibling::div//div | "
-                        + "//div[contains(text(), '%s')]/following-sibling::div//div | "
-                        + "//div[contains(text(), '%s')]/following-sibling::div[@class='list-item-counter'])",
+                "(//div[text()='%s']/parent::div/following-sibling::div//div | "
+                        + "//div[text()='%s']/following-sibling::div//div | "
+                        + "//div[text()='%s']/following-sibling::div[@class='list-item-counter'])",
                 listName, listName, listName));
         return locator.innerText();
     }
 
     public void searchCreatedList(String listName) {
+        waitUtility.waitUntilSpinnerHidden();
+        if(CLEAR_SEARCH_BOX.isVisible()){
+            CLEAR_SEARCH_BOX.click(new Locator.ClickOptions().setForce(true));
+            waitUtility.waitUntilSpinnerHidden();
+        }
         SEARCH_KEYWORD.fill(listName);
     }
 

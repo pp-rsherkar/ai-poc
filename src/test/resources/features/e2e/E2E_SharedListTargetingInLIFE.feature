@@ -18,7 +18,9 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     And User selects the "Domains" radio button from create new list page
     #3
     And User enters "<LIST_NAME>" in the List Name field
-    And Verify that when "<DOMAIN_NAMES>" names are specified manually, the option to upload a file disappears
+    And Verify that when "Domain" names are specified manually, the option to upload a file disappears
+      | amazon.com |
+      | apple.com  |
     And Verify that the user is able to create a "Domains" list by specifying names manually
     And Verify that the counter on the left displays the correct value for each list in the navigation panel
     #4
@@ -43,8 +45,8 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     And User deletes the campaign
     Then Verify that the campaign is deleted successfully
     Examples:
-      | LIST_NAME | DOMAIN_NAMES          | ADVERTISER     | CP_NAME             | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE    |
-      | Domain    | amazon.com, apple.com | 01- Advertiser | DomainList_Campaign | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | Domains/Apps |
+      | LIST_NAME | ADVERTISER     | CP_NAME             | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE    |
+      | Domain    | 01- Advertiser | DomainList_Campaign | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | Domains/Apps |
 
   @e2e
   Scenario Outline: Create App Bundle List by uploading AppBundles names from a file and target in 'Domains/Apps' targeting at Tactic level
@@ -92,7 +94,10 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     Then Verify that the Create New List screen is displayed
     #3
     And User enters "<LIST_NAME>" in the List Name field
-    And Verify that when "<KEYWORD_NAMES>" names are specified manually, the option to upload a file disappears
+    And Verify that when "Keyword" names are specified manually, the option to upload a file disappears
+      | Active Shooter |
+      | Antisemitism   |
+      | Church Shoot   |
     And Verify that the user is able to create a "Keywords" list by specifying names manually
     And Verify that the counter on the left displays the correct value for each list in the navigation panel
     #4
@@ -114,8 +119,8 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     And User clicks Tactic Setting tab
     And Verify that the selected list is displayed in the targeting rule and retrieve the total count of targeted items
     Examples:
-      | LIST_NAME | KEYWORD_NAMES                              | ADVERTISER     | CP_NAME          | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE |
-      | Keyword   | Active Shooter, Antisemitism, Church Shoot | 01- Advertiser | Keyword_Campaign | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | Keywords  |
+      | LIST_NAME | ADVERTISER     | CP_NAME          | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE |
+      | Keyword   | 01- Advertiser | Keyword_Campaign | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | Keywords  |
 
   @e2e
   Scenario Outline: Create IP Address List by by manually entering IP Address and target in 'IP Address' targeting at Tactic level
@@ -126,7 +131,9 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     Then Verify that the Create New List screen is displayed
     #3
     And User enters "<LIST_NAME>" in the List Name field
-    And Verify that when "<IP_ADDRESS>" names are specified manually, the option to upload a file disappears
+    And Verify that when "IP Address" names are specified manually, the option to upload a file disappears
+      | 123.46.7.5 |
+      | 123.46.7.7 |
     And Verify that the user is able to create a "IP Address" list by specifying names manually
     And Verify that the counter on the left displays the correct value for each list in the navigation panel
     #4
@@ -151,5 +158,5 @@ Feature: End to End workflow for Shared Lists - Domain, App Bundles, Keywords an
     And User deletes the campaign
     Then Verify that the campaign is deleted successfully
     Examples:
-      | LIST_NAME  | IP_ADDRESS             | ADVERTISER     | CP_NAME             | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE  |
-      | IP_Address | 123.46.7.5, 123.46.7.7 | 01- Advertiser | IP_Address_Campaign | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | IP Address |
+      | LIST_NAME  | ADVERTISER     | CP_NAME             | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | CHANNEL          | RULE_TYPE  |
+      | IP_Address | 01- Advertiser | IP_Address_Campaign | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | IP Address |

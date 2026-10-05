@@ -87,7 +87,7 @@ public class TargetingTemplate {
             String templateName,
             List<String> lineItemsList,
             List<String> channelList,
-            Map<String, List<String>> rulesMap) {
+            Map<String, List<String>> rulesMap, String targetType) {
         Map<String, Map<String, String>> lineItemsToRuleCounts = new HashMap<>();
 
         for (String s : lineItemsList) {
@@ -101,7 +101,7 @@ public class TargetingTemplate {
                             lineItemText + "_" + templateName + "_" + CommonUtils.timeStampCalculation();
                     TEMPLATE_NAME_TEXT.fill(templateNameWithTimestamp);
                     selectChannel(channelList);
-                    addTargetingRules(rulesMap);
+                    addTargetingRules(rulesMap, targetType);
                     SAVE_BUTTON.click();
                     waitUtility.waitForLocatorVisible(SUCCESS_ALERT);
                     waitUtility.waitUntilSpinnerHidden();
@@ -130,10 +130,10 @@ public class TargetingTemplate {
         }
     }
 
-    public void addTargetingRules(Map<String, List<String>> rulesMap) {
+    public void addTargetingRules(Map<String, List<String>> rulesMap, String targetType) {
         clickAddTargetingRule();
         for (Map.Entry<String, List<String>> entry : rulesMap.entrySet()) {
-            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
+            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue(), targetType);
         }
         tacticSettings.closeRuleTypePanel();
     }

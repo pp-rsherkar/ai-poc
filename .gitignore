@@ -3,8 +3,5 @@ node_modules/
 .idea/
 .vscode/
 .playwright-mcp/
-.pytest_cache/
-__pycache__/
-*.pyc
 .target/
 target/

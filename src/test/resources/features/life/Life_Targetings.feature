@@ -1,12 +1,19 @@
 Feature: LIFE Regression - Targetings
-  It ensures creation of a campaign with different Targeting Rules:
-  1. Verify all Targeting Rules under categories and create a campaign by adding all Targeting Rules
-  2. Verify list of Targeting Rules available under various LI types
-  3. Verify the created targeting template is available on Targeting Templates page
-  4. Verify the count of rules added for the selected targeting rule type on the tactic settings page
+  It ensures creation of a campaign with different Targeting Rules. It covers:
+  1. Verifying available categories and configuring rules for specific Line Item types:
+    a. Display
+    b. Video
+    c. Native Video
+    d. Search Extension
+    e. DOOH
+    f. Audio
+  2. Verifying the count of added rules on the Tactic Settings page
+  3. Verifying the campaign successfully reaches a running state
+  4. Saving tactic settings as a Targeting Template
+  5. Verifying the template is searchable and available on the Targeting Templates page
 
   @regression
-  Scenario Outline: Verify all Targeting Rules under categories and create a campaign by adding all Targeting Rules
+  Scenario Outline: Verify all Targeting Rules under categories, create a campaign with all Targeting Rules, and verify the targeting template
     Given This scenario will be executed in the "Demo" environment as a "User"
     And "Life" application is logged in successfully with Account "automation@pulsepoint"
     And User clicks on Create Campaign
@@ -25,7 +32,7 @@ Feature: LIFE Regression - Targetings
       | GEOGRAPHY          |
       | MEDIA SUPPLY       |
       | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Email,Sensitive Areas,Lookalike Audience |
       | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                                  |
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                              |
@@ -33,7 +40,7 @@ Feature: LIFE Regression - Targetings
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                    |
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability     |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                     |
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Behavioral Segment       | AutoSegment18577650                                                   |
       | NPI                      | AutoSmartList954103283                                                |
       | HCP by Specialty         | Radiology, Aerospace Medicine                                         |
@@ -112,7 +119,7 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       |
       | Video              |
       | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience   |
       | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                              |
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                          |
@@ -121,7 +128,7 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
       | Video              | Video Size,Video Placement,Video Skipping                                                                                                                                                                                     |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                 |
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Video Size      | Small, Large                          |
       | Video Placement | Interstitial, Accompanying Content    |
       | Video Skipping  | Skippable and Non-Skippable Inventory |
@@ -149,7 +156,7 @@ Feature: LIFE Regression - Targetings
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User clicks on Add Targeting Rule
+    And User clicks on "Add Targeting Rule"
     Then Verify targeting panel with all targeting under below categories
       | AUDIENCE ATTRIBUTE |
       | HEALTH JOURNEY     |
@@ -159,7 +166,7 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       |
       | Video              |
       | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience   |
       | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                              |
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                          |
@@ -168,7 +175,7 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
       | Video              | Video Size,Video Placement                                                                                                                                                                                                    |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                 |
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Video Size      | Small, Large                               |
       | Video Placement | NoContent/Standalone, Accompanying Content |
     Then Verify the configured targeting rules
@@ -195,7 +202,7 @@ Feature: LIFE Regression - Targetings
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User clicks on Add Targeting Rule
+    And User clicks on "Add Targeting Rule"
     Then Verify targeting panel with all targeting under below categories
       | SEARCH SPECIFIC    |
       | AUDIENCE ATTRIBUTE |
@@ -206,7 +213,7 @@ Feature: LIFE Regression - Targetings
       | MEDIA SUPPLY       |
       | Video              |
       | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | SEARCH SPECIFIC    | Search Keywords                                                                                                                                                                                                               |
       | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience   |
       | HEALTH JOURNEY     | Health Populations+,In Condition                                                                                                                                                                                              |
@@ -215,7 +222,7 @@ Feature: LIFE Regression - Targetings
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                                |
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals,Viewability |
       | LEGAL TARGETINGS   | Legal Pages,Legal Populations                                                                                                                                                                                                 |
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Search Keywords | Pandemic, Intestine |
     Then Verify the configured targeting rules
     When User saves the settings
@@ -240,16 +247,16 @@ Feature: LIFE Regression - Targetings
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User clicks on Add Targeting Rule
+    And User clicks on "Add Targeting Rule"
     Then Verify targeting panel with all targeting under below categories
       | AUDIENCE ATTRIBUTE |
       | GEOGRAPHY          |
       | MEDIA SUPPLY       |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | AUDIENCE ATTRIBUTE | IP Address                                                                                            |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Venue Type,Weather Signals                             |
       | MEDIA SUPPLY       | Audience Multiplier,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Inventory Source,Deals |
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Venue Type              | Transit, Retail, Office Buildings |
       | Custom Targeting Bundle |                    203397, 203396 |
       | Audience Multiplier     |                             6-500 |
@@ -277,7 +284,7 @@ Feature: LIFE Regression - Targetings
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    And User clicks on Add Targeting Rule
+    And User clicks on "Add Targeting Rule"
     Then Verify targeting panel with all targeting under below categories
       | AUDIENCE ATTRIBUTE |
       | HEALTH JOURNEY     |
@@ -285,14 +292,14 @@ Feature: LIFE Regression - Targetings
       | GEOGRAPHY          |
       | MEDIA SUPPLY       |
       | LEGAL TARGETINGS   |
-    And Verify target type with respect to category
+    And Verify targeting rule type with respect to category
       | AUDIENCE ATTRIBUTE | Behavioral Segment,NPI,NPI Facility Affiliation,Retargeting Pixels,HCP by Specialty,Health Populations,OTC Populations,IP Address,Clickers,Converters,Keyword Populations,Practice Staff,Sensitive Areas,Lookalike Audience |
       | HEALTH JOURNEY     | Health Populations+,Bespoke,In Condition                                                                                                                                                                                    |
       | DEMOGRAPHICS       | Age,Ethnicity,Gender                                                                                                                                                                                                        |
       | GEOGRAPHY          | Geo Targets,Geo Radius,Postal Codes,Area Codes,Weather Signals                                                                                                                                                              |
       | MEDIA SUPPLY       | Brand Safety Profile,Brand Suitability,Browser,Curated Markets,Custom Targeting Bundle,Deal Groups,Device,Domains/Apps,IAS Context Control,Invalid Traffic,Inventory Source,Inventory Type,Operating System,Deals           |
       | LEGAL TARGETINGS   | Legal Populations                                                                                                                                                                                                           |
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Clickers | DomainList_Campaign_20260503_001635, TargetingTemplate_20260503_003625 |
       | Age      |                                                    18-24, 50-54, 60-64 |
     Then Verify the configured targeting rules

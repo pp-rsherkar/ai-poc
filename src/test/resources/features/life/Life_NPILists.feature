@@ -1,4 +1,4 @@
-Feature: LIFE regression - Create NPI List of following types:
+Feature: LIFE Regression - NPI lists creation
   1. Static NPI List by specifying NPI Numbers
   2. Static NPI List by uploading file with NPI Numbers
   3. Smart NPI List by specifying Type
@@ -11,7 +11,7 @@ Feature: LIFE regression - Create NPI List of following types:
     And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
-  Scenario Outline: Create Static NPI List by specifying NPI Numbers.
+  Scenario Outline: Verify Static NPI list creation by entering NPI numbers manually
     When User navigates to Administrative section
     And User navigates to Accounts Tab
     And User searches the account "automation@pulsepoint" and selects the account
@@ -35,7 +35,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser,1Demo Advertiser | 1478523698 | STATIC_NPI |
 
   @regression
-  Scenario Outline: Create, update, and delete Static NPI List by uploading file "<FILE_NAME>" with NPI Numbers
+  Scenario Outline: Verify creation, update and deletion of Static NPI list by uploading file "<FILE_NAME>" with NPI Numbers
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -58,7 +58,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | STATIC_NPI | 01- Advertiser | NPIStaticList.txt  |
 
   @regression
-  Scenario Outline: Create, update, and delete an Attribute NPI List by uploading a "<FILE_NAME>" file with NPI Attributes
+  Scenario Outline: Verify creation, update and deletion of an Attribute NPI List by uploading a "<FILE_NAME>" file with NPI Attributes
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -82,7 +82,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | ATTRIBUTE | 01- Advertiser | NPI_AttributeListText.txt | NPI         |
 
   @regression
-  Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using API
+  Scenario Outline: Verify Auto Import NPI list creation from API call
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -111,7 +111,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | Auto_Imported | 01- Advertiser |        1OurVM | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
 
   @regression
-  Scenario Outline: Create Auto-Imported NPI List with "<LIST_TYPE>" by uploading file using Reload Now button
+  Scenario Outline: Verify Auto Import NPI list creation by clicking on Reload Now button available in UI
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -139,7 +139,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | Auto_Imported | 01- Advertiser |        1OurVM | /home/NPIAutoImport/Automation | AutoImport_Automation1.csv | List with Attributes | NPI             | Import Columns |
 
   @regression
-  Scenario Outline: Validate List Population Options in Smart List Creation Panel
+  Scenario Outline: Verify List Population Options in Smart List Creation Panel
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -161,7 +161,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Smart Pixel by selecting the engagement type "<ENGAGEMENT_TYPE>"
+  Scenario Outline: Verify Smart List creation for Smart Pixel option by selecting the engagement type "<ENGAGEMENT_TYPE>"
     And User navigates to Pixels page
     Then Verify the tabs displayed on the Pixels page
     And User selects the "<ADVERTISER>" and fetches Smart pixel list
@@ -185,7 +185,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Smart Pixel | Engaged Anywhere   | www.brooklyn.com, www.manhattan.com | www.cambridge.org, www.wikipedia.org | Active Shooter, Antisemitism |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a NPI List by selecting the HCP Switch type "<HCP_SWITCH>"
+  Scenario Outline: Verify Smart List creation for NPI List option by selecting the HCP Switch type "<HCP_SWITCH>"
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -205,7 +205,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | NPI List | HCP From   | NPI_           |
 
   @regression
-  Scenario Outline: Validate the error message while creating Smart List as a NPI List by selecting the HCP Switch type "<HCP_SWITCH>"
+  Scenario Outline: Verify the error message on Smart List creation for NPI List option by selecting the HCP Switch type "<HCP_SWITCH>"
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -221,7 +221,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Specialty | Exclude    | Allergy & Immunology |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Speciality by selecting the HCP Switch type "<HCP_SWITCH>"
+  Scenario Outline: Verify Smart List creation for Specialty option by selecting the HCP Switch type "<HCP_SWITCH>"
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -240,7 +240,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Specialty | Include Only | Allergy & Immunology, Anesthesiology |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Profession
+  Scenario Outline: Verify Smart List creation for Profession option
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -258,7 +258,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Profession | Nurse Practitioner, Pharmacist |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Prescribed Drug without File upload
+  Scenario Outline: Verify Smart List creation for Prescribed Drug option without File upload
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -279,7 +279,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Prescribed Drug | Glynase, L-Oral PARACETAMOL Syrup |      4 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Prescribed Drug by uploading a File
+  Scenario Outline: Verify Smart List creation for Prescribed Drug option by uploading a File
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -298,7 +298,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Prescribed Drug | PrescribedDrugs_BulkUpload.txt |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis Code without File upload
+  Scenario Outline: Verify Smart List creation for  Diagnosis Code option without File upload
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -319,7 +319,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Diagnosis Code | Alcoholic fatty liver, Other specified sepsis |      5 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Diagnosis Code by uploading a File
+  Scenario Outline: Verify Smart List creation for  Diagnosis Code option by uploading a File
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -338,7 +338,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Diagnosis Code | Diagnosis_BulkUpload.txt |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Medical Procedure without File upload
+  Scenario Outline: Verify Smart List creation for Medical Procedure option without File upload
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -359,7 +359,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure Code | Cardiac shunt imaging, Florbetaben f18 diagnostic |      6 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Medical Procedure by uploading a File
+  Scenario Outline: Verify Smart List creation for Medical Procedure option by uploading a File
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -378,7 +378,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Medical Procedure Code | MedicalProcedure_BulkUpload.txt |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Prescription Behavior Change with Top Dropper option
+  Scenario Outline: Verify Smart List creation for Prescription Behavior Change option with Top Dropper selection
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -404,7 +404,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Prescription Behavior Change | Acne Reparatif, Parathyroid |                  60 |                  10 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Prescription Behavior Change with New Prescribers option
+  Scenario Outline: Verify Smart List creation for Prescription Behavior Change option with New Prescribers selection
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -425,7 +425,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Prescription Behavior Change | Acne Reparatif, Parathyroid |                   8 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Endemic Research under IB Health with MESH option
+  Scenario Outline: Verify Smart List creation for Endemic Research option under IB Health with MESH selection
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -447,7 +447,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | IB Health       | MESH                | Animal Diseases |      55 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Endemic Research under IB Health with Medscape option
+  Scenario Outline: Verify Smart List creation for Endemic Research option under IB Health with Medscape selection
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -470,7 +470,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | IB Health       | Medscape            | Pacemaker, Arthritis     |      10 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Endemic Research under IB Health with WebMD option
+  Scenario Outline: Verify Smart List creation for Endemic Research option under IB Health with WebMD selection
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -493,7 +493,7 @@ Feature: LIFE regression - Create NPI List of following types:
       | 01- Advertiser | SMART_Pixel_NPI | Endemic Research | IB Health       | WebMD               | Knee Pain, Asthma   |      15 |
 
   @regression
-  Scenario Outline: Validate the successful creation of a Smart List as a Endemic Research under Endemic Network
+  Scenario Outline: Verify Smart List creation for Endemic Research option under Endemic Network
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed

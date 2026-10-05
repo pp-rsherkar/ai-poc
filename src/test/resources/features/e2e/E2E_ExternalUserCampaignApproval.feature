@@ -18,7 +18,7 @@ Feature: E2E workflow for creating a campaign with an external user and approvin
     Then Verify line item details are saved and user is navigated to the tactic page
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then Verify tactic details are saved and user is navigated to the settings tab
-    When User clicks on Add Targeting Rule
+    When User clicks on "Add Targeting Rule"
     And User selects "<RULE_TYPE>" as rule type and configures the targeting rules, and saves the settings
     Then Verify settings details are saved and user is navigated to the creatives tab
     And User assigns the existing creative named "<CREATIVE>", enables the tactic and saves the changes

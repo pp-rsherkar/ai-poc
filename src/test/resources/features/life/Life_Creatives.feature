@@ -1,14 +1,26 @@
-Feature: LIFE Regression - Create a Creative Library and verify filters, sort, search options for all creative types including Bulk Upload
+Feature: LIFE Regression - Creative Library management, validation, and bulk upload
   It covers:
-  1. Creating creatives via UI for the following types:
-  a.  Display
-  b.  Video
-  c.  Audio
-  d.  Native Display
-  e.  Native Video
-  f.  Search Extension
-  2. Bulk uploading creatives for supported types
-  3. Verifying available filters, sort, and search functionality on the Creative Library page
+  1. Creating and verifying creatives via UI for the following types:
+    a. Display
+    b. Video
+    c. Audio
+    d. Native Display
+    e. Native Video
+    f. Search Extension
+  2. Verifying Creative Library functionality including:
+    a. Active and Archived tabs
+    b. Filters, sorting, search, and pagination
+    c. Creative preview
+    d. Copy, archive, unarchive, and deletion
+    e. Association tab column filters and Line Item navigation
+  3. Verifying bulk creative upload functionality for supported types, including:
+    a. Creative type and advertiser selection
+    b. Templates and file uploads
+    c. Field requirements and default values
+    d. Validations and error handling
+    e. Approval status
+    f. Third-party tracking pixels
+    g. Creative creation and data persistence
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -16,7 +28,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
-  Scenario: Verify filters under Active and Archived activity, clear-all button, sort, and search options on the Creative Library page
+  Scenario: Verify filters under Active and Archived activity, clear-all button, sort, Copy, Archive, and Unarchive functionality and search options on the Creative Library page
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     And Check Activity buttons "Active" and verify following filters are available and working
@@ -61,7 +73,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | Archived          |
 
   @regression
-  Scenario Outline: Verify page alignment for different pagination values - "<PAGINATION_VALUE>"
+  Scenario Outline: Verify Creative Library pagination for different pagination values - "<PAGINATION_VALUE>"
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     When User selects pagination values "<PAGINATION_VALUE>" from the dropdown
@@ -84,7 +96,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify the creative is removed from the Creative Library page
 
   @regression
-  Scenario: Verify Bulk actions on creatives not associated with any Campaign
+  Scenario: Verify Bulk Archive, Approve, and Unarchive actions on creatives not associated with any Campaign
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     When User performs "Bulk Archive" action using "Archive Creatives" option on multiple creatives - "2" and verifies the selected creatives are moved to "Archived" tab
@@ -93,7 +105,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And User performs "Bulk Unarchive" action using "Unarchive Creatives" option on multiple creatives - "3" and verifies the selected creatives are moved to "Active" tab
 
   @regression
-  Scenario: Verify Preview option on a creative
+  Scenario: Verify Creative Preview from Creative Library and Creative Details
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     When User clicks on Preview icon for a creative from Creative Library page
@@ -105,7 +117,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify user is able to close the Creative Preview tab
 
   @regression
-  Scenario Outline: Create new Creative Library entries for multiple Creative Types
+  Scenario Outline: Create and verify Creative Library entries for multiple Creative Types
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     # Display
@@ -163,7 +175,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
     And Verify the Creatives Advertiser dropdown is displaying all Advertisers mapped to the logged in account "automation@pulsepoint"
 
   @regression
-  Scenario Outline: Verify Bulk Creative Upload with Approval status as "<STATUS>"
+  Scenario Outline: Verify Bulk Creative Upload and save creative with Approval status as "<STATUS>"
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     Given User clicks Bulk Upload button on Creative Library page
@@ -218,7 +230,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | 01- Advertiser | Display_Image.jpg | Creative      | DisplayBulkUploadTemplate1.xlsx | BlankDisplayBulkUploadTemplate.xlsx | Auto_DSA       | Auto_Financer | Approved |
 
   @regression
-  Scenario Outline: Validate Bulk Upload Functionality and Field Requirements for HTML Creatives using file type "<FILE_TYPE>"
+  Scenario Outline: Validate Bulk Upload Functionality, Field Requirements, and Domain Validations for HTML Creatives using file type "<FILE_TYPE>"
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     Given User clicks Bulk Upload button on Creative Library page
@@ -337,7 +349,7 @@ Feature: LIFE Regression - Create a Creative Library and verify filters, sort, s
       | End Date       |
 
   @regression
-  Scenario: Verify Column Filter present on Association Tab of existing creative and navigation to the respective Line Item
+  Scenario: Verify Association Tab column filters and navigation to the respective Line Item
     And User clicks Creative Library options present under Activation tab
     Then Verify Creative Library page is displayed
     When User assigns a campaign to the creative using "Bulk Assign" option

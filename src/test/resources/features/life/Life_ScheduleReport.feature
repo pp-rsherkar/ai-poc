@@ -1,4 +1,4 @@
-Feature: LIFE Regression - Schedule Report fields verification and report generation
+Feature: LIFE Regression - Schedule Report fields and reportion verification
   It ensures the correct loading, configuration, default behavior, and interaction of key elements in the Schedule Report tab, including:
   1. Report Name field input
   2. Frequency options (Once, Daily, Weekly, Monthly) and default selection
@@ -108,7 +108,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | FTP, SFTP, S3, GCP | pbalu, pjadhav | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
 
   @regression
-  Scenario Outline: Verify a Scheduled Report generation with Frequency value - Once and using Email delivery method
+  Scenario Outline: Verify Scheduled Report generation with Frequency value - Once and using Email delivery method
     And User should be able to select template "<TEMPLATE>" from the dropdown
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
@@ -138,7 +138,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | ScheduleReport | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Once            | (GMT+05:30) India Standard Time | Custom Dates     |
 
   @regression
-  Scenario Outline: Verify a Scheduled Report generation with Frequency value - Daily and using Email delivery method
+  Scenario Outline: Verify  Scheduled Report generation with Frequency value - Daily and using Email delivery method
     And User should be able to select template "<TEMPLATE>" from the dropdown
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
@@ -166,7 +166,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | ScheduleReport | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Daily           | (GMT+05:30) India Standard Time | Month to Date    |
 
   @regression
-  Scenario Outline: Verify a Scheduled Report generation with Frequency value - Weekly and using Email delivery method
+  Scenario Outline: Verify  Scheduled Report generation with Frequency value - Daily and using Email delivery method
     And User should be able to select template "<TEMPLATE>" from the dropdown
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field
@@ -193,7 +193,7 @@ Feature: LIFE Regression - Schedule Report fields verification and report genera
       | ScheduleReport | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Weekly          | (GMT+05:30) India Standard Time | Month to Date    |
 
   @regression
-  Scenario Outline: Verify a Scheduled Report generation with Frequency value - Monthly and using Email delivery method
+  Scenario Outline: Verify Scheduled Report generation with Frequency value - Monthly and using Email delivery method
     And User should be able to select template "<TEMPLATE>" from the dropdown
     And User should be able to select advertiser as "<ADVERTISER>"
     When Campaign should load for selection when user types campaign initials "<CAMPAIGN_INITIALS>" in "Campaign" field

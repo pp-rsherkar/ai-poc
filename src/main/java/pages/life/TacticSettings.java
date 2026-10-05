@@ -25,7 +25,6 @@ public class TacticSettings {
     private final Locator SEARCH_RULE_OPTION;
     private final Locator RULE_POSTAL_CODES_TEXTBOX;
     private final Locator RULE_DEVICE_BLOCK;
-    private final Locator RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB;
     private final Locator VERIFY_NPI;
     private final Locator FETCH_TARGET_RULE_TYPES;
     private final Locator FETCH_TARGET_RULE_OPTIONS;
@@ -124,22 +123,21 @@ public class TacticSettings {
         this.RULE_POSTAL_CODES_TEXTBOX = page.locator("//div[@id='targetedItemsTA']");
         this.RULE_DEVICE_BLOCK = page.locator(
                 "//sui-radio-button[contains(@class,'ui radio checkbox')]//label[text()='Block Selected']");
-        this.RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
         this.VERIFY_NPI = page.locator("//span[contains(@class,'target-item')]/span[normalize-space(text())='NPI']");
         this.FETCH_TARGET_RULE_TYPES = page.locator("//span[contains(@class,'target-item__label')]");
         this.FETCH_TARGET_RULE_OPTIONS = page.locator("//app-ds-pill-wrapper");
         this.EXPAND_TARGETING_ICONS = page.locator("//i[@class='dropdown icon gaExpandTargeting']");
         this.TARGET_CATEGORY_NAME = page.locator("//div[contains(@class,'targetCategoryName')]");
         this.PERSON_TAB = page.locator("//button[normalize-space(text())='Person']");
-        this.HOUSEHOLD_TAB = page.locator("//button[normalize-space(text())='Household']");
-        this.HOUSEHOLD_IP_TAB = page.locator("//button[normalize-space(text())='Household IP']");
+        this.HOUSEHOLD_TAB = page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Household"));
+        this.HOUSEHOLD_IP_TAB = page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Household IP"));
         this.HEALTH_POPULATIONS_TREATMENTS_OPTION =
                 page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Treatments')]");
         this.RULE_INDIVIDUAL_KEYWORDS_OPTION =
                 page.locator("//div[contains(@class,'vertical-tab')]//a[contains(text(),'Individual Keywords')]");
         this.KEYWORD_POPULATIONS_TEXTBOX = page.locator("//div[contains(@class,'keywordContainer')]//textarea");
         this.GEO_TARGETS_BULK_UPLOAD = page.locator("//span[text()='Bulk Upload']");
-        this.GEO_TARGETS_UPLOAD_BUTTON = page.locator("//button[normalize-space()='Upload']");
+        this.GEO_TARGETS_UPLOAD_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Upload"));
         this.GEO_TARGETS_TEXTBOX = page.locator("//textarea[@id='geotargetedItemsTA']");
         this.BRAND_SAFETY_PROFILE_SEGMENT_ID = page.locator(
                 "//span[contains(text(),'DoubleVerify Authentic Brand Suitability ID')]/parent::div/following-sibling::div//input[@type='text']");
@@ -209,7 +207,7 @@ public class TacticSettings {
         this.BEHAVIOUR_SEGMENT =
                 page.locator("//div[contains(@class,'behavior') and contains(@class,'bidMultiplierImages')]");
         this.BEHAVIOUR_SEGMENT_ERROR = page.locator("//div[contains(@class,'noDataMessageHeader')]");
-        this.BID_PANEL_CANCEL_BUTTON = page.locator("//button[contains(@class,'cancelbtn')]");
+        this.BID_PANEL_CANCEL_BUTTON = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Cancel"));
         this.NPI_BID = page.locator("//div[contains(@class,'npi') and contains(@class,'bidMultiplierImages')]");
         this.NPI_ERROR = page.locator("//div[contains(@class,'noDataMessageHeader')]");
         this.INACTIVE_PANEL =
@@ -226,7 +224,6 @@ public class TacticSettings {
         this.DOLLAR_TYPE_FEE_INPUT = page.locator(
                 "//div[contains(@class,'management-fee-container')]//input[contains(@class,'doller-img')]");
         this.BID_PANEL = page.locator("//div[@class='bidMultiplierCategoryName ng-star-inserted' and contains(text(), 'AUDIENCE ATTRIBUTE')]");
-
     }
 
     public String verifyTacticSettingsText() {
@@ -326,7 +323,7 @@ public class TacticSettings {
         searchAndSelectRuleType(ruleType);
         switch (ruleType) {
             case "Health Population":
-                HOUSEHOLD_IP_TAB.click();
+                HOUSEHOLD_IP_TAB.first().click();
                 break;
             case "NPI":
                 PRACTICE_IP.click();
@@ -334,7 +331,7 @@ public class TacticSettings {
                 SHOW_MORE_BUTTON.click();
                 break;
             case "Behavioral Segment":
-                HOUSEHOLD_IP_TAB.click();
+                HOUSEHOLD_IP_TAB.first().click();
                 SHOW_MORE_BUTTON.click();
                 break;
         }
@@ -384,7 +381,8 @@ public class TacticSettings {
         return TACTIC_SETTINGS_SUCCESS.innerText();
     }
 
-    public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues) {
+    public void selectMultipleRuleTypes(String ruleType, List<String> ruleValues, String targetType) {
+        Locator targetTypeLocator = page.locator(String.format("//sui-radio-button//label[contains(text(),'%s')]", targetType));
         SEARCH_RULE_TYPE.clear();
         SEARCH_RULE_TYPE.type(ruleType);
         if (SELECT_RULE_TYPE.isVisible()) {
@@ -396,8 +394,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'segmentname')]/preceding-sibling::div[contains(@class, 'iconsWrapper')]//div[contains(@class, 'include-default')])[1]",
-                                val);
+                                "(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'segmentname')]/preceding-sibling::div[contains(@class, 'iconsWrapper')]//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -405,8 +403,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'npilist-itemWrapper')]//div[contains(@class, 'include-default')])[1]",
-                                val);
+                                "(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'npilist-itemWrapper')]//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -414,20 +412,20 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target'])[1]",
-                                val);
+                                "(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
                 case "Health Populations", "Health Populations+":
-                    HOUSEHOLD_IP_TAB.click();
+                    HOUSEHOLD_IP_TAB.first().click();
                     HEALTH_POPULATIONS_TREATMENTS_OPTION.click();
                     waitUtility.waitForLocatorVisible(APP_TREE_VIEW_NODE.last());
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/button[@title='Target'])[1]",
-                                val);
+                                "(//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/button[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -441,13 +439,13 @@ public class TacticSettings {
                     }
                     break;
                 case "Practice Staff":
-                    HOUSEHOLD_TAB.click();
+                    HOUSEHOLD_TAB.first().click();
                     waitUtility.waitForLocatorVisible(NPI_TREE_VIEW_NODE.first());
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'itemWrapper')]//div[contains(@class, 'include-default')])[1]",
-                                val);
+                                "(//span[contains(text(), '%s')]/ancestor::div[contains(@class, 'itemWrapper')]//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -455,8 +453,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//div[contains(text(), '%s')]/ancestor::div[contains(@class, 'left cliptext')]/preceding-sibling::div[contains(@class, 'left iconsWrapper')]//div[contains(@class, 'include-default')])[1]",
-                                val);
+                                "(//div[contains(text(), '%s')]/ancestor::div[contains(@class, 'left cliptext')]/preceding-sibling::div[contains(@class, 'left iconsWrapper')]//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -464,12 +462,13 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/button[@title='Target']",
-                                val);
+                                "//mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/button[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
                 case "Age", "Browser", "Invalid Traffic", "Ethnicity", "Gender":
+                    targetTypeLocator.click();
                     for (String val : ruleValues) {
                         String xpath = String.format("//label[contains(text(),'%s')]", val);
                         isElementVisible(xpath);
@@ -479,8 +478,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.first().fill(val);
                         String xpath = String.format(
-                                "//span[contains(text(),'%s')]/ancestor::div[contains(@class,'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='Target']",
-                                val);
+                                "//span[contains(text(),'%s')]/ancestor::div[contains(@class,'left name-icon')]/preceding-sibling::div[contains(@class,'left targetBlockIcons')]/div[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -538,8 +537,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//mark[contains(text(),'%s')]/ancestor::div[contains(@class,'treeviewNode')]//div[contains(@class,'include-default')])[1]",
-                                val);
+                                "(//mark[contains(text(),'%s')]/ancestor::div[contains(@class,'treeviewNode')]//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -558,6 +557,7 @@ public class TacticSettings {
                     }
                     break;
                 case "Device", "Operating System":
+                    targetTypeLocator.click();
                     RULE_DEVICE_BLOCK.click();
                     for (String val : ruleValues) {
                         String xpath = String.format("//label[contains(text(),'%s')]", val);
@@ -569,16 +569,17 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "//span[text()='%s']/ancestor::div[@class='cliptext']/preceding-sibling::div[@class='target_icon h-20']//div[contains(@class,'include-default')]",
-                                val);
+                                "//span[text()='%s']/parent::div[@class='cliptext']/preceding-sibling::div[@class='target_icon h-20']//div[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
                 case "Inventory Source":
+                    targetTypeLocator.click();
                     for (String val : ruleValues) {
                         String xpath = String.format(
-                                "//span[text()='%s']/ancestor::div[contains(@class,'name-icon')]/preceding-sibling::div[contains(@class,'targetBlockIcons')]//div[contains(@class,'include-default')]",
-                                val);
+                                "//span[text()='%s']/ancestor::div[contains(@class,'name-icon')]/preceding-sibling::div[contains(@class,'targetBlockIcons')]//div[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -590,18 +591,18 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "//mark[text()='%s']/ancestor::div[contains(@class,'treeviewNode')]//button[contains(@class,'include-default')]",
-                                val);
+                                "//mark[text()='%s']/ancestor::div[contains(@class,'treeviewNode')]//button[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
                 case "Legal Populations":
-                    RULE_LEGAL_POPULATIONS_HOUSEHOLD_TAB.click();
+                    HOUSEHOLD_TAB.first().click();
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[contains(@class, 'include-default')]",
-                                val);
+                                "//span/mark[contains(text(), '%s')]/ancestor::div[contains(@class, 'left name-icon')]/preceding-sibling::div[contains(@class, 'left targetBlockIcons')]//button[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -610,8 +611,8 @@ public class TacticSettings {
                         NPI_FACILITY_AFFILIATION_SEARCH.fill(val);
                         page.keyboard().press("Enter");
                         String xpath = String.format(
-                                "//mark[contains(text(),'%s')]/parent::div[contains(@style,'display:')]/preceding-sibling::div//div[@title='Target']",
-                                val);
+                                "//mark[contains(text(),'%s')]/parent::div[contains(@style,'display:')]/preceding-sibling::div//div[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -620,17 +621,17 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//div[contains(@title,'%s')]/preceding-sibling::div//div[@title='Target'])[1]", val);
+                                "(//div[contains(@title,'%s')]/preceding-sibling::div//div[@title='%s'])[1]", val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
                 case "OTC Populations":
-                    HOUSEHOLD_IP_TAB.click();
+                    HOUSEHOLD_IP_TAB.first().click();
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//mark[contains(text(),'%s')]/ancestor::div//preceding-sibling::div//div[@title='Target'])[1]",
-                                val);
+                                "(//mark[contains(text(),'%s')]/ancestor::div//preceding-sibling::div//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -639,8 +640,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//mark[contains(text(),'%s')]/ancestor::div//preceding-sibling::div//div[@title='Target'])[1]",
-                                val);
+                                "(//mark[contains(text(),'%s')]/ancestor::div//preceding-sibling::div//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -648,8 +649,8 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//div[contains(text(),'%s')]/parent::div//preceding-sibling::div//div[@title='Target'])[1]",
-                                val);
+                                "(//div[contains(text(),'%s')]/parent::div//preceding-sibling::div//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -659,8 +660,7 @@ public class TacticSettings {
                         SEARCH_RULE_OPTION.fill(val);
                         page.keyboard().press("Enter");
                         String xpath = String.format(
-                                "//mark[text()='%s']/ancestor::div/preceding-sibling::div//button[@title='Target' and not(@hidden)]",
-                                val);
+                                "//mark[text()='%s']/ancestor::div/preceding-sibling::div//button[@title='%s' and not(@hidden)]", val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -670,8 +670,8 @@ public class TacticSettings {
                         SEARCH_RULE_OPTION.fill(val);
                         page.keyboard().press("Enter");
                         String xpath = String.format(
-                                "//mark[text()='%s']/ancestor::div[contains(@class,'name-icon')]/preceding-sibling::div//div[@title='Target']",
-                                val);
+                                "//mark[text()='%s']/ancestor::div[contains(@class,'name-icon')]/preceding-sibling::div//div[@title='%s']",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -682,12 +682,13 @@ public class TacticSettings {
                         SEARCH_RULE_OPTION.fill(val);
                         page.keyboard().press("Enter");
                         String xpath = String.format(
-                                "(//mark[text()='%s']/ancestor::div[contains(@class,'name-icon')]/preceding-sibling::div//div[@title='Target'])[1]",
-                                val);
+                                "(//mark[text()='%s']/ancestor::div[contains(@class,'name-icon')]/preceding-sibling::div//div[@title='%s'])[1]",
+                                val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
                 case "Inventory Type", "Video Placement":
+                    targetTypeLocator.click();
                     for (String val : ruleValues) {
                         String xpath = String.format("//sui-checkbox//label[text()='%s']", val);
                         isElementVisible(xpath);
@@ -696,7 +697,7 @@ public class TacticSettings {
                 case "Video Size":
                     for (String val : ruleValues) {
                         String xpath = String.format(
-                                "//span[text()='%s']/parent::div/preceding-sibling::div//div[@title='Target']", val);
+                                "//span[text()='%s']/parent::div/preceding-sibling::div//div[@title='%s']", val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -716,7 +717,7 @@ public class TacticSettings {
                     for (String val : ruleValues) {
                         SEARCH_RULE_OPTION.fill(val);
                         String xpath = String.format(
-                                "(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='Target'])[1]", val);
+                                "(//div[contains(text(), '%s')]/preceding-sibling::div/div[@title='%s'])[1]", val, targetType);
                         isElementVisible(xpath);
                     }
                     break;
@@ -1165,6 +1166,10 @@ public class TacticSettings {
     public void waitForBidPanel() {
         waitUtility.waitUntilSpinnerHidden();
         waitUtility.waitForLocatorVisible(BID_PANEL);
+    }
 
+    public Map.Entry<List<String>, String> createRuleGroupData(List<String> values, String targetType) {
+        String expectedOperator = "Target".equalsIgnoreCase(targetType) ? "OR" : "AND";
+        return new AbstractMap.SimpleEntry<>(values, expectedOperator);
     }
 }

@@ -1,8 +1,9 @@
 Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creation and Assignment
   1. Verify Private Deals Tab
   2. Verify Life Marketplace Deals Tab
-  3. Addition of Private Deals and assigned to a tactic when Only Target Applied Deals toggle is ON
-  4. Addition of Private Deals and assigned to a tactic when Only Target Applied Deals toggle is OFF
+  3. Add New Private Deals with deal price type, pricing strategy and assign to a tactic
+  4. Verify active deal moves to archived while campaign is not running state
+  5. Verify active deal should not be deleted while campaign is running state
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -155,8 +156,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Examples:
       | EXCHANGE_TYPE | DEAL_ID | DEAL_NAME  | MEDIA_TYPE                 | DEAL_PRICE_TYPE | PRICE | ADVERTISER     | CURATOR                          | CREATIVE      |
       | JW Player     | Deal_   | Deal_Name_ | Display (All), Video (All) | Fixed           |   230 | 01- Advertiser | PulsePoint (Direct Integrations) | Auto_Creative |
-    # Source: QA-1849
 
+    # Source: QA-1849
   @todo
   Scenario: Inventory Breakdown affordance opens a panel scoped to the deal added via the Tactic Deals targeting rule
     When User clicks Tactic Setting tab
@@ -168,8 +169,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
   # Framework Gap: Requires the Inventory Breakdown affordance hook and panel page object in LifeSteps.java (new feature, not yet implemented)
     When User clicks the Inventory Breakdown icon for that deal
     Then The Inventory Breakdown panel opens scoped to the deal added to the tactic, showing Display Inventory and Video Inventory views
-# Source: QA-1849
 
+# Source: QA-1849
   @todo
   Scenario Outline: Inventory Breakdown affordance opens a panel scoped to the correct deal from the remaining entry surfaces
   # Framework Gap: Requires navigation hook for the "<SURFACE>" entry point in LifeSteps.java (no existing page object reaches this surface)
@@ -178,13 +179,13 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     When User clicks the Inventory Breakdown icon for that deal
     Then The Inventory Breakdown panel opens scoped to "<SCOPE>", showing Display Inventory and Video Inventory views
     Examples:
-      | SURFACE                    | CONTEXT                                   | SCOPE                                  |
-      | Supply > Deals             | the Supply deals library view             | the selected deal                      |
-      | Targeting Template > Deals | a deal selected in a Deals targeting rule | the deal selected in the template      |
-      | Media Planner > Deals      | a deal selected for a new media plan      | the deal selected for the media plan   |
-      | Deal Group > Add Deals     | a single expanded deal within the group   | the expanded deal, not the whole group |
-# Source: QA-1849
+      | SURFACE                    | CONTEXT                                   | SCOPE                                   |
+      | Supply > Deals              | the Supply deals library view             | the selected deal                       |
+      | Targeting Template > Deals  | a deal selected in a Deals targeting rule | the deal selected in the template       |
+      | Media Planner > Deals       | a deal selected for a new media plan      | the deal selected for the media plan    |
+      | Deal Group > Add Deals      | a single expanded deal within the group   | the expanded deal, not the whole group  |
 
+# Source: QA-1849
   @todo
   Scenario: Inventory Breakdown panel exposes both Display and Video Inventory views without losing deal context
   # Framework Gap: Requires navigation hook for Supply > Deals in LifeSteps.java
@@ -194,8 +195,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
   # Framework Gap: Requires view-toggle + deal-context retention check in LifeSteps.java
     When User switches between Display Inventory and Video Inventory twice
     Then The figures shown remain scoped to the same deal in both views
-# Source: QA-1849
 
+# Source: QA-1849
   @todo
   Scenario Outline: Timeframe filter exposes exactly three windows and updates the displayed figures
   # Framework Gap: Requires navigation hook for Supply > Deals in LifeSteps.java
@@ -206,12 +207,12 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     When User selects "<TIMEFRAME>"
     Then Displayed inventory reflects "<WINDOW>"
     Examples:
-      | TIMEFRAME    | WINDOW                      |
-      | Yesterday    | the prior calendar day only |
-      | Last 7 Days  | the trailing 7-day window   |
-      | Last 30 Days | the trailing 30-day window  |
-# Source: QA-1849, GAP-3, AMB-4
+      | TIMEFRAME     | WINDOW                              |
+      | Yesterday     | the prior calendar day only         |
+      | Last 7 Days   | the trailing 7-day window           |
+      | Last 30 Days  | the trailing 30-day window          |
 
+# Source: QA-1849, GAP-3, AMB-4
   @todo
   Scenario: Timeframe boundary handling and first-open default require product confirmation before automated pass/fail
   # Framework Gap: Requires navigation hook for Supply > Deals in LifeSteps.java
@@ -221,8 +222,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
   # Framework Gap: Requires inventory record seeded exactly on the 7x24h boundary plus a Timeframe boundary read hook
     When An inventory record is timestamped exactly 7x24 hours before now and User selects "Last 7 Days"
     Then Document whether that record is included or excluded, since GAP-3 leaves the exact window undefined
-# Source: QA-1849
 
+# Source: QA-1849
   @todo
   Scenario Outline: Video Min/Max Duration formatting applies the greater-than-120-second rule at its boundaries
   # Framework Gap: Requires navigation hook for Supply > Deals in LifeSteps.java
@@ -231,12 +232,12 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then The Max Duration field reads "<MAX_DISPLAY>"
     Examples:
       | MAX_DURATION | MAX_DISPLAY |
-      |         150s | >120s       |
-      |          90s |         90s |
-      |         120s |        120s |
-      |         121s | >120s       |
-# Source: QA-1849, AMB-1
+      | 150s         | >120s       |
+      | 90s          | 90s         |
+      | 120s         | 120s        |
+      | 121s         | >120s       |
 
+# Source: QA-1849, AMB-1
   @todo
   Scenario: Min Duration display when Max Duration crosses the 120-second threshold requires product confirmation
   # Framework Gap: Requires navigation hook for Supply > Deals in LifeSteps.java
@@ -246,8 +247,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
   # Framework Gap: Requires Min/Max Duration field-read hook in LifeSteps.java
     When User views a deal with Min Duration "20s" and Max Duration "100s"
     Then Both Min Duration and Max Duration display their exact values and ">120s" appears for neither
-# Source: QA-1849, GAP-1, GAP-2, GAP-4, GAP-5
 
+# Source: QA-1849, GAP-1, GAP-2, GAP-4, GAP-5
   @todo
   Scenario: Deal Group breakdown scopes to the individually expanded deal and handles empty, error, and permission states
   # Framework Gap: Requires navigation hook for Deal Group > Add Deals in LifeSteps.java
@@ -264,8 +265,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
   # Framework Gap: Requires role-restricted test account + permission-check hook in LifeSteps.java
     When A user without deal-management permissions attempts to open Inventory Breakdown
     Then Document the access behavior against the intended role scope, since GAP-5 leaves this unspecified
-# Source: QA-1849, AMB-2, AMB-3
 
+# Source: QA-1849, AMB-2, AMB-3
   @todo
   Scenario: Inventory Breakdown figures stay consistent across surfaces, views, and rapid Timeframe changes
   # Framework Gap: Requires navigation hooks for Supply > Deals and Media Planner > Deals, plus cross-surface figure comparison, in LifeSteps.java
@@ -280,8 +281,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
   # Framework Gap: Requires rapid-Timeframe-switch simulation and stale-response-guard read hook in LifeSteps.java
     When User selects "Last 30 Days" immediately after "Last 7 Days", before the first response returns
     Then The panel reflects only the most recently selected Timeframe once loading completes
-  # Source: ET-25051
 
+  # Source: ET-25051
   @todo
   Scenario Outline: Ad size distribution shows the top 10 sizes plus an Others bucket at and below the boundary
     When User clicks Tactic Setting tab
@@ -294,11 +295,11 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then The Display Inventory ad size section shows "<EXPECTED>"
     Examples:
       | DISTINCT_SIZES | EXPECTED                                    |
-      | more than 10   | the top 10 sizes plus an Others bucket      |
-      | exactly 10     | all 10 sizes with no Others bucket          |
-      | fewer than 10  | only the sizes that exist, no Others bucket |
-  # Source: ET-25051
+      | more than 10    | the top 10 sizes plus an Others bucket      |
+      | exactly 10      | all 10 sizes with no Others bucket          |
+      | fewer than 10   | only the sizes that exist, no Others bucket |
 
+  # Source: ET-25051
   @todo
   Scenario: Video Inventory shows the VAST versus VPAID tag-type split alongside duration
     When User clicks Tactic Setting tab
@@ -309,8 +310,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     # Framework Gap: Requires a VAST/VPAID tag-type split read hook in LifeSteps.java
     And User opens the Inventory Breakdown and views Video Inventory
     Then The minimum and maximum video duration are shown, and the VAST and VPAID percentages are shown and sum to 100
-  # Source: ET-25051
 
+  # Source: ET-25051
   @todo
   Scenario: Top 10 domains and app bundles are shown for every media type, and a display-only deal shows no video or audio section
     When User clicks Tactic Setting tab
@@ -324,16 +325,16 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     # Framework Gap: Requires a display-only deal fixture and a media-type-section-visibility read hook
     Given The deal opened is display-only, with no video or audio inventory
     Then No Video Inventory or Audio Inventory section is shown, or each shows an explicit empty state rather than the wrong media type's data
-  # Source: ET-25051
 
+  # Source: ET-25051
   @todo
   Scenario: The breakdown figures match the underlying deal delivery statistics
     # Framework Gap: Requires a direct read hook against dealdailystats/dealdomaindailystats (or an equivalent reporting API) to compare against the panel, in LifeSteps.java
     Given A deal has known recorded statistics in dealdailystats and dealdomaindailystats for a given timeframe
     When User opens the Inventory Breakdown for that deal and timeframe
     Then The percentages and top-10 lists shown match the underlying statistics for that deal and timeframe
-  # Source: ET-25051
 
+  # Source: ET-25051
   @todo
   Scenario: Opening and closing the Inventory Breakdown leaves the underlying deal selection unchanged
     When User clicks Tactic Setting tab
@@ -344,8 +345,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     # Framework Gap: Requires an Inventory Breakdown open/close hook that doesn't disturb deal-selection state, in LifeSteps.java
     And User opens the Inventory Breakdown for the selected deal and then closes it
     Then The deal remains selected exactly as it was before the panel was opened
-  # Source: ET-25051
 
+  # Source: ET-25051
   @todo
   Scenario: The Inventory Breakdown does not regress the Media Planner view, deal labels, or reporting for deals with nothing applied
     # Framework Gap: Requires a before/after Media Planner behavior comparison hook in LifeSteps.java
@@ -358,8 +359,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then Its breakdown shows no curated market or PMP inventory attribution
     # Framework Gap: Requires a same-deal multi-timeframe percentage-consistency read hook
     And The breakdown percentages for one deal are internally consistent across all three timeframes
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario: A no-avails warning appears at tactic level for a directly targeted deal, scoped to the 1-day and 7-day windows
     # Framework Gap: Requires an avails-history fixture (deal with no avails yesterday / past 7 days) and a tactic-level warning indicator page object
@@ -370,8 +371,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then The warning states that both windows triggered
     When The deal had avails yesterday and across the past 7 days
     Then No warning appears
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario Outline: No-avails warnings are suppressed for deals that are not actually eligible to deliver
     # Framework Gap: Requires fixtures for out-of-flight-date, disabled, and not-yet-started deals with no avails
@@ -382,8 +383,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
       | outside its start and end dates |
       | disabled                        |
       | not yet started                 |
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario: Deal group no-avails warnings surface every flagged deal next to the group name
     # Framework Gap: Requires a targeted-deal-group fixture with a mix of flagged and healthy deals
@@ -391,24 +392,24 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then A warning appears next to the deal group name without needing to expand the group
     When More than one deal inside the group has no recent avails
     Then All flagged deals are surfaced, not only the first, and the count in the deal section warning matches the number of flagged deals
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario: An all-deals-unavailable state shows an orange box alongside the per-deal warnings
     # Framework Gap: Requires an all-unavailable fixture, both for a multi-deal group and for a tactic targeting exactly one deal
     Given Every deal applied to a tactic is unavailable
     Then An orange box warning appears
     And Both the per-deal warning and the all-unavailable orange box appear together where the design requires it
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario: The no-avails warning appears under both inventory targeting modes
     Given A tactic's inventory targeting is set to Selected Inventory Only
     Then The no-avails warning is surfaced when applicable
     Given A tactic's inventory targeting is Selected Inventory plus Open Exchange
     Then The no-avails warning is surfaced when applicable
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario: A tactic showing a no-avails warning can still be saved and activated, and the warning clears once avails resume
     Given A tactic shows a no-avails warning
@@ -419,8 +420,8 @@ Feature: Life PMP Regression - Verify Private and Life MarketPlace Deals Creatio
     Then Its warning disappears, while a warning on another deal in the same group remains until that deal also recovers
     When A flagged deal is removed from the tactic
     Then The warning updates accordingly
-  # Source: ET-25054
 
+  # Source: ET-25054
   @todo
   Scenario: No-avails warnings coexist with the existing curated market indicator, and a data-lookup failure does not flag every deal
     # Framework Gap: Requires the existing curated-market-incompatibility indicator located and confirmed in the codebase before a coexistence assertion can be written

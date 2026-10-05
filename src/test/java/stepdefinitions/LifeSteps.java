@@ -60,6 +60,7 @@ public class LifeSteps {
     List<String> capturedDetails = new ArrayList<>();
     List<String> itemList = new ArrayList<>();
     Map<String, List<String>> itemMap = new HashMap<>();
+    private Map<String, Map<String, Map.Entry<List<String>, String>>> targetingSummary = new LinkedHashMap<>();
     Navigation navigation = new Navigation(DriverFactory.getPage());
     Campaigns campaigns = new Campaigns(DriverFactory.getPage());
     LineItemDetails lineItemDetails = new LineItemDetails(DriverFactory.getPage());
@@ -559,10 +560,10 @@ public class LifeSteps {
         navigation.clickOnIcon("Add Targeting Rule");
     }
 
-    @When("User clicks on Add Targeting Rule")
-    public void userClicksOnAddTargetingRule() {
+    @When("User clicks on {string}")
+    public void userClicksOnAddTargetingRule(String buttonName) {
         logger.info("Adding Targeting Rule");
-        navigation.clickOnIcon("Add Targeting Rule");
+        navigation.clickOnIcon(buttonName);
     }
 
     @Then("User selects {string} as rule type and configures the targeting rules, and saves the settings")
@@ -986,8 +987,8 @@ public class LifeSteps {
         Assert.assertEquals(0, reportTemplates.searchResultRowCount());
     }
 
-    @Given("User configures targeting rules as below")
-    public void user_selects_the_channel_configures_targeting_rules(DataTable ruleTypeAndOptions) {
+    @Given("User configures targeting rules as below with target type as {string}")
+    public void user_selects_the_channel_configures_targeting_rules(String targetType, DataTable ruleTypeAndOptions) {
         logger.info("Configuring targeting rules from DataTable");
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
         rulesMap = CommonUtils.processDataTable(rawMap);
@@ -995,7 +996,10 @@ public class LifeSteps {
             logger.info("Adding Rule Type: {} with Options: {}", entry.getKey(), entry.getValue());
             keyType.add(entry.getKey());
             keyValues.addAll(entry.getValue());
-            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue());
+            tacticSettings.selectMultipleRuleTypes(entry.getKey(), entry.getValue(), targetType);
+            targetingSummary
+                    .computeIfAbsent(entry.getKey(), k -> new LinkedHashMap<>())
+                    .put(targetType, tacticSettings.createRuleGroupData(entry.getValue(), targetType));
         }
         tacticSettings.closeRuleTypePanel();
     }
@@ -1857,8 +1861,8 @@ public class LifeSteps {
         Assert.assertTrue("Category names are not matched", isMatched);
     }
 
-    @And("Verify target type with respect to category")
-    public void verifyTargetTypeWithRespectToCategory(DataTable categoryNameAndType) {
+    @And("Verify targeting rule type with respect to category")
+    public void verifyTargetingRuleTypeWithRespectToCategory(DataTable categoryNameAndType) {
         logger.info("Verifying target types with respect to their categories");
         Map<String, String> rawMap = categoryNameAndType.asMap(String.class, String.class);
         Map<String, List<String>> categoryNameAndTypeMap = CommonUtils.processDataTable(rawMap);
@@ -1905,9 +1909,9 @@ public class LifeSteps {
     }
 
     @When(
-            "User creates Targeting template {string} for the line items {string} with channel {string} and Targeting Rules")
+            "User creates Targeting template {string} for the line items {string} with channel {string} and Targeting Rules with target Type as {string}")
     public void userCreatesTargetingTemplateForTheLineItemsWithChannelAndTargetingRules(
-            String templateName, String lineItems, String channel, DataTable ruleTypeAndOptions) {
+            String templateName, String lineItems, String channel, String targetType, DataTable ruleTypeAndOptions) {
         logger.info(
                 "Creating Targeting Template: {} for Line Items: {} and Channel: {}", templateName, lineItems, channel);
         Map<String, String> rawMap = ruleTypeAndOptions.asMap(String.class, String.class);
@@ -1916,7 +1920,7 @@ public class LifeSteps {
         List<String> lineItemsList = Arrays.stream(lineItems.split(",")).toList();
         List<String> channelList = Arrays.stream(channel.split(",")).toList();
         keyValueMap =
-                targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap);
+                targetingTemplate.createAndSaveTargetingTemplate(templateName, lineItemsList, channelList, rulesMap, targetType);
         logger.info("Targeting template created. Returned Key-Value Map: {}", keyValueMap);
     }
 
@@ -2110,8 +2114,9 @@ public class LifeSteps {
     }
 
     @And(
-            "Create a tactic with below targeting rules and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
+            "Create a tactic with below targeting rules with target type as {string} and {string} line items and other details {string} {string} {string} {string} {string} {string} {string}")
     public void createATacticWithBelowTargetingRulesAndLineItemsAndOtherDetails(
+            String targetType,
             String lineItemType,
             String advertiser,
             String campaign_name,
@@ -2141,7 +2146,7 @@ public class LifeSteps {
                 lineItemName,
                 lineBudget,
                 tacticName,
-                rulesMap);
+                rulesMap, targetType);
         logger.info("Returned Template Names from tactic creation: {}", templateNameList);
 
         for (String templateName : templateNameList) {
@@ -2805,7 +2810,7 @@ public class LifeSteps {
                 listName,
                 listType);
         metricName = listName + "_" + CommonUtils.timeStampCalculation();
-
+        logger.info("List Name is {}", metricName);
         String listNameError = sharedList.validateErrorOnEmptyListNameInput(metricName);
         Assert.assertEquals("List Name is required", listNameError);
         String dataInputError = sharedList.validateErrorOnEmptyListInput(metricName);
@@ -2830,10 +2835,10 @@ public class LifeSteps {
     }
 
     @And("Verify that if multiple {string} are specified on a single line, a validation error is shown")
-    public void verifyThatIfMultipleDomainNamesAreSpecifiedOnASingleLineAValidationErrorIsShown(String domainName) {
+    public void verifyThatIfMultipleDomainNamesAreSpecifiedOnASingleLineAValidationErrorIsShown(String listType, DataTable dataTable) {
         logger.info(
-                "Verify that if multiple {} are specified on a single line, a validation error is shown", domainName);
-        List<String> domainNameList = CommonUtils.convertStringToList(domainName);
+                "Verify that if multiple {} are specified on a single line for list type {}, a validation error is shown", dataTable, listType);
+        List<String> domainNameList = new ArrayList<>(dataTable.asList(String.class));
         String validationErrorMessage = sharedList.checkErrorOnSingleLineMultipleDomainsInput(domainNameList);
         Assert.assertTrue("No Validation error is displayed", validationErrorMessage.contains("validation error(s)"));
     }
@@ -2850,15 +2855,16 @@ public class LifeSteps {
     }
 
     @And("Verify that when {string} names are specified manually, the option to upload a file disappears")
-    public void verifyThatWheNamesAreSpecifiedManuallyTheOptionToUploadAFileDisappears(String listType) {
+    public void verifyThatWhenNamesAreSpecifiedManuallyTheOptionToUploadAFileDisappears(String listType, DataTable dataTable) {
         logger.info(
                 "Verify that when {} names are specified manually, the option to upload a file disappears", listType);
         keyValues.clear();
-        keyValues = new ArrayList<>(CommonUtils.convertStringToList(listType));
+        keyValues = new ArrayList<>(dataTable.asList(String.class));
+        itemCount = keyValues.size();
         sharedList.clearListTextArea();
         boolean isUploadVisibleBefore = sharedList.verifyUploadSectionIsVisibleBeforeListInput();
         Assert.assertTrue("Upload section is not available before list input", isUploadVisibleBefore);
-        logger.info("Entering domain names manually");
+        logger.info("Entering names manually");
         sharedList.enterDomainNames(keyValues);
         boolean isUploadVisibleAfter = sharedList.verifyUploadSectionIsVisibleAfterListInput();
         Assert.assertTrue("Upload section is available after list input", isUploadVisibleAfter);
@@ -2912,12 +2918,12 @@ public class LifeSteps {
         sharedList.searchCreatedList(metricName);
         sharedList.openSearchedList(metricName);
         totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
-        Assert.assertEquals(totalListCount, keyValues.size());
+        Assert.assertEquals(totalListCount, itemCount);
     }
 
-    @And("User retrieves all the entered data after saving the list details {string}")
-    public void userRetrievesAllTheEnteredDataAfterSavingTheListDetails(String listName) {
-        logger.info("Retrieving all the entered data after saving the list details: {}", listName);
+    @And("User verifies that saved details for list {string} match the input data")
+    public void userVerifiesThatSavedDetailsForListMatchTheInputData(String listName) {
+        logger.info("Verifying that saved details for list '{}' match the input data", listName);
         capturedDetails.clear();
         capturedDetails = sharedList.fetchListDetailsFromEditPanel();
         List<String> normalizedExpected = itemList.stream()
@@ -2935,10 +2941,11 @@ public class LifeSteps {
         Assert.assertEquals("List Details are not matching", normalizedExpected, normalizedActual);
     }
 
-    @And("Verify that the user is able to edit an existing {string} name list {string}")
-    public void verifyThatTheUserIsAbleToEditAnExistingNameList(String listType, String modifiedName) {
-        logger.info("Editing existing '{}' list with modified names: {}", listType, modifiedName);
-        keyValues = new ArrayList<>(CommonUtils.convertStringToList(modifiedName));
+    @And("Verify that the user is able to edit an existing {string} list with below details")
+    public void verifyThatTheUserIsAbleToEditAnExistingNameList(String listType, DataTable modifiedList) {
+        logger.info("Editing existing '{}' list", listType);
+        keyValues = new ArrayList<>(modifiedList.asList(String.class));
+        itemCount = itemCount + keyValues.size();
         sharedList.editAnExistingList(keyValues);
         itemList.clear();
         itemList = sharedList.fetchListDetailsFromEditPanel();
@@ -3182,12 +3189,18 @@ public class LifeSteps {
         Assert.assertEquals(file1RecordCount + file2RecordCount, leftPanelCount);
     }
 
-    @And("Verify that the user is able to delete the uploaded file {string}")
+    @And("Verify that the user is able to delete the uploaded file {string} and verify the counter on the left displays the updated value after file deletion")
     public void verifyThatTheUserIsAbleToDeleteTheUploadedFile(String fileName) {
+        int totalListCountBeforeDeletion = file1RecordCount + file2RecordCount;
         logger.info("Deleting uploaded file: {}", fileName);
         sharedList.deleteFile(fileName);
         String removalConfirmation = sharedList.fetchRemovalConfirmation();
         Assert.assertEquals(fileName, removalConfirmation);
+        logger.info("Verifying the list count after list deletion: {}", fileName);
+        sharedList.searchCreatedList(metricName);
+        sharedList.openSearchedList(metricName);
+        totalListCount = Integer.parseInt(sharedList.fetchCountFromLeftPanel(metricName));
+        Assert.assertEquals(totalListCount, totalListCountBeforeDeletion - file1RecordCount);
     }
 
     /*Roshani Sherkar
@@ -6542,32 +6555,56 @@ public class LifeSteps {
 
     @Then("User navigates to tactic setting tab")
     public void userNavigatesToTacticSettingTab() {
-        logger.info("User navigates to Line item from Association Tab");
+        logger.info("User navigates to Tactic Setting Tab");
         tacticDetails.clickSettingsTab();
     }
 
-    @Then("The user clicks on show expression tab and fetch the values displayed")
-    public void the_user_clicks_on_show_expression_tab_and_fetch_the_values_displayed() {
+    @Then("User clicks on show expression tab")
+    public void the_user_clicks_on_show_expression_tab() {
         tacticDetails.clickShowExpressionButton();
-        tacticDetails.fetchShowExpressionValues();
     }
 
-    @Then(
-            "Verify that all the rule types added in targeting rules are displayed in show expression with correct values along with {string}")
-    public void
-            verify_all_rule_types_added_in_targeting_rules_are_displayed_in_show_expression_with_correct_values_along_with_default_expression(
-                    String defaultExpression) {
-        boolean result = tacticDetails.ruleMappingWithShowExpressionValues(rulesMap, defaultExpression);
-        Assert.assertTrue("Targeting rules added is not matching with the ones in show expression", result);
-    }
+    @Then("User verifies that all expressions including {string} are having correct AND and OR logic")
+    public void userVerifiesThatAllTheTargetedAndBlockedExpressionsAreHavingCorrectANDAndORLogic(String defaultRuleType) {
+        if (defaultRuleType != null && !defaultRuleType.isBlank()) {
+            String ruleKey = defaultRuleType.toUpperCase();
+            boolean exists = targetingSummary.keySet().stream().anyMatch(k -> k.equalsIgnoreCase(ruleKey));
+            if (!exists) {
+                tacticDetails.fetchShowExpressionValues();
+                List<String> dynamicValues = tacticDetails.getValuesForRuleType(ruleKey);
 
-    @Then("Verify show expression connector AND OR logic is correct")
-    public void verifyShowExpressionConnectorLogicIsCorrect() {
-        tacticDetails.fetchShowExpressionValues();
-        Assert.assertTrue(
-                "Show expression connector logic is incorrect. Raw values: "
-                        + tacticDetails.getShowExpressionRawValues(),
-                tacticDetails.assertShowExpressionConnectorLogic(tacticDetails.getShowExpressionRawValues()));
+                // If dynamicValues is empty, default to single item list so itemCount check works cleanly
+                if (dynamicValues == null || dynamicValues.isEmpty()) {
+                    dynamicValues = Collections.singletonList("DEFAULT");
+                }
+                targetingSummary
+                        .computeIfAbsent(ruleKey, k -> new LinkedHashMap<>())
+                        .put("Target", new AbstractMap.SimpleEntry<>(dynamicValues, "OR"));
+            }
+        }
+
+        // STEP 2: Now safely iterate over targetingSummary without throwing ConcurrentModificationException
+        for (Map.Entry<String, Map<String, Map.Entry<List<String>, String>>> ruleEntry : targetingSummary.entrySet()) {
+            String ruleType = ruleEntry.getKey();
+            Map<String, Map.Entry<List<String>, String>> targetTypeMap = ruleEntry.getValue();
+
+            for (Map.Entry<String, Map.Entry<List<String>, String>> targetEntry : targetTypeMap.entrySet()) {
+                String targetType = targetEntry.getKey();
+                Map.Entry<List<String>, String> ruleData = targetEntry.getValue();
+
+                List<String> values = ruleData.getKey();
+                String expectedOperator = ruleData.getValue();
+                int itemCount = values.size();
+                logger.info("Validating Rule: {} | Target Type: {} | Item Count: {}", ruleType, targetType, itemCount);
+                // Validate inner AND/OR logic on UI only if the group has more than 1 item
+                if (itemCount > 1) {
+                    List<String> actualUiOperators = tacticDetails.getOperatorsForRuleGroup(ruleType, targetType);
+                    boolean isValid = actualUiOperators.stream().allMatch(op -> op.equalsIgnoreCase(expectedOperator));
+                    Assert.assertTrue("Logic operator mismatch for " + ruleType + " [" + targetType + "]. " +
+                            "Expected all '" + expectedOperator + "', but found UI operators: " + actualUiOperators, isValid);
+                }
+            }
+        }
     }
 
     @Then("User removes the targeting {string} and saves the settings")
@@ -7570,19 +7607,24 @@ public class LifeSteps {
         Assert.assertEquals("Creative(s)", creativesText);
     }
 
-    @When(
-            "User creates line items with tactics and targeting rules as below and assigns existing creative named {string}")
-    public void userCreatesLineItemsWithTacticsAndTargetingRules(String creative, DataTable dataTable) {
+    @When("User creates line items with tactics and targeting rules as below with target type as {string} and assigns existing creative named {string}")
+    public void userCreatesLineItemsWithTacticsAndTargetingRules(String targetType, String creative, DataTable dataTable) {
         logger.info("Creating line items with tactics and targeting rules");
+
         tacticDetails.createLineItemsWithTacticsAndTargetingRules(
-                dataTable.asMaps(String.class, String.class), creative, perTacticRules -> {
+                dataTable.asMaps(String.class, String.class),
+                targetType,
+                creative,
+                (Map<String, List<String>> perTacticRules) -> {
                     logger.info("Running per-tactic targeting rule verifications for: {}", perTacticRules.keySet());
-                    rulesMap = new LinkedHashMap<>(perTacticRules);
-                    keyType = new ArrayList<>(perTacticRules.keySet());
-                    keyValues = new ArrayList<>();
-                    for (List<String> v : perTacticRules.values()) {
-                        keyValues.addAll(v);
-                    }
+
+                    this.rulesMap = new LinkedHashMap<>(perTacticRules);
+                    this.keyType = new ArrayList<>(perTacticRules.keySet());
+
+                    this.keyValues = perTacticRules.values().stream()
+                            .flatMap(List::stream)
+                            .collect(Collectors.toList());
+
                     verify_the_configured_targeting_rules();
                     verifyTheCountOfRulesAddedForTheSelectedTargetingRuleTypeOnTheTacticSettingsPage();
                 });

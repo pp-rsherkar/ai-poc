@@ -11,7 +11,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
     And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
-  Scenario Outline: Verify user is able to export Keyword list created by uploading a file
+  Scenario Outline: Verify that user is able to download the uploaded "Keyword" list by uploading a file
     Given User navigates to the "Keyword Lists" page
     And Verify that the search option is present on the "Keyword Lists" tab
     When User clicks on Create New List
@@ -27,7 +27,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | Keyword_FileUpload | KeywordsFile1.csv |
 
   @regression
-  Scenario Outline: Verify user is able to export Domain list created by uploading a file
+  Scenario Outline: Verify that user is able to download the uploaded "Domain" list by uploading a file
     Given User navigates to the "Domain & App Lists" page
     When User clicks on Create New List
     And User selects the "Domains" radio button from create new list page
@@ -43,7 +43,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | Domain_FileUpload | DomainNameFile1.csv |
 
   @regression
-  Scenario Outline: Verify user is able to export App Bundle list created by uploading a file
+  Scenario Outline: Verify that user is able to download the uploaded "App Bundle" list
     Given User navigates to the "Domain & App Lists" page
     When User clicks on Create New List
     And User selects the "App Bundles" radio button from create new list page
@@ -60,7 +60,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | AppBundle_FileUpload | AppBundleFile1.csv |
 
   @regression
-  Scenario Outline: Verify user is able to export IP list created by uploading a file
+  Scenario Outline: Verify that user is able to download the uploaded "IP" list
     And User navigates to the "IP Address Lists" page
     When User clicks on Create New List
     Then Verify that the Create New List screen is displayed
@@ -75,7 +75,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | IPAddress_FileUpload | IPAddressFile1.csv |
 
   @regression
-  Scenario Outline: Verify user is able to export the Regular NPI list created by uploading a file
+  Scenario Outline: Verify that user is able to download the uploaded Regular NPI list
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -91,7 +91,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | STATIC_NPI | 01- Advertiser | NPIStaticList.xlsx |
 
   @regression
-  Scenario Outline: Verify user is able to export Smart NPI list
+  Scenario Outline: Verify that user is able to download the Smart NPI list
     And User navigates to NPI Lists page
     When User clicks on Create New List
     Then Verify creation of NPI List screen is displayed
@@ -110,7 +110,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | 01- Advertiser | SMART_NPI | Medical Procedure Code | Cardiac shunt imaging, Florbetaben f18 diagnostic |
 
   @regression
-  Scenario Outline: Verify user is able to export PulsePoint Provided NPI list
+  Scenario Outline: Verify user is able to download PulsePoint Provided NPI list
     And User navigates to NPI Lists page
     And User searches and selects the NPI List "<LIST_NAME>"
     And Verify that user is able to download the "NPI" list
@@ -120,7 +120,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | AutoNPIAdmin257977008 |
 
   @regression
-  Scenario Outline: Verify export option is not available for Email list created by uploading a file
+  Scenario Outline: Verify that download option should not be available for uploaded Email list
     And User navigates to the "Email Lists" page
     When User clicks on Create New List
     Then Verify that the Create New List screen is displayed
@@ -133,7 +133,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | Email_FileUpload | EmailFile1.csv   |
 
   @regression
-  Scenario Outline: Verify user is able to export the audit log of a campaign, line item and tactic
+  Scenario Outline: Verify that user is able to export the audit log for campaign, line item and tactic
     And User clicks on Create Campaign
     When User enters the campaign details as "<ADVERTISER>" "<CP_NAME>" "<CP_TYPE>" "<CP_BUDGET>" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -156,7 +156,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | 01- Advertiser | Auto    | Regular |     20000 | Line      |         500 | Tactic      | Display Advanced | Behavioral Segment | Auto_Creative |
 
   @regression
-  Scenario Outline: Verify user is able to export settings of the campaign having "Single" line items
+  Scenario Outline: Verify user is able to export settings of the campaign with Single line items
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -171,7 +171,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | Single_LI_Campaign | Behavioral Segment | Please_Dont_Delete |
 
   @regression
-  Scenario Outline: Verify user is able to export settings of the campaign having "Multiple" line items
+  Scenario Outline: Verify user is able to export settings of the campaign with Multiple line items
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page
@@ -187,7 +187,7 @@ Feature: LIFE Regression - This feature verifies the export/download functionali
       | Multiple_LI_Campaign | Behavioral Segment | Please_Dont_Delete |
 
   @regression
-  Scenario Outline: Verify user is able to export settings of the campaign having "Different" line items
+  Scenario Outline: Verify user is able to export settings of the campaign with Different line items type
     And User clicks on Create Campaign
     When User enters the campaign details as "01- Advertiser" "<CAMPAIGN_NAME>" "Regular" "20000" and saves the campaign
     Then Verify campaign details are saved and user is navigated to the line item page

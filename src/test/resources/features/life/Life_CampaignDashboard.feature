@@ -3,6 +3,8 @@ Feature: LIFE Regression - Check below features available on Campaign Dashboard
   2. Navigation to Campaign, Line Item and Tactic from dashboard
   3. Modify Dashboard column basis filter
   4. Verify Active, Today, Yesterday, Favorite and Hide Finished filters
+  5. Verify that bulk actions are enabled when the entity checkbox is selected for a Line Item
+  6. Verify that bulk actions are enabled when the entity checkbox is selected for a Tactic"
 
   @regression
   Scenario Outline: Verify comments addition on Campaign Dashboard and validate it on Campaign, Line Item and Tactic pages

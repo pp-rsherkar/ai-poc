@@ -1,4 +1,4 @@
-Feature: LIFE Regression - Run Report fields verification and report generation
+Feature: LIFE Regression - Run Report fields and reportion verification
   It ensures the correct loading, population, interaction, and behavior of all critical fields within the Run Report pop-up, including:
   1. Template selection
   2. Dimensions and Metrics configuration
@@ -13,7 +13,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
     And Verify Campaign Dashboard is displayed with title "Campaigns"
 
   @regression
-  Scenario Outline: Validate Run Report panel's field verification on Reports Page and allow report generation
+  Scenario Outline: Verify fields on Reports page - Run Report panels and Report generation
     And User navigates to Administrative section and fetches the advertiser for the account "automation@pulsepoint"
     And User fetches the logged in username
     When User navigates to run report from mega menu of the life application
@@ -93,7 +93,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
 
   @regression
-  Scenario Outline: Validate One time report section's field verification and generate One time report using Template and Custom Dates option from Run Now
+  Scenario Outline: Verify One time report section fields and generation of One time report using Template and Custom Dates option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
     And User should be able to select template "<TEMPLATE>" from the dropdown
@@ -123,7 +123,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | AutoTemplate20 | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | (GMT+05:30) India Standard Time | CSV, Excel, Pipe Delimited CSV, Pipe Delimited TXT, Tab Delimited TXT, TSV |
 
   @regression
-  Scenario Outline: Validate One time report section's field verification and generate One time report using a Pick Dimensions/Metrics and Life Time option from Run Now
+  Scenario Outline: Verify One time report section fields and generation of One time report using a Pick Dimensions/Metrics and Life Time option from Run Now
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened
     When User clicks on "Pick Dimensions/Metrics" link
@@ -149,7 +149,7 @@ Feature: LIFE Regression - Run Report fields verification and report generation
       | 01- Advertiser | CreativeCampaign  | CreativeLine       | CreativeTactic  | Creative          | Advertiser Name, Campaign Name, LineItem Name, Tactic Name | Impressions, Clicks | (GMT+05:30) India Standard Time |
 
   @regression
-  Scenario Outline: Validate One time report section's field verification and generate One time report by entering Tactic and Flight option from Run Now
+  Scenario Outline: Verify One time report section fields and generation of One time report by entering Tactic and Flight option from Run Now
     Then User searches the Campaign "<CAMPAIGN_NAME>", navigates to LineItem and fetches the flight details
     When User navigates to run report from mega menu of the life application
     And Verify Run Report panel should be opened

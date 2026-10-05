@@ -1,8 +1,10 @@
 Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
   1. Create multiple tactics
-  2. Verify the availability of three tabs
+  2. Verify the availability of three tabs - Settings, Creatives, Debugger, Details
   3. Verify header section of tactic displays correct status
   4. Verify user is able to add custom field
+  5. Verify show expression query is correct for the chosen targeting rules
+  6. Verify forecast refreshes after adding Age targeting to a new tactic"
 
   Background:
     Given This scenario will be executed in the "Demo" environment as a "User"
@@ -214,7 +216,7 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     Then User navigates to tactic setting tab
     Then User verify Behaviour segment and NPI are not allowed in bid multiplier rules when same are not selected in targeting rules
     Then User close the bid panel to add targeting rules
-    And User configures targeting rules as below
+    And User configures targeting rules as below with target type as "Target"
       | Behavioral Segment | 111 > 222 > Patients of HCPs prescribing Ivig and SCIg competitors |
       | NPI                | AutoSmartList954103283                                             |
     Then Verify Bid multiplier panel with all options under below categories
@@ -286,8 +288,8 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then User navigates to tactic setting tab
     Then User verifies that forecast data is unavailable when no targeting rules are applied
-    When User clicks on Add Targeting Rule
-    And User configures targeting rules as below
+    When User clicks on "Add Targeting Rule"
+    And User configures targeting rules as below with target type as "Target"
       | Age | 35-39, 55-59 |
     And User saves the settings
     And User navigates to tactic setting tab
@@ -306,16 +308,20 @@ Feature: LIFE Regression - Verify below scenarios in Tactic creation flow
     When User enters the tactic details as "<TACTIC_NAME>" and saves the tactic
     Then User navigates to tactic setting tab
     Then User verifies that forecast data is unavailable when no targeting rules are applied
-    When User clicks on Add Targeting Rule
-    And User configures targeting rules as below
-      | Behavioral Segment | AutoSegment18577650, 10136 Testing |
-      | Health Populations | Anesthesia and Analgesia           |
-      | Age                |                       25-29, 35-39 |
+    When User clicks on "Add Targeting Rule"
+    And User configures targeting rules as below with target type as "Target"
+      | Device            | Mobile, Tablet         |
+      | Age               | 18-24, 25-29, 30-34    |
+      | In Condition      | Liver Diseases         |
+      | Legal Populations | Adoption, Emancipation |
+    When User clicks on "New Targeting Rule"
+    And User configures targeting rules as below with target type as "Block"
+      | In Condition      | Diabetes Mellitus                  |
+      | Legal Populations | Child Support, Considering Divorce |
     And User saves the settings
     And User navigates to tactic setting tab
-    Then The user clicks on show expression tab and fetch the values displayed
-    Then Verify that all the rule types added in targeting rules are displayed in show expression with correct values along with "<DEFAULT_EXPRESSION>"
-    And Verify show expression connector AND OR logic is correct
+    Then User clicks on show expression tab
+    Then User verifies that all expressions including "<DEFAULT_EXPRESSION>" are having correct AND and OR logic
     Examples:
       | ADVERTISER     | CP_NAME | CP_TYPE | CP_BUDGET | LINE_NAME | LINE_BUDGET | TACTIC_NAME | DEFAULT_EXPRESSION |
       | 01- Advertiser | Test    | Regular |     10000 | Line      |         120 | Dynamic_Tac | COUNTRY            |

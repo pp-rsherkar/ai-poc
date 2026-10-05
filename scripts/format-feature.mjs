@@ -53,20 +53,6 @@ function removeBlankLineBeforeExamples(source, keywords) {
   return source.replace(examplesLine, '\n')
 }
 
-function removeBlankLineBeforeTodo(source) {
-  return source.replace(
-    /(\n[ \t]*# Source:[^\n]*)\n\n(?=[ \t]*@todo\b)/gu,
-    '$1\n'
-  )
-}
-
-function ensureBlankLineBeforeSource(source) {
-  return source.replace(
-    /([^\n])\n([ \t]*# Source:)/gu,
-    '$1\n\n$2'
-  )
-}
-
 export function formatFeature(source) {
   const document = parse(source)
   const formatted = pretty(document)
@@ -74,13 +60,10 @@ export function formatFeature(source) {
     formatted,
     examplesKeywords(document)
   )
-  const traceableFormatted = removeBlankLineBeforeTodo(
-    ensureBlankLineBeforeSource(projectFormatted)
-  )
 
   // Keep the upstream formatter's safety property: never emit invalid Gherkin.
-  parse(traceableFormatted, document.feature?.language)
-  return traceableFormatted
+  parse(projectFormatted, document.feature?.language)
+  return projectFormatted
 }
 
 async function readStdin() {

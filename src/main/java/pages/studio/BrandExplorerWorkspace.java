@@ -43,8 +43,9 @@ public class BrandExplorerWorkspace {
         this.BRAND_EXPLORER_TABLE = WORKSPACE_FRAME.locator("//div[contains(@class,'Box')]//table");
         this.SAVE_WORKSPACE = WORKSPACE_FRAME.locator(
                 "//button[contains(@data-tour-id,'save-workspace-button')]//div[contains(text(),'Save')]");
-        this.TIMEFRAME = WORKSPACE_FRAME.locator(
-                "//ds-typography[normalize-space()='Time Frame']/following-sibling::div//input[starts-with(@id,'listbox-input-')]");
+        this.TIMEFRAME = WORKSPACE_FRAME
+                                .locator("//ds-typography[normalize-space()='Time Frame']/following-sibling::div//ds-dropdown")
+                                .locator("button[role='combobox']>span");
         this.DATE_RANGE_PICKER = WORKSPACE_FRAME.locator("[data-testid='date-range-picker']");
         this.START_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-from-text-input']");
         this.END_DATE_INPUT = WORKSPACE_FRAME.locator("input[data-testid='date-to-text-input']");
@@ -104,7 +105,7 @@ public class BrandExplorerWorkspace {
 
     public String getDefaultTimeFrame() {
         waitUtility.waitForLocatorVisible(TIMEFRAME);
-        return TIMEFRAME.inputValue().trim();
+        return TIMEFRAME.innerText().trim();
     }
 
     public void saveBrandExplorerWorkspace() {
@@ -118,7 +119,7 @@ public class BrandExplorerWorkspace {
     }
 
     public List<String> getTimeFrameOptions() {
-        Locator options = WORKSPACE_FRAME.locator("//div[@role='dialog']//li[@role='option']");
+        Locator options = WORKSPACE_FRAME.locator(".dd-dialog ul slot");
         waitUtility.waitForLocatorVisible(options.first());
         List<String> optionLabels = new ArrayList<>();
         int count = options.count();
@@ -130,7 +131,7 @@ public class BrandExplorerWorkspace {
 
     public void selectTimeFramePreset(String timeFrame) {
         Locator option = WORKSPACE_FRAME.locator(
-                String.format("//div[@role='dialog']//li[@role='option']/span[normalize-space()='%s']", timeFrame));
+                String.format(".dd-dialog ul slot:has-text('%s')", timeFrame));
         waitUtility.waitForLocatorVisible(option);
         option.click();
         page.keyboard().press("Escape");
@@ -549,11 +550,16 @@ public class BrandExplorerWorkspace {
     private String getFilterCardSummary(String field, String expectedValue) {
         Locator card = filterFieldCard(field);
         waitUtility.waitForLocatorVisible(card);
+        String summary = card.innerText().replaceAll("\\s+", " ").trim();
         if (expectedValue != null) {
-            waitUtility.waitForLocatorVisible(
-                    card.getByText(expectedValue, new Locator.GetByTextOptions().setExact(true)).first());
+            Locator valueChip = card.getByText(expectedValue, new Locator.GetByTextOptions().setExact(true)).first();
+            waitUtility.waitForLocatorVisible(valueChip);
+            String chipText = valueChip.innerText().trim();
+            if (!summary.contains(chipText)) {
+                summary = summary + " " + chipText;
+            }
         }
-        return card.innerText().replaceAll("\\s+", " ").trim();
+        return summary;
     }
 
     private Locator tableColumnCells(String columnName) {
