@@ -29,6 +29,31 @@ test('removes the blank line before tagged Examples', () => {
   assert.match(formatted, /Given value <value>\n    @dataset\n    Examples: data/)
 })
 
+test('keeps Source directly above @todo', () => {
+  const formatted = formatFeature(`Feature: source tags
+  # Source: QA-1
+  @todo
+  Scenario: traceable case
+    Given one
+`)
+
+  assert.match(formatted, /# Source: QA-1\n  @todo/)
+  assert.doesNotMatch(formatted, /# Source: QA-1\n\n  @todo/)
+})
+
+test('separates Source from the previous scenario', () => {
+  const formatted = formatFeature(`Feature: source spacing
+  Scenario: previous case
+    Given one
+  # Source: QA-1
+  @todo
+  Scenario: traceable case
+    Given two
+`)
+
+  assert.match(formatted, /Given one\n\n  # Source: QA-1\n  @todo/)
+})
+
 test('retains the blank line between scenarios', () => {
   const formatted = formatFeature(`Feature: scenarios
   Scenario: first

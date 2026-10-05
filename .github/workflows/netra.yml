@@ -1,151 +1,236 @@
-name: Netra JIRA Requirement Analysis
+name: Netra QA analysis
+
+# Required GitHub Secrets:
+# - ANTHROPIC_API_KEY: API credential used only by Claude Code.
+# - JIRA_EMAIL: email of the dedicated Atlassian automation account.
+# - JIRA_API_TOKEN: scoped API token owned by JIRA_EMAIL.
+# - JIRA_BASE_URL: Atlassian Cloud site used to select the intended cloudId.
+# The workflow creates the temporary Rovo MCP configuration in RUNNER_TEMP.
 
 on:
   workflow_dispatch:
     inputs:
-      input_type:
-        description: "Which input field below is populated (provide exactly one)"
-        required: true
-        type: choice
-        options: [fixVersion, ticketKey, ticketList, jiraUrl]
-      input_value:
-        description: "The value for the chosen input_type, e.g. July-2026-portal / ABC-1234 / ABC-1234, ABC-1235 / a Jira board URL"
+      jira_scope:
+        description: "Ticket key, comma-separated ticket list, Jira URL, or fix version"
         required: true
         type: string
       detail_mode:
-        description: "full (expand linked/parent context) or fast (skip STEP 4)"
+        description: "Full expands linked and parent context; fast skips that expansion"
         required: true
         type: choice
-        options: [full, fast]
+        options:
+          - full
+          - fast
         default: full
       production_project_key:
-        description: "Project holding production bugs (STEP 7)"
-        required: false
+        description: "Jira project containing production defects"
+        required: true
         type: string
         default: HT
+      confluence_detail_mode:
+        description: "Confluence is disabled unless explicitly requested"
+        required: true
+        type: choice
+        options:
+          - disabled
+          - shallow
+          - full
+        default: disabled
+      max_budget_usd:
+        description: "Maximum Anthropic API spend for this run"
+        required: true
+        type: string
+        default: "25"
 
 permissions:
   contents: read
 
+concurrency:
+  group: netra-${{ github.ref }}-${{ inputs.jira_scope }}
+  cancel-in-progress: false
+
 jobs:
   run-netra:
+    name: Analyze Jira scope with Netra
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      CLAUDE_CODE_VERSION: ${{ vars.CLAUDE_CODE_VERSION || '2.1.281' }}
+      NETRA_OUTPUT_DIR: target/netra
+      INPUT_JIRA_SCOPE: ${{ inputs.jira_scope }}
+      INPUT_DETAIL_MODE: ${{ inputs.detail_mode }}
+      INPUT_PRODUCTION_PROJECT_KEY: ${{ inputs.production_project_key }}
+      INPUT_CONFLUENCE_DETAIL_MODE: ${{ inputs.confluence_detail_mode }}
+      INPUT_MAX_BUDGET_USD: ${{ inputs.max_budget_usd }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python (openpyxl / python-docx formatters)
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: .claude/skills/jira-analysis/requirements.txt
 
-      - name: Set up Node (Claude Code CLI + mcp-atlassian via uvx)
+      - name: Install Netra Python dependencies
+        run: >-
+          python -m pip install
+          --requirement .claude/skills/jira-analysis/requirements.txt
+
+      - name: Run Netra Python tests
+        run: >-
+          python -m unittest discover
+          -s .claude/skills/jira-analysis/tests
+          -p 'test_*.py'
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
-      - name: Install uv
-        run: pip install uv
+      - name: Install Claude subprocess sandbox
+        run: sudo apt-get update && sudo apt-get install --yes bubblewrap
 
-      - name: Install Claude Code CLI
+      - name: Install pinned Claude Code CLI
         run: |
-          npm install -g @anthropic-ai/claude-code@latest
-          claude --version
-          claude update || true
+          npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
           claude --version
 
-      - name: Debug mcp-atlassian startup
+      - name: Prepare CI MCP configuration
         env:
-          JIRA_URL: ${{ secrets.JIRA_URL }}
-          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-        run: timeout 15 uvx mcp-atlassian || true
-
-      - name: Render MCP server config (Jira/Confluence via mcp-atlassian)
-        env:
-          JIRA_URL: ${{ secrets.JIRA_URL }}
-          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
         run: |
-          cat > mcp-config.json <<EOF
-          {
-            "mcpServers": {
-              "atlassian": {
-                "command": "uvx",
-                "args": ["mcp-atlassian"],
-                "env": {
-                  "JIRA_URL": "${JIRA_URL}",
-                  "JIRA_USERNAME": "${JIRA_USERNAME}",
-                  "JIRA_API_TOKEN": "${JIRA_API_TOKEN}"
-                }
+          python - <<'PY'
+          import base64
+          import json
+          import os
+          from pathlib import Path
+
+          email = os.environ.get("JIRA_EMAIL", "").strip()
+          token = os.environ.get("JIRA_API_TOKEN", "").strip()
+          if not email or not token:
+              raise SystemExit("Missing JIRA_EMAIL or JIRA_API_TOKEN GitHub Secret.")
+
+          credentials = base64.b64encode(f"{email}:{token}".encode()).decode()
+          config = {
+              "mcpServers": {
+                  "atlassian-rovo": {
+                      "type": "http",
+                      "url": "https://mcp.atlassian.com/v2/mcp",
+                      "headers": {"Authorization": f"Basic {credentials}"},
+                  }
               }
-            }
           }
-          EOF
 
-      - name: Prepare output directory
-        run: mkdir -p netra-output
+          path = Path(os.environ["RUNNER_TEMP"]) / "netra-mcp.json"
+          path.write_text(json.dumps(config), encoding="utf-8")
+          path.chmod(0o600)
+          with Path(os.environ["GITHUB_ENV"]).open("a", encoding="utf-8") as env_file:
+              env_file.write(f"NETRA_MCP_CONFIG_PATH={path}\n")
+          PY
+
+      - name: Create clean output directory
+        run: |
+          rm -rf "${NETRA_OUTPUT_DIR}"
+          mkdir -p "${NETRA_OUTPUT_DIR}"
 
       - name: Run Netra
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          INPUT_TYPE: ${{ inputs.input_type }}
-          INPUT_VALUE: ${{ inputs.input_value }}
-          DETAIL_MODE: ${{ inputs.detail_mode }}
-          PROD_PROJECT_KEY: ${{ inputs.production_project_key }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
+          CLAUDE_CODE_SKIP_PROMPT_HISTORY: "1"
+          CLAUDE_CODE_MCP_ALLOWLIST_ENV: "1"
         run: |
-          PROMPT="/netra ${INPUT_TYPE}: ${INPUT_VALUE}, detailMode: ${DETAIL_MODE}, productionProjectKey: ${PROD_PROJECT_KEY}
-
-          CI-mode overrides for this run only (the skill's chat-oriented conventions do not apply headlessly):
-          - Replace every /home/claude/ path and /mnt/user-data/outputs/ path in the skill with ./netra-output/ (workspace-relative). Create the directory if needed.
-          - show_widget and present_files tools do not exist here — skip every widget render and skip the present_files call. Instead, after STEP 14 passes, print the HANDOFF block as plain text and leave the four artifacts in ./netra-output/.
-          - No Confluence.md upload is possible in this run — always skip STEP 6.
-          - Still perform every other step (JQL build, Jira fetch/paging/expansion, production issue fetch, triage, navigation context, cache, batching, per-ticket JSON generation, build_docx.py/build_xlsx.py/build_dashboard.py, STEP 14 verification) exactly as specified."
-
-          claude -p "$PROMPT" \
-            --mcp-config mcp-config.json \
-            --allowedTools "Bash,Read,Write,Edit,Glob,Grep,mcp__atlassian__*" \
-            --permission-mode bypassPermissions \
-            --model claude-opus-5-5 \
-            --output-format text \
-            2>&1 | tee netra-run.log
-
-      - name: Verify Netra produced all four artifacts
-        if: always()
-        run: |
-          {
-            echo "### Netra run summary"
-            echo '```'
-            tail -n 80 netra-run.log
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          shopt -s nullglob
-          docx=(netra-output/*.docx)
-          xlsx=(netra-output/*.xlsx)
-          html=(netra-output/*.html)
-          json=(netra-output/*.json)
-
-          if [ ${#docx[@]} -eq 0 ] || [ ${#xlsx[@]} -eq 0 ] || [ ${#html[@]} -eq 0 ] || [ ${#json[@]} -eq 0 ]; then
-            echo "::error::Netra did not produce all four expected artifacts (.docx, .xlsx, .html, .json) in netra-output/. It likely hit a Halting Condition instead of completing STEP 14. See the log above."
+          if [ -z "${ANTHROPIC_API_KEY}" ]; then
+            echo "::error::Missing ANTHROPIC_API_KEY GitHub Secret."
+            exit 1
+          fi
+          if [ -z "${JIRA_BASE_URL}" ]; then
+            echo "::error::Missing JIRA_BASE_URL GitHub Secret."
             exit 1
           fi
 
-      - name: Upload deliverables
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: netra-deliverables
-          path: |
-            netra-output/*.docx
-            netra-output/*.xlsx
-            netra-output/*.html
-            netra-output/*.json
+          prompt=$(printf '%s\n' \
+            "Analyze Jira scope: ${INPUT_JIRA_SCOPE}" \
+            "Use Atlassian site: ${JIRA_BASE_URL}" \
+            "detailMode: ${INPUT_DETAIL_MODE}" \
+            "productionProjectKey: ${INPUT_PRODUCTION_PROJECT_KEY}" \
+            "confluenceDetailMode: ${INPUT_CONFLUENCE_DETAIL_MODE}" \
+            "Write the authoritative result to target/netra/analysis.json." \
+            "Validate it and generate DOCX, XLSX, and HTML with the repository's deterministic builder." \
+            "Treat Jira, Confluence, and the repository as read-only sources." \
+            "Do not modify repository source files or any external system.")
 
-      - name: Upload run transcript
-        if: always()
+          claude --agent netra \
+            --print "${prompt}" \
+            --mcp-config "${NETRA_MCP_CONFIG_PATH}" \
+            --strict-mcp-config \
+            --permission-mode dontAsk \
+            --allowedTools "Read,Grep,Glob,Write,Bash,mcp__atlassian-rovo__getAccessibleAtlassianResources,mcp__atlassian-rovo__getJiraIssue,mcp__atlassian-rovo__searchJiraIssuesUsingJql,mcp__atlassian-rovo__getConfluenceContent,mcp__atlassian-rovo__search,mcp__atlassian-rovo__discover,mcp__atlassian-rovo__executeRead" \
+            --model sonnet \
+            --max-budget-usd "${INPUT_MAX_BUDGET_USD}" \
+            --no-session-persistence \
+            --output-format text
+
+      - name: Validate analysis contract
+        run: |
+          if [ ! -f "${NETRA_OUTPUT_DIR}/analysis.json" ]; then
+            echo "::error::Netra stopped without producing analysis.json. Review the Netra step for its structured blocker."
+            exit 1
+          fi
+          python .claude/skills/jira-analysis/scripts/validate-analysis.py \
+            "${NETRA_OUTPUT_DIR}/analysis.json"
+
+      - name: Rebuild deterministic deliverables
+        run: >-
+          python .claude/skills/jira-analysis/scripts/build-deliverables.py
+          "${NETRA_OUTPUT_DIR}/analysis.json"
+          --output-dir "${NETRA_OUTPUT_DIR}"
+
+      - name: Verify output and repository boundaries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          output = Path("target/netra")
+          expected = {".json", ".docx", ".xlsx", ".html"}
+          found = {path.suffix for path in output.iterdir() if path.is_file()}
+          missing = sorted(expected - found)
+          if missing:
+              raise SystemExit(f"Missing Netra artifact types: {', '.join(missing)}")
+          PY
+
+          changes=$(git status --porcelain --untracked-files=all -- . \
+            ':(exclude)target/**')
+          if [ -n "${changes}" ]; then
+            echo "::error::Netra modified files outside target/."
+            printf '%s\n' "${changes}"
+            exit 1
+          fi
+
+      - name: Add run summary
+        run: |
+          {
+            echo "### Netra QA analysis"
+            echo
+            echo "- Scope: \`${INPUT_JIRA_SCOPE}\`"
+            echo "- Detail mode: \`${INPUT_DETAIL_MODE}\`"
+            echo "- Output: \`${NETRA_OUTPUT_DIR}/\`"
+            echo "- Contract validation: passed"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload Netra deliverables
         uses: actions/upload-artifact@v4
         with:
-          name: netra-run-log
-          path: netra-run.log
+          name: netra-analysis
+          path: target/netra/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove temporary MCP configuration
+        if: always()
+        run: rm -f "${NETRA_MCP_CONFIG_PATH:-${RUNNER_TEMP}/netra-mcp.json}"

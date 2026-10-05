@@ -113,9 +113,9 @@ Feature: Medscape Soft Match Workspace in Studio Application
     And Verify user is able to delete the workspace
     Examples:
       | ADVERTISER | WORKSPACE_NAME      | SOURCE_NPI_LIST | DELIVERABLE_ID | BUSINESS     | BUSINESS_VERTICAL | PRODUCT           | PHARMA                 | BRAND                  | STATE_EXCLUSION |
-      | Medscape   | Medscape_Soft_Match | Medscape List_1 | 338482.141     | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       | Bristol-Myers Squibb   | BMS Email Suppression  |                 |
-      | Medscape   | Medscape_Soft_Match | Medscape List_2 | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts | GlaxoSmithKline_Global | GlaxoSmithKline_Global | Colorado        |
-      | Medscape   | Medscape_Soft_Match | Medscape List_3 | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 |
+      | Medscape   | Medscape_Soft_Match | Medscape List_1 |     338482.141 | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       | Bristol-Myers Squibb   | BMS Email Suppression  |                 |
+      | Medscape   | Medscape_Soft_Match | Medscape List_2 |     338482.141 | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts | GlaxoSmithKline_Global | GlaxoSmithKline_Global | Colorado        |
+      | Medscape   | Medscape_Soft_Match | Medscape List_3 |     338482.141 | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 |
 
   @todo
   Scenario Outline: Create Medscape Soft Match workspace and download the reach analysis report and delete the workspace
@@ -139,12 +139,12 @@ Feature: Medscape Soft Match Workspace in Studio Application
     And Verify user is able to delete the workspace
     Examples:
       | ADVERTISER | WORKSPACE_NAME      | SOURCE_NPI_LIST | DELIVERABLE_ID | BUSINESS     | BUSINESS_VERTICAL | PRODUCT           | PHARMA                 | BRAND                  | STATE_EXCLUSION |
-      | Medscape   | Medscape_Soft_Match | Medscape List_1 | 338482.141     | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       |                        |                        |                 |
-      | Medscape   | Medscape_Soft_Match | Medscape List_1 | 338482.141     | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       |                        |                        | Colorado        |
-      | Medscape   | Medscape_Soft_Match | Medscape List_1 | 338482.141     | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       | Bristol-Myers Squibb   | BMS Email Suppression  | Colorado        |
-      | Medscape   | Medscape_Soft_Match | Medscape List_3 | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 |
-      | Medscape   | Medscape_Soft_Match | Medscape List_2 | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 |
-      | Medscape   | Medscape_Soft_Match | Medscape List_2 | 338482.141     | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts | GlaxoSmithKline_Global | GlaxoSmithKline_Global |                 |
+      | Medscape   | Medscape_Soft_Match | Medscape List_1 |     338482.141 | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       |                        |                        |                 |
+      | Medscape   | Medscape_Soft_Match | Medscape List_1 |     338482.141 | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       |                        |                        | Colorado        |
+      | Medscape   | Medscape_Soft_Match | Medscape List_1 |     338482.141 | Medscape (7) | Sponsorship (6)   | MSITE_TOPIC       | Bristol-Myers Squibb   | BMS Email Suppression  | Colorado        |
+      | Medscape   | Medscape_Soft_Match | Medscape List_3 |     338482.141 | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 |
+      | Medscape   | Medscape_Soft_Match | Medscape List_2 |     338482.141 | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts |                        |                        |                 |
+      | Medscape   | Medscape_Soft_Match | Medscape List_2 |     338482.141 | MD/alert (3) | Sponsorship (19)  | MD/Alert e-Alerts | GlaxoSmithKline_Global | GlaxoSmithKline_Global |                 |
 
   @todo
   Scenario: Select Medscape Soft Match workspace and delete the workspace

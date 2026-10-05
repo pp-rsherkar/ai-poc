@@ -139,8 +139,8 @@ Feature: LIFE Regression - Line Item Management
     Examples:
       | LINE_ITEM  | CUSTOM_NAME  | LINE_BUDGET |
       | Line_Item_ | Custom_Field |          50 |
-
   # Source: ET-25081
+
   @todo
   Scenario: Create a line item using the new Open AI line item type
     And User clicks on Create Campaign
