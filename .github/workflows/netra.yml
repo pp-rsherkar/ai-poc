@@ -37,9 +37,15 @@ on:
           - full
         default: disabled
       max_budget_usd:
-        description: "Maximum Anthropic API spend for this run"
+        description: "Maximum Anthropic API spend for this run, or unlimited"
         required: true
-        type: string
+        type: choice
+        options:
+          - "5"
+          - "10"
+          - "25"
+          - "50"
+          - unlimited
         default: "25"
 
 permissions:
@@ -165,6 +171,14 @@ jobs:
             "Treat Jira, Confluence, and the repository as read-only sources." \
             "Do not modify repository source files or any external system.")
 
+          runtime_args=(--no-session-persistence --output-format text)
+          if [ "${INPUT_MAX_BUDGET_USD}" != "unlimited" ]; then
+            runtime_args=(
+              --max-budget-usd "${INPUT_MAX_BUDGET_USD}"
+              "${runtime_args[@]}"
+            )
+          fi
+
           claude --agent netra \
             --print "${prompt}" \
             --mcp-config "${NETRA_MCP_CONFIG_PATH}" \
@@ -172,9 +186,7 @@ jobs:
             --permission-mode dontAsk \
             --allowedTools "Read,Grep,Glob,Write,Bash,mcp__atlassian-rovo__getAccessibleAtlassianResources,mcp__atlassian-rovo__getJiraIssue,mcp__atlassian-rovo__searchJiraIssuesUsingJql,mcp__atlassian-rovo__getConfluenceContent,mcp__atlassian-rovo__search,mcp__atlassian-rovo__discover,mcp__atlassian-rovo__executeRead" \
             --model sonnet \
-            --max-budget-usd "${INPUT_MAX_BUDGET_USD}" \
-            --no-session-persistence \
-            --output-format text
+            "${runtime_args[@]}"
 
       - name: Validate analysis contract
         run: |

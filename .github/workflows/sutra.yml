@@ -1,5 +1,10 @@
 name: Sutra test design
 
+# Required GitHub Secrets:
+# - ANTHROPIC_API_KEY: API credential used only by Claude Code.
+# - QA_AUTOMATION: token permitted to push a generated branch and open a pull request.
+# Set SUTRA_DELIVERY_MODE=artifact_only as a repository variable to disable PR delivery.
+
 on:
   workflow_run:
     workflows:
@@ -9,7 +14,8 @@ on:
 
 permissions:
   actions: read
-  contents: read
+  contents: write
+  pull-requests: write
 
 concurrency:
   group: sutra-netra-run-${{ github.event.workflow_run.id }}
@@ -17,8 +23,7 @@ concurrency:
 
 jobs:
   run-sutra:
-    # Disabled until the reference implementation is reviewed and merged.
-    if: ${{ false && github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Design Gherkin from Netra artifact
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -27,6 +32,7 @@ jobs:
       NETRA_OUTPUT_DIR: target/netra
       SUTRA_OUTPUT_DIR: target/sutra
       NETRA_RUN_ID: ${{ github.event.workflow_run.id }}
+      SUTRA_DELIVERY_MODE: ${{ vars.SUTRA_DELIVERY_MODE || 'pull_request' }}
       SUTRA_MAX_BUDGET_USD: ${{ vars.SUTRA_MAX_BUDGET_USD || '25' }}
 
     steps:
@@ -83,6 +89,12 @@ jobs:
 
       - name: Prepare Sutra output and empty MCP configuration
         run: |
+          if [[ "${SUTRA_DELIVERY_MODE}" != "artifact_only" && \
+                "${SUTRA_DELIVERY_MODE}" != "pull_request" ]]; then
+            echo "::error::SUTRA_DELIVERY_MODE must be artifact_only or pull_request."
+            exit 1
+          fi
+
           rm -rf "${SUTRA_OUTPUT_DIR}"
           mkdir -p "${SUTRA_OUTPUT_DIR}"
           python - <<'PY'
@@ -153,12 +165,71 @@ jobs:
             "${NETRA_OUTPUT_DIR}/analysis.json" \
             "${SUTRA_OUTPUT_DIR}/test-design-output.json"
 
+      - name: Apply validated feature files for pull request
+        if: env.SUTRA_DELIVERY_MODE == 'pull_request'
+        run: |
+          unexpected=$(git status --porcelain --untracked-files=all -- . \
+            ':(exclude)target/**')
+          if [ -n "${unexpected}" ]; then
+            echo "::error::Sutra modified repository files before the validated apply step."
+            printf '%s\n' "${unexpected}"
+            exit 1
+          fi
+
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          from pathlib import Path
+
+          repository_root = Path.cwd().resolve()
+          output_root = (repository_root / "target/sutra").resolve()
+          features_root = (repository_root / "src/test/resources/features").resolve()
+          design = json.loads(
+              (output_root / "test-design-output.json").read_text(encoding="utf-8")
+          )
+
+          applied = []
+          for item in design["featureFiles"]:
+              if item["action"] == "unchanged":
+                  continue
+
+              artifact = Path(item["artifactPath"])
+              if not artifact.is_absolute():
+                  artifact = repository_root / artifact
+              artifact = artifact.resolve()
+              if output_root not in artifact.parents:
+                  raise SystemExit(f"Feature artifact is outside target/sutra: {artifact}")
+
+              target = (repository_root / item["targetPath"]).resolve()
+              if features_root not in target.parents:
+                  raise SystemExit(f"Feature target is outside the feature tree: {target}")
+
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(artifact, target)
+              applied.append(str(target))
+
+          path_list = Path(os.environ["RUNNER_TEMP"]) / "sutra-target-features.txt"
+          path_list.write_text("\n".join(applied), encoding="utf-8")
+          PY
+
+          mapfile -t target_features < "${RUNNER_TEMP}/sutra-target-features.txt"
+          if [ "${#target_features[@]}" -gt 0 ]; then
+            scripts/check-feature-format.sh "${target_features[@]}"
+          else
+            echo "Sutra produced no new feature-file changes for a pull request."
+          fi
+
       - name: Verify repository boundary
         run: |
-          changes=$(git status --porcelain --untracked-files=all -- . \
-            ':(exclude)target/**')
+          allowed_exclusions=(':(exclude)target/**')
+          if [ "${SUTRA_DELIVERY_MODE}" = "pull_request" ]; then
+            allowed_exclusions+=(':(exclude)src/test/resources/features/**')
+          fi
+          changes=$(git status --porcelain --untracked-files=all -- \
+            . "${allowed_exclusions[@]}")
           if [ -n "${changes}" ]; then
-            echo "::error::Sutra modified files outside target/."
+            echo "::error::Sutra modified files outside its allowed output paths."
             printf '%s\n' "${changes}"
             exit 1
           fi
@@ -171,6 +242,7 @@ jobs:
             echo "- Netra run ID: `${NETRA_RUN_ID}`"
             echo "- Source: `${NETRA_OUTPUT_DIR}/analysis.json`"
             echo "- Output: `${SUTRA_OUTPUT_DIR}/`"
+            echo "- Delivery mode: `${SUTRA_DELIVERY_MODE}`"
             echo "- Contract and Gherkin validation: passed"
             echo "- Atlassian MCP: not used"
           } >> "${GITHUB_STEP_SUMMARY}"
@@ -182,6 +254,23 @@ jobs:
           path: target/sutra/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Create pull request for generated feature files
+        if: env.SUTRA_DELIVERY_MODE == 'pull_request'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.QA_AUTOMATION }}
+          base: ${{ github.event.workflow_run.head_branch }}
+          branch: sutra/netra-${{ github.event.workflow_run.id }}
+          delete-branch: true
+          commit-message: "test: add Sutra scenarios for Netra run ${{ github.event.workflow_run.id }}"
+          title: "test: add Sutra scenarios for Netra run ${{ github.event.workflow_run.id }}"
+          body: |
+            Sutra generated these Gherkin scenarios from the validated Netra analysis produced by run `${{ github.event.workflow_run.id }}`.
+
+            The workflow aligned feature tables, checked feature formatting, and validated the structured test-design handoff before opening this pull request.
+          add-paths: |
+            src/test/resources/features/**
 
       - name: Remove temporary MCP configuration
         if: always()

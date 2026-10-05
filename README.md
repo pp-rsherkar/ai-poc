@@ -264,10 +264,12 @@ claude --agent sutra \
 In GitHub Actions, Netra and Sutra have separate workflows. A successful `Netra QA analysis` run triggers Sutra through
 GitHub's `workflow_run` event. Sutra receives the exact Netra run ID from the event, downloads the `netra-analysis`
 artifact with read-only Actions permission, validates `analysis.json`, and uploads
-`sutra-test-design-<netra-run-id>`. No secret or mutable "latest run" pointer is needed. This follows GitHub's official
+`sutra-test-design-<netra-run-id>`. By default, Sutra also applies its validated staged feature files and opens a pull
+request against the branch analyzed by Netra. Set the repository variable `SUTRA_DELIVERY_MODE` to `artifact_only` to
+retain artifact delivery without creating a pull request. PR delivery uses the `QA_AUTOMATION` secret. No secret or
+mutable "latest run" pointer is needed for the Netra handoff. This follows GitHub's official
 [cross-workflow artifact pattern](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run)
-and does not require Sutra to reconnect to Atlassian. Netra is enabled for manual dispatch. Sutra remains disabled
-until this reference implementation is reviewed and merged to the default branch.
+and does not require Sutra to reconnect to Atlassian. Netra is enabled for manual dispatch.
 
 ### AI definition review
 
