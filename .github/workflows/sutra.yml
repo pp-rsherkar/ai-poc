@@ -26,11 +26,6 @@ on:
         description: "Jira key (QA-1498), Sheet name/URL, or Doc name/URL — space-separate for sheet_and_doc"
         required: false
         type: string
-      restrict_to:
-        description: "Optional: restrict to a single ticket/tab (e.g. ET-24713) instead of the whole sheet/doc"
-        required: false
-        type: string
-
 
 permissions:
   contents: write
@@ -160,7 +155,6 @@ jobs:
           USE_NETRA_ARTIFACT: ${{ inputs.use_netra_artifact }}
           SOURCE_TYPE: ${{ inputs.source_type }}
           SOURCE_REF: ${{ inputs.source_ref }}
-          RESTRICT_TO: ${{ inputs.restrict_to }}
         run: |
           if [ "$USE_NETRA_ARTIFACT" = "true" ]; then
             XLSX_FILE=$(ls ./inputs/netra-deliverables/*.xlsx 2>/dev/null | head -n1)
@@ -176,9 +170,6 @@ jobs:
               exit 1
             fi
             PROMPT="/sutra ${SOURCE_TYPE}: ${SOURCE_REF}"
-          fi
-          if [ -n "$RESTRICT_TO" ]; then
-            PROMPT="$PROMPT (restrict to ${RESTRICT_TO} only)"
           fi
           claude -p "$PROMPT" \
             --mcp-config mcp-config.json \
