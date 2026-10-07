@@ -12,17 +12,6 @@ on:
         description: "The value for the chosen input_type, e.g. July-2026-portal / ABC-1234 / ABC-1234, ABC-1235 / a Jira board URL"
         required: true
         type: string
-      detail_mode:
-        description: "full (expand linked/parent context) or fast (skip STEP 4)"
-        required: true
-        type: choice
-        options: [full, fast]
-        default: full
-      production_project_key:
-        description: "Project holding production bugs (STEP 7)"
-        required: false
-        type: string
-        default: HT
 
 permissions:
   contents: read
@@ -90,10 +79,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           INPUT_TYPE: ${{ inputs.input_type }}
           INPUT_VALUE: ${{ inputs.input_value }}
-          DETAIL_MODE: ${{ inputs.detail_mode }}
-          PROD_PROJECT_KEY: ${{ inputs.production_project_key }}
         run: |
-          PROMPT="/netra ${INPUT_TYPE}: ${INPUT_VALUE}, detailMode: ${DETAIL_MODE}, productionProjectKey: ${PROD_PROJECT_KEY}
+          PROMPT="/netra ${INPUT_TYPE}: ${INPUT_VALUE}
           CI-mode overrides for this run only (the skill's chat-oriented conventions do not apply headlessly):
           - Replace every /home/claude/ path and /mnt/user-data/outputs/ path in the skill with ./netra-output/ (workspace-relative). Create the directory if needed.
           - show_widget and present_files tools do not exist here — skip every widget render and skip the present_files call. Instead, after STEP 14 passes, print the HANDOFF block as plain text and leave the four artifacts in ./netra-output/.
